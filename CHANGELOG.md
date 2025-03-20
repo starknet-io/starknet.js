@@ -25,6 +25,12 @@
 
 - Library defaults to RPC 0.8 with the corresponding API changes, dropped RPC 0.6 support
 
+## [6.24.1](https://github.com/starknet-io/starknet.js/compare/v6.24.0...v6.24.1) (2025-03-20)
+
+### Bug Fixes
+
+- repair snip-12 enum type nested dependency ([#1289](https://github.com/starknet-io/starknet.js/issues/1289)) ([1cd4219](https://github.com/starknet-io/starknet.js/commit/1cd4219df5e61a676bc58ba8c8673269695fc2db))
+
 # [6.24.0](https://github.com/starknet-io/starknet.js/compare/v6.23.1...v6.24.0) (2025-03-12)
 
 ### Features
