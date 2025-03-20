@@ -48,6 +48,7 @@ export * from './utils/contract';
 export * from './utils/transactionReceipt';
 export * from './utils/units';
 export * as wallet from './wallet/connect';
+export * as rosettanetWallet from './wallet/rosettanetConnect';
 export * from './global/config';
 export * from './global/logger';
 export * from './global/logger.type';
