@@ -484,7 +484,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### ETransactionType
 
-Ƭ **ETransactionType**: `ValuesType`<typeof [`ETransactionType`](types.RPC.RPCSPEC06.md#etransactiontype-1)\>
+Ƭ **ETransactionType**: `ValuesType`\<typeof [`ETransactionType`](types.RPC.RPCSPEC06.md#etransactiontype-1)\>
 
 #### Defined in
 
@@ -496,7 +496,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### ESimulationFlag
 
-Ƭ **ESimulationFlag**: `ValuesType`<typeof [`ESimulationFlag`](types.RPC.RPCSPEC06.md#esimulationflag-1)\>
+Ƭ **ESimulationFlag**: `ValuesType`\<typeof [`ESimulationFlag`](types.RPC.RPCSPEC06.md#esimulationflag-1)\>
 
 #### Defined in
 
@@ -508,7 +508,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### ETransactionStatus
 
-Ƭ **ETransactionStatus**: `ValuesType`<typeof [`ETransactionStatus`](types.RPC.RPCSPEC06.md#etransactionstatus-1)\>
+Ƭ **ETransactionStatus**: `ValuesType`\<typeof [`ETransactionStatus`](types.RPC.RPCSPEC06.md#etransactionstatus-1)\>
 
 #### Defined in
 
@@ -520,7 +520,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### ETransactionFinalityStatus
 
-Ƭ **ETransactionFinalityStatus**: `ValuesType`<typeof [`ETransactionFinalityStatus`](types.RPC.RPCSPEC06.md#etransactionfinalitystatus-1)\>
+Ƭ **ETransactionFinalityStatus**: `ValuesType`\<typeof [`ETransactionFinalityStatus`](types.RPC.RPCSPEC06.md#etransactionfinalitystatus-1)\>
 
 #### Defined in
 
@@ -532,7 +532,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### ETransactionExecutionStatus
 
-Ƭ **ETransactionExecutionStatus**: `ValuesType`<typeof [`ETransactionExecutionStatus`](types.RPC.RPCSPEC06.md#etransactionexecutionstatus-1)\>
+Ƭ **ETransactionExecutionStatus**: `ValuesType`\<typeof [`ETransactionExecutionStatus`](types.RPC.RPCSPEC06.md#etransactionexecutionstatus-1)\>
 
 #### Defined in
 
@@ -544,7 +544,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### EBlockTag
 
-Ƭ **EBlockTag**: `ValuesType`<typeof [`EBlockTag`](types.RPC.RPCSPEC06.md#eblocktag-1)\>
+Ƭ **EBlockTag**: `ValuesType`\<typeof [`EBlockTag`](types.RPC.RPCSPEC06.md#eblocktag-1)\>
 
 #### Defined in
 
@@ -556,7 +556,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### EDataAvailabilityMode
 
-Ƭ **EDataAvailabilityMode**: `ValuesType`<typeof [`EDataAvailabilityMode`](types.RPC.RPCSPEC06.md#edataavailabilitymode-1)\>
+Ƭ **EDataAvailabilityMode**: `ValuesType`\<typeof [`EDataAvailabilityMode`](types.RPC.RPCSPEC06.md#edataavailabilitymode-1)\>
 
 #### Defined in
 
@@ -568,7 +568,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### EDAMode
 
-Ƭ **EDAMode**: `ValuesType`<typeof [`EDAMode`](types.RPC.RPCSPEC06.md#edamode-1)\>
+Ƭ **EDAMode**: `ValuesType`\<typeof [`EDAMode`](types.RPC.RPCSPEC06.md#edamode-1)\>
 
 #### Defined in
 
@@ -580,7 +580,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### ETransactionVersion
 
-Ƭ **ETransactionVersion**: `ValuesType`<typeof [`ETransactionVersion`](types.RPC.RPCSPEC06.md#etransactionversion-1)\>
+Ƭ **ETransactionVersion**: `ValuesType`\<typeof [`ETransactionVersion`](types.RPC.RPCSPEC06.md#etransactionversion-1)\>
 
 #### Defined in
 
@@ -592,7 +592,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### ETransactionVersion2
 
-Ƭ **ETransactionVersion2**: `ValuesType`<typeof [`ETransactionVersion2`](types.RPC.RPCSPEC06.md#etransactionversion2-1)\>
+Ƭ **ETransactionVersion2**: `ValuesType`\<typeof [`ETransactionVersion2`](types.RPC.RPCSPEC06.md#etransactionversion2-1)\>
 
 #### Defined in
 
@@ -604,7 +604,7 @@ https://github.com/starkware-libs/starknet-specs
 
 ### ETransactionVersion3
 
-Ƭ **ETransactionVersion3**: `ValuesType`<typeof [`ETransactionVersion3`](types.RPC.RPCSPEC06.md#etransactionversion3-1)\>
+Ƭ **ETransactionVersion3**: `ValuesType`\<typeof [`ETransactionVersion3`](types.RPC.RPCSPEC06.md#etransactionversion3-1)\>
 
 #### Defined in
 

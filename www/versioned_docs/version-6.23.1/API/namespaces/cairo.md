@@ -678,7 +678,7 @@ uint512('345745685892349863487563453485768723498');
 
 ### tuple
 
-▸ **tuple**(`...args`): `Record`<`number`, `boolean` \| `object` \| [`BigNumberish`](types.md#bignumberish)\>
+▸ **tuple**(`...args`): `Record`\<`number`, `boolean` \| `object` \| [`BigNumberish`](types.md#bignumberish)\>
 
 Create unnamed tuple Cairo type (helper same as common struct type)
 
@@ -690,7 +690,7 @@ Create unnamed tuple Cairo type (helper same as common struct type)
 
 #### Returns
 
-`Record`<`number`, `boolean` \| `object` \| [`BigNumberish`](types.md#bignumberish)\>
+`Record`\<`number`, `boolean` \| `object` \| [`BigNumberish`](types.md#bignumberish)\>
 
 **`Example`**
 

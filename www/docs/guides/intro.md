@@ -39,9 +39,9 @@ npm run start # fires up a local documentation site
 
 ## Compiling Starknet contracts
 
-Please check the Starknet documentation <ins>[here](https://docs.starknet.io/documentation/quick_start/declare_a_smart_contract/#compiling_a_smart_contract)</ins> to compile Starknet contracts.
+Please check the Starknet documentation <ins>[here](https://docs.starknet.io/quick-start/overview/)</ins> to compile Starknet contracts.
 
-Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.6.1/)</ins> documentation site.
+Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts/)</ins> documentation site.
 
 ## Interacting with contracts and accounts
 

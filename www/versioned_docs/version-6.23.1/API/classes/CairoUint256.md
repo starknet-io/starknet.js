@@ -101,7 +101,7 @@ Initialization from Uint256 object
 
 ▸ **validate**(`bigNumberish`): `bigint`
 
-Validate if BigNumberish can be represented as Unit256
+Validate if BigNumberish can be represented as Uint256
 
 #### Parameters
 
@@ -123,7 +123,7 @@ Validate if BigNumberish can be represented as Unit256
 
 ▸ **validateProps**(`low`, `high`): `Object`
 
-Validate if low and high can be represented as Unit256
+Validate if low and high can be represented as Uint256
 
 #### Parameters
 
@@ -151,7 +151,7 @@ Validate if low and high can be represented as Unit256
 
 ▸ **is**(`bigNumberish`): `boolean`
 
-Check if BigNumberish can be represented as Unit256
+Check if BigNumberish can be represented as Uint256
 
 #### Parameters
 
@@ -212,7 +212,7 @@ Return bigint representation
 ▸ **toUint256HexString**(): `Object`
 
 Return Uint256 structure with HexString props
-{low: HexString, high: HexString}
+`{low: HexString, high: HexString}`
 
 #### Returns
 
@@ -234,7 +234,7 @@ Return Uint256 structure with HexString props
 ▸ **toUint256DecimalString**(): `Object`
 
 Return Uint256 structure with DecimalString props
-{low: DecString, high: DecString}
+`{low: DecString, high: DecString}`
 
 #### Returns
 

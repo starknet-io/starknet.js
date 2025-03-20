@@ -12,9 +12,9 @@ The Ledger has to be connected, unlocked and the Starknet APP has to be selected
 
 ## Type parameters
 
-| Name        | Type                                    |
-| :---------- | :-------------------------------------- |
-| `Transport` | extends `Record`<`any`, `any`\> = `any` |
+| Name        | Type                                     |
+| :---------- | :--------------------------------------- |
+| `Transport` | extends `Record`\<`any`, `any`\> = `any` |
 
 ## Hierarchy
 
@@ -30,15 +30,15 @@ The Ledger has to be connected, unlocked and the Starknet APP has to be selected
 
 ### constructor
 
-• **new LedgerSigner111**<`Transport`\>(`transport`, `accountID`, `eip2645application?`, `pathFunction?`): [`LedgerSigner111`](LedgerSigner111.md)<`Transport`\>
+• **new LedgerSigner111**\<`Transport`\>(`transport`, `accountID`, `eip2645application?`, `pathFunction?`): [`LedgerSigner111`](LedgerSigner111.md)\<`Transport`\>
 
 constructor of the LedgerSigner class.
 
 #### Type parameters
 
-| Name        | Type                                    |
-| :---------- | :-------------------------------------- |
-| `Transport` | extends `Record`<`any`, `any`\> = `any` |
+| Name        | Type                                     |
+| :---------- | :--------------------------------------- |
+| `Transport` | extends `Record`\<`any`, `any`\> = `any` |
 
 #### Parameters
 
@@ -51,7 +51,7 @@ constructor of the LedgerSigner class.
 
 #### Returns
 
-[`LedgerSigner111`](LedgerSigner111.md)<`Transport`\>
+[`LedgerSigner111`](LedgerSigner111.md)\<`Transport`\>
 
 **`Example`**
 
@@ -149,15 +149,15 @@ const myLedgerSigner = new LedgerSigner111(myNodeTransport, 0);
 
 ### getPubKey
 
-▸ **getPubKey**(): `Promise`<`string`\>
+▸ **getPubKey**(): `Promise`\<`string`\>
 
 provides the Starknet public key
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
-an hex string : 64 characters are Point X coordinate.
+an hex string: 64 characters are Point X coordinate.
 
 **`Example`**
 
@@ -178,15 +178,15 @@ const result = await myLedgerSigner.getPubKey();
 
 ### getFullPubKey
 
-▸ **getFullPubKey**(): `Promise`<`string`\>
+▸ **getFullPubKey**(): `Promise`\<`string`\>
 
 provides the full public key (with parity prefix)
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
-an hex string : 2 first characters are the parity, the 64 following characters are Point X coordinate. 64 last characters are Point Y coordinate.
+an hex string: 2 first characters are the parity, the 64 following characters are Point X coordinate. 64 last characters are Point Y coordinate.
 
 **`Example`**
 
@@ -203,13 +203,13 @@ const result = await myLedgerSigner.getFullPubKey();
 
 ### getAppVersion
 
-▸ **getAppVersion**(): `Promise`<`string`\>
+▸ **getAppVersion**(): `Promise`\<`string`\>
 
 Returns the version of the Starknet APP implemented in the Ledger.
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 version.
 
@@ -228,7 +228,7 @@ const result = await myLedgerSigner.getAppVersion();
 
 ### signMessage
 
-▸ **signMessage**(`typedDataToHash`, `accountAddress`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
+▸ **signMessage**(`typedDataToHash`, `accountAddress`): `Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign a TypedData message (SNIP-12) in a Ledger.
 
@@ -241,7 +241,7 @@ Sign a TypedData message (SNIP-12) in a Ledger.
 
 #### Returns
 
-`Promise`<[`Signature`](../namespaces/types.md#signature)\>
+`Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 The signed message.
 
@@ -266,7 +266,7 @@ const result = myLedgerSigner.signMessage(snip12Message, account0.address);
 
 ### signTransaction
 
-▸ **signTransaction**(`transactions`, `transactionsDetail`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
+▸ **signTransaction**(`transactions`, `transactionsDetail`): `Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign in a Ledger a V1 or a V3 transaction. This is a blind sign on the Ledger screen.
 
@@ -279,7 +279,7 @@ Sign in a Ledger a V1 or a V3 transaction. This is a blind sign on the Ledger sc
 
 #### Returns
 
-`Promise`<[`Signature`](../namespaces/types.md#signature)\>
+`Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 The signed transaction.
 
@@ -326,7 +326,7 @@ const result = myLedgerSigner.signTransaction([call0, call1], txDetailsV3);
 
 ### signDeployAccountTransaction
 
-▸ **signDeployAccountTransaction**(`details`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
+▸ **signDeployAccountTransaction**(`details`): `Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign in a Ledger the deployment of a new account. This is a blind sign on the Ledger screen.
 
@@ -338,7 +338,7 @@ Sign in a Ledger the deployment of a new account. This is a blind sign on the Le
 
 #### Returns
 
-`Promise`<[`Signature`](../namespaces/types.md#signature)\>
+`Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 The deploy account signature.
 
@@ -363,7 +363,7 @@ const result = myLedgerSigner.signDeployAccountTransaction(details);
 
 ### signDeclareTransaction
 
-▸ **signDeclareTransaction**(`details`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
+▸ **signDeclareTransaction**(`details`): `Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign in a Ledger the declaration of a new class. This is a blind sign on the Ledger screen.
 
@@ -375,7 +375,7 @@ Sign in a Ledger the declaration of a new class. This is a blind sign on the Led
 
 #### Returns
 
-`Promise`<[`Signature`](../namespaces/types.md#signature)\>
+`Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 The declare Signature.
 
@@ -400,7 +400,7 @@ const result = myLedgerSigner.signDeclareTransaction(details);
 
 ### signRaw
 
-▸ **signRaw**(`msgHash`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
+▸ **signRaw**(`msgHash`): `Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 Internal function to sign a hash in a Ledger Nano.
 This is a blind sign in the Ledger ; no display of what you are signing.
@@ -413,7 +413,7 @@ This is a blind sign in the Ledger ; no display of what you are signing.
 
 #### Returns
 
-`Promise`<[`Signature`](../namespaces/types.md#signature)\>
+`Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 #### Defined in
 
@@ -423,13 +423,13 @@ This is a blind sign in the Ledger ; no display of what you are signing.
 
 ### getPublicKeys
 
-▸ **getPublicKeys**(): `Promise`<`void`\>
+▸ **getPublicKeys**(): `Promise`\<`void`\>
 
 internal function to get both the Starknet public key and the full public key
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 

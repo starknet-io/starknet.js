@@ -23,7 +23,7 @@ Some important topics that have to be understood:
   - private customized version of Starknet.
   - local Starknet node (connected to mainnet or testnet).
 
-> Understanding what Starknet is and how it works is necessary. Then, you can learn how to interact with it using Starknet.js. So, at this stage, you should be aware of the content of the [Starknet official doc](https://docs.starknet.io/documentation/) and [the Starknet Book](https://book.starknet.io/).
+> Understanding what Starknet is and how it works is necessary. Then, you can learn how to interact with it using Starknet.js. So, at this stage, you should be aware of the content of the [Starknet official doc](https://docs.starknet.io).
 
 - The `RpcChannel` and `RpcProvider` classes and their methods are used for low-level communication with an RPC node.
 - Your DAPP will mainly interact with `Account` and `Contract` class instances; they use underlying `RpcProvider` connections to provide high-level methods for interacting with their Starknet namesakes, accounts and contracts.

@@ -146,7 +146,7 @@ If you don't want to filter by key, you can either remove the `keys` parameter, 
 :::
 
 :::warning CAUTION
-An event can be nested in a Cairo component (See the Cairo code of the contract to verify). In this case, the array of keys will start with additional hashes, and you will have to adapt your code in consequence ; in this example, we have to skip one hash :
+An event can be nested in a Cairo component (See the Cairo code of the contract to verify). In this case, the array of keys will start with additional hashes, and you will have to adapt your code in consequence ; in this example, we have to skip one hash:
 
 ```typescript
 const keyFilter = [[], [num.toHex(hash.starknetKeccak('EventPanic'))]];
@@ -168,7 +168,7 @@ Hereunder a code to read all the chunks of a request:
 ```typescript
 const keyFilter = [num.toHex(hash.starknetKeccak('EventPanic')), '0x8'];
 let block = await provider.getBlock('latest');
-console.log('bloc #', block.block_number);
+console.log('block #', block.block_number);
 
 let continuationToken: string | undefined = '0';
 let chunkNum: number = 1;
@@ -206,7 +206,7 @@ while (continuationToken) {
 }
 ```
 
-If you want to parse an array of events of the same contract (abi of the contract available) :
+If you want to parse an array of events of the same contract (abi of the contract available):
 
 ```typescript
 const abiEvents = events.getAbiEvents(abi);

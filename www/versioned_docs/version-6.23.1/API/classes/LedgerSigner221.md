@@ -12,9 +12,9 @@ The Ledger has to be connected, unlocked and the Starknet APP has to be selected
 
 ## Type parameters
 
-| Name        | Type                                    |
-| :---------- | :-------------------------------------- |
-| `Transport` | extends `Record`<`any`, `any`\> = `any` |
+| Name        | Type                                     |
+| :---------- | :--------------------------------------- |
+| `Transport` | extends `Record`\<`any`, `any`\> = `any` |
 
 ## Hierarchy
 
@@ -30,28 +30,28 @@ The Ledger has to be connected, unlocked and the Starknet APP has to be selected
 
 ### constructor
 
-• **new LedgerSigner221**<`Transport`\>(`transport`, `accountID`, `eip2645application?`, `pathFunction?`): [`LedgerSigner221`](LedgerSigner221.md)<`Transport`\>
+• **new LedgerSigner221**\<`Transport`\>(`transport`, `accountID`, `eip2645application?`, `pathFunction?`): [`LedgerSigner221`](LedgerSigner221.md)\<`Transport`\>
 
 constructor of the LedgerSigner class.
 
 #### Type parameters
 
-| Name        | Type                                    |
-| :---------- | :-------------------------------------- |
-| `Transport` | extends `Record`<`any`, `any`\> = `any` |
+| Name        | Type                                     |
+| :---------- | :--------------------------------------- |
+| `Transport` | extends `Record`\<`any`, `any`\> = `any` |
 
 #### Parameters
 
-| Name                  | Type                                                                    | Default value            | Description                                                                                                                                                                                                                                                                                                 |
-| :-------------------- | :---------------------------------------------------------------------- | :----------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `transport`           | `Transport`                                                             | `undefined`              | 5 transports are available to handle USB, bluetooth, Node, Web, Mobile. See Guides for more details.                                                                                                                                                                                                        |
-| `accountID`           | `number`                                                                | `undefined`              | ID of Ledger Nano (can handle 2\*\*31 accounts).                                                                                                                                                                                                                                                            |
-| `eip2645application?` | `string`                                                                | `'LedgerW'`              | A wallet is defined by an ERC2645 derivation path (6 items). One item is called `application` and can be customized. Default value is `LedgerW`.                                                                                                                                                            |
-| `pathFunction?`       | [`LedgerPathCalculation`](../namespaces/types.md#ledgerpathcalculation) | `getLedgerPathBuffer221` | defines the function that will calculate the path. By default `getLedgerPathBuffer221` is selected. If you are using APP v2.2.1 with an account created with the v1.1.1, you need to use : `typescript const myLedgerSigner = new LedgerSigner211(myNodeTransport, 0, undefined, getLedgerPathBuffer111); ` |
+| Name                  | Type                                                                    | Default value            | Description                                                                                                                                                                                                                                                                                                |
+| :-------------------- | :---------------------------------------------------------------------- | :----------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `transport`           | `Transport`                                                             | `undefined`              | 5 transports are available to handle USB, bluetooth, Node, Web, Mobile. See Guides for more details.                                                                                                                                                                                                       |
+| `accountID`           | `number`                                                                | `undefined`              | ID of Ledger Nano (can handle 2\*\*31 accounts).                                                                                                                                                                                                                                                           |
+| `eip2645application?` | `string`                                                                | `'LedgerW'`              | A wallet is defined by an ERC2645 derivation path (6 items). One item is called `application` and can be customized. Default value is `LedgerW`.                                                                                                                                                           |
+| `pathFunction?`       | [`LedgerPathCalculation`](../namespaces/types.md#ledgerpathcalculation) | `getLedgerPathBuffer221` | defines the function that will calculate the path. By default `getLedgerPathBuffer221` is selected. If you are using APP v2.2.1 with an account created with the v1.1.1, you need to use: `typescript const myLedgerSigner = new LedgerSigner211(myNodeTransport, 0, undefined, getLedgerPathBuffer111); ` |
 
 #### Returns
 
-[`LedgerSigner221`](LedgerSigner221.md)<`Transport`\>
+[`LedgerSigner221`](LedgerSigner221.md)\<`Transport`\>
 
 **`Example`**
 
@@ -185,7 +185,7 @@ const myLedgerSigner = new LedgerSigner211(myNodeTransport, 0);
 
 ### signTransaction
 
-▸ **signTransaction**(`transactions`, `transactionsDetail`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
+▸ **signTransaction**(`transactions`, `transactionsDetail`): `Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign in a Ledger a V1 or a V3 transaction. The details are displayed on the Ledger screen.
 
@@ -198,7 +198,7 @@ Sign in a Ledger a V1 or a V3 transaction. The details are displayed on the Ledg
 
 #### Returns
 
-`Promise`<[`Signature`](../namespaces/types.md#signature)\>
+`Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 The signed transaction.
 
@@ -249,7 +249,7 @@ const result = myLedgerSigner.signTransaction([call0, call1], txDetailsV3);
 
 ### signDeployAccountTransaction
 
-▸ **signDeployAccountTransaction**(`details`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
+▸ **signDeployAccountTransaction**(`details`): `Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign in a Ledger the deployment of a new account. The details are displayed on the Ledger screen.
 
@@ -261,7 +261,7 @@ Sign in a Ledger the deployment of a new account. The details are displayed on t
 
 #### Returns
 
-`Promise`<[`Signature`](../namespaces/types.md#signature)\>
+`Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 The deploy account signature.
 
@@ -367,7 +367,7 @@ Call encoded in an array of Uint8Array (each containing 7 u256).
 
 ### signTxV1
 
-▸ **signTxV1**(`txDetails`, `calls`): `Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
+▸ **signTxV1**(`txDetails`, `calls`): `Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
 
 Ask the Ledger Nano to display and sign a Starknet V1 transaction.
 
@@ -380,7 +380,7 @@ Ask the Ledger Nano to display and sign a Starknet V1 transaction.
 
 #### Returns
 
-`Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
+`Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
 
 an object including the transaction Hash and the signature
 
@@ -420,7 +420,7 @@ const res = await myLedgerSigner.signTxV1(txDet, calls);
 
 ### signTxV3
 
-▸ **signTxV3**(`txDetails`, `calls`): `Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
+▸ **signTxV3**(`txDetails`, `calls`): `Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
 
 Ask to the Ledger Nano to display and sign a Starknet V3 transaction.
 
@@ -433,7 +433,7 @@ Ask to the Ledger Nano to display and sign a Starknet V3 transaction.
 
 #### Returns
 
-`Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
+`Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
 
 an object including the transaction Hash and the signature
 
@@ -481,7 +481,7 @@ const res = await myLedgerSigner.signTxV3(txDetailsV3, calls);
 
 ### signDeployAccountV1
 
-▸ **signDeployAccountV1**(`deployAccountDetail`): `Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
+▸ **signDeployAccountV1**(`deployAccountDetail`): `Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
 
 Ask the Ledger Nano to display and sign a Starknet V1 account deployment.
 
@@ -493,7 +493,7 @@ Ask the Ledger Nano to display and sign a Starknet V1 account deployment.
 
 #### Returns
 
-`Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
+`Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
 
 an object including the transaction Hash and the signature
 
@@ -535,7 +535,7 @@ const res = await myLedgerSigner.signDeployAccountV1(deployData);
 
 ### signDeployAccountV3
 
-▸ **signDeployAccountV3**(`deployAccountDetail`): `Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
+▸ **signDeployAccountV3**(`deployAccountDetail`): `Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
 
 Ask the Ledger Nano to display and sign a Starknet V3 account deployment.
 
@@ -547,7 +547,7 @@ Ask the Ledger Nano to display and sign a Starknet V3 account deployment.
 
 #### Returns
 
-`Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
+`Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../namespaces/types.md#signature) }\>
 
 an object including the transaction Hash and the signature
 
@@ -589,15 +589,15 @@ const res = await myLedgerSigner.signDeployAccountV3(deployData);
 
 ### getPubKey
 
-▸ **getPubKey**(): `Promise`<`string`\>
+▸ **getPubKey**(): `Promise`\<`string`\>
 
 provides the Starknet public key
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
-an hex string : 64 characters are Point X coordinate.
+an hex string: 64 characters are Point X coordinate.
 
 **`Example`**
 
@@ -622,15 +622,15 @@ const result = await myLedgerSigner.getPubKey();
 
 ### getFullPubKey
 
-▸ **getFullPubKey**(): `Promise`<`string`\>
+▸ **getFullPubKey**(): `Promise`\<`string`\>
 
 provides the full public key (with parity prefix)
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
-an hex string : 2 first characters are the parity, the 64 following characters are Point X coordinate. 64 last characters are Point Y coordinate.
+an hex string: 2 first characters are the parity, the 64 following characters are Point X coordinate. 64 last characters are Point Y coordinate.
 
 **`Example`**
 
@@ -651,13 +651,13 @@ const result = await myLedgerSigner.getFullPubKey();
 
 ### getAppVersion
 
-▸ **getAppVersion**(): `Promise`<`string`\>
+▸ **getAppVersion**(): `Promise`\<`string`\>
 
 Returns the version of the Starknet APP implemented in the Ledger.
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 version.
 
@@ -680,7 +680,7 @@ const result = await myLedgerSigner.getAppVersion();
 
 ### signMessage
 
-▸ **signMessage**(`typedDataToHash`, `accountAddress`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
+▸ **signMessage**(`typedDataToHash`, `accountAddress`): `Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign a TypedData message (SNIP-12) in a Ledger.
 
@@ -693,7 +693,7 @@ Sign a TypedData message (SNIP-12) in a Ledger.
 
 #### Returns
 
-`Promise`<[`Signature`](../namespaces/types.md#signature)\>
+`Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 The signed message.
 
@@ -722,7 +722,7 @@ const result = myLedgerSigner.signMessage(snip12Message, account0.address);
 
 ### signDeclareTransaction
 
-▸ **signDeclareTransaction**(`details`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
+▸ **signDeclareTransaction**(`details`): `Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign in a Ledger the declaration of a new class. This is a blind sign on the Ledger screen.
 
@@ -734,7 +734,7 @@ Sign in a Ledger the declaration of a new class. This is a blind sign on the Led
 
 #### Returns
 
-`Promise`<[`Signature`](../namespaces/types.md#signature)\>
+`Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 The declare Signature.
 
@@ -763,7 +763,7 @@ const result = myLedgerSigner.signDeclareTransaction(details);
 
 ### signRaw
 
-▸ **signRaw**(`msgHash`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
+▸ **signRaw**(`msgHash`): `Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 Internal function to sign a hash in a Ledger Nano.
 This is a blind sign in the Ledger ; no display of what you are signing.
@@ -776,7 +776,7 @@ This is a blind sign in the Ledger ; no display of what you are signing.
 
 #### Returns
 
-`Promise`<[`Signature`](../namespaces/types.md#signature)\>
+`Promise`\<[`Signature`](../namespaces/types.md#signature)\>
 
 #### Inherited from
 
@@ -790,13 +790,13 @@ This is a blind sign in the Ledger ; no display of what you are signing.
 
 ### getPublicKeys
 
-▸ **getPublicKeys**(): `Promise`<`void`\>
+▸ **getPublicKeys**(): `Promise`\<`void`\>
 
 internal function to get both the Starknet public key and the full public key
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Inherited from
 

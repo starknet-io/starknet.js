@@ -26,16 +26,16 @@ As several Wallets can be installed in your browser, the WalletAccount needs the
 ## Select a Wallet
 
 You can ask the `get-starknet` v4 library to display a list of wallets, then it will ask you to make a choice. It will return the SWO of the wallet the user selected.  
-Using the `get-starknet-core` v4 library, you can create your own UI and logic to select the wallet. An example of DAPP using a custom UI : [**here**](https://github.com/PhilippeR26/Starknet-WalletAccount/blob/main/src/app/components/client/WalletHandle/SelectWallet.tsx), where you can select only the wallets compatible with the Starknet wallet API.  
+Using the `get-starknet-core` v4 library, you can create your own UI and logic to select the wallet. An example of DAPP using a custom UI: [**here**](https://github.com/PhilippeR26/Starknet-WalletAccount/blob/main/src/app/components/client/WalletHandle/SelectWallet.tsx), where you can select only the wallets compatible with the Starknet wallet API.  
 ![](./pictures/SelectWallet.png)
 
-So, you instantiate a new WalletAccount with :
+So, you instantiate a new WalletAccount with:
 
 ```typescript
 import { connect } from 'get-starknet'; // v4.0.0 min
 import { WalletAccount } from 'starknet'; // v6.10.0 min
 const myFrontendProviderUrl = 'https://free-rpc.nethermind.io/sepolia-juno/v0_7';
-// standard UI to select a wallet :
+// standard UI to select a wallet:
 const selectedWalletSWO = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
 const myWalletAccount = new WalletAccount({ nodeUrl: myFrontendProviderUrl }, selectedWalletSWO);
 ```
@@ -43,7 +43,7 @@ const myWalletAccount = new WalletAccount({ nodeUrl: myFrontendProviderUrl }, se
 ## Use as an account
 
 Once the new WalletAccount is created, you can use all the power of Starknet.js, exactly as a with a normal Account instance.  
-You can use for example `myWalletAccount.execute(call)` or `myWalletAccount.signMessage(typedMessage)` :
+You can use for example `myWalletAccount.execute(call)` or `myWalletAccount.signMessage(typedMessage)`:
 
 ```typescript
 const claimCall = airdropContract.populate('claim_airdrop', {
@@ -67,7 +67,7 @@ const resp = await lendContract.process_lend_asset(addr); // use of the browser 
 
 ## Use as a provider
 
-Your WalletAccount instance can be used as a provider :
+Your WalletAccount instance can be used as a provider:
 
 ```typescript
 const bl = await myWalletAccount.getBlockNumber();
@@ -78,10 +78,10 @@ You can use all the methods of the RpcProvider class. Under the hood, the Wallet
 
 ## Subscription to events
 
-You can subscribe to 2 events :
+You can subscribe to 2 events:
 
-- `accountsChanged` : Triggered each time you change the current account in the wallet.
-- `networkChanged` : Triggered each time you change the current network in the wallet.
+- `accountsChanged`: Triggered each time you change the current account in the wallet.
+- `networkChanged`: Triggered each time you change the current network in the wallet.
 
 At each change of the network, both account and network events are occurring.  
 At each change of the account, only the account event is occurring.
@@ -111,7 +111,7 @@ const handleNetwork: NetworkChangeEventHandler = (chainId?: string, accounts?: s
 selectedWalletSWO.on('networkChanged', handleNetwork);
 ```
 
-### Un-subscribe :
+### Un-subscribe:
 
 Similar to subscription, using `.off` method.
 

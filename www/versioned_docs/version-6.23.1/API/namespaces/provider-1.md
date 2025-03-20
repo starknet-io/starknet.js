@@ -24,7 +24,7 @@ custom_edit_url: null
 
 ### wait
 
-▸ **wait**(`delay`): `Promise`<`unknown`\>
+▸ **wait**(`delay`): `Promise`\<`unknown`\>
 
 Helper - Async Sleep for 'delay' time
 
@@ -36,7 +36,7 @@ Helper - Async Sleep for 'delay' time
 
 #### Returns
 
-`Promise`<`unknown`\>
+`Promise`\<`unknown`\>
 
 **`Example`**
 
@@ -331,7 +331,7 @@ default node url
 
 ```typescript
 const result = provider.getDefaultNodeUrl(constants.NetworkName.SN_MAIN, false);
-// console : "Using default public node url, please provide nodeUrl in provider options!"
+// console: "Using default public node url, please provide nodeUrl in provider options!"
 // result = "https://starknet-mainnet.public.blastapi.io/rpc/v0_7"
 ```
 

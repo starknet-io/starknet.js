@@ -146,7 +146,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate Fee for executing a list of transactions on starknet
    * Contract must be deployed for fee estimation to be possible
    *
-   * @param invocations array of transaction object containing :
+   * @param invocations array of transaction object containing:
    * - type - the type of transaction : 'DECLARE' | (multi)'DEPLOY' | (multi)'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
    * - payload - the payload of the transaction
    *

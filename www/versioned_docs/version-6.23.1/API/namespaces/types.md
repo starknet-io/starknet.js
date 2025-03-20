@@ -170,7 +170,7 @@ Hexadecimal-string array
 
 ### AllowArray
 
-Ƭ **AllowArray**<`T`\>: `T` \| `T`[]
+Ƭ **AllowArray**\<`T`\>: `T` \| `T`[]
 
 #### Type parameters
 
@@ -186,7 +186,7 @@ Hexadecimal-string array
 
 ### OptionalPayload
 
-Ƭ **OptionalPayload**<`T`\>: \{ `payload`: `T` } \| `T`
+Ƭ **OptionalPayload**\<`T`\>: \{ `payload`: `T` } \| `T`
 
 #### Type parameters
 
@@ -284,7 +284,7 @@ Hexadecimal-string array
 
 ### DeployAccountContractTransaction
 
-Ƭ **DeployAccountContractTransaction**: `Omit`<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload), `"contractAddress"`\> & \{ `signature?`: [`Signature`](types.md#signature) }
+Ƭ **DeployAccountContractTransaction**: `Omit`\<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload), `"contractAddress"`\> & \{ `signature?`: [`Signature`](types.md#signature) }
 
 #### Defined in
 
@@ -344,7 +344,7 @@ DeclareContractPayload with classHash or contract defined
 
 ### DeclareAndDeployContractPayload
 
-Ƭ **DeclareAndDeployContractPayload**: `Omit`<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload), `"classHash"`\> & [`DeclareContractPayload`](types.md#declarecontractpayload)
+Ƭ **DeclareAndDeployContractPayload**: `Omit`\<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload), `"classHash"`\> & [`DeclareContractPayload`](types.md#declarecontractpayload)
 
 #### Defined in
 
@@ -431,7 +431,7 @@ DeclareContractPayload with classHash or contract defined
 
 ### InvocationsDetails
 
-Ƭ **InvocationsDetails**: \{ `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `maxFee?`: [`BigNumberish`](types.md#bignumberish) ; `version?`: [`BigNumberish`](types.md#bignumberish) } & `Partial`<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
+Ƭ **InvocationsDetails**: \{ `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `maxFee?`: [`BigNumberish`](types.md#bignumberish) ; `version?`: [`BigNumberish`](types.md#bignumberish) } & `Partial`\<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
 
 #### Defined in
 
@@ -495,7 +495,7 @@ Contain all additional details params
 
 ### TransactionType
 
-Ƭ **TransactionType**: `ValuesType`<typeof [`TransactionType`](types.md#transactiontype-1)\>
+Ƭ **TransactionType**: `ValuesType`\<typeof [`TransactionType`](types.md#transactiontype-1)\>
 
 #### Defined in
 
@@ -507,7 +507,7 @@ Contain all additional details params
 
 ### TransactionStatus
 
-Ƭ **TransactionStatus**: `ValuesType`<typeof [`TransactionStatus`](types.md#transactionstatus-1)\>
+Ƭ **TransactionStatus**: `ValuesType`\<typeof [`TransactionStatus`](types.md#transactionstatus-1)\>
 
 #### Defined in
 
@@ -519,7 +519,7 @@ Contain all additional details params
 
 ### TransactionFinalityStatus
 
-Ƭ **TransactionFinalityStatus**: `ValuesType`<typeof [`TransactionFinalityStatus`](types.md#transactionfinalitystatus-1)\>
+Ƭ **TransactionFinalityStatus**: `ValuesType`\<typeof [`TransactionFinalityStatus`](types.md#transactionfinalitystatus-1)\>
 
 #### Defined in
 
@@ -531,7 +531,7 @@ Contain all additional details params
 
 ### TransactionExecutionStatus
 
-Ƭ **TransactionExecutionStatus**: `ValuesType`<typeof [`TransactionExecutionStatus`](types.md#transactionexecutionstatus-1)\>
+Ƭ **TransactionExecutionStatus**: `ValuesType`\<typeof [`TransactionExecutionStatus`](types.md#transactionexecutionstatus-1)\>
 
 #### Defined in
 
@@ -543,7 +543,7 @@ Contain all additional details params
 
 ### BlockStatus
 
-Ƭ **BlockStatus**: `ValuesType`<typeof [`BlockStatus`](types.md#blockstatus-1)\>
+Ƭ **BlockStatus**: `ValuesType`\<typeof [`BlockStatus`](types.md#blockstatus-1)\>
 
 #### Defined in
 
@@ -555,7 +555,7 @@ Contain all additional details params
 
 ### BlockTag
 
-Ƭ **BlockTag**: `ValuesType`<typeof [`BlockTag`](types.md#blocktag-1)\>
+Ƭ **BlockTag**: `ValuesType`\<typeof [`BlockTag`](types.md#blocktag-1)\>
 
 #### Defined in
 
@@ -619,7 +619,7 @@ Complete invocations array with account details (internal type from account -> p
 
 ### Invocations
 
-Ƭ **Invocations**: (\{ `type`: typeof [`DECLARE`](types.md#declare) } & [`OptionalPayload`](types.md#optionalpayload)<[`DeclareContractPayload`](types.md#declarecontractpayload)\> \| \{ `type`: typeof [`DEPLOY`](types.md#deploy) } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload)\>\> \| \{ `type`: typeof [`DEPLOY_ACCOUNT`](types.md#deploy_account) } & [`OptionalPayload`](types.md#optionalpayload)<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> \| \{ `type`: typeof [`INVOKE`](types.md#invoke) } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`Call`](types.md#call)\>\>)[]
+Ƭ **Invocations**: (\{ `type`: typeof [`DECLARE`](types.md#declare) } & [`OptionalPayload`](types.md#optionalpayload)\<[`DeclareContractPayload`](types.md#declarecontractpayload)\> \| \{ `type`: typeof [`DEPLOY`](types.md#deploy) } & [`OptionalPayload`](types.md#optionalpayload)\<[`AllowArray`](types.md#allowarray)\<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload)\>\> \| \{ `type`: typeof [`DEPLOY_ACCOUNT`](types.md#deploy_account) } & [`OptionalPayload`](types.md#optionalpayload)\<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> \| \{ `type`: typeof [`INVOKE`](types.md#invoke) } & [`OptionalPayload`](types.md#optionalpayload)\<[`AllowArray`](types.md#allowarray)\<[`Call`](types.md#call)\>\>)[]
 
 Invocations array user provide to bulk method (simulate)
 
@@ -804,7 +804,7 @@ Compressed or decompressed Cairo0 or Cairo1 Contract
 
 ### EntryPointType
 
-Ƭ **EntryPointType**: `ValuesType`<typeof [`EntryPointType`](types.md#entrypointtype-1)\>
+Ƭ **EntryPointType**: `ValuesType`\<typeof [`EntryPointType`](types.md#entrypointtype-1)\>
 
 #### Defined in
 
@@ -816,7 +816,7 @@ Compressed or decompressed Cairo0 or Cairo1 Contract
 
 ### Abi
 
-Ƭ **Abi**: `ReadonlyArray`<[`FunctionAbi`](types.md#functionabi) \| [`AbiEvent`](types.md#abievent) \| [`AbiStruct`](types.md#abistruct) \| [`InterfaceAbi`](types.md#interfaceabi) \| `any`\>
+Ƭ **Abi**: `ReadonlyArray`\<[`FunctionAbi`](types.md#functionabi) \| [`AbiEvent`](types.md#abievent) \| [`AbiStruct`](types.md#abistruct) \| [`InterfaceAbi`](types.md#interfaceabi) \| `any`\>
 
 ABI
 
@@ -1075,7 +1075,7 @@ format produced after compressing 'program' property
 
 ### LegacyCompiledContract
 
-Ƭ **LegacyCompiledContract**: `Omit`<[`LegacyContractClass`](types.md#legacycontractclass), `"program"`\> & \{ `program`: [`Program`](../interfaces/types.Program.md) }
+Ƭ **LegacyCompiledContract**: `Omit`\<[`LegacyContractClass`](types.md#legacycontractclass), `"program"`\> & \{ `program`: [`Program`](../interfaces/types.Program.md) }
 
 format produced after compiling .cairo to .json
 
@@ -1193,7 +1193,7 @@ sierra_program is hex array
 
 ### SierraContractClass
 
-Ƭ **SierraContractClass**: `Omit`<[`CompiledSierra`](types.md#compiledsierra), `"abi"` \| `"sierra_program_debug_info"`\> & \{ `sierra_program`: `string` ; `abi`: `string` }
+Ƭ **SierraContractClass**: `Omit`\<[`CompiledSierra`](types.md#compiledsierra), `"abi"` \| `"sierra_program_debug_info"`\> & \{ `sierra_program`: `string` ; `abi`: `string` }
 
 format produced after compressing 'sierra_program', stringifies 'abi' property and omit sierra_program_debug_info
 
@@ -1322,7 +1322,7 @@ SUBTYPES
 
 ### BlockWithTxHashes
 
-Ƭ **BlockWithTxHashes**: `Merge`<[`BlockWithTxHashes`](types.RPC.RPCSPEC06.md#blockwithtxhashes), [`BlockWithTxHashes`](types.RPC.RPCSPEC07.API.md#blockwithtxhashes)\>
+Ƭ **BlockWithTxHashes**: `Merge`\<[`BlockWithTxHashes`](types.RPC.RPCSPEC06.md#blockwithtxhashes), [`BlockWithTxHashes`](types.RPC.RPCSPEC07.API.md#blockwithtxhashes)\>
 
 #### Defined in
 
@@ -1332,7 +1332,7 @@ SUBTYPES
 
 ### ContractClassPayload
 
-Ƭ **ContractClassPayload**: `Merge`<[`ContractClass`](types.RPC.RPCSPEC06.md#contractclass), [`ContractClass`](types.RPC.RPCSPEC07.API.md#contractclass)\>
+Ƭ **ContractClassPayload**: `Merge`\<[`ContractClass`](types.RPC.RPCSPEC06.md#contractclass), [`ContractClass`](types.RPC.RPCSPEC07.API.md#contractclass)\>
 
 #### Defined in
 
@@ -1342,7 +1342,7 @@ SUBTYPES
 
 ### FeeEstimate
 
-Ƭ **FeeEstimate**: `Merge`<[`FEE_ESTIMATE`](types.RPC.RPCSPEC06.SPEC.md#fee_estimate), [`FEE_ESTIMATE`](types.RPC.RPCSPEC07.API.SPEC.md#fee_estimate)\>
+Ƭ **FeeEstimate**: `Merge`\<[`FEE_ESTIMATE`](types.RPC.RPCSPEC06.SPEC.md#fee_estimate), [`FEE_ESTIMATE`](types.RPC.RPCSPEC07.API.SPEC.md#fee_estimate)\>
 
 #### Defined in
 
@@ -1352,7 +1352,7 @@ SUBTYPES
 
 ### TransactionReceipt
 
-Ƭ **TransactionReceipt**: `Merge`<[`TransactionReceipt`](types.RPC.RPCSPEC06.md#transactionreceipt), [`TransactionReceipt`](types.RPC.RPCSPEC07.API.md#transactionreceipt)\>
+Ƭ **TransactionReceipt**: `Merge`\<[`TransactionReceipt`](types.RPC.RPCSPEC06.md#transactionreceipt), [`TransactionReceipt`](types.RPC.RPCSPEC07.API.md#transactionreceipt)\>
 
 #### Defined in
 
@@ -1605,7 +1605,7 @@ SUBTYPES
 
 ### SIMULATION_FLAG
 
-Ƭ **SIMULATION_FLAG**: `Merge`<[`SIMULATION_FLAG`](types.RPC.RPCSPEC06.SPEC.md#simulation_flag), [`SIMULATION_FLAG`](types.RPC.RPCSPEC07.API.SPEC.md#simulation_flag)\>
+Ƭ **SIMULATION_FLAG**: `Merge`\<[`SIMULATION_FLAG`](types.RPC.RPCSPEC06.SPEC.md#simulation_flag), [`SIMULATION_FLAG`](types.RPC.RPCSPEC07.API.SPEC.md#simulation_flag)\>
 
 #### Defined in
 
@@ -1675,7 +1675,7 @@ SUBTYPES
 
 ### ContractClassResponse
 
-Ƭ **ContractClassResponse**: [`LegacyContractClass`](types.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](types.md#compiledsierra), `"sierra_program_debug_info"`\>
+Ƭ **ContractClassResponse**: [`LegacyContractClass`](types.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](types.md#compiledsierra), `"sierra_program_debug_info"`\>
 
 Standardized type
 
@@ -1720,7 +1720,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### AccountInvocationsFactoryDetails
 
-Ƭ **AccountInvocationsFactoryDetails**: \{ `versions`: \`$\{ETransactionVersion}\`[] ; `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate?`: `boolean` } & `Partial`<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
+Ƭ **AccountInvocationsFactoryDetails**: \{ `versions`: \`$\{ETransactionVersion}\`[] ; `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate?`: `boolean` } & `Partial`\<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
 
 #### Defined in
 
@@ -1775,10 +1775,10 @@ CompiledSierra without '.sierra_program_debug_info'
 
 #### Type declaration
 
-| Name      | Type                                                                                                                                                       |
-| :-------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `declare` | \{ `class_hash`: [`BigNumberish`](types.md#bignumberish) } & `Partial`<[`DeclareTransactionReceiptResponse`](types.md#declaretransactionreceiptresponse)\> |
-| `deploy`  | [`DeployContractUDCResponse`](types.md#deploycontractudcresponse)                                                                                          |
+| Name      | Type                                                                                                                                                        |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `declare` | \{ `class_hash`: [`BigNumberish`](types.md#bignumberish) } & `Partial`\<[`DeclareTransactionReceiptResponse`](types.md#declaretransactionreceiptresponse)\> |
+| `deploy`  | [`DeployContractUDCResponse`](types.md#deploycontractudcresponse)                                                                                           |
 
 #### Defined in
 
@@ -1788,7 +1788,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### SimulateTransactionDetails
 
-Ƭ **SimulateTransactionDetails**: \{ `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate?`: `boolean` ; `skipExecute?`: `boolean` } & `Partial`<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
+Ƭ **SimulateTransactionDetails**: \{ `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate?`: `boolean` ; `skipExecute?`: `boolean` } & `Partial`\<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
 
 #### Defined in
 
@@ -1798,7 +1798,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### EstimateFeeAction
 
-Ƭ **EstimateFeeAction**: \{ `type`: typeof [`INVOKE`](types.md#invoke) ; `payload`: [`AllowArray`](types.md#allowarray)<[`Call`](types.md#call)\> } \| \{ `type`: typeof [`DECLARE`](types.md#declare) ; `payload`: [`DeclareContractPayload`](types.md#declarecontractpayload) } \| \{ `type`: typeof [`DEPLOY_ACCOUNT`](types.md#deploy_account) ; `payload`: [`DeployAccountContractPayload`](types.md#deployaccountcontractpayload) } \| \{ `type`: typeof [`DEPLOY`](types.md#deploy) ; `payload`: [`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload) }
+Ƭ **EstimateFeeAction**: \{ `type`: typeof [`INVOKE`](types.md#invoke) ; `payload`: [`AllowArray`](types.md#allowarray)\<[`Call`](types.md#call)\> } \| \{ `type`: typeof [`DECLARE`](types.md#declare) ; `payload`: [`DeclareContractPayload`](types.md#declarecontractpayload) } \| \{ `type`: typeof [`DEPLOY_ACCOUNT`](types.md#deploy_account) ; `payload`: [`DeployAccountContractPayload`](types.md#deployaccountcontractpayload) } \| \{ `type`: typeof [`DEPLOY`](types.md#deploy) ; `payload`: [`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload) }
 
 #### Defined in
 
@@ -1829,7 +1829,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### CairoEnum
 
-Ƭ **CairoEnum**: [`CairoCustomEnum`](../classes/CairoCustomEnum.md) \| [`CairoOption`](../classes/CairoOption.md)<`any`\> \| [`CairoResult`](../classes/CairoResult.md)<`any`, `any`\>
+Ƭ **CairoEnum**: [`CairoCustomEnum`](../classes/CairoCustomEnum.md) \| [`CairoOption`](../classes/CairoOption.md)\<`any`\> \| [`CairoResult`](../classes/CairoResult.md)\<`any`, `any`\>
 
 #### Defined in
 
@@ -1839,7 +1839,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### ValidateType
 
-Ƭ **ValidateType**: `ValuesType`<typeof [`ValidateType`](types.md#validatetype-1)\>
+Ƭ **ValidateType**: `ValuesType`\<typeof [`ValidateType`](types.md#validatetype-1)\>
 
 #### Defined in
 
@@ -1851,7 +1851,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### Uint
 
-Ƭ **Uint**: `ValuesType`<typeof [`Uint`](types.md#uint-1)\>
+Ƭ **Uint**: `ValuesType`\<typeof [`Uint`](types.md#uint-1)\>
 
 #### Defined in
 
@@ -1863,7 +1863,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### Literal
 
-Ƭ **Literal**: `ValuesType`<typeof [`Literal`](types.md#literal-1)\>
+Ƭ **Literal**: `ValuesType`\<typeof [`Literal`](types.md#literal-1)\>
 
 #### Defined in
 
@@ -1875,7 +1875,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### AsyncContractFunction
 
-Ƭ **AsyncContractFunction**<`T`\>: (...`args`: [`ArgsOrCalldataWithOptions`](types.md#argsorcalldatawithoptions)) => `Promise`<`T`\>
+Ƭ **AsyncContractFunction**\<`T`\>: (...`args`: [`ArgsOrCalldataWithOptions`](types.md#argsorcalldatawithoptions)) => `Promise`\<`T`\>
 
 #### Type parameters
 
@@ -1885,7 +1885,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 #### Type declaration
 
-▸ (`...args`): `Promise`<`T`\>
+▸ (`...args`): `Promise`\<`T`\>
 
 ##### Parameters
 
@@ -1895,7 +1895,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ##### Returns
 
-`Promise`<`T`\>
+`Promise`\<`T`\>
 
 #### Defined in
 
@@ -1982,7 +1982,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### CallOptions
 
-Ƭ **CallOptions**: `Pick`<[`ContractOptions`](types.md#contractoptions), `"blockIdentifier"` \| `"parseRequest"` \| `"parseResponse"` \| `"formatResponse"`\>
+Ƭ **CallOptions**: `Pick`\<[`ContractOptions`](types.md#contractoptions), `"blockIdentifier"` \| `"parseRequest"` \| `"parseResponse"` \| `"formatResponse"`\>
 
 #### Defined in
 
@@ -1992,7 +1992,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### InvokeOptions
 
-Ƭ **InvokeOptions**: `Pick`<[`ContractOptions`](types.md#contractoptions), `"maxFee"` \| `"nonce"` \| `"signature"` \| `"parseRequest"`\>
+Ƭ **InvokeOptions**: `Pick`\<[`ContractOptions`](types.md#contractoptions), `"maxFee"` \| `"nonce"` \| `"signature"` \| `"parseRequest"`\>
 
 #### Defined in
 
@@ -2124,7 +2124,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### V2DeclareSignerDetails
 
-Ƭ **V2DeclareSignerDetails**: `Required`<[`InvocationsDetails`](types.md#invocationsdetails)\> & \{ `classHash`: `string` ; `compiledClassHash?`: `string` ; `senderAddress`: `string` ; `chainId`: [`StarknetChainId`](../enums/constants.StarknetChainId.md) ; `version`: \`$\{ETransactionVersion2}\` }
+Ƭ **V2DeclareSignerDetails**: `Required`\<[`InvocationsDetails`](types.md#invocationsdetails)\> & \{ `classHash`: `string` ; `compiledClassHash?`: `string` ; `senderAddress`: `string` ; `chainId`: [`StarknetChainId`](../enums/constants.StarknetChainId.md) ; `version`: \`$\{ETransactionVersion2}\` }
 
 #### Defined in
 
@@ -2154,7 +2154,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### V2DeployAccountSignerDetails
 
-Ƭ **V2DeployAccountSignerDetails**: `Required`<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> & `Required`<[`InvocationsDetails`](types.md#invocationsdetails)\> & \{ `contractAddress`: [`BigNumberish`](types.md#bignumberish) ; `chainId`: [`StarknetChainId`](../enums/constants.StarknetChainId.md) ; `version`: \`$\{ETransactionVersion2}\` }
+Ƭ **V2DeployAccountSignerDetails**: `Required`\<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> & `Required`\<[`InvocationsDetails`](types.md#invocationsdetails)\> & \{ `contractAddress`: [`BigNumberish`](types.md#bignumberish) ; `chainId`: [`StarknetChainId`](../enums/constants.StarknetChainId.md) ; `version`: \`$\{ETransactionVersion2}\` }
 
 #### Defined in
 
@@ -2164,7 +2164,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### V3DeployAccountSignerDetails
 
-Ƭ **V3DeployAccountSignerDetails**: `Required`<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> & [`V3TransactionDetails`](types.md#v3transactiondetails) & \{ `contractAddress`: [`BigNumberish`](types.md#bignumberish) ; `chainId`: [`StarknetChainId`](../enums/constants.StarknetChainId.md) ; `version`: \`$\{ETransactionVersion3}\` }
+Ƭ **V3DeployAccountSignerDetails**: `Required`\<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> & [`V3TransactionDetails`](types.md#v3transactiondetails) & \{ `contractAddress`: [`BigNumberish`](types.md#bignumberish) ; `chainId`: [`StarknetChainId`](../enums/constants.StarknetChainId.md) ; `version`: \`$\{ETransactionVersion3}\` }
 
 #### Defined in
 
@@ -2248,7 +2248,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### TransactionReceiptCallbacksDefault
 
-Ƭ **TransactionReceiptCallbacksDefault**: `Partial`<[`TransactionReceiptCallbacksDefined`](types.md#transactionreceiptcallbacksdefined)\> & \{ `_`: () => `void` }
+Ƭ **TransactionReceiptCallbacksDefault**: `Partial`\<[`TransactionReceiptCallbacksDefined`](types.md#transactionreceiptcallbacksdefined)\> & \{ `_`: () => `void` }
 
 #### Defined in
 
@@ -2268,7 +2268,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### TransactionReceiptUtilityInterface
 
-Ƭ **TransactionReceiptUtilityInterface**: \{ `statusReceipt`: [`TransactionReceiptStatus`](types.md#transactionreceiptstatus) ; `value`: [`TransactionReceiptValue`](types.md#transactionreceiptvalue) ; `match`: (`callbacks`: [`TransactionReceiptCallbacks`](types.md#transactionreceiptcallbacks)) => `void` } & \{ [key in \`is$\{Capitalize<TransactionReceiptStatus\>}\`]: Function }
+Ƭ **TransactionReceiptUtilityInterface**: \{ `statusReceipt`: [`TransactionReceiptStatus`](types.md#transactionreceiptstatus) ; `value`: [`TransactionReceiptValue`](types.md#transactionreceiptvalue) ; `match`: (`callbacks`: [`TransactionReceiptCallbacks`](types.md#transactionreceiptcallbacks)) => `void` } & \{ [key in \`is$\{Capitalize\<TransactionReceiptStatus\>}\`]: Function }
 
 #### Defined in
 

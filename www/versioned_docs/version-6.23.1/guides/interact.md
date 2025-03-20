@@ -110,7 +110,7 @@ To perform a such transaction, you need:
 - a node with a rpc spec 0.6.0.
 - Starknet.js v6.
 
-You have to initialize the account this way :
+You have to initialize the account this way:
 
 ```typescript
 const account0 = new Account(
@@ -124,7 +124,7 @@ const account0 = new Account(
 
 By this way, all the transactions sent by this account are by default performed in V3 (paid with STRK). If the transactionVersion parameter is omitted, "legacy" transactions will be performed.
 
-One example of V3 transaction, using account.execute :
+One example of V3 transaction, using account.execute:
 
 ```typescript
 const myCall = myTestContract.populate('test_fail', [100]);
@@ -155,12 +155,12 @@ if (txR.isSuccess()) {
 ```
 
 Yes, it's much more complicated. Let's see in detail.  
-In fact, Starknet v0.13.0 is using few of these parameters :  
+In fact, Starknet v0.13.0 is using few of these parameters:  
 `feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L2` is not yet accepted.  
 `feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1` is accepted.  
-`maxFee : 10**15` : value not taken into account in V3  
-`tip: 10**13` : value not yet taken into account  
-`paymasterData: []` : only empty value currently authorized
+`maxFee: 10**15`: value not taken into account in V3  
+`tip: 10**13`: value not yet taken into account  
+`paymasterData: []`: only empty value currently authorized
 
 ```typescript
 l1_gas: {

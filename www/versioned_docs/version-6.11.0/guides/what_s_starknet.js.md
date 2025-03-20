@@ -23,7 +23,7 @@ Some important topics that have to be understood:
   - private customized version of Starknet.
   - local Starknet node (connected to mainnet or testnet).
 
-> Understanding what Starknet is and how it works is necessary. Then, you can learn how to interact with it using Starknet.js. So, at this stage, you should be aware of the content of the [Starknet official doc](https://docs.starknet.io/documentation/) and [the Starknet Book](https://book.starknet.io/).
+> Understanding what Starknet is and how it works is necessary. Then, you can learn how to interact with it using Starknet.js. So, at this stage, you should be aware of the content of the [Starknet official doc](https://docs.starknet.io).
 
 - Only the `RpcProvider` object communicates directly with the network; your DAPP will mainly interact with `Account` and `Contract` objects. You will define with the `RpcProvider` with which network you want to work. You can use the provider to access some low-level data from the network (block, timestamp, ...).
 - `Signer` and `Utils` objects contain many useful functions for interaction with Starknet.js.
