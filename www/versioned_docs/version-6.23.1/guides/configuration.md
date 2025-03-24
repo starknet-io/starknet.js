@@ -42,7 +42,7 @@ config.hasKey('newKey');
 
 Default global configuration is the initial state that global configuration starts with.
 
-Details can be found in [global/constants.ts](https://github.com/starknet-io/starknet.js/blob/develop/src/global/constants.ts)
+Details can be found in [global/constants.ts](https://github.com/starknet-io/starknet.js/blob/v6.23.1/src/global/constants.ts)
 
 ```ts
   logLevel: 'INFO', // verbosity levels of the system logger, more details under logger

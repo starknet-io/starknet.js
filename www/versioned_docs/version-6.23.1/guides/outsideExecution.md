@@ -18,7 +18,7 @@ Outside Execution provides several benefits:
 ### Check SNIP-9 Support
 
 The account that will sign the outside transaction has to be compatible with SNIP-9 (V1 or V2).  
-At mid-2024 :
+At mid-2024:
 
 |       account        | compatibility |
 | :------------------: | :-----------: |
@@ -27,7 +27,7 @@ At mid-2024 :
 |    Braavos v1.0.0    |      v2       |
 | OpenZeppelin v0.17.0 |    v2 (\*)    |
 
-> (\*): only OpenZeppelin accounts including the `src9` component :  
+> (\*): only OpenZeppelin accounts including the `src9` component:  
 > Starknet account: class = [0x540d7f5ec7ecf317e68d48564934cb99259781b1ee3cedbbc37ec5337f8e688](https://voyager.online/class/0x0540d7f5ec7ecf317e68d48564934cb99259781b1ee3cedbbc37ec5337f8e688)  
 > ETH account: class = [0x3940bc18abf1df6bc540cabadb1cad9486c6803b95801e57b6153ae21abfe06](https://voyager.online/class/0x3940bc18abf1df6bc540cabadb1cad9486c6803b95801e57b6153ae21abfe06)
 
@@ -61,7 +61,7 @@ const call1: Call = {
 };
 ```
 
-Then, you have to initialize some parameters :
+Then, you have to initialize some parameters:
 
 - The `caller` is the address of the account that will execute the outside transaction.
 - The transaction can be executed in a time frame that is defined in `execute_after` and `execute_before`, using Unix timestamp.
@@ -122,7 +122,7 @@ const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTr
 
 ### Process the Outside Execution
 
-Finally, if you are in the time frame, you can perform the Outside Execution, using the executor Account :
+Finally, if you are in the time frame, you can perform the Outside Execution, using the executor Account:
 
 ```typescript
 const executorAccount = new Account(provider, executorAddress, executorPrivateKey);
@@ -159,7 +159,7 @@ In this process, **the private key of the Ledger account is never exposed**.
 
 First, create a Ledger account in devnet-rs. You will find some documentation [here](./signature.md#signing-with-a-ledger-hardware-wallet), and an example [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/4.deployLedgerAccount.ts).
 
-The initial balances are :
+The initial balances are:
 
 |                 account | ETH balance |
 | ----------------------: | ----------- |
@@ -240,7 +240,7 @@ const res0 = await executorAccount.executeFromOutside(outsideTransaction2);
 await myProvider.waitForTransaction(res0.transaction_hash);
 ```
 
-The balances are now :
+The balances are now:
 
 |                 account | ETH balance |
 | ----------------------: | ----------- |
@@ -257,7 +257,7 @@ const res1 = await executorAccount.executeFromOutside([outsideTransaction1, outs
 await myProvider.waitForTransaction(res1.transaction_hash);
 ```
 
-The balances are finally :
+The balances are finally:
 
 |                 account | ETH balance |
 | ----------------------: | ----------- |

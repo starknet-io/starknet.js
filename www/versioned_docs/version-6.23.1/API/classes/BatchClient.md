@@ -70,7 +70,7 @@ custom_edit_url: null
 
 ### pendingRequests
 
-• `Private` **pendingRequests**: `Record`<`string` \| `number`, [`RequestBody`](../namespaces/types.RPC.JRPC.md#requestbody)\> = `{}`
+• `Private` **pendingRequests**: `Record`\<`string` \| `number`, [`RequestBody`](../namespaces/types.RPC.JRPC.md#requestbody)\> = `{}`
 
 #### Defined in
 
@@ -80,7 +80,7 @@ custom_edit_url: null
 
 ### batchPromises
 
-• `Private` **batchPromises**: `Record`<`string` \| `number`, `Promise`<[`ResponseBody`](../namespaces/types.RPC.JRPC.md#responsebody)[]\>\> = `{}`
+• `Private` **batchPromises**: `Record`\<`string` \| `number`, `Promise`\<[`ResponseBody`](../namespaces/types.RPC.JRPC.md#responsebody)[]\>\> = `{}`
 
 #### Defined in
 
@@ -100,7 +100,7 @@ custom_edit_url: null
 
 ### delayPromise
 
-• `Private` `Optional` **delayPromise**: `Promise`<`void`\>
+• `Private` `Optional` **delayPromise**: `Promise`\<`void`\>
 
 #### Defined in
 
@@ -128,11 +128,11 @@ custom_edit_url: null
 
 ### baseFetch
 
-• `Private` **baseFetch**: (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`<`Response`\>
+• `Private` **baseFetch**: (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`\<`Response`\>
 
 #### Type declaration
 
-▸ (`input`, `init?`): `Promise`<`Response`\>
+▸ (`input`, `init?`): `Promise`\<`Response`\>
 
 ##### Parameters
 
@@ -143,7 +143,7 @@ custom_edit_url: null
 
 ##### Returns
 
-`Promise`<`Response`\>
+`Promise`\<`Response`\>
 
 #### Defined in
 
@@ -153,11 +153,11 @@ custom_edit_url: null
 
 ### wait
 
-▸ **wait**(): `Promise`<`void`\>
+▸ **wait**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
@@ -167,7 +167,7 @@ custom_edit_url: null
 
 ### addPendingRequest
 
-▸ **addPendingRequest**<`T`\>(`method`, `params?`, `id?`): `string` \| `number`
+▸ **addPendingRequest**\<`T`\>(`method`, `params?`, `id?`): `string` \| `number`
 
 #### Type parameters
 
@@ -195,7 +195,7 @@ custom_edit_url: null
 
 ### sendBatch
 
-▸ **sendBatch**(`requests`): `Promise`<`any`\>
+▸ **sendBatch**(`requests`): `Promise`\<`any`\>
 
 #### Parameters
 
@@ -205,7 +205,7 @@ custom_edit_url: null
 
 #### Returns
 
-`Promise`<`any`\>
+`Promise`\<`any`\>
 
 #### Defined in
 
@@ -215,7 +215,7 @@ custom_edit_url: null
 
 ### fetch
 
-▸ **fetch**<`T`, `TResponse`\>(`method`, `params?`, `id?`): `Promise`<`TResponse`\>
+▸ **fetch**\<`T`, `TResponse`\>(`method`, `params?`, `id?`): `Promise`\<`TResponse`\>
 
 Automatically batches and fetches JSON-RPC calls in a single request.
 
@@ -236,7 +236,7 @@ Automatically batches and fetches JSON-RPC calls in a single request.
 
 #### Returns
 
-`Promise`<`TResponse`\>
+`Promise`\<`TResponse`\>
 
 JSON-RPC Response
 

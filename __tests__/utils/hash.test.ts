@@ -51,9 +51,9 @@ describe('getSelector', () => {
 
 describe('L1->L2 messaging', () => {
   // L1 tx for a message L1->L2
-  // data extracted from :
+  // data extracted from:
   // https://sepolia.etherscan.io/tx/0xd82ce7dd9f3964d89d2eb9d555e1460fb7792be274950abe578d610f95cc40f5
-  // data extracted from etherscan :
+  // data extracted from etherscan:
   const l1FromAddress = '0x0000000000000000000000008453fc6cd1bcfe8d4dfc069c400b433054d47bdc';
   const l2ToAddress = 2158142789748719025684046545159279785659305214176670733242887773692203401023n;
   const l2Selector = 774397379524139446221206168840917193112228400237242521560346153613428128537n;

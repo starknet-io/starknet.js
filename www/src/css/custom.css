@@ -53,3 +53,12 @@ html[class*="docs-version-4"] div[class*="announcementBar"] {
 .hidden {
   display: none;
 }
+
+li.theme-doc-sidebar-item-category-level-1:first-of-type
+>ul.menu__list:first-of-type
+>li[class*="-level-2"] {
+  > a.menu__link,
+  > * > a.menu__link {
+    text-transform: capitalize;
+  }
+}

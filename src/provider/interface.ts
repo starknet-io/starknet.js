@@ -90,7 +90,7 @@ export abstract class ProviderInterface {
    * @param {BigNumberish} l2TxHash L2 transaction hash
    * @returns {string} Hex string of L1 message hash
    * @example
-   * In Sepolia Testnet :
+   * In Sepolia Testnet:
    * ```typescript
    * const result = provider.getL1MessageHash('0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819');
    * // result = '0x55b3f8b6e607fffd9b4d843dfe8f9b5c05822cd94fcad8797deb01d77805532a'
@@ -133,7 +133,7 @@ export abstract class ProviderInterface {
    * Get the value of the storage (contract's variable) at the given address and key
    *
    * @param contractAddress
-   * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
+   * @param key - from starknetKeccak()
    * @param blockIdentifier - block identifier
    * @returns the value of the storage variable
    */
@@ -147,7 +147,7 @@ export abstract class ProviderInterface {
    * Gets the transaction information from a tx id.
    *
    * @param transactionHash
-   * @returns the transaction object \{ transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? \}
+   * @returns the transaction object `{ transaction_id, status, transaction, block_number?, transaction_index?, transaction_failure_reason? }`
    */
   public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
 

@@ -16,20 +16,20 @@ Then you need to select a node. A node is a safe way to connect with the Starkne
   > Main development devnets are Starknet-devnet-rs, Madara, ...
 
 Each node is communicating with Starknet.js using a rpc specification. Most of the nodes are able to use 2 rpc spec versions.  
-For example, this node is compatible with v0.6.0 & v0.7.0, using the following entry points :
+For example, this node is compatible with v0.6.0 & v0.7.0, using the following entry points:
 
 - "https://free-rpc.nethermind.io/sepolia-juno/v0_6"
 - "https://free-rpc.nethermind.io/sepolia-juno/v0_7"
 
-From rpc spec v0.5.0, you can request the rpc spec version that uses a node address :
+From rpc spec v0.5.0, you can request the rpc spec version that uses a node address:
 
 ```typescript
 const resp = await myProvider.getSpecVersion();
 console.log('rpc version =', resp);
-// result : rpc version = 0.7.0
+// result: rpc version = 0.7.0
 ```
 
-On Starknet.js side, you have to select the proper version, to be in accordance with the node you want to use :
+On Starknet.js side, you have to select the proper version, to be in accordance with the node you want to use:
 
 | Rpc spec version of your node | Starknet.js version to use   |
 | :---------------------------: | ---------------------------- |
@@ -91,7 +91,7 @@ const providerAlchemyMainnet = new RpcProvider({
 const providerMainnetNethermindPublic = new RpcProvider({
   nodeUrl: 'https://free-rpc.nethermind.io/mainnet-juno/v0_7',
 });
-// Public Blast node rpc 0.7.0 for Mainnet (0.4, 0.5 & 0_6 also available) :
+// Public Blast node rpc 0.7.0 for Mainnet (0.4, 0.5 & 0_6 also available):
 const providerBlastMainnet = new RpcProvider({
   nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7',
 });
@@ -112,15 +112,15 @@ The Goerli testnet is no more in service.
 ### Sepolia Testnet
 
 ```typescript
-// Infura node rpc 0.5.1 for Sepolia Testnet :
+// Infura node rpc 0.5.1 for Sepolia Testnet:
 const providerInfuraSepoliaTestnet = new RpcProvider({
   nodeUrl: 'https://starknet-sepolia.infura.io/v3/' + infuraKey,
 });
-// Public Nethermind node rpc 0.7.0 for Sepolia Testnet (0_6 also available) :
+// Public Nethermind node rpc 0.7.0 for Sepolia Testnet (0_6 also available):
 const providerSepoliaTestnetNethermindPublic = new RpcProvider({
   nodeUrl: 'https://free-rpc.nethermind.io/sepolia-juno/v0_7',
 });
-// Public Blast node rpc 0.7.0 for Sepolia Testnet (0_6 also available) :
+// Public Blast node rpc 0.7.0 for Sepolia Testnet (0_6 also available):
 const providerSepoliaTestnetBlastPublic = new RpcProvider({
   nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
 });

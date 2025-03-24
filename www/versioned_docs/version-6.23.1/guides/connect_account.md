@@ -26,9 +26,9 @@ Addresses and private keys are displayed on the console at initialization.
 The result for `account #0`:
 
 ```text
-Address    : 0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691
+Address   : 0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691
 Private key: 0x71d7bb07b9a64f6f78ac4c816aff4da9
-Public key : 0x7e52885445756b313ea16849145363ccb73fb4ab0440dbac333cf9d13de82b9
+Public key: 0x7e52885445756b313ea16849145363ccb73fb4ab0440dbac333cf9d13de82b9
 ```
 
 Then you can use this code:

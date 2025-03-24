@@ -10,7 +10,7 @@ You can exchange messages between L1 & L2 networks:
 - L2 Starknet testnet ↔️ L1 Sepolia ETH testnet.
 - L2 local Starknet devnet ↔️ L1 local ETH testnet (anvil, ...).
 
-You can find an explanation of the global mechanism [here](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
+You can find an explanation of the global mechanism [here](https://docs.starknet.io/architecture-and-concepts/network-architecture/messaging-mechanism/).
 
 Most of the code for this messaging process will be written in Cairo, but Starknet.js provides some functionalities for this subject.
 
@@ -50,10 +50,10 @@ If the fee is paid in L1, the Cairo contract at `to_Address` is automatically ex
 
 ### L1 ➡️ L2 hashes
 
-Starknet.js proposes 2 functions to calculate hashes related to a L1 ➡️ L2 message :
+Starknet.js proposes 2 functions to calculate hashes related to a L1 ➡️ L2 message:
 
 - The L2 message hash:  
-  For a L1 tx requesting a message L1->L2, some data extracted from etherscan : https://sepolia.etherscan.io/tx/0xd82ce7dd9f3964d89d2eb9d555e1460fb7792be274950abe578d610f95cc40f5
+  For a L1 tx requesting a message L1->L2, some data extracted from etherscan: https://sepolia.etherscan.io/tx/0xd82ce7dd9f3964d89d2eb9d555e1460fb7792be274950abe578d610f95cc40f5
 
   ```typescript
   const l1FromAddress = '0x0000000000000000000000008453fc6cd1bcfe8d4dfc069c400b433054d47bdc';
@@ -77,7 +77,7 @@ Starknet.js proposes 2 functions to calculate hashes related to a L1 ➡️ L2 m
   // l1ToL2MessageHash = '0x2e350fa9d830482605cb68be4fdb9f0cb3e1f95a0c51623ac1a5d1bd997c2090'
   ```
 
-  Can be verified here : https://sepolia.starkscan.co/message/0x2e350fa9d830482605cb68be4fdb9f0cb3e1f95a0c51623ac1a5d1bd997c2090#messagelogs
+  Can be verified here: https://sepolia.starkscan.co/message/0x2e350fa9d830482605cb68be4fdb9f0cb3e1f95a0c51623ac1a5d1bd997c2090#messagelogs
 
 - The L2 transaction hash:  
   For the same message:
@@ -92,7 +92,7 @@ Starknet.js proposes 2 functions to calculate hashes related to a L1 ➡️ L2 m
   );
   // l1ToL2TransactionHash = '0x67d959200d65d4ad293aa4b0da21bb050a1f669bce37d215c6edbf041269c07'
   ```
-  Can be verified here : https://sepolia.starkscan.co/tx/0x067d959200d65d4ad293aa4b0da21bb050a1f669bce37d215c6edbf041269c07
+  Can be verified here: https://sepolia.starkscan.co/tx/0x067d959200d65d4ad293aa4b0da21bb050a1f669bce37d215c6edbf041269c07
 
 ## L2 ➡️ L1 messages
 
@@ -112,7 +112,7 @@ The result is in `estimatedFee1`, of type BN.
 
 ### L2 ➡️ L1 hash
 
-Starknet.js proposes a function to calculate the L1 ➡️ L2 message hash :
+Starknet.js proposes a function to calculate the L1 ➡️ L2 message hash:
 
 ```typescript
 const l2TransactionHash = '0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819';
@@ -120,4 +120,4 @@ const l1MessageHash = await provider.getL1MessageHash(l2TransactionHash);
 // l1MessageHash = '0x55b3f8b6e607fffd9b4d843dfe8f9b5c05822cd94fcad8797deb01d77805532a'
 ```
 
-Can be verified here : https://sepolia.voyager.online/tx/0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819#messages
+Can be verified here: https://sepolia.voyager.online/tx/0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819#messages
