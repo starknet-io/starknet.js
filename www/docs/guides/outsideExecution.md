@@ -269,3 +269,29 @@ The balances are finally :
 :::info
 The complete code of this example is available [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/Starknet131/Starknet131-devnet/17.outsideExecuteLedger.ts).
 :::
+
+## Estimate fees for an outside execution:
+
+On executor side, if you want to estimate how many fees you will pay:
+
+```typescript
+const outsideExecutionCall: Call[] =
+  outsideExecution.buildExecuteFromOutsideCall(outsideTransaction1);
+const estimateFee = await executorAccount.estimateFee(outsideExecutionCall);
+```
+
+## Simulate an outside execution:
+
+On executor side, if you want to simulate the transaction:
+
+```typescript
+const outsideExecutionCall: Call[] =
+  outsideExecution.buildExecuteFromOutsideCall(outsideTransaction1);
+const invocations: Invocations = [
+  {
+    type: TransactionType.INVOKE,
+    payload: outsideExecutionCall,
+  },
+];
+const responseSimulate = await executorAccount.simulateTransaction(invocations);
+```

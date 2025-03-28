@@ -8,6 +8,7 @@ import {
   Uint,
 } from '../../types';
 import assert from '../assert';
+import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { isHex, toBigInt } from '../num';
@@ -238,14 +239,39 @@ const validateTuple = (parameter: any, input: AbiEntry) => {
   // todo: skip tuple structural validation for now
 };
 
-const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enums: AbiEnums) => {
-  const baseType = getArrayType(input.type);
+const validateArray = (
+  parameterArray: Array<any> | Record<string, any>,
+  input: AbiEntry,
+  structs: AbiStructs,
+  enums: AbiEnums
+) => {
+  const isNormalArray = isTypeArray(input.type);
+  const baseType = isNormalArray
+    ? getArrayType(input.type)
+    : CairoFixedArray.getFixedArrayType(input.type);
+
   // Long text (special case when parameter is not an array but long text)
-  if (isTypeFelt(baseType) && isLongText(parameter)) {
+  if (isNormalArray && isTypeFelt(baseType) && isLongText(parameterArray)) {
     return;
   }
-
-  assert(Array.isArray(parameter), `Validate: arg ${input.name} should be an Array`);
+  let parameter: Array<any> = [];
+  if (isNormalArray) {
+    assert(Array.isArray(parameterArray), `Validate: arg ${input.name} should be an Array`);
+    parameter = parameterArray;
+  } else {
+    // fixedArray
+    switch (true) {
+      case Array.isArray(parameterArray):
+        // the type cast is just for the documentation generation, TS narrowing works as expected
+        parameter = parameterArray as any;
+        break;
+      case typeof parameterArray === 'object':
+        parameter = Object.values(parameterArray);
+        break;
+      default:
+        throw new Error(`Validate: arg ${input.name} should be an Array or an object.`);
+    }
+  }
 
   switch (true) {
     case isTypeFelt(baseType):
@@ -256,7 +282,7 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
       break;
 
     case isTypeArray(baseType):
-      parameter.forEach((param: BigNumberish) =>
+      parameter.forEach((param: any) =>
         validateArray(param, { name: '', type: baseType }, structs, enums)
       );
       break;
@@ -408,7 +434,7 @@ export default function validateFields(
       case isTypeByteArray(input.type):
         validateByteArray(parameter, input);
         break;
-      case isTypeArray(input.type):
+      case isTypeArray(input.type) || CairoFixedArray.isTypeFixedArray(input.type):
         validateArray(parameter, input, structs, enums);
         break;
       case isTypeStruct(input.type, structs):
