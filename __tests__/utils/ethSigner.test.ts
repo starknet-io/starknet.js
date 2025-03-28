@@ -5,6 +5,7 @@ import {
   Contract,
   EthSigner,
   Provider,
+  ProviderInterface,
   addAddressPadding,
   cairo,
   encode,
@@ -21,10 +22,11 @@ import { validateAndParseEthAddress } from '../../src/utils/eth';
 import { ETransactionVersion } from '../../src/types/api';
 import {
   contracts,
+  createTestProvider,
   describeIfDevnet,
-  devnetETHtokenAddress,
+  ETHtokenAddress,
   getTestAccount,
-  getTestProvider,
+  STRKtokenAddress,
 } from '../config/fixtures';
 
 describe('Ethereum signer', () => {
@@ -63,11 +65,14 @@ describe('Ethereum signer', () => {
   });
 
   describe('cairo v2.5.3 new secp256k1 type', () => {
-    const provider = new Provider(getTestProvider());
+    let provider: ProviderInterface;
+    let account: Account;
     let ethPubKContract: Contract;
-    const account = getTestAccount(provider);
 
     beforeAll(async () => {
+      provider = new Provider(await createTestProvider());
+      account = getTestAccount(provider);
+
       const { deploy } = await account.declareAndDeploy({
         contract: contracts.EthPubk.sierra,
         casm: contracts.EthPubk.casm,
@@ -97,10 +102,14 @@ describe('Ethereum signer', () => {
 
   describeIfDevnet('ETH account tx V2', () => {
     // devnet only because estimateFee in Sepolia v0.13.1 are producing widely different numbers.
-    const provider = new Provider(getTestProvider());
-    const account = getTestAccount(provider);
+    let provider: ProviderInterface;
+    let account: Account;
     let ethAccount: Account;
+
     beforeAll(async () => {
+      provider = new Provider(await createTestProvider());
+      account = getTestAccount(provider);
+
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
         contract: contracts.EthAccount.sierra,
         casm: contracts.EthAccount.casm,
@@ -126,7 +135,13 @@ describe('Ethereum signer', () => {
         0
       );
 
-      ethAccount = new Account(provider, contractETHAccountAddress, ethSigner);
+      ethAccount = new Account(
+        provider,
+        contractETHAccountAddress,
+        ethSigner,
+        undefined,
+        ETransactionVersion.V2
+      );
       const deployPayload = {
         classHash: decClassHash,
         constructorCalldata: accountETHconstructorCalldata,
@@ -136,7 +151,7 @@ describe('Ethereum signer', () => {
         await ethAccount.estimateAccountDeployFee(deployPayload);
       // fund account with ETH
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetETHtokenAddress,
+        contractAddress: ETHtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: contractETHAccountAddress,
@@ -154,15 +169,14 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account transaction V2', async () => {
-      const ethContract2 = new Contract(contracts.Erc20.abi, devnetETHtokenAddress, ethAccount);
-      const respTransfer = await ethContract2.transfer(
-        account.address,
-        cairo.uint256(1 * 10 ** 4),
-        { maxFee: 1 * 10 ** 16 }
-      );
+      const ethContract2 = new Contract(contracts.Erc20.abi, ETHtokenAddress, ethAccount);
+      const respTransfer = await ethContract2
+        .withOptions({ maxFee: 1 * 10 ** 16 })
+        .transfer(account.address, cairo.uint256(1 * 10 ** 4));
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
       if (txR.isSuccess()) {
-        expect(txR.execution_status).toBe('SUCCEEDED');
+        // TODO: @PhilippeR26 Why this is not working, fix 'as any' hotfix
+        expect((txR as any).execution_status).toBe('SUCCEEDED');
       } else {
         fail('txR not success');
       }
@@ -187,12 +201,14 @@ describe('Ethereum signer', () => {
 
   describeIfDevnet('ETH account tx V3', () => {
     // devnet only because estimateFee in Sepolia v0.13.1 are producing widely different numbers.
-    const provider = new Provider(getTestProvider());
-    const account = getTestAccount(provider);
-    const devnetSTRKtokenAddress =
-      '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d';
+    let provider: Provider;
+    let account: Account;
     let ethAccount: Account;
+
     beforeAll(async () => {
+      provider = new Provider(await createTestProvider());
+      account = getTestAccount(provider);
+
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
         contract: contracts.EthAccount.sierra,
         casm: contracts.EthAccount.casm,
@@ -233,7 +249,7 @@ describe('Ethereum signer', () => {
       });
       // fund account with STRK
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetSTRKtokenAddress,
+        contractAddress: STRKtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: contractETHAccountAddress,
@@ -264,13 +280,13 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account transaction V3', async () => {
-      const strkContract2 = new Contract(contracts.Erc20.abi, devnetSTRKtokenAddress, ethAccount);
+      const strkContract2 = new Contract(contracts.Erc20.abi, STRKtokenAddress, ethAccount);
       const txCallData = strkContract2.populate('transfer', [
         account.address,
         cairo.uint256(1 * 10 ** 4),
       ]);
       const feeTransfer = await ethAccount.estimateInvokeFee(txCallData);
-      const respTransfer = await ethAccount.execute(txCallData, undefined, {
+      const respTransfer = await ethAccount.execute(txCallData, {
         resourceBounds: {
           l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
           l1_gas: {
@@ -282,7 +298,7 @@ describe('Ethereum signer', () => {
 
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
       if (txR.isSuccess()) {
-        expect(txR.execution_status).toBe('SUCCEEDED');
+        expect((txR as any).execution_status).toBe('SUCCEEDED');
       } else {
         fail('txR not success');
       }

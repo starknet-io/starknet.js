@@ -12,6 +12,7 @@ import {
   Account,
   BigNumberish,
   StarknetDomain,
+  TypedDataRevision,
   num,
   stark,
   typedData,
@@ -22,7 +23,6 @@ import { PRIME } from '../../src/global/constants';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
 import {
-  TypedDataRevision,
   encodeType,
   encodeValue,
   getMessageHash,

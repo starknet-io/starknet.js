@@ -1,5 +1,6 @@
-import { ETransactionVersion } from '../types/api';
-import { type LogLevel } from './logger.type';
+import type { FeeMarginPercentage } from '../types';
+import { ETransactionVersion, RPCSPEC08 } from '../types/api';
+import type { LogLevel } from './logger.type';
 
 export { IS_BROWSER } from '../utils/encode';
 
@@ -13,7 +14,7 @@ export const TEXT_TO_FELT_MAX_LEN = 31;
  * types.RPC.ETransactionVersion
  * For BN do BigInt(TRANSACTION_VERSION.*)
  */
-export { ETransactionVersion as TRANSACTION_VERSION };
+export const { ETransactionVersion: TRANSACTION_VERSION } = RPCSPEC08;
 
 export const ZERO = 0n;
 export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1
@@ -54,28 +55,9 @@ export enum TransactionHashPrefix {
   L1_HANDLER = '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
 }
 
-export const enum FeeMarginPercentage {
-  L1_BOUND_MAX_AMOUNT = 50,
-  L1_BOUND_MAX_PRICE_PER_UNIT = 50,
-  MAX_FEE = 50,
-}
-
 export const UDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
-} as const;
-
-export const RPC_DEFAULT_VERSION = 'v0_7';
-
-export const RPC_NODES = {
-  SN_MAIN: [
-    `https://starknet-mainnet.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
-    `https://free-rpc.nethermind.io/mainnet-juno/${RPC_DEFAULT_VERSION}`,
-  ],
-  SN_SEPOLIA: [
-    `https://starknet-sepolia.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
-    `https://free-rpc.nethermind.io/sepolia-juno/${RPC_DEFAULT_VERSION}`,
-  ],
 } as const;
 
 export const OutsideExecutionCallerAny = '0x414e595f43414c4c4552'; // encodeShortString('ANY_CALLER')
@@ -90,19 +72,65 @@ export const HARDENING_BYTE = 128;
 // 0x80000000
 export const HARDENING_4BYTES = 2147483648n;
 
+/**
+ * dot formate rpc versions
+ */
+export const SupportedRpcVersion = {
+  0.7: '0.7',
+  0.8: '0.8',
+} as const;
+export type SupportedRpcVersion = (typeof SupportedRpcVersion)[keyof typeof SupportedRpcVersion];
+
+export type SupportedTransactionVersion =
+  | typeof ETransactionVersion.V2
+  | typeof ETransactionVersion.V3;
+
 // Default initial global config
 export const DEFAULT_GLOBAL_CONFIG: {
   legacyMode: boolean;
   logLevel: LogLevel;
-  accountTxVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
+  rpcVersion: SupportedRpcVersion;
+  transactionVersion: SupportedTransactionVersion;
+  feeMarginPercentage: FeeMarginPercentage;
 } = {
   legacyMode: false,
+  rpcVersion: '0.8',
+  transactionVersion: ETransactionVersion.V3,
   logLevel: 'INFO',
-  accountTxVersion: ETransactionVersion.V2,
+  feeMarginPercentage: {
+    bounds: {
+      l1_gas: {
+        max_amount: 50,
+        max_price_per_unit: 50,
+      },
+      l1_data_gas: {
+        max_amount: 50,
+        max_price_per_unit: 50,
+      },
+      l2_gas: {
+        max_amount: 50,
+        max_price_per_unit: 50,
+      },
+    },
+    maxFee: 50,
+  },
 };
+
+export const RPC_DEFAULT_NODES = {
+  SN_MAIN: [
+    `https://starknet-mainnet.public.blastapi.io/rpc/`,
+    `https://free-rpc.nethermind.io/mainnet-juno/`,
+  ],
+  SN_SEPOLIA: [
+    `https://starknet-sepolia.public.blastapi.io/rpc/`,
+    `https://free-rpc.nethermind.io/sepolia-juno/`,
+  ],
+} as const;
 
 // Default system messages
 export const SYSTEM_MESSAGES = {
   legacyTxWarningMessage:
     'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
+  legacyTxRPC08Message: 'RPC 0.8 do not support legacy transactions',
+  SWOldV3: 'RPC 0.7 V3 tx (improper resource bounds) not supported in RPC 0.8',
 };

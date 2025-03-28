@@ -5,8 +5,8 @@ import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
   AbiEvents,
+  AbiStruct,
   ArgsOrCalldata,
-  ArgsOrCalldataWithOptions,
   AsyncContractFunction,
   Call,
   CallOptions,
@@ -17,11 +17,10 @@ import {
   FunctionAbi,
   InvokeFunctionResponse,
   InvokeOptions,
-  InvokeTransactionReceiptResponse,
+  GetTransactionReceiptResponse,
   ParsedEvents,
   RawArgs,
   Result,
-  AbiStruct,
   ValidateType,
   type SuccessfulTransactionReceiptResponse,
 } from '../types';
@@ -31,40 +30,22 @@ import { createAbiParser } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
-import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
-import type { INVOKE_TXN_RECEIPT } from '../types/provider/spec';
 import { logger } from '../global/logger';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
-
-export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
-  const options = [
-    'blockIdentifier',
-    'parseRequest',
-    'parseResponse',
-    'formatResponse',
-    'maxFee',
-    'nonce',
-    'signature',
-    'addressSalt',
-  ];
-  const lastArg = args[args.length - 1];
-  if (typeof lastArg === 'object' && options.some((x) => x in lastArg)) {
-    return { args: args as ArgsOrCalldata, options: args.pop() as ContractOptions };
-  }
-  return { args: args as ArgsOrCalldata };
-};
 
 /**
  * Adds call methods to the contract
  */
 function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
-  return async function (...args: ArgsOrCalldataWithOptions): Promise<any> {
-    const params = splitArgsAndOptions(args);
-    return contract.call(functionAbi.name, params.args, {
+  return async function (...args: ArgsOrCalldata): Promise<any> {
+    const options = { ...contract.contractOptions };
+    // eslint-disable-next-line no-param-reassign
+    contract.contractOptions = undefined;
+    return contract.call(functionAbi.name, args, {
       parseRequest: true,
       parseResponse: true,
-      ...params.options,
+      ...options,
     });
   };
 }
@@ -73,11 +54,13 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
  * Adds invoke methods to the contract
  */
 function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
-  return async function (...args: Array<any>): Promise<any> {
-    const params = splitArgsAndOptions(args);
-    return contract.invoke(functionAbi.name, params.args, {
+  return async function (...args: ArgsOrCalldata): Promise<any> {
+    const options = { ...contract.contractOptions };
+    // eslint-disable-next-line no-param-reassign
+    contract.contractOptions = undefined;
+    return contract.invoke(functionAbi.name, args, {
       parseRequest: true,
-      ...params.options,
+      ...options,
     });
   };
 }
@@ -143,6 +126,8 @@ export class Contract implements ContractInterface {
 
   private callData: CallData;
 
+  public contractOptions?: ContractOptions;
+
   /**
    * Contract class to handle contract methods
    *
@@ -204,6 +189,11 @@ export class Contract implements ContractInterface {
         });
       }
     });
+  }
+
+  public withOptions(options: ContractOptions) {
+    this.contractOptions = options;
+    return this;
   }
 
   public attach(address: string): void {
@@ -285,7 +275,7 @@ export class Contract implements ContractInterface {
       entrypoint: method,
     };
     if ('execute' in this.providerOrAccount) {
-      return this.providerOrAccount.execute(invocation, undefined, {
+      return this.providerOrAccount.execute(invocation, {
         maxFee,
         nonce,
       });
@@ -328,23 +318,27 @@ export class Contract implements ContractInterface {
     };
   }
 
+  // TODO: Demistify what is going on here ???
+  // TODO: receipt status filtering test and fix this do not look right
   public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
     let parsed: ParsedEvents;
     receipt.match({
       success: (txR: SuccessfulTransactionReceiptResponse) => {
         const emittedEvents =
-          (txR as InvokeTransactionReceiptResponse).events
+          txR.events
             ?.map((event) => {
               return {
-                block_hash: (txR as INVOKE_TXN_RECEIPT).block_hash,
-                block_number: (txR as INVOKE_TXN_RECEIPT).block_number,
-                transaction_hash: (txR as INVOKE_TXN_RECEIPT).transaction_hash,
+                // TODO: this do not check that block is production and block_hash and block_number actually exists
+                // TODO: second issue is that ts do not complains about it
+                block_hash: txR.block_hash,
+                block_number: txR.block_number,
+                transaction_hash: txR.transaction_hash,
                 ...event,
               };
             })
             .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || [];
         parsed = parseRawEvents(
-          emittedEvents,
+          emittedEvents as any, // TODO: any temp hotfix, fix this
           this.events,
           this.structs,
           CallData.getAbiEnum(this.abi)

@@ -1,3 +1,46 @@
+# [7.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v7.0.0-beta.3...v7.0.0-beta.4) (2025-03-28)
+
+### Bug Fixes
+
+- repair snip-12 enum type nested dependency ([#1289](https://github.com/starknet-io/starknet.js/issues/1289)) ([1cd4219](https://github.com/starknet-io/starknet.js/commit/1cd4219df5e61a676bc58ba8c8673269695fc2db))
+
+### Features
+
+- drop fetch-cookie dependency ([9a57daf](https://github.com/starknet-io/starknet.js/commit/9a57dafce473432df7040f68e0824e9e78f6e215))
+- drop isomorphic-fetch dependency ([9da0083](https://github.com/starknet-io/starknet.js/commit/9da0083d2084b0bd9ec7da06ea9a80f267f4e397))
+- prune deprecated functionalities ([cbd18f5](https://github.com/starknet-io/starknet.js/commit/cbd18f59fb0749c558ba4eabc0f094464941b088))
+
+### BREAKING CHANGES
+
+- Removed multiple functionalities that have been marked as deprecated
+
+# [7.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v7.0.0-beta.2...v7.0.0-beta.3) (2025-03-13)
+
+### Features
+
+- add simulate and estimate fee utility methods for outside execution ([#1327](https://github.com/starknet-io/starknet.js/issues/1327)) ([3668b01](https://github.com/starknet-io/starknet.js/commit/3668b01c4f63969bb0770ee6120fe3eac72d0335))
+- implement cairo fixed array support ([#1310](https://github.com/starknet-io/starknet.js/issues/1310)) ([45df63e](https://github.com/starknet-io/starknet.js/commit/45df63e7bb7f7cb2de2e98900387b1c44a95f257))
+
+# [7.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v7.0.0-beta.1...v7.0.0-beta.2) (2025-03-10)
+
+### Bug Fixes
+
+- contract withOptions Fix/1252 ([#1255](https://github.com/starknet-io/starknet.js/issues/1255)) ([b59952e](https://github.com/starknet-io/starknet.js/commit/b59952e74baf82641d6028c96625db104049c02e))
+- update ws impl, add TEST_WS_URL, update token constants ([411eeec](https://github.com/starknet-io/starknet.js/commit/411eeec1df6a38358f28612260066b38fc942957))
+
+### Features
+
+- the WebSockets ([#1251](https://github.com/starknet-io/starknet.js/issues/1251)) ([fabca27](https://github.com/starknet-io/starknet.js/commit/fabca27a7a3e398030a99cf8d78bffa51cebfe9a)), closes [#1272](https://github.com/starknet-io/starknet.js/issues/1272)
+- v7 fee, new methods, tests ([#1337](https://github.com/starknet-io/starknet.js/issues/1337)) ([00743de](https://github.com/starknet-io/starknet.js/commit/00743de2cad5375a558844646f11b4adef15188b))
+
+# [7.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v6.24.0-beta.1...v7.0.0-beta.1) (2025-03-04)
+
+- Implement RPC 0.8 and V3 transactions ([#1328](https://github.com/starknet-io/starknet.js/issues/1328)) ([316ae27](https://github.com/starknet-io/starknet.js/commit/316ae2789376368dcffe653ce4817eebf0a63d97))
+
+### BREAKING CHANGES
+
+- Library defaults to RPC 0.8 with the corresponding API changes, dropped RPC 0.6 support
+
 ## [6.24.1](https://github.com/starknet-io/starknet.js/compare/v6.24.0...v6.24.1) (2025-03-20)
 
 ### Bug Fixes

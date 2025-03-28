@@ -1,7 +1,8 @@
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
-import { ZERO, FeeMarginPercentage } from '../global/constants';
+import { PRICE_UNIT } from 'starknet-types-08';
+import { SupportedRpcVersion, ZERO } from '../../global/constants';
 import {
   ArraySignatureType,
   BigNumberish,
@@ -9,18 +10,36 @@ import {
   Program,
   Signature,
   UniversalDetails,
-} from '../types';
-import { EDAMode, EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from '../types/api';
-import { FeeEstimate } from '../types/provider';
-import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal, buf2hex } from './encode';
-import { parse, stringify } from './json';
+} from '../../types';
+import { FeeEstimate } from '../../provider/types/index.type';
+import {
+  addHexPrefix,
+  arrayBufferToString,
+  atobUniversal,
+  btoaUniversal,
+  buf2hex,
+} from '../encode';
+import { parse, stringify } from '../json';
 import {
   addPercent,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
   toHex,
-} from './num';
-import { isUndefined, isString, isBigInt } from './typed';
+} from '../num';
+import { isBigInt, isString } from '../typed';
+import {
+  EDAMode,
+  EDataAvailabilityMode,
+  ETransactionVersion,
+  isRPC08_FeeEstimate,
+  ResourceBounds,
+  ResourceBoundsOverhead,
+  ResourceBoundsOverheadRPC07,
+  ResourceBoundsOverheadRPC08,
+} from '../../provider/types/spec.type';
+import { estimateFeeToBounds as estimateFeeToBoundsRPC07 } from './rpc07';
+import { estimateFeeToBounds as estimateFeeToBoundsRPC08 } from './rpc08';
+import { config } from '../../global/config';
 
 type V3Details = Required<
   Pick<
@@ -102,15 +121,6 @@ export function randomAddress(): string {
 }
 
 /**
- * Lowercase and hex prefix string
- *
- * @deprecated Not used internally, naming is confusing based on functionality
- */
-export function makeAddress(input: string): string {
-  return addHexPrefix(input).toLowerCase();
-}
-
-/**
  * Format Signature to standard type (hex array)
  * @param {Signature} [sig]
  * @returns {ArraySignatureType} Custom hex string array
@@ -173,7 +183,7 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
 /**
  * Convert estimated fee to max fee including a margin
  * @param {BigNumberish} estimatedFee - The estimated fee
- * @param {number} [overhead = feeMarginPercentage.MAX_FEE] - The overhead added to the gas
+ * @param {number} [overhead] - The overhead added to the gas
  * @returns {bigint} The maximum fee with the margin
  * @example
  * ```typescript
@@ -183,7 +193,7 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
  */
 export function estimatedFeeToMaxFee(
   estimatedFee: BigNumberish,
-  overhead: number = FeeMarginPercentage.MAX_FEE
+  overhead: number = config.get('feeMarginPercentage').maxFee
 ): bigint {
   return addPercent(estimatedFee, overhead);
 }
@@ -192,49 +202,48 @@ export function estimatedFeeToMaxFee(
  * Calculates the maximum resource bounds for fee estimation.
  *
  * @param {FeeEstimate | 0n} estimate The estimate for the fee. If a BigInt is provided, the returned bounds will be set to '0x0'.
- * @param {number} [amountOverhead = feeMarginPercentage.L1_BOUND_MAX_AMOUNT] - The percentage overhead added to the gas consumed or overall fee amount.
- * @param {number} [priceOverhead = feeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT] The percentage overhead added to the gas price per unit.
- * @returns {ResourceBounds} The maximum resource bounds for fee estimation.
+ * @param {ResourceBoundsOverhead} [overhead] - The percentage overhead added to the max units and max price per unit.
+ * @returns {ResourceBounds} The resource bounds with overhead.
  * @throws {Error} If the estimate object is undefined or does not have the required properties.
- * @example
- * ```typescript
- * const feeEstimated: FeeEstimate = {
-  gas_consumed: "0x3456a",
-  gas_price: "0xa45567567567ae4",
-  overall_fee: "0x2198F463A77A899A5668",
-  unit: "WEI"
-};
-const result = stark.estimateFeeToBounds(feeEstimated, 70, 50);
- * // result = {
- * //   l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
- * //   l1_gas: { max_amount: '0x58f9a', max_price_per_unit: '0xf6801b01b01b856' }
- * // }
- * ```
  */
 export function estimateFeeToBounds(
   estimate: FeeEstimate | 0n,
-  amountOverhead: number = FeeMarginPercentage.L1_BOUND_MAX_AMOUNT,
-  priceOverhead: number = FeeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT
+  overhead: ResourceBoundsOverhead = config.get('feeMarginPercentage').bounds,
+  specVersion?: string
 ): ResourceBounds {
   if (isBigInt(estimate)) {
     return {
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+      ...(specVersion === '0.8' && {
+        l1_data_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+      }),
     };
   }
 
-  if (isUndefined(estimate.gas_consumed) || isUndefined(estimate.gas_price)) {
-    throw Error('estimateFeeToBounds: estimate is undefined');
+  if (isRPC08_FeeEstimate(estimate)) {
+    return estimateFeeToBoundsRPC08(estimate, overhead as ResourceBoundsOverheadRPC08); // TODO: remove as
   }
+  return estimateFeeToBoundsRPC07(estimate, overhead as ResourceBoundsOverheadRPC07); // TODO: remove as
+}
 
-  const maxUnits =
-    estimate.data_gas_consumed !== undefined && estimate.data_gas_price !== undefined // RPC v0.7
-      ? toHex(addPercent(BigInt(estimate.overall_fee) / BigInt(estimate.gas_price), amountOverhead))
-      : toHex(addPercent(estimate.gas_consumed, amountOverhead));
-  const maxUnitPrice = toHex(addPercent(estimate.gas_price, priceOverhead));
+export type feeOverhead = ResourceBounds;
+
+/**
+ * Mock zero fee response
+ */
+export function ZEROFee(specVersion: string) {
   return {
-    l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-    l1_gas: { max_amount: maxUnits, max_price_per_unit: maxUnitPrice },
+    l1_gas_consumed: 0n,
+    l1_gas_price: 0n,
+    l1_data_gas_consumed: 0n,
+    l1_data_gas_price: 0n,
+    l2_gas_consumed: 0n,
+    l2_gas_price: 0n,
+    overall_fee: ZERO,
+    unit: 'FRI' as PRICE_UNIT,
+    suggestedMaxFee: ZERO,
+    resourceBounds: estimateFeeToBounds(ZERO, undefined, specVersion),
   };
 }
 
@@ -331,14 +340,14 @@ export function toFeeVersion(providedVersion?: BigNumberish): ETransactionVersio
  * ```
  */
 
-export function v3Details(details: UniversalDetails): V3Details {
+export function v3Details(details: UniversalDetails, specVersion?: SupportedRpcVersion): V3Details {
   return {
     tip: details.tip || 0,
     paymasterData: details.paymasterData || [],
     accountDeploymentData: details.accountDeploymentData || [],
     nonceDataAvailabilityMode: details.nonceDataAvailabilityMode || EDataAvailabilityMode.L1,
     feeDataAvailabilityMode: details.feeDataAvailabilityMode || EDataAvailabilityMode.L1,
-    resourceBounds: details.resourceBounds ?? estimateFeeToBounds(ZERO),
+    resourceBounds: details.resourceBounds ?? estimateFeeToBounds(ZERO, undefined, specVersion),
   };
 }
 

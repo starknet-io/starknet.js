@@ -45,18 +45,9 @@ export * from './utils/address';
 export * from './utils/calldata';
 export * from './utils/calldata/enum';
 export * from './utils/contract';
-export * from './utils/transactionReceipt';
+export * from './utils/transactionReceipt/transactionReceipt';
 export * from './utils/units';
 export * as wallet from './wallet/connect';
 export * from './global/config';
 export * from './global/logger';
 export * from './global/logger.type';
-
-/**
- * Deprecated
- */
-/* eslint-disable import/first */
-import * as num from './utils/num';
-
-/** @deprecated prefer the 'num' naming */
-export const number = num;

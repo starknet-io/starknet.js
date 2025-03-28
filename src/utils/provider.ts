@@ -1,4 +1,4 @@
-import { NetworkName, RPC_NODES } from '../global/constants';
+import { NetworkName, RPC_DEFAULT_NODES, SupportedRpcVersion } from '../global/constants';
 import {
   BlockIdentifier,
   BlockTag,
@@ -14,7 +14,6 @@ import {
   StateUpdateResponse,
   V3TransactionDetails,
 } from '../types';
-import { ETransactionVersion } from '../types/api';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
@@ -22,8 +21,10 @@ import { isHex, toHex } from './num';
 import { isDecimalString } from './shortString';
 import { isBigInt, isNumber, isString } from './typed';
 import { compressProgram } from './stark';
-import type { GetTransactionReceiptResponse } from './transactionReceipt';
+import type { GetTransactionReceiptResponse } from './transactionReceipt/transactionReceipt.type';
 import { logger } from '../global/logger';
+import { ETransactionVersion } from '../provider/types/spec.type';
+import { config } from '../global/config';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -120,14 +121,38 @@ export function parseContract(contract: CompiledContract | string): ContractClas
  * // result = "https://starknet-mainnet.public.blastapi.io/rpc/v0_7"
  * ```
  */
-export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
+export const getDefaultNodeUrl = (
+  networkName?: NetworkName,
+  mute: boolean = false,
+  rpcVersion?: SupportedRpcVersion
+): string => {
   if (!mute) {
     logger.info('Using default public node url, please provide nodeUrl in provider options!');
   }
-  const nodes = RPC_NODES[networkName ?? NetworkName.SN_SEPOLIA];
+  const rpcNodes = getDefaultNodes(rpcVersion ?? config.get('rpcVersion'));
+
+  const nodes = rpcNodes[networkName ?? NetworkName.SN_SEPOLIA];
   const randIdx = Math.floor(Math.random() * nodes.length);
   return nodes[randIdx];
 };
+
+/**
+ * return Defaults RPC Nodes endpoints
+ */
+export function getDefaultNodes(rpcVersion: SupportedRpcVersion) {
+  const vToUrl = (versionString: SupportedRpcVersion) =>
+    `v${versionString.replace(/^v/, '').replace(/\./g, '_')}`;
+
+  const nodes: any = { ...RPC_DEFAULT_NODES };
+
+  Object.keys(nodes).forEach(function (key, _) {
+    nodes[key] = nodes[key].map((it: any) => {
+      return `${it}${vToUrl(rpcVersion)}`;
+    });
+  });
+
+  return nodes;
+}
 
 export const validBlockTags = Object.values(BlockTag);
 
@@ -288,7 +313,7 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
 /**
  * Determines if the given response matches the specified version.
  *
- * @param {('0.5' | '0.6' | '0.7')} version The version to compare against the response.
+ * @param {SupportedRpcVersion} version The version to compare against the response.
  * @param {string} response The response to check against the version.
  * @returns {boolean} True if the response matches the version, false otherwise.
  * @example
@@ -297,11 +322,16 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
  * // result = false
  * ```
  */
-export function isVersion(version: '0.5' | '0.6' | '0.7', response: string): boolean {
+export function isVersion(version: SupportedRpcVersion, response: string): boolean {
   const [majorS, minorS] = version.split('.');
   const [majorR, minorR] = response.split('.');
 
   return majorS === majorR && minorS === minorR;
+}
+
+export function stringToSpecVersion(version: string) {
+  const [major, minor] = version.split('.');
+  return `${major}.${minor}` as SupportedRpcVersion;
 }
 
 /**

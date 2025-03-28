@@ -3,7 +3,6 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 import type {
-  BlockWithTxHashes,
   ContractClassPayload,
   ContractClassResponse,
   EstimateFeeResponse,
@@ -13,13 +12,14 @@ import type {
   GetTxReceiptResponseWithoutHelper,
   RpcProviderOptions,
   SimulateTransactionResponse,
-  SimulatedTransaction,
-  TransactionReceipt,
-} from '../../types/provider';
-import { toBigInt } from '../num';
+  BlockWithTxHashes,
+} from '../../provider/types/index.type';
+import { toBigInt, tryToBigInt } from '../num';
 import { isString } from '../typed';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from './interface';
+import { SimulateTransaction, TransactionReceipt } from '../../provider/types/spec.type';
+// import { TransactionReceipt } from '../../types/api/merge';
 
 export class RPCResponseParser
   implements
@@ -44,30 +44,14 @@ export class RPCResponseParser
   }
 
   private estimateFeeToBounds(estimate: Parameters<typeof estimateFeeToBounds>[0]) {
-    return estimateFeeToBounds(
-      estimate,
-      this.margin?.l1BoundMaxAmount,
-      this.margin?.l1BoundMaxPricePerUnit
-    );
+    return estimateFeeToBounds(estimate, this.margin?.bounds);
   }
 
   public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
-    return { status: 'PENDING', ...res } as GetBlockResponse;
+    return res as GetBlockResponse;
   }
 
   public parseTransactionReceipt(res: TransactionReceipt): GetTxReceiptResponseWithoutHelper {
-    // HOTFIX RPC 0.5 to align with RPC 0.6
-    // This case is RPC 0.5. It can be only v2 thx with FRI units
-    if ('actual_fee' in res && isString(res.actual_fee)) {
-      return {
-        ...(res as GetTxReceiptResponseWithoutHelper),
-        actual_fee: {
-          amount: res.actual_fee,
-          unit: 'FRI',
-        },
-      } as GetTxReceiptResponseWithoutHelper;
-    }
-
     return res as GetTxReceiptResponseWithoutHelper;
   }
 
@@ -75,26 +59,36 @@ export class RPCResponseParser
     const val = res[0];
     return {
       overall_fee: toBigInt(val.overall_fee),
-      gas_consumed: toBigInt(val.gas_consumed),
-      gas_price: toBigInt(val.gas_price),
       unit: val.unit,
+
+      l1_gas_consumed: tryToBigInt(val.l1_gas_consumed) ?? tryToBigInt(val.gas_consumed) ?? 0n,
+      l1_gas_price: tryToBigInt(val.l1_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
+      l2_gas_consumed: tryToBigInt(val.l2_gas_consumed) ?? undefined,
+      l2_gas_price: tryToBigInt(val.l2_gas_price) ?? undefined,
+      l1_data_gas_consumed:
+        tryToBigInt(val.l1_data_gas_consumed) ?? tryToBigInt(val.data_gas_consumed) ?? 0n,
+      l1_data_gas_price: tryToBigInt(val.l1_data_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
+
       suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
       resourceBounds: this.estimateFeeToBounds(val),
-      data_gas_consumed: val.data_gas_consumed ? toBigInt(val.data_gas_consumed) : 0n,
-      data_gas_price: val.data_gas_price ? toBigInt(val.data_gas_price) : 0n,
     };
   }
 
   public parseFeeEstimateBulkResponse(res: FeeEstimate[]): EstimateFeeResponseBulk {
     return res.map((val) => ({
       overall_fee: toBigInt(val.overall_fee),
-      gas_consumed: toBigInt(val.gas_consumed),
-      gas_price: toBigInt(val.gas_price),
       unit: val.unit,
+
+      l1_gas_consumed: tryToBigInt(val.l1_gas_consumed) ?? tryToBigInt(val.gas_consumed) ?? 0n,
+      l1_gas_price: tryToBigInt(val.l1_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
+      l2_gas_consumed: tryToBigInt(val.l2_gas_consumed) ?? undefined,
+      l2_gas_price: tryToBigInt(val.l2_gas_price) ?? undefined,
+      l1_data_gas_consumed:
+        tryToBigInt(val.l1_data_gas_consumed) ?? tryToBigInt(val.data_gas_consumed) ?? 0n,
+      l1_data_gas_price: tryToBigInt(val.l1_data_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
+
       suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
       resourceBounds: this.estimateFeeToBounds(val),
-      data_gas_consumed: val.data_gas_consumed ? toBigInt(val.data_gas_consumed) : 0n,
-      data_gas_price: val.data_gas_price ? toBigInt(val.data_gas_price) : 0n,
     }));
   }
 
@@ -106,7 +100,7 @@ export class RPCResponseParser
     // res: SimulateTransactionResponse
     res: any
   ): SimulateTransactionResponse {
-    return res.map((it: SimulatedTransaction) => {
+    return res.map((it: SimulateTransaction) => {
       return {
         ...it,
         suggestedMaxFee: this.estimatedFeeToMaxFee(it.fee_estimation.overall_fee),
