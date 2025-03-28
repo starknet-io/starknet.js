@@ -254,16 +254,6 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockTransactionCount(blockIdentifier);
   }
 
-  /**
-   * Return transactions from pending block
-   * @deprecated Instead use getBlock(BlockTag.PENDING); (will be removed in next minor version)
-   * Utility method, same result can be achieved using getBlockWithTxHashes(BlockTag.pending);
-   */
-  public async getPendingTransactions() {
-    const { transactions } = await this.getBlockWithTxHashes(BlockTag.PENDING);
-    return Promise.all(transactions.map((it: any) => this.getTransactionByHash(it)));
-  }
-
   public async getTransaction(txHash: BigNumberish) {
     return this.channel.getTransactionByHash(txHash);
   }
@@ -387,18 +377,6 @@ export class RpcProvider implements ProviderInterface {
       return { cairo: '1', compiler: undefined };
     }
     return { cairo: '0', compiler: '0' };
-  }
-
-  /**
-   * @deprecated use get*type*EstimateFee (will be refactored based on type after sequencer deprecation)
-   */
-  public async getEstimateFee(
-    invocation: Invocation,
-    invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean
-  ) {
-    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier, skipValidate);
   }
 
   public async getInvokeEstimateFee(

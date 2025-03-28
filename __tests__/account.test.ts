@@ -7,7 +7,6 @@ import {
   DeclareDeployUDCResponse,
   Provider,
   ProviderInterface,
-  RpcError,
   TransactionType,
   cairo,
   constants,
@@ -363,29 +362,6 @@ describe('deploy and test Wallet', () => {
     expect(balance.low).toStrictEqual(toBigInt(990));
   });
 
-  test('execute with and without deprecated abis parameter', async () => {
-    const transaction = {
-      contractAddress: erc20Address,
-      entrypoint: 'transfer',
-      calldata: [erc20.address, '10', '0'],
-    };
-    const details: Parameters<(typeof account)['execute']>[2] = { nonce: 0 };
-
-    let error1: RpcError | undefined;
-    // eslint-disable-next-line no-return-assign
-    await account.execute(transaction, details).catch((e) => (error1 = e));
-    expect(error1).toBeDefined();
-    expect(error1).toBeInstanceOf(RpcError);
-    expect(error1!.isType('TRANSACTION_EXECUTION_ERROR')).toBe(true);
-
-    let error2: RpcError | undefined;
-    // eslint-disable-next-line no-return-assign
-    await account.execute(transaction, undefined, details).catch((e) => (error2 = e));
-    expect(error2).toBeDefined();
-    expect(error2).toBeInstanceOf(RpcError);
-    expect(error2!.isType('TRANSACTION_EXECUTION_ERROR')).toBe(true);
-  });
-
   test('execute with custom nonce', async () => {
     const result = await account.getNonce();
     const nonce = toBigInt(result);
@@ -395,7 +371,6 @@ describe('deploy and test Wallet', () => {
         entrypoint: 'transfer',
         calldata: [account.address, '10', '0'],
       },
-      undefined,
       { nonce }
     );
 
@@ -433,14 +408,14 @@ describe('deploy and test Wallet', () => {
       const r2 = toBigInt(r) + 123n;
 
       const signature2 = new Signature(toBigInt(r2.toString()), toBigInt(s));
-
       if (!signature2) return;
 
-      const verifMessageResponse: boolean = await account.verifyMessage(
+      const verifyMessageResponse: boolean = await account.verifyMessageInStarknet(
         typedDataExample,
-        signature2
+        signature2,
+        account.address
       );
-      expect(verifMessageResponse).toBe(false);
+      expect(verifyMessageResponse).toBe(false);
 
       const wrongAccount = new Account(
         provider,
@@ -449,14 +424,17 @@ describe('deploy and test Wallet', () => {
         undefined,
         TEST_TX_VERSION
       ); // non existing account
-      await expect(wrongAccount.verifyMessage(typedDataExample, signature2)).rejects.toThrow();
+      await expect(
+        wrongAccount.verifyMessageInStarknet(typedDataExample, signature2, wrongAccount.address)
+      ).rejects.toThrow();
     });
 
     test('sign and verify message', async () => {
       const signature = await account.signMessage(typedDataExample);
-      const verifMessageResponse: boolean = await account.verifyMessage(
+      const verifMessageResponse: boolean = await account.verifyMessageInStarknet(
         typedDataExample,
-        signature
+        signature,
+        account.address
       );
       expect(verifMessageResponse).toBe(true);
     });

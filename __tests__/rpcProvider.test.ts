@@ -326,11 +326,6 @@ describeIfRpc('RPCProvider', () => {
       expect(transaction).toHaveProperty('transaction_hash');
     });
 
-    test('getPendingTransactions', async () => {
-      const transactions = await rpcProvider.getPendingTransactions();
-      expect(Array.isArray(transactions)).toBe(true);
-    });
-
     test('getSyncingStats', async () => {
       const syncingStats = await rpcProvider.getSyncingStats();
       expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');

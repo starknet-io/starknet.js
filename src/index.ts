@@ -51,12 +51,3 @@ export * as wallet from './wallet/connect';
 export * from './global/config';
 export * from './global/logger';
 export * from './global/logger.type';
-
-/**
- * Deprecated
- */
-/* eslint-disable import/first */
-import * as num from './utils/num';
-
-/** @deprecated prefer the 'num' naming */
-export const number = num;
