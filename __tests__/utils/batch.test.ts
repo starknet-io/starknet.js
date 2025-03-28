@@ -1,4 +1,4 @@
-import fetch from '../../src/utils/fetch';
+import fetch from '../../src/utils/connect/fetch';
 import { BatchClient } from '../../src/utils/batch';
 import { createBlockForDevnet, createTestProvider } from '../config/fixtures';
 import { initializeMatcher } from '../config/schema';

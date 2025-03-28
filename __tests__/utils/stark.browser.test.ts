@@ -8,10 +8,6 @@ import * as json from '../../src/utils/json';
 
 const { IS_BROWSER } = constants;
 
-// isows has faulty module resolution in the browser emulation environment which prevents test execution
-// it is not required for these tests so removing it with a mock circumvents the issue
-jest.mock('isows', () => jest.fn());
-
 test('isBrowser', () => {
   expect(IS_BROWSER).toBe(true);
 });
