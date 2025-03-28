@@ -75,31 +75,53 @@ const account0 = new Account(
 const res = await account0.execute(myCall, { version: 1 });
 ```
 
-## Removal of deprecated functions
-
-Some functions & namespaces are deprecated for a long time. They are now deleted:
-
-1. `number` namespace removed. Use existing `num` namespace
-2. Usage of `new WalletAccount(...)` is removed. Use existing `WalletAccount.connect(...)` or `WalletAccount.silentConnect(...)`
-3. `UINT_128_MAX, UINT_256_MAX` are no more available in `uint256` namespace. Use existing direct import `import { UINT_256_MAX } from "starknet";`
-4. `TypedDataRevision, StarknetEnumType, StarknetMerkleType, StarknetType, StarknetDomain, TypedData` are no more available in `typeData` namespace. Use existing direct import `import { StarknetDomain } from "starknet";`
-5. In `transaction` namespace, functions `fromCallsToExecuteCalldataWithNonce(), transformCallsToMulticallArrays_cairo1()` are removed.
-6. **`BigNumberish` is no more available in `num` namespace.** Use existing direct import `import { BigNumberish } from "starknet";`
-7. `stringifyAlwaysAsBig()` is no more available in `json` namespace. Use existing `json.stringify()`
-8. `stringToArrayBuffer()` is no more available in `encode` namespace. Use existing `encode.utf8ToArray()`
-9. In `stark` namespace, function `makeAddress()` is removed.
-10. `CallStruct` type is removed.
-11. **`getEstimatefee()` method of `ProviderInterface` and of `RpcProvider` is removed.** Use `myAccount.estimateInvokeFee()` or `myAccount.estimateDeclareFee()`
-12. `getPendingTransactions()` method of `RpcProvider` is removed. Use `myProvider.getBlockWithTxHashes(BlockTag.PENDING)`
-13. **In `Account.execute()`, the `abi` parameter is removed in `execute(transactions: AllowArray<Call>, abis?: Abi[], transactionsDetail?: InvocationsDetails)`.** Use only `myAccount.execute(transactions: AllowArray<Call>, transactionsDetail?: InvocationsDetails)`
-
-## Verification of SNIP-12 messages
-
-As the verification of a message in Starknet network is not related to the Account class:
-
-- In `Account` class, function `verifyMessageHash` is removed. Use existing `myProvider.verifyMessageInStarknet()`
-- In `Account` class, function `verifyMessage` is removed. Use existing `myProvider.verifyMessageInStarknet()`
-
 ## Transaction receipt
 
-In the transaction receipt `ReceiptTx` class, the status [`isRejected`](https://starknetjs.com/docs/6.23.1/API/classes/ReceiptTx#isrejected) has been removed.
+In the `ReceiptTx` class, the status [`isRejected`](https://starknetjs.com/docs/6.23.1/API/classes/ReceiptTx#isrejected) has been removed.
+
+## Removed deprecated functionalities
+
+### RpcProvider
+
+|                                                     method                                                      | replacement                                                                                                                                                                                                                                                                                                                                                 |
+| :-------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`getPendingTransactions(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getpendingtransactions) | [`getBlockWithTxHashes(BlockTag.PENDING)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getblockwithtxhashes)<br/>[`getBlock(BlockTag.PENDING)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getblock)                                                                                                                               |
+|         [`getEstimateFee(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getestimatefee)         | [`getInvokeEstimateFee(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getinvokeestimatefee)<br/>[`getDeclareEstimateFee(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getdeclareestimatefee)<br/>[`getDeployAccountEstimateFee(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getdeployaccountestimatefee) |
+
+### Account
+
+|                                                                                                    method                                                                                                    | details                                                                                                                                                                                                                                                                                                                                                                                                          |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|                                                               [`execute(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Account#execute)                                                               | The deprecated [`execute(transactions, abis?, transactionsDetail?)`](https://starknetjs.com/docs/6.23.1/API/classes/Account#parameters-20) override with the optional (and unused) `abis` parameter has been removed.<br/><br/> [`execute(transactions, transactionsDetail?)`](https://starknetjs.com/docs/6.23.1/API/classes/Account#parameters-19) now only accepts two parameters and should be used as such. |
+| [`verifyMessage(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Account#verifymessage) <br/><br/> [`verifyMessageHash(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Account#verifymessagehash) | The deprecated `Account` message verification methods have been removed. <br/><br/> The `RpcProvider` [`verifyMessageInStarknet(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#verifymessageinstarknet) method should be used instead.                                                                                                                                                           |
+
+### WalletAccount
+
+When initializing a `WalletAccount` instance through the constructor [`new WalletAccount(...)`](https://starknetjs.com/docs/6.23.1/API/classes/WalletAccount#constructor) the `address` parameter has been made mandatory with the deprecated eager address retrieval removed.
+
+To initialize a `WalletAccount` instance [`WalletAccount.connect(...)`](https://starknetjs.com/docs/6.23.1/API/classes/WalletAccount#connect) should be used.
+
+### Removed namespace
+
+The `number` namespace alias has been removed in favor of `num` as noted in the v5 migration guide.
+
+### Removed utility functions
+
+|   namespace   |                                                                                                                                                  function                                                                                                                                                   |                                              replacement                                               |
+| :-----------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------: |
+|   `encode`    |                                                                                                 [`stringToArrayBuffer(...)`](https://starknetjs.com/docs/6.23.1/API/namespaces/encode#stringtoarraybuffer)                                                                                                  |        [`utf8ToArray(...)`](https://starknetjs.com/docs/next/API/namespaces/encode#utf8toarray)        |
+|    `json`     |                                                                                                 [`stringifyAlwaysAsBig(...)`](https://starknetjs.com/docs/6.23.1/API/namespaces/json#stringifyalwaysasbig)                                                                                                  |           [`stringify(...)`](https://starknetjs.com/docs/next/API/namespaces/json#stringify)           |
+|    `stark`    |                                                                                                          [`makeAddress(...)`](https://starknetjs.com/docs/6.23.1/API/namespaces/stark#makeaddress)                                                                                                          | [`validateAndParseAddress(...)`](https://starknetjs.com/docs/next/API/modules#validateandparseaddress) |
+| `transaction` | [`fromCallsToExecuteCalldataWithNonce(...)`](https://starknetjs.com/docs/6.23.1/API/namespaces/transaction#fromcallstoexecutecalldatawithnonce) <br/> [`transformCallsToMulticallArrays_cairo1(...)`](https://starknetjs.com/docs/6.23.1/API/namespaces/transaction#transformcallstomulticallarrays_cairo1) |                                                   /                                                    |
+
+- the [`CallStruct`](https://starknetjs.com/docs/6.23.1/API/interfaces/types.CallStruct) type that was used by the `transaction` methods has also been removed
+
+### Removed type alias exports
+
+Multiple TypeScript types have had their old location re-exports removed. They are no longer available within their old namespace but are available as direct imports: `import { *type* } from 'starknet'`.
+
+|  namespace  |                                                                                                                                                                                                                                                                                                            type                                                                                                                                                                                                                                                                                                             |
+| :---------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|    `num`    |                                                                                                                                                                                                                                                                    [`BigNumberish`](https://starknetjs.com/docs/6.23.1/API/namespaces/num#bignumberish)                                                                                                                                                                                                                                                                     |
+| `typedData` | [`TypedDataRevision`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#typeddatarevision) <br/> [`StarknetEnumType`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#starknetenumtype) <br/> [`StarknetMerkleType`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#starknetmerkletype) <br/> [`StarknetType`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#starknettype) <br/> [`StarknetDomain`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#starknetdomain) <br/> [`TypedData`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#typeddata) |
+|  `uint256`  |                                                                                                                                                                                                                   [`UINT_128_MAX`](https://starknetjs.com/docs/6.23.1/API/namespaces/uint256#uint_128_max) <br/> [`UINT_256_MAX`](https://starknetjs.com/docs/6.23.1/API/namespaces/uint256#uint_256_max)                                                                                                                                                                                                                   |
