@@ -103,13 +103,14 @@
     "@scure/base": "1.2.1",
     "@scure/starknet": "1.1.0",
     "abi-wan-kanabi": "2.2.4",
-    "isows": "^1.0.6",
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
     "starknet-types-07": "npm:@starknet-io/types-js@~0.7.10",
     "starknet-types-08": "npm:@starknet-io/types-js@~0.8.1",
-    "ts-mixer": "^6.0.3",
-    "ws": "^8.18.0"
+    "ts-mixer": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",

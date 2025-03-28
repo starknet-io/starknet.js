@@ -28,7 +28,7 @@ import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import { validateAndParseEthAddress } from '../utils/eth';
-import fetch from '../utils/fetch';
+import fetch from '../utils/connect/fetch';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import {
