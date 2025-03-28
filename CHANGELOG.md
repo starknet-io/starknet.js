@@ -1,3 +1,19 @@
+# [7.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v7.0.0-beta.3...v7.0.0-beta.4) (2025-03-28)
+
+### Bug Fixes
+
+- repair snip-12 enum type nested dependency ([#1289](https://github.com/starknet-io/starknet.js/issues/1289)) ([1cd4219](https://github.com/starknet-io/starknet.js/commit/1cd4219df5e61a676bc58ba8c8673269695fc2db))
+
+### Features
+
+- drop fetch-cookie dependency ([9a57daf](https://github.com/starknet-io/starknet.js/commit/9a57dafce473432df7040f68e0824e9e78f6e215))
+- drop isomorphic-fetch dependency ([9da0083](https://github.com/starknet-io/starknet.js/commit/9da0083d2084b0bd9ec7da06ea9a80f267f4e397))
+- prune deprecated functionalities ([cbd18f5](https://github.com/starknet-io/starknet.js/commit/cbd18f59fb0749c558ba4eabc0f094464941b088))
+
+### BREAKING CHANGES
+
+- Removed multiple functionalities that have been marked as deprecated
+
 # [7.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v7.0.0-beta.2...v7.0.0-beta.3) (2025-03-13)
 
 ### Features
