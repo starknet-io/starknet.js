@@ -1,3 +1,9 @@
+## [7.0.1](https://github.com/starknet-io/starknet.js/compare/v7.0.0...v7.0.1) (2025-03-28)
+
+### Bug Fixes
+
+- preserve value for numeric arguments within address padding utility ([abc7958](https://github.com/starknet-io/starknet.js/commit/abc7958a68f5edc396f038f2352a9d747980502f))
+
 # [7.0.0](https://github.com/starknet-io/starknet.js/compare/v6.24.1...v7.0.0) (2025-03-28)
 
 - Implement RPC 0.8 and V3 transactions ([#1328](https://github.com/starknet-io/starknet.js/issues/1328)) ([316ae27](https://github.com/starknet-io/starknet.js/commit/316ae2789376368dcffe653ce4817eebf0a63d97))
