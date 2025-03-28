@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "7.0.0-beta.4",
+  "version": "7.0.0",
   "description": "JavaScript library for Starknet",
   "license": "MIT",
   "repository": {

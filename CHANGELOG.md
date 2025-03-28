@@ -1,3 +1,26 @@
+# [7.0.0](https://github.com/starknet-io/starknet.js/compare/v6.24.1...v7.0.0) (2025-03-28)
+
+- Implement RPC 0.8 and V3 transactions ([#1328](https://github.com/starknet-io/starknet.js/issues/1328)) ([316ae27](https://github.com/starknet-io/starknet.js/commit/316ae2789376368dcffe653ce4817eebf0a63d97))
+
+### Bug Fixes
+
+- contract withOptions Fix/1252 ([#1255](https://github.com/starknet-io/starknet.js/issues/1255)) ([b59952e](https://github.com/starknet-io/starknet.js/commit/b59952e74baf82641d6028c96625db104049c02e))
+- update ws impl, add TEST_WS_URL, update token constants ([411eeec](https://github.com/starknet-io/starknet.js/commit/411eeec1df6a38358f28612260066b38fc942957))
+
+### Features
+
+- drop fetch-cookie dependency ([9a57daf](https://github.com/starknet-io/starknet.js/commit/9a57dafce473432df7040f68e0824e9e78f6e215))
+- drop isomorphic-fetch dependency ([9da0083](https://github.com/starknet-io/starknet.js/commit/9da0083d2084b0bd9ec7da06ea9a80f267f4e397))
+- prune deprecated functionalities ([cbd18f5](https://github.com/starknet-io/starknet.js/commit/cbd18f59fb0749c558ba4eabc0f094464941b088))
+- the WebSockets ([#1251](https://github.com/starknet-io/starknet.js/issues/1251)) ([fabca27](https://github.com/starknet-io/starknet.js/commit/fabca27a7a3e398030a99cf8d78bffa51cebfe9a)), closes [#1272](https://github.com/starknet-io/starknet.js/issues/1272)
+- Update Beta to latest Develop ([#1312](https://github.com/starknet-io/starknet.js/issues/1312)) ([2958051](https://github.com/starknet-io/starknet.js/commit/295805116cf0f57b8708f545cc187f19f79588f4)), closes [#949](https://github.com/starknet-io/starknet.js/issues/949) [#970](https://github.com/starknet-io/starknet.js/issues/970)
+- v7 fee, new methods, tests ([#1337](https://github.com/starknet-io/starknet.js/issues/1337)) ([00743de](https://github.com/starknet-io/starknet.js/commit/00743de2cad5375a558844646f11b4adef15188b))
+
+### BREAKING CHANGES
+
+- Removed multiple functionalities that have been marked as deprecated
+- Library defaults to RPC 0.8 with the corresponding API changes, dropped RPC 0.6 support
+
 # [7.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v7.0.0-beta.3...v7.0.0-beta.4) (2025-03-28)
 
 ### Bug Fixes
