@@ -9,15 +9,18 @@ const starknet_trace_api_openrpc = require('starknet_specs/api/starknet_trace_ap
 const starknet_write_api = require('starknet_specs/api/starknet_write_api.json');
 const starknet_ws_api = require('starknet_specs/api/starknet_ws_api.json');
 
+const extractErrors = (api) => api?.components?.errors || {}; 
+
 const errorNameCodeMap = Object.fromEntries(
-  Object.entries({
-    ...starknet_api_openrpc.components.errors,
-    ...starknet_executables.components.errors,
-    ...starknet_trace_api_openrpc.components.errors,
-    ...starknet_write_api.components.errors,
-    ...starknet_ws_api.components.errors,
-  })
-    .map((e) => [e[0], e[1].code])
+  [
+    ...Object.entries(extractErrors(starknet_api_openrpc)),
+    ...Object.entries(extractErrors(starknet_executables)),
+    ...Object.entries(extractErrors(starknet_trace_api_openrpc)),
+    ...Object.entries(extractErrors(starknet_write_api)),
+    ...Object.entries(extractErrors(starknet_ws_api)),
+  ]
+    .filter(([_, value]) => value?.code !== undefined)
+    .map(([key, value]) => [key, value.code])
     .sort((a, b) => a[1] - b[1])
 );
 
