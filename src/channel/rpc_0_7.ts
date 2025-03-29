@@ -188,8 +188,8 @@ export class RpcChannel {
     if (!this.specVersion) {
       const extendedVersion = await this.getSpecificationVersion();
       const [major, minor] = extendedVersion.split('.');
-      const specVerson = `${major}.${minor}` as SupportedRpcVersion;
-      this.specVersion ??= specVerson;
+      const specVersion = `${major}.${minor}` as SupportedRpcVersion;
+      this.specVersion ??= specVersion;
     }
     return this.specVersion;
   }
