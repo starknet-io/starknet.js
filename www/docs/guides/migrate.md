@@ -4,7 +4,8 @@ sidebar_position: 101
 
 # Migrate from v6 to v7
 
-This document only covers the features present in v6 which have changed in some significant way in v7.  
+This document only covers the features present in v6 which have changed in some significant way in v7.
+
 If you encounter any missing changes, please let us know and we will update this guide.
 
 ## Fetch dependencies
@@ -24,35 +25,39 @@ const provider = new RpcProvider({
 
 ## Rpc compatibility
 
-Starknet.js v6 is compatible with Starknet nodes Rpc 0.6 & 0.7.  
-Starknet.js v7 is no more compatible with Rpc 0.6, and is now compatible with Rpc 0.8. It means that it's compatible only for Rpc 0.7 & 0.8.
+Starknet.js v6 is compatible with Starknet RPC **0.6** and **0.7** nodes.
 
-By default, Starknet.js v7 is using only Rpc 0.8 with V3 transactions (STRK fees). It means that by default, you can no more execute V1 transactions (ETH fees).
+Starknet.js v7 drops support for RPC **0.6**, and introduces support for RPC **0.8**, it supports RPC **0.7** and **0.8** nodes.
 
-|                   | Rpc 0.7  | Rpc 0.8 <br /> (default) |
+By default, Starknet.js v7 uses RPC **0.8** with **V3** transactions (STRK fees). This means that you can no longer execute **V1** transactions (ETH fees) by default.
+
+|                   | RPC 0.7  | RPC 0.8 <br /> (default) |
 | ----------------: | :------: | :----------------------: |
 |  V1 tx (ETH fees) | Possible |        Impossible        |
 | V3 tx (STRK fees) | Default  |         Default          |
 
-You can configure your code to be able to use Rpc 0.7, with ETH & STRK fees available:
+You can configure your code to use RPC **0.7** with ETH and STRK fees available by using the following options:
 
-- Add `specVersion: "0.7"` property to the instantiation of the RpcProvider.
-- Add `config.set("legacyMode", true)` to authorize V1 transactions.
-- Add `logger.setLogLevel('ERROR')` if you want to remove the warnings when processing V1 transactions.
+- Define `specVersion: '0.7'` when instantiating an RpcProvider
+- Use `config.set('legacyMode', true)` to enable **V1** transactions
+- Use `logger.setLogLevel('ERROR')` if you want to remove the warnings when processing **V1** transactions
 
 ```typescript
 import { RpcProvider, Account, config, logger, ETransactionVersion } from 'starknet';
+
 const myProvider = new RpcProvider({
   nodeUrl: 'https://free-rpc.nethermind.io/sepolia-juno/v0_7',
   specVersion: '0.7',
 });
+
 config.set('legacyMode', true);
+
 logger.setLogLevel('ERROR');
 ```
 
-By default, you are now processing V3 transactions with Rpc 0.7. To process a V1 transaction,
+With the above settings the code still uses **V3** transactions with RPC **0.7** by default. To utilize **V1** transactions there are two approaches:
 
-- you can configure the Account to process by default V1 transactions:
+- either configure it at the `Account` instance level by setting the appropriate constructor parameter:
 
 ```typescript
 const account0 = new Account(
@@ -64,7 +69,7 @@ const account0 = new Account(
 );
 ```
 
-- if the account is not configured for V1 transactions, you can add an option to any transaction:
+- or configure it for individual method invocations by setting the corresponding options parameter property:
 
 ```typescript
 const res = await account0.execute(myCall, { version: 1 });
@@ -97,4 +102,4 @@ As the verification of a message in Starknet network is not related to the Accou
 
 ## Transaction receipt
 
-In transaction receipt, the status `isRejected` is removed.
+In the transaction receipt `ReceiptTx` class, the status [`isRejected`](https://starknetjs.com/docs/6.23.1/API/classes/ReceiptTx#isrejected) has been removed.
