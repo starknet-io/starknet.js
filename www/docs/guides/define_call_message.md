@@ -129,7 +129,7 @@ bytes31 is similar to shortString.
 You can send to Starknet.js methods: string.
 
 ```typescript
-await myContract.my_function('Token', '0x0x534e5f4d41494e'); // send 2 shortStrings
+await myContract.my_function('Token', '0x534e5f4d41494e'); // send 2 shortStrings
 ```
 
 To encode yourself a string:

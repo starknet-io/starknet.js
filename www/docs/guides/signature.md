@@ -82,7 +82,7 @@ console.log('Result (boolean) =', isFullPubKeyRelatedToAccount);
 The sender can provide an account address, despite a full public key.
 
 ```typescript
-const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' }); //devnet-rs
+const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' }); //devnet
 const accountAddress = '0x...'; // account of sender
 
 const msgHash2 = hash.computeHashOnElements(message);
@@ -251,7 +251,7 @@ The Ledger shall be connected, unlocked, with the Starknet internal APP activate
 
 Some complete examples :  
 A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/6.testLedgerAccount221.ts).  
-A test Web DAPP, to use in devnet-rs network : [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
+A test Web DAPP, to use in devnet network : [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
 
 If you want to read the version of the Ledger Starknet APP :
 

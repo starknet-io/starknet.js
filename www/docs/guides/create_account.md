@@ -18,7 +18,7 @@ Creating an account is a bit tricky; you have several steps:
 
 ## Create an OZ (Open Zeppelin) account
 
-Here, we will create a wallet with the Open Zeppelin smart contract v0.8.1. The contract class is already implemented in Testnet.  
+Here, we will create a wallet with the Open Zeppelin smart contract v0.17.0. The contract class is already implemented in Testnet.  
 This contract is coded in Cairo 1.
 
 ```typescript
@@ -28,17 +28,17 @@ import { Account, constants, ec, json, stark, RpcProvider, hash, CallData } from
 ### Compute address
 
 ```typescript
-// connect provider (Mainnet or Sepolia)
+// connect rpc 0.8 provider (Mainnet or Sepolia)
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
-// new Open Zeppelin account v0.8.1
+// new Open Zeppelin account v0.17.0
 // Generate public and private key pair.
 const privateKey = stark.randomAddress();
 console.log('New OZ account:\nprivateKey=', privateKey);
 const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
 console.log('publicKey=', starkKeyPub);
 
-const OZaccountClassHash = '0x061dac032f228abef9c6626f995015233097ae253a7f72d68552db02f2971b8f';
+const OZaccountClassHash = '0x540d7f5ec7ecf317e68d48564934cb99259781b1ee3cedbbc37ec5337f8e688';
 // Calculate future address of the account
 const OZaccountConstructorCallData = CallData.compile({ publicKey: starkKeyPub });
 const OZcontractAddress = hash.calculateContractAddressFromHash(
@@ -50,27 +50,27 @@ const OZcontractAddress = hash.calculateContractAddressFromHash(
 console.log('Precalculated account address=', OZcontractAddress);
 ```
 
-If you want a specific private key, replace `stark.randomAddress`()` with your choice.
+If you want a specific private key, replace `stark.randomAddress()` with your choice.
 
 Then you have to fund this address!
 
 How to proceed is out of the scope of this guide, but you can for example:
 
-- Transfer ETH from another wallet.
-- Bridge ETH to this Starknet address.
+- Transfer STRK from another wallet.
+- Bridge STRK to this Starknet address.
 - Use a faucet. (https://starknet-faucet.vercel.app/)
-- Mint ETH on starknet-devnet-rs, like so:
+- Mint STRK on starknet-devnet, like so:
 
 ```bash
-// ETH
-curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000}' -H "Content-Type:application/json"
 // STRK
 curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"unit":"FRI"}' -H "Content-Type:application/json"
+// ETH
+curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"unit":"WEI"}' -H "Content-Type:application/json"
 ```
 
 ### Deployment of the new account
 
-If you have sent enough funds to this new address, you can go forward to the final step:
+If you have sent enough STRK to this new address, you can go forward to the final step:
 
 ```typescript
 const OZaccount = new Account(provider, OZcontractAddress, privateKey);
@@ -88,6 +88,10 @@ console.log('✅ New OpenZeppelin account created.\n   address =', contract_addr
 ## Create an Argent account
 
 Here, we will create a wallet with the Argent smart contract v0.4.0. The contract class is already implemented in the networks.
+
+:::caution
+Smart ArgentX accounts can't be used outside of the ArgentX wallet. With Starknet.js, use only standard ArgentX accounts.
+:::
 
 ```typescript
 import {
@@ -107,7 +111,7 @@ import {
 ### Compute address
 
 ```typescript
-// connect provider
+// connect rpc 0.8 provider
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
 //new Argent X account v0.4.0
@@ -142,7 +146,7 @@ Then you have to fund this address.
 
 ### Deployment of the new account
 
-If you have sent enough funds to this new address, you can go forward to the final step:
+If you have sent enough STRK to this new address, you can go forward to the final step:
 
 ```typescript
 const accountAX = new Account(provider, AXcontractAddress, privateKeyAX);
@@ -161,12 +165,12 @@ console.log('✅ ArgentX wallet deployed at:', AXcontractFinalAddress);
 
 ## Create a Braavos account
 
-More complicated, a Braavos account needs a proxy and a specific signature. Starknet.js is handling only Starknet standard signatures; so we need extra code to handle this specific signature for account creation. These nearly 200 lines of code are not displayed here but are available in a module [here](./doc_scripts/deployBraavos.ts).
+More complicated, a Braavos account needs a proxy and a specific signature. Starknet.js is handling only Starknet standard signatures; so we need extra code to handle this specific signature for account creation. These nearly 400 lines of code are not displayed here but are available in a module [here](./doc_scripts/deployBraavos.ts).
 
 We will deploy hereunder a Braavos account in devnet. So launch starknet-devnet with these parameters:
 
 ```bash
-starknet-devnet --seed 0 --fork-network 'https://free-rpc.nethermind.io/sepolia-juno/v0_7'
+starknet-devnet --seed 0 --fork-network 'https://free-rpc.nethermind.io/sepolia-juno/v0_8'
 ```
 
 Initialization:
@@ -207,8 +211,10 @@ console.log('Calculated account address=', BraavosProxyAddress);
 
 ```typescript
 // estimate fees
-const estimatedFee = await estimateBraavosAccountDeployFee(privateKeyBraavos, providerDevnet);
-console.log('calculated fee =', estimatedFee);
+const estimatedFee = await estimateBraavosAccountDeployFee(privateKeyBraavos, providerDevnet, {
+  version: ETransactionVersion.V3,
+});
+console.log('calculated fees =', estimatedFee);
 ```
 
 ### Deploy account
@@ -219,22 +225,22 @@ const { data: answer } = await axios.post(
   'http://127.0.0.1:5050/mint',
   {
     address: BraavosProxyAddress,
-    amount: 10_000_000_000_000_000_000,
+    amount: 100_000_000_000_000_000_000,
+    unit: 'FRI',
   },
   { headers: { 'Content-Type': 'application/json' } }
 );
-console.log('Answer mint =', answer); // 10 ETH
+console.log('Answer mint =', answer); // 100 STRK
 
 // deploy Braavos account
 const { transaction_hash, contract_address: BraavosAccountFinalAddress } =
-  await deployBraavosAccount(privateKeyBraavos, providerDevnet, estimatedFee);
-// estimatedFee is optional
+  await deployBraavosAccount(privateKeyBraavos, providerDevnet);
 console.log('Transaction hash =', transaction_hash);
 await providerDevnet.waitForTransaction(transaction_hash);
-console.log('✅ Braavos wallet deployed at', BraavosAccountFinalAddress);
+console.log('✅ Braavos account deployed at', BraavosAccountFinalAddress);
 ```
 
-The computed address has been funded automatically by minting a new dummy ETH in Starknet devnet!
+The computed address has been funded automatically by minting dummy STRK in Starknet devnet!
 
 ## Create an Ethereum account
 
@@ -249,8 +255,9 @@ Below is an example of account creation in Sepolia Testnet.
 const privateKeyETH = '0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9';
 const ethSigner = new EthSigner(privateKeyETH);
 const ethFullPublicKey = await ethSigner.getPubKey();
-const accountEthClassHash = '0x23e416842ca96b1f7067693892ed00881d97a4b0d9a4c793b75cb887944d98d';
-const myCallData = new CallData(ethAccountAbi);
+// OpenZeppelin v0.17.0 :
+const accountEthClassHash = '0x3940bc18abf1df6bc540cabadb1cad9486c6803b95801e57b6153ae21abfe06';
+const myCallData = new CallData(sierraContract.abi);
 const accountETHconstructorCalldata = myCallData.compile('constructor', {
   public_key: ethFullPublicKey,
 });
@@ -270,7 +277,7 @@ console.log('Pre-calculated ETH account address =', contractETHaddress);
 > const myPrivateKey = eth.ethRandomPrivateKey();
 > ```
 
-Then you have to fund this address.
+Then you have to fund this address with some STRK.
 
 ### Deployment of the new account
 
@@ -283,12 +290,12 @@ const deployPayload = {
   constructorCalldata: accountETHconstructorCalldata,
   addressSalt: salt,
 };
-const { suggestedMaxFee: feeDeploy } = await ethAccount.estimateAccountDeployFee(deployPayload);
-const { transaction_hash, contract_address } = await ethAccount.deployAccount(
-  deployPayload,
-  { maxFee: stark.estimatedFeeToMaxFee(feeDeploy, 100) }
-  // Extra fee to fund the validation of the transaction
-);
+const estimatedFees = await ethAccount.estimateAccountDeployFee(deployPayload, {
+  skipValidate: false,
+});
+const { transaction_hash, contract_address } = await ethAccount.deployAccount(deployPayload, {
+  skipValidate: false,
+});
 await provider.waitForTransaction(transaction_hash);
 console.log('✅ New Ethereum account final address =', contract_address);
 ```
@@ -315,7 +322,7 @@ You can entirely customize the wallet - for example:
 
 The only limitation is your imagination...
 
-Here is an example of a customized wallet, including super administrator management, on a local starknet-devnet-rs:
+Here is an example of a customized wallet, including super administrator management, on a local starknet-devnet:
 
 > launch `cargo run --release -- --seed 0` before using this script
 
@@ -329,7 +336,7 @@ import axios from 'axios';
 // connect provider
 const provider = new RpcProvider({ network: 'http://127.0.0.1:5050/rpc' });
 
-// initialize existing pre-deployed account 0 of Devnet-rs
+// initialize existing pre-deployed account 0 of Devnet
 const privateKey0 = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
 const accountAddress0 = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
 const account0 = new Account(provider, accountAddress0, privateKey0);
@@ -369,7 +376,11 @@ console.log('Precalculated account address=', AAcontractAddress);
 // fund account address before account creation
 const { data: answer } = await axios.post(
   'http://127.0.0.1:5050/mint',
-  { address: AAcontractAddress, amount: 50_000_000_000_000_000_000, lite: true },
+  {
+    address: AAcontractAddress,
+    amount: 50_000_000_000_000_000_000,
+    unit: 'FRI',
+  },
   { headers: { 'Content-Type': 'application/json' } }
 );
 console.log('Answer mint =', answer);

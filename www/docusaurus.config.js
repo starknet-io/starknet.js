@@ -69,7 +69,7 @@ const config = {
         //... other Algolia param
       },
       announcementBar: {
-        content: `<a href="${migrationGuideLink}">Migrate from v5</a>`,
+        content: `<a href="${migrationGuideLink}">Migrate from v6</a>`,
         backgroundColor: 'rgb(230 231 232)',
       },
       navbar: {
@@ -119,7 +119,7 @@ const config = {
                 to: '/docs/guides/intro',
               },
               {
-                label: 'Migrate from v5',
+                label: 'Migrate from v6',
                 to: migrationGuideLink,
               },
             ],

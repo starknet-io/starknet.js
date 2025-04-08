@@ -46,10 +46,10 @@ const account0 = new Account(provider, account0Address, privateKey0);
 
 // Declare & deploy Test contract in devnet
 const compiledTestSierra = json.parse(
-  fs.readFileSync('./compiledContracts/test.sierra').toString('ascii')
+  fs.readFileSync('./compiledContracts/test.contract_class.json').toString('ascii')
 );
 const compiledTestCasm = json.parse(
-  fs.readFileSync('./compiledContracts/test.casm').toString('ascii')
+  fs.readFileSync('./compiledContracts/test.compiled_contract_class.json').toString('ascii')
 );
 const deployResponse = await account0.declareAndDeploy({
   contract: compiledTestSierra,
@@ -201,4 +201,6 @@ await provider.waitForTransaction(declareResponse.transaction_hash);
 console.log('✅ Test Completed.');
 ```
 
-> If the class is already declared, `declare()` will fail. You can also use `declareIfNot()` to not fail in this case.
+:::tip
+If the class is already declared, `declare()` will fail. You can also use `declareIfNot()` to not fail in this case.
+:::

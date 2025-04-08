@@ -24,7 +24,7 @@ import { WebSocketChannel } from 'starknet';
 ### Create instance
 
 ```typescript
-// crete new ws channel
+// create new ws channel
 const webSocketChannel = new WebSocketChannel({
   nodeUrl: 'wss://sepolia-pathfinder-rpc.server.io/rpc/v0_8',
 });

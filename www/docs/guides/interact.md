@@ -8,11 +8,11 @@ Once your provider, contract, and account are connected, you can interact with t
 
 - you can read the memory of the contract, without fees.
 - you can write to memory, but you have to pay fees.
-  - On Mainnet, you have to pay fees with a bridged ETH token.
-  - On Testnet, you have to pay with a bridged Sepolia ETH token.
-  - On devnet, you have to pay with a dummy ETH token.
+  - On Mainnet, you have to pay fees with bridged STRK or ETH token.
+  - On Testnet, you have to pay with bridged Sepolia STRK or Sepolia ETH token.
+  - On devnet, you have to pay with dummy STRK or ETH token.
 
-Your account should be funded enough to pay fees (0.01 ETH should be enough to start).
+Your account should be funded enough to pay fees (20 STRK should be enough to start).
 
 ![](./pictures/Interact_contract.png)
 
@@ -62,6 +62,10 @@ You have to invoke Starknet, with the use of the meta-class method: `contract.fu
 
 > After the invoke, you have to wait the incorporation of the modification of Balance in the network, with `await provider.waitForTransaction(transaction_hash)`
 
+:::note
+By default, you are executing transactions that uses STRK token to pay the fees.
+:::
+
 Here is an example of how to increase and check the balance:
 
 ```typescript
@@ -99,83 +103,46 @@ console.log('Final balance =', bal2);
 
 `Contract.populate()` is the recommended method to define the parameters to call/invoke the Cairo functions.
 
-## ✍️ Send a V3 transaction, paying fees with STRK
+## ✍️ Send a transaction, paying fees with ETH
 
-We have seen in the previous chapter how to send a "legacy" transaction, with fees paid in ETH.  
-You can also send transactions and pay the fees with the STRK token. It is called a V3 transaction.  
-To perform a such transaction, you need:
+You need to be connected to a node using Rpc 0.7:
 
-- an account compatible with V3 transactions.
-- Some STRK tokens in this account.
-- a node with a rpc spec 0.6.0.
-- Starknet.js v6.
+- Define `specVersion: '0.7'` when instantiating an RpcProvider
+- Use `config.set('legacyMode', true)` to enable **V1** transactions (ETH fees)
+- Use `logger.setLogLevel('ERROR')` if you want to remove the warnings when processing **V1** transactions
 
-You have to initialize the account this way :
+```typescript
+import { RpcProvider, Account, config, logger, ETransactionVersion } from 'starknet';
+
+const myProvider = new RpcProvider({
+  nodeUrl: 'https://free-rpc.nethermind.io/sepolia-juno/v0_7',
+  specVersion: '0.7',
+});
+
+config.set('legacyMode', true);
+
+logger.setLogLevel('ERROR');
+```
+
+With the above settings the code still uses **V3** transactions (STRK fees) with RPC **0.7** by default. To utilize **V1** transactions (ETH fees) there are two approaches:
+
+- either configure it at the `Account` instance level by setting the appropriate constructor parameter:
 
 ```typescript
 const account0 = new Account(
-  provider,
+  myProvider,
   accountAddress0,
   privateKey0,
   undefined,
-  constants.TRANSACTION_VERSION.V3
+  ETransactionVersion.V2
 );
 ```
 
-By this way, all the transactions sent by this account are by default performed in V3 (paid with STRK). If the transactionVersion parameter is omitted, "legacy" transactions will be performed.
-
-One example of V3 transaction, using account.execute :
+- or configure it for individual method invocations by setting the corresponding options parameter property:
 
 ```typescript
-const myCall = myTestContract.populate('test_fail', [100]);
-const maxQtyGasAuthorized = 1800n; // max quantity of gas authorized
-const maxPriceAuthorizeForOneGas = 12n * 10n ** 9n; // max FRI authorized to pay 1 gas (1 FRI=10**-18 STRK)
-console.log('max authorized cost =', maxQtyGasAuthorized * maxPriceAuthorizeForOneGas, 'FRI');
-const { transaction_hash: txH } = await account0.execute(myCall, {
-  version: 3,
-  maxFee: 10 ** 15,
-  feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1,
-  tip: 10 ** 13,
-  paymasterData: [],
-  resourceBounds: {
-    l1_gas: {
-      max_amount: num.toHex(maxQtyGasAuthorized),
-      max_price_per_unit: num.toHex(maxPriceAuthorizeForOneGas),
-    },
-    l2_gas: {
-      max_amount: num.toHex(0),
-      max_price_per_unit: num.toHex(0),
-    },
-  },
-});
-const txR = await provider.waitForTransaction(txH);
-if (txR.isSuccess()) {
-  console.log('Paid fee =', txR.actual_fee);
-}
+const res = await account0.execute(myCall, { version: 1 });
 ```
-
-Yes, it's much more complicated. Let's see in detail.  
-In fact, Starknet v0.13.0 is using few of these parameters :  
-`feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L2` is not yet accepted.  
-`feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1` is accepted.  
-`maxFee : 10**15` : value not taken into account in V3  
-`tip: 10**13` : value not yet taken into account  
-`paymasterData: []` : only empty value currently authorized
-
-```typescript
-l1_gas: {
-      max_amount: num.toHex(2000n),  // max quantity of gas authorized
-    max_price_per_unit: num.toHex(12n * 10n ** 9n) // max FRI authorized to pay 1 gas (here 12 G FRI)
-},
-l2_gas: {
-    max_amount: num.toHex(0), // currently set to 0
-    max_price_per_unit: num.toHex(0) // currently set to 0
-}
-```
-
-Take care that these gas values have to be `string` type.  
-In future versions, Starknet will uses all these parameters.  
-The `version` parameter is optional (account settings by default), and overtakes the `transactionVersion` parameter of the Account instantiation. Here, it's not really necessary to use this parameter, as the same transaction version has been already initialized in the account instantiation.
 
 ## Sending sequential transactions
 
@@ -251,7 +218,7 @@ const result = await account.execute(myCall);
 const txR = await provider.waitForTransaction(result.transaction_hash);
 
 console.log(txR.statusReceipt, txR.value);
-console.log(txR.isSuccess(), txR.isRejected(), txR.isReverted(), txR.isError());
+console.log(txR.isSuccess(), txR.isReverted(), txR.isError());
 
 txR.match({
   success: () => {
@@ -265,9 +232,6 @@ txR.match({
 txR.match({
   success: (txR: SuccessfulTransactionReceiptResponse) => {
     console.log('Success =', txR);
-  },
-  rejected: (txR: RejectedTransactionReceiptResponse) => {
-    console.log('Rejected =', txR);
   },
   reverted: (txR: RevertedTransactionReceiptResponse) => {
     console.log('Reverted =', txR);

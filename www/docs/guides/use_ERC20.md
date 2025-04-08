@@ -25,11 +25,12 @@ The account contract will use the public key to check that you have the private 
 
 This way, the ERC20 contract is absolutely sure that the caller of the transfer function knows the private key of this account.
 
-## ETH token is an ERC20 in Starknet
+## STRK token is an ERC20 in Starknet
 
-In opposition to Ethereum, the ETH token is an ERC20 in Starknet, like all other tokens. In all networks, its ERC20 contract address is:
+In opposition to Ethereum, the ETH & STRK fee tokens are both ERC20 in Starknet, like all other tokens. In all networks, their ERC20 contract addresses are :
 
 ```typescript
+const addrSTRK = '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d';
 const addrETH = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';
 ```
 
@@ -37,14 +38,14 @@ const addrETH = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004
 
 Let's dive down the rabbit hole!
 
-This example works with an ERC20, that we will deploy on the devnet-rs (launched with `cargo run --release -- --seed 0`).
+This example works with an ERC20, that we will deploy on the devnet rpc 0.8 (launched with `cargo run --release -- --seed 0`).
 
 First, let's initialize an existing account:
 
 ```typescript
 // initialize provider
 const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
-// initialize existing pre-deployed account 0 of Devnet-rs
+// initialize existing pre-deployed account 0 of Devnet
 const privateKey = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
 const accountAddress = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
 
