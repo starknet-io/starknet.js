@@ -10,6 +10,7 @@ import { Account, AccountInterface } from '../account';
 import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
 import {
+  Abi,
   AllowArray,
   CairoVersion,
   Call,
@@ -19,6 +20,7 @@ import {
   ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
+  UniversalDetails,
 } from '../types';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
@@ -37,6 +39,8 @@ import {
 } from './connect';
 import { StarknetWalletProvider } from './types';
 import { logger } from '../global/logger';
+import { PaymasterOptions } from '../types/paymaster';
+import { PaymasterInterface } from '../paymaster';
 
 // TODO: Remove non address constructor in next major version
 // Represent 'Selected Active' Account inside Connected Wallet
@@ -61,9 +65,17 @@ export class WalletAccount extends Account implements AccountInterface {
     providerOrOptions: ProviderOptions | ProviderInterface,
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion,
-    address: string = ''
+    address?: string,
+    paymaster?: PaymasterOptions | PaymasterInterface
+  );
+  constructor(
+    providerOrOptions: ProviderOptions | ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion,
+    address: string = '',
+    paymaster?: PaymasterOptions | PaymasterInterface
   ) {
-    super(providerOrOptions, address, '', cairoVersion); // At this point unknown address
+    super(providerOrOptions, address, '', cairoVersion, undefined, paymaster); // At this point unknown address
     this.walletProvider = walletProvider;
 
     // Update Address on change
@@ -127,7 +139,16 @@ export class WalletAccount extends Account implements AccountInterface {
   /**
    * ACCOUNT METHODS
    */
-  override execute(calls: AllowArray<Call>) {
+  override execute(
+    calls: AllowArray<Call>,
+    arg2?: Abi[] | UniversalDetails,
+    transactionsDetail: UniversalDetails = {}
+  ) {
+    const details = arg2 === undefined || Array.isArray(arg2) ? transactionsDetail : arg2;
+    if (details.paymaster) {
+      return this.executePaymaster(Array.isArray(calls) ? calls : [calls], details.paymaster);
+    }
+
     const txCalls = [].concat(calls as any).map((it) => {
       const { contractAddress, entrypoint, calldata } = it;
       return {
