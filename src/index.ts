@@ -4,6 +4,7 @@
 export * from './wallet';
 export * from './account';
 export * from './contract';
+export * from './paymaster';
 export * from './provider';
 export * from './signer';
 export * from './channel';
@@ -31,6 +32,7 @@ export * as shortString from './utils/shortString';
 export * as typedData from './utils/typedData';
 export * as ec from './utils/ec';
 export * as starknetId from './utils/starknetId';
+export * as paymaster from './utils/paymaster';
 export * as provider from './utils/provider';
 export * as selector from './utils/hash/selector';
 export * as events from './utils/events';

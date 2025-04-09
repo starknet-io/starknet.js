@@ -44,6 +44,7 @@ import {
   TypedData,
   UniversalDeployerContractPayload,
   UniversalDetails,
+  PaymasterDetails,
 } from '../types';
 import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
 import {
@@ -69,6 +70,7 @@ import {
   estimateFeeToBounds,
   randomAddress,
   reduceV2,
+  signatureToHexArray,
   toFeeVersion,
   toTransactionVersion,
   v3Details,
@@ -77,6 +79,10 @@ import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 import { config } from '../global/config';
+import { defaultPaymaster, PaymasterInterface } from '../paymaster';
+import { PaymasterRpc } from '../paymaster/rpc';
+import { PaymasterOptions, TypedDataWithTokenAmountAndPrice } from '../types/paymaster';
+import { TimeBounds } from '../types/api/paymaster-rpc-spec/nonspec';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -87,6 +93,8 @@ export class Account extends Provider implements AccountInterface {
 
   readonly transactionVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
 
+  public paymaster: PaymasterInterface;
+
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
@@ -94,7 +102,8 @@ export class Account extends Provider implements AccountInterface {
     cairoVersion?: CairoVersion,
     transactionVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3 = config.get(
       'accountTxVersion'
-    )
+    ),
+    paymaster?: PaymasterOptions | PaymasterInterface
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
@@ -107,6 +116,7 @@ export class Account extends Provider implements AccountInterface {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
     this.transactionVersion = transactionVersion;
+    this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
   }
 
   // provided version or contract based preferred transactionVersion
@@ -344,6 +354,11 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<InvokeFunctionResponse> {
     const details = arg2 === undefined || Array.isArray(arg2) ? transactionsDetail : arg2;
     const calls = Array.isArray(transactions) ? transactions : [transactions];
+
+    if (details.paymaster) {
+      return this.executePaymaster(calls, details.paymaster);
+    }
+
     const nonce = toBigInt(details.nonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3), // TODO: does this depend on cairo version ?
@@ -386,6 +401,62 @@ export class Account extends Provider implements AccountInterface {
         version,
       }
     );
+  }
+
+  public async buildPaymasterTypedData(
+    calls: Call[],
+    paymasterDetails?: PaymasterDetails
+  ): Promise<TypedDataWithTokenAmountAndPrice> {
+    const timeBounds: TimeBounds | undefined =
+      paymasterDetails?.timeBounds &&
+      paymasterDetails.timeBounds.executeAfter &&
+      paymasterDetails.timeBounds.executeBefore
+        ? {
+            execute_after: paymasterDetails.timeBounds.executeAfter.getTime().toString(),
+            execute_before: paymasterDetails.timeBounds.executeBefore.getTime().toString(),
+          }
+        : undefined;
+    const gasTokenAddress = paymasterDetails?.gasToken
+      ? toHex(BigInt(paymasterDetails.gasToken))
+      : undefined;
+    return this.paymaster.buildTypedData(
+      this.address,
+      calls,
+      gasTokenAddress,
+      timeBounds,
+      paymasterDetails?.deploymentData
+    );
+  }
+
+  public async executePaymaster(
+    calls: Call[],
+    paymasterDetails?: PaymasterDetails
+  ): Promise<InvokeFunctionResponse> {
+    const { typedData, tokenAmountAndPrice } = await this.buildPaymasterTypedData(
+      calls,
+      paymasterDetails
+    );
+    if (
+      paymasterDetails?.maxEstimatedFee &&
+      tokenAmountAndPrice.estimatedAmount > paymasterDetails.maxEstimatedFee
+    ) {
+      throw Error('Estimated max fee too high');
+    }
+    if (
+      paymasterDetails?.maxPriceInStrk &&
+      tokenAmountAndPrice.priceInStrk > paymasterDetails.maxPriceInStrk
+    ) {
+      throw Error('Gas token price is too high');
+    }
+    const signature = await this.signMessage(typedData);
+    return this.paymaster
+      .execute(
+        this.address,
+        typedData,
+        signatureToHexArray(signature),
+        paymasterDetails?.deploymentData
+      )
+      .then((response) => ({ transaction_hash: response.transaction_hash }));
   }
 
   /**
