@@ -6,7 +6,7 @@ import {
   UDC,
   ZERO,
 } from '../global/constants';
-import { Provider, ProviderInterface } from '../provider';
+import { LibraryError, Provider, ProviderInterface } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {
   AccountInvocations,
@@ -117,6 +117,13 @@ export class Account extends Provider implements AccountInterface {
       cairoVersion: this.cairoVersion,
       channel: this.channel.id,
     });
+  }
+
+  /** @deprecated @hidden */
+  // The deprecation tag is meant to discourage use, not to signal future removal
+  // it should only be removed if the relationship with the corresponding Provider.create(...) method changes
+  static async create(): Promise<never> {
+    throw new LibraryError('Not supported');
   }
 
   // provided version or contract based preferred transactionVersion

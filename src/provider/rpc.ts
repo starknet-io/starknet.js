@@ -92,18 +92,22 @@ export class RpcProvider implements ProviderInterface {
    * auto configure channel based on provided node
    * leave space for other async before constructor
    */
-  static async create(optionsOrProvider?: RpcProviderOptions) {
+  // NOTE: the generic T and 'this' reference are used so that the expanded class is generated when a mixin is applied
+  static async create<T extends RpcProvider>(
+    this: { new (...args: ConstructorParameters<typeof RpcProvider>): T },
+    optionsOrProvider?: RpcProviderOptions
+  ): Promise<T> {
     const channel = new RPC07.RpcChannel({ ...optionsOrProvider });
     const spec = await channel.getSpecVersion();
 
     if (isVersion('0.7', spec)) {
-      return new RpcProvider({ ...optionsOrProvider, specVersion: '0.7' });
+      return new this({ ...optionsOrProvider, specVersion: '0.7' }) as T;
     }
     if (isVersion('0.8', spec)) {
-      return new RpcProvider({ ...optionsOrProvider, specVersion: '0.8' });
+      return new this({ ...optionsOrProvider, specVersion: '0.8' }) as T;
     }
 
-    throw new Error('unable to detect specification version');
+    throw new LibraryError('Unable to detect specification version');
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
