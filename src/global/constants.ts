@@ -135,10 +135,12 @@ export const RPC_DEFAULT_NODES = {
   SN_MAIN: [
     `https://starknet-mainnet.public.blastapi.io/rpc/`,
     `https://free-rpc.nethermind.io/mainnet-juno/`,
+    `https://rpc.starknet.lava.build:443`,
   ],
   SN_SEPOLIA: [
     `https://starknet-sepolia.public.blastapi.io/rpc/`,
     `https://free-rpc.nethermind.io/sepolia-juno/`,
+    `https://rpc.starknet-testnet.lava.build:443`,
   ],
 } as const;
 
