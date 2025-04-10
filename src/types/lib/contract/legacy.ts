@@ -36,5 +36,23 @@ export type ContractEntryPointFields = {
 export interface Program extends Record<string, any> {
   builtins: string[];
   data: string[];
-  // TODO: Add missing properties
+  attributes?: Array<{
+    accessible_scopes?: string[];
+    end_pc?: number;
+    flow_tracking_data?: {
+      ap_tracking?: {
+        group?: number;
+        offset?: number;
+      };
+      reference_ids?: Record<string, any>;
+    };
+    name?: string;
+    start_pc?: number;
+    value?: string | number;
+  }>;
+  compiler_version?: string;
+  main_scope?: string;
+  identifiers?: Record<string, any>;
+  reference_manager?: Record<string, any>;
+  debug_info?: Record<string, any>;
 }
