@@ -10,7 +10,7 @@ Once your provider, contract, and account are connected, you can interact with t
 - you can write to memory, but you have to pay fees.
   - On Mainnet, you have to pay fees with bridged STRK or ETH token.
   - On Testnet, you have to pay with bridged Sepolia STRK or Sepolia ETH token.
-  - On devnet, you have to pay with dummy STRK or ETH token.
+  - On Devnet, you have to pay with dummy STRK or ETH token.
 
 Your account should be funded enough to pay fees (20 STRK should be enough to start).
 
@@ -40,7 +40,7 @@ const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 // Connect the deployed Test contract in Sepolia Testnet
 const testAddress = '0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77';
 
-// read abi of Test contract
+// read the ABI of the Test contract
 const { abi: testAbi } = await provider.getClassAt(testAddress);
 if (testAbi === undefined) {
   throw new Error('no abi.');
@@ -63,7 +63,7 @@ You have to invoke Starknet, with the use of the meta-class method: `contract.fu
 > After the invoke, you have to wait the incorporation of the modification of Balance in the network, with `await provider.waitForTransaction(transaction_hash)`
 
 :::note
-By default, you are executing transactions that uses STRK token to pay the fees.
+By default, you are executing transactions that use the STRK token to pay the fees.
 :::
 
 Here is an example of how to increase and check the balance:
@@ -80,7 +80,7 @@ const account0 = new Account(provider, account0Address, privateKey0);
 // Connect the deployed Test contract in Testnet
 const testAddress = '0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77';
 
-// read abi of Test contract
+// read the ABI of the Test contract
 const { abi: testAbi } = await provider.getClassAt(testAddress);
 if (testAbi === undefined) {
   throw new Error('no abi.');
@@ -105,7 +105,7 @@ console.log('Final balance =', bal2);
 
 ## ✍️ Send a transaction, paying fees with ETH
 
-You need to be connected to a node using Rpc 0.7:
+You need to be connected to a node using RPC 0.7:
 
 - Define `specVersion: '0.7'` when instantiating an RpcProvider
 - Use `config.set('legacyMode', true)` to enable **V1** transactions (ETH fees)

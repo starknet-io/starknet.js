@@ -15,9 +15,9 @@ You need 2 pieces of data:
 import { Account, RpcProvider } from 'starknet';
 ```
 
-## Connect to a pre-deployed account in Starknet-devnet
+## Connect to a pre-deployed account in Starknet Devnet
 
-When you launch starknet-devnet, 10 accounts are pre-deployed with 100 dummy ETH & STRK in each.
+When you launch `starknet-devnet`, 10 accounts are pre-deployed with 100 dummy ETH and STRK in each.
 
 Addresses and private keys are displayed on the console at initialization.
 
@@ -34,9 +34,9 @@ Public key : 0x7e52885445756b313ea16849145363ccb73fb4ab0440dbac333cf9d13de82b9
 Then you can use this code:
 
 ```typescript
-// initialize provider for devnet v0.3.0
+// initialize provider for Devnet v0.3.0
 const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
-// initialize existing pre-deployed account 0 of Devnet
+// initialize existing account 0 pre-deployed on Devnet
 const accountAddress = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
 const privateKey = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
 
@@ -59,7 +59,7 @@ For example, to connect an existing account on testnet, with a private key store
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-// initialize rpc v0.8 provider
+// initialize RPC v0.8 provider
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 // initialize existing account
 const privateKey = process.env.OZ_NEW_ACCOUNT_PRIVKEY;
@@ -69,7 +69,7 @@ const account = new Account(provider, accountAddress, privateKey);
 ```
 
 :::tip
-If you are connected to a rpc v0.7 node, and if you want to use ETH as fees for this account:
+If you are connected to an RPC v0.7 node and you want to use ETH as fees for this account:
 
 ```typescript
 const myAccount = new Account(
@@ -85,7 +85,8 @@ const myAccount = new Account(
 
 ## Connect to an account that uses Ethereum signature
 
-As a consequence of account abstraction, you can find accounts that uses Ethereum signature logical.  
+Accounts that use Ethereum signatures are possible because of account abstraction.
+
 To connect to this type of account:
 
 ```typescript

@@ -4,7 +4,7 @@ sidebar_position: 11
 
 # Estimate fees
 
-By default, all non-free Starknet commands (declare, deploy, invoke) work without any limitation of cost.
+By default, all non-free Starknet commands (declare, deploy, invoke) work without any cost limits.
 
 You might want to inform the DAPP user of the cost of the incoming paid command before proceeding and requesting its validation.
 
@@ -22,13 +22,13 @@ const { suggestedMaxFee, unit } = await account0.estimateInvokeFee({
 });
 ```
 
-The result is in `suggestedMaxFee`, of type BigInt. The unit of this number is in `unit`. it's WEI for "legacy" transactions, and FRI for V3 transactions.
+The result is in `suggestedMaxFee`, of type BigInt. The corresponding unit for this number is in `unit`. It's WEI for "legacy" transactions, and FRI for V3 transactions.
 
 :::tip
 More details about the complex subject of Starknet fees in [Starknet docs](https://docs.starknet.io/architecture-and-concepts/network-architecture/fee-mechanism/)
 :::
 
-The complete answer for a rpc 0.7 "legacy" transaction :
+The complete answer for an RPC 0.7 "legacy" transaction:
 
 ```typescript
 {
@@ -46,7 +46,7 @@ The complete answer for a rpc 0.7 "legacy" transaction :
 }
 ```
 
-The complete answer for a rpc 0.7 V3 transaction :
+The complete answer for an RPC 0.7 V3 transaction:
 
 ```typescript
 {
@@ -64,7 +64,7 @@ The complete answer for a rpc 0.7 V3 transaction :
 }
 ```
 
-The complete answer for a rpc 0.8 V3 transaction :
+The complete answer for an RPC 0.8 V3 transaction:
 
 ```typescript
 {
@@ -96,7 +96,7 @@ const { suggestedMaxFee } = await account0.estimateDeclareFee({
 });
 ```
 
-The result is in `suggestedMaxFee`, of type BigInt. Units and full response format are the same than `invoke`.
+The result is in `suggestedMaxFee`, of type BigInt. The units and full response format are the same as `invoke`.
 
 ## estimateDeployFee
 
@@ -110,7 +110,7 @@ const { suggestedMaxFee } = await account0.estimateDeployFee({
 });
 ```
 
-The result is in `suggestedMaxFee`, of type BigInt. Units and full response format are the same than `invoke`.
+The result is in `suggestedMaxFee`, of type BigInt. The units and full response format are the same as `invoke`.
 
 ## estimateAccountDeployFee
 
@@ -128,7 +128,7 @@ The result is in `suggestedMaxFee`, of type BigInt. Units and full response form
 
 ## Fee limitation
 
-In some cases, a transaction can fail due to underestimation of the fees. You can increase these limits by setting a global config setting (default values are 50) :
+In some cases, a transaction can fail due to the fees being underestimated. You can increase these limits by setting a global config setting (default values are 50):
 
 ```typescript
 config.set('feeMarginPercentage', {
@@ -181,7 +181,7 @@ const declareResponse = await account0.declareIfNot({ contract: testSierra, casm
 
 ## Real fees paid
 
-After the processing of the transaction, you can read the fees that have really been paid :
+After a transaction has been processed, you can read the fees that have actually been paid:
 
 ```typescript
 const txR = await provider.waitForTransaction(declareResponse.transaction_hash);
@@ -199,7 +199,7 @@ For STRK fees, the result is:
 { "unit": "FRI", "amount": "0x3a4f43814e180000" }
 ```
 
-For ETH fees :
+For ETH fees:
 
 ```json
 { "unit": "WEI", "amount": "0x70c6fff3c000" }

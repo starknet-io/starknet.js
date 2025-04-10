@@ -34,7 +34,7 @@ import { RpcProvider, Account, Contract, json, stark, uint256, shortString } fro
 
 Starknet.js proposes a function to perform both operations in one step: `declareAndDeploy()`.
 
-Here, to declare & deploy a `Test.cairo` smart contract, in devnet:
+Here, to declare & deploy a `Test.cairo` smart contract, in Devnet:
 
 ```typescript
 // connect provider
@@ -44,7 +44,7 @@ const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = '0x123....789';
 const account0 = new Account(provider, account0Address, privateKey0);
 
-// Declare & deploy Test contract in devnet
+// Declare & deploy Test contract in Devnet
 const compiledTestSierra = json.parse(
   fs.readFileSync('./compiledContracts/test.contract_class.json').toString('ascii')
 );
@@ -79,14 +79,14 @@ const account0Address: string = '0x123....789';
 
 const account0 = new Account(provider, account0Address, privateKey0);
 
-// Deploy Test contract in devnet
+// Deploy Test contract in Devnet
 // ClassHash of the already declared contract
 const testClassHash = '0xff0378becffa6ad51c67ac968948dbbd110b8a8550397cf17866afebc6c17d';
 
 const deployResponse = await account0.deployContract({ classHash: testClassHash });
 await provider.waitForTransaction(deployResponse.transaction_hash);
 
-// read abi of Test contract
+// read the ABI of the Test contract
 const { abi: testAbi } = await provider.getClassByHash(testClassHash);
 if (testAbi === undefined) {
   throw new Error('no abi.');
@@ -160,7 +160,7 @@ const deployResponse = await account0.deployContract({
 });
 ```
 
-Properties have to be ordered in conformity with the abi.
+Properties have to be ordered in conformity with the ABI.
 
 Even easier:
 
@@ -185,7 +185,7 @@ const account0Address: string = '0x123....789';
 
 const account0 = new Account(provider, account0Address, privateKey0);
 
-// Declare Test contract in devnet
+// Declare Test contract in Devnet
 const compiledTestSierra = json.parse(
   fs.readFileSync('./compiledContracts/test.sierra').toString('ascii')
 );

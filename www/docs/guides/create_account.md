@@ -28,7 +28,7 @@ import { Account, constants, ec, json, stark, RpcProvider, hash, CallData } from
 ### Compute address
 
 ```typescript
-// connect rpc 0.8 provider (Mainnet or Sepolia)
+// connect RPC 0.8 provider (Mainnet or Sepolia)
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
 // new Open Zeppelin account v0.17.0
@@ -111,7 +111,7 @@ import {
 ### Compute address
 
 ```typescript
-// connect rpc 0.8 provider
+// connect RPC 0.8 provider
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
 //new Argent X account v0.4.0
@@ -167,7 +167,7 @@ console.log('✅ ArgentX wallet deployed at:', AXcontractFinalAddress);
 
 More complicated, a Braavos account needs a proxy and a specific signature. Starknet.js is handling only Starknet standard signatures; so we need extra code to handle this specific signature for account creation. These nearly 400 lines of code are not displayed here but are available in a module [here](./doc_scripts/deployBraavos.ts).
 
-We will deploy hereunder a Braavos account in devnet. So launch starknet-devnet with these parameters:
+We will deploy hereunder a Braavos account in Devnet. So launch `starknet-devnet` with these parameters:
 
 ```bash
 starknet-devnet --seed 0 --fork-network 'https://free-rpc.nethermind.io/sepolia-juno/v0_8'
@@ -220,7 +220,7 @@ console.log('calculated fees =', estimatedFee);
 ### Deploy account
 
 ```typescript
-// fund account address before account creation (easy in devnet)
+// fund account address before account creation (easy in Devnet)
 const { data: answer } = await axios.post(
   'http://127.0.0.1:5050/mint',
   {
@@ -240,7 +240,7 @@ await providerDevnet.waitForTransaction(transaction_hash);
 console.log('✅ Braavos account deployed at', BraavosAccountFinalAddress);
 ```
 
-The computed address has been funded automatically by minting dummy STRK in Starknet devnet!
+The computed address has been funded automatically by minting dummy STRK in Starknet Devnet!
 
 ## Create an Ethereum account
 
@@ -255,7 +255,7 @@ Below is an example of account creation in Sepolia Testnet.
 const privateKeyETH = '0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9';
 const ethSigner = new EthSigner(privateKeyETH);
 const ethFullPublicKey = await ethSigner.getPubKey();
-// OpenZeppelin v0.17.0 :
+// OpenZeppelin v0.17.0:
 const accountEthClassHash = '0x3940bc18abf1df6bc540cabadb1cad9486c6803b95801e57b6153ae21abfe06';
 const myCallData = new CallData(sierraContract.abi);
 const accountETHconstructorCalldata = myCallData.compile('constructor', {

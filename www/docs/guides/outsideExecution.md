@@ -18,7 +18,7 @@ Outside Execution provides several benefits:
 ### Check SNIP-9 Support
 
 The account that will sign the outside transaction has to be compatible with SNIP-9 (V1 or V2).  
-At early-2025 :
+At early-2025:
 
 |       account       | compatibility |
 | :-----------------: | :-----------: |
@@ -157,9 +157,9 @@ In this example, we want to sign, with a Ledger Nano X, several transactions at 
 By this way, you can pre-sign some transactions with the Ledger, and if during the night something occurs, a backend can execute automatically some of these transactions, **in any order**.  
 In this process, **the private key of the Ledger account is never exposed**.
 
-First, create a Ledger account in devnet. You will find some documentation [here](./signature.md#signing-with-a-ledger-hardware-wallet), and an example [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/4.deployLedgerAccount.ts).
+First, create a Ledger account in Devnet. You will find some documentation [here](./signature.md#signing-with-a-ledger-hardware-wallet), and an example [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/4.deployLedgerAccount.ts).
 
-The initial balances are :
+The initial balances are:
 
 |                 account | ETH balance |
 | ----------------------: | ----------- |

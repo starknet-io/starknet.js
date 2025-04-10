@@ -6,9 +6,9 @@ sidebar_position: 14
 
 You can exchange messages between L1 & L2 networks:
 
-- L2 Starknet mainnet ↔️ L1 Ethereum.
-- L2 Starknet testnet ↔️ L1 Sepolia ETH testnet.
-- L2 local Starknet devnet ↔️ L1 local ETH testnet (anvil, ...).
+- L2 Starknet Mainnet ↔️ L1 Ethereum.
+- L2 Starknet Testnet ↔️ L1 Sepolia ETH testnet.
+- L2 local Starknet Devnet ↔️ L1 local ETH testnet (anvil, ...).
 
 You can find an explanation of the global mechanism [here](https://docs.starknet.io/architecture-and-concepts/network-architecture/messaging-mechanism/).
 

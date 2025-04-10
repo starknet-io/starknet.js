@@ -11,7 +11,9 @@ const generateSourceLinkTemplate = (gitRevision) =>
     gitRevision || '{gitRevision}'
   }/{path}#L{line}`;
 
-const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/guides/migrate`;
+// TODO: restore after v7 full release
+// const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/guides/migrate`;
+const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/next/guides/migrate`;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -69,7 +71,7 @@ const config = {
         //... other Algolia param
       },
       announcementBar: {
-        content: `<a href="${migrationGuideLink}">Migrate from v6</a>`,
+        content: `<a href="${migrationGuideLink}">Migrate to v7</a>`,
         backgroundColor: 'rgb(230 231 232)',
       },
       navbar: {
@@ -119,7 +121,7 @@ const config = {
                 to: '/docs/guides/intro',
               },
               {
-                label: 'Migrate from v6',
+                label: 'Migrate to v7',
                 to: migrationGuideLink,
               },
             ],

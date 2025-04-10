@@ -227,7 +227,7 @@ It's not mandatory to create manually an object conform to the Cairo 0 named tup
 
 ### Ethereum public key
 
-If your abi is requesting this type : `core::starknet::secp256k1::Secp256k1Point`, it means that you have probably to send an Ethereum full public key. Example :
+If your ABI is requesting this type: `core::starknet::secp256k1::Secp256k1Point`, it means that you have probably to send an Ethereum full public key. Example:
 
 ```json
 {
@@ -242,7 +242,7 @@ If your abi is requesting this type : `core::starknet::secp256k1::Secp256k1Point
 }
 ```
 
-- If you are using a calldata construction method using the Abi, you have just to use a 512 bits number (so, without parity) :
+- If you are using a calldata construction method using the ABI, you have just to use a 512 bits number (so, without parity):
 
 ```typescript
 const privateKeyETH = '0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9';
@@ -254,7 +254,7 @@ const accountETHconstructorCalldata = myCallData.compile('constructor', {
 });
 ```
 
-- If you are using a calldata construction method without the Abi, you have to send a tuple of 2 u256 :
+- If you are using a calldata construction method without the ABI, you have to send a tuple of 2 u256:
 
 ```typescript
 const ethFullPublicKey =
@@ -456,7 +456,7 @@ const myCall: Call = myContract.populate('get_elements', functionParameters);
 const res = await myContract.get_elements(myCall.calldata);
 ```
 
-It can be used only with methods that know the abi: `Contract.populate, myCallData.compile`.  
+It can be used only with methods that know the ABI: `Contract.populate, myCallData.compile`.  
 Starknet.js will perform a full check of conformity with the ABI of the contract, reorder the object's properties if necessary, stop if something is wrong or missing, remove not requested properties, and convert everything to Starknet format.  
 Starknet.js will alert you earlier of errors in your parameters (with human comprehensible words), before the call to Starknet. So, no more incomprehensible Starknet messages due to parameters construction.
 
