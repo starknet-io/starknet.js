@@ -90,6 +90,8 @@ export { _TransactionHashPrefix as TransactionHashPrefix };
 const _SupportedRpcVersion = {
   0.7: '0.7',
   0.8: '0.8',
+  v07: '0.7',
+  v08: '0.8',
 } as const;
 type _SupportedRpcVersion = ValuesType<typeof _SupportedRpcVersion>;
 export { _SupportedRpcVersion as SupportedRpcVersion };
