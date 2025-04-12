@@ -1,3 +1,4 @@
+import { ValuesType } from './helpers/valuesType';
 import { BigNumberish, RawArgs, type Signature } from './lib';
 
 export interface OutsideExecutionOptions {
@@ -74,8 +75,9 @@ export const OutsideExecutionTypesV2 = {
   ],
 };
 
-export enum OutsideExecutionVersion {
-  UNSUPPORTED = '0',
-  V1 = '1',
-  V2 = '2',
-}
+export const OutsideExecutionVersion = {
+  UNSUPPORTED: '0',
+  V1: '1',
+  V2: '2',
+} as const;
+export type OutsideExecutionVersion = ValuesType<typeof OutsideExecutionVersion>;

@@ -269,7 +269,7 @@ const res14e = (await myTestContract.call('test2a', [
 ])) as bigint;
 ```
 
-Take care that if you call a method that do not use the abi (as `CallData.compile`), you have to list all the variants of the enum, like this:
+Take care that if you call a method that do not use the ABI (as `CallData.compile`), you have to list all the variants of the enum, like this:
 
 ```typescript
 const orderToSend: Order = { p1: 8, p2: 10 };

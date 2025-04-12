@@ -4,9 +4,9 @@ sidebar_position: 11
 
 # Estimate fees
 
-By default, all non-free Starknet commands (declare, deploy, invoke) work without any limitation of cost.
+By default, all non-free Starknet commands (declare, deploy, invoke) work without any cost limits.
 
-Nevertheless, you might want to inform the DAPP user of the cost of the incoming transaction before proceeding and requesting its validation.
+You might want to inform the DAPP user of the cost of the incoming paid command before proceeding and requesting its validation.
 
 Starknet.js proposes several functions to estimate the fees:
 
@@ -15,43 +15,72 @@ Starknet.js proposes several functions to estimate the fees:
 To estimate the cost to invoke a contract in the network:
 
 ```typescript
-const { suggestedMaxFee: estimatedFee1 } = await account0.estimateInvokeFee({
+const { suggestedMaxFee, unit } = await account0.estimateInvokeFee({
   contractAddress: testAddress,
   entrypoint: 'increase_balance',
   calldata: ['10', '30'],
 });
 ```
 
-The result is in `estimatedFee1`, of type BigInt. Unit is WEI for "legacy" transactions, and FRI for V3 transactions.
+The result is in `suggestedMaxFee`, of type BigInt. The corresponding unit for this number is in `unit`. It's WEI for "legacy" transactions, and FRI for V3 transactions.
 
-The complete answer for a "legacy" transaction :
+:::tip
+More details about the complex subject of Starknet fees in [Starknet docs](https://docs.starknet.io/architecture-and-concepts/network-architecture/fee-mechanism/)
+:::
+
+The complete answer for an RPC 0.7 "legacy" transaction:
 
 ```typescript
 {
-  overall_fee: 2499000034986n,
-  gas_consumed: 2499n,
-  gas_price: 1000000014n,
+  overall_fee: 123900000000000n,
   unit: 'WEI',
-  suggestedMaxFee: 3748500052479n,
+  l1_gas_consumed: 1047n,
+  l1_gas_price: 100000000000n,
+  l1_data_gas_consumed: 192n,
+  l1_data_gas_price: 100000000000n,
+  suggestedMaxFee: 185850000000000n,
   resourceBounds: {
     l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-    l1_gas: { max_amount: '0xabc', max_price_per_unit: '0x59682f15' }
+    l1_gas: { max_amount: '0x742', max_price_per_unit: '0x22ecb25c00' }
   }
 }
 ```
 
-The complete answer for a V3 transaction :
+The complete answer for an RPC 0.7 V3 transaction:
 
 ```typescript
 {
-  overall_fee: 46098414083169n,
-  gas_consumed: 2499n,
-  gas_price: 18446744331n,
+  overall_fee: 123900000000000n,
   unit: 'FRI',
-  suggestedMaxFee: 69147621124753n,
+  l1_gas_consumed: 1047n,
+  l1_gas_price: 100000000000n,
+  l1_data_gas_consumed: 192n,
+  l1_data_gas_price: 100000000000n,
+  suggestedMaxFee: 185850000000000n,
   resourceBounds: {
     l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-    l1_gas: { max_amount: '0xabc', max_price_per_unit: '0x671447890' }
+    l1_gas: { max_amount: '0x742', max_price_per_unit: '0x22ecb25c00' }
+  }
+}
+```
+
+The complete answer for an RPC 0.8 V3 transaction:
+
+```typescript
+{
+  overall_fee: 4188627200000000000n,
+  unit: 'FRI',
+  l1_gas_consumed: 0n,
+  l1_gas_price: 100000000000n,
+  l2_gas_consumed: 41886080n,
+  l2_gas_price: 100000000000n,
+  l1_data_gas_consumed: 192n,
+  l1_data_gas_price: 100000000000n,
+  suggestedMaxFee: 6282940800000000000n,
+  resourceBounds: {
+    l2_gas: { max_amount: '0x3beb240', max_price_per_unit: '0x22ecb25c00' },
+    l1_gas: { max_amount: '0x0', max_price_per_unit: '0x22ecb25c00' },
+    l1_data_gas: { max_amount: '0x120', max_price_per_unit: '0x22ecb25c00' }
   }
 }
 ```
@@ -61,78 +90,117 @@ The complete answer for a V3 transaction :
 To estimate the cost to declare a contract in the network:
 
 ```typescript
-const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeclareFee({
+const { suggestedMaxFee } = await account0.estimateDeclareFee({
   contract: compiledTest,
   classHash: testClassHash,
 });
 ```
 
-The result is in `estimatedFee1`, of type BigInt.
+The result is in `suggestedMaxFee`, of type BigInt. The units and full response format are the same as `invoke`.
 
 ## estimateDeployFee
 
 To estimate the cost to deploy a contract in the network:
 
 ```typescript
-const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeployFee({
+const { suggestedMaxFee } = await account0.estimateDeployFee({
   classHash: testClassHash,
-  // constructorCalldata is not necessary if the contract to deploy has no constructor
+  // `constructorCalldata` is not necessary if the contract to deploy has no constructor
   constructorCalldata: callData,
 });
 ```
 
-The result is in `estimatedFee1`, of type BigInt.
+The result is in `suggestedMaxFee`, of type BigInt. The units and full response format are the same as `invoke`.
 
 ## estimateAccountDeployFee
 
 To estimate the cost to deploy an account in the network:
 
 ```typescript
-const { suggestedMaxFee: estimatedFee1 } = await account0.estimateAccountDeployFee({
+const { suggestedMaxFee } = await account0.estimateAccountDeployFee({
   classHash: OZaccountClassHash,
   constructorCalldata: OZaccountConstructorCallData,
   contractAddress: OZcontractAddress,
 });
 ```
 
-The result is in `estimatedFee1`, of type BigInt.
+The result is in `suggestedMaxFee`, of type BigInt. Units and full response format are the same than `invoke`.
 
 ## Fee limitation
 
-In all non-free functions, you can add an optional parameter limiting the fee consumption.  
-If the fee has been previously estimated, you can use this value for this parameter, but sometimes this value is under-evaluated: **don't hesitate to add a margin of approximately 10%**:
+In some cases, a transaction can fail due to the fees being underestimated. You can increase these limits by setting a global config setting (default values are 50):
 
 ```typescript
-(estimatedFee1 * 11n) / 10n;
-```
-
-You can also use the `stark.estimatedFeeToMaxFee` function:
-
-```typescript
-import { stark } from 'starknet';
-stark.estimatedFeeToMaxFee(estimatedFee1, 0.1);
-```
-
-Example for declaring:
-
-```typescript
-const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeclareFee({
-  contract: compiledTest,
+config.set('feeMarginPercentage', {
+  bounds: {
+    l1_gas: {
+      max_amount: 75,
+      max_price_per_unit: 60,
+    },
+    l2_gas: {
+      max_amount: 100,
+      max_price_per_unit: 60,
+    },
+    l1_data_gas: {
+      max_amount: 80,
+      max_price_per_unit: 70,
+    },
+  },
+  maxFee: 22,
 });
-
-const declareResponse = await account0.declare(
-  { contract: compiledTest },
-  { maxFee: (estimatedFee1 * 11n) / 10n }
-);
 ```
 
-## Real fee paid
+:::note
 
-After the processing of the transaction, you can read the fee that has really been paid :
+- Values are additional percentage: 75 means 75% additional fees.
+- To get back to normal values: set all values to 50.
+  :::
+
+Example for declaring, with 80% additional fees:
 
 ```typescript
-const txR = await provider.waitForTransaction(txH);
-if (txR.isSuccess()) {
-  console.log('Fee paid =', txR.actual_fee);
-}
+config.set('feeMarginPercentage', {
+  bounds: {
+    l1_gas: {
+      max_amount: 80,
+      max_price_per_unit: 80,
+    },
+    l2_gas: {
+      max_amount: 80,
+      max_price_per_unit: 80,
+    },
+    l1_data_gas: {
+      max_amount: 80,
+      max_price_per_unit: 80,
+    },
+  },
+  maxFee: 80,
+});
+const declareResponse = await account0.declareIfNot({ contract: testSierra, casm: testCasm });
+```
+
+## Real fees paid
+
+After a transaction has been processed, you can read the fees that have actually been paid:
+
+```typescript
+const txR = await provider.waitForTransaction(declareResponse.transaction_hash);
+txR.match({
+  success: (txR: SuccessfulTransactionReceiptResponse) => {
+    console.log('Fees paid =', txR.actual_fee);
+  },
+  _: () => {},
+});
+```
+
+For STRK fees, the result is:
+
+```json
+{ "unit": "FRI", "amount": "0x3a4f43814e180000" }
+```
+
+For ETH fees:
+
+```json
+{ "unit": "WEI", "amount": "0x70c6fff3c000" }
 ```

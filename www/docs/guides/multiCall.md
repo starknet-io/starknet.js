@@ -11,7 +11,7 @@ Interacting with more than one contract with one transaction is one of Starknet'
 Set up basic stuff before multicall.
 
 ```javascript
-// devnet private key from Account #0 if generated with --seed 0
+// Devnet private key from Account #0 if generated with --seed 0
 const privateKey = '0xe3e70682c2094cac629f6fbed82c07cd';
 const accountAddress = '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a';
 

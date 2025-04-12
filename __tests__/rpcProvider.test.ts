@@ -1,24 +1,5 @@
 import { getStarkKey, Signature, utils } from '@scure/starknet';
-import typedDataExample from '../__mocks__/typedData/baseExample.json';
-import {
-  Account,
-  Block,
-  CallData,
-  Contract,
-  FeeEstimate,
-  ProviderInterface,
-  RPC,
-  RPCResponseParser,
-  ReceiptTx,
-  RpcProvider,
-  TransactionExecutionStatus,
-  cairo,
-  stark,
-  waitForTransactionOptions,
-} from '../src';
-import { StarknetChainId } from '../src/global/constants';
-import { felt, uint256 } from '../src/utils/calldata/cairo';
-import { toBigInt, toHexString } from '../src/utils/num';
+import { hasMixin } from 'ts-mixer';
 import {
   contracts,
   createBlockForDevnet,
@@ -32,8 +13,32 @@ import {
   waitNextBlock,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
-import { isBoolean } from '../src/utils/typed';
+import typedDataExample from '../__mocks__/typedData/baseExample.json';
+import {
+  Account,
+  Block,
+  CallData,
+  Contract,
+  FeeEstimate,
+  LibraryError,
+  ProviderInterface,
+  RPC,
+  RPCResponseParser,
+  ReceiptTx,
+  RpcProvider,
+  TransactionExecutionStatus,
+  cairo,
+  stark,
+  waitForTransactionOptions,
+} from '../src';
+import { StarknetChainId } from '../src/global/constants';
+import { felt, uint256 } from '../src/utils/calldata/cairo';
+import { toBigInt, toHexString } from '../src/utils/num';
 import { isVersion } from '../src/utils/provider';
+import { isBoolean } from '../src/utils/typed';
+import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
+import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
+import { StarknetId } from '../src/provider/extensions/starknetId';
 
 describeIfRpc('RPCProvider', () => {
   let rpcProvider: RpcProvider;
@@ -51,6 +56,16 @@ describeIfRpc('RPCProvider', () => {
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
     await createBlockForDevnet();
+  });
+
+  test('create should be usable by the base and extended RpcProvider, but not Account', async () => {
+    const nodeUrl = process.env.TEST_RPC_URL;
+    const base = await BaseRpcProvider.create({ nodeUrl });
+    const extended = await ExtendedRpcProvider.create({ nodeUrl });
+
+    expect(hasMixin(base, StarknetId)).toBe(false);
+    expect(hasMixin(extended, StarknetId)).toBe(true);
+    await expect(Account.create()).rejects.toThrow(LibraryError);
   });
 
   test('detect spec version with create', async () => {
