@@ -1,3 +1,14 @@
+# [7.1.0](https://github.com/starknet-io/starknet.js/compare/v7.0.1...v7.1.0) (2025-04-14)
+
+### Bug Fixes
+
+- ensure enum replacement objects are reachable for type resolution ([#1375](https://github.com/starknet-io/starknet.js/issues/1375)) ([eb8b10d](https://github.com/starknet-io/starknet.js/commit/eb8b10dd075475d83cbd4748b610d911f945823f))
+- make the provider create method generic to enable it when mixins are applied ([#1370](https://github.com/starknet-io/starknet.js/issues/1370)) ([1f48dc6](https://github.com/starknet-io/starknet.js/commit/1f48dc6957aea8d5480f5413c184ac82ea5dd0db))
+
+### Features
+
+- update to rpc 0.8.1 ([83e17b8](https://github.com/starknet-io/starknet.js/commit/83e17b8b385fe00b5d2ed476de80a6773565bd9a))
+
 ## [7.0.1](https://github.com/starknet-io/starknet.js/compare/v7.0.0...v7.0.1) (2025-03-28)
 
 ### Bug Fixes
