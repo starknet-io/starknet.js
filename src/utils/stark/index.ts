@@ -320,7 +320,7 @@ export function toFeeVersion(providedVersion?: BigNumberish): ETransactionVersio
 
 /**
  * Return provided or default v3 tx details
- * @param {UniversalDetails} details details of the transaction
+ * @param {UniversalDetails} details of the transaction
  * @return {V3Details} an object including the V3 transaction details.
  * @example
  * ```typescript
