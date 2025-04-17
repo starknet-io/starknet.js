@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import type { FeeMarginPercentage } from '../types';
-import { ETransactionVersion, RPCSPEC08 } from '../types/api';
+import { ETransactionVersion, RPCSPEC08, RPC_DEFAULT_VERSION } from '../types/api';
 import { ValuesType } from '../types/helpers/valuesType';
 import type { LogLevel } from './logger.type';
 
@@ -135,12 +135,12 @@ export const RPC_DEFAULT_NODES = {
   SN_MAIN: [
     `https://starknet-mainnet.public.blastapi.io/rpc/`,
     `https://free-rpc.nethermind.io/mainnet-juno/`,
-    `https://rpc.starknet.lava.build:443`,
+    `https://rpc.starknet.lava.build:443/${RPC_DEFAULT_VERSION}`,
   ],
   SN_SEPOLIA: [
     `https://starknet-sepolia.public.blastapi.io/rpc/`,
     `https://free-rpc.nethermind.io/sepolia-juno/`,
-    `https://rpc.starknet-testnet.lava.build:443`,
+    `https://rpc.starknet-testnet.lava.build:443/${RPC_DEFAULT_VERSION}`,
   ],
 } as const;
 
