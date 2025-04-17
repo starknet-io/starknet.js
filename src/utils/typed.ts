@@ -58,7 +58,7 @@ export function isBoolean(value: unknown): value is boolean {
 /**
  * Test if value is bigint
  *
- * @param value value to test
+ * @param value to test
  * @returns {boolean} true if value is bigint, false otherwise
  * @example
  * ```typescript
