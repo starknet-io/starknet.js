@@ -225,7 +225,7 @@ You can use all the methods of the `RpcProvider` class. Under the hood, the `Wal
 
 The `WalletAccount` class is able to interact with all the entrypoints of the Starknet Wallet API, including some functionalities that do not exists in the `Account` class.
 
-A full description of this API can be found [**here**](https://github.com/PhilippeR26/Starknet-WalletAccount/blob/api/doc/walletAPIspec.md).
+A full description of this API can be found [**here**](https://github.com/starknet-io/get-starknet/blob/master/packages/core/documentation/walletAPIdocumentation.md).
 
 Some examples:
 
