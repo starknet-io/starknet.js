@@ -1,5 +1,10 @@
-import { RpcError } from '../src';
-import { PaymasterRpc } from '../src/paymaster/rpc';
+import {
+  RpcError,
+  PaymasterRpc,
+  ExecutionParameters,
+  UserTransaction,
+  ExecutableUserTransaction,
+} from '../src';
 import fetchMock from '../src/utils/fetchPonyfill';
 import { signatureToHexArray } from '../src/utils/stark';
 import { OutsideExecutionTypedData } from '../src/types/api/paymaster-rpc-spec/nonspec';
@@ -86,7 +91,7 @@ describe('PaymasterRpc', () => {
     });
   });
 
-  describe('buildTypedData', () => {
+  describe('buildTransaction', () => {
     it('should return typedData and parsed tokenAmountAndPrice', async () => {
       // Given
       const client = new PaymasterRpc();
@@ -95,30 +100,60 @@ describe('PaymasterRpc', () => {
         entrypoint: 'transfer',
         calldata: ['0x1', '0x2'],
       };
+      const transaction: UserTransaction = {
+        type: 'invoke',
+        invoke: {
+          userAddress: '0xuser',
+          calls: [mockCall],
+        },
+      };
+      const parameters: ExecutionParameters = {
+        version: '0x1',
+        feeMode: {
+          mode: 'default',
+          gasToken: '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+        },
+      };
 
       mockFetch.mockResolvedValueOnce({
         json: async () => ({
           result: {
+            type: 'invoke',
             typed_data: { domain: {}, message: {}, types: {} },
-            token_amount_and_price: {
-              estimated_amount: '0x1234',
-              price_in_strk: '0x5678',
+            parameters: {
+              version: '0x1',
+              fee_mode: {
+                mode: 'default',
+                gas_token: '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+              },
+              time_bounds: null,
+            },
+            fee: {
+              gas_token_price_in_strk: '0x5ffeeacbaf058dfee0',
+              estimated_fee_in_strk: '0xe8a2e6bd26e66',
+              estimated_fee_in_gas_token: '0x21a1a7339fd',
+              suggested_max_fee_in_strk: '0x2b9e8b43774b32',
+              suggested_max_fee_in_gas_token: '0x64e4f59adf7',
             },
           },
         }),
       });
 
       // When
-      const result = await client.buildTypedData('0xuser', [mockCall]);
+      const result = await client.buildTransaction(transaction, parameters);
 
       // Then
-      expect(result.tokenAmountAndPrice.estimatedAmount).toBe(BigInt(0x1234));
-      expect(result.tokenAmountAndPrice.priceInStrk).toBe(BigInt(0x5678));
-      expect(result.typedData).toBeDefined();
+      expect(result.fee.estimated_fee_in_strk).toBe(BigInt(0xe8a2e6bd26e66));
+      expect(result.fee.suggested_max_fee_in_strk).toBe(BigInt(0x2b9e8b43774b32));
+      expect(result.parameters.feeMode.mode).toBe('default');
+      expect(result.type).toBe('invoke');
+      // @ts-ignore
+      // eslint-disable-next-line
+      expect(result['typed_data']).toBeDefined();
     });
   });
 
-  describe('execute', () => {
+  describe('executeTransaction', () => {
     it('should send execution request and return transaction hash', async () => {
       // Given
       const client = new PaymasterRpc();
@@ -136,6 +171,21 @@ describe('PaymasterRpc', () => {
           calls: [],
         },
       };
+      const transaction: ExecutableUserTransaction = {
+        type: 'invoke',
+        invoke: {
+          userAddress: '0xuser',
+          typedData: mockTypedData,
+          signature: mockSignature,
+        },
+      };
+      const parameters: ExecutionParameters = {
+        version: '0x1',
+        feeMode: {
+          mode: 'default',
+          gasToken: '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+        },
+      };
 
       mockFetch.mockResolvedValueOnce({
         json: async () => ({
@@ -147,7 +197,7 @@ describe('PaymasterRpc', () => {
       });
 
       // When
-      const result = await client.execute('0xuser', mockTypedData, mockSignature);
+      const result = await client.executeTransaction(transaction, parameters);
 
       // Then
       expect(signatureToHexArray).toHaveBeenCalledWith(mockSignature);
@@ -155,18 +205,31 @@ describe('PaymasterRpc', () => {
     });
   });
 
-  describe('getSupportedTokensAndPrices', () => {
+  describe('getSupportedTokens', () => {
     it('should return supported tokens and prices', async () => {
       // Given
       const client = new PaymasterRpc();
-      const expected = { tokens: [], prices: {} };
+      const rpc_response = [
+        {
+          address: '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080',
+          decimals: 6,
+          price_in_strk: '0x38aea',
+        },
+      ];
+      const expected = [
+        {
+          address: '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080',
+          decimals: 6,
+          priceInStrk: BigInt('0x38aea'),
+        },
+      ];
 
       mockFetch.mockResolvedValueOnce({
-        json: async () => ({ result: expected }),
+        json: async () => ({ result: rpc_response }),
       });
 
       // When
-      const result = await client.getSupportedTokensAndPrices();
+      const result = await client.getSupportedTokens();
 
       // Then
       expect(result).toEqual(expected);

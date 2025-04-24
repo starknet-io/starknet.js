@@ -79,8 +79,8 @@ export const RPC_NODES = {
 } as const;
 
 export const PAYMASTER_RPC_NODES = {
-  SN_MAIN: [`https://starknet.paymaster.avnu.fi/v1`],
-  SN_SEPOLIA: [`https://sepolia.paymaster.avnu.fi/v1`],
+  SN_MAIN: [`https://starknet.paymaster.avnu.fi`],
+  SN_SEPOLIA: [`https://sepolia.paymaster.avnu.fi`],
 } as const;
 
 export const OutsideExecutionCallerAny = '0x414e595f43414c4c4552'; // encodeShortString('ANY_CALLER')

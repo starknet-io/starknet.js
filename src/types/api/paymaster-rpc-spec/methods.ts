@@ -1,14 +1,11 @@
 import {
-  ACCOUNT_DEPLOYMENT_DATA,
-  ADDRESS,
-  CALL,
-  OUTSIDE_EXECUTION_TYPED_DATA,
-  SIGNATURE,
-  TIME_BOUNDS,
+  USER_TRANSACTION,
   TOKEN_DATA,
+  EXECUTION_PARAMETERS,
+  EXECUTABLE_USER_TRANSACTION,
 } from './components';
 import * as Errors from './errors';
-import { BuildTypedDataResponse, ExecuteResponse } from './nonspec';
+import { BuildTransactionResponse, ExecuteResponse } from './nonspec';
 
 type ReadMethods = {
   // Returns the status of the paymaster service
@@ -17,27 +14,25 @@ type ReadMethods = {
     result: boolean;
   };
 
-  // Receives the array of calls that the user wishes to make, along with token data. Returns a typed object for the user to sign and, optionally, data about token amount and rate
-  paymaster_buildTypedData: {
+  // Receives the transaction the user wants to execute. Returns the typed data along with the estimated gas cost and the maximum gas cost suggested to ensure execution
+  paymaster_buildTransaction: {
     params: {
-      user_address: ADDRESS;
-      deployment_data?: ACCOUNT_DEPLOYMENT_DATA;
-      calls: CALL[];
-      time_bounds?: TIME_BOUNDS;
-      gas_token_address?: ADDRESS;
+      transaction: USER_TRANSACTION;
+      parameters: EXECUTION_PARAMETERS;
     };
-    result: BuildTypedDataResponse;
+    result: BuildTransactionResponse;
     errors:
       | Errors.INVALID_ADDRESS
       | Errors.CLASS_HASH_NOT_SUPPORTED
       | Errors.INVALID_DEPLOYMENT_DATA
       | Errors.TOKEN_NOT_SUPPORTED
       | Errors.INVALID_TIME_BOUNDS
-      | Errors.UNKNOWN_ERROR;
+      | Errors.UNKNOWN_ERROR
+      | Errors.TRANSACTION_EXECUTION_ERROR;
   };
 
   // Get a list of the tokens that the paymaster supports, together with their prices in STRK
-  paymaster_getSupportedTokensAndPrices: {
+  paymaster_getSupportedTokens: {
     params: {};
     result: TOKEN_DATA[];
   };
@@ -45,12 +40,10 @@ type ReadMethods = {
 
 type WriteMethods = {
   // Sends the signed typed data to the paymaster service for execution
-  paymaster_execute: {
+  paymaster_executeTransaction: {
     params: {
-      user_address: ADDRESS;
-      deployment_data?: ACCOUNT_DEPLOYMENT_DATA;
-      typed_data: OUTSIDE_EXECUTION_TYPED_DATA;
-      signature: SIGNATURE;
+      transaction: EXECUTABLE_USER_TRANSACTION;
+      parameters: EXECUTION_PARAMETERS;
     };
     result: ExecuteResponse;
     errors:

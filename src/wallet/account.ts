@@ -146,7 +146,10 @@ export class WalletAccount extends Account implements AccountInterface {
   ) {
     const details = arg2 === undefined || Array.isArray(arg2) ? transactionsDetail : arg2;
     if (details.paymaster) {
-      return this.executePaymaster(Array.isArray(calls) ? calls : [calls], details.paymaster);
+      return this.executePaymasterTransaction(
+        Array.isArray(calls) ? calls : [calls],
+        details.paymaster
+      );
     }
 
     const txCalls = [].concat(calls as any).map((it) => {

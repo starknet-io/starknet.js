@@ -1,11 +1,10 @@
-import { Account, Signature, Call, PaymasterDetails } from '../src';
-import { PaymasterRpc } from '../src/paymaster/rpc';
+import { Account, Signature, Call, PaymasterDetails, PaymasterRpc } from '../src';
 
 jest.mock('../src/paymaster/rpc');
 
 describe('Account - Paymaster integration', () => {
-  const mockBuildTypedData = jest.fn();
-  const mockExecute = jest.fn();
+  const mockBuildTransaction = jest.fn();
+  const mockExecuteTransaction = jest.fn();
   const mockSignMessage = jest.fn();
 
   const fakeTypedData = {
@@ -26,18 +25,26 @@ describe('Account - Paymaster integration', () => {
   const calls: Call[] = [{ contractAddress: '0x123', entrypoint: 'transfer', calldata: [] }];
 
   const paymasterResponse = {
-    typedData: fakeTypedData,
-    tokenAmountAndPrice: {
-      estimatedAmount: 1000n,
-      priceInStrk: 200n,
+    type: 'invoke',
+    typed_data: fakeTypedData,
+    parameters: {
+      version: '0x1',
+      feeMode: { mode: 'default', gasToken: '0x456' },
+    },
+    fee: {
+      gas_token_price_in_strk: 200n,
+      estimated_fee_in_strk: 3000n,
+      estimated_fee_in_gas_token: 1000n,
+      suggested_max_fee_in_strk: 4000n,
+      suggested_max_fee_in_gas_token: 1200n,
     },
   };
 
   const mockPaymaster = () =>
     ({
-      buildTypedData: mockBuildTypedData,
-      execute: mockExecute,
-    }) as any;
+      buildTransaction: mockBuildTransaction,
+      executeTransaction: mockExecuteTransaction,
+    }) as unknown as PaymasterRpc;
 
   const setupAccount = () =>
     new Account(
@@ -52,63 +59,83 @@ describe('Account - Paymaster integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (PaymasterRpc as jest.Mock).mockImplementation(mockPaymaster);
-    mockBuildTypedData.mockResolvedValue(paymasterResponse);
-    mockExecute.mockResolvedValue({ transaction_hash: '0x123' });
+    mockBuildTransaction.mockResolvedValue(paymasterResponse);
+    mockExecuteTransaction.mockResolvedValue({ transaction_hash: '0x123' });
   });
 
-  describe('buildPaymasterTypedData', () => {
+  describe('buildPaymasterTransaction', () => {
     it('should return typed data and token prices from paymaster', async () => {
-      // Given
       const account = setupAccount();
 
-      // When
-      const result = await account.buildPaymasterTypedData(calls, { gasToken: '0x456' });
+      const result = await account.buildPaymasterTransaction(calls, {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      });
 
-      // Then
-      expect(mockBuildTypedData).toHaveBeenCalledWith(
-        '0xabc',
-        calls,
-        '0x456',
-        undefined,
-        undefined
+      expect(mockBuildTransaction).toHaveBeenCalledWith(
+        {
+          type: 'invoke',
+          invoke: { userAddress: '0xabc', calls },
+        },
+        {
+          version: '0x1',
+          feeMode: { mode: 'default', gasToken: '0x456' },
+          timeBounds: undefined,
+        }
       );
+
       expect(result).toEqual(paymasterResponse);
     });
   });
 
-  describe('executePaymaster', () => {
+  describe('executePaymasterTransaction', () => {
     it('should sign and execute transaction via paymaster', async () => {
-      // Given
       const account = setupAccount();
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
 
-      // When
-      const result = await account.executePaymaster(calls);
+      const result = await account.executePaymasterTransaction(calls, details);
 
-      // Then
-      expect(mockBuildTypedData).toHaveBeenCalledTimes(1);
+      expect(mockBuildTransaction).toHaveBeenCalledTimes(1);
       expect(mockSignMessage).toHaveBeenCalledWith(fakeTypedData, '0xabc');
-      expect(mockExecute).toHaveBeenCalledWith('0xabc', fakeTypedData, fakeSignature, undefined);
+      expect(mockExecuteTransaction).toHaveBeenCalledWith(
+        {
+          type: 'invoke',
+          invoke: {
+            userAddress: '0xabc',
+            typedData: fakeTypedData,
+            signature: ['0x1', '0x2'],
+          },
+        },
+        {
+          version: '0x1',
+          feeMode: { mode: 'default', gasToken: '0x456' },
+          timeBounds: undefined,
+        }
+      );
       expect(result).toEqual({ transaction_hash: '0x123' });
     });
 
-    it('should throw if estimated fee exceeds maxEstimatedFee', async () => {
-      // Given
+    it('should throw if estimated fee exceeds maxEstimatedFeeInGasToken', async () => {
       const account = setupAccount();
-      const details: PaymasterDetails = { maxEstimatedFee: 500n };
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+        maxEstimatedFeeInGasToken: 500n,
+      };
 
-      // When / Then
-      await expect(account.executePaymaster(calls, details)).rejects.toThrow(
+      await expect(account.executePaymasterTransaction(calls, details)).rejects.toThrow(
         'Estimated max fee too high'
       );
     });
 
     it('should throw if token price exceeds maxPriceInStrk', async () => {
-      // Given
       const account = setupAccount();
-      const details: PaymasterDetails = { maxPriceInStrk: 100n };
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+        maxGasTokenPriceInStrk: 100n,
+      };
 
-      // When / Then
-      await expect(account.executePaymaster(calls, details)).rejects.toThrow(
+      await expect(account.executePaymasterTransaction(calls, details)).rejects.toThrow(
         'Gas token price is too high'
       );
     });

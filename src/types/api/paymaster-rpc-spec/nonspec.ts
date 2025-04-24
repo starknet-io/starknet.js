@@ -3,22 +3,39 @@
  */
 import {
   ACCOUNT_DEPLOYMENT_DATA,
+  EXECUTION_PARAMETERS,
+  FEE_ESTIMATE,
   OUTSIDE_EXECUTION_TYPED_DATA,
-  TIME_BOUNDS,
   TRACKING_ID,
   TRANSACTION_HASH,
-  u256,
 } from './components';
 
 // METHOD RESPONSES
-// response paymaster_buildTypedData
-export type BuildTypedDataResponse = {
-  typed_data: OUTSIDE_EXECUTION_TYPED_DATA;
-  token_amount_and_price: {
-    estimated_amount: u256;
-    price_in_strk: u256;
-  };
+// response paymaster_buildTransaction
+export type BuildDeployTransactionResponse = {
+  type: 'deploy';
+  deployment: ACCOUNT_DEPLOYMENT_DATA;
+  parameters: EXECUTION_PARAMETERS;
+  fee: FEE_ESTIMATE;
 };
+export type BuildInvokeTransactionResponse = {
+  type: 'invoke';
+  typed_data: OUTSIDE_EXECUTION_TYPED_DATA;
+  parameters: EXECUTION_PARAMETERS;
+  fee: FEE_ESTIMATE;
+};
+export type BuildDeployAndInvokeTransactionResponse = {
+  type: 'deploy_and_invoke';
+  deployment: ACCOUNT_DEPLOYMENT_DATA;
+  typed_data: OUTSIDE_EXECUTION_TYPED_DATA;
+  parameters: EXECUTION_PARAMETERS;
+  fee: FEE_ESTIMATE;
+};
+export type BuildTransactionResponse =
+  | BuildDeployTransactionResponse
+  | BuildInvokeTransactionResponse
+  | BuildDeployAndInvokeTransactionResponse;
+
 // response paymaster_execute
 export type ExecuteResponse = {
   tracking_id: TRACKING_ID;
@@ -27,4 +44,3 @@ export type ExecuteResponse = {
 
 export type AccountDeploymentData = ACCOUNT_DEPLOYMENT_DATA;
 export type OutsideExecutionTypedData = OUTSIDE_EXECUTION_TYPED_DATA;
-export type TimeBounds = TIME_BOUNDS;

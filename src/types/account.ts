@@ -12,6 +12,7 @@ import {
 } from './lib';
 import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
 import { AccountDeploymentData } from './api/paymaster-rpc-spec/nonspec';
+import { FeeMode, PaymasterTimeBounds } from './paymaster';
 
 export interface EstimateFee extends EstimateFeeResponse {}
 
@@ -46,16 +47,11 @@ export interface UniversalDetails {
 }
 
 export interface PaymasterDetails {
+  feeMode: FeeMode;
   deploymentData?: AccountDeploymentData;
-  gasToken?: string;
   timeBounds?: PaymasterTimeBounds;
-  maxEstimatedFee?: BigNumberish;
-  maxPriceInStrk?: BigNumberish;
-}
-
-export interface PaymasterTimeBounds {
-  executeAfter?: Date;
-  executeBefore?: Date;
+  maxEstimatedFeeInGasToken?: BigNumberish;
+  maxGasTokenPriceInStrk?: BigNumberish;
 }
 
 export interface EstimateFeeDetails extends UniversalDetails {}

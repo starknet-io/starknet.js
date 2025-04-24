@@ -26,18 +26,18 @@ Before sending a transaction with a Paymaster, you must first know **which token
 Use the following method:
 
 ```ts
-const supported = await account.paymaster.getSupportedTokensAndPrices();
+const supported = await account.paymaster.getSupportedTokens();
 
 console.log(supported);
 /*
 [
     {
-        "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
         "decimals": 18,
         "priceInStrk": "0x5ffeeacbaf058dfee0"
     },
     {
-        "tokenAddress": "0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080",
+        "address": "0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080",
         "decimals": 6,
         "priceInStrk": "0x38aea"
     }
@@ -47,7 +47,7 @@ console.log(supported);
 
 ## Sending a Transaction with a Paymaster
 
-To use a Paymaster, pass a `paymaster` field in the `options` of your `account.execute(...)` call:
+To use a Paymaster, pass a `paymaster` field in the `options` of your `account.execute(...)` call. Here you must define the fee mode (sponsored or not):
 
 ```ts
 await account.execute(
@@ -60,7 +60,7 @@ await account.execute(
   ],
   {
     paymaster: {
-      gasToken: '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+      feeMode: { mode: 'default', gasToken: '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7' } } }
     },
   }
 );
@@ -68,21 +68,21 @@ await account.execute(
 
 ### Paymaster Options
 
-| Field             | Type   | Description                                                              |
-| ----------------- | ------ | ------------------------------------------------------------------------ |
-| `gasToken`        | string | Token address used to pay gas (must be supported).                       |
-| `maxEstimatedFee` | bigint | Max fee you're willing to pay in the gas token.                          |
-| `maxPriceInStrk`  | bigint | Max token price in STRK.                                                 |
-| `deploymentData`  | object | Data required if your account is being deployed.                         |
-| `timeBounds`      | object | Optional execution window with `executeAfter` and `executeBefore` dates. |
+| Field                       | Type    | Description                                                                   |
+| --------------------------- | ------- | ----------------------------------------------------------------------------- |
+| `feeMode`                   | FeeMode | When not sponsored, you need to use 'default' mode and specify the gas token. |
+| `maxEstimatedFeeInGasToken` | bigint  | Max fee you're willing to pay in the gas token.                               |
+| `maxGasTokenPriceInStrk`    | bigint  | Max token price in STRK.                                                      |
+| `deploymentData`            | object  | Data required if your account is being deployed.                              |
+| `timeBounds`                | object  | Optional execution window with `executeAfter` and `executeBefore` dates.      |
 
 ### How It Works Behind the Scenes
 
 When `paymaster` option is provided in `account.execute()`, this happens:
 
-1. `account.buildPaymasterTypedData()` is called to prepare the typed data to sign.
-2. `account.signMessage()` signs that typed data.
-3. `paymaster.execute()` is called with your address, typed data, and signature.
+1. `account.buildPaymasterTransaction()` is called to prepare the transaction.
+2. `account.signMessage()` signs the returned typed data.
+3. `paymaster.executeTransaction()` is called with your address, typed data, and signature.
 
 ## PaymasterRpc Functions
 
@@ -90,12 +90,12 @@ The `account.paymaster` property is an instance of `PaymasterRpc`.
 
 Here are the available methods:
 
-| Method                           | Description                                                               |
-| -------------------------------- | ------------------------------------------------------------------------- |
-| `isAvailable()   `               | Returns `true` if the Paymaster service is up and running.                |
-| ` getSupportedTokensAndPrices()` | Returns the accepted tokens and their price in STRK.                      |
-| `buildTypedData(...)     `       | Builds the typed data object for a paymaster-sponsored gas request.       |
-| `execute(...)`                   | Sends a signed typed data request to execute a transaction via Paymaster. |
+| Method                       | Description                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------- |
+| `isAvailable()   `           | Returns `true` if the Paymaster service is up and running.                      |
+| ` getSupportedTokens()`      | Returns the accepted tokens and their price in STRK.                            |
+| `buildTransaction(...)     ` | Builds the required data (could include a typed data to sign) for the execution |
+| `executeTransaction(...)`    | Calls the paymasters service to execute the transaction                         |
 
 ## Full Example – React + starknet.js + Paymaster
 
@@ -105,6 +105,7 @@ import { connect } from 'get-starknet';
 import { Account, PaymasterRpc, TokenData, WalletAccount } from 'starknet';
 
 const paymasterRpc = new PaymasterRpc({ default: true });
+// const paymasterRpc = new PaymasterRpc({ nodeUrl: 'https://sepolia.paymaster.avnu.fi' });
 
 const App: FC = () => {
   const [account, setAccount] = useState<Account>();
@@ -125,7 +126,7 @@ const App: FC = () => {
   };
 
   useEffect(() => {
-    paymasterRpc.getSupportedTokensAndPrices().then((tokens) => {
+    paymasterRpc.getSupportedTokens().then((tokens) => {
       setGasTokens(tokens);
     });
   }, []);
@@ -148,7 +149,7 @@ const App: FC = () => {
     ];
     setLoading(true);
     account
-      .execute(calls, { paymaster: { gasToken: gasToken?.tokenAddress } })
+      .execute(calls, { paymaster: { feeMode: { mode: 'default', gasToken: gasToken.address } } })
       .then((res) => {
         setTx(res.transaction_hash);
         setLoading(false);

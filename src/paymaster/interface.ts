@@ -1,11 +1,12 @@
-import { Signature, TypedData } from 'starknet-types-07';
-import { Call, RpcProviderOptions } from '../types';
 import {
-  AccountDeploymentData,
-  ExecuteResponse,
-  TimeBounds,
-} from '../types/api/paymaster-rpc-spec/nonspec';
-import { TokenData, TypedDataWithTokenAmountAndPrice } from '../types/paymaster';
+  PreparedTransaction,
+  RpcProviderOptions,
+  TokenData,
+  UserTransaction,
+  ExecutableUserTransaction,
+  ExecutionParameters,
+} from '../types';
+import { ExecuteResponse } from '../types/api/paymaster-rpc-spec/nonspec';
 
 export abstract class PaymasterInterface {
   public abstract nodeUrl: string;
@@ -22,38 +23,28 @@ export abstract class PaymasterInterface {
   public abstract isAvailable(): Promise<boolean>;
 
   /**
-   * Sends the array of calls that the user wishes to make, along with token data.
-   * Returns a typed object for the user to sign and, optionally, data about token amount and rate.
+   * Receives the transaction the user wants to execute. Returns the typed data along with
+   * the estimated gas cost and the maximum gas cost suggested to ensure execution
    *
-   * @param userAddress The address of the user account
-   * @param calls The sequence of calls that the user wishes to perform
-   * @param deploymentData The necessary data to deploy an account through the universal deployer contract
-   * @param timeBounds Bounds on valid timestamps
-   * @param gasTokenAddress The address of the token contract that the user wishes use to pay fees with. If not present then the paymaster can allow other flows, such as sponsoring
-   * @returns The typed data that the user needs to sign, together with information about the fee
+   * @param transaction Transaction to be executed by the paymaster
+   * @param parameters Execution parameters to be used when executing the transaction
+   * @returns The transaction data required for execution along with an estimation of the fee
    */
-  public abstract buildTypedData(
-    userAddress: string,
-    calls: Call[],
-    gasTokenAddress?: string,
-    timeBounds?: TimeBounds,
-    deploymentData?: AccountDeploymentData
-  ): Promise<TypedDataWithTokenAmountAndPrice>;
+  public abstract buildTransaction(
+    transaction: UserTransaction,
+    parameters: ExecutionParameters
+  ): Promise<PreparedTransaction>;
 
   /**
    * Sends the signed typed data to the paymaster service for execution
    *
-   * @param userAddress The address of the user account
-   * @param deploymentData The necessary data to deploy an account through the universal deployer contract
-   * @param typedData The typed data that was returned by the `paymaster_buildTypedData` endpoint and signed upon by the user
-   * @param signature The signature of the user on the typed data
+   * @param transaction Typed data build by calling paymaster_buildTransaction signed by the user to be executed by the paymaster service
+   * @param parameters Execution parameters to be used when executing the transaction
    * @returns The hash of the transaction broadcasted by the paymaster and the tracking ID corresponding to the user `execute` request
    */
-  public abstract execute(
-    userAddress: string,
-    typedData: TypedData,
-    signature: Signature,
-    deploymentData?: AccountDeploymentData
+  public abstract executeTransaction(
+    transaction: ExecutableUserTransaction,
+    parameters: ExecutionParameters
   ): Promise<ExecuteResponse>;
 
   /**
@@ -61,5 +52,5 @@ export abstract class PaymasterInterface {
    *
    * @returns An array of token data
    */
-  public abstract getSupportedTokensAndPrices(): Promise<TokenData[]>;
+  public abstract getSupportedTokens(): Promise<TokenData[]>;
 }

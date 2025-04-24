@@ -45,14 +45,17 @@ import {
   UniversalDeployerContractPayload,
   UniversalDetails,
   PaymasterDetails,
-} from '../types';
-import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
-import {
+  PreparedTransaction,
+  PaymasterOptions,
   OutsideExecutionVersion,
   type OutsideExecution,
   type OutsideExecutionOptions,
   type OutsideTransaction,
-} from '../types/outsideExecution';
+  ExecutionParameters,
+  UserTransaction,
+  ExecutableUserTransaction,
+} from '../types';
+import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
@@ -79,10 +82,7 @@ import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 import { config } from '../global/config';
-import { defaultPaymaster, PaymasterInterface } from '../paymaster';
-import { PaymasterRpc } from '../paymaster/rpc';
-import { PaymasterOptions, TypedDataWithTokenAmountAndPrice } from '../types/paymaster';
-import { TimeBounds } from '../types/api/paymaster-rpc-spec/nonspec';
+import { defaultPaymaster, PaymasterInterface, PaymasterRpc } from '../paymaster';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -356,7 +356,7 @@ export class Account extends Provider implements AccountInterface {
     const calls = Array.isArray(transactions) ? transactions : [transactions];
 
     if (details.paymaster) {
-      return this.executePaymaster(calls, details.paymaster);
+      return this.executePaymasterTransaction(calls, details.paymaster);
     }
 
     const nonce = toBigInt(details.nonce ?? (await this.getNonce()));
@@ -403,59 +403,88 @@ export class Account extends Provider implements AccountInterface {
     );
   }
 
-  public async buildPaymasterTypedData(
+  public async buildPaymasterTransaction(
     calls: Call[],
-    paymasterDetails?: PaymasterDetails
-  ): Promise<TypedDataWithTokenAmountAndPrice> {
-    const timeBounds: TimeBounds | undefined =
-      paymasterDetails?.timeBounds &&
-      paymasterDetails.timeBounds.executeAfter &&
-      paymasterDetails.timeBounds.executeBefore
-        ? {
-            execute_after: paymasterDetails.timeBounds.executeAfter.getTime().toString(),
-            execute_before: paymasterDetails.timeBounds.executeBefore.getTime().toString(),
-          }
-        : undefined;
-    const gasTokenAddress = paymasterDetails?.gasToken
-      ? toHex(BigInt(paymasterDetails.gasToken))
-      : undefined;
-    return this.paymaster.buildTypedData(
-      this.address,
-      calls,
-      gasTokenAddress,
-      timeBounds,
-      paymasterDetails?.deploymentData
-    );
+    paymasterDetails: PaymasterDetails
+  ): Promise<PreparedTransaction> {
+    const parameters: ExecutionParameters = {
+      version: '0x1',
+      feeMode: paymasterDetails.feeMode,
+      timeBounds: paymasterDetails.timeBounds,
+    };
+    let transaction: UserTransaction;
+    if (paymasterDetails.deploymentData) {
+      transaction = {
+        type: 'deploy_and_invoke',
+        invoke: { userAddress: this.address, calls },
+        deployment: paymasterDetails.deploymentData,
+      };
+    } else {
+      transaction = {
+        type: 'invoke',
+        invoke: { userAddress: this.address, calls },
+      };
+    }
+    return this.paymaster.buildTransaction(transaction, parameters);
   }
 
-  public async executePaymaster(
+  public async executePaymasterTransaction(
     calls: Call[],
-    paymasterDetails?: PaymasterDetails
+    paymasterDetails: PaymasterDetails
   ): Promise<InvokeFunctionResponse> {
-    const { typedData, tokenAmountAndPrice } = await this.buildPaymasterTypedData(
-      calls,
-      paymasterDetails
-    );
+    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
     if (
-      paymasterDetails?.maxEstimatedFee &&
-      tokenAmountAndPrice.estimatedAmount > paymasterDetails.maxEstimatedFee
+      paymasterDetails.maxEstimatedFeeInGasToken &&
+      preparedTransaction.fee.estimated_fee_in_gas_token >
+        paymasterDetails.maxEstimatedFeeInGasToken
     ) {
       throw Error('Estimated max fee too high');
     }
     if (
-      paymasterDetails?.maxPriceInStrk &&
-      tokenAmountAndPrice.priceInStrk > paymasterDetails.maxPriceInStrk
+      paymasterDetails?.maxGasTokenPriceInStrk &&
+      preparedTransaction.fee.gas_token_price_in_strk > paymasterDetails.maxGasTokenPriceInStrk
     ) {
       throw Error('Gas token price is too high');
     }
-    const signature = await this.signMessage(typedData);
+    let transaction: ExecutableUserTransaction;
+    switch (preparedTransaction.type) {
+      case 'deploy_and_invoke': {
+        const signature = await this.signMessage(preparedTransaction.typed_data);
+        transaction = {
+          type: 'deploy_and_invoke',
+          invoke: {
+            userAddress: this.address,
+            typedData: preparedTransaction.typed_data,
+            signature: signatureToHexArray(signature),
+          },
+          deployment: preparedTransaction.deployment,
+        };
+        break;
+      }
+      case 'invoke': {
+        const signature = await this.signMessage(preparedTransaction.typed_data);
+        transaction = {
+          type: 'invoke',
+          invoke: {
+            userAddress: this.address,
+            typedData: preparedTransaction.typed_data,
+            signature: signatureToHexArray(signature),
+          },
+        };
+        break;
+      }
+      case 'deploy': {
+        transaction = {
+          type: 'deploy',
+          deployment: preparedTransaction.deployment,
+        };
+        break;
+      }
+      default:
+        throw Error('Invalid transaction type');
+    }
     return this.paymaster
-      .execute(
-        this.address,
-        typedData,
-        signatureToHexArray(signature),
-        paymasterDetails?.deploymentData
-      )
+      .executeTransaction(transaction, preparedTransaction.parameters)
       .then((response) => ({ transaction_hash: response.transaction_hash }));
   }
 
