@@ -311,27 +311,50 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
 }
 
 /**
- * Determines if the given response matches the specified version.
+ * Determines if the provided version matches the specified version.
+ * Version must be formatted "major.minor.patch" using dot delimiters.
+ * Use wildcard * or unspecified to match 'any' value on the position.
+ * ex. 7.3.* == 7.3.15, * == 1.1.1, 0.8 == 0.8.5. '' != 0.8.5
  *
- * @param {SupportedRpcVersion} version The version to compare against the response.
- * @param {string} response The response to check against the version.
+ *
+ * @param {string} expected version.
+ * @param {string} provided to check against the expected version.
  * @returns {boolean} True if the response matches the version, false otherwise.
  * @example
  * ``` typescript
- * const result = provider.isVersion("0.7","0_7");
- * // result = false
+ * const result = provider.isVersion("0.7","0.7.1");
+ * // result = true
  * ```
  */
-export function isVersion(version: SupportedRpcVersion, response: string): boolean {
-  const [majorS, minorS] = version.split('.');
-  const [majorR, minorR] = response.split('.');
+export function isVersion(expected: string, provided: string): boolean {
+  const expectedParts = expected.split('.');
+  const providedParts = provided.split('.');
 
-  return majorS === majorR && minorS === minorR;
+  return expectedParts.every((part, index) => part === '*' || part === providedParts[index]);
 }
 
-export function stringToSpecVersion(version: string) {
-  const [major, minor] = version.split('.');
-  return `${major}.${minor}` as SupportedRpcVersion;
+/**
+ * Define if provided version is SDK supported rpc specification version
+ */
+export function isSupportedSpecVersion(
+  version: string,
+  options: { allowAnyPatchVersion: boolean } = { allowAnyPatchVersion: false }
+): version is SupportedRpcVersion {
+  return Object.values(SupportedRpcVersion).some((v) =>
+    isVersion(options.allowAnyPatchVersion ? toAnyPatchVersion(v) : v, version)
+  );
+}
+
+/**
+ * Convert fixed version to any patch version.
+ * ex. 0.8.1 -> 0.8.*
+ */
+export function toAnyPatchVersion(version: string) {
+  const parts = version.split('.');
+  if (parts.length < 3) {
+    return version;
+  }
+  return `${parts[0]}.${parts[1]}.*`;
 }
 
 /**

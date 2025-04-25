@@ -49,7 +49,7 @@ import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { solidityUint256PackedKeccak256 } from '../utils/hash';
 import { isBigNumberish, toBigInt, toHex } from '../utils/num';
-import { isVersion, wait } from '../utils/provider';
+import { isSupportedSpecVersion, isVersion, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { formatSignature } from '../utils/stark';
 import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
@@ -57,6 +57,8 @@ import { getMessageHash, validateTypedData } from '../utils/typedData';
 import { LibraryError } from '../utils/errors';
 import { ProviderInterface } from './interface';
 import { config } from '../global/config';
+import { SupportedRpcVersion } from '../global/constants';
+import { logger } from '../global/logger';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -79,8 +81,10 @@ export class RpcProvider implements ProviderInterface {
         } else
           throw new Error(`unsupported channel for spec version: ${optionsOrProvider.specVersion}`);
       } else if (isVersion('0.8', config.get('rpcVersion'))) {
+        // default channel when unspecified
         this.channel = new RPC08.RpcChannel({ ...optionsOrProvider, waitMode: false });
       } else if (isVersion('0.7', config.get('rpcVersion'))) {
+        // default channel when unspecified
         this.channel = new RPC07.RpcChannel({ ...optionsOrProvider, waitMode: false });
       } else throw new Error('unable to define spec version for channel');
 
@@ -100,14 +104,27 @@ export class RpcProvider implements ProviderInterface {
     const channel = new RPC07.RpcChannel({ ...optionsOrProvider });
     const spec = await channel.getSpecVersion();
 
-    if (isVersion('0.7', spec)) {
-      return new this({ ...optionsOrProvider, specVersion: '0.7' }) as T;
-    }
-    if (isVersion('0.8', spec)) {
-      return new this({ ...optionsOrProvider, specVersion: '0.8' }) as T;
+    // Optimistic Warning in case of the patch version
+    if (!isSupportedSpecVersion(spec)) {
+      logger.warn(`Using incompatible node spec version ${spec}`);
     }
 
-    throw new LibraryError('Unable to detect specification version');
+    if (isVersion('0.7', spec)) {
+      return new this({
+        ...optionsOrProvider,
+        specVersion: SupportedRpcVersion.v0_7_1,
+      }) as T;
+    }
+    if (isVersion('0.8', spec)) {
+      return new this({
+        ...optionsOrProvider,
+        specVersion: SupportedRpcVersion.v0_8_1,
+      }) as T;
+    }
+
+    throw new LibraryError(
+      `Provided RPC node specification versions ${spec} is not compatible with the SDK. SDK supported RPC versions ${Object.keys(SupportedRpcVersion).toString()}`
+    );
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
@@ -119,17 +136,17 @@ export class RpcProvider implements ProviderInterface {
   }
 
   /**
-   * return spec version in format "M.m"
+   * return channel spec version
    */
   public async getSpecVersion() {
-    return this.channel.getSpecVersion();
+    return this.channel.readSpecVersion();
   }
 
   /**
-   * @returns return spec version in format 'M.m.p-rc'
+   * @returns return connected node spec version
    */
   public async getSpecificationVersion() {
-    return this.channel.getSpecificationVersion();
+    return this.channel.getSpecVersion();
   }
 
   public async getNonceForAddress(
