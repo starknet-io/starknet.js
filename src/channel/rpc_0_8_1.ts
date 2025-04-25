@@ -4,7 +4,8 @@ import {
   SupportedRpcVersion,
   SYSTEM_MESSAGES,
 } from '../global/constants';
-import { LibraryError, RpcError } from '../utils/errors';
+import { logger } from '../global/logger';
+import { isRPC08_ResourceBounds } from '../provider/types/spec.type';
 import {
   AccountInvocationItem,
   AccountInvocations,
@@ -14,19 +15,20 @@ import {
   Call,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
   Invocation,
   InvocationsDetailsWithNonce,
   RPC_ERROR,
   RpcProviderOptions,
   TransactionType,
-  getEstimateFeeBulkOptions,
-  getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { JRPC, RPCSPEC08 as RPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
+import { LibraryError, RpcError } from '../utils/errors';
 import { validateAndParseEthAddress } from '../utils/eth';
 import fetch from '../utils/fetch';
 import { getSelector, getSelectorFromName } from '../utils/hash';
@@ -37,18 +39,10 @@ import {
   toHex,
   toStorageKey,
 } from '../utils/num';
-import {
-  Block,
-  getDefaultNodeUrl,
-  isSupportedSpecVersion,
-  isV3Tx,
-  isVersion,
-  wait,
-} from '../utils/provider';
+import { Block, getDefaultNodeUrl, wait } from '../utils/provider';
+import { isSupportedSpecVersion, isV3Tx, isVersion } from '../utils/resolve';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
-import { logger } from '../global/logger';
-import { isRPC08_ResourceBounds } from '../provider/types/spec.type';
 // TODO: check if we can filet type before entering to this method, as so to specify here only RPC 0.8 types
 
 const defaultOptions = {
@@ -60,7 +54,7 @@ const defaultOptions = {
 export class RpcChannel {
   readonly id = 'RPC081';
 
-  readonly channelSpecVersion: SupportedRpcVersion = '0.8.1';
+  readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_8_1;
 
   public nodeUrl: string;
 
@@ -207,11 +201,18 @@ export class RpcChannel {
   }
 
   /**
-   * fetch if undefined else just return this.nodeSpecVersion
-   * return this.nodeSpecVersion as 'M.m.p'
-   * @example this.nodeSpecVersion = "0.8.1"
+   * fetch rpc node specVersion
+   * @example this.specVersion = "0.7.1"
    */
-  public async getSpecVersion() {
+  public getSpecVersion() {
+    return this.fetchEndpoint('starknet_specVersion');
+  }
+
+  /**
+   * fetch if undefined else just return this.specVersion
+   * @example this.specVersion = "0.8.1"
+   */
+  public async setupSpecVersion() {
     if (!this.specVersion) {
       const unknownSpecVersion = await this.fetchEndpoint('starknet_specVersion');
 

@@ -72,13 +72,13 @@ class StrategyResolver {
     process.env.TX_VERSION = process.env.TX_VERSION ?? DEFAULT_GLOBAL_CONFIG.transactionVersion;
   }
 
-  async getSpecVersion() {
+  async getNodeSpecVersion() {
     const tempProv = new RpcProvider({
       nodeUrl: process.env.TEST_RPC_URL,
     });
 
     process.env.RPC_SPEC_VERSION = await tempProv.getSpecVersion();
-    process.env.RPC_FULL_SPEC_VERSION = await tempProv.getSpecificationVersion();
+    console.log('Detected Spec Version:', process.env.RPC_SPEC_VERSION);
   }
 
   async logConfigInfo() {
@@ -96,8 +96,7 @@ class StrategyResolver {
       IS_DEVNET: process.env.IS_DEVNET,
       IS_RPC: process.env.IS_RPC,
       IS_TESTNET: process.env.IS_TESTNET,
-      'Rpc node spec version': process.env.RPC_SPEC_VERSION,
-      'Rpc node full spec v.': process.env.RPC_FULL_SPEC_VERSION,
+      'Detected Spec Version': process.env.RPC_SPEC_VERSION,
     });
 
     console.log('Global Test Environment is Ready');
@@ -148,7 +147,7 @@ class StrategyResolver {
     if (!this.hasAllAccountEnvs) console.error('Test Setup Environment is NOT Ready');
 
     this.defineTestTransactionVersion();
-    await this.getSpecVersion();
+    await this.getNodeSpecVersion();
 
     this.logConfigInfo();
   }

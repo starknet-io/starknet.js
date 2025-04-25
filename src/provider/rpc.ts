@@ -1,4 +1,7 @@
-import { RPC08, RPC07 } from '../channel';
+import { RPC07, RPC08 } from '../channel';
+import { config } from '../global/config';
+import { SupportedRpcVersion } from '../global/constants';
+import { logger } from '../global/logger';
 import {
   AccountInvocations,
   BigNumberish,
@@ -6,31 +9,45 @@ import {
   BlockIdentifier,
   BlockTag,
   Call,
-  ContractClassResponse,
   ContractClassIdentifier,
+  ContractClassResponse,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   GetBlockResponse,
+  getContractVersionOptions,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
+  GetTransactionReceiptResponse,
   GetTxReceiptResponseWithoutHelper,
   Invocation,
   Invocations,
   InvocationsDetailsWithNonce,
   PendingBlock,
   PendingStateUpdate,
+  RPC,
   RpcProviderOptions,
+  type Signature,
   StateUpdate,
   StateUpdateResponse,
   TransactionType,
-  getContractVersionOptions,
-  getEstimateFeeBulkOptions,
-  getSimulateTransactionOptions,
-  type Signature,
   type TypedData,
   waitForTransactionOptions,
-  GetTransactionReceiptResponse,
-  RPC,
 } from '../types';
+import assert from '../utils/assert';
+import { CallData } from '../utils/calldata';
+import { getAbiContractVersion } from '../utils/calldata/cairo';
+import { extractContractHashes, isSierra } from '../utils/contract';
+import { LibraryError } from '../utils/errors';
+import { solidityUint256PackedKeccak256 } from '../utils/hash';
+import { isBigNumberish, toBigInt, toHex } from '../utils/num';
+import { wait } from '../utils/provider';
+import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
+import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { formatSignature } from '../utils/stark';
+import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
+import { getMessageHash, validateTypedData } from '../utils/typedData';
+import { ProviderInterface } from './interface';
 import type {
   DeclaredTransaction,
   DeployedAccountTransaction,
@@ -43,22 +60,6 @@ import type {
   TRANSACTION_TRACE,
   TransactionWithHash,
 } from './types/spec.type';
-import assert from '../utils/assert';
-import { CallData } from '../utils/calldata';
-import { getAbiContractVersion } from '../utils/calldata/cairo';
-import { extractContractHashes, isSierra } from '../utils/contract';
-import { solidityUint256PackedKeccak256 } from '../utils/hash';
-import { isBigNumberish, toBigInt, toHex } from '../utils/num';
-import { isSupportedSpecVersion, isVersion, wait } from '../utils/provider';
-import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { formatSignature } from '../utils/stark';
-import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
-import { getMessageHash, validateTypedData } from '../utils/typedData';
-import { LibraryError } from '../utils/errors';
-import { ProviderInterface } from './interface';
-import { config } from '../global/config';
-import { SupportedRpcVersion } from '../global/constants';
-import { logger } from '../global/logger';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -136,17 +137,24 @@ export class RpcProvider implements ProviderInterface {
   }
 
   /**
-   * return channel spec version
+   * read channel spec version
    */
-  public async getSpecVersion() {
+  public readSpecVersion() {
     return this.channel.readSpecVersion();
   }
 
   /**
-   * @returns return connected node spec version
+   * get channel spec version
    */
-  public async getSpecificationVersion() {
+  public async getSpecVersion() {
     return this.channel.getSpecVersion();
+  }
+
+  /**
+   * setup channel spec version and return it
+   */
+  public setupSpecVersion() {
+    return this.channel.setupSpecVersion();
   }
 
   public async getNonceForAddress(

@@ -1,5 +1,4 @@
-import { SupportedRpcVersion } from '../../src/global/constants';
-import { isVersion, toAnyPatchVersion, isSupportedSpecVersion } from '../../src/utils/provider';
+import { isVersion, toAnyPatchVersion, isSupportedSpecVersion, constants } from '../../src';
 
 describe('isVersion', () => {
   it('matches exact versions', () => {
@@ -101,7 +100,7 @@ describe('isSupportedSpecVersion', () => {
 
   describe('isSupportedSpecVersion', () => {
     it('returns true for exact supported version', () => {
-      expect(isSupportedSpecVersion(SupportedRpcVersion.v0_7_1)).toBe(true);
+      expect(isSupportedSpecVersion(constants.SupportedRpcVersion.v0_7_1)).toBe(true);
     });
 
     it('returns false for unsupported version', () => {

@@ -36,6 +36,7 @@ export * as selector from './utils/hash/selector';
 export * as events from './utils/events';
 export * as outsideExecution from './utils/outsideExecution';
 export * as src5 from './utils/src5';
+export * from './utils/resolve';
 export * from './utils/batch';
 export * from './utils/responseParser';
 export * from './utils/cairoDataTypes/uint256';
