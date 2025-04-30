@@ -20,6 +20,7 @@ export type LegacyCompiledContract = Omit<LegacyContractClass, 'program'> & {
 /** SUBTYPES */
 export type Builtins = string[];
 export type CompressedProgram = string;
+export type Hint = Record<string, unknown>;
 
 export type EntryPointsByType = {
   CONSTRUCTOR: ContractEntryPointFields[];
@@ -33,9 +34,11 @@ export type ContractEntryPointFields = {
   builtins?: Builtins;
 };
 
-export interface Program extends Record<string, any> {
+export interface Program {
   builtins: string[];
   data: string[];
+  hints: Record<string, Hint[]>;
+  prime: string;
   attributes?: Array<{
     accessible_scopes?: string[];
     end_pc?: number;
@@ -44,7 +47,7 @@ export interface Program extends Record<string, any> {
         group?: number;
         offset?: number;
       };
-      reference_ids?: Record<string, any>;
+      reference_ids?: Record<string, number>;
     };
     name?: string;
     start_pc?: number;
@@ -52,7 +55,19 @@ export interface Program extends Record<string, any> {
   }>;
   compiler_version?: string;
   main_scope?: string;
-  identifiers?: Record<string, any>;
-  reference_manager?: Record<string, any>;
-  debug_info?: Record<string, any>;
+  identifiers?: Record<string, {
+    full_name?: string;
+    members?: Record<string, unknown>;
+    type?: string;
+    size?: number;
+    references?: unknown[];
+    cairo_type?: string;
+  }>;
+  reference_manager?: Record<string, {
+    references: unknown[];
+  }>;
+  debug_info?: Record<string, {
+    file_contents?: Record<string, string>;
+    instruction_locations?: Record<string, unknown[]>;
+  }>;
 }
