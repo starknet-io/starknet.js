@@ -16,6 +16,10 @@ In `starknet.js`, you can interact with a Paymaster in two ways:
 
 This guide shows how to use the Paymaster with `Account`, how to configure it, and how to retrieve the list of supported
 tokens.
+U
+:::warning
+To be able to use the Paymaster, accounts must be compatible with SNIP-9 (Outside execution).
+:::
 
 ---
 

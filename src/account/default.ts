@@ -407,6 +407,14 @@ export class Account extends Provider implements AccountInterface {
     calls: Call[],
     paymasterDetails: PaymasterDetails
   ): Promise<PreparedTransaction> {
+    // If the account isn't deployed, we can't call the supportsInterface function to know if the account is compatible with SNIP-9
+    if (!paymasterDetails.deploymentData) {
+      const snip9Version = await this.getSnip9Version();
+      if (snip9Version === OutsideExecutionVersion.UNSUPPORTED) {
+        throw Error('Account is not compatible with SNIP-9');
+      }
+    }
+
     const parameters: ExecutionParameters = {
       version: '0x1',
       feeMode: paymasterDetails.feeMode,
