@@ -44,14 +44,18 @@ import {
   TypedData,
   UniversalDeployerContractPayload,
   UniversalDetails,
-} from '../types';
-import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
-import {
+  PaymasterDetails,
+  PreparedTransaction,
+  PaymasterOptions,
   OutsideExecutionVersion,
   type OutsideExecution,
   type OutsideExecutionOptions,
   type OutsideTransaction,
-} from '../types/outsideExecution';
+  ExecutionParameters,
+  UserTransaction,
+  ExecutableUserTransaction,
+} from '../types';
+import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
@@ -69,6 +73,7 @@ import {
   estimateFeeToBounds,
   randomAddress,
   reduceV2,
+  signatureToHexArray,
   toFeeVersion,
   toTransactionVersion,
   v3Details,
@@ -77,6 +82,7 @@ import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 import { config } from '../global/config';
+import { defaultPaymaster, PaymasterInterface, PaymasterRpc } from '../paymaster';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -87,6 +93,8 @@ export class Account extends Provider implements AccountInterface {
 
   readonly transactionVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
 
+  public paymaster: PaymasterInterface;
+
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
@@ -94,7 +102,8 @@ export class Account extends Provider implements AccountInterface {
     cairoVersion?: CairoVersion,
     transactionVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3 = config.get(
       'accountTxVersion'
-    )
+    ),
+    paymaster?: PaymasterOptions | PaymasterInterface
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
@@ -107,6 +116,7 @@ export class Account extends Provider implements AccountInterface {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
     this.transactionVersion = transactionVersion;
+    this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
   }
 
   // provided version or contract based preferred transactionVersion
@@ -344,6 +354,11 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<InvokeFunctionResponse> {
     const details = arg2 === undefined || Array.isArray(arg2) ? transactionsDetail : arg2;
     const calls = Array.isArray(transactions) ? transactions : [transactions];
+
+    if (details.paymaster) {
+      return this.executePaymasterTransaction(calls, details.paymaster);
+    }
+
     const nonce = toBigInt(details.nonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3), // TODO: does this depend on cairo version ?
@@ -386,6 +401,99 @@ export class Account extends Provider implements AccountInterface {
         version,
       }
     );
+  }
+
+  public async buildPaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<PreparedTransaction> {
+    // If the account isn't deployed, we can't call the supportsInterface function to know if the account is compatible with SNIP-9
+    if (!paymasterDetails.deploymentData) {
+      const snip9Version = await this.getSnip9Version();
+      if (snip9Version === OutsideExecutionVersion.UNSUPPORTED) {
+        throw Error('Account is not compatible with SNIP-9');
+      }
+    }
+
+    const parameters: ExecutionParameters = {
+      version: '0x1',
+      feeMode: paymasterDetails.feeMode,
+      timeBounds: paymasterDetails.timeBounds,
+    };
+    let transaction: UserTransaction;
+    if (paymasterDetails.deploymentData) {
+      transaction = {
+        type: 'deploy_and_invoke',
+        invoke: { userAddress: this.address, calls },
+        deployment: paymasterDetails.deploymentData,
+      };
+    } else {
+      transaction = {
+        type: 'invoke',
+        invoke: { userAddress: this.address, calls },
+      };
+    }
+    return this.paymaster.buildTransaction(transaction, parameters);
+  }
+
+  public async executePaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<InvokeFunctionResponse> {
+    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
+    if (
+      paymasterDetails.maxEstimatedFeeInGasToken &&
+      preparedTransaction.fee.estimated_fee_in_gas_token >
+        paymasterDetails.maxEstimatedFeeInGasToken
+    ) {
+      throw Error('Estimated max fee too high');
+    }
+    if (
+      paymasterDetails?.maxGasTokenPriceInStrk &&
+      preparedTransaction.fee.gas_token_price_in_strk > paymasterDetails.maxGasTokenPriceInStrk
+    ) {
+      throw Error('Gas token price is too high');
+    }
+    let transaction: ExecutableUserTransaction;
+    switch (preparedTransaction.type) {
+      case 'deploy_and_invoke': {
+        const signature = await this.signMessage(preparedTransaction.typed_data);
+        transaction = {
+          type: 'deploy_and_invoke',
+          invoke: {
+            userAddress: this.address,
+            typedData: preparedTransaction.typed_data,
+            signature: signatureToHexArray(signature),
+          },
+          deployment: preparedTransaction.deployment,
+        };
+        break;
+      }
+      case 'invoke': {
+        const signature = await this.signMessage(preparedTransaction.typed_data);
+        transaction = {
+          type: 'invoke',
+          invoke: {
+            userAddress: this.address,
+            typedData: preparedTransaction.typed_data,
+            signature: signatureToHexArray(signature),
+          },
+        };
+        break;
+      }
+      case 'deploy': {
+        transaction = {
+          type: 'deploy',
+          deployment: preparedTransaction.deployment,
+        };
+        break;
+      }
+      default:
+        throw Error('Invalid transaction type');
+    }
+    return this.paymaster
+      .executeTransaction(transaction, preparedTransaction.parameters)
+      .then((response) => ({ transaction_hash: response.transaction_hash }));
   }
 
   /**

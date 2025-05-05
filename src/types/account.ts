@@ -11,6 +11,8 @@ import {
   V3TransactionDetails,
 } from './lib';
 import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
+import { AccountDeploymentData } from './api/paymaster-rpc-spec/nonspec';
+import { FeeMode, PaymasterTimeBounds } from './paymaster';
 
 export interface EstimateFee extends EstimateFeeResponse {}
 
@@ -34,6 +36,7 @@ export interface UniversalDetails {
   blockIdentifier?: BlockIdentifier;
   maxFee?: BigNumberish; // ignored on estimate
   tip?: BigNumberish;
+  paymaster?: PaymasterDetails;
   paymasterData?: BigNumberish[];
   accountDeploymentData?: BigNumberish[];
   nonceDataAvailabilityMode?: EDataAvailabilityMode;
@@ -41,6 +44,14 @@ export interface UniversalDetails {
   version?: BigNumberish;
   resourceBounds?: ResourceBounds; // ignored on estimate
   skipValidate?: boolean; // ignored on non-estimate
+}
+
+export interface PaymasterDetails {
+  feeMode: FeeMode;
+  deploymentData?: AccountDeploymentData;
+  timeBounds?: PaymasterTimeBounds;
+  maxEstimatedFeeInGasToken?: BigNumberish;
+  maxGasTokenPriceInStrk?: BigNumberish;
 }
 
 export interface EstimateFeeDetails extends UniversalDetails {}
