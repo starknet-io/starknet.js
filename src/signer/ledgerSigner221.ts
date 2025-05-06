@@ -134,7 +134,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
       const ledgerResponse = await this.signTxV1(det, transactions);
       assert(
         toBigInt(msgHash) === ledgerResponse.hash,
-        'The transaction hash calculated by Starknet.js is different from the one calculated by the Ledger.'
+        'The V1 transaction hash calculated by Starknet.js is different from the one calculated by the Ledger.'
       ); // probably non compatibility with Cairo 0
       return ledgerResponse.signature;
     }
@@ -151,7 +151,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
       const ledgerResponse = await this.signTxV3(det, transactions);
       assert(
         toBigInt(msgHash) === ledgerResponse.hash,
-        'The transaction hash calculated by Starknet.js is different from the one calculated by the Ledger.'
+        'The V3 transaction hash calculated by Starknet.js is different from the one calculated by the Ledger.'
       ); // probably non compatibility with Cairo 0
       return ledgerResponse.signature;
     }
