@@ -6,7 +6,7 @@ import {
   Contract,
   DeclareDeployUDCResponse,
   Provider,
-  RpcError,
+  ProviderInterface,
   TransactionType,
   cairo,
   constants,
@@ -22,10 +22,11 @@ import {
 import {
   TEST_TX_VERSION,
   contracts,
+  createTestProvider,
   describeIfDevnet,
+  devnetFeeTokenAddress,
   erc20ClassHash,
   getTestAccount,
-  getTestProvider,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
@@ -36,8 +37,8 @@ const { uint256 } = cairo;
 const { Signature } = ec.starkCurve;
 
 describe('deploy and test Wallet', () => {
-  const provider = new Provider(getTestProvider());
-  const account = getTestAccount(provider);
+  let provider: Provider;
+  let account: Account;
   let erc20: Contract;
   let erc20Address: string;
   let dapp: Contract;
@@ -45,6 +46,9 @@ describe('deploy and test Wallet', () => {
 
   beforeAll(async () => {
     initializeMatcher(expect);
+
+    provider = new Provider(await createTestProvider());
+    account = getTestAccount(provider);
     expect(account).toBeInstanceOf(Account);
 
     dd = await account.declareAndDeploy({
@@ -129,10 +133,9 @@ describe('deploy and test Wallet', () => {
         calldata,
         0
       );
-      const devnetERC20Address =
-        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetERC20Address,
+        contractAddress: devnetFeeTokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: tobeAccountAddress,
@@ -359,23 +362,6 @@ describe('deploy and test Wallet', () => {
     expect(balance.low).toStrictEqual(toBigInt(990));
   });
 
-  test('execute with and without deprecated abis parameter', async () => {
-    const transaction = {
-      contractAddress: erc20Address,
-      entrypoint: 'transfer',
-      calldata: [erc20.address, '10', '0'],
-    };
-    const details = { maxFee: 0n };
-
-    const error1: RpcError = await account.execute(transaction, details).catch((e) => e);
-    expect(error1).toBeInstanceOf(RpcError);
-    expect(error1.isType('INSUFFICIENT_MAX_FEE')).toBe(true);
-
-    const error2: RpcError = await account.execute(transaction, undefined, details).catch((e) => e);
-    expect(error2).toBeInstanceOf(RpcError);
-    expect(error2.isType('INSUFFICIENT_MAX_FEE')).toBe(true);
-  });
-
   test('execute with custom nonce', async () => {
     const result = await account.getNonce();
     const nonce = toBigInt(result);
@@ -385,7 +371,6 @@ describe('deploy and test Wallet', () => {
         entrypoint: 'transfer',
         calldata: [account.address, '10', '0'],
       },
-      undefined,
       { nonce }
     );
 
@@ -423,14 +408,14 @@ describe('deploy and test Wallet', () => {
       const r2 = toBigInt(r) + 123n;
 
       const signature2 = new Signature(toBigInt(r2.toString()), toBigInt(s));
-
       if (!signature2) return;
 
-      const verifMessageResponse: boolean = await account.verifyMessage(
+      const verifyMessageResponse: boolean = await account.verifyMessageInStarknet(
         typedDataExample,
-        signature2
+        signature2,
+        account.address
       );
-      expect(verifMessageResponse).toBe(false);
+      expect(verifyMessageResponse).toBe(false);
 
       const wrongAccount = new Account(
         provider,
@@ -439,14 +424,17 @@ describe('deploy and test Wallet', () => {
         undefined,
         TEST_TX_VERSION
       ); // non existing account
-      await expect(wrongAccount.verifyMessage(typedDataExample, signature2)).rejects.toThrow();
+      await expect(
+        wrongAccount.verifyMessageInStarknet(typedDataExample, signature2, wrongAccount.address)
+      ).rejects.toThrow();
     });
 
     test('sign and verify message', async () => {
       const signature = await account.signMessage(typedDataExample);
-      const verifMessageResponse: boolean = await account.verifyMessage(
+      const verifMessageResponse: boolean = await account.verifyMessageInStarknet(
         typedDataExample,
-        signature
+        signature,
+        account.address
       );
       expect(verifMessageResponse).toBe(true);
     });
@@ -842,8 +830,13 @@ describe('deploy and test Wallet', () => {
 describe('unit', () => {
   describeIfDevnet('Devnet', () => {
     initializeMatcher(expect);
-    const provider = getTestProvider();
-    const account = getTestAccount(provider);
+    let provider: ProviderInterface;
+    let account: Account;
+
+    beforeAll(async () => {
+      provider = await createTestProvider();
+      account = getTestAccount(provider);
+    });
 
     test('declareIfNot', async () => {
       const declare = await account.declareIfNot({

@@ -21,3 +21,16 @@
   align-items: center;
   justify-content: center;
 }
+
+.feedSection {
+  padding: 3rem 0;
+  background-color: #303846;
+}
+.feedContainer {
+  width: 90%;
+  max-width: 600px;
+  margin: auto;
+}
+.twitterTarget {
+  color: white;
+}

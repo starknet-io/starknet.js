@@ -24,7 +24,7 @@ import {
 import { CairoCustomEnum } from '../utils/calldata/enum/CairoCustomEnum';
 import { CairoOption } from '../utils/calldata/enum/CairoOption';
 import { CairoResult } from '../utils/calldata/enum/CairoResult';
-import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
+import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt/transactionReceipt.type';
 
 declare module 'abi-wan-kanabi' {
   export interface Config<OptionT = any, ResultT = any, ErrorT = any> {

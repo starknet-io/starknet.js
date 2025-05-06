@@ -1,5 +1,4 @@
 import {
-  BlockWithTxHashes,
   FeeEstimate,
   CallContractResponse,
   DeclareContractResponse,
@@ -9,8 +8,9 @@ import {
   GetTransactionResponse,
   InvokeFunctionResponse,
   SimulateTransactionResponse,
+  BlockWithTxHashes,
 } from '../../types';
-import type { GetTransactionReceiptResponse } from '../transactionReceipt';
+import type { GetTransactionReceiptResponse } from '../transactionReceipt/transactionReceipt.type';
 
 export abstract class ResponseParser {
   abstract parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse;
