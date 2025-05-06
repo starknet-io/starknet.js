@@ -1,15 +1,14 @@
 import { UDC } from '../global/constants';
+import { ETransactionVersion } from '../provider/types/spec.type';
 import {
   BigNumberish,
   CairoVersion,
   Call,
-  CallStruct,
   Calldata,
   ParsedStruct,
   RawArgs,
   UniversalDeployerContractPayload,
 } from '../types';
-import { ETransactionVersion } from '../types/api';
 import { CallData } from './calldata';
 import { starkCurve } from './ec';
 import { calculateContractAddressFromHash, getSelectorFromName } from './hash';
@@ -95,27 +94,6 @@ export const fromCallsToExecuteCalldata = (calls: Call[]) => {
   const { callArray, calldata } = transformCallsToMulticallArrays(calls);
   const compiledCalls = CallData.compile({ callArray });
   return [...compiledCalls, ...calldata] as Calldata;
-};
-
-/**
- * Transforms a list of calls into the Cairo 0 `__execute__` calldata including nonce.
- * @deprecated
- */
-export const fromCallsToExecuteCalldataWithNonce = (calls: Call[], nonce: BigNumberish) => {
-  return [...fromCallsToExecuteCalldata(calls), toBigInt(nonce).toString()] as Calldata;
-};
-
-/**
- * Format Data inside Calls
- * @deprecated Not required for getting execute Calldata
- */
-export const transformCallsToMulticallArrays_cairo1 = (calls: Call[]) => {
-  const callArray = calls.map<CallStruct>((call) => ({
-    to: toBigInt(call.contractAddress).toString(10),
-    selector: toBigInt(getSelectorFromName(call.entrypoint)).toString(10),
-    calldata: CallData.compile(call.calldata || []),
-  }));
-  return callArray;
 };
 
 /**

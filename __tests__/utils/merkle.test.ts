@@ -1,6 +1,6 @@
+import { BigNumberish } from '../../src';
 import { computePedersenHash, computePoseidonHash } from '../../src/utils/hash';
 import { MerkleTree, proofMerklePath } from '../../src/utils/merkle';
-import { BigNumberish } from '../../src/utils/num';
 
 type RawHashMethod = (a: BigNumberish, b: BigNumberish) => string;
 

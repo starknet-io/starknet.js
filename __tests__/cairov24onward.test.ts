@@ -1,4 +1,5 @@
 import {
+  Account,
   BigNumberish,
   CairoCustomEnum,
   CairoFixedArray,
@@ -10,6 +11,7 @@ import {
   CairoUint512,
   CallData,
   Contract,
+  ProviderInterface,
   byteArray,
   cairo,
   num,
@@ -17,11 +19,16 @@ import {
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
 
 describe('Cairo v2.4 onwards', () => {
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let provider: ProviderInterface;
+  let account: Account;
+
+  beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+  });
 
   describe('cairo v2.4.0 new types', () => {
     let stringContract: Contract;
@@ -169,8 +176,8 @@ describe('Cairo v2.4 onwards', () => {
 
     test('Tuple ((u256,(u16,Order2)), u8)', async () => {
       type Order2 = {
-        p1: num.BigNumberish;
-        p2: num.BigNumberish[];
+        p1: BigNumberish;
+        p2: BigNumberish[];
       };
       const myOrder2: Order2 = { p1: 100, p2: [5, 6, 7] };
       const calldata9 = myCallData.compile('get_tuple9', {

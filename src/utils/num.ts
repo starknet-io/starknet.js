@@ -7,9 +7,6 @@ import assert from './assert';
 import { addHexPrefix, buf2hex, removeHexPrefix } from './encode';
 import { isBigInt, isNumber, isString } from './typed';
 
-/** @deprecated prefer importing from 'types' over 'num' */
-export type { BigNumberish };
-
 /**
  * Test if string is hex-string
  *
@@ -44,6 +41,14 @@ export function isHex(hex: string): boolean {
  */
 export function toBigInt(value: BigNumberish): bigint {
   return BigInt(value);
+}
+
+/**
+ * try to convert BigNumberish to bigint
+ * in case of undefined return undefined
+ */
+export function tryToBigInt(value: BigNumberish | undefined) {
+  return value ? BigInt(value) : undefined;
 }
 
 /**
