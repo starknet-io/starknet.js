@@ -75,7 +75,7 @@ describeIfRpc('RPCProvider', () => {
     const rawResult = await channel.fetch('starknet_specVersion');
     const j = await rawResult.json();
     expect(channel.readSpecVersion()).toBeDefined();
-    expect(isVersion(j.result, await channel.setupSpecVersion())).toBeTruthy();
+    expect(isVersion(j.result, await channel.setUpSpecVersion())).toBeTruthy();
   });
 
   test('baseFetch override', async () => {

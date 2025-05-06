@@ -48,7 +48,7 @@ export class RpcChannel {
   readonly id = 'RPC071';
 
   /**
-   * This Channel provide communication using spec version
+   * RPC specification version this Channel class implements
    */
   readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_7_1;
 
@@ -207,7 +207,7 @@ export class RpcChannel {
    * fetch if undefined test and set specVersion, else just return this.specVersion
    * @example this.specVersion = "0.7.1"
    */
-  public async setupSpecVersion() {
+  public async setUpSpecVersion() {
     if (!this.specVersion) {
       const unknownSpecVersion = await this.fetchEndpoint('starknet_specVersion');
 

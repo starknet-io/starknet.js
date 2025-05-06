@@ -54,6 +54,9 @@ const defaultOptions = {
 export class RpcChannel {
   readonly id = 'RPC081';
 
+  /**
+   * RPC specification version this Channel class implements
+   */
   readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_8_1;
 
   public nodeUrl: string;
@@ -71,7 +74,7 @@ export class RpcChannel {
   private chainId?: StarknetChainId;
 
   /**
-   * Connected rpc node specification version
+   * RPC specification version of the connected node
    */
   private specVersion?: SupportedRpcVersion;
 
@@ -212,7 +215,7 @@ export class RpcChannel {
    * fetch if undefined else just return this.specVersion
    * @example this.specVersion = "0.8.1"
    */
-  public async setupSpecVersion() {
+  public async setUpSpecVersion() {
     if (!this.specVersion) {
       const unknownSpecVersion = await this.fetchEndpoint('starknet_specVersion');
 

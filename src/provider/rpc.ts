@@ -124,7 +124,7 @@ export class RpcProvider implements ProviderInterface {
     }
 
     throw new LibraryError(
-      `Provided RPC node specification versions ${spec} is not compatible with the SDK. SDK supported RPC versions ${Object.keys(SupportedRpcVersion).toString()}`
+      `Provided RPC node specification version ${spec} is not compatible with the SDK. SDK supported RPC versions ${Object.keys(SupportedRpcVersion).toString()}`
     );
   }
 
@@ -153,8 +153,8 @@ export class RpcProvider implements ProviderInterface {
   /**
    * setup channel spec version and return it
    */
-  public setupSpecVersion() {
-    return this.channel.setupSpecVersion();
+  public setUpSpecVersion() {
+    return this.channel.setUpSpecVersion();
   }
 
   public async getNonceForAddress(
