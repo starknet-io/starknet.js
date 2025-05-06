@@ -228,7 +228,7 @@ import type Transport from '@ledgerhq/hw-transport'; // type for the transporter
 In a Web DAPP, take care that some browsers are not compatible (FireFox, ...), and that the Bluetooth is not working in all cases and in all operating systems.
 
 :::note
-The last version of the Ledger Starknet APP (v2.2.1) supports explained V1 (ETH) & V3 (STRK) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to Enable `Blind signing` in the APP settings.
+The last version of the Ledger Starknet APP (v2.3.1) supports explained V1 (ETH, Rpc 0.7) & V3 (STRK, Rpc 0.7 & 0.8) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to enable `Blind signing` in the APP settings.
 :::
 
 For example, for a Node script:
@@ -236,7 +236,7 @@ For example, for a Node script:
 ```typescript
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
 const myLedgerTransport: Transport = await TransportNodeHid.create();
-const myLedgerSigner = new LedgerSigner221(myLedgerTransport, 0);
+const myLedgerSigner = new LedgerSigner231(myLedgerTransport, 0);
 const pubK = await myLedgerSigner.getPubKey();
 const fullPubK = await myLedgerSigner.getFullPubKey();
 // ...
@@ -246,12 +246,15 @@ const ledgerAccount = new Account(myProvider, ledger0addr, myLedgerSigner);
 ```
 
 :::warning important
-The Ledger shall be connected, unlocked, with the Starknet internal APP activated, before launch of the script.
-:::
 
-Some complete examples:  
-A Node script: [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/6.testLedgerAccount221.ts).  
-A test Web DAPP, to use in Devnet: [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
+- The Ledger shall be connected, unlocked, with the Starknet internal APP activated, before launch of the script.
+- The Ledger Starknet APP is not handling the signature of Class declaration.
+- The transactions are detailed in the Nano screen only for a single transaction of STRK, ETH or USDC. All other cases are blind signing.
+  :::
+
+Some complete examples :  
+A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/10.testLedger231-rpc08.ts).  
+A test Web DAPP, to use in devnet-rs network : [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
 
 If you want to read the version of the Ledger Starknet APP:
 
@@ -268,10 +271,10 @@ You also have in Starknet.js a signer for the old v1.1.1 Ledger Starknet APP.
 const myLedgerSigner = new LedgerSigner111(myLedgerTransport, 0);
 ```
 
-If you want to use the accounts created with the v1.1.1, using the v2.2.1:
+If you want to use the accounts created with the v1.1.1, using the v2.3.1 signer :
 
 ```typescript
-const myLedgerSigner = new LedgerSigner221(myLedgerTransport, 0, undefined, getLedgerPathBuffer111);
+const myLedgerSigner = new LedgerSigner231(myLedgerTransport, 0, undefined, getLedgerPathBuffer111);
 ```
 
 :::
