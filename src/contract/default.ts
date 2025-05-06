@@ -275,7 +275,7 @@ export class Contract implements ContractInterface {
       entrypoint: method,
     };
     if ('execute' in this.providerOrAccount) {
-      return this.providerOrAccount.execute(invocation, undefined, {
+      return this.providerOrAccount.execute(invocation, {
         maxFee,
         nonce,
       });

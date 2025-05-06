@@ -2,7 +2,19 @@ import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
 import { PRICE_UNIT } from 'starknet-types-08';
+import { config } from '../../global/config';
 import { SupportedRpcVersion, ZERO } from '../../global/constants';
+import { FeeEstimate } from '../../provider/types/index.type';
+import {
+  EDAMode,
+  EDataAvailabilityMode,
+  ETransactionVersion,
+  isRPC08_FeeEstimate,
+  ResourceBounds,
+  ResourceBoundsOverhead,
+  ResourceBoundsOverheadRPC07,
+  ResourceBoundsOverheadRPC08,
+} from '../../provider/types/spec.type';
 import {
   ArraySignatureType,
   BigNumberish,
@@ -11,7 +23,6 @@ import {
   Signature,
   UniversalDetails,
 } from '../../types';
-import { FeeEstimate } from '../../provider/types/index.type';
 import {
   addHexPrefix,
   arrayBufferToString,
@@ -26,20 +37,10 @@ import {
   bigNumberishArrayToHexadecimalStringArray,
   toHex,
 } from '../num';
+import { isVersion } from '../resolve';
 import { isBigInt, isString } from '../typed';
-import {
-  EDAMode,
-  EDataAvailabilityMode,
-  ETransactionVersion,
-  isRPC08_FeeEstimate,
-  ResourceBounds,
-  ResourceBoundsOverhead,
-  ResourceBoundsOverheadRPC07,
-  ResourceBoundsOverheadRPC08,
-} from '../../provider/types/spec.type';
 import { estimateFeeToBounds as estimateFeeToBoundsRPC07 } from './rpc07';
 import { estimateFeeToBounds as estimateFeeToBoundsRPC08 } from './rpc08';
-import { config } from '../../global/config';
 
 type V3Details = Required<
   Pick<
@@ -118,15 +119,6 @@ export function decompressProgram(base64: CompressedProgram | CompressedProgram[
 export function randomAddress(): string {
   const randomKeyPair = utils.randomPrivateKey();
   return getStarkKey(randomKeyPair);
-}
-
-/**
- * Lowercase and hex prefix string
- *
- * @deprecated Not used internally, naming is confusing based on functionality
- */
-export function makeAddress(input: string): string {
-  return addHexPrefix(input).toLowerCase();
 }
 
 /**
@@ -218,15 +210,16 @@ export function estimatedFeeToMaxFee(
 export function estimateFeeToBounds(
   estimate: FeeEstimate | 0n,
   overhead: ResourceBoundsOverhead = config.get('feeMarginPercentage').bounds,
-  specVersion?: string
+  specVersion?: SupportedRpcVersion
 ): ResourceBounds {
   if (isBigInt(estimate)) {
     return {
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-      ...(specVersion === '0.8' && {
-        l1_data_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-      }),
+      ...(specVersion &&
+        isVersion('0.8', specVersion) && {
+          l1_data_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+        }),
     };
   }
 
@@ -241,7 +234,7 @@ export type feeOverhead = ResourceBounds;
 /**
  * Mock zero fee response
  */
-export function ZEROFee(specVersion: string) {
+export function ZEROFee(specVersion: SupportedRpcVersion) {
   return {
     l1_gas_consumed: 0n,
     l1_gas_price: 0n,

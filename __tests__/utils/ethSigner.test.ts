@@ -286,7 +286,7 @@ describe('Ethereum signer', () => {
         cairo.uint256(1 * 10 ** 4),
       ]);
       const feeTransfer = await ethAccount.estimateInvokeFee(txCallData);
-      const respTransfer = await ethAccount.execute(txCallData, undefined, {
+      const respTransfer = await ethAccount.execute(txCallData, {
         resourceBounds: {
           l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
           l1_gas: {
@@ -336,20 +336,6 @@ describe('Ethereum signer', () => {
           '0x5d574bd1467f1ca5178c118be7cdb3e74718c37bae90ab686a9b8536ca24436'
         );
       }
-    });
-  });
-  describe('Ethereum address', () => {
-    test('Eth address format', async () => {
-      const ethAddr = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not a valid 20 bytes ETh address
-      expect(validateAndParseEthAddress(ethAddr)).toBe(
-        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
-      );
-      expect(validateAndParseEthAddress(BigInt(ethAddr))).toBe(
-        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
-      );
-      expect(validateAndParseEthAddress(BigInt(ethAddr).toString(10))).toBe(
-        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
-      );
     });
   });
   describe('Ethereum address', () => {

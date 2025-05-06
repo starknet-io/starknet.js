@@ -301,12 +301,6 @@ export type getEstimateFeeBulkOptions = {
   skipValidate?: boolean;
 };
 
-export interface CallStruct {
-  to: string;
-  selector: string;
-  calldata: string[];
-}
-
 /**
  * Represent Contract version
  */

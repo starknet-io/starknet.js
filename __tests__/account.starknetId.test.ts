@@ -46,39 +46,36 @@ describe('deploy and test Wallet', () => {
     });
     multicallAddress = multicallResponse.deploy.contract_address;
 
-    const { transaction_hash } = await account.execute(
-      [
-        {
-          contractAddress: devnetERC20Address,
-          entrypoint: 'approve',
-          calldata: [namingAddress, 0, 1], // Price of domain
-        },
-        {
-          contractAddress: identityAddress,
-          entrypoint: 'mint',
-          calldata: ['1'], // TokenId
-        },
-        {
-          contractAddress: namingAddress,
-          entrypoint: 'buy',
-          calldata: [
-            '1', // Starknet id linked
-            '1499554868251', // Domain encoded "fricoben"
-            '62', // days
-            '0', // resolver
-            0, // sponsor
-            0,
-            0,
-          ],
-        },
-        {
-          contractAddress: identityAddress,
-          entrypoint: 'set_main_id',
-          calldata: ['1'],
-        },
-      ],
-      undefined
-    );
+    const { transaction_hash } = await account.execute([
+      {
+        contractAddress: devnetERC20Address,
+        entrypoint: 'approve',
+        calldata: [namingAddress, 0, 1], // Price of domain
+      },
+      {
+        contractAddress: identityAddress,
+        entrypoint: 'mint',
+        calldata: ['1'], // TokenId
+      },
+      {
+        contractAddress: namingAddress,
+        entrypoint: 'buy',
+        calldata: [
+          '1', // Starknet id linked
+          '1499554868251', // Domain encoded "fricoben"
+          '62', // days
+          '0', // resolver
+          0, // sponsor
+          0,
+          0,
+        ],
+      },
+      {
+        contractAddress: identityAddress,
+        entrypoint: 'set_main_id',
+        calldata: ['1'],
+      },
+    ]);
 
     await provider.waitForTransaction(transaction_hash);
   });
@@ -102,21 +99,18 @@ describe('deploy and test Wallet', () => {
   describe('Test getStarkProfile', () => {
     beforeAll(async () => {
       // Add verifier data
-      const { transaction_hash: transaction_hash_verifier } = await account.execute(
-        [
-          {
-            contractAddress: identityAddress,
-            entrypoint: 'set_verifier_data',
-            calldata: [
-              '1', // token_id
-              shortString.encodeShortString('discord'), // field
-              123, // value
-              0,
-            ],
-          },
-        ],
-        undefined
-      );
+      const { transaction_hash: transaction_hash_verifier } = await account.execute([
+        {
+          contractAddress: identityAddress,
+          entrypoint: 'set_verifier_data',
+          calldata: [
+            '1', // token_id
+            shortString.encodeShortString('discord'), // field
+            123, // value
+            0,
+          ],
+        },
+      ]);
       await provider.waitForTransaction(transaction_hash_verifier);
     });
 

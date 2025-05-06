@@ -50,15 +50,6 @@ export function utf8ToArray(str: string): Uint8Array {
 }
 
 /**
- * Convert utf8-string to Uint8Array
- *
- * @deprecated equivalent to 'utf8ToArray', alias will be removed
- */
-export function stringToArrayBuffer(str: string): Uint8Array {
-  return utf8ToArray(str);
-}
-
-/**
  * Convert string to array buffer (browser and node compatible)
  *
  * @param {string} a The Base64 encoded string to convert.

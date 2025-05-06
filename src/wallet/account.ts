@@ -36,32 +36,16 @@ import {
   watchAsset,
 } from './connect';
 import { StarknetWalletProvider } from './types';
-import { logger } from '../global/logger';
 
-// TODO: Remove non address constructor in next major version
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
   public walletProvider: StarknetWalletProvider;
 
-  /**
-   * @deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.
-   */
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     walletProvider: StarknetWalletProvider,
+    address: string,
     cairoVersion?: CairoVersion
-  );
-  constructor(
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion,
-    address?: string
-  );
-  constructor(
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion,
-    address: string = ''
   ) {
     super(providerOrOptions, address, '', cairoVersion); // At this point unknown address
     this.walletProvider = walletProvider;
@@ -79,15 +63,6 @@ export class WalletAccount extends Account implements AccountInterface {
       // At the moment channel is stateless but it could change
       this.channel.setChainId(res as StarknetChainId);
     });
-
-    if (!address.length) {
-      logger.warn(
-        '@deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.'
-      );
-      requestAccounts(this.walletProvider).then(([accountAddress]) => {
-        this.address = accountAddress.toLowerCase();
-      });
-    }
   }
 
   /**
@@ -190,7 +165,7 @@ export class WalletAccount extends Account implements AccountInterface {
     silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
-    return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
+    return new WalletAccount(provider, walletProvider, accountAddress, cairoVersion);
   }
 
   static async connectSilent(

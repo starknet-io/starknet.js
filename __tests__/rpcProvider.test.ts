@@ -1,24 +1,5 @@
 import { getStarkKey, Signature, utils } from '@scure/starknet';
-import typedDataExample from '../__mocks__/typedData/baseExample.json';
-import {
-  Account,
-  Block,
-  CallData,
-  Contract,
-  FeeEstimate,
-  ProviderInterface,
-  RPC,
-  RPCResponseParser,
-  ReceiptTx,
-  RpcProvider,
-  TransactionExecutionStatus,
-  cairo,
-  stark,
-  waitForTransactionOptions,
-} from '../src';
-import { StarknetChainId } from '../src/global/constants';
-import { felt, uint256 } from '../src/utils/calldata/cairo';
-import { toBigInt, toHexString } from '../src/utils/num';
+import { hasMixin } from 'ts-mixer';
 import {
   contracts,
   createBlockForDevnet,
@@ -32,8 +13,32 @@ import {
   waitNextBlock,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
+import typedDataExample from '../__mocks__/typedData/baseExample.json';
+import {
+  Account,
+  Block,
+  CallData,
+  Contract,
+  FeeEstimate,
+  LibraryError,
+  ProviderInterface,
+  RPC,
+  RPCResponseParser,
+  ReceiptTx,
+  RpcProvider,
+  TransactionExecutionStatus,
+  cairo,
+  stark,
+  waitForTransactionOptions,
+  isVersion,
+} from '../src';
+import { StarknetChainId } from '../src/global/constants';
+import { felt, uint256 } from '../src/utils/calldata/cairo';
+import { toBigInt, toHexString } from '../src/utils/num';
 import { isBoolean } from '../src/utils/typed';
-import { isVersion } from '../src/utils/provider';
+import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
+import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
+import { StarknetId } from '../src/provider/extensions/starknetId';
 
 describeIfRpc('RPCProvider', () => {
   let rpcProvider: RpcProvider;
@@ -53,6 +58,16 @@ describeIfRpc('RPCProvider', () => {
     await createBlockForDevnet();
   });
 
+  test('create should be usable by the base and extended RpcProvider, but not Account', async () => {
+    const nodeUrl = process.env.TEST_RPC_URL;
+    const base = await BaseRpcProvider.create({ nodeUrl });
+    const extended = await ExtendedRpcProvider.create({ nodeUrl });
+
+    expect(hasMixin(base, StarknetId)).toBe(false);
+    expect(hasMixin(extended, StarknetId)).toBe(true);
+    await expect(Account.create()).rejects.toThrow(LibraryError);
+  });
+
   test('detect spec version with create', async () => {
     const providerTest = await RpcProvider.create({ nodeUrl: process.env.TEST_RPC_URL });
     const { channel } = providerTest;
@@ -60,7 +75,7 @@ describeIfRpc('RPCProvider', () => {
     const rawResult = await channel.fetch('starknet_specVersion');
     const j = await rawResult.json();
     expect(channel.readSpecVersion()).toBeDefined();
-    expect(isVersion(j.result, await channel.getSpecVersion())).toBeTruthy();
+    expect(isVersion(j.result, await channel.setUpSpecVersion())).toBeTruthy();
   });
 
   test('baseFetch override', async () => {
@@ -324,11 +339,6 @@ describeIfRpc('RPCProvider', () => {
         0
       );
       expect(transaction).toHaveProperty('transaction_hash');
-    });
-
-    test('getPendingTransactions', async () => {
-      const transactions = await rpcProvider.getPendingTransactions();
-      expect(Array.isArray(transactions)).toBe(true);
     });
 
     test('getSyncingStats', async () => {

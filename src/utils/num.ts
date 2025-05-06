@@ -7,9 +7,6 @@ import assert from './assert';
 import { addHexPrefix, buf2hex, removeHexPrefix } from './encode';
 import { isBigInt, isNumber, isString } from './typed';
 
-/** @deprecated prefer importing from 'types' over 'num' */
-export type { BigNumberish };
-
 /**
  * Test if string is hex-string
  *
