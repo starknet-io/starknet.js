@@ -1,4 +1,4 @@
-import { RPC06, RPC07 } from '../channel';
+import { RPC08, RPC07 } from '../channel';
 import { StarknetChainId } from '../global/constants';
 import type {
   AccountInvocations,
@@ -17,6 +17,7 @@ import type {
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
+  GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetailsWithNonce,
@@ -31,10 +32,9 @@ import type {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
-import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 
 export abstract class ProviderInterface {
-  public abstract channel: RPC07.RpcChannel | RPC06.RpcChannel;
+  public abstract channel: RPC07.RpcChannel | RPC08.RpcChannel;
 
   /**
    * Gets the Starknet chain Id
@@ -177,7 +177,6 @@ export abstract class ProviderInterface {
 
   /**
    * Invokes a function on starknet
-   * @deprecated This method won't be supported as soon as fees are mandatory. Should not be used outside of Account class
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
@@ -211,29 +210,6 @@ export abstract class ProviderInterface {
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse>;
-
-  /**
-   * Estimates the fee for a given INVOKE transaction
-   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead. Should not be used outside of Account class
-   *
-   * @param invocation the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   * @param details - optional details containing:
-   * - nonce - optional nonce
-   * - version - optional version
-   * @param blockIdentifier - (optional) block identifier
-   * @param skipValidate - (optional) skip cairo __validate__ method
-   * @returns the estimated fee
-   */
-  public abstract getEstimateFee(
-    invocation: Invocation,
-    details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean
-  ): Promise<EstimateFeeResponse>;
 
   /**
    * Estimates the fee for a given INVOKE transaction

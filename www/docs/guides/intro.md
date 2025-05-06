@@ -18,7 +18,7 @@ npm install starknet@next
 
 ## Running tests locally
 
-Local tests rely on <ins>[Starknet Devnet](https://github.com/0xSpaceShard/starknet-devnet-rs)</ins>, a local testnet emulation.
+Local tests rely on <ins>[Starknet Devnet](https://github.com/0xSpaceShard/starknet-devnet)</ins>, a local testnet emulation.
 
 Launch a Devnet instance and run:
 
@@ -41,7 +41,7 @@ npm run start # fires up a local documentation site
 
 Please check the Starknet documentation <ins>[here](https://docs.starknet.io/documentation/quick_start/declare_a_smart_contract/#compiling_a_smart_contract)</ins> to compile Starknet contracts.
 
-Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.6.1/)</ins> documentation site.
+Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/)</ins> documentation site.
 
 ## Interacting with contracts and accounts
 
@@ -51,4 +51,4 @@ For some more extensive examples visit PhilippeR26's <ins>[workshop](https://git
 
 ## Contracts used in the guides
 
-You can find the compiled contracts used in these guides in the <ins>[\_\_mocks\_\_](https://github.com/starknet-io/starknet.js/tree/develop/__mocks__/cairo/myAccountAbstraction/)</ins> directory.
+You can find the compiled contracts used in these guides in the <ins>[\_\_mocks\_\_](https://github.com/starknet-io/starknet.js/tree/develop/__mocks__/cairo/)</ins> directory.

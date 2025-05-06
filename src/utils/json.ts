@@ -65,6 +65,3 @@ export const stringify = (
   space?: string | number | undefined,
   numberStringifiers?: json.NumberStringifier[] | undefined
 ): string => json.stringify(value, replacer, space, numberStringifiers)!;
-
-/** @deprecated equivalent to 'stringify', alias will be removed */
-export const stringifyAlwaysAsBig = stringify;
