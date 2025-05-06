@@ -688,9 +688,9 @@ export class RpcProvider implements ProviderInterface {
   /**
    * Given an l1 tx hash, returns the associated l1_handler tx hashes and statuses for all L1 -> L2 messages sent by the l1 transaction, ordered by the l1 tx sending order
    */
-  public getL1MessagesStatus(transactionHash: BigNumberish) {
+  public async getL1MessagesStatus(transactionHash: BigNumberish): Promise<RPC.L1L2MessagesStatus> {
     if (this.channel instanceof RPC08.RpcChannel) {
-      this.channel.getMessagesStatus(transactionHash);
+      return this.channel.getMessagesStatus(transactionHash);
     }
 
     throw new LibraryError('Unsupported method for RPC version');
@@ -699,14 +699,14 @@ export class RpcProvider implements ProviderInterface {
   /**
    * Get merkle paths in one of the state tries: global state, classes, individual contract
    */
-  public getStorageProof(
+  public async getStorageProof(
     classHashes: BigNumberish[],
     contractAddresses: BigNumberish[],
     contractsStorageKeys: RPC.CONTRACT_STORAGE_KEYS[],
     blockIdentifier?: BlockIdentifier
-  ) {
+  ): Promise<RPC.StorageProof> {
     if (this.channel instanceof RPC08.RpcChannel) {
-      this.channel.getStorageProof(
+      return this.channel.getStorageProof(
         classHashes,
         contractAddresses,
         contractsStorageKeys,
@@ -720,9 +720,9 @@ export class RpcProvider implements ProviderInterface {
   /**
    * Get the contract class definition in the given block associated with the given hash
    */
-  public getCompiledCasm(classHash: BigNumberish) {
+  public async getCompiledCasm(classHash: BigNumberish): Promise<RPC.CASM_COMPILED_CONTRACT_CLASS> {
     if (this.channel instanceof RPC08.RpcChannel) {
-      this.channel.getCompiledCasm(classHash);
+      return this.channel.getCompiledCasm(classHash);
     }
 
     throw new LibraryError('Unsupported method for RPC version');
