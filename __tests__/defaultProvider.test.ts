@@ -3,9 +3,9 @@ import {
   BlockNumber,
   CallData,
   GetBlockResponse,
+  isPendingStateUpdate,
   LibraryError,
   Provider,
-  provider,
   ProviderInterface,
   stark,
 } from '../src';
@@ -19,8 +19,6 @@ import {
   wrongClassHash,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
-
-const { isPendingStateUpdate } = provider;
 
 describe('defaultProvider', () => {
   let testProvider: ProviderInterface;

@@ -157,9 +157,11 @@ export class WebSocketChannel {
   /**
    * Assign implementation to this method to listen unsubscription
    */
-  public onUnsubscribe: (this: WebSocketChannel, _subscriptionId: number) => any = () => {};
+  public onUnsubscribe: (this: WebSocketChannel, _subscriptionId: SUBSCRIPTION_ID) => any =
+    () => {};
 
-  private onUnsubscribeLocal: (this: WebSocketChannel, _subscriptionId: number) => any = () => {};
+  private onUnsubscribeLocal: (this: WebSocketChannel, _subscriptionId: SUBSCRIPTION_ID) => any =
+    () => {};
 
   /**
    * JSON RPC latest sent message id
@@ -171,7 +173,7 @@ export class WebSocketChannel {
    * subscriptions ids
    * mapped by keys WSSubscriptions
    */
-  readonly subscriptions: Map<string, number> = new Map();
+  readonly subscriptions: Map<string, SUBSCRIPTION_ID> = new Map();
 
   /**
    * Construct class and event listeners
@@ -323,7 +325,7 @@ export class WebSocketChannel {
    * @param subscriptionId
    * @param ref internal usage, only for managed subscriptions
    */
-  public async unsubscribe(subscriptionId: number, ref?: string) {
+  public async unsubscribe(subscriptionId: SUBSCRIPTION_ID, ref?: string) {
     const status = (await this.sendReceive('starknet_unsubscribe', {
       subscription_id: subscriptionId,
     })) as boolean;
@@ -346,7 +348,7 @@ export class WebSocketChannel {
    * const subscriptionId = await webSocketChannel.waitForUnsubscription();
    * ```
    */
-  public async waitForUnsubscription(forSubscriptionId?: number) {
+  public async waitForUnsubscription(forSubscriptionId?: SUBSCRIPTION_ID) {
     // unsubscribe
     return new Promise((resolve, reject) => {
       if (!this.websocket) return;
