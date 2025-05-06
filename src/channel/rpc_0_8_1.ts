@@ -4,7 +4,8 @@ import {
   SupportedRpcVersion,
   SYSTEM_MESSAGES,
 } from '../global/constants';
-import { LibraryError, RpcError } from '../utils/errors';
+import { logger } from '../global/logger';
+import { isRPC08_ResourceBounds } from '../provider/types/spec.type';
 import {
   AccountInvocationItem,
   AccountInvocations,
@@ -14,19 +15,20 @@ import {
   Call,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
   Invocation,
   InvocationsDetailsWithNonce,
   RPC_ERROR,
   RpcProviderOptions,
   TransactionType,
-  getEstimateFeeBulkOptions,
-  getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { JRPC, RPCSPEC08 as RPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
+import { LibraryError, RpcError } from '../utils/errors';
 import { validateAndParseEthAddress } from '../utils/eth';
 import fetch from '../utils/fetch';
 import { getSelector, getSelectorFromName } from '../utils/hash';
@@ -37,11 +39,10 @@ import {
   toHex,
   toStorageKey,
 } from '../utils/num';
-import { Block, getDefaultNodeUrl, isV3Tx, wait } from '../utils/provider';
+import { Block, getDefaultNodeUrl, wait } from '../utils/provider';
+import { isSupportedSpecVersion, isV3Tx, isVersion } from '../utils/resolve';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
-import { logger } from '../global/logger';
-import { isRPC08_ResourceBounds } from '../provider/types/spec.type';
 // TODO: check if we can filet type before entering to this method, as so to specify here only RPC 0.8 types
 
 const defaultOptions = {
@@ -51,7 +52,12 @@ const defaultOptions = {
 };
 
 export class RpcChannel {
-  readonly id = 'RPC08';
+  readonly id = 'RPC081';
+
+  /**
+   * RPC specification version this Channel class implements
+   */
+  readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_8_1;
 
   public nodeUrl: string;
 
@@ -67,6 +73,9 @@ export class RpcChannel {
 
   private chainId?: StarknetChainId;
 
+  /**
+   * RPC specification version of the connected node
+   */
   private specVersion?: SupportedRpcVersion;
 
   private transactionRetryIntervalFallback?: number;
@@ -89,11 +98,19 @@ export class RpcChannel {
       waitMode,
     } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
-      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default, '0.8');
+      this.nodeUrl = getDefaultNodeUrl(
+        nodeUrl as NetworkName,
+        optionsOrProvider?.default,
+        this.channelSpecVersion
+      );
     } else if (nodeUrl) {
       this.nodeUrl = nodeUrl;
     } else {
-      this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default, '0.8');
+      this.nodeUrl = getDefaultNodeUrl(
+        undefined,
+        optionsOrProvider?.default,
+        this.channelSpecVersion
+      );
     }
     this.baseFetch = baseFetch ?? fetch;
     this.blockIdentifier = blockIdentifier ?? defaultOptions.blockIdentifier;
@@ -186,6 +203,40 @@ export class RpcChannel {
     return this.chainId;
   }
 
+  /**
+   * fetch rpc node specVersion
+   * @example this.specVersion = "0.7.1"
+   */
+  public getSpecVersion() {
+    return this.fetchEndpoint('starknet_specVersion');
+  }
+
+  /**
+   * fetch if undefined else just return this.specVersion
+   * @example this.specVersion = "0.8.1"
+   */
+  public async setUpSpecVersion() {
+    if (!this.specVersion) {
+      const unknownSpecVersion = await this.fetchEndpoint('starknet_specVersion');
+
+      // check if the channel is compatible with the node
+      if (!isVersion(this.channelSpecVersion, unknownSpecVersion)) {
+        logger.error(SYSTEM_MESSAGES.channelVersionMismatch, {
+          channelId: this.id,
+          channelSpecVersion: this.channelSpecVersion,
+          nodeSpecVersion: this.specVersion,
+        });
+      }
+
+      if (!isSupportedSpecVersion(unknownSpecVersion)) {
+        throw new LibraryError(`${SYSTEM_MESSAGES.unsupportedSpecVersion}, channelId: ${this.id}`);
+      }
+
+      this.specVersion = unknownSpecVersion;
+    }
+    return this.specVersion;
+  }
+
   // TODO: New Method add test
   /**
    * Given an l1 tx hash, returns the associated l1_handler tx hashes and statuses for all L1 -> L2 messages sent by the l1 transaction, ordered by the l1 tx sending order
@@ -223,28 +274,6 @@ export class RpcChannel {
     return this.fetchEndpoint('starknet_getCompiledCasm', {
       class_hash,
     });
-  }
-
-  /**
-   * fetch if undefined else just return this.specVersion
-   * return this.specVersion as 'M.m'
-   * @example this.specVersion = "0.8"
-   */
-  public async getSpecVersion() {
-    if (!this.specVersion) {
-      const extendedVersion = await this.getSpecificationVersion();
-      const [major, minor] = extendedVersion.split('.');
-      const specVerson = `${major}.${minor}` as SupportedRpcVersion;
-      this.specVersion ??= specVerson;
-    }
-    return this.specVersion;
-  }
-
-  /**
-   * fetch spec version in extended format "M.m.p-?"
-   */
-  public getSpecificationVersion() {
-    return this.fetchEndpoint('starknet_specVersion');
   }
 
   public getNonceForAddress(

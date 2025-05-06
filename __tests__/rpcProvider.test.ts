@@ -30,11 +30,11 @@ import {
   cairo,
   stark,
   waitForTransactionOptions,
+  isVersion,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toBigInt, toHexString } from '../src/utils/num';
-import { isVersion } from '../src/utils/provider';
 import { isBoolean } from '../src/utils/typed';
 import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
 import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
@@ -75,7 +75,7 @@ describeIfRpc('RPCProvider', () => {
     const rawResult = await channel.fetch('starknet_specVersion');
     const j = await rawResult.json();
     expect(channel.readSpecVersion()).toBeDefined();
-    expect(isVersion(j.result, await channel.getSpecVersion())).toBeTruthy();
+    expect(isVersion(j.result, await channel.setUpSpecVersion())).toBeTruthy();
   });
 
   test('baseFetch override', async () => {
