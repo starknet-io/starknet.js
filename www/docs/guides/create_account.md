@@ -165,9 +165,9 @@ console.log('✅ ArgentX wallet deployed at:', AXcontractFinalAddress);
 
 ## Create a Braavos account
 
-More complicated, a Braavos account needs a proxy and a specific signature. Starknet.js is handling only Starknet standard signatures; so we need extra code to handle this specific signature for account creation. These nearly 400 lines of code are not displayed here but are available in a module [here](./doc_scripts/deployBraavos.ts).
+More complicated, a Braavos account needs a proxy and a specific signature. Starknet.js is handling only Starknet standard signatures; so we need extra code to handle this specific signature for account creation. These more than 200 lines of code are not displayed here but are available in a module [here](./doc_scripts/deployBraavos.ts).
 
-We will deploy hereunder a Braavos account in Devnet. So launch `starknet-devnet` with these parameters:
+We will deploy hereunder a Braavos account in Devnet (use at least v0.3.0). So launch `starknet-devnet` with these parameters:
 
 ```bash
 starknet-devnet --seed 0 --fork-network 'https://free-rpc.nethermind.io/sepolia-juno/v0_8'
