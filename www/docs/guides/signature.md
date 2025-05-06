@@ -40,7 +40,7 @@ On the receiver side, you can verify that:
 2 ways to perform this verification:
 
 - off-chain, using the full public key (very fast, but only for standard Starknet hash & sign).
-- on-chain, using the account address (slow, add workload to the node/sequencer, but can manage exotic account abstraction about hash or sign).
+- on-chain, using the account address (slow, adds workload to the node, but can manage exotic account abstraction about hash or sign).
 
 ### Verify outside of Starknet:
 
@@ -82,7 +82,7 @@ console.log('Result (boolean) =', isFullPubKeyRelatedToAccount);
 The sender can provide an account address, despite a full public key.
 
 ```typescript
-const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' }); //devnet-rs
+const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' }); //devnet
 const accountAddress = '0x...'; // account of sender
 
 const msgHash2 = hash.computeHashOnElements(message);
@@ -98,7 +98,7 @@ These items are designed to be able to be an interface with a browser wallet. At
 - the `message` at the bottom of the wallet window, showing clearly (not in hex) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
 - the `domain` above the message. Its structure has to be in accordance with `StarknetDomain`.
 
-The types than can be used are defined in [SNIP-12](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-12.md). An example of simple message :
+The types than can be used are defined in [SNIP-12](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-12.md). An example of simple message:
 
 ```typescript
 const myTypedData: TypedData = {
@@ -228,15 +228,15 @@ import type Transport from '@ledgerhq/hw-transport'; // type for the transporter
 In a Web DAPP, take care that some browsers are not compatible (FireFox, ...), and that the Bluetooth is not working in all cases and in all operating systems.
 
 :::note
-The last version of the Ledger Starknet APP (v2.2.1) supports explained V1 (ETH) & V3 (STRK) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to Enable `Blind signing` in the APP settings.
+The last version of the Ledger Starknet APP (v2.3.1) supports explained V1 (ETH, Rpc 0.7) & V3 (STRK, Rpc 0.7 & 0.8) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to enable `Blind signing` in the APP settings.
 :::
 
-For example, for a Node script :
+For example, for a Node script:
 
 ```typescript
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
 const myLedgerTransport: Transport = await TransportNodeHid.create();
-const myLedgerSigner = new LedgerSigner221(myLedgerTransport, 0);
+const myLedgerSigner = new LedgerSigner231(myLedgerTransport, 0);
 const pubK = await myLedgerSigner.getPubKey();
 const fullPubK = await myLedgerSigner.getFullPubKey();
 // ...
@@ -246,14 +246,17 @@ const ledgerAccount = new Account(myProvider, ledger0addr, myLedgerSigner);
 ```
 
 :::warning important
-The Ledger shall be connected, unlocked, with the Starknet internal APP activated, before launch of the script.
-:::
+
+- The Ledger shall be connected, unlocked, with the Starknet internal APP activated, before launch of the script.
+- The Ledger Starknet APP is not handling the signature of Class declaration.
+- The transactions are detailed in the Nano screen only for a single transaction of STRK, ETH or USDC. All other cases are blind signing.
+  :::
 
 Some complete examples :  
-A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/6.testLedgerAccount221.ts).  
+A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/10.testLedger231-rpc08.ts).  
 A test Web DAPP, to use in devnet-rs network : [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
 
-If you want to read the version of the Ledger Starknet APP :
+If you want to read the version of the Ledger Starknet APP:
 
 ```typescript
 const resp = await myLedgerTransport.send(Number('0x5a'), 0, 0, 0);
@@ -268,10 +271,10 @@ You also have in Starknet.js a signer for the old v1.1.1 Ledger Starknet APP.
 const myLedgerSigner = new LedgerSigner111(myLedgerTransport, 0);
 ```
 
-If you want to use the accounts created with the v1.1.1, using the v2.2.1 :
+If you want to use the accounts created with the v1.1.1, using the v2.3.1 signer :
 
 ```typescript
-const myLedgerSigner = new LedgerSigner221(myLedgerTransport, 0, undefined, getLedgerPathBuffer111);
+const myLedgerSigner = new LedgerSigner231(myLedgerTransport, 0, undefined, getLedgerPathBuffer111);
 ```
 
 :::

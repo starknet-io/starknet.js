@@ -13,6 +13,7 @@ import {
   CompiledSierra,
   Contract,
   DeclareDeployUDCResponse,
+  ProviderInterface,
   RawArgsArray,
   RawArgsObject,
   TypedContractV2,
@@ -29,7 +30,13 @@ import {
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { isString } from '../src/utils/typed';
-import { TEST_TX_VERSION, contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import {
+  contracts,
+  createTestProvider,
+  devnetFeeTokenAddress,
+  getTestAccount,
+  TEST_TX_VERSION,
+} from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -37,8 +44,14 @@ const { toHex } = num;
 const { starknetKeccak } = selector;
 
 describe('Cairo 1', () => {
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let provider: ProviderInterface;
+  let account: Account;
+
+  beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+  });
+
   describe('API &  Contract interactions', () => {
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: TypedContractV2<typeof tAbi>;
@@ -130,9 +143,11 @@ describe('Cairo 1', () => {
       );
       await account.waitForTransaction(tx.transaction_hash);
 
-      const balance = await cairo1Contract.get_balance({
-        parseResponse: false,
-      });
+      const balance = await cairo1Contract
+        .withOptions({
+          parseResponse: false,
+        })
+        .get_balance();
 
       // TODO: handle parseResponse correctly, get_balance should return a list here !?
       expect(num.toBigInt(balance)).toBe(100n);
@@ -335,9 +350,11 @@ describe('Cairo 1', () => {
     test('Cairo 1 more complex structs', async () => {
       const tx = await cairo1Contract.set_bet();
       await account.waitForTransaction(tx.transaction_hash);
-      const status = await cairo1Contract.get_bet(1, {
-        formatResponse: { name: 'string', description: 'string' },
-      });
+      const status = await cairo1Contract
+        .withOptions({
+          formatResponse: { name: 'string', description: 'string' },
+        })
+        .get_bet(1);
 
       const expected = {
         name: 'test',
@@ -714,10 +731,9 @@ describe('Cairo 1', () => {
         calldata,
         0
       );
-      const devnetERC20Address =
-        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetERC20Address,
+        contractAddress: devnetFeeTokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
