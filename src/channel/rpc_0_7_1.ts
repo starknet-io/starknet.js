@@ -67,7 +67,7 @@ export class RpcChannel {
   private chainId?: StarknetChainId;
 
   /**
-   * Connected RPC node specification version
+   * RPC specification version of the connected node
    */
   private specVersion?: SupportedRpcVersion;
 
