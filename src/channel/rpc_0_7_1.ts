@@ -4,7 +4,6 @@ import {
   SupportedRpcVersion,
   SYSTEM_MESSAGES,
 } from '../global/constants';
-import { LibraryError, RpcError } from '../utils/errors';
 import {
   AccountInvocationItem,
   AccountInvocations,
@@ -14,36 +13,31 @@ import {
   Call,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
   Invocation,
   InvocationsDetailsWithNonce,
   RPC_ERROR,
   RpcProviderOptions,
   TransactionType,
-  getEstimateFeeBulkOptions,
-  getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
-import { JRPC, RPCSPEC08 as RPC } from '../types/api';
+import { JRPC, RPCSPEC07 as RPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
+import { LibraryError, RpcError } from '../utils/errors';
 import { validateAndParseEthAddress } from '../utils/eth';
 import fetch from '../utils/connect/fetch';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import {
-  bigNumberishArrayToHexadecimalStringArray,
-  getHexStringArray,
-  toHex,
-  toStorageKey,
-} from '../utils/num';
-import { Block, getDefaultNodeUrl, isV3Tx, wait } from '../utils/provider';
+import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
+import { Block, getDefaultNodeUrl, wait } from '../utils/provider';
+import { isSupportedSpecVersion, isV3Tx, isVersion } from '../utils/resolve';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
-import { isRPC08_ResourceBounds } from '../provider/types/spec.type';
 import { config } from '../global/config';
-// TODO: check if we can filet type before entering to this method, as so to specify here only RPC 0.8 types
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
@@ -52,7 +46,12 @@ const defaultOptions = {
 };
 
 export class RpcChannel {
-  readonly id = 'RPC08';
+  readonly id = 'RPC071';
+
+  /**
+   * RPC specification version this Channel class implements
+   */
+  readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_7_1;
 
   public nodeUrl: string;
 
@@ -68,6 +67,9 @@ export class RpcChannel {
 
   private chainId?: StarknetChainId;
 
+  /**
+   * RPC specification version of the connected node
+   */
   private specVersion?: SupportedRpcVersion;
 
   private transactionRetryIntervalFallback?: number;
@@ -90,11 +92,19 @@ export class RpcChannel {
       waitMode,
     } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
-      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default, '0.8');
+      this.nodeUrl = getDefaultNodeUrl(
+        nodeUrl as NetworkName,
+        optionsOrProvider?.default,
+        this.channelSpecVersion
+      );
     } else if (nodeUrl) {
       this.nodeUrl = nodeUrl;
     } else {
-      this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default, '0.8');
+      this.nodeUrl = getDefaultNodeUrl(
+        undefined,
+        optionsOrProvider?.default,
+        this.channelSpecVersion
+      );
     }
     this.baseFetch = baseFetch || config.get('fetch') || fetch;
     this.blockIdentifier = blockIdentifier ?? defaultOptions.blockIdentifier;
@@ -104,7 +114,6 @@ export class RpcChannel {
     this.specVersion = specVersion;
     this.transactionRetryIntervalFallback = transactionRetryIntervalFallback;
     this.waitMode = waitMode ?? false;
-
     this.requestId = 0;
 
     if (typeof batch === 'number') {
@@ -165,7 +174,7 @@ export class RpcChannel {
       if (this.batchClient) {
         const { error, result } = await this.batchClient.fetch(
           method,
-          params,
+          params as any, // TODO: fix this temporary cast with some permanent solution
           (this.requestId += 1)
         );
         this.errorHandler(method, params, error);
@@ -187,65 +196,38 @@ export class RpcChannel {
     return this.chainId;
   }
 
-  // TODO: New Method add test
   /**
-   * Given an l1 tx hash, returns the associated l1_handler tx hashes and statuses for all L1 -> L2 messages sent by the l1 transaction, ordered by the l1 tx sending order
+   * fetch rpc node specVersion
+   * @example this.specVersion = "0.7.1"
    */
-  public getMessagesStatus(txHash: BigNumberish) {
-    const transaction_hash = toHex(txHash);
-    return this.fetchEndpoint('starknet_getMessagesStatus', {
-      transaction_hash,
-    });
-  }
-
-  // TODO: New Method add test
-  public getStorageProof(
-    classHashes: BigNumberish[] = [],
-    contractAddresses: BigNumberish[] = [],
-    contractsStorageKeys: RPC.CONTRACT_STORAGE_KEYS[] = [], // TODO: allow BigNUmberish[] and fix formatting before request
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ) {
-    const block_id = new Block(blockIdentifier).identifier;
-    const class_hashes = bigNumberishArrayToHexadecimalStringArray(classHashes);
-    const contract_addresses = bigNumberishArrayToHexadecimalStringArray(contractAddresses);
-
-    return this.fetchEndpoint('starknet_getStorageProof', {
-      block_id,
-      class_hashes,
-      contract_addresses,
-      contracts_storage_keys: contractsStorageKeys,
-    });
-  }
-
-  // TODO: New Method add test
-  public getCompiledCasm(classHash: BigNumberish): Promise<RPC.CASM_COMPILED_CONTRACT_CLASS> {
-    const class_hash = toHex(classHash);
-
-    return this.fetchEndpoint('starknet_getCompiledCasm', {
-      class_hash,
-    });
+  public getSpecVersion() {
+    return this.fetchEndpoint('starknet_specVersion');
   }
 
   /**
-   * fetch if undefined else just return this.specVersion
-   * return this.specVersion as 'M.m'
-   * @example this.specVersion = "0.8"
+   * fetch if undefined test and set specVersion, else just return this.specVersion
+   * @example this.specVersion = "0.7.1"
    */
-  public async getSpecVersion() {
+  public async setUpSpecVersion() {
     if (!this.specVersion) {
-      const extendedVersion = await this.getSpecificationVersion();
-      const [major, minor] = extendedVersion.split('.');
-      const specVerson = `${major}.${minor}` as SupportedRpcVersion;
-      this.specVersion ??= specVerson;
+      const unknownSpecVersion = await this.fetchEndpoint('starknet_specVersion');
+
+      // check if the channel is compatible with the node
+      if (!isVersion(this.channelSpecVersion, unknownSpecVersion)) {
+        logger.error(SYSTEM_MESSAGES.channelVersionMismatch, {
+          channelId: this.id,
+          channelSpecVersion: this.channelSpecVersion,
+          nodeSpecVersion: this.specVersion,
+        });
+      }
+
+      if (!isSupportedSpecVersion(unknownSpecVersion)) {
+        throw new LibraryError(`${SYSTEM_MESSAGES.unsupportedSpecVersion}, channelId: ${this.id}`);
+      }
+
+      this.specVersion = unknownSpecVersion;
     }
     return this.specVersion;
-  }
-
-  /**
-   * fetch spec version in extended format "M.m.p-?"
-   */
-  public getSpecificationVersion() {
-    return this.fetchEndpoint('starknet_specVersion');
   }
 
   public getNonceForAddress(
@@ -443,7 +425,7 @@ export class RpcChannel {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
     }
-    return txReceipt as RPC.TXN_RECEIPT;
+    return txReceipt as RPC.SPEC.TXN_RECEIPT;
   }
 
   public getStorageAt(
@@ -517,27 +499,43 @@ export class RpcChannel {
 
   public async invoke(functionInvocation: Invocation, details: InvocationsDetailsWithNonce) {
     let promise;
-    if (isV3Tx(details)) {
-      if (isRPC08_ResourceBounds(details.resourceBounds)) {
-        // V3
-        promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
-          invoke_transaction: {
-            type: RPC.ETransactionType.INVOKE,
-            sender_address: functionInvocation.contractAddress,
-            calldata: CallData.toHex(functionInvocation.calldata),
-            version: RPC.ETransactionVersion.V3,
-            signature: signatureToHexArray(functionInvocation.signature),
-            nonce: toHex(details.nonce),
-            resource_bounds: details.resourceBounds,
-            tip: toHex(details.tip),
-            paymaster_data: details.paymasterData.map((it) => toHex(it)),
-            account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
-            nonce_data_availability_mode: details.nonceDataAvailabilityMode,
-            fee_data_availability_mode: details.feeDataAvailabilityMode,
-          },
-        });
-      } else throw Error(SYSTEM_MESSAGES.SWOldV3);
-    } else throw Error(SYSTEM_MESSAGES.legacyTxRPC08Message);
+    if (!isV3Tx(details)) {
+      // V1
+      promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
+        invoke_transaction: {
+          sender_address: functionInvocation.contractAddress,
+          calldata: CallData.toHex(functionInvocation.calldata),
+          type: RPC.ETransactionType.INVOKE,
+          max_fee: toHex(details.maxFee || 0),
+          version: RPC.ETransactionVersion.V1,
+          signature: signatureToHexArray(functionInvocation.signature),
+          nonce: toHex(details.nonce),
+        },
+      });
+
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V1,
+        type: RPC.ETransactionType.INVOKE,
+      });
+    } else {
+      // V3
+      promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
+        invoke_transaction: {
+          type: RPC.ETransactionType.INVOKE,
+          sender_address: functionInvocation.contractAddress,
+          calldata: CallData.toHex(functionInvocation.calldata),
+          version: RPC.ETransactionVersion.V3,
+          signature: signatureToHexArray(functionInvocation.signature),
+          nonce: toHex(details.nonce),
+          resource_bounds: details.resourceBounds,
+          tip: toHex(details.tip),
+          paymaster_data: details.paymasterData.map((it) => toHex(it)),
+          account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
+          nonce_data_availability_mode: details.nonceDataAvailabilityMode,
+          fee_data_availability_mode: details.feeDataAvailabilityMode,
+        },
+      });
+    }
 
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
@@ -547,33 +545,79 @@ export class RpcChannel {
     details: InvocationsDetailsWithNonce
   ) {
     let promise;
-    if (isSierra(contract) && isV3Tx(details)) {
-      if (isRPC08_ResourceBounds(details.resourceBounds)) {
-        // V3 Cairo1
-        promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
-          declare_transaction: {
-            type: RPC.ETransactionType.DECLARE,
-            sender_address: senderAddress,
-            compiled_class_hash: compiledClassHash || '',
-            version: RPC.ETransactionVersion.V3,
-            signature: signatureToHexArray(signature),
-            nonce: toHex(details.nonce),
-            contract_class: {
-              sierra_program: decompressProgram(contract.sierra_program),
-              contract_class_version: contract.contract_class_version,
-              entry_points_by_type: contract.entry_points_by_type,
-              abi: contract.abi,
-            },
-            resource_bounds: details.resourceBounds,
-            tip: toHex(details.tip),
-            paymaster_data: details.paymasterData.map((it) => toHex(it)),
-            account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
-            nonce_data_availability_mode: details.nonceDataAvailabilityMode,
-            fee_data_availability_mode: details.feeDataAvailabilityMode,
+    if (!isSierra(contract) && !isV3Tx(details)) {
+      // V1 Cairo 0
+      promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
+        declare_transaction: {
+          type: RPC.ETransactionType.DECLARE,
+          contract_class: {
+            program: contract.program,
+            entry_points_by_type: contract.entry_points_by_type,
+            abi: contract.abi,
           },
-        });
-      } else throw Error(SYSTEM_MESSAGES.SWOldV3);
-    } else throw Error(SYSTEM_MESSAGES.legacyTxRPC08Message);
+          version: RPC.ETransactionVersion.V1,
+          max_fee: toHex(details.maxFee || 0),
+          signature: signatureToHexArray(signature),
+          sender_address: senderAddress,
+          nonce: toHex(details.nonce),
+        },
+      });
+
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V1,
+        type: RPC.ETransactionType.DECLARE,
+      });
+    } else if (isSierra(contract) && !isV3Tx(details)) {
+      // V2 Cairo1
+      promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
+        declare_transaction: {
+          type: RPC.ETransactionType.DECLARE,
+          contract_class: {
+            sierra_program: decompressProgram(contract.sierra_program),
+            contract_class_version: contract.contract_class_version,
+            entry_points_by_type: contract.entry_points_by_type,
+            abi: contract.abi,
+          },
+          compiled_class_hash: compiledClassHash || '',
+          version: RPC.ETransactionVersion.V2,
+          max_fee: toHex(details.maxFee || 0),
+          signature: signatureToHexArray(signature),
+          sender_address: senderAddress,
+          nonce: toHex(details.nonce),
+        },
+      });
+
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V2,
+        type: RPC.ETransactionType.DECLARE,
+      });
+    } else if (isSierra(contract) && isV3Tx(details)) {
+      // V3 Cairo1
+      promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
+        declare_transaction: {
+          type: RPC.ETransactionType.DECLARE,
+          sender_address: senderAddress,
+          compiled_class_hash: compiledClassHash || '',
+          version: RPC.ETransactionVersion.V3,
+          signature: signatureToHexArray(signature),
+          nonce: toHex(details.nonce),
+          contract_class: {
+            sierra_program: decompressProgram(contract.sierra_program),
+            contract_class_version: contract.contract_class_version,
+            entry_points_by_type: contract.entry_points_by_type,
+            abi: contract.abi,
+          },
+          resource_bounds: details.resourceBounds,
+          tip: toHex(details.tip),
+          paymaster_data: details.paymasterData.map((it) => toHex(it)),
+          account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
+          nonce_data_availability_mode: details.nonceDataAvailabilityMode,
+          fee_data_availability_mode: details.feeDataAvailabilityMode,
+        },
+      });
+    } else {
+      throw Error('declare unspotted parameters');
+    }
 
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
@@ -583,27 +627,44 @@ export class RpcChannel {
     details: InvocationsDetailsWithNonce
   ) {
     let promise;
-    if (isV3Tx(details)) {
-      if (isRPC08_ResourceBounds(details.resourceBounds)) {
-        promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
-          deploy_account_transaction: {
-            type: RPC.ETransactionType.DEPLOY_ACCOUNT,
-            version: RPC.ETransactionVersion.V3,
-            signature: signatureToHexArray(signature),
-            nonce: toHex(details.nonce),
-            contract_address_salt: toHex(addressSalt || 0),
-            constructor_calldata: CallData.toHex(constructorCalldata || []),
-            class_hash: toHex(classHash),
-            resource_bounds: details.resourceBounds,
-            tip: toHex(details.tip),
-            paymaster_data: details.paymasterData.map((it) => toHex(it)),
-            nonce_data_availability_mode: details.nonceDataAvailabilityMode,
-            fee_data_availability_mode: details.feeDataAvailabilityMode,
-          },
-        });
-      } else throw Error(SYSTEM_MESSAGES.SWOldV3);
+    if (!isV3Tx(details)) {
+      // v1
+      promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
+        deploy_account_transaction: {
+          constructor_calldata: CallData.toHex(constructorCalldata || []),
+          class_hash: toHex(classHash),
+          contract_address_salt: toHex(addressSalt || 0),
+          type: RPC.ETransactionType.DEPLOY_ACCOUNT,
+          max_fee: toHex(details.maxFee || 0),
+          version: RPC.ETransactionVersion.V1,
+          signature: signatureToHexArray(signature),
+          nonce: toHex(details.nonce),
+        },
+      });
+
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V1,
+        type: RPC.ETransactionType.DEPLOY_ACCOUNT,
+      });
+    } else {
       // v3
-    } else throw Error(SYSTEM_MESSAGES.legacyTxRPC08Message);
+      promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
+        deploy_account_transaction: {
+          type: RPC.ETransactionType.DEPLOY_ACCOUNT,
+          version: RPC.ETransactionVersion.V3,
+          signature: signatureToHexArray(signature),
+          nonce: toHex(details.nonce),
+          contract_address_salt: toHex(addressSalt || 0),
+          constructor_calldata: CallData.toHex(constructorCalldata || []),
+          class_hash: toHex(classHash),
+          resource_bounds: details.resourceBounds,
+          tip: toHex(details.tip),
+          paymaster_data: details.paymasterData.map((it) => toHex(it)),
+          nonce_data_availability_mode: details.nonceDataAvailabilityMode,
+          fee_data_availability_mode: details.feeDataAvailabilityMode,
+        },
+      });
+    }
 
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
@@ -668,7 +729,16 @@ export class RpcChannel {
 
     if (!isV3Tx(invocation)) {
       // V0,V1,V2
-      throw Error('v0,v1,v2 tx are not supported on RPC 0.8');
+      details = {
+        signature: signatureToHexArray(invocation.signature),
+        nonce: toHex(invocation.nonce),
+        max_fee: toHex(invocation.maxFee || 0),
+      };
+
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: invocation.version,
+        type: invocation.type,
+      });
     } else {
       // V3
       details = {
@@ -685,21 +755,27 @@ export class RpcChannel {
 
     if (invocation.type === TransactionType.INVOKE) {
       return {
-        // V3
+        // v0 v1 v3
         type: RPC.ETransactionType.INVOKE,
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
-        version: toHex(defaultVersions.v3),
+        version: toHex(invocation.version || defaultVersions.v3),
         ...details,
-      } as RPC.BROADCASTED_INVOKE_TXN;
+      } as RPC.SPEC.BROADCASTED_INVOKE_TXN;
     }
     if (invocation.type === TransactionType.DECLARE) {
       if (!isSierra(invocation.contract)) {
-        logger.error('Cairo 0 -  non Sierra v1 tx are not supported');
-        throw Error('Declaring non Sierra contract using RPC 0.8');
+        // Cairo 0 - v1
+        return {
+          type: invocation.type,
+          contract_class: invocation.contract,
+          sender_address: invocation.senderAddress,
+          version: toHex(invocation.version || defaultVersions.v1),
+          ...details,
+        } as RPC.SPEC.BROADCASTED_DECLARE_TXN_V1;
       }
       return {
-        // Cairo - V3
+        // Cairo 1 - v2 v3
         type: invocation.type,
         contract_class: {
           ...invocation.contract,
@@ -707,22 +783,22 @@ export class RpcChannel {
         },
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,
-        version: toHex(defaultVersions.v3),
+        version: toHex(invocation.version || defaultVersions.v3),
         ...details,
-      } as RPC.BROADCASTED_DECLARE_TXN;
+      } as RPC.SPEC.BROADCASTED_DECLARE_TXN;
     }
     if (invocation.type === TransactionType.DEPLOY_ACCOUNT) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { account_deployment_data, ...restDetails } = details;
-      // V3
+      // v1 v3
       return {
         type: invocation.type,
         constructor_calldata: CallData.toHex(invocation.constructorCalldata || []),
         class_hash: toHex(invocation.classHash),
         contract_address_salt: toHex(invocation.addressSalt || 0),
-        version: toHex(defaultVersions.v3),
+        version: toHex(invocation.version || defaultVersions.v3) as RPC.SPEC.INVOKE_TXN['version'],
         ...restDetails,
-      } as RPC.BROADCASTED_DEPLOY_ACCOUNT_TXN;
+      } as RPC.SPEC.BROADCASTED_DEPLOY_ACCOUNT_TXN;
     }
     throw Error('RPC buildTransaction received unknown TransactionType');
   }

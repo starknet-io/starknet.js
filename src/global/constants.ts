@@ -88,10 +88,10 @@ export { _TransactionHashPrefix as TransactionHashPrefix };
  * dot format rpc versions
  */
 const _SupportedRpcVersion = {
-  0.7: '0.7',
-  0.8: '0.8',
-  v07: '0.7',
-  v08: '0.8',
+  '0.7.1': '0.7.1',
+  '0.8.1': '0.8.1',
+  v0_7_1: '0.7.1',
+  v0_8_1: '0.8.1',
 } as const;
 type _SupportedRpcVersion = ValuesType<typeof _SupportedRpcVersion>;
 export { _SupportedRpcVersion as SupportedRpcVersion };
@@ -111,7 +111,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   websocket: any;
 } = {
   legacyMode: false,
-  rpcVersion: '0.8',
+  rpcVersion: '0.8.1',
   transactionVersion: ETransactionVersion.V3,
   logLevel: 'INFO',
   feeMarginPercentage: {
@@ -152,4 +152,8 @@ export const SYSTEM_MESSAGES = {
     'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
   legacyTxRPC08Message: 'RPC 0.8 do not support legacy transactions',
   SWOldV3: 'RPC 0.7 V3 tx (improper resource bounds) not supported in RPC 0.8',
+  channelVersionMismatch:
+    'Channel specification version is not compatible with the connected node Specification Version',
+  unsupportedSpecVersion:
+    'The connected node specification version is not supported by this library',
 };
