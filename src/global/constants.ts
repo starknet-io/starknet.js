@@ -107,6 +107,8 @@ export const DEFAULT_GLOBAL_CONFIG: {
   rpcVersion: _SupportedRpcVersion;
   transactionVersion: SupportedTransactionVersion;
   feeMarginPercentage: FeeMarginPercentage;
+  fetch: any;
+  websocket: any;
 } = {
   legacyMode: false,
   rpcVersion: '0.8',
@@ -129,6 +131,8 @@ export const DEFAULT_GLOBAL_CONFIG: {
     },
     maxFee: 50,
   },
+  fetch: undefined,
+  websocket: undefined,
 };
 
 export const RPC_DEFAULT_NODES = {

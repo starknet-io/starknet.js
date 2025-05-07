@@ -36,6 +36,7 @@ import { Block, getDefaultNodeUrl, isV3Tx, wait } from '../utils/provider';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
+import { config } from '../global/config';
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
@@ -88,7 +89,7 @@ export class RpcChannel {
     } else {
       this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default, '0.7');
     }
-    this.baseFetch = baseFetch ?? fetch;
+    this.baseFetch = baseFetch || config.get('fetch') || fetch;
     this.blockIdentifier = blockIdentifier ?? defaultOptions.blockIdentifier;
     this.chainId = chainId;
     this.headers = { ...defaultOptions.headers, ...headers };

@@ -1,7 +1,8 @@
 import { LibraryError } from '../errors';
 
 export default (typeof fetch !== 'undefined' && fetch) ||
-  (typeof window !== 'undefined' && window.fetch) ||
+  (typeof globalThis !== 'undefined' && globalThis.fetch) ||
+  (typeof window !== 'undefined' && window.fetch.bind(window)) ||
   (typeof global !== 'undefined' && global.fetch) ||
   ((() => {
     throw new LibraryError(

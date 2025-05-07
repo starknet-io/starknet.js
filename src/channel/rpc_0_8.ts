@@ -42,6 +42,7 @@ import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
 import { isRPC08_ResourceBounds } from '../provider/types/spec.type';
+import { config } from '../global/config';
 // TODO: check if we can filet type before entering to this method, as so to specify here only RPC 0.8 types
 
 const defaultOptions = {
@@ -95,7 +96,7 @@ export class RpcChannel {
     } else {
       this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default, '0.8');
     }
-    this.baseFetch = baseFetch ?? fetch;
+    this.baseFetch = baseFetch || config.get('fetch') || fetch;
     this.blockIdentifier = blockIdentifier ?? defaultOptions.blockIdentifier;
     this.chainId = chainId;
     this.headers = { ...defaultOptions.headers, ...headers };

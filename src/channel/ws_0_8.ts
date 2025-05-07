@@ -16,6 +16,7 @@ import WebSocket from '../utils/connect/ws';
 import { stringify } from '../utils/json';
 import { bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/num';
 import { Block } from '../utils/provider';
+import { config } from '../global/config';
 
 export const WSSubscriptions = {
   NEW_HEADS: 'newHeads',
@@ -184,7 +185,7 @@ export class WebSocketChannel {
     // provided existing websocket
     const nodeUrl = options.nodeUrl || 'http://localhost:3000 '; // TODO: implement getDefaultNodeUrl default node when defined by providers?
     this.nodeUrl = options.websocket ? options.websocket.url : nodeUrl;
-    this.websocket = options.websocket ? options.websocket : new WebSocket(nodeUrl);
+    this.websocket = options.websocket || config.get('websocket') || new WebSocket(nodeUrl);
 
     this.websocket.addEventListener('open', this.onOpen.bind(this));
     this.websocket.addEventListener('close', this.onCloseProxy.bind(this));
