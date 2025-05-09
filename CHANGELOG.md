@@ -1,3 +1,18 @@
+# [7.2.0](https://github.com/starknet-io/starknet.js/compare/v7.1.0...v7.2.0) (2025-05-09)
+
+### Bug Fixes
+
+- new rpc08 methods do not work ([9a0f0fa](https://github.com/starknet-io/starknet.js/commit/9a0f0fab96bfad1565e2529771e2ec4c3f165db7))
+- resolve versions utils and test ([949de76](https://github.com/starknet-io/starknet.js/commit/949de76173fdbbadf99d08ea275fc0c42df46c92))
+- update fetch checks ([8d1f0b5](https://github.com/starknet-io/starknet.js/commit/8d1f0b5e18fda1bb1eb2da821286600b5ee25151))
+
+### Features
+
+- full speck version implementation ([fd08f22](https://github.com/starknet-io/starknet.js/commit/fd08f22b6621214823660c2d293af2887b89147f))
+- global fetch and websocket in config, globalThis for auto-detect fetch ([1f2340a](https://github.com/starknet-io/starknet.js/commit/1f2340a127544f1b2a65b82032b0b21aff85e2ac))
+- ledger v2.3.1 ([8a4fabb](https://github.com/starknet-io/starknet.js/commit/8a4fabb2b43066ed42ee5cb1722c41ad1e95864b))
+- remove WebSocket dependencies ([ae83b1b](https://github.com/starknet-io/starknet.js/commit/ae83b1b63dd9f87142ba00b7ecc08791241ef4bb))
+
 # [7.1.0](https://github.com/starknet-io/starknet.js/compare/v7.0.1...v7.1.0) (2025-04-14)
 
 ### Bug Fixes
