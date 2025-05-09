@@ -1,5 +1,3 @@
-import { WebSocket } from 'isows';
-
 import { Provider, WSSubscriptions, WebSocketChannel } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { getTestAccount, getTestProvider, STRKtokenAddress, TEST_WS_URL } from './config/fixtures';

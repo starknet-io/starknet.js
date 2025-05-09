@@ -35,6 +35,16 @@ await webSocketChannel.waitForConnection();
 // ... use webSocketChannel
 ```
 
+If the environment doesn't have a detectable global `WebSocket`, an appropriate `WebSocket` implementation should be used and set with the `websocket` constructor parameter.
+
+```typescript
+import { WebSocket } from 'ws';
+
+const webSocketChannel = new WebSocketChannel({
+  websocket: new WebSocket('wss://sepolia-pathfinder-rpc.server.io/rpc/v0_8'),
+});
+```
+
 ### Usage
 
 ```typescript
