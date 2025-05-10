@@ -55,14 +55,30 @@ export interface Program {
   }>;
   compiler_version?: string;
   main_scope?: string;
-  identifiers?: Record<string, {
-    full_name?: string;
-    members?: Record<string, unknown>;
-    type?: string;
-    size?: number;
-    references?: unknown[];
-    cairo_type?: string;
-  }>;
+  identifiers?: Record<string, 
+    | {
+        destination: string;
+        type: 'alias';
+      }
+    | {
+        decorators: string[];
+        pc: number;
+        type: 'function';
+      }
+    | {
+        full_name: string;
+        members: Record<string, never> | Record<string, {
+          cairo_type: string;
+          offset: number;
+        }>;
+        size: number;
+        type: 'struct';
+      }
+    | {
+        cairo_type: string;
+        type: 'type_definition';
+      }
+  >;
   reference_manager?: Record<string, {
     references: unknown[];
   }>;
