@@ -9,7 +9,11 @@ import {
 } from '../global/constants';
 import { logger } from '../global/logger';
 import { LibraryError, Provider, ProviderInterface } from '../provider';
-import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
+import {
+  ETransactionVersion,
+  ETransactionVersion3,
+  ResourceBounds,
+} from '../provider/types/spec.type';
 import { Signer, SignerInterface } from '../signer';
 import {
   AccountInvocations,

@@ -5,7 +5,7 @@ import {
   UserTransaction,
   ExecutableUserTransaction,
 } from '../src';
-import fetchMock from '../src/utils/fetchPonyfill';
+import fetchMock from '../src/utils/connect/fetch';
 import { signatureToHexArray } from '../src/utils/stark';
 import { OutsideExecutionTypedData } from '../src/types/api/paymaster-rpc-spec/nonspec';
 

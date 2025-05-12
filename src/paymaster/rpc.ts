@@ -13,7 +13,7 @@ import {
   UserTransaction,
 } from '../types';
 import { getDefaultPaymasterNodeUrl } from '../utils/paymaster';
-import fetch from '../utils/fetchPonyfill';
+import fetch from '../utils/connect/fetch';
 import { LibraryError, RpcError } from '../utils/errors';
 import { PaymasterInterface } from './interface';
 import { NetworkName } from '../global/constants';
