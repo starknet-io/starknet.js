@@ -38,6 +38,7 @@ export * as selector from './utils/hash/selector';
 export * as events from './utils/events';
 export * as outsideExecution from './utils/outsideExecution';
 export * as src5 from './utils/src5';
+export * from './utils/resolve';
 export * from './utils/batch';
 export * from './utils/responseParser';
 export * from './utils/cairoDataTypes/uint256';
@@ -47,18 +48,9 @@ export * from './utils/address';
 export * from './utils/calldata';
 export * from './utils/calldata/enum';
 export * from './utils/contract';
-export * from './utils/transactionReceipt';
+export * from './utils/transactionReceipt/transactionReceipt';
 export * from './utils/units';
 export * as wallet from './wallet/connect';
 export * from './global/config';
 export * from './global/logger';
 export * from './global/logger.type';
-
-/**
- * Deprecated
- */
-/* eslint-disable import/first */
-import * as num from './utils/num';
-
-/** @deprecated prefer the 'num' naming */
-export const number = num;

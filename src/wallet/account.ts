@@ -4,7 +4,7 @@ import type {
   NetworkChangeEventHandler,
   Signature,
   WatchAssetParameters,
-} from 'starknet-types-07';
+} from 'starknet-types-08';
 
 import { Account, AccountInterface } from '../account';
 import { StarknetChainId } from '../global/constants';
@@ -38,41 +38,18 @@ import {
   watchAsset,
 } from './connect';
 import { StarknetWalletProvider } from './types';
-import { logger } from '../global/logger';
 import { PaymasterOptions } from '../types/paymaster';
 import { PaymasterInterface } from '../paymaster';
 
-// TODO: Remove non address constructor in next major version
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
   public walletProvider: StarknetWalletProvider;
 
-  /**
-   * @deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.
-   */
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
-  );
-  constructor(
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    walletProvider: StarknetWalletProvider,
+    address: string,
     cairoVersion?: CairoVersion,
-    address?: string
-  );
-  constructor(
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion,
-    address?: string,
-    paymaster?: PaymasterOptions | PaymasterInterface
-  );
-  constructor(
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion,
-    address: string = '',
     paymaster?: PaymasterOptions | PaymasterInterface
   ) {
     super(providerOrOptions, address, '', cairoVersion, undefined, paymaster); // At this point unknown address
@@ -91,15 +68,6 @@ export class WalletAccount extends Account implements AccountInterface {
       // At the moment channel is stateless but it could change
       this.channel.setChainId(res as StarknetChainId);
     });
-
-    if (!address.length) {
-      logger.warn(
-        '@deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.'
-      );
-      requestAccounts(this.walletProvider).then(([accountAddress]) => {
-        this.address = accountAddress.toLowerCase();
-      });
-    }
   }
 
   /**
@@ -214,7 +182,7 @@ export class WalletAccount extends Account implements AccountInterface {
     silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
-    return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
+    return new WalletAccount(provider, walletProvider, accountAddress, cairoVersion);
   }
 
   static async connectSilent(

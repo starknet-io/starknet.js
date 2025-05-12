@@ -1,19 +1,22 @@
-import { LibraryError, RPC06, RPC07, RpcError } from '../src';
-import { createBlockForDevnet, getTestProvider } from './config/fixtures';
+import { LibraryError, RPC08, RPC07, RpcError } from '../src';
+import { createBlockForDevnet, createTestProvider } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 describe('RpcChannel', () => {
-  const { nodeUrl } = getTestProvider(false).channel;
-  const channel07 = new RPC07.RpcChannel({ nodeUrl });
+  let nodeUrl: string;
+  let channel07: RPC07.RpcChannel;
   initializeMatcher(expect);
 
   beforeAll(async () => {
+    nodeUrl = (await createTestProvider(false)).channel.nodeUrl;
+    channel07 = new RPC07.RpcChannel({ nodeUrl });
+
     await createBlockForDevnet();
   });
 
   test('baseFetch override', async () => {
     const baseFetch = jest.fn();
-    const fetchChannel06 = new RPC06.RpcChannel({ nodeUrl, baseFetch });
+    const fetchChannel06 = new RPC08.RpcChannel({ nodeUrl, baseFetch });
     const fetchChannel07 = new RPC07.RpcChannel({ nodeUrl, baseFetch });
     (fetchChannel06.fetch as any)();
     expect(baseFetch).toHaveBeenCalledTimes(1);

@@ -27,39 +27,50 @@ import {
 } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { getDecimalString } from '../src/utils/num';
-import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { contracts, createTestProvider, ETHtokenAddress, getTestAccount } from './config/fixtures';
 
 describe('Account and OutsideExecution', () => {
-  const ethAddress = '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
-  const provider = new Provider(getTestProvider());
-  const executorAccount = getTestAccount(provider);
+  let provider: Provider;
+  let executorAccount: Account;
   let signerAccount: Account;
+
   const targetPK = stark.randomAddress();
   const targetPubK = ec.starkCurve.getStarkKey(targetPK);
+
   // For ERC20 transfer outside call
-  const recipientAccount = executorAccount;
-  const ethContract = new Contract(contracts.Erc20OZ.sierra.abi, ethAddress, provider);
-  const call1: Call = {
-    contractAddress: ethAddress,
-    entrypoint: 'transfer',
-    calldata: {
-      recipient: recipientAccount.address,
-      amount: cairo.uint256(100),
-    },
-  };
-  const call2: Call = {
-    contractAddress: ethAddress,
-    entrypoint: 'transfer',
-    calldata: {
-      recipient: recipientAccount.address,
-      amount: cairo.uint256(200),
-    },
-  };
+  let recipientAccount: Account;
+  let ethContract: Contract;
+
+  let call1: Call;
+  let call2: Call;
+
   const now_seconds = Math.floor(Date.now() / 1000);
   const hour_ago = (now_seconds - 3600).toString();
   const hour_later = (now_seconds + 3600).toString();
 
   beforeAll(async () => {
+    provider = new Provider(await createTestProvider());
+    executorAccount = getTestAccount(provider);
+    recipientAccount = executorAccount;
+    ethContract = new Contract(contracts.Erc20OZ.sierra.abi, ETHtokenAddress, provider);
+
+    call1 = {
+      contractAddress: ETHtokenAddress,
+      entrypoint: 'transfer',
+      calldata: {
+        recipient: recipientAccount.address,
+        amount: cairo.uint256(100),
+      },
+    };
+    call2 = {
+      contractAddress: ETHtokenAddress,
+      entrypoint: 'transfer',
+      calldata: {
+        recipient: recipientAccount.address,
+        amount: cairo.uint256(200),
+      },
+    };
+
     // Deploy the SNIP-9 signer account (ArgentX v 0.4.0, using SNIP-9 v2):
     const calldataAX = new CallData(contracts.ArgentX4Account.sierra.abi);
     const axSigner = new CairoCustomEnum({ Starknet: { pubkey: targetPubK } });
@@ -79,7 +90,7 @@ describe('Account and OutsideExecution', () => {
 
     // Transfer dust of ETH token to the signer account
     const transferCall = {
-      contractAddress: ethAddress,
+      contractAddress: ETHtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: signerAccount.address,
@@ -92,7 +103,7 @@ describe('Account and OutsideExecution', () => {
 
   test('getOutsideCall', async () => {
     expect(outsideExecution.getOutsideCall(call1)).toEqual({
-      to: ethAddress,
+      to: ETHtokenAddress,
       selector: getSelectorFromName(call1.entrypoint),
       calldata: [num.hexToDecimalString(recipientAccount.address), '100', '0'],
     });
@@ -124,7 +135,7 @@ describe('Account and OutsideExecution', () => {
           {
             Calldata: [num.hexToDecimalString(recipientAccount.address), '100', '0'],
             Selector: getSelectorFromName(call1.entrypoint),
-            To: ethAddress,
+            To: ETHtokenAddress,
           },
         ],
         'Execute After': 100,
@@ -286,7 +297,7 @@ describe('Account and OutsideExecution', () => {
       caller: 'ANY_CALLER',
     };
     const call3: Call = {
-      contractAddress: ethAddress,
+      contractAddress: ETHtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: recipientAccount.address,
@@ -294,7 +305,7 @@ describe('Account and OutsideExecution', () => {
       },
     };
     const call4: Call = {
-      contractAddress: ethAddress,
+      contractAddress: ETHtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: recipientAccount.address,
@@ -318,7 +329,7 @@ describe('Account and OutsideExecution', () => {
     expect(outsideTransaction1.outsideExecution.execute_before).toBe(hour_later);
     expect(outsideTransaction1.outsideExecution.calls).toEqual([
       {
-        to: ethAddress,
+        to: ETHtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
         calldata: [getDecimalString(recipientAccount.address), '300', '0'],
       },
@@ -330,12 +341,12 @@ describe('Account and OutsideExecution', () => {
     );
     expect(outsideTransaction2.outsideExecution.calls).toEqual([
       {
-        to: ethAddress,
+        to: ETHtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
         calldata: [getDecimalString(recipientAccount.address), '100', '0'],
       },
       {
-        to: ethAddress,
+        to: ETHtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
         calldata: [getDecimalString(recipientAccount.address), '200', '0'],
       },
@@ -371,17 +382,19 @@ describe('Account and OutsideExecution', () => {
     const outsideExecutionCall: Call[] =
       outsideExecution.buildExecuteFromOutsideCall(outsideTransaction);
     const estimateFee = await executorAccount.estimateFee(outsideExecutionCall);
-    expect(Object.keys(estimateFee)).toEqual(
-      Object.keys({
-        overall_fee: 0,
-        gas_consumed: 0,
-        gas_price: 0,
-        unit: 0,
-        suggestedMaxFee: 0,
-        resourceBounds: 0,
-        data_gas_consumed: 0,
-        data_gas_price: 0,
-      })
+    expect(Object.keys(estimateFee).sort()).toEqual(
+      [
+        'overall_fee',
+        'unit',
+        'suggestedMaxFee',
+        'resourceBounds',
+        'l1_gas_consumed',
+        'l1_data_gas_consumed',
+        'l1_data_gas_price',
+        'l1_gas_price',
+        'l2_gas_consumed',
+        'l2_gas_price',
+      ].sort()
     );
 
     const invocations: Invocations = [
@@ -391,13 +404,13 @@ describe('Account and OutsideExecution', () => {
       },
     ];
     const responseSimulate = await executorAccount.simulateTransaction(invocations);
-    expect(Object.keys(responseSimulate[0])).toEqual(
+    expect(Object.keys(responseSimulate[0]).sort()).toEqual(
       Object.keys({
         transaction_trace: 0,
         fee_estimation: 0,
         suggestedMaxFee: 0,
         resourceBounds: 0,
-      })
+      }).sort()
     );
   });
 

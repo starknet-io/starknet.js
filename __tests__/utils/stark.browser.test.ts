@@ -11,6 +11,7 @@ const { IS_BROWSER } = constants;
 test('isBrowser', () => {
   expect(IS_BROWSER).toBe(true);
 });
+
 describe('compressProgram()', () => {
   // the @noble/curves dependency that is included in this file through utils/stark executes precomputations
   // that rely on TextEncoder. The jsdom environment does not expose TextEncoder and it also overrides

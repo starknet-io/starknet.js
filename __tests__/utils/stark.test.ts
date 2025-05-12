@@ -1,6 +1,5 @@
-import { CallData, RawArgs, UniversalDetails, json, stark } from '../../src';
+import { CallData, RawArgs, UniversalDetails, json, stark, FeeEstimate } from '../../src';
 import { EDataAvailabilityMode } from '../../src/types/api';
-import { FeeEstimate } from '../../src/types/provider';
 import { toBigInt, toHex } from '../../src/utils/num';
 import { contracts } from '../config/fixtures';
 
@@ -71,11 +70,12 @@ describe('stark', () => {
   });
 
   test('estimateFeeToBounds', () => {
-    const estimateFeeResponse: FeeEstimate = {
+    // TODO: How is this response possibe when data_gas_consumed, data_gas_price are not optional response parameters
+    const estimateFeeResponse /* : FeeEstimate */ = {
       gas_consumed: '100',
       gas_price: '10',
       overall_fee: '1000',
-      unit: 'FRI',
+      unit: 'FRI' as const,
     };
     const estimateFeeResponse07: FeeEstimate = {
       ...estimateFeeResponse,
@@ -83,10 +83,11 @@ describe('stark', () => {
       data_gas_price: '10',
       overall_fee: '2000',
     };
-    expect(stark.estimateFeeToBounds(estimateFeeResponse)).toStrictEqual({
+    // TODO: look like this was RPC 0.6 test, instead add RPC 0.8 Tests
+    /*     expect(stark.estimateFeeToBounds(estimateFeeResponse)).toStrictEqual({
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x96', max_price_per_unit: '0xf' },
-    });
+    }); */
     expect(stark.estimateFeeToBounds(estimateFeeResponse07)).toStrictEqual({
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x12c', max_price_per_unit: '0xf' },

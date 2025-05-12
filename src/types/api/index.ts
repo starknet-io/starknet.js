@@ -1,6 +1,9 @@
 export * as JRPC from './jsonrpc';
 
-export * as RPCSPEC06 from './rpcspec_0_6';
-export * as PAYMASTER_RPC_SPEC from './paymaster-rpc-spec';
 export * as RPCSPEC07 from 'starknet-types-07';
-export * from 'starknet-types-07';
+export * as RPCSPEC08 from 'starknet-types-08';
+export * as PAYMASTER_RPC_SPEC from './paymaster-rpc-spec';
+
+export * from 'starknet-types-08';
+// TODO: Should this be default export type as RPCSPEC07 & RPCSPEC08 are sued only in channel rest of the code do not know what rpc version it works with and it can be both.
+// export * from '../../provider/types/spec.type';
