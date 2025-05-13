@@ -9,7 +9,7 @@ import {
 import fetchMock from '../src/utils/connect/fetch';
 import { signatureToHexArray } from '../src/utils/stark';
 
-jest.mock('../src/utils/fetchPonyfill');
+jest.mock('../src/utils/connect/fetch');
 jest.mock('../src/utils/stark', () => ({
   signatureToHexArray: jest.fn(() => ['0x1', '0x2']),
 }));
