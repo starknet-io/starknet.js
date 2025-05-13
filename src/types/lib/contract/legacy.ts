@@ -61,22 +61,87 @@ export interface Program {
         type: 'alias';
       }
     | {
-        decorators: string[];
-        pc: number;
+        decorators: Array<string | {
+          name: string;
+          [key: string]: unknown;
+        }>;
+        pc: string | number;
         type: 'function';
+        implicit_args?: {
+          full_name: string;
+          members: Record<string, {
+            cairo_type: string;
+            offset: number;
+          }>;
+          size: number;
+          type: 'struct';
+        };
+        explicit_args?: {
+          full_name: string;
+          members: Record<string, {
+            cairo_type: string;
+            offset: number;
+          }>;
+          size: number;
+          type: 'struct';
+        };
+        return_type?: {
+          full_name: string;
+          members: Record<string, {
+            cairo_type: string;
+            offset: number;
+          }>;
+          size: number;
+          type: 'struct';
+        };
       }
     | {
         full_name: string;
-        members: Record<string, never> | Record<string, {
+        members: Record<string, {
           cairo_type: string;
           offset: number;
-        }>;
-        size: number;
+        }> | Record<string, never>;
+        size: string | number;
         type: 'struct';
+        references?: unknown[];
+        cairo_type?: string;
       }
     | {
         cairo_type: string;
         type: 'type_definition';
+      }
+    | {
+        full_name: string;
+        type: 'namespace';
+      }
+    | {
+        full_name: string;
+        members: Record<string, {
+          cairo_type: string;
+          offset: number;
+        }>;
+        size: string | number;
+        type: 'interface';
+      }
+    | {
+        full_name: string;
+        members: Record<string, {
+          cairo_type: string;
+          offset: number;
+        }>;
+        size: string | number;
+        type: 'enum';
+      }
+    | {
+        full_name: string;
+        type: 'label';
+      }
+    | {
+        full_name: string;
+        type: 'constant';
+        value: string | number | boolean | null | {
+          [key: string]: unknown;
+        };
       }
   >;
   reference_manager?: Record<string, {
