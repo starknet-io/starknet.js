@@ -1,4 +1,3 @@
-import { WebSocket } from 'isows';
 import type {
   SUBSCRIPTION_ID,
   SubscriptionEventsResponse,
@@ -13,9 +12,11 @@ import type {
 import { BigNumberish, SubscriptionBlockIdentifier } from '../types';
 import { JRPC } from '../types/api';
 import { WebSocketEvent } from '../types/api/jsonrpc';
+import WebSocket from '../utils/connect/ws';
 import { stringify } from '../utils/json';
 import { bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/num';
 import { Block } from '../utils/provider';
+import { config } from '../global/config';
 
 export const WSSubscriptions = {
   NEW_HEADS: 'newHeads',
@@ -32,9 +33,10 @@ export type WebSocketOptions = {
    */
   nodeUrl?: string;
   /**
-   * You can provide websocket object defined by protocol standard else library will use default 'isows'/'ws' package
-   * https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket#protocols .
-   * https://www.rfc-editor.org/rfc/rfc6455.html#section-1 .
+   * This parameter should be used when working in an environment without native WebSocket support by providing
+   * an equivalent WebSocket object that conforms to the protocol, e.g. from the 'isows' and/or 'ws' modules
+   * * https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket#protocols .
+   * * https://www.rfc-editor.org/rfc/rfc6455.html#section-1 .
    * @default WebSocket
    */
   websocket?: WebSocket;
@@ -183,7 +185,7 @@ export class WebSocketChannel {
     // provided existing websocket
     const nodeUrl = options.nodeUrl || 'http://localhost:3000 '; // TODO: implement getDefaultNodeUrl default node when defined by providers?
     this.nodeUrl = options.websocket ? options.websocket.url : nodeUrl;
-    this.websocket = options.websocket ? options.websocket : new WebSocket(nodeUrl);
+    this.websocket = options.websocket || config.get('websocket') || new WebSocket(nodeUrl);
 
     this.websocket.addEventListener('open', this.onOpen.bind(this));
     this.websocket.addEventListener('close', this.onCloseProxy.bind(this));
