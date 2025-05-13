@@ -1,16 +1,17 @@
-import { JRPC } from '../types/api';
-import {
-  type Call,
+import type { JRPC, PAYMASTER_API } from '../types/api';
+import type {
+  Call,
   ExecutableUserTransaction,
   ExecutionParameters,
   FeeMode,
   PaymasterFeeEstimate,
   PaymasterTimeBounds,
   PreparedTransaction,
-  RPC,
   RPC_ERROR,
   RpcProviderOptions,
   UserTransaction,
+  PaymasterOptions,
+  TokenData,
 } from '../types';
 import { getDefaultPaymasterNodeUrl } from '../utils/paymaster';
 import fetch from '../utils/connect/fetch';
@@ -18,42 +19,34 @@ import { LibraryError, RpcError } from '../utils/errors';
 import { PaymasterInterface } from './interface';
 import { NetworkName } from '../global/constants';
 import { stringify } from '../utils/json';
-import { ExecuteResponse } from '../types/api/paymaster-rpc-spec/nonspec';
 import { CallData } from '../utils/calldata';
 import { getSelectorFromName } from '../utils/hash';
 import { signatureToHexArray } from '../utils/stark';
-import { PaymasterOptions, TokenData } from '../types';
-import {
-  CALL,
-  EXECUTABLE_USER_TRANSACTION,
-  EXECUTION_PARAMETERS,
-  FEE_MODE,
-  TIME_BOUNDS,
-  USER_TRANSACTION,
-} from '../types/api/paymaster-rpc-spec/components';
 
-const convertCalls = (calls: Call[]): CALL[] =>
+const convertCalls = (calls: Call[]): PAYMASTER_API.CALL[] =>
   calls.map((call) => ({
     to: call.contractAddress,
     selector: getSelectorFromName(call.entrypoint),
     calldata: CallData.toHex(call.calldata),
   }));
 
-const convertFeeMode = (feeMode: FeeMode): FEE_MODE => {
+const convertFeeMode = (feeMode: FeeMode): PAYMASTER_API.FEE_MODE => {
   if (feeMode.mode === 'sponsored') {
     return { mode: 'sponsored' };
   }
   return { mode: 'default', gas_token: feeMode.gasToken };
 };
 
-const convertFEE_MODE = (feeMode: FEE_MODE): FeeMode => {
+const convertFEE_MODE = (feeMode: PAYMASTER_API.FEE_MODE): FeeMode => {
   if (feeMode.mode === 'sponsored') {
     return { mode: 'sponsored' };
   }
   return { mode: 'default', gasToken: feeMode.gas_token };
 };
 
-const convertTimeBounds = (timeBounds?: PaymasterTimeBounds): TIME_BOUNDS | undefined =>
+const convertTimeBounds = (
+  timeBounds?: PaymasterTimeBounds
+): PAYMASTER_API.TIME_BOUNDS | undefined =>
   timeBounds && timeBounds.executeAfter && timeBounds.executeBefore
     ? {
         execute_after: timeBounds.executeAfter.getTime().toString(),
@@ -61,7 +54,9 @@ const convertTimeBounds = (timeBounds?: PaymasterTimeBounds): TIME_BOUNDS | unde
       }
     : undefined;
 
-const convertTIME_BOUNDS = (timeBounds?: TIME_BOUNDS): PaymasterTimeBounds | undefined =>
+const convertTIME_BOUNDS = (
+  timeBounds?: PAYMASTER_API.TIME_BOUNDS
+): PaymasterTimeBounds | undefined =>
   timeBounds && timeBounds.execute_after && timeBounds.execute_before
     ? {
         executeAfter: new Date(timeBounds.execute_after),
@@ -69,7 +64,9 @@ const convertTIME_BOUNDS = (timeBounds?: TIME_BOUNDS): PaymasterTimeBounds | und
       }
     : undefined;
 
-const convertEXECUTION_PARAMETERS = (parameters: EXECUTION_PARAMETERS): ExecutionParameters => ({
+const convertEXECUTION_PARAMETERS = (
+  parameters: PAYMASTER_API.EXECUTION_PARAMETERS
+): ExecutionParameters => ({
   version: parameters.version,
   feeMode: convertFEE_MODE(parameters.fee_mode),
   timeBounds: convertTIME_BOUNDS(parameters.time_bounds),
@@ -144,16 +141,16 @@ export class PaymasterRpc implements PaymasterInterface {
     }
   }
 
-  protected async fetchEndpoint<T extends keyof RPC.PAYMASTER_RPC_SPEC.Methods>(
+  protected async fetchEndpoint<T extends keyof PAYMASTER_API.Methods>(
     method: T,
-    params?: RPC.PAYMASTER_RPC_SPEC.Methods[T]['params']
-  ): Promise<RPC.PAYMASTER_RPC_SPEC.Methods[T]['result']> {
+    params?: PAYMASTER_API.Methods[T]['params']
+  ): Promise<PAYMASTER_API.Methods[T]['result']> {
     try {
       this.requestId += 1;
       const rawResult = await this.fetch(method, params, this.requestId);
       const { error, result } = await rawResult.json();
       this.errorHandler(method, params, error);
-      return result as RPC.PAYMASTER_RPC_SPEC.Methods[T]['result'];
+      return result as PAYMASTER_API.Methods[T]['result'];
     } catch (error: any) {
       this.errorHandler(method, params, error?.response?.data, error);
       throw error;
@@ -168,7 +165,7 @@ export class PaymasterRpc implements PaymasterInterface {
     transaction: UserTransaction,
     parameters: ExecutionParameters
   ): Promise<PreparedTransaction> {
-    let userTransaction: USER_TRANSACTION;
+    let userTransaction: PAYMASTER_API.USER_TRANSACTION;
     switch (transaction.type) {
       case 'invoke':
         userTransaction = {
@@ -195,7 +192,7 @@ export class PaymasterRpc implements PaymasterInterface {
         userTransaction = transaction;
         break;
     }
-    const executionParameters: EXECUTION_PARAMETERS = {
+    const executionParameters: PAYMASTER_API.EXECUTION_PARAMETERS = {
       version: parameters.version,
       fee_mode: convertFeeMode(parameters.feeMode),
       time_bounds: convertTimeBounds(parameters.timeBounds),
@@ -245,8 +242,8 @@ export class PaymasterRpc implements PaymasterInterface {
   public async executeTransaction(
     transaction: ExecutableUserTransaction,
     parameters: ExecutionParameters
-  ): Promise<ExecuteResponse> {
-    let user_transaction: EXECUTABLE_USER_TRANSACTION;
+  ): Promise<PAYMASTER_API.ExecuteResponse> {
+    let user_transaction: PAYMASTER_API.EXECUTABLE_USER_TRANSACTION;
     switch (transaction.type) {
       case 'invoke':
         user_transaction = {
@@ -275,7 +272,7 @@ export class PaymasterRpc implements PaymasterInterface {
         user_transaction = transaction;
         break;
     }
-    const executionParameters: EXECUTION_PARAMETERS = {
+    const executionParameters: PAYMASTER_API.EXECUTION_PARAMETERS = {
       version: parameters.version,
       fee_mode: convertFeeMode(parameters.feeMode),
       time_bounds: convertTimeBounds(parameters.timeBounds),

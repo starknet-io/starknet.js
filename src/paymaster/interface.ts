@@ -5,8 +5,8 @@ import {
   UserTransaction,
   ExecutableUserTransaction,
   ExecutionParameters,
+  RPC,
 } from '../types';
-import { ExecuteResponse } from '../types/api/paymaster-rpc-spec/nonspec';
 
 export abstract class PaymasterInterface {
   public abstract nodeUrl: string;
@@ -45,7 +45,7 @@ export abstract class PaymasterInterface {
   public abstract executeTransaction(
     transaction: ExecutableUserTransaction,
     parameters: ExecutionParameters
-  ): Promise<ExecuteResponse>;
+  ): Promise<RPC.PAYMASTER_API.ExecuteResponse>;
 
   /**
    * Get a list of the tokens that the paymaster supports, together with their prices in STRK

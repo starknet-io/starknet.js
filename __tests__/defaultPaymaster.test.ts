@@ -4,10 +4,10 @@ import {
   ExecutionParameters,
   UserTransaction,
   ExecutableUserTransaction,
+  RPC,
 } from '../src';
 import fetchMock from '../src/utils/connect/fetch';
 import { signatureToHexArray } from '../src/utils/stark';
-import { OutsideExecutionTypedData } from '../src/types/api/paymaster-rpc-spec/nonspec';
 
 jest.mock('../src/utils/fetchPonyfill');
 jest.mock('../src/utils/stark', () => ({
@@ -158,7 +158,7 @@ describe('PaymasterRpc', () => {
       // Given
       const client = new PaymasterRpc();
       const mockSignature = ['0x1', '0x2'];
-      const mockTypedData: OutsideExecutionTypedData = {
+      const mockTypedData: RPC.PAYMASTER_API.OutsideExecutionTypedData = {
         domain: {},
         types: {},
         primaryType: '',

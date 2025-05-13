@@ -4,11 +4,7 @@
  */
 
 import { BigNumberish, Call } from '../lib';
-import { OutsideExecutionTypedData } from '../api/paymaster-rpc-spec/nonspec';
-import {
-  ACCOUNT_DEPLOYMENT_DATA,
-  OUTSIDE_EXECUTION_TYPED_DATA,
-} from '../api/paymaster-rpc-spec/components';
+import { PAYMASTER_API } from '../api';
 
 export type PaymasterFeeEstimate = {
   gas_token_price_in_strk: BigNumberish;
@@ -20,20 +16,20 @@ export type PaymasterFeeEstimate = {
 
 export type PreparedDeployTransaction = {
   type: 'deploy';
-  deployment: ACCOUNT_DEPLOYMENT_DATA;
+  deployment: PAYMASTER_API.ACCOUNT_DEPLOYMENT_DATA;
   parameters: ExecutionParameters;
   fee: PaymasterFeeEstimate;
 };
 export type PreparedInvokeTransaction = {
   type: 'invoke';
-  typed_data: OutsideExecutionTypedData;
+  typed_data: PAYMASTER_API.OutsideExecutionTypedData;
   parameters: ExecutionParameters;
   fee: PaymasterFeeEstimate;
 };
 export type PreparedDeployAndInvokeTransaction = {
   type: 'deploy_and_invoke';
-  deployment: ACCOUNT_DEPLOYMENT_DATA;
-  typed_data: OutsideExecutionTypedData;
+  deployment: PAYMASTER_API.ACCOUNT_DEPLOYMENT_DATA;
+  typed_data: PAYMASTER_API.OutsideExecutionTypedData;
   parameters: ExecutionParameters;
   fee: PaymasterFeeEstimate;
 };
@@ -50,7 +46,7 @@ export interface TokenData {
 
 export type DeployTransaction = {
   type: 'deploy';
-  deployment: ACCOUNT_DEPLOYMENT_DATA;
+  deployment: PAYMASTER_API.ACCOUNT_DEPLOYMENT_DATA;
 };
 export type InvokeTransaction = {
   type: 'invoke';
@@ -62,14 +58,14 @@ export type UserInvoke = {
 };
 export type DeployAndInvokeTransaction = {
   type: 'deploy_and_invoke';
-  deployment: ACCOUNT_DEPLOYMENT_DATA;
+  deployment: PAYMASTER_API.ACCOUNT_DEPLOYMENT_DATA;
   invoke: UserInvoke;
 };
 export type UserTransaction = DeployTransaction | InvokeTransaction | DeployAndInvokeTransaction;
 
 export type ExecutableDeployTransaction = {
   type: 'deploy';
-  deployment: ACCOUNT_DEPLOYMENT_DATA;
+  deployment: PAYMASTER_API.ACCOUNT_DEPLOYMENT_DATA;
 };
 export type ExecutableInvokeTransaction = {
   type: 'invoke';
@@ -77,12 +73,12 @@ export type ExecutableInvokeTransaction = {
 };
 export type ExecutableUserInvoke = {
   userAddress: string;
-  typedData: OUTSIDE_EXECUTION_TYPED_DATA;
+  typedData: PAYMASTER_API.OUTSIDE_EXECUTION_TYPED_DATA;
   signature: string[];
 };
 export type ExecutableDeployAndInvokeTransaction = {
   type: 'deploy_and_invoke';
-  deployment: ACCOUNT_DEPLOYMENT_DATA;
+  deployment: PAYMASTER_API.ACCOUNT_DEPLOYMENT_DATA;
   invoke: ExecutableUserInvoke;
 };
 export type ExecutableUserTransaction =

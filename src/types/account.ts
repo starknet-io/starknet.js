@@ -1,4 +1,4 @@
-import { EDataAvailabilityMode, ETransactionVersion } from './api';
+import { EDataAvailabilityMode, ETransactionVersion, PAYMASTER_API } from './api';
 import {
   AllowArray,
   BigNumberish,
@@ -15,7 +15,6 @@ import {
   EstimateFeeResponse,
 } from '../provider/types/index.type';
 import { ResourceBounds } from '../provider/types/spec.type';
-import { AccountDeploymentData } from './api/paymaster-rpc-spec/nonspec';
 import { FeeMode, PaymasterTimeBounds } from './paymaster';
 
 export interface EstimateFee extends EstimateFeeResponse {}
@@ -52,7 +51,7 @@ export interface UniversalDetails {
 
 export interface PaymasterDetails {
   feeMode: FeeMode;
-  deploymentData?: AccountDeploymentData;
+  deploymentData?: PAYMASTER_API.AccountDeploymentData;
   timeBounds?: PaymasterTimeBounds;
   maxEstimatedFeeInGasToken?: BigNumberish;
   maxGasTokenPriceInStrk?: BigNumberish;
