@@ -97,7 +97,7 @@ export const isLongText = (val: any): boolean => isText(val) && !isShortString(v
  * @example
  * ```typescript
  * const result = shortString.splitLongString("Hello, world! we just testing splitLongString function.");
- * // result = [ 'Hello, world! we just testing s', 'plitLongString function.' ]
+ * // result = [ 'Hello, world! we just testing s', 'splitLongString function.' ]
  * ```
  */
 export function splitLongString(longStr: string): string[] {
