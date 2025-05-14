@@ -60,7 +60,7 @@ You can recover all the events related to this transaction hash:
 
 ```typescript
 if (txReceipt.isSuccess()) {
-  const listEvents = txReceipt.events;
+  const listEvents = txReceipt.value.events;
 }
 ```
 
