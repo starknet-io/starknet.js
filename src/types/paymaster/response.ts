@@ -4,7 +4,7 @@
  */
 
 import { BigNumberish, Call } from '../lib';
-import { PAYMASTER_API } from '../api';
+import { OutsideExecutionTypedData, PAYMASTER_API } from '../api';
 
 export type PaymasterFeeEstimate = {
   gas_token_price_in_strk: BigNumberish;
@@ -22,14 +22,14 @@ export type PreparedDeployTransaction = {
 };
 export type PreparedInvokeTransaction = {
   type: 'invoke';
-  typed_data: PAYMASTER_API.OutsideExecutionTypedData;
+  typed_data: OutsideExecutionTypedData;
   parameters: ExecutionParameters;
   fee: PaymasterFeeEstimate;
 };
 export type PreparedDeployAndInvokeTransaction = {
   type: 'deploy_and_invoke';
   deployment: PAYMASTER_API.ACCOUNT_DEPLOYMENT_DATA;
-  typed_data: PAYMASTER_API.OutsideExecutionTypedData;
+  typed_data: OutsideExecutionTypedData;
   parameters: ExecutionParameters;
   fee: PaymasterFeeEstimate;
 };
@@ -39,7 +39,7 @@ export type PreparedTransaction =
   | PreparedDeployAndInvokeTransaction;
 
 export interface TokenData {
-  address: string;
+  token_address: string;
   decimals: number;
   priceInStrk: BigNumberish;
 }
@@ -73,7 +73,7 @@ export type ExecutableInvokeTransaction = {
 };
 export type ExecutableUserInvoke = {
   userAddress: string;
-  typedData: PAYMASTER_API.OUTSIDE_EXECUTION_TYPED_DATA;
+  typedData: OutsideExecutionTypedData;
   signature: string[];
 };
 export type ExecutableDeployAndInvokeTransaction = {

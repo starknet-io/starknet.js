@@ -1,4 +1,4 @@
-import type { JRPC, PAYMASTER_API } from '../types/api';
+import type { JRPC, PAYMASTER_API, TIME_BOUNDS } from '../types/api';
 import type {
   Call,
   ExecutableUserTransaction,
@@ -44,9 +44,7 @@ const convertFEE_MODE = (feeMode: PAYMASTER_API.FEE_MODE): FeeMode => {
   return { mode: 'default', gasToken: feeMode.gas_token };
 };
 
-const convertTimeBounds = (
-  timeBounds?: PaymasterTimeBounds
-): PAYMASTER_API.TIME_BOUNDS | undefined =>
+const convertTimeBounds = (timeBounds?: PaymasterTimeBounds): TIME_BOUNDS | undefined =>
   timeBounds && timeBounds.executeAfter && timeBounds.executeBefore
     ? {
         execute_after: timeBounds.executeAfter.getTime().toString(),
@@ -54,9 +52,7 @@ const convertTimeBounds = (
       }
     : undefined;
 
-const convertTIME_BOUNDS = (
-  timeBounds?: PAYMASTER_API.TIME_BOUNDS
-): PaymasterTimeBounds | undefined =>
+const convertTIME_BOUNDS = (timeBounds?: TIME_BOUNDS): PaymasterTimeBounds | undefined =>
   timeBounds && timeBounds.execute_after && timeBounds.execute_before
     ? {
         executeAfter: new Date(timeBounds.execute_after),
@@ -286,7 +282,7 @@ export class PaymasterRpc implements PaymasterInterface {
   public async getSupportedTokens(): Promise<TokenData[]> {
     return this.fetchEndpoint('paymaster_getSupportedTokens').then((tokens) =>
       tokens.map((token) => ({
-        address: token.address,
+        token_address: token.token_address,
         decimals: token.decimals,
         priceInStrk: BigInt(token.price_in_strk),
       }))

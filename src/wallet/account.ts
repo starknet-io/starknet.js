@@ -179,18 +179,20 @@ export class WalletAccount extends Account implements AccountInterface {
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
-    return new WalletAccount(provider, walletProvider, accountAddress, cairoVersion);
+    return new WalletAccount(provider, walletProvider, accountAddress, cairoVersion, paymaster);
   }
 
   static async connectSilent(
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface
   ) {
-    return WalletAccount.connect(provider, walletProvider, cairoVersion, true);
+    return WalletAccount.connect(provider, walletProvider, cairoVersion, paymaster, true);
   }
 
   // TODO: MISSING ESTIMATES
