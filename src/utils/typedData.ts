@@ -24,9 +24,6 @@ import { isBigNumberish, isHex, toHex } from './num';
 import { encodeShortString } from './shortString';
 import { isBoolean, isString } from './typed';
 
-/** @deprecated prefer importing from 'types' over 'typedData' */
-export * from '../types/typedData';
-
 interface Context {
   parent?: string;
   key?: string;
@@ -167,36 +164,46 @@ export function getDependencies(
   contains: string = '',
   revision: Revision = Revision.LEGACY
 ): string[] {
+  let dependencyTypes: string[] = [type];
+
   // Include pointers (struct arrays)
   if (type[type.length - 1] === '*') {
-    type = type.slice(0, -1);
+    dependencyTypes = [type.slice(0, -1)];
   } else if (revision === Revision.ACTIVE) {
     // enum base
     if (type === 'enum') {
-      type = contains;
+      dependencyTypes = [contains];
     }
     // enum element types
     else if (type.match(/^\(.*\)$/)) {
-      type = type.slice(1, -1);
+      dependencyTypes = type
+        .slice(1, -1)
+        .split(',')
+        .map((depType) => (depType[depType.length - 1] === '*' ? depType.slice(0, -1) : depType));
     }
   }
 
-  if (dependencies.includes(type) || !types[type]) {
-    return dependencies;
-  }
-
-  return [
-    type,
-    ...(types[type] as StarknetEnumType[]).reduce<string[]>(
-      (previous, t) => [
-        ...previous,
-        ...getDependencies(types, t.type, previous, t.contains, revision).filter(
-          (dependency) => !previous.includes(dependency)
-        ),
+  return dependencyTypes
+    .filter((t) => !dependencies.includes(t) && types[t])
+    .reduce<string[]>(
+      // This comment prevents prettier from rolling everything here into a single line.
+      (p, depType) => [
+        ...p,
+        ...[
+          depType,
+          ...(types[depType] as StarknetEnumType[]).reduce<string[]>(
+            (previous, t) => [
+              ...previous,
+              ...getDependencies(types, t.type, previous, t.contains, revision).filter(
+                (dependency) => !previous.includes(dependency)
+              ),
+            ],
+            []
+          ),
+        ].filter((dependency) => !p.includes(dependency)),
       ],
       []
-    ),
-  ];
+    );
 }
 
 function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
@@ -528,7 +535,7 @@ export function getStructHash<T extends TypedData>(
  * Get the SNIP-12 encoded message to sign, from the typedData object.
  *
  * @param {TypedData} typedData - The TypedData object.
- * @param {BigNumberish} account - The account to sign the message.
+ * @param {BigNumberish} accountAddress - The account address to sign the message.
  *
  * @returns {string} The hash of the message to sign.
  * @throws Will throw an error if the typedData does not match the JSON schema.
@@ -582,7 +589,7 @@ export function getStructHash<T extends TypedData>(
  * // result = "0x70338fb11b8f70b68b261de8a322bcb004bd85e88ac47d9147982c7f5ac66fd"
  * ```
  */
-export function getMessageHash(typedData: TypedData, account: BigNumberish): string {
+export function getMessageHash(typedData: TypedData, accountAddress: BigNumberish): string {
   if (!validateTypedData(typedData)) {
     throw new Error('Typed data does not match JSON schema');
   }
@@ -593,7 +600,7 @@ export function getMessageHash(typedData: TypedData, account: BigNumberish): str
   const message = [
     encodeShortString('StarkNet Message'),
     getStructHash(typedData.types, domain, typedData.domain, revision),
-    account,
+    accountAddress,
     getStructHash(typedData.types, typedData.primaryType, typedData.message, revision),
   ];
 

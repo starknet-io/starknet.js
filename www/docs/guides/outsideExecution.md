@@ -18,16 +18,16 @@ Outside Execution provides several benefits:
 ### Check SNIP-9 Support
 
 The account that will sign the outside transaction has to be compatible with SNIP-9 (V1 or V2).  
-At mid-2024 :
+At early-2025:
 
-|       account        | compatibility |
-| :------------------: | :-----------: |
-|    ArgentX v0.3.0    |      v1       |
-|    ArgentX v0.4.0    |      v2       |
-|    Braavos v1.0.0    |      v2       |
-| OpenZeppelin v0.17.0 |    v2 (\*)    |
+|       account       | compatibility |
+| :-----------------: | :-----------: |
+|   ArgentX v0.3.0    |      v1       |
+|   ArgentX v0.4.0    |      v2       |
+|   Braavos v1.1.0    |      v2       |
+| OpenZeppelin v1.0.0 |    v2 (\*)    |
 
-> (\*): only OpenZeppelin accounts including the `src9` component :  
+> (\*): only OpenZeppelin accounts including the `src9` component. Examples for v0.17.0:  
 > Starknet account: class = [0x540d7f5ec7ecf317e68d48564934cb99259781b1ee3cedbbc37ec5337f8e688](https://voyager.online/class/0x0540d7f5ec7ecf317e68d48564934cb99259781b1ee3cedbbc37ec5337f8e688)  
 > ETH account: class = [0x3940bc18abf1df6bc540cabadb1cad9486c6803b95801e57b6153ae21abfe06](https://voyager.online/class/0x3940bc18abf1df6bc540cabadb1cad9486c6803b95801e57b6153ae21abfe06)
 
@@ -157,9 +157,9 @@ In this example, we want to sign, with a Ledger Nano X, several transactions at 
 By this way, you can pre-sign some transactions with the Ledger, and if during the night something occurs, a backend can execute automatically some of these transactions, **in any order**.  
 In this process, **the private key of the Ledger account is never exposed**.
 
-First, create a Ledger account in devnet-rs. You will find some documentation [here](./signature.md#signing-with-a-ledger-hardware-wallet), and an example [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/4.deployLedgerAccount.ts).
+First, create a Ledger account in Devnet. You will find some documentation [here](./signature.md#signing-with-a-ledger-hardware-wallet), and an example [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/4.deployLedgerAccount.ts).
 
-The initial balances are :
+The initial balances are:
 
 |                 account | ETH balance |
 | ----------------------: | ----------- |
@@ -269,3 +269,29 @@ The balances are finally :
 :::info
 The complete code of this example is available [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/Starknet131/Starknet131-devnet/17.outsideExecuteLedger.ts).
 :::
+
+## Estimate fees for an outside execution:
+
+On executor side, if you want to estimate how many fees you will pay:
+
+```typescript
+const outsideExecutionCall: Call[] =
+  outsideExecution.buildExecuteFromOutsideCall(outsideTransaction1);
+const estimateFee = await executorAccount.estimateFee(outsideExecutionCall);
+```
+
+## Simulate an outside execution:
+
+On executor side, if you want to simulate the transaction:
+
+```typescript
+const outsideExecutionCall: Call[] =
+  outsideExecution.buildExecuteFromOutsideCall(outsideTransaction1);
+const invocations: Invocations = [
+  {
+    type: TransactionType.INVOKE,
+    payload: outsideExecutionCall,
+  },
+];
+const responseSimulate = await executorAccount.simulateTransaction(invocations);
+```

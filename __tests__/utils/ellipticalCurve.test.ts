@@ -2,7 +2,7 @@ import { constants, ec } from '../../src';
 import { StarknetChainId } from '../../src/global/constants';
 import { computeHashOnElements } from '../../src/utils/hash';
 import { calculateTransactionHash } from '../../src/utils/hash/transactionHash/v2';
-import { fromCallsToExecuteCalldataWithNonce } from '../../src/utils/transaction';
+import { fromCallsToExecuteCalldata } from '../../src/utils/transaction';
 
 test('getKeyPair()', () => {
   const privateKey = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
@@ -46,7 +46,7 @@ test('hashMessage()', () => {
   ];
   const nonce = '3';
   const maxFee = '0';
-  const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
+  const calldata = [...fromCallsToExecuteCalldata(transactions), nonce];
 
   const hashMsg = calculateTransactionHash(
     account,

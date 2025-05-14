@@ -40,6 +40,7 @@ export const isTypeArray = (type: string) =>
   /\*/.test(type) ||
   type.startsWith('core::array::Array::') ||
   type.startsWith('core::array::Span::');
+
 /**
  * Checks if the given type is a tuple type.
  *

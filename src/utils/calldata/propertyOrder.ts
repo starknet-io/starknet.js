@@ -26,6 +26,7 @@ import {
 } from './enum';
 import extractTupleMemberTypes from './tuple';
 import { isUndefined, isString } from '../typed';
+import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 
 function errorU256(key: string) {
   return Error(
@@ -46,6 +47,9 @@ export default function orderPropsByAbi(
   enums: AbiEnums
 ): object {
   const orderInput = (unorderedItem: any, abiType: string): any => {
+    if (CairoFixedArray.isTypeFixedArray(abiType)) {
+      return orderFixedArray(unorderedItem, abiType);
+    }
     if (isTypeArray(abiType)) {
       return orderArray(unorderedItem, abiType);
     }
@@ -128,6 +132,25 @@ export default function orderPropsByAbi(
       return myArray; // longstring
     }
     return myArray.map((myElem) => orderInput(myElem, typeInArray));
+  }
+
+  function orderFixedArray(input: Array<any> | Record<string, any>, abiParam: string): Array<any> {
+    const typeInFixedArray = CairoFixedArray.getFixedArrayType(abiParam);
+    const arraySize = CairoFixedArray.getFixedArraySize(abiParam);
+    if (Array.isArray(input)) {
+      if (arraySize !== input.length) {
+        throw new Error(
+          `ABI type ${abiParam}: array provided do not includes  ${arraySize} items. ${input.length} items provided.`
+        );
+      }
+      return input.map((myElem) => orderInput(myElem, typeInFixedArray));
+    }
+    if (arraySize !== Object.keys(input).length) {
+      throw new Error(
+        `ABI type ${abiParam}: object provided do not includes  ${arraySize} properties. ${Object.keys(input).length} items provided.`
+      );
+    }
+    return orderInput(input, typeInFixedArray);
   }
 
   function orderTuple(unorderedObject2: RawArgsObject, abiParam: string): object {

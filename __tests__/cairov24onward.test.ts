@@ -1,6 +1,8 @@
 import {
+  Account,
   BigNumberish,
   CairoCustomEnum,
+  CairoFixedArray,
   CairoOption,
   CairoOptionVariant,
   CairoResult,
@@ -9,6 +11,7 @@ import {
   CairoUint512,
   CallData,
   Contract,
+  ProviderInterface,
   byteArray,
   cairo,
   num,
@@ -16,11 +19,16 @@ import {
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
 
 describe('Cairo v2.4 onwards', () => {
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let provider: ProviderInterface;
+  let account: Account;
+
+  beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+  });
 
   describe('cairo v2.4.0 new types', () => {
     let stringContract: Contract;
@@ -168,8 +176,8 @@ describe('Cairo v2.4 onwards', () => {
 
     test('Tuple ((u256,(u16,Order2)), u8)', async () => {
       type Order2 = {
-        p1: num.BigNumberish;
-        p2: num.BigNumberish[];
+        p1: BigNumberish;
+        p2: BigNumberish[];
       };
       const myOrder2: Order2 = { p1: 100, p2: [5, 6, 7] };
       const calldata9 = myCallData.compile('get_tuple9', {
@@ -405,6 +413,63 @@ describe('Cairo v2.4 onwards', () => {
       const value = 2n ** 80n;
       const res0 = await u96Contract.call('test_u96', [value]);
       expect(res0).toBe(value + 1n);
+    });
+  });
+
+  describe('Cairo v2.9.2 fixed-array', () => {
+    const myArray: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
+    const myWrongArray = [...myArray, 9];
+    const expectedCalldata = myArray.map((val) => val.toString());
+    let fixedArrayContract: Contract;
+
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: contracts.fixedArray.sierra,
+        casm: contracts.fixedArray.casm,
+      });
+      fixedArrayContract = new Contract(
+        contracts.fixedArray.sierra.abi,
+        deploy.contract_address,
+        account
+      );
+    });
+
+    test('Fixed array compile [core::integer::u32; 8]', async () => {
+      const myCallData = new CallData(fixedArrayContract.abi);
+      const myCalldata0 = myCallData.compile('fixed_array', [myArray]);
+      expect(myCalldata0).toEqual(expectedCalldata);
+      const myCalldata1 = myCallData.compile('fixed_array', {
+        x: myArray,
+      });
+      expect(myCalldata1).toEqual(expectedCalldata);
+      const myCall0 = fixedArrayContract.populate('fixed_array', [myArray]);
+      expect(myCall0.calldata).toEqual(expectedCalldata);
+      const myCall1 = fixedArrayContract.populate('fixed_array', { x: myArray });
+      expect(myCall1.calldata).toEqual(expectedCalldata);
+      const res0 = await fixedArrayContract.call('fixed_array', [myArray]);
+      const expectedRes = myArray.map((val) => BigInt(val));
+      expect(res0).toEqual(expectedRes);
+      const res1 = await fixedArrayContract.fixed_array(myArray);
+      expect(res1).toEqual(expectedRes);
+      const myCalldata = CallData.compile([CairoFixedArray.compile(myArray)]);
+      const res2 = await fixedArrayContract.call('fixed_array', myCalldata);
+      expect(res2).toEqual(expectedRes);
+      const myCalldata3 = myCallData.compile('fixed_array', [CairoFixedArray.compile(myArray)]);
+      const res3 = await fixedArrayContract.call('fixed_array', myCalldata3);
+      expect(res3).toEqual(expectedRes);
+      const myFixedArray = new CairoFixedArray(myArray, '[core::integer::u32; 8]');
+      const myCalldata4 = myCallData.compile('fixed_array', { x: myFixedArray.compile() });
+      const res4 = await fixedArrayContract.call('fixed_array', myCalldata4);
+      expect(res4).toEqual(expectedRes);
+    });
+
+    test('Fixed array too long', async () => {
+      const myCallData = new CallData(fixedArrayContract.abi);
+      expect(() => myCallData.compile('fixed_array', [myWrongArray])).toThrow();
+      expect(() => myCallData.compile('fixed_array', { x: myWrongArray })).toThrow();
+      expect(() => fixedArrayContract.populate('fixed_array', [myWrongArray])).toThrow();
+      expect(() => fixedArrayContract.populate('fixed_array', { x: myWrongArray })).toThrow();
+      await expect(fixedArrayContract.call('fixed_array', [myWrongArray])).rejects.toThrow();
     });
   });
 });
