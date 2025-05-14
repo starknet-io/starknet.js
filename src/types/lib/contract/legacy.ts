@@ -61,11 +61,8 @@ export interface Program {
         type: 'alias';
       }
     | {
-        decorators: Array<string | {
-          name: string;
-          [key: string]: unknown;
-        }>;
-        pc: string | number;
+        decorators: string[];
+        pc: number;
         type: 'function';
         implicit_args?: {
           full_name: string;
@@ -86,13 +83,8 @@ export interface Program {
           type: 'struct';
         };
         return_type?: {
-          full_name: string;
-          members: Record<string, {
-            cairo_type: string;
-            offset: number;
-          }>;
-          size: number;
-          type: 'struct';
+          cairo_type: string;
+          type: 'type_definition';
         };
       }
     | {
@@ -101,10 +93,8 @@ export interface Program {
           cairo_type: string;
           offset: number;
         }> | Record<string, never>;
-        size: string | number;
+        size: number;
         type: 'struct';
-        references?: unknown[];
-        cairo_type?: string;
       }
     | {
         cairo_type: string;
@@ -115,33 +105,25 @@ export interface Program {
         type: 'namespace';
       }
     | {
-        full_name: string;
-        members: Record<string, {
-          cairo_type: string;
-          offset: number;
-        }>;
-        size: string | number;
-        type: 'interface';
+        type: 'const';
+        value: string | number;
       }
     | {
-        full_name: string;
-        members: Record<string, {
-          cairo_type: string;
-          offset: number;
-        }>;
-        size: string | number;
-        type: 'enum';
-      }
-    | {
-        full_name: string;
+        pc: number;
         type: 'label';
       }
     | {
+        cairo_type: string;
         full_name: string;
-        type: 'constant';
-        value: string | number | boolean | null | {
-          [key: string]: unknown;
-        };
+        references: Array<{
+          ap_tracking_data: {
+            group: number;
+            offset: number;
+          };
+          pc: number;
+          value: string;
+        }>;
+        type: 'reference';
       }
   >;
   reference_manager?: Record<string, {
