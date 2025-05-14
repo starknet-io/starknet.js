@@ -70,7 +70,7 @@ describe('stark', () => {
   });
 
   test('estimateFeeToBounds', () => {
-    // TODO: How is this response possibe when data_gas_consumed, data_gas_price are not optional response parameters
+    // TODO: How is this response possible when data_gas_consumed, data_gas_price are not optional response parameters
     const estimateFeeResponse /* : FeeEstimate */ = {
       gas_consumed: '100',
       gas_price: '10',
