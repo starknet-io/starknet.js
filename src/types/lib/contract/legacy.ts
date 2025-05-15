@@ -101,7 +101,6 @@ export interface Program {
         type: 'type_definition';
       }
     | {
-        full_name: string;
         type: 'namespace';
       }
     | {
