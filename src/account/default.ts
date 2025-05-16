@@ -428,11 +428,18 @@ export class Account extends Provider implements AccountInterface {
     };
     let transaction: UserTransaction;
     if (paymasterDetails.deploymentData) {
-      transaction = {
-        type: 'deploy_and_invoke',
-        invoke: { userAddress: this.address, calls },
-        deployment: paymasterDetails.deploymentData,
-      };
+      if (calls.length > 0) {
+        transaction = {
+          type: 'deploy_and_invoke',
+          invoke: { userAddress: this.address, calls },
+          deployment: paymasterDetails.deploymentData,
+        };
+      } else {
+        transaction = {
+          type: 'deploy',
+          deployment: paymasterDetails.deploymentData,
+        };
+      }
     } else {
       transaction = {
         type: 'invoke',
