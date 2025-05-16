@@ -72,13 +72,11 @@ await account.execute(
 
 ### Paymaster Options
 
-| Field                       | Type    | Description                                                                   |
-| --------------------------- | ------- | ----------------------------------------------------------------------------- |
-| `feeMode`                   | FeeMode | When not sponsored, you need to use 'default' mode and specify the gas token. |
-| `maxEstimatedFeeInGasToken` | bigint  | Max fee you're willing to pay in the gas token.                               |
-| `maxGasTokenPriceInStrk`    | bigint  | Max token price in STRK.                                                      |
-| `deploymentData`            | object  | Data required if your account is being deployed.                              |
-| `timeBounds`                | object  | Optional execution window with `executeAfter` and `executeBefore` dates.      |
+| Field            | Type    | Description                                                                   |
+| ---------------- | ------- | ----------------------------------------------------------------------------- |
+| `feeMode`        | FeeMode | When not sponsored, you need to use 'default' mode and specify the gas token. |
+| `deploymentData` | object  | Data required if your account is being deployed.                              |
+| `timeBounds`     | object  | Optional execution window with `executeAfter` and `executeBefore` dates.      |
 
 ### How It Works Behind the Scenes
 

@@ -115,29 +115,5 @@ describe('Account - Paymaster integration', () => {
       );
       expect(result).toEqual({ transaction_hash: '0x123' });
     });
-
-    it('should throw if estimated fee exceeds maxEstimatedFeeInGasToken', async () => {
-      const account = setupAccount();
-      const details: PaymasterDetails = {
-        feeMode: { mode: 'default', gasToken: '0x456' },
-        maxEstimatedFeeInGasToken: 500n,
-      };
-
-      await expect(account.executePaymasterTransaction(calls, details)).rejects.toThrow(
-        'Estimated max fee too high'
-      );
-    });
-
-    it('should throw if token price exceeds maxPriceInStrk', async () => {
-      const account = setupAccount();
-      const details: PaymasterDetails = {
-        feeMode: { mode: 'default', gasToken: '0x456' },
-        maxGasTokenPriceInStrk: 100n,
-      };
-
-      await expect(account.executePaymasterTransaction(calls, details)).rejects.toThrow(
-        'Gas token price is too high'
-      );
-    });
   });
 });

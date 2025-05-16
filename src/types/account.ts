@@ -53,8 +53,6 @@ export interface PaymasterDetails {
   feeMode: FeeMode;
   deploymentData?: PAYMASTER_API.AccountDeploymentData;
   timeBounds?: PaymasterTimeBounds;
-  maxEstimatedFeeInGasToken?: BigNumberish;
-  maxGasTokenPriceInStrk?: BigNumberish;
 }
 
 export interface EstimateFeeDetails extends UniversalDetails {}

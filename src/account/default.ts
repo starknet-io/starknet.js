@@ -463,19 +463,6 @@ export class Account extends Provider implements AccountInterface {
     paymasterDetails: PaymasterDetails
   ): Promise<InvokeFunctionResponse> {
     const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
-    if (
-      paymasterDetails.maxEstimatedFeeInGasToken &&
-      preparedTransaction.fee.estimated_fee_in_gas_token >
-        paymasterDetails.maxEstimatedFeeInGasToken
-    ) {
-      throw Error('Estimated max fee too high');
-    }
-    if (
-      paymasterDetails?.maxGasTokenPriceInStrk &&
-      preparedTransaction.fee.gas_token_price_in_strk > paymasterDetails.maxGasTokenPriceInStrk
-    ) {
-      throw Error('Gas token price is too high');
-    }
     let transaction: ExecutableUserTransaction;
     switch (preparedTransaction.type) {
       case 'deploy_and_invoke': {
