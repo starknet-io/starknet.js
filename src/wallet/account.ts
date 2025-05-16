@@ -10,6 +10,7 @@ import { Account, AccountInterface } from '../account';
 import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
 import {
+  Abi,
   AllowArray,
   CairoVersion,
   Call,
@@ -19,6 +20,7 @@ import {
   ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
+  UniversalDetails,
 } from '../types';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
@@ -36,6 +38,8 @@ import {
   watchAsset,
 } from './connect';
 import { StarknetWalletProvider } from './types';
+import { PaymasterOptions } from '../types/paymaster';
+import { PaymasterInterface } from '../paymaster';
 
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
@@ -45,9 +49,10 @@ export class WalletAccount extends Account implements AccountInterface {
     providerOrOptions: ProviderOptions | ProviderInterface,
     walletProvider: StarknetWalletProvider,
     address: string,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface
   ) {
-    super(providerOrOptions, address, '', cairoVersion); // At this point unknown address
+    super(providerOrOptions, address, '', cairoVersion, undefined, paymaster); // At this point unknown address
     this.walletProvider = walletProvider;
 
     // Update Address on change
@@ -102,7 +107,19 @@ export class WalletAccount extends Account implements AccountInterface {
   /**
    * ACCOUNT METHODS
    */
-  override execute(calls: AllowArray<Call>) {
+  override execute(
+    calls: AllowArray<Call>,
+    arg2?: Abi[] | UniversalDetails,
+    transactionsDetail: UniversalDetails = {}
+  ) {
+    const details = arg2 === undefined || Array.isArray(arg2) ? transactionsDetail : arg2;
+    if (details.paymaster) {
+      return this.executePaymasterTransaction(
+        Array.isArray(calls) ? calls : [calls],
+        details.paymaster
+      );
+    }
+
     const txCalls = [].concat(calls as any).map((it) => {
       const { contractAddress, entrypoint, calldata } = it;
       return {
@@ -162,18 +179,20 @@ export class WalletAccount extends Account implements AccountInterface {
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
-    return new WalletAccount(provider, walletProvider, accountAddress, cairoVersion);
+    return new WalletAccount(provider, walletProvider, accountAddress, cairoVersion, paymaster);
   }
 
   static async connectSilent(
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface
   ) {
-    return WalletAccount.connect(provider, walletProvider, cairoVersion, true);
+    return WalletAccount.connect(provider, walletProvider, cairoVersion, paymaster, true);
   }
 
   // TODO: MISSING ESTIMATES
