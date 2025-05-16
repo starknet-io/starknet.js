@@ -54,6 +54,7 @@ import {
   PaymasterDetails,
   PreparedTransaction,
   PaymasterOptions,
+  PaymasterFeeEstimate,
 } from '../types';
 import {
   OutsideExecutionVersion,
@@ -409,7 +410,7 @@ export class Account extends Provider implements AccountInterface {
     );
   }
 
-  public async buildPaymasterTransaction(
+  private async buildPaymasterTransaction(
     calls: Call[],
     paymasterDetails: PaymasterDetails
   ): Promise<PreparedTransaction> {
@@ -447,6 +448,14 @@ export class Account extends Provider implements AccountInterface {
       };
     }
     return this.paymaster.buildTransaction(transaction, parameters);
+  }
+
+  public async estimatePaymasterTransactionFee(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<PaymasterFeeEstimate> {
+    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
+    return preparedTransaction.fee;
   }
 
   public async executePaymasterTransaction(
