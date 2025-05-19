@@ -63,11 +63,11 @@ describe('Account - Paymaster integration', () => {
     mockExecuteTransaction.mockResolvedValue({ transaction_hash: '0x123' });
   });
 
-  describe('buildPaymasterTransaction', () => {
-    it('should return typed data and token prices from paymaster', async () => {
+  describe('estimatePaymasterTransactionFee', () => {
+    it('should return estimated transaction fee from paymaster', async () => {
       const account = setupAccount();
 
-      const result = await account.buildPaymasterTransaction(calls, {
+      const result = await account.estimatePaymasterTransactionFee(calls, {
         feeMode: { mode: 'default', gasToken: '0x456' },
       });
 
@@ -83,7 +83,7 @@ describe('Account - Paymaster integration', () => {
         }
       );
 
-      expect(result).toEqual(paymasterResponse);
+      expect(result).toEqual(paymasterResponse.fee);
     });
   });
 
