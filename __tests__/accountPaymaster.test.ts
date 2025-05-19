@@ -88,6 +88,17 @@ describe('Account - Paymaster integration', () => {
   });
 
   describe('executePaymasterTransaction', () => {
+    it('should throw if token price exceeds maxPriceInStrk', async () => {
+      const account = setupAccount();
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+
+      await expect(account.executePaymasterTransaction(calls, details, 100n)).rejects.toThrow(
+        'Gas token price is too high'
+      );
+    });
+
     it('should sign and execute transaction via paymaster', async () => {
       const account = setupAccount();
       const details: PaymasterDetails = {

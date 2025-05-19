@@ -364,7 +364,11 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<InvokeFunctionResponse> {
     const calls = Array.isArray(transactions) ? transactions : [transactions];
     if (transactionsDetail.paymaster) {
-      return this.executePaymasterTransaction(calls, transactionsDetail.paymaster);
+      return this.executePaymasterTransaction(
+        calls,
+        transactionsDetail.paymaster,
+        transactionsDetail.maxFee
+      );
     }
     const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
@@ -460,9 +464,13 @@ export class Account extends Provider implements AccountInterface {
 
   public async executePaymasterTransaction(
     calls: Call[],
-    paymasterDetails: PaymasterDetails
+    paymasterDetails: PaymasterDetails,
+    maxFee?: BigNumberish
   ): Promise<InvokeFunctionResponse> {
     const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
+    if (maxFee && preparedTransaction.fee.gas_token_price_in_strk > maxFee) {
+      throw Error('Gas token price is too high');
+    }
     let transaction: ExecutableUserTransaction;
     switch (preparedTransaction.type) {
       case 'deploy_and_invoke': {
