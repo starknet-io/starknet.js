@@ -1,3 +1,14 @@
+# [7.3.0](https://github.com/starknet-io/starknet.js/compare/v7.2.0...v7.3.0) (2025-05-20)
+
+### Bug Fixes
+
+- docs typos ([#1393](https://github.com/starknet-io/starknet.js/issues/1393)) ([1c08c87](https://github.com/starknet-io/starknet.js/commit/1c08c873daaf05f38a9274ed339ccc4da753e9ad))
+- typos ([0506162](https://github.com/starknet-io/starknet.js/commit/050616221a58545d79eece7040b4abc205c220e0))
+
+### Features
+
+- Implement SNIP29 ([#1377](https://github.com/starknet-io/starknet.js/issues/1377)) ([90c2811](https://github.com/starknet-io/starknet.js/commit/90c281190fbc87ab4103a08985b295e2743d1aad))
+
 # [7.2.0](https://github.com/starknet-io/starknet.js/compare/v7.1.0...v7.2.0) (2025-05-09)
 
 ### Bug Fixes

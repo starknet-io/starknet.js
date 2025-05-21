@@ -146,6 +146,11 @@ export const RPC_DEFAULT_NODES = {
   ],
 } as const;
 
+export const PAYMASTER_RPC_NODES = {
+  SN_MAIN: [`https://starknet.paymaster.avnu.fi`],
+  SN_SEPOLIA: [`https://sepolia.paymaster.avnu.fi`],
+} as const;
+
 // Default system messages
 export const SYSTEM_MESSAGES = {
   legacyTxWarningMessage:
