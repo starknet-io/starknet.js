@@ -366,8 +366,7 @@ export class Account extends Provider implements AccountInterface {
     if (transactionsDetail.paymaster) {
       return this.executePaymasterTransaction(
         calls,
-        transactionsDetail.paymaster,
-        transactionsDetail.maxFee
+        transactionsDetail.paymaster // TODO call safeExecutePaymasterTransaction here ???????
       );
     }
     const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
@@ -462,15 +461,9 @@ export class Account extends Provider implements AccountInterface {
     return preparedTransaction.fee;
   }
 
-  public async executePaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails,
-    maxFee?: BigNumberish
-  ): Promise<InvokeFunctionResponse> {
-    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
-    if (maxFee && preparedTransaction.fee.gas_token_price_in_strk > maxFee) {
-      throw Error('Gas token price is too high');
-    }
+  private async postBuildPaymasterTransaction(
+    preparedTransaction: PreparedTransaction
+  ): Promise<ExecutableUserTransaction> {
     let transaction: ExecutableUserTransaction;
     switch (preparedTransaction.type) {
       case 'deploy_and_invoke': {
@@ -508,9 +501,81 @@ export class Account extends Provider implements AccountInterface {
       default:
         throw Error('Invalid transaction type');
     }
+    return transaction;
+  }
+
+  private async internalexecutePaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails,
+    maxFeeInGasToken?: BigNumberish
+  ): Promise<InvokeFunctionResponse> {
+    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
+    // If maxFeeInGasToken is provided, do all safety checks
+    if (maxFeeInGasToken) {
+      // We only check the calls if user effectively has to pay something
+      if (
+        preparedTransaction.type === 'invoke' ||
+        preparedTransaction.type === 'deploy_and_invoke'
+      ) {
+        // Check if the gas token price is too high
+        if (preparedTransaction.fee.suggested_max_fee_in_gas_token > maxFeeInGasToken) {
+          throw Error('Gas token price is too high');
+        }
+
+        /** *** Here we'll assert that returned calls are stritly equal to the provided calls **** */
+
+        // Check dataType version
+        const isV1TypedData = (data: any): boolean => {
+          return 'calls' in data && !('Calls' in data);
+        };
+
+        // extract unsafe calls to verify
+        const unsafeCalls = isV1TypedData(preparedTransaction.typed_data)
+          ? (preparedTransaction.typed_data.message as any).calls
+          : (preparedTransaction.typed_data.message as any).Calls;
+
+        // Here there is always 1 more call in the returned calls -> Transfer of the gas token
+        if (unsafeCalls.length - 1 !== calls.length) {
+          throw Error('Provided calls are not strictly equal to the returned calls');
+        }
+
+        // extract gas fee from unsafe calls
+        const unsafeCall = unsafeCalls[unsafeCalls.length - 1];
+        const unsafeGasTokenCalldata = isV1TypedData(unsafeCall)
+          ? unsafeCall.calldata
+          : unsafeCall.Calldata;
+        const unsafeGasTokenValue = unsafeGasTokenCalldata[1];
+        // Assert gas token to signed is stricly equal to the provided gas fees
+        if (
+          BigInt(unsafeGasTokenValue) !==
+          BigInt(preparedTransaction.fee.suggested_max_fee_in_gas_token)
+        ) {
+          throw Error('Gas token value is not equal to the provided gas fees');
+        }
+      }
+    }
+
+    const transaction: ExecutableUserTransaction =
+      await this.postBuildPaymasterTransaction(preparedTransaction);
+
     return this.paymaster
       .executeTransaction(transaction, preparedTransaction.parameters)
       .then((response) => ({ transaction_hash: response.transaction_hash }));
+  }
+
+  public async executePaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<InvokeFunctionResponse> {
+    return this.internalexecutePaymasterTransaction(calls, paymasterDetails);
+  }
+
+  public async safeExecutePaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails,
+    maxFeeInGasToken: BigNumberish
+  ): Promise<InvokeFunctionResponse> {
+    return this.internalexecutePaymasterTransaction(calls, paymasterDetails, maxFeeInGasToken);
   }
 
   /**
