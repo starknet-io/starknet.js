@@ -2,6 +2,7 @@ import { ProviderInterface } from '../provider';
 import { SignerInterface } from '../signer';
 import {
   AllowArray,
+  BigNumberish,
   BlockIdentifier,
   CairoVersion,
   Call,
@@ -252,6 +253,54 @@ export abstract class AccountInterface extends ProviderInterface {
     calls: Call[],
     paymasterDetails: PaymasterDetails
   ): Promise<PreparedTransaction>;
+
+  /**
+   * Execute a paymaster transaction
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @param paymasterDetails the paymaster details containing:
+   * - feeMode - the fee mode
+   * - deploymentData - the deployment data (optional)
+   * - timeBounds - the time bounds (optional)
+   *
+   * @returns the tarnsaction hash if successful, otherwise an error is thrown
+   */
+  public abstract executePaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<InvokeFunctionResponse>;
+
+  /**
+   * Execute a safe paymaster transaction
+   *
+   * Assert that the gas token value is equal to the provided gas fees.
+   * Assert that the calls are strictly equal to the returned calls.
+   * Assert that the gas token (in gas token) price is not too high.
+   * Assert that typedData to signed is strictly equal to the provided typedData.
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @param paymasterDetails the paymaster details containing:
+   * - feeMode - the fee mode
+   * - deploymentData - the deployment data (optional)
+   * - timeBounds - the time bounds (optional)
+   *
+   * @param maxFeeInGasToken - the max fee acceptable to pay in gas token
+   *
+   * @returns the tarnsaction hash if successful, otherwise an error is thrown
+   */
+  public abstract safeExecutePaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails,
+    maxFeeInGasToken: BigNumberish
+  ): Promise<InvokeFunctionResponse>;
 
   /**
    * Declares a given compiled contract (json) to starknet

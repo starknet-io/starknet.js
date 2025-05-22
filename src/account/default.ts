@@ -460,7 +460,7 @@ export class Account extends Provider implements AccountInterface {
     return preparedTransaction.fee;
   }
 
-  private async postBuildPaymasterTransaction(
+  private async preparePaymasterTransaction(
     preparedTransaction: PreparedTransaction
   ): Promise<ExecutableUserTransaction> {
     let transaction: ExecutableUserTransaction;
@@ -530,7 +530,7 @@ export class Account extends Provider implements AccountInterface {
     }
   }
 
-  private async internalexecutePaymasterTransaction(
+  private async executePaymasterTransactionWithSafetyChecksIfNeeded(
     calls: Call[],
     paymasterDetails: PaymasterDetails,
     maxFeeInGasToken?: BigNumberish
@@ -558,8 +558,6 @@ export class Account extends Provider implements AccountInterface {
               ? (preparedTransaction.typed_data.message as any).calls
               : (preparedTransaction.typed_data.message as any).Calls;
 
-          console.log(calls, unsafeCalls);
-
           // Here there is always 1 more call in the returned calls -> Transfer of the gas token
           this.assertCallsAreStrictlyEqual(calls, unsafeCalls);
 
@@ -579,7 +577,7 @@ export class Account extends Provider implements AccountInterface {
     }
 
     const transaction: ExecutableUserTransaction =
-      await this.postBuildPaymasterTransaction(preparedTransaction);
+      await this.preparePaymasterTransaction(preparedTransaction);
 
     return this.paymaster
       .executeTransaction(transaction, preparedTransaction.parameters)
@@ -590,7 +588,7 @@ export class Account extends Provider implements AccountInterface {
     calls: Call[],
     paymasterDetails: PaymasterDetails
   ): Promise<InvokeFunctionResponse> {
-    return this.internalexecutePaymasterTransaction(calls, paymasterDetails);
+    return this.executePaymasterTransactionWithSafetyChecksIfNeeded(calls, paymasterDetails);
   }
 
   public async safeExecutePaymasterTransaction(
@@ -598,7 +596,11 @@ export class Account extends Provider implements AccountInterface {
     paymasterDetails: PaymasterDetails,
     maxFeeInGasToken: BigNumberish
   ): Promise<InvokeFunctionResponse> {
-    return this.internalexecutePaymasterTransaction(calls, paymasterDetails, maxFeeInGasToken);
+    return this.executePaymasterTransactionWithSafetyChecksIfNeeded(
+      calls,
+      paymasterDetails,
+      maxFeeInGasToken
+    );
   }
 
   /**
