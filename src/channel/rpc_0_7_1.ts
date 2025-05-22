@@ -38,6 +38,7 @@ import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
 import { config } from '../global/config';
+import { assertX } from '../utils/assert';
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
@@ -535,6 +536,12 @@ export class RpcChannel {
           fee_data_availability_mode: details.feeDataAvailabilityMode,
         },
       });
+
+      assertX(!(details as any).max_fee, () => {
+        logger.warn(SYSTEM_MESSAGES.maxFeeInV3, {
+          type: RPC.ETransactionType.INVOKE,
+        });
+      });
     }
 
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
@@ -615,6 +622,12 @@ export class RpcChannel {
           fee_data_availability_mode: details.feeDataAvailabilityMode,
         },
       });
+
+      assertX(!(details as any).max_fee, () => {
+        logger.warn(SYSTEM_MESSAGES.maxFeeInV3, {
+          type: RPC.ETransactionType.DECLARE,
+        });
+      });
     } else {
       throw Error('declare unspotted parameters');
     }
@@ -663,6 +676,12 @@ export class RpcChannel {
           nonce_data_availability_mode: details.nonceDataAvailabilityMode,
           fee_data_availability_mode: details.feeDataAvailabilityMode,
         },
+      });
+
+      assertX(!(details as any).max_fee, () => {
+        logger.warn(SYSTEM_MESSAGES.maxFeeInV3, {
+          type: RPC.ETransactionType.DEPLOY_ACCOUNT,
+        });
       });
     }
 
@@ -751,6 +770,13 @@ export class RpcChannel {
         fee_data_availability_mode: invocation.feeDataAvailabilityMode,
         account_deployment_data: invocation.accountDeploymentData.map((it) => toHex(it)),
       };
+
+      assertX(!(invocation as any).maxFee, () => {
+        logger.warn(SYSTEM_MESSAGES.maxFeeInV3, {
+          type: invocation.type,
+          versionType,
+        });
+      });
     }
 
     if (invocation.type === TransactionType.INVOKE) {

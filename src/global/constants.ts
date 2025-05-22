@@ -136,14 +136,8 @@ export const DEFAULT_GLOBAL_CONFIG: {
 };
 
 export const RPC_DEFAULT_NODES = {
-  SN_MAIN: [
-    `https://starknet-mainnet.public.blastapi.io/rpc/`,
-    `https://free-rpc.nethermind.io/mainnet-juno/`,
-  ],
-  SN_SEPOLIA: [
-    `https://starknet-sepolia.public.blastapi.io/rpc/`,
-    `https://free-rpc.nethermind.io/sepolia-juno/`,
-  ],
+  SN_MAIN: [`https://starknet-mainnet.public.blastapi.io/rpc/`],
+  SN_SEPOLIA: [`https://starknet-sepolia.public.blastapi.io/rpc/`],
 } as const;
 
 export const PAYMASTER_RPC_NODES = {
@@ -161,4 +155,5 @@ export const SYSTEM_MESSAGES = {
     'Channel specification version is not compatible with the connected node Specification Version',
   unsupportedSpecVersion:
     'The connected node specification version is not supported by this library',
+  maxFeeInV3: 'maxFee is not supported in V3 transactions, use resourceBounds instead',
 };
