@@ -537,7 +537,7 @@ export class RpcChannel {
         },
       });
 
-      assertX(!(details as any).max_fee, () => {
+      assertX(!(details as any).maxFee, () => {
         logger.warn(SYSTEM_MESSAGES.maxFeeInV3, {
           type: RPC.ETransactionType.INVOKE,
         });
@@ -623,7 +623,7 @@ export class RpcChannel {
         },
       });
 
-      assertX(!(details as any).max_fee, () => {
+      assertX(!(details as any).maxFee, () => {
         logger.warn(SYSTEM_MESSAGES.maxFeeInV3, {
           type: RPC.ETransactionType.DECLARE,
         });
@@ -678,7 +678,7 @@ export class RpcChannel {
         },
       });
 
-      assertX(!(details as any).max_fee, () => {
+      assertX(!(details as any).maxFee, () => {
         logger.warn(SYSTEM_MESSAGES.maxFeeInV3, {
           type: RPC.ETransactionType.DEPLOY_ACCOUNT,
         });
