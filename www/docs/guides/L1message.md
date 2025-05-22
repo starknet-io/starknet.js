@@ -78,7 +78,7 @@ Starknet.js proposes 3 functions to calculate hashes related to a L1 ➡️ L2 m
   // l1ToL2MessageHash = '0x2e350fa9d830482605cb68be4fdb9f0cb3e1f95a0c51623ac1a5d1bd997c2090'
   ```
 
-  Can be verified here : https://sepolia.starkscan.co/message/0x2e350fa9d830482605cb68be4fdb9f0cb3e1f95a0c51623ac1a5d1bd997c2090#messagelogs
+  Can be verified here: https://sepolia.starkscan.co/message/0x2e350fa9d830482605cb68be4fdb9f0cb3e1f95a0c51623ac1a5d1bd997c2090#messagelogs
 
 - The L1 ➡️ L2 message hash, from the L2 transaction hash:
 
@@ -108,9 +108,9 @@ Starknet.js proposes 3 functions to calculate hashes related to a L1 ➡️ L2 m
 
 ## L2 ➡️ L1 messages
 
-To send a message to L1, you will just invoke a Cairo contract function, paying a fee that will pay all the processes (in L1 & L2).
+To send a message to L1, you will just invoke a Cairo contract function, paying a fee that will pay for all the processes (in L1 & L2).
 
-If necessary you can estimate this fee with the generic `estimateInvokeFee` function:
+If necessary, you can estimate this fee with the generic `estimateInvokeFee` function:
 
 ```typescript
 const { suggestedMaxFee } = await account0.estimateInvokeFee({
