@@ -413,7 +413,7 @@ export class Account extends Provider implements AccountInterface {
     );
   }
 
-  private async buildPaymasterTransaction(
+  public async buildPaymasterTransaction(
     calls: Call[],
     paymasterDetails: PaymasterDetails
   ): Promise<PreparedTransaction> {
@@ -424,7 +424,6 @@ export class Account extends Provider implements AccountInterface {
         throw Error('Account is not compatible with SNIP-9');
       }
     }
-
     const parameters: ExecutionParameters = {
       version: '0x1',
       feeMode: paymasterDetails.feeMode,
@@ -504,53 +503,77 @@ export class Account extends Provider implements AccountInterface {
     return transaction;
   }
 
+  private assertCallsAreStrictlyEqual(calls: Call[], unsafeCalls: Call[]) {
+    const error = new Error('Provided calls are not strictly equal to the returned calls');
+    if (unsafeCalls.length - 1 !== calls.length) {
+      throw error;
+    }
+    for (let i = 0; i < calls.length; i += 1) {
+      const call = calls[i];
+      const unsafeCall = unsafeCalls[i];
+      if (
+        call.contractAddress !== unsafeCall.contractAddress ||
+        call.entrypoint !== unsafeCall.entrypoint
+      ) {
+        throw error;
+      }
+      const callCalldata = CallData.toCalldata(call.calldata);
+      const unsafeCallCalldata = CallData.toCalldata(unsafeCall.calldata);
+      if (callCalldata.length !== unsafeCallCalldata.length) {
+        throw error;
+      }
+      for (let j = 0; j < callCalldata.length; j += 1) {
+        if (BigInt(callCalldata[j]) !== BigInt(unsafeCallCalldata[j])) {
+          throw error;
+        }
+      }
+    }
+  }
+
   private async internalexecutePaymasterTransaction(
     calls: Call[],
     paymasterDetails: PaymasterDetails,
     maxFeeInGasToken?: BigNumberish
   ): Promise<InvokeFunctionResponse> {
     const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
-    // If maxFeeInGasToken is provided, do all safety checks
-    if (maxFeeInGasToken) {
-      // We only check the calls if user effectively has to pay something
-      if (
-        preparedTransaction.type === 'invoke' ||
-        preparedTransaction.type === 'deploy_and_invoke'
-      ) {
-        // Check if the gas token price is too high
-        if (preparedTransaction.fee.suggested_max_fee_in_gas_token > maxFeeInGasToken) {
-          throw Error('Gas token price is too high');
-        }
-
-        /** *** Here we'll assert that returned calls are stritly equal to the provided calls **** */
-
-        // Check dataType version
-        const isV1TypedData = (data: any): boolean => {
-          return 'calls' in data && !('Calls' in data);
-        };
-
-        // extract unsafe calls to verify
-        const unsafeCalls = isV1TypedData(preparedTransaction.typed_data)
-          ? (preparedTransaction.typed_data.message as any).calls
-          : (preparedTransaction.typed_data.message as any).Calls;
-
-        // Here there is always 1 more call in the returned calls -> Transfer of the gas token
-        if (unsafeCalls.length - 1 !== calls.length) {
-          throw Error('Provided calls are not strictly equal to the returned calls');
-        }
-
-        // extract gas fee from unsafe calls
-        const unsafeCall = unsafeCalls[unsafeCalls.length - 1];
-        const unsafeGasTokenCalldata = isV1TypedData(unsafeCall)
-          ? unsafeCall.calldata
-          : unsafeCall.Calldata;
-        const unsafeGasTokenValue = unsafeGasTokenCalldata[1];
-        // Assert gas token to signed is stricly equal to the provided gas fees
+    // If tx is not sponsored, we need to make safety checks
+    if (paymasterDetails.feeMode.mode !== 'sponsored') {
+      // If maxFeeInGasToken is provided, do all safety checks
+      if (maxFeeInGasToken) {
+        // We only check the calls if user effectively has to pay something
         if (
-          BigInt(unsafeGasTokenValue) !==
-          BigInt(preparedTransaction.fee.suggested_max_fee_in_gas_token)
+          preparedTransaction.type === 'invoke' ||
+          preparedTransaction.type === 'deploy_and_invoke'
         ) {
-          throw Error('Gas token value is not equal to the provided gas fees');
+          // Check if the gas token price is too high
+          if (preparedTransaction.fee.suggested_max_fee_in_gas_token > maxFeeInGasToken) {
+            throw Error('Gas token price is too high');
+          }
+
+          /** *** Here we'll assert that returned calls are stritly equal to the provided calls **** */
+
+          // extract unsafe calls to verify
+          const unsafeCalls: Call[] =
+            'calls' in preparedTransaction.typed_data.message
+              ? (preparedTransaction.typed_data.message as any).calls
+              : (preparedTransaction.typed_data.message as any).Calls;
+
+          console.log(calls, unsafeCalls);
+
+          // Here there is always 1 more call in the returned calls -> Transfer of the gas token
+          this.assertCallsAreStrictlyEqual(calls, unsafeCalls);
+
+          // extract gas fee from unsafe calls
+          const unsafeCall = unsafeCalls[unsafeCalls.length - 1];
+          const unsafeGasTokenCalldata = CallData.toCalldata(unsafeCall.calldata);
+          const unsafeGasTokenValue = unsafeGasTokenCalldata[1];
+          // Assert gas token to signed is stricly equal to the provided gas fees
+          if (
+            BigInt(unsafeGasTokenValue) !==
+            BigInt(preparedTransaction.fee.suggested_max_fee_in_gas_token)
+          ) {
+            throw Error('Gas token value is not equal to the provided gas fees');
+          }
         }
       }
     }

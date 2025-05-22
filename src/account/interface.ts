@@ -22,6 +22,9 @@ import {
   InvokeFunctionResponse,
   MultiDeployContractResponse,
   Nonce,
+  PaymasterDetails,
+  PaymasterFeeEstimate,
+  PreparedTransaction,
   Signature,
   SimulateTransactionDetails,
   SimulateTransactionResponse,
@@ -209,6 +212,46 @@ export abstract class AccountInterface extends ProviderInterface {
     transactions: AllowArray<Call>,
     transactionsDetail?: InvocationsDetails
   ): Promise<InvokeFunctionResponse>;
+
+  /**
+   * Estimate Fee for executing a paymaster transaction on starknet
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @param paymasterDetails the paymaster details containing:
+   * - feeMode - the fee mode
+   * - deploymentData - the deployment data (optional)
+   * - timeBounds - the time bounds (optional)
+   *
+   * @returns response extracting fee from buildPaymasterTransaction
+   */
+  public abstract estimatePaymasterTransactionFee(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<PaymasterFeeEstimate>;
+
+  /**
+   * Build a paymaster transaction
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @param paymasterDetails the paymaster details containing:
+   * - feeMode - the fee mode
+   * - deploymentData - the deployment data (optional)
+   * - timeBounds - the time bounds (optional)
+   *
+   * @returns the prepared transaction
+   */
+  public abstract buildPaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<PreparedTransaction>;
 
   /**
    * Declares a given compiled contract (json) to starknet
