@@ -118,7 +118,7 @@ export function solidityUint256PackedKeccak256(params: BigNumberish[]): string {
 }
 
 /**
- * Calculate the L2 message hash related by a message L1->L2
+ * Calculate the message hash related by a message L1->L2
  * @param {BigNumberish} l1FromAddress L1 account address that paid the message.
  * @param {BigNumberish} l2ToAddress L2 contract address to execute.
  * @param {string | BigNumberish} l2Selector can be a function name ("bridge_withdraw") or a number (BigNumberish).
@@ -157,4 +157,33 @@ export function getL2MessageHash(
     l2Calldata.length,
     ...l2Calldata,
   ]);
+}
+
+/**
+ * Calculate the message hash related by a message L2->L1.
+ * @param {BigNumberish} fromL2Address L2 contract address that send the message.
+ * @param {BigNumberish} toL1Address Recipient L1 account address.
+ * @param {BigNumberish[]} payload an array of BigNumberish of the raw parameters passed to the message.
+ * @returns {string} hex-string of the message hash.
+ * @example
+ * ```typescript
+ * const fromL2Address = '0x04c5772d1914fe6ce891b64eb35bf3522aeae1315647314aac58b01137607f3f';
+ *   const toL1Address = '0x8453fc6cd1bcfe8d4dfc069c400b433054d47bdc';
+ *   const payload = [
+ *     0n,
+ *     1270393329865452722422775477982592488490549769359n,
+ *    4543560n,
+ *     200000000000000,
+ *    0n,
+ *   ];
+ *   const result = hash.getL1MessageHash(fromL2Address, toL1Address, payload);
+ * // result = "0x2eace1d0ab5dbe354a93fb0a59c6b98f26e6a0fe7c33f87329f8fc9829058b8b"
+ * ```
+ */
+export function getL1MessageHash(
+  fromL2Address: BigNumberish,
+  toL1Address: BigNumberish,
+  payload: BigNumberish[]
+): string {
+  return solidityUint256PackedKeccak256([fromL2Address, toL1Address, payload.length, ...payload]);
 }
