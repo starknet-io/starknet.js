@@ -50,7 +50,7 @@ If the fee is paid in L1, the Cairo contract at `to_Address` is automatically ex
 
 ### L1 ➡️ L2 hashes
 
-Starknet.js proposes 2 functions to calculate hashes related to a L1 ➡️ L2 message :
+Starknet.js proposes 3 functions to calculate hashes related to a L1 ➡️ L2 message :
 
 - The L1 ➡️ L2 message hash, from the L1 transaction:
 
@@ -90,7 +90,7 @@ Starknet.js proposes 2 functions to calculate hashes related to a L1 ➡️ L2 m
 
   Can be verified here : https://sepolia.voyager.online/tx/0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819#messages
 
-- The L2 transaction hash, from the L1 transaction:
+- The L1 ➡️ L2 transaction hash, from the L1 transaction:
 
   ```typescript
   const l1ToL2TransactionHash = hash.calculateL2MessageTxHash(
@@ -123,3 +123,21 @@ const { suggestedMaxFee } = await account0.estimateInvokeFee({
 The result is in `suggestedMaxFee`.
 
 ### L2 ➡️ L1 hash
+
+The L2 ➡️ L1 message hash, from the message content:
+
+```typescript
+const fromL2Address = '0x04c5772d1914fe6ce891b64eb35bf3522aeae1315647314aac58b01137607f3f';
+const toL1Address = '0x8453fc6cd1bcfe8d4dfc069c400b433054d47bdc';
+const payloadMessage = [
+  0n,
+  1270393329865452722422775477982592488490549769359n,
+  4543560n,
+  200000000000000,
+  0n,
+];
+const l2ToL1MessageHash = hash.getL1MessageHash(fromL2Address, toL1Address, payloadMessage);
+// l2ToL1MessageHash = '0x2eace1d0ab5dbe354a93fb0a59c6b98f26e6a0fe7c33f87329f8fc9829058b8b'
+```
+
+Can be verified here : https://sepolia.voyager.online/message/0x2eace1d0ab5dbe354a93fb0a59c6b98f26e6a0fe7c33f87329f8fc9829058b8b
