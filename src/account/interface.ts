@@ -257,29 +257,9 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Execute a paymaster transaction
    *
-   * @param calls the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   *
-   * @param paymasterDetails the paymaster details containing:
-   * - feeMode - the fee mode
-   * - deploymentData - the deployment data (optional)
-   * - timeBounds - the time bounds (optional)
-   *
-   * @returns the tarnsaction hash if successful, otherwise an error is thrown
-   */
-  public abstract executePaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails
-  ): Promise<InvokeFunctionResponse>;
-
-  /**
-   * Execute a safe paymaster transaction
-   *
-   * Assert that the gas token value is equal to the provided gas fees.
+   * Assert that the gas token value is equal to the provided gas fees
    * Assert that the calls are strictly equal to the returned calls.
-   * Assert that the gas token (in gas token) price is not too high.
+   * Assert that the gas token (in gas token) price is not too high, if provided.
    * Assert that typedData to signed is strictly equal to the provided typedData.
    *
    * @param calls the invocation object containing:
@@ -292,14 +272,14 @@ export abstract class AccountInterface extends ProviderInterface {
    * - deploymentData - the deployment data (optional)
    * - timeBounds - the time bounds (optional)
    *
-   * @param maxFeeInGasToken - the max fee acceptable to pay in gas token
+   * @param maxFeeInGasToken - the max fee acceptable to pay in gas token (optional)
    *
    * @returns the tarnsaction hash if successful, otherwise an error is thrown
    */
-  public abstract safeExecutePaymasterTransaction(
+  public abstract executePaymasterTransaction(
     calls: Call[],
     paymasterDetails: PaymasterDetails,
-    maxFeeInGasToken: BigNumberish
+    maxFeeInGasToken?: BigNumberish
   ): Promise<InvokeFunctionResponse>;
 
   /**

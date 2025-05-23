@@ -366,7 +366,7 @@ export class Account extends Provider implements AccountInterface {
     if (transactionsDetail.paymaster) {
       return this.executePaymasterTransaction(
         calls,
-        transactionsDetail.paymaster // TODO call safeExecutePaymasterTransaction here ???????
+        transactionsDetail.paymaster // TODO call executePaymasterTransaction with maxFee here? be careful, executePaymasterTransaction accept maxFee in gas token
       );
     }
     const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
@@ -503,34 +503,73 @@ export class Account extends Provider implements AccountInterface {
     return transaction;
   }
 
-  private assertCallsAreStrictlyEqual(calls: Call[], unsafeCalls: Call[]) {
-    const error = new Error('Provided calls are not strictly equal to the returned calls');
-    if (unsafeCalls.length - 1 !== calls.length) {
-      throw error;
+  private assertCallsAreStrictlyEqual(originalCalls: Call[], paymasterCalls: Call[]) {
+    const baseError = 'Provided calls are not strictly equal to the returned calls';
+
+    // Paymaster calls always include one additional call (gas token transfer)
+    if (paymasterCalls.length - 1 !== originalCalls.length) {
+      throw new Error(
+        `${baseError}: Expected ${originalCalls.length + 1} calls, got ${paymasterCalls.length}`
+      );
     }
-    for (let i = 0; i < calls.length; i += 1) {
-      const call = calls[i];
-      const unsafeCall = unsafeCalls[i];
-      if (
-        call.contractAddress !== unsafeCall.contractAddress ||
-        call.entrypoint !== unsafeCall.entrypoint
-      ) {
-        throw error;
+
+    // Compare each original call with the corresponding paymaster call
+    for (let callIndex = 0; callIndex < originalCalls.length; callIndex += 1) {
+      const originalCall = originalCalls[callIndex];
+      const paymasterCall = paymasterCalls[callIndex];
+
+      // Normalize addresses by removing leading zeros and converting to lowercase
+      const normalizeAddress = (address: string): string => {
+        return toBigInt(address).toString(16).toLowerCase();
+      };
+
+      // Check contract addresses (normalize to handle leading zeros)
+      const originalAddress = normalizeAddress(originalCall.contractAddress);
+      const paymasterAddress = normalizeAddress(paymasterCall.contractAddress);
+
+      if (originalAddress !== paymasterAddress) {
+        throw new Error(
+          `${baseError}: Contract address mismatch at call ${callIndex}. ` +
+            `Expected: ${originalCall.contractAddress}, Got: ${paymasterCall.contractAddress}`
+        );
       }
-      const callCalldata = CallData.toCalldata(call.calldata);
-      const unsafeCallCalldata = CallData.toCalldata(unsafeCall.calldata);
-      if (callCalldata.length !== unsafeCallCalldata.length) {
-        throw error;
+
+      // Check entrypoints (should be exact string match)
+      if (originalCall.entrypoint !== paymasterCall.entrypoint) {
+        throw new Error(
+          `${baseError}: Entrypoint mismatch at call ${callIndex}. ` +
+            `Expected: ${originalCall.entrypoint}, Got: ${paymasterCall.entrypoint}`
+        );
       }
-      for (let j = 0; j < callCalldata.length; j += 1) {
-        if (BigInt(callCalldata[j]) !== BigInt(unsafeCallCalldata[j])) {
-          throw error;
+
+      // Convert calldata to normalized arrays for comparison
+      const originalCalldata = CallData.toCalldata(originalCall.calldata);
+      const paymasterCalldata = CallData.toCalldata(paymasterCall.calldata);
+
+      // Check calldata length
+      if (originalCalldata.length !== paymasterCalldata.length) {
+        throw new Error(
+          `${baseError}: Calldata length mismatch at call ${callIndex}. ` +
+            `Expected length: ${originalCalldata.length}, Got length: ${paymasterCalldata.length}`
+        );
+      }
+
+      // Compare each calldata element (normalize using BigInt to handle leading zeros)
+      for (let dataIndex = 0; dataIndex < originalCalldata.length; dataIndex += 1) {
+        const originalValue = BigInt(originalCalldata[dataIndex]);
+        const paymasterValue = BigInt(paymasterCalldata[dataIndex]);
+
+        if (originalValue !== paymasterValue) {
+          throw new Error(
+            `${baseError}: Calldata value mismatch at call ${callIndex}, parameter ${dataIndex}. ` +
+              `Expected: ${originalCalldata[dataIndex]}, Got: ${paymasterCalldata[dataIndex]}`
+          );
         }
       }
     }
   }
 
-  private async executePaymasterTransactionWithSafetyChecksIfNeeded(
+  public async executePaymasterTransaction(
     calls: Call[],
     paymasterDetails: PaymasterDetails,
     maxFeeInGasToken?: BigNumberish
@@ -558,7 +597,6 @@ export class Account extends Provider implements AccountInterface {
               ? (preparedTransaction.typed_data.message as any).calls
               : (preparedTransaction.typed_data.message as any).Calls;
 
-          // Here there is always 1 more call in the returned calls -> Transfer of the gas token
           this.assertCallsAreStrictlyEqual(calls, unsafeCalls);
 
           // extract gas fee from unsafe calls
@@ -582,25 +620,6 @@ export class Account extends Provider implements AccountInterface {
     return this.paymaster
       .executeTransaction(transaction, preparedTransaction.parameters)
       .then((response) => ({ transaction_hash: response.transaction_hash }));
-  }
-
-  public async executePaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails
-  ): Promise<InvokeFunctionResponse> {
-    return this.executePaymasterTransactionWithSafetyChecksIfNeeded(calls, paymasterDetails);
-  }
-
-  public async safeExecutePaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails,
-    maxFeeInGasToken: BigNumberish
-  ): Promise<InvokeFunctionResponse> {
-    return this.executePaymasterTransactionWithSafetyChecksIfNeeded(
-      calls,
-      paymasterDetails,
-      maxFeeInGasToken
-    );
   }
 
   /**

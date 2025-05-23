@@ -163,7 +163,7 @@ describe('Account - Paymaster integration', () => {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
 
-      const result = await getAccount().safeExecutePaymasterTransaction(calls, details, '0x123456');
+      const result = await getAccount().executePaymasterTransaction(calls, details, '0x123456');
       expect(result).toEqual({ transaction_hash: '0x123' });
     });
 
@@ -171,7 +171,7 @@ describe('Account - Paymaster integration', () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'sponsored' },
       };
-      const result = await getAccount().safeExecutePaymasterTransaction(calls, details, '0x123');
+      const result = await getAccount().executePaymasterTransaction(calls, details, '0x123');
       expect(result).toEqual({
         transaction_hash: '0x123',
       });
@@ -183,7 +183,7 @@ describe('Account - Paymaster integration', () => {
       };
 
       await expect(
-        getAccount().safeExecutePaymasterTransaction(calls, details, '0x123')
+        getAccount().executePaymasterTransaction(calls, details, '0x123')
       ).rejects.toThrow('Gas token price is too high');
     });
 
@@ -193,7 +193,7 @@ describe('Account - Paymaster integration', () => {
       };
       getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionChangeFees;
       await expect(
-        getAccount().safeExecutePaymasterTransaction(calls, details, '0x123456')
+        getAccount().executePaymasterTransaction(calls, details, '0x123456')
       ).rejects.toThrow('Gas token value is not equal to the provided gas fees');
     });
 
@@ -204,7 +204,7 @@ describe('Account - Paymaster integration', () => {
       getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionAddedCalls;
 
       await expect(
-        getAccount().safeExecutePaymasterTransaction(calls, details, '0x123456')
+        getAccount().executePaymasterTransaction(calls, details, '0x123456')
       ).rejects.toThrow('Provided calls are not strictly equal to the returned calls');
     });
   });
