@@ -50,9 +50,10 @@ If the fee is paid in L1, the Cairo contract at `to_Address` is automatically ex
 
 ### L1 ➡️ L2 hashes
 
-Starknet.js proposes 2 functions to calculate hashes related to a L1 ➡️ L2 message :
+Starknet.js proposes 3 functions to calculate hashes related to a L1 ➡️ L2 message :
 
-- The L2 message hash:  
+- The L1 ➡️ L2 message hash, from the L1 transaction:
+
   For a L1 tx requesting a message L1->L2, some data extracted from etherscan : https://sepolia.etherscan.io/tx/0xd82ce7dd9f3964d89d2eb9d555e1460fb7792be274950abe578d610f95cc40f5
 
   ```typescript
@@ -79,8 +80,18 @@ Starknet.js proposes 2 functions to calculate hashes related to a L1 ➡️ L2 m
 
   Can be verified here: https://sepolia.starkscan.co/message/0x2e350fa9d830482605cb68be4fdb9f0cb3e1f95a0c51623ac1a5d1bd997c2090#messagelogs
 
-- The L2 transaction hash:  
-  For the same message:
+- The L1 ➡️ L2 message hash, from the L2 transaction hash:
+
+  ```typescript
+  const l2TransactionHash = '0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819';
+  const l1MessageHash = await provider.getL1MessageHash(l2TransactionHash);
+  // l1MessageHash = '0x55b3f8b6e607fffd9b4d843dfe8f9b5c05822cd94fcad8797deb01d77805532a'
+  ```
+
+  Can be verified here : https://sepolia.voyager.online/tx/0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819#messages
+
+- The L1 ➡️ L2 transaction hash, from the L1 transaction:
+
   ```typescript
   const l1ToL2TransactionHash = hash.calculateL2MessageTxHash(
     l1FromAddress,
@@ -92,7 +103,8 @@ Starknet.js proposes 2 functions to calculate hashes related to a L1 ➡️ L2 m
   );
   // l1ToL2TransactionHash = '0x67d959200d65d4ad293aa4b0da21bb050a1f669bce37d215c6edbf041269c07'
   ```
-  Can be verified here: https://sepolia.starkscan.co/tx/0x067d959200d65d4ad293aa4b0da21bb050a1f669bce37d215c6edbf041269c07
+
+  Can be verified here : https://sepolia.starkscan.co/tx/0x067d959200d65d4ad293aa4b0da21bb050a1f669bce37d215c6edbf041269c07
 
 ## L2 ➡️ L1 messages
 
@@ -101,23 +113,31 @@ To send a message to L1, you will just invoke a Cairo contract function, paying 
 If necessary, you can estimate this fee with the generic `estimateInvokeFee` function:
 
 ```typescript
-const { suggestedMaxFee: estimatedFee1 } = await account0.estimateInvokeFee({
+const { suggestedMaxFee } = await account0.estimateInvokeFee({
   contractAddress: testAddress,
   entrypoint: 'withdraw_to_L1',
   calldata: ['123456789', '30'],
 });
 ```
 
-The result is in `estimatedFee1`, of type BN.
+The result is in `suggestedMaxFee`.
 
 ### L2 ➡️ L1 hash
 
-Starknet.js proposes a function to calculate the L1 ➡️ L2 message hash :
+The L2 ➡️ L1 message hash, from the message content:
 
 ```typescript
-const l2TransactionHash = '0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819';
-const l1MessageHash = await provider.getL1MessageHash(l2TransactionHash);
-// l1MessageHash = '0x55b3f8b6e607fffd9b4d843dfe8f9b5c05822cd94fcad8797deb01d77805532a'
+const fromL2Address = '0x04c5772d1914fe6ce891b64eb35bf3522aeae1315647314aac58b01137607f3f';
+const toL1Address = '0x8453fc6cd1bcfe8d4dfc069c400b433054d47bdc';
+const payloadMessage = [
+  0n,
+  1270393329865452722422775477982592488490549769359n,
+  4543560n,
+  200000000000000,
+  0n,
+];
+const l2ToL1MessageHash = hash.getL1MessageHash(fromL2Address, toL1Address, payloadMessage);
+// l2ToL1MessageHash = '0x2eace1d0ab5dbe354a93fb0a59c6b98f26e6a0fe7c33f87329f8fc9829058b8b'
 ```
 
-Can be verified here: https://sepolia.voyager.online/tx/0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819#messages
+Can be verified here : https://sepolia.voyager.online/message/0x2eace1d0ab5dbe354a93fb0a59c6b98f26e6a0fe7c33f87329f8fc9829058b8b
