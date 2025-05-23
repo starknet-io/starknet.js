@@ -364,12 +364,6 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: UniversalDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const calls = Array.isArray(transactions) ? transactions : [transactions];
-    if (transactionsDetail.paymaster) {
-      return this.executePaymasterTransaction(
-        calls,
-        transactionsDetail.paymaster // TODO call executePaymasterTransaction with maxFee here? be careful, executePaymasterTransaction accept maxFee in gas token
-      );
-    }
     const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3), // TODO: does this depend on cairo version ?
