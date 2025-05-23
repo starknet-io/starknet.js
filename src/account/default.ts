@@ -65,7 +65,7 @@ import {
   UserTransaction,
   ExecutableUserTransaction,
 } from '../types';
-import { CallData, assertCallsAreStrictlyEqual } from '../utils/calldata';
+import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
@@ -92,6 +92,7 @@ import { isString, isUndefined } from '../utils/typed';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 import { defaultPaymaster, PaymasterInterface, PaymasterRpc } from '../paymaster';
+import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -508,49 +509,24 @@ export class Account extends Provider implements AccountInterface {
     paymasterDetails: PaymasterDetails,
     maxFeeInGasToken?: BigNumberish
   ): Promise<InvokeFunctionResponse> {
+    // Build the transaction
     const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
-    // If tx is not sponsored, we need to make safety checks
-    if (paymasterDetails.feeMode.mode !== 'sponsored') {
-      // If maxFeeInGasToken is provided, do all safety checks
-      if (maxFeeInGasToken) {
-        // We only check the calls if user effectively has to pay something
-        if (
-          preparedTransaction.type === 'invoke' ||
-          preparedTransaction.type === 'deploy_and_invoke'
-        ) {
-          // Check if the gas token price is too high
-          if (preparedTransaction.fee.suggested_max_fee_in_gas_token > maxFeeInGasToken) {
-            throw Error('Gas token price is too high');
-          }
 
-          /** *** Here we'll assert that returned calls are stritly equal to the provided calls **** */
+    // Check the transaction is safe
+    // Check gas fee value
+    // Check that provided calls and builded calls are strictly equal
+    assertPaymasterTransactionSafety(
+      preparedTransaction,
+      calls,
+      paymasterDetails,
+      maxFeeInGasToken
+    );
 
-          // extract unsafe calls to verify
-          const unsafeCalls: Call[] =
-            'calls' in preparedTransaction.typed_data.message
-              ? (preparedTransaction.typed_data.message as any).calls
-              : (preparedTransaction.typed_data.message as any).Calls;
-
-          assertCallsAreStrictlyEqual(calls, unsafeCalls);
-
-          // extract gas fee from unsafe calls
-          const unsafeCall = unsafeCalls[unsafeCalls.length - 1];
-          const unsafeGasTokenCalldata = CallData.toCalldata(unsafeCall.calldata);
-          const unsafeGasTokenValue = unsafeGasTokenCalldata[1];
-          // Assert gas token to signed is stricly equal to the provided gas fees
-          if (
-            BigInt(unsafeGasTokenValue) !==
-            BigInt(preparedTransaction.fee.suggested_max_fee_in_gas_token)
-          ) {
-            throw Error('Gas token value is not equal to the provided gas fees');
-          }
-        }
-      }
-    }
-
+    // Prepare the transaction, tx is safe here
     const transaction: ExecutableUserTransaction =
       await this.preparePaymasterTransaction(preparedTransaction);
 
+    // Execute the transaction
     return this.paymaster
       .executeTransaction(transaction, preparedTransaction.parameters)
       .then((response) => ({ transaction_hash: response.transaction_hash }));

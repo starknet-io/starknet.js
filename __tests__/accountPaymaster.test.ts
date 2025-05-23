@@ -129,7 +129,7 @@ describe('Account - Paymaster integration', () => {
   });
 
   describe('executePaymasterTransaction', () => {
-    it('should sign and execute transaction via paymaster', async () => {
+    it('should sign and execute transaction via paymaster without checking gas fees', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -155,9 +155,7 @@ describe('Account - Paymaster integration', () => {
       );
       expect(result).toEqual({ transaction_hash: '0x123' });
     });
-  });
 
-  describe('safeExecutePaymasterTransaction', () => {
     it('should sign and execute transaction via paymaster', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
