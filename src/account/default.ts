@@ -65,7 +65,7 @@ import {
   UserTransaction,
   ExecutableUserTransaction,
 } from '../types';
-import { CallData } from '../utils/calldata';
+import { CallData, assertCallsAreStrictlyEqual } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
@@ -503,72 +503,6 @@ export class Account extends Provider implements AccountInterface {
     return transaction;
   }
 
-  private assertCallsAreStrictlyEqual(originalCalls: Call[], paymasterCalls: Call[]) {
-    const baseError = 'Provided calls are not strictly equal to the returned calls';
-
-    // Paymaster calls always include one additional call (gas token transfer)
-    if (paymasterCalls.length - 1 !== originalCalls.length) {
-      throw new Error(
-        `${baseError}: Expected ${originalCalls.length + 1} calls, got ${paymasterCalls.length}`
-      );
-    }
-
-    // Compare each original call with the corresponding paymaster call
-    for (let callIndex = 0; callIndex < originalCalls.length; callIndex += 1) {
-      const originalCall = originalCalls[callIndex];
-      const paymasterCall = paymasterCalls[callIndex];
-
-      // Normalize addresses by removing leading zeros and converting to lowercase
-      const normalizeAddress = (address: string): string => {
-        return toBigInt(address).toString(16).toLowerCase();
-      };
-
-      // Check contract addresses (normalize to handle leading zeros)
-      const originalAddress = normalizeAddress(originalCall.contractAddress);
-      const paymasterAddress = normalizeAddress(paymasterCall.contractAddress);
-
-      if (originalAddress !== paymasterAddress) {
-        throw new Error(
-          `${baseError}: Contract address mismatch at call ${callIndex}. ` +
-            `Expected: ${originalCall.contractAddress}, Got: ${paymasterCall.contractAddress}`
-        );
-      }
-
-      // Check entrypoints (should be exact string match)
-      if (originalCall.entrypoint !== paymasterCall.entrypoint) {
-        throw new Error(
-          `${baseError}: Entrypoint mismatch at call ${callIndex}. ` +
-            `Expected: ${originalCall.entrypoint}, Got: ${paymasterCall.entrypoint}`
-        );
-      }
-
-      // Convert calldata to normalized arrays for comparison
-      const originalCalldata = CallData.toCalldata(originalCall.calldata);
-      const paymasterCalldata = CallData.toCalldata(paymasterCall.calldata);
-
-      // Check calldata length
-      if (originalCalldata.length !== paymasterCalldata.length) {
-        throw new Error(
-          `${baseError}: Calldata length mismatch at call ${callIndex}. ` +
-            `Expected length: ${originalCalldata.length}, Got length: ${paymasterCalldata.length}`
-        );
-      }
-
-      // Compare each calldata element (normalize using BigInt to handle leading zeros)
-      for (let dataIndex = 0; dataIndex < originalCalldata.length; dataIndex += 1) {
-        const originalValue = BigInt(originalCalldata[dataIndex]);
-        const paymasterValue = BigInt(paymasterCalldata[dataIndex]);
-
-        if (originalValue !== paymasterValue) {
-          throw new Error(
-            `${baseError}: Calldata value mismatch at call ${callIndex}, parameter ${dataIndex}. ` +
-              `Expected: ${originalCalldata[dataIndex]}, Got: ${paymasterCalldata[dataIndex]}`
-          );
-        }
-      }
-    }
-  }
-
   public async executePaymasterTransaction(
     calls: Call[],
     paymasterDetails: PaymasterDetails,
@@ -597,7 +531,7 @@ export class Account extends Provider implements AccountInterface {
               ? (preparedTransaction.typed_data.message as any).calls
               : (preparedTransaction.typed_data.message as any).Calls;
 
-          this.assertCallsAreStrictlyEqual(calls, unsafeCalls);
+          assertCallsAreStrictlyEqual(calls, unsafeCalls);
 
           // extract gas fee from unsafe calls
           const unsafeCall = unsafeCalls[unsafeCalls.length - 1];
