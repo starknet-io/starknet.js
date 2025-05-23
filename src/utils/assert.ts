@@ -14,3 +14,18 @@ export default function assert(condition: boolean, message?: string): asserts co
     throw new Error(message || 'Assertion failure');
   }
 }
+
+/**
+ * Asserts that the given condition is true, otherwise call the method.
+ * @param condition
+ * @param method
+ */
+export function assertX(condition: boolean, method: () => void): asserts condition {
+  if (!condition) {
+    if (method.length === 0) {
+      method(); // Call the method if it's a function with no arguments
+    } else {
+      throw new Error('AssertionX failure: message function should not require arguments');
+    }
+  }
+}
