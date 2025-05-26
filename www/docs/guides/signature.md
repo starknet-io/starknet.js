@@ -250,7 +250,8 @@ const ledgerAccount = new Account(myProvider, ledger0addr, myLedgerSigner);
 - The Ledger shall be connected, unlocked, with the Starknet internal APP activated, before launch of the script.
 - The Ledger Starknet APP is not handling the signature of Class declaration.
 - The transactions are detailed in the Nano screen only for a single transaction of STRK, ETH or USDC. All other cases are blind signing.
-  :::
+
+:::
 
 Some complete examples :  
 A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/10.testLedger231-rpc08.ts).  
