@@ -1,4 +1,6 @@
+import { OutsideCallV2, OutsideExecutionTypedDataV2 } from 'starknet-types-08';
 import { Account, Signature, Call, PaymasterDetails, OutsideExecutionVersion } from '../src';
+import { getSelectorFromName } from '../src/utils/hash';
 
 jest.mock('../src/paymaster/rpc');
 
@@ -13,21 +15,34 @@ describe('Account - Paymaster integration', () => {
   const mockSignMessage = jest.fn();
 
   const fakeSignature: Signature = ['0x1', '0x2'];
-  const calls: Call[] = [{ contractAddress: '0x123', entrypoint: 'transfer', calldata: [] }];
+  const originalCalls: Call[] = [
+    { contractAddress: '0x123', entrypoint: 'transfer', calldata: [] },
+  ];
 
-  const typedData = {
+  const originalCallsAsOutsideCalls: OutsideCallV2[] = [
+    {
+      To: '0x123',
+      Selector: getSelectorFromName('transfer'),
+      Calldata: [],
+    },
+  ];
+
+  const typedData: OutsideExecutionTypedDataV2 = {
     types: {},
     domain: {},
     primaryType: '',
     message: {
-      caller: '0xcaller',
-      nonce: '0xnonce',
-      execute_after: '0x1',
-      execute_before: '0x2',
-      calls_len: `0x${(calls.length + 1).toString(16)}`,
-      calls: [
-        ...calls,
-        { contractAddress: '0x456', entrypoint: 'transfer', calldata: ['0xcaller', 1200, 0] },
+      Caller: '0xcaller',
+      Nonce: '0xnonce',
+      'Execute After': '0x1',
+      'Execute Before': '0x2',
+      Calls: [
+        ...originalCallsAsOutsideCalls,
+        {
+          To: '0x456',
+          Selector: getSelectorFromName('transfer'),
+          Calldata: ['0xcaller', '1200', '0'],
+        },
       ],
     },
   };
@@ -48,36 +63,52 @@ describe('Account - Paymaster integration', () => {
     },
   };
 
-  const maliciousTypedDataChangeToken = {
+  const maliciousTypedDataChangeToken: OutsideExecutionTypedDataV2 = {
     ...typedData,
     message: {
       ...typedData.message,
-      calls: [
-        ...calls,
-        { contractAddress: '0x4567', entrypoint: 'transfer', calldata: ['0xcaller', 1200, 0] },
+      Calls: [
+        ...originalCallsAsOutsideCalls,
+        {
+          To: '0x4567',
+          Selector: getSelectorFromName('transfer'),
+          Calldata: ['0xcaller', '1200', '0'],
+        },
       ],
     },
   };
 
-  const maliciousTypedDataChangeFees = {
+  const maliciousTypedDataChangeFees: OutsideExecutionTypedDataV2 = {
     ...typedData,
     message: {
       ...typedData.message,
-      calls: [
-        ...calls,
-        { contractAddress: '0x456', entrypoint: 'transfer', calldata: ['0xcaller', 13000, 0] },
+      Calls: [
+        ...originalCallsAsOutsideCalls,
+        {
+          To: '0x456',
+          Selector: getSelectorFromName('transfer'),
+          Calldata: ['0xcaller', '13000', '0'],
+        },
       ],
     },
   };
 
-  const maliciousTypedDataAddedCalls = {
+  const maliciousTypedDataAddedCalls: OutsideExecutionTypedDataV2 = {
     ...typedData,
     message: {
       ...typedData.message,
-      calls: [
-        ...calls,
-        { contractAddress: '0x456', entrypoint: 'transfer', calldata: ['0xcaller', 13000, 0] },
-        { contractAddress: '0x456', entrypoint: 'transfer', calldata: ['0xcaller', 13000, 0] },
+      Calls: [
+        ...originalCallsAsOutsideCalls,
+        {
+          To: '0x456',
+          Selector: getSelectorFromName('transfer'),
+          Calldata: ['0xcaller', '13000', '0'],
+        },
+        {
+          To: '0x456',
+          Selector: getSelectorFromName('transfer'),
+          Calldata: ['0xcaller', '13000', '0'],
+        },
       ],
     },
   };
@@ -127,14 +158,14 @@ describe('Account - Paymaster integration', () => {
 
   describe('estimatePaymasterTransactionFee', () => {
     it('should return estimated transaction fee from paymaster', async () => {
-      const result = await getAccount().estimatePaymasterTransactionFee(calls, {
+      const result = await getAccount().estimatePaymasterTransactionFee(originalCalls, {
         feeMode: { mode: 'default', gasToken: '0x456' },
       });
 
       expect(mockBuildTransaction).toHaveBeenCalledWith(
         {
           type: 'invoke',
-          invoke: { userAddress: '0xabc', calls },
+          invoke: { userAddress: '0xabc', calls: originalCalls },
         },
         {
           version: '0x1',
@@ -153,7 +184,7 @@ describe('Account - Paymaster integration', () => {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
 
-      const result = await getAccount().executePaymasterTransaction(calls, details);
+      const result = await getAccount().executePaymasterTransaction(originalCalls, details);
 
       expect(mockBuildTransaction).toHaveBeenCalledTimes(1);
       expect(mockSignMessage).toHaveBeenCalledWith(typedData, '0xabc');
@@ -180,7 +211,11 @@ describe('Account - Paymaster integration', () => {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
 
-      const result = await getAccount().executePaymasterTransaction(calls, details, '0x123456');
+      const result = await getAccount().executePaymasterTransaction(
+        originalCalls,
+        details,
+        '0x123456'
+      );
       expect(result).toEqual({ transaction_hash: '0x123' });
     });
 
@@ -188,7 +223,11 @@ describe('Account - Paymaster integration', () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'sponsored' },
       };
-      const result = await getAccount().executePaymasterTransaction(calls, details, '0x123');
+      const result = await getAccount().executePaymasterTransaction(
+        originalCalls,
+        details,
+        '0x123'
+      );
       expect(result).toEqual({
         transaction_hash: '0x123',
       });
@@ -200,7 +239,7 @@ describe('Account - Paymaster integration', () => {
       };
 
       await expect(
-        getAccount().executePaymasterTransaction(calls, details, '0x123')
+        getAccount().executePaymasterTransaction(originalCalls, details, '0x123')
       ).rejects.toThrow('Gas token price is too high');
     });
 
@@ -210,7 +249,7 @@ describe('Account - Paymaster integration', () => {
       };
       getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionChangeFees;
       await expect(
-        getAccount().executePaymasterTransaction(calls, details, '0x123456')
+        getAccount().executePaymasterTransaction(originalCalls, details, '0x123456')
       ).rejects.toThrow('Gas token value is not equal to the provided gas fees');
     });
 
@@ -220,7 +259,7 @@ describe('Account - Paymaster integration', () => {
       };
       getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionChangeToken;
       await expect(
-        getAccount().executePaymasterTransaction(calls, details, '0x123456')
+        getAccount().executePaymasterTransaction(originalCalls, details, '0x123456')
       ).rejects.toThrow('Gas token address is not equal to the provided gas token');
     });
 
@@ -231,7 +270,7 @@ describe('Account - Paymaster integration', () => {
       getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionAddedCalls;
 
       await expect(
-        getAccount().executePaymasterTransaction(calls, details, '0x123456')
+        getAccount().executePaymasterTransaction(originalCalls, details, '0x123456')
       ).rejects.toThrow('Provided calls are not strictly equal to the returned calls');
     });
   });

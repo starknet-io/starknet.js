@@ -6,7 +6,6 @@ import {
   AllowArray,
   Args,
   ArgsOrCalldata,
-  Call,
   Calldata,
   FunctionAbi,
   HexCalldata,
@@ -16,7 +15,7 @@ import {
   ValidateType,
 } from '../../types';
 import assert from '../assert';
-import { toBigInt, toHex } from '../num';
+import { toHex } from '../num';
 import { isBigInt } from '../typed';
 import { getSelectorFromName } from '../hash/selector';
 import { isLongText } from '../shortString';
@@ -354,72 +353,5 @@ export class CallData {
         ) as Result
     );
     return decodedArray.length === 1 ? decodedArray[0] : decodedArray;
-  }
-}
-
-/**
- * Asserts that the given calls are strictly equal, otherwise throws an error.
- * @param {Call[]} originalCalls - The original calls.
- * @param {Call[]} unsafeCalls - The unsafe calls.
- * @throws {Error} Throws an error if the calls are not strictly equal.
- */
-export function assertCallsAreStrictlyEqual(originalCalls: Call[], unsafeCalls: Call[]) {
-  const baseError = 'Provided calls are not strictly equal to the returned calls';
-
-  // Unsafe calls always include one additional call (gas token transfer)
-  assert(
-    unsafeCalls.length - 1 === originalCalls.length,
-    `${baseError}: Expected ${originalCalls.length + 1} calls, got ${unsafeCalls.length}`
-  );
-
-  // Compare each original call with the corresponding unsafe call
-  for (let callIndex = 0; callIndex < originalCalls.length; callIndex += 1) {
-    const originalCall = originalCalls[callIndex];
-    const unsafeCall = unsafeCalls[callIndex];
-
-    // Normalize addresses by removing leading zeros and converting to lowercase
-    const normalizeAddress = (address: string): string => {
-      return toBigInt(address).toString(16).toLowerCase();
-    };
-
-    // Check contract addresses (normalize to handle leading zeros)
-    const originalAddress = normalizeAddress(originalCall.contractAddress);
-    const unsafeAddress = normalizeAddress(unsafeCall.contractAddress);
-
-    assert(
-      originalAddress === unsafeAddress,
-      `${baseError}: Contract address mismatch at call ${callIndex}. ` +
-        `Expected: ${originalCall.contractAddress}, Got: ${unsafeCall.contractAddress}`
-    );
-
-    // Check entrypoints (should be exact string match)
-    assert(
-      originalCall.entrypoint === unsafeCall.entrypoint,
-      `${baseError}: Entrypoint mismatch at call ${callIndex}. ` +
-        `Expected: ${originalCall.entrypoint}, Got: ${unsafeCall.entrypoint}`
-    );
-
-    // Convert calldata to normalized arrays for comparison
-    const originalCalldata = CallData.toCalldata(originalCall.calldata);
-    const unsafeCalldata = CallData.toCalldata(unsafeCall.calldata);
-
-    // Check calldata length
-    assert(
-      originalCalldata.length === unsafeCalldata.length,
-      `${baseError}: Calldata length mismatch at call ${callIndex}. ` +
-        `Expected length: ${originalCalldata.length}, Got length: ${unsafeCalldata.length}`
-    );
-
-    // Compare each calldata element (normalize using BigInt to handle leading zeros)
-    for (let dataIndex = 0; dataIndex < originalCalldata.length; dataIndex += 1) {
-      const originalValue = BigInt(originalCalldata[dataIndex]);
-      const unsafeValue = BigInt(unsafeCalldata[dataIndex]);
-
-      assert(
-        originalValue === unsafeValue,
-        `${baseError}: Calldata value mismatch at call ${callIndex}, parameter ${dataIndex}. ` +
-          `Expected: ${originalCalldata[dataIndex]}, Got: ${unsafeCalldata[dataIndex]}`
-      );
-    }
   }
 }
