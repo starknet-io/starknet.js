@@ -39,6 +39,15 @@ const assertGasFeeFromUnsafeCalls = (unsafeCalls: Call[], fees: BigNumberish) =>
   );
 };
 
+const assertGasTokenFromUnsafeCalls = (unsafeCalls: Call[], gasToken: string) => {
+  const unsafeCall = unsafeCalls[unsafeCalls.length - 1];
+  // Assert gas token to signed is stricly equal to the provided gas fees
+  assert(
+    BigInt(unsafeCall.contractAddress) === BigInt(gasToken),
+    'Gas token address is not equal to the provided gas token'
+  );
+};
+
 export const assertPaymasterTransactionSafety = (
   preparedTransaction: PreparedTransaction,
   calls: Call[],
@@ -57,6 +66,9 @@ export const assertPaymasterTransactionSafety = (
 
       // Assert calls provided and unsafe calls are strictly equal
       assertCallsAreStrictlyEqual(calls, unsafeCalls);
+
+      // Assert gas token address from unsafe calls is equal to the provided gas token
+      assertGasTokenFromUnsafeCalls(unsafeCalls, paymasterDetails.feeMode.gasToken);
 
       // If maxFeeInGasToken is provided, do all safety checks
       if (maxFeeInGasToken) {

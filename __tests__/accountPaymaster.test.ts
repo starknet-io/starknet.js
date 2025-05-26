@@ -5,6 +5,7 @@ jest.mock('../src/paymaster/rpc');
 describe('Account - Paymaster integration', () => {
   let account: Account | null = null;
   const mockBuildTransaction = jest.fn();
+  const mockMaliciousBuildTransactionChangeToken = jest.fn();
   const mockMaliciousBuildTransactionChangeFees = jest.fn();
   const mockMaliciousBuildTransactionAddedCalls = jest.fn();
   const mockExecuteTransaction = jest.fn();
@@ -47,6 +48,17 @@ describe('Account - Paymaster integration', () => {
     },
   };
 
+  const maliciousTypedDataChangeToken = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      calls: [
+        ...calls,
+        { contractAddress: '0x4567', entrypoint: 'transfer', calldata: ['0xcaller', 1200, 0] },
+      ],
+    },
+  };
+
   const maliciousTypedDataChangeFees = {
     ...typedData,
     message: {
@@ -70,6 +82,10 @@ describe('Account - Paymaster integration', () => {
     },
   };
 
+  const maliciousPaymasterResponseChangeToken = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataChangeToken,
+  };
   const maliciousPaymasterResponseChangeFees = {
     ...paymasterResponse,
     typed_data: maliciousTypedDataChangeFees,
@@ -100,6 +116,9 @@ describe('Account - Paymaster integration', () => {
     jest.clearAllMocks();
     jest.spyOn(getAccount(), 'getSnip9Version').mockImplementation(mockGetSnip9Version);
     mockBuildTransaction.mockResolvedValue(paymasterResponse);
+    mockMaliciousBuildTransactionChangeToken.mockResolvedValue(
+      maliciousPaymasterResponseChangeToken
+    );
     mockMaliciousBuildTransactionChangeFees.mockResolvedValue(maliciousPaymasterResponseChangeFees);
     mockMaliciousBuildTransactionAddedCalls.mockResolvedValue(maliciousPaymasterResponseAddedCalls);
     mockExecuteTransaction.mockResolvedValue({ transaction_hash: '0x123' });
@@ -193,6 +212,16 @@ describe('Account - Paymaster integration', () => {
       await expect(
         getAccount().executePaymasterTransaction(calls, details, '0x123456')
       ).rejects.toThrow('Gas token value is not equal to the provided gas fees');
+    });
+
+    it('should throw if Gas token address is not equal to the provided gas token', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionChangeToken;
+      await expect(
+        getAccount().executePaymasterTransaction(calls, details, '0x123456')
+      ).rejects.toThrow('Gas token address is not equal to the provided gas token');
     });
 
     it('should throw if provided calls are not strictly equal to the returned calls', async () => {
