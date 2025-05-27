@@ -374,8 +374,8 @@ export function encodeValue(
         const encodedSubtypes = variantType.type
           .slice(1, -1)
           .split(',')
+          .filter((subtype) => !!subtype)
           .map((subtype, index) => {
-            if (!subtype) return subtype;
             const subtypeData = (variantData as unknown[])[index];
             return encodeValue(types, subtype, subtypeData, undefined, revision)[1];
           });

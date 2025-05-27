@@ -335,7 +335,7 @@ describe('typedData', () => {
 
     messageHash = getMessageHash(exampleEnum, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x150a589bb56a4fbf4ee01f52e44fd5adde6af94c02b37e383413fed185321a2"`
+      `"0x56c727165c4b4ce1b5aba142c7253a2fef3da41d3c1db185056465cfe7c59f5"`
     );
 
     messageHash = getMessageHash(exampleEnumNested, exampleAddress);
