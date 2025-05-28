@@ -261,10 +261,7 @@ export function encodeType(
 
   const escapedTypes = newTypes.map((dependency) => {
     const dependencyElements = allTypes[dependency].map((t) => {
-      const targetType =
-        t.type === 'enum' && revision === Revision.ACTIVE
-          ? (t as StarknetEnumType).contains
-          : t.type;
+      const targetType = t.type;
       // parentheses handling for enum variant types
       const typeString = targetType.match(/^\(.*\)$/)
         ? `(${targetType

@@ -66,11 +66,11 @@ describe('typedData', () => {
     );
     encoded = encodeType(exampleEnum.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
-      `"\\"Example\\"(\\"someEnum1\\":\\"EnumA\\",\\"someEnum2\\":\\"EnumB\\")\\"EnumA\\"(\\"Variant 1\\"(),\\"Variant 2\\"(\\"u128\\",\\"u128*\\"),\\"Variant 3\\"(\\"u128\\"))\\"EnumB\\"(\\"Variant 1\\"(),\\"Variant 2\\"(\\"u128\\"))"`
+      `"\\"Example\\"(\\"someEnum1\\":\\"enum\\",\\"someEnum2\\":\\"enum\\")\\"EnumA\\"(\\"Variant 1\\"(),\\"Variant 2\\"(\\"u128\\",\\"u128*\\"),\\"Variant 3\\"(\\"u128\\"))\\"EnumB\\"(\\"Variant 1\\"(),\\"Variant 2\\"(\\"u128\\"))"`
     );
     encoded = encodeType(exampleEnumNested.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
-      `"\\"Example\\"(\\"someEnum\\":\\"EnumA\\")\\"EnumA\\"(\\"Variant 1\\"(),\\"Variant 2\\"(\\"u128\\",\\"StructA\\"))\\"EnumB\\"(\\"Variant A\\"(),\\"Variant B\\"(\\"StructB*\\"))\\"StructA\\"(\\"nestedEnum\\":\\"EnumB\\")\\"StructB\\"(\\"flag\\":\\"bool\\")"`
+      `"\\"Example\\"(\\"someEnum\\":\\"enum\\")\\"EnumA\\"(\\"Variant 1\\"(),\\"Variant 2\\"(\\"u128\\",\\"StructA\\"))\\"EnumB\\"(\\"Variant A\\"(),\\"Variant B\\"(\\"StructB*\\"))\\"StructA\\"(\\"nestedEnum\\":\\"enum\\")\\"StructB\\"(\\"flag\\":\\"bool\\")"`
     );
     encoded = encodeType(exampleMerkleTreeNested.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
@@ -114,11 +114,11 @@ describe('typedData', () => {
     );
     typeHash = getTypeHash(exampleEnum.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
-      `"0x393bf83422ca8626a2932696cfa0acb19dcad6de2fe84a2dd2ca7607ea5329a"`
+      `"0x2d5ac0cebbe47959d53fafa1c230a3cbd4e2f17f89c461b17c4864baf54439f"`
     );
     typeHash = getTypeHash(exampleEnumNested.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
-      `"0x267f739fd83d30528a0fafb23df33b6c35ca0a5adbcfb32152721478fa9d0ce"`
+      `"0x246f8826603bb897655d8058028a31bfbb3589694df3c18a1fc36d386464752"`
     );
   });
 
@@ -340,12 +340,12 @@ describe('typedData', () => {
 
     messageHash = getMessageHash(exampleEnum, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x56c727165c4b4ce1b5aba142c7253a2fef3da41d3c1db185056465cfe7c59f5"`
+      `"0x2d08477eaace244270ffbeeb855e5a70b5a0b2a37260c5bda5a121567782eb3"`
     );
 
     messageHash = getMessageHash(exampleEnumNested, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x6e70eb4ef625dda451094716eee7f31fa81ca0ba99d390885e9c7b0d64cd22"`
+      `"0x688fa07902ebe69a1eabc1f480956deafdf429810dcacf02dac3050684fb937"`
     );
 
     messageHash = getMessageHash(exampleMerkleTreeNested, exampleAddress);
