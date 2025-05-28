@@ -4,6 +4,7 @@ import typedDataExample from '../../__mocks__/typedData/baseExample.json';
 import exampleBaseTypes from '../../__mocks__/typedData/example_baseTypes.json';
 import exampleEnum from '../../__mocks__/typedData/example_enum.json';
 import exampleEnumNested from '../../__mocks__/typedData/example_enumNested.json';
+import exampleMerkleTreeNested from '../../__mocks__/typedData/example_MerkleTreeNested.json';
 import examplePresetTypes from '../../__mocks__/typedData/example_presetTypes.json';
 import typedDataStructArrayExample from '../../__mocks__/typedData/mail_StructArray.json';
 import typedDataSessionExample from '../../__mocks__/typedData/session_MerkleTree.json';
@@ -70,6 +71,10 @@ describe('typedData', () => {
     encoded = encodeType(exampleEnumNested.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
       `"\\"Example\\"(\\"someEnum\\":\\"EnumA\\")\\"EnumA\\"(\\"Variant 1\\"(),\\"Variant 2\\"(\\"u128\\",\\"StructA\\"))\\"EnumB\\"(\\"Variant A\\"(),\\"Variant B\\"(\\"StructB*\\"))\\"StructA\\"(\\"nestedEnum\\":\\"EnumB\\")\\"StructB\\"(\\"flag\\":\\"bool\\")"`
+    );
+    encoded = encodeType(exampleMerkleTreeNested.types, 'Example', TypedDataRevision.ACTIVE);
+    expect(encoded).toMatchInlineSnapshot(
+      `"\\"Example\\"(\\"flag\\":\\"bool\\",\\"data\\":\\"Session\\")\\"Policy\\"(\\"contractAddress\\":\\"felt\\",\\"selector\\":\\"selector\\")\\"Session\\"(\\"root\\":\\"merkletree\\")"`
     );
   });
 
@@ -341,6 +346,11 @@ describe('typedData', () => {
     messageHash = getMessageHash(exampleEnumNested, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
       `"0x6e70eb4ef625dda451094716eee7f31fa81ca0ba99d390885e9c7b0d64cd22"`
+    );
+
+    messageHash = getMessageHash(exampleMerkleTreeNested, exampleAddress);
+    expect(messageHash).toMatchInlineSnapshot(
+      `"0x313bc1cbd70dcf9c53da0470606810ddc5fc1eeac12a5d2294bfec5777432ab"`
     );
 
     expect(spyPedersen).not.toHaveBeenCalled();

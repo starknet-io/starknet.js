@@ -170,8 +170,8 @@ export function getDependencies(
   if (type[type.length - 1] === '*') {
     dependencyTypes = [type.slice(0, -1)];
   } else if (revision === Revision.ACTIVE) {
-    // enum base
-    if (type === 'enum') {
+    // enum or merkletree base
+    if (type === 'enum' || type === 'merkletree') {
       dependencyTypes = [contains];
     }
     // enum element types
@@ -259,26 +259,25 @@ export function encodeType(
 
   const esc = revisionConfiguration[revision].escapeTypeString;
 
-  return newTypes
-    .map((dependency) => {
-      const dependencyElements = allTypes[dependency].map((t) => {
-        const targetType =
-          t.type === 'enum' && revision === Revision.ACTIVE
-            ? (t as StarknetEnumType).contains
-            : t.type;
-        // parentheses handling for enum variant types
-        const typeString = targetType.match(/^\(.*\)$/)
-          ? `(${targetType
-              .slice(1, -1)
-              .split(',')
-              .map((e) => (e ? esc(e) : e))
-              .join(',')})`
-          : `:${esc(targetType)}`;
-        return `${esc(t.name)}${typeString}`;
-      });
-      return `${esc(dependency)}(${dependencyElements})`;
-    })
-    .join('');
+  const escapedTypes = newTypes.map((dependency) => {
+    const dependencyElements = allTypes[dependency].map((t) => {
+      const targetType =
+        t.type === 'enum' && revision === Revision.ACTIVE
+          ? (t as StarknetEnumType).contains
+          : t.type;
+      // parentheses handling for enum variant types
+      const typeString = targetType.match(/^\(.*\)$/)
+        ? `(${targetType
+            .slice(1, -1)
+            .split(',')
+            .map((e) => (e ? esc(e) : e))
+            .join(',')})`
+        : `:${esc(targetType)}`;
+      return `${esc(t.name)}${typeString}`;
+    });
+    return `${esc(dependency)}(${dependencyElements})`;
+  });
+  return escapedTypes.join('');
 }
 
 /**
@@ -480,7 +479,7 @@ export function encodeData<T extends TypedData>(
     ([ts, vs], field) => {
       if (
         data[field.name as keyof T['message']] === undefined ||
-        (data[field.name as keyof T['message']] === null && field.type !== 'enum')
+        data[field.name as keyof T['message']] === null
       ) {
         throw new Error(`Cannot encode data: missing data for '${field.name}'`);
       }
