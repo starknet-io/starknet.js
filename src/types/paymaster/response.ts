@@ -94,6 +94,6 @@ export type ExecutionParameters = {
 };
 
 export interface PaymasterTimeBounds {
-  executeAfter?: Date;
-  executeBefore?: Date;
+  executeAfter?: number;
+  executeBefore?: number;
 }
