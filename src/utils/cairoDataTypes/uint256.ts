@@ -55,7 +55,7 @@ export class CairoUint256 {
   }
 
   /**
-   * Validate if BigNumberish can be represented as Unit256
+   * Validate if BigNumberish can be represented as Uint256
    */
   static validate(bigNumberish: BigNumberish) {
     const bigInt = BigInt(bigNumberish);
@@ -65,7 +65,7 @@ export class CairoUint256 {
   }
 
   /**
-   * Validate if low and high can be represented as Unit256
+   * Validate if low and high can be represented as Uint256
    */
   static validateProps(low: BigNumberish, high: BigNumberish) {
     const bigIntLow = BigInt(low);
@@ -80,7 +80,7 @@ export class CairoUint256 {
   }
 
   /**
-   * Check if BigNumberish can be represented as Unit256
+   * Check if BigNumberish can be represented as Uint256
    */
   static is(bigNumberish: BigNumberish) {
     try {
