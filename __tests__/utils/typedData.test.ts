@@ -58,7 +58,7 @@ describe('typedData', () => {
     );
     encoded = encodeType(exampleBaseTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
-      `"\\"Example\\"(\\"n0\\":\\"felt\\",\\"n1\\":\\"bool\\",\\"n2\\":\\"string\\",\\"n3\\":\\"selector\\",\\"n4\\":\\"u128\\",\\"n5\\":\\"i128\\",\\"n6\\":\\"ContractAddress\\",\\"n7\\":\\"ClassHash\\",\\"n8\\":\\"timestamp\\",\\"n9\\":\\"shortstring\\")"`
+      `"\\"Example\\"(\\"n0\\":\\"felt\\",\\"n1\\":\\"bool\\",\\"n2\\":\\"string\\",\\"n3_0\\":\\"selector\\",\\"n3_1\\":\\"selector\\",\\"n4\\":\\"u128\\",\\"n5\\":\\"i128\\",\\"n6\\":\\"ContractAddress\\",\\"n7\\":\\"ClassHash\\",\\"n8\\":\\"timestamp\\",\\"n9\\":\\"shortstring\\")"`
     );
     encoded = encodeType(examplePresetTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
@@ -106,7 +106,7 @@ describe('typedData', () => {
     );
     typeHash = getTypeHash(exampleBaseTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
-      `"0x1f94cd0be8b4097a41486170fdf09a4cd23aefbc74bb2344718562994c2c111"`
+      `"0x2fe0aa1f0baee396812084785f7907b3e1204f8b3451d6ec37b18d35f5e004d"`
     );
     typeHash = getTypeHash(examplePresetTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
@@ -137,18 +137,21 @@ describe('typedData', () => {
   });
 
   test('should prepare selector', () => {
-    const res1 = prepareSelector('myFunction');
-    expect(res1).toEqual('0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8');
+    const name = 'myFunction';
+    const selector = '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8';
 
-    const res2 = prepareSelector(
-      '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
-    );
-    expect(res2).toEqual('0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8');
+    const res1 = prepareSelector(name);
+    expect(res1).toEqual(selector);
 
-    const res3 = prepareSelector(
-      '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
-    );
+    const res2 = prepareSelector(selector);
+    expect(res2).toEqual(selector);
+
+    const res3 = prepareSelector(selector);
     expect(res3).not.toEqual('0xc14cfe23f3fa7ce7b1f8db7d76');
+
+    const res4 = prepareSelector(selector, TypedDataRevision.ACTIVE);
+    expect(res4).not.toEqual(selector);
+    expect(res4).toEqual('0x424f5e095375246eb2e25c35fdb9a1398a2b8b1f1f3956c270dbc24c46bdda');
   });
 
   test('should transform merkle tree', () => {
@@ -330,7 +333,7 @@ describe('typedData', () => {
     let messageHash: string;
     messageHash = getMessageHash(exampleBaseTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0xdb7829db8909c0c5496f5952bcfc4fc894341ce01842537fc4f448743480b6"`
+      `"0x39642ac15ae851fc1a1dd3e3096642f0c21f2d00e779b51374d8edbd6dd16c5"`
     );
 
     messageHash = getMessageHash(examplePresetTypes, exampleAddress);

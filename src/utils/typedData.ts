@@ -119,8 +119,8 @@ export function validateTypedData(data: unknown): data is TypedData {
  * // result2 = '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
  * ```
  */
-export function prepareSelector(selector: string): string {
-  return isHex(selector) ? selector : getSelectorFromName(selector);
+export function prepareSelector(selector: string, revision: Revision = Revision.LEGACY): string {
+  return revision === Revision.LEGACY && isHex(selector) ? selector : getSelectorFromName(selector);
 }
 
 /**
@@ -394,7 +394,7 @@ export function encodeValue(
       return ['felt', root];
     }
     case 'selector': {
-      return ['felt', prepareSelector(data as string)];
+      return ['felt', prepareSelector(data as string, revision)];
     }
     case 'string': {
       if (revision === Revision.ACTIVE) {
