@@ -6,31 +6,71 @@ sidebar_position: 20
 
 ## Overview
 
-A **Paymaster** in Starknet allows your account to pay gas fees using alternative tokens (e.g., ETH, USDC) instead of
+A Paymaster in Starknet allows your account to pay gas fees using alternative tokens (e.g. ETH, USDC, ...) instead of
 STRK.
+
+:::info
+There are 2 types of paymaster transaction:
+
+- `default` when the account is paying the fees.
+- `sponsored` when a dApp wants to cover the gas fees on behalf of users.
+  :::
 
 In `starknet.js`, you can interact with a Paymaster in two ways:
 
-- Through the `Account` class (via `account.execute(...)` with a `paymaster` option)
+- Through the `Account` or `WalletAccount` classes
 - Or directly via the `PaymasterRpc` class
 
-This guide shows how to use the Paymaster with `Account`, how to configure it, and how to retrieve the list of supported
-tokens.
-U
-:::warning
-To be able to use the Paymaster, accounts must be compatible with SNIP-9 (Outside execution).
+:::warning IMPORTANT
+To be able to use the Paymaster, accounts must be compatible with SNIP-9 (Outside execution).  
+See [SNIP-9 compatibility](./outsideExecution.md#check-snip-9-support)
 :::
 
----
+## Paymaster service
+
+Paymaster service is provided by specific backends compatible with [SNIP-29](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-29.md).
+
+By default, a random service is selected in the list of available services:
+
+```typescript
+const myPaymasterRpc = new PaymasterRpc({ default: true });
+```
+
+If you want a specific paymaster service:
+
+```typescript
+const myPaymasterRpc = new PaymasterRpc({ nodeUrl: 'https://sepolia.paymaster.avnu.fi' });
+```
+
+Current available services are:
+
+| Name |              Mainnet               |              Testnet              |
+| :--: | :--------------------------------: | :-------------------------------: |
+| AVNU | https://starknet.paymaster.avnu.fi | https://sepolia.paymaster.avnu.fi |
+
+## Account with paymaster feature
+
+To instantiate a new account compatible with paymaster:
+
+```typescript
+const myAccount = new Account(
+  myProvider,
+  accountAddress,
+  privateKey,
+  undefined,
+  undefined,
+  myPaymasterRpc
+);
+```
 
 ## Getting Supported Gas Tokens
 
-Before sending a transaction with a Paymaster, you must first know **which tokens are accepted**.
+Before sending a transaction with a Paymaster, you must first know which tokens are accepted:
 
-Use the following method:
-
-```ts
-const supported = await account.paymaster.getSupportedTokens();
+```typescript
+const supported = await myAccount.paymaster.getSupportedTokens();
+// or
+const supported = await myPaymaster.getSupportedTokens();
 
 console.log(supported);
 /*
@@ -51,40 +91,93 @@ console.log(supported);
 
 ## Sending a Transaction with a Paymaster
 
-To use a Paymaster, pass a `paymaster` field in the `options` of your `account.execute(...)` call. Here you must define the fee mode (sponsored or not):
+To send a [`Call`](./define_call_message.md#call-or-call) (result of [`myContract.populate()`](./define_call_message.md#object-with-abi-conformity-check) or `myCallData.compile()`), here for a `default` paymaster transaction:
 
-```ts
-await account.execute(
-  [
-    {
-      contractAddress: '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
-      entrypoint: 'approve',
-      calldata: ['0xSPENDER', '0x1', '0'],
-    },
-  ],
-  {
-    paymaster: {
-      feeMode: { mode: 'default', gasToken: '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7' } } }
-    },
-  }
+```typescript
+const gasToken = '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080'; // USDC in Testnet
+const feesDetails: PaymasterDetails = {
+  feeMode: { mode: 'default', gasToken },
+};
+const feeEstimation = await myAccount.estimatePaymasterTransactionFee([myCall], feesDetails);
+// ask here to the user to accept this fee
+const res = await myAccount.executePaymasterTransaction(
+  [myCall],
+  feesDetails,
+  feeEstimation.suggested_max_fee_in_gas_token
 );
+const txR = await myProvider.waitForTransaction(res.transaction_hash);
 ```
 
-### Paymaster Options
+### Sponsored paymaster
 
-| Field            | Type    | Description                                                                   |
-| ---------------- | ------- | ----------------------------------------------------------------------------- |
-| `feeMode`        | FeeMode | When not sponsored, you need to use 'default' mode and specify the gas token. |
-| `deploymentData` | object  | Data required if your account is being deployed.                              |
-| `timeBounds`     | object  | Optional execution window with `executeAfter` and `executeBefore` dates.      |
+For a sponsored transaction, use :
 
-### How It Works Behind the Scenes
+```typescript
+const myPaymasterRpc = new PaymasterRpc({
+  nodeUrl: 'https://sepolia.paymaster.avnu.fi',
+  headers: { 'api-key': process.env.PAYMASTER_API_KEY },
+});
+const myAccount = new Account(
+  myProvider,
+  accountAddress,
+  privateKey,
+  undefined,
+  undefined,
+  myPaymasterRpc
+);
+const feesDetails: PaymasterDetails = {
+  feeMode: { mode: 'sponsored' },
+};
+const res = await myAccount.executePaymasterTransaction([myCall], feesDetails);
+const txR = await myProvider.waitForTransaction(res.transaction_hash);
+```
 
-When `paymaster` option is provided in `account.execute()`, this happens:
+### Time bounds
 
-1. `account.buildPaymasterTransaction()` is called to prepare the transaction.
-2. `account.signMessage()` signs the returned typed data.
-3. `paymaster.executeTransaction()` is called with your address, typed data, and signature.
+Optional execution window with `executeAfter` and `executeBefore` dates:
+
+```typescript
+const feesDetails: PaymasterDetails = {
+  feeMode: { mode: 'default', gasToken },
+  timeBounds: {
+    executeBefore: Date.now() / 1000 + 60, // 60 seconds
+    executeAfter: Date.now() / 1000,
+  },
+};
+```
+
+:::note
+Time unit is the Starknet blockchain time unit: seconds.
+:::
+
+### Deploy Account
+
+:::warning important
+If the account selected in the Wallet extension (Braavos, ArgentX, ...) is not deployed, you can't process a Paymaster transaction.
+:::
+
+If necessary, deploy first the account, using:
+
+```typescript
+// starknetWalletObject is the wallet selected by get-starknet v4.
+// Get data to deploy the account:
+const deploymentData: AccountDeploymentData = await wallet.deploymentData(starknetWalletObject);
+const feesDetails: PaymasterDetails = {
+  feeMode: { mode: 'default', gasToken },
+  deploymentData: { ...deploymentData, version: 1 as 1 },
+};
+// MyWalletAccount is the WalletAccount instance related to the selected wallet.
+const estimatedFees: PaymasterFeeEstimate = await MyWalletAccount.estimatePaymasterTransactionFee(
+  [],
+  feesDetails
+);
+const resp = await MyWalletAccount.executePaymasterTransaction(
+  [],
+  feesDetails,
+  estimatedFees.suggested_max_fee_in_gas_token
+);
+const txR = await newAccount.waitForTransaction(resp.transaction_hash);
+```
 
 ## PaymasterRpc Functions
 
@@ -99,15 +192,20 @@ Here are the available methods:
 | `buildTransaction(...)     ` | Builds the required data (could include a typed data to sign) for the execution |
 | `executeTransaction(...)`    | Calls the paymasters service to execute the transaction                         |
 
+## Examples
+
+### Demo DAPP
+
+A demo DAPP is available [here](https://starknet-paymaster-snip-29.vercel.app/) (needs some USDC in an account to process).
+
 ## Full Example – React + starknet.js + Paymaster
 
 ```tsx
 import { FC, useEffect, useState } from 'react';
-import { connect } from 'get-starknet';
-import { Account, PaymasterRpc, TokenData, WalletAccount } from 'starknet';
+import { connect } from 'get-starknet'; // v4 only
+import { Account, PaymasterRpc, TokenData, WalletAccount } from 'starknet'; // v7.4.0+
 
 const paymasterRpc = new PaymasterRpc({ default: true });
-// const paymasterRpc = new PaymasterRpc({ nodeUrl: 'https://sepolia.paymaster.avnu.fi' });
 
 const App: FC = () => {
   const [account, setAccount] = useState<Account>();
@@ -151,7 +249,9 @@ const App: FC = () => {
     ];
     setLoading(true);
     account
-      .execute(calls, { paymaster: { feeMode: { mode: 'default', gasToken: gasToken.address } } })
+      .executePaymasterTransaction(calls, {
+        feeMode: { mode: 'default', gasToken: gasToken.address },
+      })
       .then((res) => {
         setTx(res.transaction_hash);
         setLoading(false);
