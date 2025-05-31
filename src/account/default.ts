@@ -455,7 +455,7 @@ export class Account extends Provider implements AccountInterface {
     return preparedTransaction.fee;
   }
 
-  private async preparePaymasterTransaction(
+  public async preparePaymasterTransaction(
     preparedTransaction: PreparedTransaction
   ): Promise<ExecutableUserTransaction> {
     let transaction: ExecutableUserTransaction;
