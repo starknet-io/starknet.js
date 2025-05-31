@@ -268,9 +268,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * - calldata - (defaults to []) the calldata
    *
    * @param paymasterDetails the paymaster details containing:
-   * - feeMode - the fee mode
+   * - feeMode - the fee mode (sponsored or default)
    * - deploymentData - the deployment data (optional)
-   * - timeBounds - the time bounds (optional)
+   * - timeBounds - the time bounds when the transaction is valid (optional) - executeAfter and executeBefore expected to be in seconds (BLOCK_TIMESTAMP)
    *
    * @param maxFeeInGasToken - the max fee acceptable to pay in gas token (optional)
    *
