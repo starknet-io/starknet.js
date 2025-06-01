@@ -7,7 +7,7 @@ import type {
   SubscriptionTransactionsStatusResponse,
   WebSocketEvents,
   WebSocketMethods,
-} from 'starknet-types-08';
+} from '@starknet-io/starknet-types-08';
 
 import { BigNumberish, SubscriptionBlockIdentifier } from '../types';
 import { JRPC } from '../types/api';

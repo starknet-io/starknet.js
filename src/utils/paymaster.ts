@@ -1,4 +1,4 @@
-import { OutsideCallV2, OutsideCallV1 } from 'starknet-types-08';
+import { OutsideCallV2, OutsideCallV1 } from '@starknet-io/starknet-types-08';
 import { NetworkName, PAYMASTER_RPC_NODES } from '../global/constants';
 import { logger } from '../global/logger';
 import { BigNumberish, PaymasterDetails, PreparedTransaction, Call } from '../types';

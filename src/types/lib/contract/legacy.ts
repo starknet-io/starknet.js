@@ -55,7 +55,8 @@ export interface Program {
   }>;
   compiler_version?: string;
   main_scope?: string;
-  identifiers?: Record<string, 
+  identifiers?: Record<
+    string,
     | {
         destination: string;
         type: 'alias';
@@ -66,19 +67,25 @@ export interface Program {
         type: 'function';
         implicit_args?: {
           full_name: string;
-          members: Record<string, {
-            cairo_type: string;
-            offset: number;
-          }>;
+          members: Record<
+            string,
+            {
+              cairo_type: string;
+              offset: number;
+            }
+          >;
           size: number;
           type: 'struct';
         };
         explicit_args?: {
           full_name: string;
-          members: Record<string, {
-            cairo_type: string;
-            offset: number;
-          }>;
+          members: Record<
+            string,
+            {
+              cairo_type: string;
+              offset: number;
+            }
+          >;
           size: number;
           type: 'struct';
         };
@@ -89,10 +96,15 @@ export interface Program {
       }
     | {
         full_name: string;
-        members: Record<string, {
-          cairo_type: string;
-          offset: number;
-        }> | Record<string, never>;
+        members:
+          | Record<
+              string,
+              {
+                cairo_type: string;
+                offset: number;
+              }
+            >
+          | Record<string, never>;
         size: number;
         type: 'struct';
       }
@@ -125,11 +137,17 @@ export interface Program {
         type: 'reference';
       }
   >;
-  reference_manager?: Record<string, {
-    references: unknown[];
-  }>;
-  debug_info?: Record<string, {
-    file_contents?: Record<string, string>;
-    instruction_locations?: Record<string, unknown[]>;
-  }>;
+  reference_manager?: Record<
+    string,
+    {
+      references: unknown[];
+    }
+  >;
+  debug_info?: Record<
+    string,
+    {
+      file_contents?: Record<string, string>;
+      instruction_locations?: Record<string, unknown[]>;
+    }
+  >;
 }
