@@ -243,7 +243,7 @@ describe('typedData', () => {
       TypedDataRevision.ACTIVE
     );
     expect(hash).toMatchInlineSnapshot(
-      `"0x555f72e550b308e50c1a4f8611483a174026c982a9893a05c185eeb85399657"`
+      `"0x59d498384b95b0f1e011d810bfb195ef4ba0a9a637f235026c760f022894b87"`
     );
   });
 
@@ -333,27 +333,27 @@ describe('typedData', () => {
     let messageHash: string;
     messageHash = getMessageHash(exampleBaseTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x39642ac15ae851fc1a1dd3e3096642f0c21f2d00e779b51374d8edbd6dd16c5"`
+      `"0x554ee8db1f628fd2cca20f80a0b76ad543e3fa1a066557ac5e3055ccd3f3724"`
     );
 
     messageHash = getMessageHash(examplePresetTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x185b339d5c566a883561a88fb36da301051e2c0225deb325c91bb7aa2f3473a"`
+      `"0x7d53c86332b95e3f23a37b70d58b209a8ae25c0b97b0d27635ac0ae5ca1973"`
     );
 
     messageHash = getMessageHash(exampleEnum, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x2d08477eaace244270ffbeeb855e5a70b5a0b2a37260c5bda5a121567782eb3"`
+      `"0x1e6ef6a264070e0cc5209b0b93d2a0eb49cb8b393517a48aa18718feba1263a"`
     );
 
     messageHash = getMessageHash(exampleEnumNested, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x688fa07902ebe69a1eabc1f480956deafdf429810dcacf02dac3050684fb937"`
+      `"0x5ee5e9938bacbf3a5fd145c218133ab25d02d03536b798f4ceaa80b46c3f8a1"`
     );
 
     messageHash = getMessageHash(exampleMerkleTreeNested, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x313bc1cbd70dcf9c53da0470606810ddc5fc1eeac12a5d2294bfec5777432ab"`
+      `"0x233570609d39af53518adee8d2d77b3fa434c9d1517e3a0e82b4f2501cd7725"`
     );
 
     expect(spyPedersen).not.toHaveBeenCalled();

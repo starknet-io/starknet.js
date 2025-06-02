@@ -21,7 +21,7 @@ import {
 } from './hash';
 import { MerkleTree } from './merkle';
 import { isBigNumberish, isHex, toHex } from './num';
-import { encodeShortString } from './shortString';
+import { encodeShortString, isShortString } from './shortString';
 import { isBoolean, isString } from './typed';
 
 interface Context {
@@ -424,11 +424,19 @@ export function encodeValue(
       } // else fall through to default
       return [type, getHex(data as string)];
     }
-    case 'felt':
-    case 'shortstring': {
-      // TODO: should 'shortstring' diverge into directly using encodeShortString()?
+    case 'felt': {
       if (revision === Revision.ACTIVE) {
         assertRange(getHex(data as string), type, RANGE_FELT);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case 'shortstring': {
+      if (revision === Revision.ACTIVE) {
+        if (ctx.parent === revisionConfiguration[revision].domain && ctx.key === 'revision') {
+          return [type, getHex(data as string)];
+        }
+        assert(isString(data) && isShortString(data), `Type mismatch for ${type} ${data}`);
+        return [type, encodeShortString(data)];
       } // else fall through to default
       return [type, getHex(data as string)];
     }
