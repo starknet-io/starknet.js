@@ -10,11 +10,13 @@ A Paymaster in Starknet allows your account to pay gas fees using alternative to
 STRK.
 
 :::info
+
 There are 2 types of paymaster transaction:
 
 - `default` when the account is paying the fees.
 - `sponsored` when a dApp wants to cover the gas fees on behalf of users.
-  :::
+
+:::
 
 In `starknet.js`, you can interact with a Paymaster in two ways:
 
@@ -22,8 +24,10 @@ In `starknet.js`, you can interact with a Paymaster in two ways:
 - Or directly via the `PaymasterRpc` class
 
 :::warning IMPORTANT
+
 To be able to use the Paymaster, accounts must be compatible with SNIP-9 (Outside execution).  
 See [SNIP-9 compatibility](./outsideExecution.md#check-snip-9-support)
+
 :::
 
 ## Paymaster service
@@ -147,13 +151,17 @@ const feesDetails: PaymasterDetails = {
 ```
 
 :::note
+
 Time unit is the Starknet blockchain time unit: seconds.
+
 :::
 
 ### Deploy Account
 
 :::warning important
+
 If the account selected in the Wallet extension (Braavos, ArgentX, ...) is not deployed, you can't process a Paymaster transaction.
+
 :::
 
 If necessary, deploy first the account, using:
