@@ -141,18 +141,21 @@ const txR = await myProvider.waitForTransaction(res.transaction_hash);
 Optional execution window with `executeAfter` and `executeBefore` dates:
 
 ```typescript
+const lastBlockTimestamp = (await myProvider.getBlock()).timestamp;
 const feesDetails: PaymasterDetails = {
   feeMode: { mode: 'default', gasToken },
   timeBounds: {
-    executeBefore: Date.now() / 1000 + 60, // 60 seconds
-    executeAfter: Date.now() / 1000,
+    executeAfter: lastBlockTimestamp - 1,
+    executeBefore: lastBlockTimestamp + 60 * 5, // 5 minutes
   },
 };
 ```
 
 :::note
 
-Time unit is the Starknet blockchain time unit: seconds.
+- Time unit is the Starknet blockchain time unit: seconds.
+- `executeAfter` must be strictly lower than the timestamp of the last block if you want to be able to process immediately.
+- `executeBefore` is valid up until a block with a higher timestamp is created. It means that even if the Unix time is higher than executeBefore, the transaction is still possible ; only the last block timeStamp is the reference.
 
 :::
 
