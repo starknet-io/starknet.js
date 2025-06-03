@@ -1,4 +1,4 @@
-import { BlockHash, TransactionHash } from 'starknet-types-07';
+import { BlockHash, TransactionHash } from '@starknet-io/starknet-types-07';
 import { CairoEnum } from './cairoEnum';
 import {
   BigNumberish,

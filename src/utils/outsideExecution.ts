@@ -1,4 +1,4 @@
-import { OutsideCallV1, OutsideCallV2 } from 'starknet-types-08';
+import { OutsideCallV1, OutsideCallV2 } from '@starknet-io/starknet-types-08';
 import { CallData } from './calldata';
 import { Call, type AllowArray, type BigNumberish, type Calldata } from '../types/lib';
 import {

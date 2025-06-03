@@ -1,7 +1,7 @@
 // this file aims to unify the RPC specification types used by the common Provider class
 
-import * as RPCSPEC07 from 'starknet-types-07';
-import * as RPCSPEC08 from 'starknet-types-08';
+import * as RPCSPEC07 from '@starknet-io/starknet-types-07';
+import * as RPCSPEC08 from '@starknet-io/starknet-types-08';
 
 import { SimpleOneOf } from '../../types/helpers';
 

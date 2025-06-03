@@ -1,7 +1,7 @@
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
-import { PRICE_UNIT } from 'starknet-types-08';
+import { PRICE_UNIT } from '@starknet-io/starknet-types-08';
 import { config } from '../../global/config';
 import { SupportedRpcVersion, ZERO } from '../../global/constants';
 import { FeeEstimate } from '../../provider/types/index.type';
