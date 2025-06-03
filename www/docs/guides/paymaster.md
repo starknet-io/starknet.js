@@ -141,12 +141,10 @@ const txR = await myProvider.waitForTransaction(res.transaction_hash);
 Optional execution window with `executeAfter` and `executeBefore` dates:
 
 ```typescript
-const lastBlockTimestamp = (await myProvider.getBlock()).timestamp;
 const feesDetails: PaymasterDetails = {
   feeMode: { mode: 'default', gasToken },
   timeBounds: {
-    executeAfter: lastBlockTimestamp - 1,
-    executeBefore: lastBlockTimestamp + 60 * 5, // 5 minutes
+    executeBefore: Math.floor(Date.now() / 1000) + 60 * 5, // 5 minutes
   },
 };
 ```
@@ -154,8 +152,9 @@ const feesDetails: PaymasterDetails = {
 :::note
 
 - Time unit is the Starknet blockchain time unit: seconds.
-- `executeAfter` must be strictly lower than the timestamp of the last block if you want to be able to process immediately.
-- `executeBefore` is valid up until a block with a higher timestamp is created. It means that even if the Unix time is higher than executeBefore, the transaction is still possible ; only the last block timeStamp is the reference.
+- `executeAfter` is optional. If omitted, the transaction can be executed immediately.
+- if `executeAfter` is defined, it must be strictly lower than the timestamp of the last block if you want to be able to process immediately.
+- `executeBefore`: the transaction is possible as long as the Unix time of the SNIP-29 server is lower than executeBefore.
 
 :::
 
