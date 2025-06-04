@@ -10,7 +10,7 @@ import {
   IsSucceeded,
   IsType,
   PENDING_BLOCK_WITH_TX_HASHES,
-} from 'starknet-types-08';
+} from '@starknet-io/starknet-types-08';
 import { CompiledSierra, LegacyContractClass } from '../../types/lib';
 import {
   FELT,

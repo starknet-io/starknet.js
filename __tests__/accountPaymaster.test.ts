@@ -1,4 +1,4 @@
-import { OutsideCallV2, OutsideExecutionTypedDataV2 } from 'starknet-types-08';
+import { OutsideCallV2, OutsideExecutionTypedDataV2 } from '@starknet-io/starknet-types-08';
 import { Account, Signature, Call, PaymasterDetails, OutsideExecutionVersion } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 

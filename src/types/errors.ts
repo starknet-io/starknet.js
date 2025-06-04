@@ -1,5 +1,5 @@
-import * as Errors from 'starknet-types-08';
-import { PAYMASTER_API } from 'starknet-types-08';
+import * as Errors from '@starknet-io/starknet-types-08';
+import { PAYMASTER_API } from '@starknet-io/starknet-types-08';
 
 // NOTE: generated with scripts/generateRpcErrorMap.js
 export type RPC_ERROR_SET = {

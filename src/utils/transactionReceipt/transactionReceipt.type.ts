@@ -32,6 +32,7 @@ export type GetTransactionReceiptResponse<
   readonly value: TransactionStatusReceiptSets[T];
   match(callbacks: TransactionReceiptCallbacks): void;
 } & {
+  // @ts-ignore - seems to be needed only for docs, check again after the doc dependencies are updated
   [key in `is${Capitalize<TransactionReceiptStatus>}`]: () => this is GetTransactionReceiptResponse<
     TransactionReceiptStatusFromMethod<key>
   >;
