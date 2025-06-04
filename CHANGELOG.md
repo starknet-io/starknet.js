@@ -1,3 +1,13 @@
+# [7.5.0](https://github.com/starknet-io/starknet.js/compare/v7.4.0...v7.5.0) (2025-06-04)
+
+### Bug Fixes
+
+- snip29 - timeBounds seconds (number), public preparePaymasterTransaction ([#1408](https://github.com/starknet-io/starknet.js/issues/1408)) ([8cd4fa8](https://github.com/starknet-io/starknet.js/commit/8cd4fa810c71300f23bab2896151afa18febbaff))
+
+### Features
+
+- rename internal types-js alias to include organization scope ([#1410](https://github.com/starknet-io/starknet.js/issues/1410)) ([d19cb57](https://github.com/starknet-io/starknet.js/commit/d19cb57c651bcbf3f48b8682572f74ff03faa451))
+
 # [7.4.0](https://github.com/starknet-io/starknet.js/compare/v7.3.0...v7.4.0) (2025-05-27)
 
 ### Bug Fixes
