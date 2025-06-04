@@ -196,7 +196,7 @@ describe('requestParser', () => {
       expect(parsedField).toEqual(['1', '27988542884245108']);
     });
 
-    test('should throw an error for Custon Enum type when there is not active variant', () => {
+    test('should throw an error for Custom Enum type when there is not active variant', () => {
       const args = [new CairoCustomEnum({ test: 'content' })];
       const argsIterator = args[Symbol.iterator]();
       expect(() =>
