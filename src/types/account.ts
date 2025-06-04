@@ -39,7 +39,6 @@ export interface UniversalDetails {
   blockIdentifier?: BlockIdentifier;
   maxFee?: BigNumberish; // ignored on estimate
   tip?: BigNumberish;
-  paymaster?: PaymasterDetails;
   paymasterData?: BigNumberish[];
   accountDeploymentData?: BigNumberish[];
   nonceDataAvailabilityMode?: EDataAvailabilityMode;
