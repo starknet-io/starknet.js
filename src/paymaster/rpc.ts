@@ -45,18 +45,18 @@ const convertFEE_MODE = (feeMode: PAYMASTER_API.FEE_MODE): FeeMode => {
 };
 
 const convertTimeBounds = (timeBounds?: PaymasterTimeBounds): TIME_BOUNDS | undefined =>
-  timeBounds && timeBounds.executeAfter && timeBounds.executeBefore
+  timeBounds
     ? {
-        execute_after: timeBounds.executeAfter.getTime().toString(),
-        execute_before: timeBounds.executeBefore.getTime().toString(),
+        execute_after: timeBounds.executeAfter || 1, // If executeAfter is not provided, set it to 1, meaning the transaction can be executed immediately
+        execute_before: timeBounds.executeBefore,
       }
     : undefined;
 
 const convertTIME_BOUNDS = (timeBounds?: TIME_BOUNDS): PaymasterTimeBounds | undefined =>
-  timeBounds && timeBounds.execute_after && timeBounds.execute_before
+  timeBounds
     ? {
-        executeAfter: new Date(timeBounds.execute_after),
-        executeBefore: new Date(timeBounds.execute_before),
+        executeAfter: timeBounds.execute_after,
+        executeBefore: timeBounds.execute_before,
       }
     : undefined;
 
