@@ -48,7 +48,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
 
   test('onUnsubscribe with unsubscribeNewHeads', async () => {
     const mockOnUnsubscribe = jest.fn().mockImplementation((subId: number) => {
-      expect(subId).toEqual(expect.any(Number));
+      expect(subId).toEqual(expect.any(String));
     });
     webSocketChannel.onUnsubscribe = mockOnUnsubscribe;
 
@@ -130,14 +130,14 @@ describe('websocket specific endpoints - pathfinder test', () => {
       i += 1;
       // TODO : Add data format validation
       expect(data.result).toBeDefined();
-      if (i >= 1) {
+      if (i >= 2) {
         const status = await webSocketChannel.unsubscribeTransactionStatus();
         expect(status).toBe(true);
       }
     };
 
     const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
-    expect(subid).toEqual(expect.any(Number));
+    expect(subid).toEqual(expect.any(String));
     const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
     const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
     expect(subscriptionId).toEqual(expectedId);
@@ -163,7 +163,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
     };
 
     const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
-    expect(subid).toEqual(expect.any(Number));
+    expect(subid).toEqual(expect.any(String));
     const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
     const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
     expect(subscriptionId).toEqual(expectedId);
@@ -267,7 +267,7 @@ describe('WebSocketChannel Buffering', () => {
 
     subIdPromise
       .then((subId) => {
-        expect(subId).toEqual(expect.any(Number));
+        expect(subId).toEqual(expect.any(String));
 
         // Simulate receiving an event BEFORE handler is attached
         // This requires a way to manually trigger onmessage or a mock WebSocket
@@ -351,7 +351,7 @@ describe('WebSocketChannel Buffering', () => {
     webSocketChannel
       .subscribeEvents()
       .then((subId) => {
-        expect(subId).toEqual(expect.any(Number));
+        expect(subId).toEqual(expect.any(String));
 
         const internalOnMessageProxy = (webSocketChannel as any).onMessageProxy;
 
@@ -412,7 +412,7 @@ describe('WebSocketChannel Buffering', () => {
     webSocketChannel
       .subscribeNewHeads()
       .then(async (subId) => {
-        expect(subId).toEqual(expect.any(Number));
+        expect(subId).toEqual(expect.any(String));
 
         // 1. Attach handler A
         webSocketChannel.onNewHeads = handlerA;

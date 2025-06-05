@@ -190,6 +190,9 @@ export class RpcChannel {
       }
 
       const rawResult = await this.fetch(method, params, (this.requestId += 1));
+      const responseForTest = rawResult.clone(); // test
+      const plainTextBody = await responseForTest.text(); // test
+      console.log('plainTextBody', plainTextBody);
       const { error, result } = await rawResult.json();
       this.errorHandler(method, params, error);
       return result as RPC.Methods[T]['result'];
