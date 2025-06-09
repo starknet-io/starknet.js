@@ -64,11 +64,13 @@ describe('websocket specific endpoints - pathfinder test', () => {
     await webSocketChannel.subscribeNewHeads();
 
     let i = 0;
-    webSocketChannel.onNewHeads = async function (data) {
+    webSocketChannel.onNewHeads = async function (result, subscriptionId) {
       expect(this).toBeInstanceOf(WebSocketChannel);
       i += 1;
       // TODO : Add data format validation
-      expect(data.result).toBeDefined();
+      expect(result).toBeDefined();
+      const currentSubId = webSocketChannel.subscriptions.get(WSSubscriptions.NEW_HEADS);
+      expect(subscriptionId).toEqual(currentSubId);
       if (i === 2) {
         const status = await webSocketChannel.unsubscribeNewHeads();
         expect(status).toBe(true);
@@ -84,10 +86,12 @@ describe('websocket specific endpoints - pathfinder test', () => {
     await webSocketChannel.subscribeEvents();
 
     let i = 0;
-    webSocketChannel.onEvents = async (data) => {
+    webSocketChannel.onEvents = async (result, subscriptionId) => {
       i += 1;
       // TODO : Add data format validation
-      expect(data.result).toBeDefined();
+      expect(result).toBeDefined();
+      const currentSubId = webSocketChannel.subscriptions.get(WSSubscriptions.EVENTS);
+      expect(subscriptionId).toEqual(currentSubId);
       if (i === 5) {
         const status = await webSocketChannel.unsubscribeEvents();
         expect(status).toBe(true);
@@ -103,10 +107,12 @@ describe('websocket specific endpoints - pathfinder test', () => {
     await webSocketChannel.subscribePendingTransaction(true);
 
     let i = 0;
-    webSocketChannel.onPendingTransaction = async (data) => {
+    webSocketChannel.onPendingTransaction = async (result, subscriptionId) => {
       i += 1;
       // TODO : Add data format validation
-      expect(data.result).toBeDefined();
+      expect(result).toBeDefined();
+      const currentSubId = webSocketChannel.subscriptions.get(WSSubscriptions.PENDING_TRANSACTION);
+      expect(subscriptionId).toEqual(currentSubId);
       if (i === 5) {
         const status = await webSocketChannel.unsubscribePendingTransaction();
         expect(status).toBe(true);
@@ -125,18 +131,21 @@ describe('websocket specific endpoints - pathfinder test', () => {
       calldata: [account.address, '10', '0'],
     });
 
+    const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
+
     let i = 0;
-    webSocketChannel.onTransactionStatus = async (data) => {
+    webSocketChannel.onTransactionStatus = async (result, subscriptionId) => {
       i += 1;
       // TODO : Add data format validation
-      expect(data.result).toBeDefined();
+      expect(result).toBeDefined();
+      const currentSubId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
+      expect(subscriptionId).toEqual(currentSubId);
       if (i >= 2) {
         const status = await webSocketChannel.unsubscribeTransactionStatus();
         expect(status).toBe(true);
       }
     };
 
-    const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
     expect(subid).toEqual(expect.any(String));
     const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
     const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
@@ -152,10 +161,12 @@ describe('websocket specific endpoints - pathfinder test', () => {
     });
 
     let i = 0;
-    webSocketChannel.onTransactionStatus = async (data) => {
+    webSocketChannel.onTransactionStatus = async (result, subscriptionId) => {
       i += 1;
       // TODO : Add data format validation
-      expect(data.result).toBeDefined();
+      expect(result).toBeDefined();
+      const currentSubId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
+      expect(subscriptionId).toEqual(currentSubId);
       if (i >= 1) {
         const status = await webSocketChannel.unsubscribeTransactionStatus();
         expect(status).toBe(true);
@@ -187,7 +198,7 @@ describe('websocket regular endpoints - pathfinder test', () => {
   });
 
   test('regular rpc endpoint', async () => {
-    const response = await webSocketChannel.sendReceiveAny('starknet_chainId');
+    const response = await webSocketChannel.sendReceive('starknet_chainId');
     expect(response).toBe(StarknetChainId.SN_SEPOLIA);
   });
 });
@@ -276,11 +287,13 @@ describe('WebSocketChannel Buffering', () => {
         // Here, we'll proceed assuming the event would be buffered if it arrived.
 
         // Attach handler
-        const handler = jest.fn((data) => {
+        const handler = jest.fn((result, subscriptionId) => {
           if (handler.mock.calls.length === 1) {
-            expect(data).toEqual(mockNewHeadsData1); // Assuming this is how data is structured after parsing
+            expect(result).toEqual(mockNewHeadsData1.result); // Assuming this is how data is structured after parsing
+            expect(subscriptionId).toEqual(mockNewHeadsData1.subscription);
           } else if (handler.mock.calls.length === 2) {
-            expect(data).toEqual(mockNewHeadsData2);
+            expect(result).toEqual(mockNewHeadsData2.result);
+            expect(subscriptionId).toEqual(mockNewHeadsData2.subscription);
             webSocketChannel.unsubscribeNewHeads().then(() => done());
           }
         });
@@ -372,13 +385,13 @@ describe('WebSocketChannel Buffering', () => {
         });
 
         const receivedOrder: any[] = [];
-        const handler = jest.fn((data) => {
-          receivedOrder.push(data);
+        const handler = jest.fn((result, subscriptionId) => {
+          receivedOrder.push({ result, subscriptionId });
           if (receivedOrder.length === 3) {
             // All 3 events processed
-            expect(receivedOrder[0]).toEqual(mockEventData1);
-            expect(receivedOrder[1]).toEqual(mockEventData2);
-            expect(receivedOrder[2]).toEqual(mockEventData3);
+            expect(receivedOrder[0].result).toEqual(mockEventData1.result);
+            expect(receivedOrder[1].result).toEqual(mockEventData2.result);
+            expect(receivedOrder[2].result).toEqual(mockEventData3.result);
             webSocketChannel.unsubscribeEvents().then(() => done());
           }
         });
@@ -423,7 +436,7 @@ describe('WebSocketChannel Buffering', () => {
             params: mockData1,
           }),
         });
-        expect(handlerA).toHaveBeenCalledWith(mockData1);
+        expect(handlerA).toHaveBeenCalledWith(mockData1.result, mockData1.subscription);
         expect(handlerA).toHaveBeenCalledTimes(1);
 
         // 2. Remove handler (set to null or new no-op)
@@ -446,24 +459,24 @@ describe('WebSocketChannel Buffering', () => {
         });
 
         // 4. Attach handler B
-        webSocketChannel.onNewHeads = async (data) => {
-          handlerB(data);
-          receivedByB.push(data);
+        webSocketChannel.onNewHeads = async (result, subscriptionId) => {
+          handlerB(result, subscriptionId);
+          receivedByB.push(result);
 
           if (receivedByB.length === 3) {
             // mockData2, mockData3, mockData4
             expect(handlerB).toHaveBeenCalledTimes(3);
-            expect(receivedByB[0]).toEqual(mockData2); // Buffered
-            expect(receivedByB[1]).toEqual(mockData3); // Buffered
-            expect(receivedByB[2]).toEqual(mockData4); // Direct
+            expect(receivedByB[0]).toEqual(mockData2.result); // Buffered
+            expect(receivedByB[1]).toEqual(mockData3.result); // Buffered
+            expect(receivedByB[2]).toEqual(mockData4.result); // Direct
             await webSocketChannel.unsubscribeNewHeads();
             done();
           }
         };
 
         // Handler B should have been called with buffered events immediately
-        expect(handlerB).toHaveBeenCalledWith(mockData2);
-        expect(handlerB).toHaveBeenCalledWith(mockData3);
+        expect(handlerB).toHaveBeenCalledWith(mockData2.result, mockData2.subscription);
+        expect(handlerB).toHaveBeenCalledWith(mockData3.result, mockData3.subscription);
         expect(handlerB).toHaveBeenCalledTimes(2); // Called for mockData2 and mockData3 from buffer
 
         // 5. Simulate another event - should go directly to B

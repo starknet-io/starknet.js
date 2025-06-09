@@ -1,12 +1,11 @@
 import type {
+  EMITTED_EVENT,
   SUBSCRIPTION_ID,
   SubscriptionEventsResponse,
   SubscriptionNewHeadsResponse,
   SubscriptionPendingTransactionsResponse,
   SubscriptionReorgResponse,
   SubscriptionTransactionsStatusResponse,
-  WebSocketEvents,
-  WebSocketMethods,
 } from '@starknet-io/starknet-types-08';
 
 import { BigNumberish, SubscriptionBlockIdentifier } from '../types';
@@ -17,6 +16,7 @@ import { stringify } from '../utils/json';
 import { bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/num';
 import { Block } from '../utils/provider';
 import { config } from '../global/config';
+import { logger } from '../global/logger';
 
 export const WSSubscriptions = {
   NEW_HEADS: 'newHeads',
@@ -40,7 +40,14 @@ export type WebSocketOptions = {
    * @default WebSocket
    */
   websocket?: WebSocket;
+  /**
+   * Maximum number of events to store in the buffer if no handler is attached.
+   * @default 1000
+   */
+  maxBufferSize?: number;
 };
+
+const DEFAULT_MAX_BUFFER_SIZE = 1000;
 
 /**
  * WebSocket channel provides communication with Starknet node over long-lived socket connection
@@ -75,58 +82,81 @@ export class WebSocketChannel {
    */
   public websocket: WebSocket;
 
-  // Private buffers for subscription events
-  private reorgBuffer: SubscriptionReorgResponse[] = [];
+  // Generic buffer for all subscription events
+  private genericEventBuffer: Array<{ type: string; data: any }> = [];
 
-  private newHeadsBuffer: SubscriptionNewHeadsResponse[] = [];
+  private readonly maxBufferSize: number;
 
-  private eventsBuffer: SubscriptionEventsResponse[] = [];
+  // Generic map for actual event handlers
+  private eventHandlers: Map<string, (result: any, subscriptionId: any) => any> = new Map();
 
-  private transactionStatusBuffer: SubscriptionTransactionsStatusResponse[] = [];
+  // Define known event method names for clarity and type-safety where applicable
+  private static readonly EVENT_METHOD_REORG = 'starknet_subscriptionReorg';
 
-  private pendingTransactionBuffer: SubscriptionPendingTransactionsResponse[] = [];
+  private static readonly EVENT_METHOD_NEW_HEADS = 'starknet_subscriptionNewHeads';
 
-  // Private storage for actual event handlers
-  private onReorgHandler:
-    | ((this: WebSocketChannel, data: SubscriptionReorgResponse) => any)
-    | null = null;
+  private static readonly EVENT_METHOD_EVENTS = 'starknet_subscriptionEvents';
 
-  private onNewHeadsHandler:
-    | ((this: WebSocketChannel, data: SubscriptionNewHeadsResponse) => any)
-    | null = null;
+  private static readonly EVENT_METHOD_TRANSACTION_STATUS =
+    'starknet_subscriptionTransactionStatus';
 
-  private onEventsHandler:
-    | ((this: WebSocketChannel, data: SubscriptionEventsResponse) => any)
-    | null = null;
+  private static readonly EVENT_METHOD_PENDING_TRANSACTION =
+    'starknet_subscriptionPendingTransactions';
 
-  private onTransactionStatusHandler:
-    | ((this: WebSocketChannel, data: SubscriptionTransactionsStatusResponse) => any)
-    | null = null;
-
-  private onPendingTransactionHandler:
-    | ((this: WebSocketChannel, data: SubscriptionPendingTransactionsResponse) => any)
-    | null = null;
+  private static readonly KNOWN_EVENT_METHODS = [
+    WebSocketChannel.EVENT_METHOD_REORG,
+    WebSocketChannel.EVENT_METHOD_NEW_HEADS,
+    WebSocketChannel.EVENT_METHOD_EVENTS,
+    WebSocketChannel.EVENT_METHOD_TRANSACTION_STATUS,
+    WebSocketChannel.EVENT_METHOD_PENDING_TRANSACTION,
+  ];
 
   /**
    * Assign implementation method to get 'on reorg event data'
    * @example
    * ```typescript
-   * webSocketChannel.onReorg = async function (data) {
+   * webSocketChannel.onReorg = async function (result, subscriptionId) {
    *  // ... do something when reorg happens
    * }
    * ```
    */
-  public get onReorg(): (this: WebSocketChannel, data: SubscriptionReorgResponse) => any {
-    return this.onReorgHandler?.bind(this) || (() => {});
+  public get onReorg(): (
+    this: WebSocketChannel,
+    result: SubscriptionReorgResponse['result'],
+    subscriptionId: SUBSCRIPTION_ID
+  ) => any {
+    const handler = this.eventHandlers.get(WebSocketChannel.EVENT_METHOD_REORG);
+    return (
+      (handler as (
+        this: WebSocketChannel,
+        result: SubscriptionReorgResponse['result'],
+        subscriptionId: SUBSCRIPTION_ID
+      ) => any) || (() => {})
+    );
   }
 
   public set onReorg(
-    handler: ((this: WebSocketChannel, data: SubscriptionReorgResponse) => any) | null
+    userHandler:
+      | ((
+          this: WebSocketChannel,
+          result: SubscriptionReorgResponse['result'],
+          subscriptionId: SUBSCRIPTION_ID
+        ) => any)
+      | null
   ) {
-    this.onReorgHandler = handler ? handler.bind(this) : null;
-    if (this.onReorgHandler) {
-      this.reorgBuffer.forEach((data) => this.onReorgHandler!(data));
-      this.reorgBuffer = [];
+    const eventType = WebSocketChannel.EVENT_METHOD_REORG;
+    if (userHandler) {
+      const boundHandler = userHandler.bind(this);
+      this.eventHandlers.set(eventType, boundHandler);
+
+      const eventsToProcess = this.genericEventBuffer.filter((event) => event.type === eventType);
+      this.genericEventBuffer = this.genericEventBuffer.filter((event) => event.type !== eventType);
+      eventsToProcess.forEach((bufferedEvent) => {
+        const eventData = bufferedEvent.data as SubscriptionReorgResponse;
+        boundHandler(eventData.result, eventData.subscription_id);
+      });
+    } else {
+      this.eventHandlers.delete(eventType);
     }
   }
 
@@ -134,22 +164,48 @@ export class WebSocketChannel {
    * Assign implementation method to get 'starknet block heads'
    * @example
    * ```typescript
-   * webSocketChannel.onNewHeads = async function (data) {
+   * webSocketChannel.onNewHeads = async function (result, subscriptionId) {
    *  // ... do something with head data
    * }
    * ```
    */
-  public get onNewHeads(): (this: WebSocketChannel, data: SubscriptionNewHeadsResponse) => any {
-    return this.onNewHeadsHandler?.bind(this) || (() => {});
+  public get onNewHeads(): (
+    this: WebSocketChannel,
+    result: SubscriptionNewHeadsResponse['result'],
+    subscriptionId: SUBSCRIPTION_ID
+  ) => any {
+    const handler = this.eventHandlers.get(WebSocketChannel.EVENT_METHOD_NEW_HEADS);
+    return (
+      (handler as (
+        this: WebSocketChannel,
+        result: SubscriptionNewHeadsResponse['result'],
+        subscriptionId: SUBSCRIPTION_ID
+      ) => any) || (() => {})
+    );
   }
 
   public set onNewHeads(
-    handler: ((this: WebSocketChannel, data: SubscriptionNewHeadsResponse) => any) | null
+    userHandler:
+      | ((
+          this: WebSocketChannel,
+          result: SubscriptionNewHeadsResponse['result'],
+          subscriptionId: SUBSCRIPTION_ID
+        ) => any)
+      | null
   ) {
-    this.onNewHeadsHandler = handler ? handler.bind(this) : null;
-    if (this.onNewHeadsHandler) {
-      this.newHeadsBuffer.forEach((data) => this.onNewHeadsHandler!(data));
-      this.newHeadsBuffer = [];
+    const eventType = WebSocketChannel.EVENT_METHOD_NEW_HEADS;
+    if (userHandler) {
+      const boundHandler = userHandler.bind(this);
+      this.eventHandlers.set(eventType, boundHandler);
+
+      const eventsToProcess = this.genericEventBuffer.filter((event) => event.type === eventType);
+      this.genericEventBuffer = this.genericEventBuffer.filter((event) => event.type !== eventType);
+      eventsToProcess.forEach((bufferedEvent) => {
+        const eventData = bufferedEvent.data as SubscriptionNewHeadsResponse;
+        boundHandler(eventData.result, eventData.subscription_id);
+      });
+    } else {
+      this.eventHandlers.delete(eventType);
     }
   }
 
@@ -157,22 +213,44 @@ export class WebSocketChannel {
    * Assign implementation method to get 'starknet events'
    * @example
    * ```typescript
-   * webSocketChannel.onEvents = async function (data) {
+   * webSocketChannel.onEvents = async function (result, subscriptionId) {
    *  // ... do something with event data
    * }
    * ```
    */
-  public get onEvents(): (this: WebSocketChannel, data: SubscriptionEventsResponse) => any {
-    return this.onEventsHandler?.bind(this) || (() => {});
+  public get onEvents(): (
+    this: WebSocketChannel,
+    result: EMITTED_EVENT,
+    subscriptionId: SUBSCRIPTION_ID
+  ) => any {
+    const handler = this.eventHandlers.get(WebSocketChannel.EVENT_METHOD_EVENTS);
+    return (
+      (handler as (
+        this: WebSocketChannel,
+        result: EMITTED_EVENT,
+        subscriptionId: SUBSCRIPTION_ID
+      ) => any) || (() => {})
+    );
   }
 
   public set onEvents(
-    handler: ((this: WebSocketChannel, data: SubscriptionEventsResponse) => any) | null
+    userHandler:
+      | ((this: WebSocketChannel, result: EMITTED_EVENT, subscriptionId: SUBSCRIPTION_ID) => any)
+      | null
   ) {
-    this.onEventsHandler = handler ? handler.bind(this) : null;
-    if (this.onEventsHandler) {
-      this.eventsBuffer.forEach((data) => this.onEventsHandler!(data));
-      this.eventsBuffer = [];
+    const eventType = WebSocketChannel.EVENT_METHOD_EVENTS;
+    if (userHandler) {
+      const boundHandler = userHandler.bind(this);
+      this.eventHandlers.set(eventType, boundHandler);
+
+      const eventsToProcess = this.genericEventBuffer.filter((event) => event.type === eventType);
+      this.genericEventBuffer = this.genericEventBuffer.filter((event) => event.type !== eventType);
+      eventsToProcess.forEach((bufferedEvent) => {
+        const eventData = bufferedEvent.data as SubscriptionEventsResponse;
+        boundHandler(eventData.result, eventData.subscription_id);
+      });
+    } else {
+      this.eventHandlers.delete(eventType);
     }
   }
 
@@ -180,25 +258,48 @@ export class WebSocketChannel {
    * Assign method to get 'starknet transactions status'
    * @example
    * ```typescript
-   * webSocketChannel.onTransactionStatus = async function (data) {
+   * webSocketChannel.onTransactionStatus = async function (result, subscriptionId) {
    *  // ... do something with tx status data
    * }
    * ```
    */
   public get onTransactionStatus(): (
     this: WebSocketChannel,
-    data: SubscriptionTransactionsStatusResponse
+    result: SubscriptionTransactionsStatusResponse['result'],
+    subscriptionId: SUBSCRIPTION_ID
   ) => any {
-    return this.onTransactionStatusHandler?.bind(this) || (() => {});
+    const handler = this.eventHandlers.get(WebSocketChannel.EVENT_METHOD_TRANSACTION_STATUS);
+    return (
+      (handler as (
+        this: WebSocketChannel,
+        result: SubscriptionTransactionsStatusResponse['result'],
+        subscriptionId: SUBSCRIPTION_ID
+      ) => any) || (() => {})
+    );
   }
 
   public set onTransactionStatus(
-    handler: ((this: WebSocketChannel, data: SubscriptionTransactionsStatusResponse) => any) | null
+    userHandler:
+      | ((
+          this: WebSocketChannel,
+          result: SubscriptionTransactionsStatusResponse['result'],
+          subscriptionId: SUBSCRIPTION_ID
+        ) => any)
+      | null
   ) {
-    this.onTransactionStatusHandler = handler ? handler.bind(this) : null;
-    if (this.onTransactionStatusHandler) {
-      this.transactionStatusBuffer.forEach((data) => this.onTransactionStatusHandler!(data));
-      this.transactionStatusBuffer = [];
+    const eventType = WebSocketChannel.EVENT_METHOD_TRANSACTION_STATUS;
+    if (userHandler) {
+      const boundHandler = userHandler.bind(this);
+      this.eventHandlers.set(eventType, boundHandler);
+
+      const eventsToProcess = this.genericEventBuffer.filter((event) => event.type === eventType);
+      this.genericEventBuffer = this.genericEventBuffer.filter((event) => event.type !== eventType);
+      eventsToProcess.forEach((bufferedEvent) => {
+        const eventData = bufferedEvent.data as SubscriptionTransactionsStatusResponse;
+        boundHandler(eventData.result, eventData.subscription_id);
+      });
+    } else {
+      this.eventHandlers.delete(eventType);
     }
   }
 
@@ -206,25 +307,48 @@ export class WebSocketChannel {
    * Assign implementation method to get 'starknet pending transactions (mempool)'
    * @example
    * ```typescript
-   * webSocketChannel.onPendingTransaction = async function (data) {
+   * webSocketChannel.onPendingTransaction = async function (result, subscriptionId) {
    *  // ... do something with pending tx data
    * }
    * ```
    */
   public get onPendingTransaction(): (
     this: WebSocketChannel,
-    data: SubscriptionPendingTransactionsResponse
+    result: SubscriptionPendingTransactionsResponse['result'],
+    subscriptionId: SUBSCRIPTION_ID
   ) => any {
-    return this.onPendingTransactionHandler?.bind(this) || (() => {});
+    const handler = this.eventHandlers.get(WebSocketChannel.EVENT_METHOD_PENDING_TRANSACTION);
+    return (
+      (handler as (
+        this: WebSocketChannel,
+        result: SubscriptionPendingTransactionsResponse['result'],
+        subscriptionId: SUBSCRIPTION_ID
+      ) => any) || (() => {})
+    );
   }
 
   public set onPendingTransaction(
-    handler: ((this: WebSocketChannel, data: SubscriptionPendingTransactionsResponse) => any) | null
+    userHandler:
+      | ((
+          this: WebSocketChannel,
+          result: SubscriptionPendingTransactionsResponse['result'],
+          subscriptionId: SUBSCRIPTION_ID
+        ) => any)
+      | null
   ) {
-    this.onPendingTransactionHandler = handler ? handler.bind(this) : null;
-    if (this.onPendingTransactionHandler) {
-      this.pendingTransactionBuffer.forEach((data) => this.onPendingTransactionHandler!(data));
-      this.pendingTransactionBuffer = [];
+    const eventType = WebSocketChannel.EVENT_METHOD_PENDING_TRANSACTION;
+    if (userHandler) {
+      const boundHandler = userHandler.bind(this);
+      this.eventHandlers.set(eventType, boundHandler);
+
+      const eventsToProcess = this.genericEventBuffer.filter((event) => event.type === eventType);
+      this.genericEventBuffer = this.genericEventBuffer.filter((event) => event.type !== eventType);
+      eventsToProcess.forEach((bufferedEvent) => {
+        const eventData = bufferedEvent.data as SubscriptionPendingTransactionsResponse;
+        boundHandler(eventData.result, eventData.subscription_id);
+      });
+    } else {
+      this.eventHandlers.delete(eventType);
     }
   }
 
@@ -278,6 +402,7 @@ export class WebSocketChannel {
     const nodeUrl = options.nodeUrl || 'http://localhost:3000 '; // TODO: implement getDefaultNodeUrl default node when defined by providers?
     this.nodeUrl = options.websocket ? options.websocket.url : nodeUrl;
     this.websocket = options.websocket || config.get('websocket') || new WebSocket(nodeUrl);
+    this.maxBufferSize = options.maxBufferSize ?? DEFAULT_MAX_BUFFER_SIZE;
 
     this.websocket.addEventListener('open', this.onOpen.bind(this));
     this.websocket.addEventListener('close', this.onCloseProxy.bind(this));
@@ -318,13 +443,6 @@ export class WebSocketChannel {
   }
 
   /**
-   * Any Starknet method not just websocket override
-   */
-  public sendReceiveAny(method: any, params?: any) {
-    return this.sendReceive(method, params);
-  }
-
-  /**
    * Send request and receive response over ws line
    * This method abstract ws messages into request/response model
    * @param method rpc method name
@@ -334,10 +452,7 @@ export class WebSocketChannel {
    * const response = await this.sendReceive('starknet_method', params);
    * ```
    */
-  public sendReceive<T extends keyof WebSocketMethods>(
-    method: T,
-    params?: WebSocketMethods[T]['params']
-  ): Promise<MessageEvent['data']['result'] | Error | Event> {
+  public sendReceive<T = any>(method: string, params?: object): Promise<T> {
     const sendId = this.send(method, params);
 
     return new Promise((resolve, reject) => {
@@ -359,7 +474,7 @@ export class WebSocketChannel {
           this.websocket.removeEventListener('error', errorHandler);
 
           if ('result' in message) {
-            resolve(message.result);
+            resolve(message.result as T);
           } else {
             reject(
               new Error(`Error on ${method} (id: ${sendId}): ${JSON.stringify(message.error)}`)
@@ -455,9 +570,9 @@ export class WebSocketChannel {
    * @param ref internal usage, only for managed subscriptions
    */
   public async unsubscribe(subscriptionId: SUBSCRIPTION_ID, ref?: string) {
-    const status = (await this.sendReceive('starknet_unsubscribe', {
+    const status = await this.sendReceive<boolean>('starknet_unsubscribe', {
       subscription_id: subscriptionId,
-    })) as boolean;
+    });
     if (status) {
       if (ref) {
         this.subscriptions.delete(ref);
@@ -553,62 +668,25 @@ export class WebSocketChannel {
 
   private onMessageProxy(event: MessageEvent<any>) {
     const message: WebSocketEvent = JSON.parse(event.data);
-    const eventName = message.method as keyof WebSocketEvents;
+    const eventName = message.method; // This is a string, like 'starknet_subscriptionNewHeads'
+    const eventData = message.params as { result: any; subscription_id: SUBSCRIPTION_ID }; // This is the data payload
 
-    switch (eventName) {
-      case 'starknet_subscriptionReorg':
-        {
-          const data = message.params as SubscriptionReorgResponse;
-          if (this.onReorgHandler) {
-            this.onReorgHandler(data);
-          } else {
-            this.reorgBuffer.push(data);
-          }
-        }
-        break;
-      case 'starknet_subscriptionNewHeads':
-        {
-          const data = message.params as SubscriptionNewHeadsResponse;
-          if (this.onNewHeadsHandler) {
-            this.onNewHeadsHandler(data);
-          } else {
-            this.newHeadsBuffer.push(data);
-          }
-        }
-        break;
-      case 'starknet_subscriptionEvents':
-        {
-          const data = message.params as SubscriptionEventsResponse;
-          if (this.onEventsHandler) {
-            this.onEventsHandler(data);
-          } else {
-            this.eventsBuffer.push(data);
-          }
-        }
-        break;
-      case 'starknet_subscriptionTransactionStatus':
-        {
-          const data = message.params as SubscriptionTransactionsStatusResponse;
-          if (this.onTransactionStatusHandler) {
-            this.onTransactionStatusHandler(data);
-          } else {
-            this.transactionStatusBuffer.push(data);
-          }
-        }
-        break;
-      case 'starknet_subscriptionPendingTransactions':
-        {
-          const data = message.params as SubscriptionPendingTransactionsResponse;
-          if (this.onPendingTransactionHandler) {
-            this.onPendingTransactionHandler(data);
-          } else {
-            this.pendingTransactionBuffer.push(data);
-          }
-        }
-        break;
-      default:
-        break;
+    const handler = this.eventHandlers.get(eventName);
+
+    if (handler) {
+      handler(eventData.result, eventData.subscription_id); // Call the stored (bound) handler
+    } else if (WebSocketChannel.KNOWN_EVENT_METHODS.includes(eventName)) {
+      // If no handler is currently attached, but it's a known event type, buffer it.
+      if (this.genericEventBuffer.length >= this.maxBufferSize) {
+        const droppedEvent = this.genericEventBuffer.shift(); // Remove the oldest
+        logger.warn(
+          `WebSocketChannel: Buffer full (max size: ${this.maxBufferSize}). Dropped oldest event of type: ${droppedEvent?.type}`
+        );
+      }
+      this.genericEventBuffer.push({ type: eventName, data: eventData });
     }
+
+    // Call the general onMessage handler if provided by the user, for all messages.
     this.onMessage(event);
   }
 
@@ -619,9 +697,9 @@ export class WebSocketChannel {
   public subscribeNewHeadsUnmanaged(blockIdentifier?: SubscriptionBlockIdentifier) {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
 
-    return this.sendReceive('starknet_subscribeNewHeads', {
+    return this.sendReceive<SUBSCRIPTION_ID>('starknet_subscribeNewHeads', {
       ...{ block_id },
-    }) as Promise<SUBSCRIPTION_ID>;
+    });
   }
 
   /**
@@ -653,11 +731,11 @@ export class WebSocketChannel {
     blockIdentifier?: SubscriptionBlockIdentifier
   ) {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
-    return this.sendReceive('starknet_subscribeEvents', {
+    return this.sendReceive<SUBSCRIPTION_ID>('starknet_subscribeEvents', {
       ...{ from_address: fromAddress !== undefined ? toHex(fromAddress) : undefined },
       ...{ keys },
       ...{ block_id },
-    }) as Promise<SUBSCRIPTION_ID>;
+    });
   }
 
   /**
@@ -694,10 +772,10 @@ export class WebSocketChannel {
   ) {
     const transaction_hash = toHex(transactionHash);
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
-    return this.sendReceive('starknet_subscribeTransactionStatus', {
+    return this.sendReceive<SUBSCRIPTION_ID>('starknet_subscribeTransactionStatus', {
       transaction_hash,
       ...{ block_id },
-    }) as Promise<SUBSCRIPTION_ID>;
+    });
   }
 
   /**
@@ -727,12 +805,12 @@ export class WebSocketChannel {
     transactionDetails?: boolean,
     senderAddress?: BigNumberish[]
   ) {
-    return this.sendReceive('starknet_subscribePendingTransactions', {
+    return this.sendReceive<SUBSCRIPTION_ID>('starknet_subscribePendingTransactions', {
       ...{ transaction_details: transactionDetails },
       ...{
         sender_address: senderAddress && bigNumberishArrayToHexadecimalStringArray(senderAddress),
       },
-    }) as Promise<SUBSCRIPTION_ID>;
+    });
   }
 
   /**
