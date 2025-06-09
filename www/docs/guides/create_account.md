@@ -170,7 +170,7 @@ More complicated, a Braavos account needs a proxy and a specific signature. Star
 We will deploy hereunder a Braavos account in Devnet (use at least v0.3.0). So launch `starknet-devnet` with these parameters:
 
 ```bash
-starknet-devnet --seed 0 --fork-network 'https://free-rpc.nethermind.io/sepolia-juno/v0_8'
+starknet-devnet --seed 0 --fork-network 'https://starknet-sepolia.public.blastapi.io/rpc/v0_8'
 ```
 
 Initialization:

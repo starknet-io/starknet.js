@@ -58,7 +58,7 @@ export function getBraavosSignature(
 ): string[] {
   let txnHash: string = '';
   const det = details as V3DeployAccountSignerDetails;
-  const v3det = stark.v3Details(det, '0.8');
+  const v3det = stark.v3Details(det, '0.8.1');
   txnHash = hash.calculateDeployAccountTransactionHash({
     contractAddress: det.contractAddress,
     classHash: det.classHash,
