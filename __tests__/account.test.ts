@@ -3,6 +3,7 @@ import {
   Account,
   AllowArray,
   Call,
+  CallData,
   Contract,
   DeclareDeployUDCResponse,
   Provider,
@@ -41,6 +42,7 @@ describe('deploy and test Wallet', () => {
   let account: Account;
   let erc20: Contract;
   let erc20Address: string;
+  // let erc20ClassH: string;
   let dapp: Contract;
   let dd: DeclareDeployUDCResponse;
 
@@ -49,16 +51,35 @@ describe('deploy and test Wallet', () => {
 
     provider = new Provider(await createTestProvider());
     account = getTestAccount(provider);
+    console.log(account);
     expect(account).toBeInstanceOf(Account);
-
-    dd = await account.declareAndDeploy({
-      contract: contracts.Erc20,
-      constructorCalldata: [
-        encodeShortString('Token'),
-        encodeShortString('ERC20'),
-        account.address,
-      ],
-    });
+    if (process.env.RPC_SPEC_VERSION === '0.7.1') {
+      dd = await account.declareAndDeploy({
+        // Cairo 0
+        contract: contracts.Erc20,
+        constructorCalldata: [
+          encodeShortString('Token'),
+          encodeShortString('ERC20'),
+          account.address,
+        ],
+      });
+      // erc20ClassH = erc20ClassHash;
+    } else {
+      const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
+      const constructor = erc20CallData.compile('constructor', {
+        name: 'Token',
+        symbol: 'ERC20',
+        fixed_supply: 1000n,
+        recipient: account.address,
+      });
+      dd = await account.declareAndDeploy({
+        // Cairo 1
+        contract: contracts.Erc20OZ.sierra,
+        casm: contracts.Erc20OZ.casm,
+        constructorCalldata: constructor,
+      });
+      // erc20ClassH = num.toHex(dd.declare.class_hash);
+    }
 
     erc20Address = dd.deploy.contract_address;
     erc20 = new Contract(contracts.Erc20.abi, erc20Address, provider);
@@ -66,10 +87,19 @@ describe('deploy and test Wallet', () => {
     const { balance } = await erc20.balanceOf(account.address);
     expect(BigInt(balance.low).toString()).toStrictEqual(BigInt(1000).toString());
 
-    const dappResponse = await account.declareAndDeploy({
-      contract: contracts.TestDapp,
-      classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
-    });
+    let dappResponse: DeclareDeployUDCResponse;
+    if (process.env.RPC_SPEC_VERSION === '0.7.1') {
+      dappResponse = await account.declareAndDeploy({
+        contract: contracts.TestDapp,
+        classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
+      });
+    } else {
+      dappResponse = await account.declareAndDeploy({
+        // Cairo 1
+        contract: contracts.C1v2.sierra,
+        casm: contracts.C1v2.casm,
+      });
+    }
 
     dapp = new Contract(contracts.TestDapp.abi, dappResponse.deploy.contract_address!, provider);
   });

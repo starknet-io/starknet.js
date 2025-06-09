@@ -49,7 +49,7 @@ const compiledContracts = {
   TestDapp: readContract('TestDapp'),
   ComplexSierra: readContractSierra('cairo/complexInput/complexInput'),
   // cairo/
-  Erc20OZ: 'ERC20-241/ERC20OZ081',
+  Erc20OZ: 'cairo264/ERC20OZ014',
   HashSierra: 'hash/hash',
   HelloSierra: 'helloSierra/hello',
   C1v2: 'helloCairo2/compiled',
@@ -81,7 +81,7 @@ const compiledContracts = {
 };
 export const contracts = mapContractSets(compiledContracts);
 
-config.set('logLevel', 'DEBUG');
+config.set('logLevel', 'ERROR');
 
 export function getTestProvider(
   isProvider?: true,
@@ -132,6 +132,7 @@ export async function createTestProvider(
 }
 
 export const TEST_TX_VERSION = process.env.TX_VERSION as SupportedTransactionVersion;
+console.log({ TEST_TX_VERSION });
 export const { TEST_WS_URL } = process.env;
 
 export const getTestAccount = (
@@ -182,7 +183,10 @@ export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
 export const describeIfNotDevnet = describeIf(process.env.IS_DEVNET === 'false');
 export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
 export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
-export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
+export const describeIfRpc081 = describeIf(process.env.RPC_SPEC_VERSION === '0.8.1');
+export const describeIfRpc071 = describeIf(process.env.RPC_SPEC_VERSION === '0.7.1');
+export const erc20ClassHash: string =
+  '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a'; // Cairo 0
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';
 export const ETHtokenAddress = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';
 export const STRKtokenAddress =
