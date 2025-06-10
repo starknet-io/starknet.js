@@ -18,7 +18,7 @@ Websocket Channel implements specification methods defined by [@starknet-io/type
 ### Import
 
 ```typescript
-import { WebSocketChannel } from 'starknet';
+import { WebSocketChannel, Subscription } from 'starknet';
 ```
 
 ### Create instance
@@ -27,6 +27,7 @@ import { WebSocketChannel } from 'starknet';
 // create new ws channel
 const webSocketChannel = new WebSocketChannel({
   nodeUrl: 'wss://sepolia-pathfinder-rpc.server.io/rpc/v0_8',
+  maxBufferSize: 200, // Optional: default is 1000
 });
 
 // ensure ws channel is open
@@ -47,25 +48,43 @@ const webSocketChannel = new WebSocketChannel({
 
 ### Usage
 
-```typescript
-// subscribe to event
-await webSocketChannel.subscribeNewHeads();
+When you call a subscription method like `subscribeNewHeads`, it now returns a `Promise` that resolves with a `Subscription` object. This object is your handle to that specific subscription.
 
-// define listener method
-webSocketChannel.onNewHeads = async function (data) {
-  //... on event new head data
-};
+You can attach a listener to it using the `.on()` method and stop listening with the `.unsubscribe()` method. This new model allows you to have multiple, independent subscriptions to the same type of event.
+
+Here is a complete example:
+
+```typescript
+// 1. Subscribe to an event. This returns a Subscription object.
+const subscription = await webSocketChannel.subscribeNewHeads();
+
+// 2. Attach a handler to the `.on()` method to process incoming events.
+subscription.on((data) => {
+  console.log('New Head:', data);
+  // After receiving one event, we can choose to unsubscribe.
+  unsubscribeFromEvents();
+});
+
+// 3. To stop receiving events, call the .unsubscribe() method.
+async function unsubscribeFromEvents() {
+  const success = await subscription.unsubscribe();
+  console.log('Unsubscribed successfully:', success);
+}
 ```
 
-Available subscriptions are:
+### Buffering
 
-- subscribeNewHeads
-- subscribeEvents
-- subscribeTransactionStatus
-- subscribePendingTransaction
+If you subscribe to an event but don't attach a handler with `.on()` immediately, the `Subscription` object will buffer incoming events for you. When you eventually attach a handler, all buffered events will be passed to it in order before any new events are processed.
+
+To prevent memory overflow, the buffer has a maximum size. You can configure this with the `maxBufferSize` option in the `WebSocketChannel` constructor (default is 1000). If the buffer becomes full, the oldest events will be dropped.
+
+### Available Subscription Methods
+
+You can subscribe to different types of events using the following methods on the `WebSocketChannel` instance. Each returns a `Promise<Subscription>`.
+
+- `subscribeNewHeads`
+- `subscribeEvents`
+- `subscribeTransactionStatus`
+- `subscribePendingTransaction`
 
 Complete API can be found on [websocket API section](/docs/next/API/classes/WebSocketChannel)
-
-### Unmanaged subscriptions
-
-Websocket channel manage subscription id, but it is limited to one subscription per event type. If you need multiple subscriptions of the same type use \*Unmanaged methods and handle subscriptions manually.

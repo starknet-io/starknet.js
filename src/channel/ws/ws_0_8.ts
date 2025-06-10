@@ -12,13 +12,6 @@ import { config } from '../../global/config';
 import { logger } from '../../global/logger';
 import { Subscription } from './subscription';
 
-export const WSSubscriptions = {
-  NEW_HEADS: 'newHeads',
-  EVENTS: 'events',
-  TRANSACTION_STATUS: 'transactionStatus',
-  PENDING_TRANSACTION: 'pendingTransactions',
-} as const;
-
 export type WebSocketOptions = {
   /**
    * websocket node url address
@@ -330,10 +323,6 @@ export class WebSocketChannel {
     this.websocket.addEventListener('close', this.onCloseProxy.bind(this));
     this.websocket.addEventListener('message', this.onMessageProxy.bind(this));
     this.websocket.addEventListener('error', this.onError.bind(this));
-  }
-
-  private reconnectAndUpdate() {
-    this.reconnect();
   }
 
   private onCloseProxy(ev: CloseEvent) {
