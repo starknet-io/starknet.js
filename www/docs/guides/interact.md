@@ -107,7 +107,7 @@ console.log('Final balance =', bal2);
 
 You need to be connected to a node using RPC 0.7:
 
-- Define `specVersion: '0.7'` when instantiating an RpcProvider
+- Define `specVersion: '0.7.1'` when instantiating an RpcProvider
 - Use `config.set('legacyMode', true)` to enable **V1** transactions (ETH fees)
 - Use `logger.setLogLevel('ERROR')` if you want to remove the warnings when processing **V1** transactions
 
@@ -115,8 +115,8 @@ You need to be connected to a node using RPC 0.7:
 import { RpcProvider, Account, config, logger, ETransactionVersion } from 'starknet';
 
 const myProvider = new RpcProvider({
-  nodeUrl: 'https://free-rpc.nethermind.io/sepolia-juno/v0_7',
-  specVersion: '0.7',
+  nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
+  specVersion: '0.7.1',
 });
 
 config.set('legacyMode', true);

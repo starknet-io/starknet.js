@@ -36,7 +36,7 @@ Instantiating a new `WalletAccount`:
 ```typescript
 import { connect } from '@starknet-io/get-starknet'; // v4.0.3 min
 import { WalletAccount, wallet } from 'starknet'; // v7.0.1 min
-const myFrontendProviderUrl = 'https://free-rpc.nethermind.io/sepolia-juno/v0_8';
+const myFrontendProviderUrl = 'https://starknet-sepolia.public.blastapi.io/rpc/v0_8';
 // standard UI to select a wallet:
 const selectedWalletSWO = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
 const myWalletAccount = await WalletAccount.connect(
