@@ -2,89 +2,137 @@
 sidebar_position: 3
 ---
 
-# Channel (WebSocket, Rpc)
+# WebSocket Channel
 
-Channel is the lowest purest object you can use to interact with the network.
-Channel represent implementation of the Starknet specification in it's strictly defined form.
+The `WebSocketChannel` provides a robust, real-time connection to a Starknet RPC Node, enabling you to subscribe to events and receive updates as they happen. It's designed for production use with features like automatic reconnection, request queueing, and a modern subscription management API.
 
-## WebSocket Channel
+Ensure that you are using a node that supports the required RPC spec (e.g., v0.8.0).
 
-WebSocket channel provide convenient way to establish websocket connection to the [Starknet RPC Node](https://www.starknet.io/fullnodes-rpc-services/).
+## Key Features
 
-Ensure that you are using node supporting the required RPC spec >= v0.8.0. Details regarding Starknet Nodes and supported RPC versions could be found on each node github/page.
+- **Modern API**: Uses a `Subscription` object to manage event streams.
+- **Automatic Reconnection**: Automatically detects connection drops and reconnects with an exponential backoff strategy.
+- **Request Queueing**: Queues any requests made while the connection is down and executes them upon reconnection.
+- **Event Buffering**: Buffers events for a subscription if no handler is attached, preventing event loss.
+- **Custom Errors**: Throws specific, catchable errors like `TimeoutError` for more reliable error handling.
 
-Websocket Channel implements specification methods defined by [@starknet-io/types-js](https://github.com/starknet-io/types-js/blob/b7d38ca30a1def28e89370068efff81b3a3062b7/src/api/methods.ts#L421)
+## Importing
 
-### Import
+To get started, import the necessary classes and types from the `starknet` library.
 
 ```typescript
-import { WebSocketChannel, Subscription } from 'starknet';
+import {
+  WebSocketChannel,
+  WebSocketOptions,
+  Subscription,
+  TimeoutError,
+  WebSocketNotConnectedError,
+} from 'starknet';
 ```
 
-### Create instance
+## Creating a WebSocket Channel
+
+Instantiate `WebSocketChannel` with your node's WebSocket URL.
 
 ```typescript
-// create new ws channel
-const webSocketChannel = new WebSocketChannel({
-  nodeUrl: 'wss://sepolia-pathfinder-rpc.server.io/rpc/v0_8',
-  maxBufferSize: 200, // Optional: default is 1000
+const channel = new WebSocketChannel({
+  nodeUrl: 'wss://your-starknet-node/rpc/v0_8',
 });
 
-// ensure ws channel is open
-await webSocketChannel.waitForConnection();
-
-// ... use webSocketChannel
+// It's good practice to wait for the initial connection
+await channel.waitForConnection();
 ```
 
-If the environment doesn't have a detectable global `WebSocket`, an appropriate `WebSocket` implementation should be used and set with the `websocket` constructor parameter.
+If you are in an environment without a native `WebSocket` object (like Node.js), you can provide a custom implementation (e.g., from the `ws` library).
 
 ```typescript
-import { WebSocket } from 'ws';
+import WebSocket from 'ws';
 
-const webSocketChannel = new WebSocketChannel({
-  websocket: new WebSocket('wss://sepolia-pathfinder-rpc.server.io/rpc/v0_8'),
+const channel = new WebSocketChannel({
+  nodeUrl: '...',
+  websocket: WebSocket, // Provide the implementation class
 });
 ```
 
-### Usage
+### Advanced Configuration
 
-When you call a subscription method like `subscribeNewHeads`, it now returns a `Promise` that resolves with a `Subscription` object. This object is your handle to that specific subscription.
-
-You can attach a listener to it using the `.on()` method and stop listening with the `.unsubscribe()` method. This new model allows you to have multiple, independent subscriptions to the same type of event.
-
-Here is a complete example:
+You can customize the channel's behavior with `WebSocketOptions`.
 
 ```typescript
-// 1. Subscribe to an event. This returns a Subscription object.
-const subscription = await webSocketChannel.subscribeNewHeads();
+const options: WebSocketOptions = {
+  nodeUrl: '...',
+  autoReconnect: true, // Default: true
+  reconnectOptions: {
+    retries: 5, // Default: 5
+    delay: 2000, // Default: 2000ms
+  },
+  requestTimeout: 60000, // Default: 60000ms
+  maxBufferSize: 1000, // Default: 1000 events per subscription
+};
 
-// 2. Attach a handler to the `.on()` method to process incoming events.
-subscription.on((data) => {
-  console.log('New Head:', data);
-  // After receiving one event, we can choose to unsubscribe.
-  unsubscribeFromEvents();
+const channel = new WebSocketChannel(options);
+```
+
+## Subscribing to Events
+
+When you call a subscription method (e.g., `subscribeNewHeads`), it returns a `Promise` that resolves with a `Subscription` object. This object is your handle to that specific event stream.
+
+You attach a listener with `.on()` and stop listening with `.unsubscribe()`.
+
+```typescript
+// 1. Subscribe to an event stream.
+const sub: Subscription<BLOCK_HEADER> = await channel.subscribeNewHeads();
+
+// 2. Attach a handler to process incoming data.
+sub.on((data) => {
+  console.log('Received new block header:', data.block_number);
 });
 
-// 3. To stop receiving events, call the .unsubscribe() method.
-async function unsubscribeFromEvents() {
-  const success = await subscription.unsubscribe();
-  console.log('Unsubscribed successfully:', success);
+// 3. When you're done, unsubscribe.
+// This is automatically handled if the channel disconnects and restores the subscription.
+// You only need to call this when you explicitly want to stop listening.
+await sub.unsubscribe();
+```
+
+### Event Buffering
+
+If you `await` a subscription but don't immediately attach an `.on()` handler, the `Subscription` object will buffer incoming events. Once you attach a handler, all buffered events will be delivered in order before any new events are processed. This prevents event loss during asynchronous setup.
+
+The buffer size is limited by `maxBufferSize` in the channel options. If the buffer is full, the oldest events are dropped.
+
+## Automatic Reconnection and Queueing
+
+The channel is designed to be resilient. If the connection drops, it will automatically try to reconnect. While reconnecting:
+
+- Any API calls (e.g., `sendReceive`, `subscribeNewHeads`) will be queued.
+- Once the connection is restored, the queue will be processed automatically.
+- All previously active subscriptions will be **automatically re-subscribed**. You do not need to manually handle this.
+
+## Error Handling
+
+The channel throws specific errors, allowing for precise error handling.
+
+```typescript
+try {
+  const result = await channel.sendReceive('starknet_chainId');
+} catch (e) {
+  if (e instanceof TimeoutError) {
+    console.error('The request timed out!');
+  } else if (e instanceof WebSocketNotConnectedError) {
+    console.error('The WebSocket is not connected.');
+  } else {
+    console.error('An unknown error occurred:', e);
+  }
 }
 ```
 
-### Buffering
+## Available Subscription Methods
 
-If you subscribe to an event but don't attach a handler with `.on()` immediately, the `Subscription` object will buffer incoming events for you. When you eventually attach a handler, all buffered events will be passed to it in order before any new events are processed.
-
-To prevent memory overflow, the buffer has a maximum size. You can configure this with the `maxBufferSize` option in the `WebSocketChannel` constructor (default is 1000). If the buffer becomes full, the oldest events will be dropped.
-
-### Available Subscription Methods
-
-You can subscribe to different types of events using the following methods on the `WebSocketChannel` instance. Each returns a `Promise<Subscription>`.
+Each of these methods returns a `Promise<Subscription>`.
 
 - `subscribeNewHeads`
 - `subscribeEvents`
 - `subscribeTransactionStatus`
 - `subscribePendingTransaction`
 
-Complete API can be found on [websocket API section](/docs/next/API/classes/WebSocketChannel)
+For more details, see the complete [API documentation](/docs/next/API/classes/WebSocketChannel).

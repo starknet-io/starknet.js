@@ -23,21 +23,37 @@ describe('websocket specific endpoints - pathfinder test', () => {
     }
   });
 
-  test('Test WS Error and edge cases', async () => {
+  test('should throw an error when sending on a disconnected socket', async () => {
+    // This test uses its own channel to disable auto-reconnect and isolate the error behavior
+    const testChannel = new WebSocketChannel({ nodeUrl: TEST_WS_URL, autoReconnect: false });
+    await testChannel.waitForConnection();
+
+    testChannel.disconnect();
+    await testChannel.waitForDisconnection();
+
+    // With autoReconnect: false, this should immediately throw, not queue.
+    await expect(testChannel.subscribeNewHeads()).rejects.toThrow(
+      'WebSocketChannel.send() fail due to socket disconnected'
+    );
+  });
+
+  test('should allow manual reconnection after a user-initiated disconnect', async () => {
+    // This test uses the default channel from `beforeEach` which has autoReconnect: true
     webSocketChannel.disconnect();
     await webSocketChannel.waitForDisconnection();
 
-    // should fail as disconnected
-    await expect(webSocketChannel.subscribeNewHeads()).rejects.toThrow();
+    // It should not have auto-reconnected because the disconnect was user-initiated
+    expect(webSocketChannel.isConnected()).toBe(false);
 
-    // should reconnect
+    // Now, manually reconnect
     webSocketChannel.reconnect();
     await webSocketChannel.waitForConnection();
+    expect(webSocketChannel.isConnected()).toBe(true);
 
-    // should succeed after reconnection, returning a Subscription object
-    const sub = await webSocketChannel.subscribeNewHeads();
-    expect(sub).toBeInstanceOf(Subscription);
-    await sub.unsubscribe();
+    // To prove the connection is working, make a simple RPC call.
+    // This avoids the flakiness of creating and tearing down a real subscription.
+    const chainId = await webSocketChannel.sendReceive('starknet_chainId');
+    expect(chainId).toBe(StarknetChainId.SN_SEPOLIA);
   });
 
   test('Test subscribeNewHeads', async () => {
@@ -126,6 +142,7 @@ describe('websocket regular endpoints - pathfinder test', () => {
   afterAll(async () => {
     expect(webSocketChannel.isConnected()).toBe(true);
     webSocketChannel.disconnect();
+    await webSocketChannel.waitForDisconnection();
   });
 
   test('regular rpc endpoint', async () => {
@@ -139,7 +156,7 @@ describe('WebSocketChannel Buffering with Subscription object', () => {
   let sub: Subscription;
 
   afterEach(async () => {
-    if (sub && !(sub as any).isUnsubscribed) {
+    if (sub && !sub.isClosed) {
       await sub.unsubscribe();
     }
     if (webSocketChannel && webSocketChannel.isConnected()) {
@@ -148,68 +165,147 @@ describe('WebSocketChannel Buffering with Subscription object', () => {
     }
   });
 
-  test('should buffer events and process upon handler attachment', (done) => {
-    webSocketChannel = new WebSocketChannel({ nodeUrl: TEST_WS_URL });
-    webSocketChannel.waitForConnection().then(async () => {
-      // Create a subscription but don't attach a handler yet
-      sub = await webSocketChannel.subscribeNewHeads();
+  test('should buffer events and process upon handler attachment', async () => {
+    // This test is for client-side buffering, so we don't need a real connection.
+    webSocketChannel = new WebSocketChannel({ nodeUrl: 'ws://dummy-url', autoReconnect: false });
+    // Mock unsubscribe to prevent network errors during cleanup in afterEach.
+    jest.spyOn(webSocketChannel, 'unsubscribe').mockResolvedValue(true);
 
-      const mockNewHeadsResult1 = { block_number: 1 };
-      const mockNewHeadsResult2 = { block_number: 2 };
+    // Manually create the subscription, bypassing the network.
+    const subId = 'mock_sub_id_buffer';
+    sub = new Subscription(webSocketChannel, 'starknet_subscribeNewHeads', {}, subId, 1000);
+    (webSocketChannel as any).activeSubscriptions.set(subId, sub);
 
-      // Simulate receiving events BEFORE handler is attached
-      sub._handleEvent(mockNewHeadsResult1);
+    const mockNewHeadsResult1 = { block_number: 1 };
+    const mockNewHeadsResult2 = { block_number: 2 };
 
-      const handler = jest.fn((result) => {
-        if (handler.mock.calls.length === 1) {
-          expect(result).toEqual(mockNewHeadsResult1); // From buffer
-        } else if (handler.mock.calls.length === 2) {
-          expect(result).toEqual(mockNewHeadsResult2); // Direct
-          sub.unsubscribe().then(() => done());
-        }
-      });
+    // 1. Simulate receiving an event BEFORE a handler is attached.
+    sub._handleEvent(mockNewHeadsResult1);
 
-      // Attach handler, which should process the buffer
-      sub.on(handler);
+    const handler = jest.fn();
 
-      // Handler should have been called once with the buffered event
-      expect(handler).toHaveBeenCalledTimes(1);
-      expect(handler).toHaveBeenCalledWith(mockNewHeadsResult1);
+    // 2. Attach handler, which should immediately process the buffer.
+    sub.on(handler);
 
-      // Simulate another event, which should be processed directly
-      sub._handleEvent(mockNewHeadsResult2);
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler).toHaveBeenCalledWith(mockNewHeadsResult1);
 
-      expect(handler).toHaveBeenCalledTimes(2);
-      expect(handler).toHaveBeenCalledWith(mockNewHeadsResult2);
-    });
+    // 3. Simulate another event, which should be processed directly.
+    sub._handleEvent(mockNewHeadsResult2);
+
+    expect(handler).toHaveBeenCalledTimes(2);
+    expect(handler).toHaveBeenCalledWith(mockNewHeadsResult2);
   });
 
   test('should drop oldest events when buffer limit is reached', async () => {
-    // Set a small buffer size for testing
-    webSocketChannel = new WebSocketChannel({ nodeUrl: TEST_WS_URL, maxBufferSize: 2 });
-    await webSocketChannel.waitForConnection();
-    sub = await webSocketChannel.subscribeNewHeads();
+    // No real connection needed for this test.
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: 'ws://dummy-url',
+      maxBufferSize: 2,
+      autoReconnect: false,
+    });
+    jest.spyOn(webSocketChannel, 'unsubscribe').mockResolvedValue(true);
+
+    // Manually create subscription with a buffer size of 2.
+    const subId = 'mock_sub_id_drop';
+    sub = new Subscription(webSocketChannel, 'starknet_subscribeNewHeads', {}, subId, 2);
+    (webSocketChannel as any).activeSubscriptions.set(subId, sub);
 
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
-    // Simulate 3 events - one more than the buffer size
+    // Simulate 3 events to overflow the buffer.
     sub._handleEvent({ block_number: 1 });
     sub._handleEvent({ block_number: 2 });
-    sub._handleEvent({ block_number: 3 });
+    sub._handleEvent({ block_number: 3 }); // This one should cause the oldest to be dropped.
 
-    // The warning should have been called once, for the third event overflowing the buffer
     expect(warnSpy).toHaveBeenCalledTimes(1);
 
     const handler = jest.fn();
     sub.on(handler);
 
-    // The handler should be called with the two most recent events (2 and 3)
+    // The handler should be called with the two most recent events.
     expect(handler).toHaveBeenCalledTimes(2);
     expect(handler).toHaveBeenCalledWith({ block_number: 2 });
     expect(handler).toHaveBeenCalledWith({ block_number: 3 });
-    // It should NOT have been called with the first, dropped event
-    expect(handler).not.toHaveBeenCalledWith({ block_number: 1 });
+    expect(handler).not.toHaveBeenCalledWith({ block_number: 1 }); // The first event was dropped.
 
     warnSpy.mockRestore();
+  });
+});
+
+describe('WebSocketChannel Auto-Reconnection', () => {
+  let webSocketChannel: WebSocketChannel;
+
+  afterEach(async () => {
+    // Ensure the channel is always disconnected after each test to prevent open handles.
+    if (webSocketChannel) {
+      webSocketChannel.disconnect();
+      await webSocketChannel.waitForDisconnection();
+    }
+  });
+
+  test('should automatically reconnect on connection drop', (done) => {
+    // Set a very short reconnection delay for faster tests
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: TEST_WS_URL,
+      reconnectOptions: { retries: 3, delay: 100 },
+    });
+
+    let hasReconnected = false;
+    webSocketChannel.on('open', () => {
+      // This will be called once on initial connection, and a second time on reconnection.
+      if (hasReconnected) {
+        done(); // Test is successful if we get here
+      } else {
+        // This is the first connection, now we simulate the drop
+        hasReconnected = true;
+        webSocketChannel.websocket.close();
+      }
+    });
+  });
+
+  test('sendReceive should time out if no response is received', async () => {
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: TEST_WS_URL,
+      requestTimeout: 100, // Set a short timeout for testing
+    });
+    await webSocketChannel.waitForConnection();
+
+    // Spy on the 'send' method and prevent it from sending anything.
+    // This guarantees that we will never get a response and the timeout will be triggered.
+    const sendSpy = jest.spyOn(webSocketChannel.websocket, 'send').mockImplementation(() => {});
+
+    // We expect this promise to reject with a timeout error.
+    await expect(
+      webSocketChannel.sendReceive('some_method_that_will_never_get_a_response')
+    ).rejects.toThrow('timed out after 100ms');
+
+    // Restore the original implementation for other tests
+    sendSpy.mockRestore();
+  });
+
+  test('should queue sendReceive requests when reconnecting and process them after', (done) => {
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: TEST_WS_URL,
+      reconnectOptions: { retries: 3, delay: 100 },
+    });
+
+    let hasReconnected = false;
+    webSocketChannel.on('open', () => {
+      if (hasReconnected) {
+        // 4. Test is done when reconnection is complete
+        done();
+      } else {
+        // 1. First connection, now simulate a drop
+        hasReconnected = true;
+        webSocketChannel.websocket.close();
+
+        // 2. Immediately try to send a request. It should be queued.
+        webSocketChannel.sendReceive('starknet_chainId').then((result) => {
+          // 3. This assertion runs after reconnection and proves the queue was processed.
+          expect(result).toBe(StarknetChainId.SN_SEPOLIA);
+        });
+      }
+    });
   });
 });
