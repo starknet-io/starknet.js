@@ -7,14 +7,14 @@ import type { WebSocketChannel } from './ws_0_8';
  * Represents a single WebSocket subscription.
  * It allows attaching event handlers and unsubscribing.
  */
-export class Subscription {
+export class Subscription<T = any> {
   public readonly id: SUBSCRIPTION_ID;
 
   private readonly channel: WebSocketChannel;
 
-  private listeners: Array<(result: any) => void> = [];
+  private listeners: Array<(result: T) => void> = [];
 
-  private buffer: any[] = [];
+  private buffer: T[] = [];
 
   private isUnsubscribed = false;
 
@@ -32,7 +32,7 @@ export class Subscription {
    * @param result The event data
    * @internal
    */
-  public _handleEvent(result: any) {
+  public _handleEvent(result: T) {
     if (this.isUnsubscribed) return;
 
     if (this.listeners.length > 0) {
@@ -51,7 +51,7 @@ export class Subscription {
    * @param handler A function that will receive the event `result` object.
    * @returns The Subscription object, allowing for chaining.
    */
-  public on(handler: (result: any) => void) {
+  public on(handler: (result: T) => void) {
     if (this.isUnsubscribed) {
       throw new Error('Subscription has been unsubscribed.');
     }
@@ -69,14 +69,25 @@ export class Subscription {
    * @returns A promise that resolves to `true` if the unsubscription was successful.
    */
   public async unsubscribe(): Promise<boolean> {
-    if (this.isUnsubscribed) return true;
-    const success = await this.channel.unsubscribe(this.id);
-    if (success) {
-      this.isUnsubscribed = true;
-      this.listeners = []; // Clear listeners
-      this.buffer = []; // Clear buffer
-      this.channel.removeSubscription(this.id); // Notify channel to remove it
+    if (this.isUnsubscribed) {
+      return true;
     }
-    return success;
+
+    // Immediately mark as unsubscribed and clean up local resources
+    // to prevent memory leaks, regardless of the server's response.
+    this.isUnsubscribed = true;
+    this.listeners = [];
+    this.buffer = [];
+    this.channel.removeSubscription(this.id); // Notify channel to remove it
+
+    try {
+      // Attempt to inform the server, but the client-side cleanup is already done.
+      const success = await this.channel.unsubscribe(this.id);
+      return success;
+    } catch (error) {
+      logger.error(`Error unsubscribing from subscription ${this.id}:`, error);
+      // Return false as the server-side unsubscription failed.
+      return false;
+    }
   }
 }

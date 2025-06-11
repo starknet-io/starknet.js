@@ -1,5 +1,12 @@
 /* eslint-disable no-underscore-dangle */
-import type { SUBSCRIPTION_ID } from '@starknet-io/starknet-types-08';
+import type {
+  BLOCK_HEADER,
+  EMITTED_EVENT,
+  NEW_TXN_STATUS,
+  SUBSCRIPTION_ID,
+  TXN_HASH,
+  TXN_WITH_HASH,
+} from '@starknet-io/starknet-types-08';
 
 import { BigNumberish, SubscriptionBlockIdentifier } from '../../types';
 import { JRPC } from '../../types/api';
@@ -50,7 +57,7 @@ export class WebSocketChannel {
   public websocket: WebSocket;
 
   // Map of active subscriptions, keyed by their ID.
-  private activeSubscriptions: Map<SUBSCRIPTION_ID, Subscription> = new Map();
+  private activeSubscriptions: Map<SUBSCRIPTION_ID, Subscription<any>> = new Map();
 
   private readonly maxBufferSize: number;
 
@@ -338,7 +345,15 @@ export class WebSocketChannel {
   }
 
   private onMessageProxy(event: MessageEvent<any>) {
-    const message: WebSocketEvent = JSON.parse(event.data);
+    let message: WebSocketEvent;
+    try {
+      message = JSON.parse(event.data);
+    } catch (error) {
+      logger.error(
+        `WebSocketChannel: Error parsing incoming message: ${event.data}, Error: ${error}`
+      );
+      return; // Stop processing this malformed message
+    }
 
     // Check if it's a subscription event
     if (
@@ -372,7 +387,7 @@ export class WebSocketChannel {
    */
   public async subscribeNewHeads(
     blockIdentifier?: SubscriptionBlockIdentifier
-  ): Promise<Subscription> {
+  ): Promise<Subscription<BLOCK_HEADER>> {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
     const subId = await this.sendReceive<SUBSCRIPTION_ID>('starknet_subscribeNewHeads', {
       ...{ block_id },
@@ -389,7 +404,7 @@ export class WebSocketChannel {
     fromAddress?: BigNumberish,
     keys?: string[][],
     blockIdentifier?: SubscriptionBlockIdentifier
-  ): Promise<Subscription> {
+  ): Promise<Subscription<EMITTED_EVENT>> {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
     const subId = await this.sendReceive<SUBSCRIPTION_ID>('starknet_subscribeEvents', {
       ...{ from_address: fromAddress !== undefined ? toHex(fromAddress) : undefined },
@@ -407,7 +422,7 @@ export class WebSocketChannel {
   public async subscribeTransactionStatus(
     transactionHash: BigNumberish,
     blockIdentifier?: SubscriptionBlockIdentifier
-  ): Promise<Subscription> {
+  ): Promise<Subscription<NEW_TXN_STATUS>> {
     const transaction_hash = toHex(transactionHash);
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
     const subId = await this.sendReceive<SUBSCRIPTION_ID>('starknet_subscribeTransactionStatus', {
@@ -425,7 +440,7 @@ export class WebSocketChannel {
   public async subscribePendingTransaction(
     transactionDetails?: boolean,
     senderAddress?: BigNumberish[]
-  ): Promise<Subscription> {
+  ): Promise<Subscription<TXN_HASH | TXN_WITH_HASH>> {
     const subId = await this.sendReceive<SUBSCRIPTION_ID>('starknet_subscribePendingTransactions', {
       ...{ transaction_details: transactionDetails },
       ...{
