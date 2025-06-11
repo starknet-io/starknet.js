@@ -55,33 +55,64 @@ export class WebSocketChannel {
   private readonly maxBufferSize: number;
 
   /**
-   * Assign implementation to this method to listen open Event
+   * An array of listeners to be called when the WebSocket connection is opened.
+   * This is useful for monitoring the connection's health and state.
+   * @example
+   * ```typescript
+   * webSocketChannel.onOpen.push((ev) => console.log('Connection opened!', ev));
+   * ```
    */
-  public onOpen: (this: WebSocketChannel, ev: Event) => any = () => {};
+  public onOpen: Array<(this: WebSocketChannel, ev: Event) => any> = [];
 
   /**
-   * Assign implementation to this method to listen close CloseEvent
+   * An array of listeners to be called when the WebSocket connection is closed.
+   * This is useful for monitoring the connection's health and state.
+   * @example
+   * ```typescript
+   * webSocketChannel.onClose.push((ev) => console.log('Connection closed!', ev));
+   * ```
    */
-  public onClose: (this: WebSocketChannel, ev: CloseEvent) => any = () => {};
+  public onClose: Array<(this: WebSocketChannel, ev: CloseEvent) => any> = [];
 
   /**
-   * Assign implementation to this method to listen message MessageEvent
+   * An array of listeners for receiving ALL raw messages from the WebSocket.
+   * This is an advanced feature and not needed for standard RPC calls or subscriptions.
+   * Use this as an "escape hatch" for debugging or handling non-standard, custom node events.
+   * @example
+   * ```typescript
+   * webSocketChannel.onMessage.push((ev) => console.log('Raw message received:', ev.data));
+   * ```
    */
-  public onMessage: (this: WebSocketChannel, ev: MessageEvent<any>) => any = () => {};
+  public onMessage: Array<(this: WebSocketChannel, ev: MessageEvent<any>) => any> = [];
 
   /**
-   * Assign implementation to this method to listen error Event
+   * An array of listeners to be called when a WebSocket error occurs.
+   * This is useful for logging and reacting to connection failures.
+   * @example
+   * ```typescript
+   * webSocketChannel.onError.push((ev) => console.error('A WebSocket error occurred:', ev));
+   * ```
    */
-  public onError: (this: WebSocketChannel, ev: Event) => any = () => {};
+  public onError: Array<(this: WebSocketChannel, ev: Event) => any> = [];
 
   /**
-   * Assign implementation to this method to listen unsubscription
+   * An array of listeners to be called when a subscription is successfully unsubscribed.
+   * The listener will receive the ID of the unsubscribed subscription.
+   * @example
+   * ```typescript
+   * webSocketChannel.onUnsubscribe.push((id) => console.log(`Unsubscribed from ${id}`));
+   * ```
    */
-  public onUnsubscribe: (this: WebSocketChannel, _subscriptionId: SUBSCRIPTION_ID) => any =
-    () => {};
+  public onUnsubscribe: Array<(this: WebSocketChannel, _subscriptionId: SUBSCRIPTION_ID) => any> =
+    [];
 
-  private onUnsubscribeLocal: (this: WebSocketChannel, _subscriptionId: SUBSCRIPTION_ID) => any =
-    () => {};
+  private openListener = (ev: Event) => this.onOpen.forEach((h) => h.call(this, ev));
+
+  private closeListener = this.onCloseProxy.bind(this);
+
+  private messageListener = this.onMessageProxy.bind(this);
+
+  private errorListener = (ev: Event) => this.onError.forEach((h) => h.call(this, ev));
 
   /**
    * JSON RPC latest sent message id
@@ -100,10 +131,10 @@ export class WebSocketChannel {
     this.websocket = options.websocket || config.get('websocket') || new WebSocket(nodeUrl);
     this.maxBufferSize = options.maxBufferSize ?? 1000;
 
-    this.websocket.addEventListener('open', this.onOpen.bind(this));
-    this.websocket.addEventListener('close', this.onCloseProxy.bind(this));
-    this.websocket.addEventListener('message', this.onMessageProxy.bind(this));
-    this.websocket.addEventListener('error', this.onError.bind(this));
+    this.websocket.addEventListener('open', this.openListener);
+    this.websocket.addEventListener('close', this.closeListener);
+    this.websocket.addEventListener('message', this.messageListener);
+    this.websocket.addEventListener('error', this.errorListener);
   }
 
   private idResolver(id?: number) {
@@ -260,56 +291,29 @@ export class WebSocketChannel {
       subscription_id: subscriptionId,
     });
     if (status) {
-      this.onUnsubscribeLocal(subscriptionId);
-      this.onUnsubscribe(subscriptionId);
+      this.onUnsubscribe.forEach((h) => h.call(this, subscriptionId));
     }
     return status;
   }
 
   /**
    * await while subscription is unsubscribed
-   * @param forSubscriptionId if defined trigger on subscriptionId else trigger on any
-   * @returns subscriptionId | onerror(Event)
+   * @param targetId The ID of the subscription to wait for.
    * @example
    * ```typescript
-   * const subscriptionId = await webSocketChannel.waitForUnsubscription();
+   * await webSocketChannel.waitForUnsubscription(subscription.id);
    * ```
    */
-  public async waitForUnsubscription(forSubscriptionId?: SUBSCRIPTION_ID) {
-    // Wait for unsubscription event
-    return new Promise((resolve, reject) => {
-      if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
-        reject(new Error('WebSocket not available or not open. Cannot wait for unsubscription.'));
-        return;
-      }
-
-      let localOnError: (event: Event) => void;
-
-      const localOnUnsubscribe = (subscriptionId: SUBSCRIPTION_ID) => {
-        if (this.onUnsubscribeLocal === localOnUnsubscribe) {
-          this.websocket.removeEventListener('error', localOnError);
-
-          if (forSubscriptionId === undefined) {
-            resolve(subscriptionId);
-          } else if (subscriptionId === forSubscriptionId) {
-            resolve(subscriptionId);
-          }
+  public waitForUnsubscription(targetId: SUBSCRIPTION_ID): Promise<void> {
+    return new Promise((resolve) => {
+      const listener = (unsubId: SUBSCRIPTION_ID) => {
+        if (unsubId === targetId) {
+          // remove this specific listener from the array
+          this.onUnsubscribe = this.onUnsubscribe.filter((l) => l !== listener);
+          resolve();
         }
       };
-
-      localOnError = (event: Event) => {
-        if (this.onUnsubscribeLocal === localOnUnsubscribe) {
-          this.websocket.removeEventListener('error', localOnError);
-          reject(
-            new Error(
-              `WebSocket error while waiting for unsubscription of ${forSubscriptionId || 'any subscription'}: ${event.type || 'Unknown error'}`
-            )
-          );
-        }
-      };
-
-      this.onUnsubscribeLocal = localOnUnsubscribe;
-      this.websocket.addEventListener('error', localOnError);
+      this.onUnsubscribe.push(listener);
     });
   }
 
@@ -319,18 +323,18 @@ export class WebSocketChannel {
   public reconnect() {
     this.websocket = new WebSocket(this.nodeUrl);
 
-    this.websocket.addEventListener('open', this.onOpen.bind(this));
-    this.websocket.addEventListener('close', this.onCloseProxy.bind(this));
-    this.websocket.addEventListener('message', this.onMessageProxy.bind(this));
-    this.websocket.addEventListener('error', this.onError.bind(this));
+    this.websocket.addEventListener('open', this.openListener);
+    this.websocket.addEventListener('close', this.closeListener);
+    this.websocket.addEventListener('message', this.messageListener);
+    this.websocket.addEventListener('error', this.errorListener);
   }
 
   private onCloseProxy(ev: CloseEvent) {
-    this.websocket.removeEventListener('open', this.onOpen);
-    this.websocket.removeEventListener('close', this.onCloseProxy);
-    this.websocket.removeEventListener('message', this.onMessageProxy);
-    this.websocket.removeEventListener('error', this.onError);
-    this.onClose(ev);
+    this.websocket.removeEventListener('open', this.openListener);
+    this.websocket.removeEventListener('close', this.closeListener);
+    this.websocket.removeEventListener('message', this.messageListener);
+    this.websocket.removeEventListener('error', this.errorListener);
+    this.onClose.forEach((h) => h.call(this, ev));
   }
 
   private onMessageProxy(event: MessageEvent<any>) {
@@ -360,7 +364,7 @@ export class WebSocketChannel {
     }
 
     // Call the general onMessage handler if provided by the user, for all messages.
-    this.onMessage(event);
+    this.onMessage.forEach((h) => h.call(this, event));
   }
 
   /**
