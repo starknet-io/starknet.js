@@ -393,7 +393,7 @@ describe('validateFields', () => {
       expect(result).toBeUndefined();
     });
 
-    test('should throw an error if tupple validation fails', () => {
+    test('should throw an error if tuple validation fails', () => {
       const error = new Error(`Validate: arg test should be a tuple (defined as object)`);
 
       expect(() =>
@@ -635,7 +635,7 @@ describe('validateFields', () => {
       ).toThrow(error);
     });
 
-    test('should throw an error if value 0 iz provided for any uint type', () => {
+    test('should throw an error if value 0 is provided for any uint type', () => {
       const error = new Error('Validate: value 0 is not authorized in NonZero uint type.');
 
       expect(() =>
