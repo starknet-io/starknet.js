@@ -293,8 +293,7 @@ describe('WebSocketChannel Auto-Reconnection', () => {
     let hasReconnected = false;
     webSocketChannel.on('open', () => {
       if (hasReconnected) {
-        // 4. Test is done when reconnection is complete
-        done();
+        // Reconnected. The promise from the queued sendReceive will resolve now.
       } else {
         // 1. First connection, now simulate a drop
         hasReconnected = true;
@@ -302,10 +301,77 @@ describe('WebSocketChannel Auto-Reconnection', () => {
 
         // 2. Immediately try to send a request. It should be queued.
         webSocketChannel.sendReceive('starknet_chainId').then((result) => {
-          // 3. This assertion runs after reconnection and proves the queue was processed.
+          // 3. This assertion runs after reconnection, proving the queue was processed.
           expect(result).toBe(StarknetChainId.SN_SEPOLIA);
+          done(); // 4. Test is done when the queued request has been successfully processed.
         });
       }
+    });
+  });
+
+  test('should queue subscribe requests when reconnecting and process them after', (done) => {
+    jest.setTimeout(30000); // Allow time for reconnect and a new block event
+
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: TEST_WS_URL,
+      reconnectOptions: { retries: 3, delay: 100 },
+    });
+
+    let hasReconnected = false;
+    webSocketChannel.on('open', () => {
+      if (hasReconnected) {
+        // Reconnected. The promise from the queued subscribeNewHeads will resolve now.
+      } else {
+        // 1. First connection, now simulate a drop
+        hasReconnected = true;
+        webSocketChannel.websocket.close();
+
+        // 2. Immediately try to subscribe. The request should be queued.
+        webSocketChannel.subscribeNewHeads().then((sub) => {
+          // 3. This should only execute after reconnection.
+          expect(sub).toBeInstanceOf(Subscription);
+          expect(webSocketChannel.isConnected()).toBe(true);
+
+          // 4. To prove it's a real subscription, wait for one event.
+          sub.on((data) => {
+            expect(data).toBeDefined();
+            done();
+          });
+        });
+      }
+    });
+  });
+
+  test('should restore active subscriptions after an automatic reconnection', (done) => {
+    jest.setTimeout(30000); // Allow time for reconnect and new block
+
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: TEST_WS_URL,
+      reconnectOptions: { retries: 3, delay: 100 },
+    });
+
+    let connectionCount = 0;
+
+    const eventHandler = (data: any) => {
+      // The handler is called. If this is after the reconnection (connectionCount > 1),
+      // it proves the subscription was successfully restored.
+      if (connectionCount > 1) {
+        expect(data).toBeDefined();
+        done();
+      }
+    };
+
+    webSocketChannel.on('open', async () => {
+      connectionCount += 1;
+      if (connectionCount === 1) {
+        // First connection: set up the subscription
+        const sub = await webSocketChannel.subscribeNewHeads();
+        sub.on(eventHandler);
+        // Now, simulate a drop
+        webSocketChannel.websocket.close();
+      }
+      // On the second 'open' event (connectionCount === 2), the test will implicitly
+      // be waiting for the eventHandler to be called, which will resolve the test.
     });
   });
 });
