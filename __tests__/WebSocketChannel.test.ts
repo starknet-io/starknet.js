@@ -1,8 +1,7 @@
-import { Provider, WSSubscriptions, WebSocketChannel } from '../src';
+/* eslint-disable no-underscore-dangle */
+import { Provider, Subscription, WebSocketChannel } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { getTestAccount, getTestProvider, STRKtokenAddress, TEST_WS_URL } from './config/fixtures';
-
-const nodeUrl = 'wss://sepolia-pathfinder-rpc.spaceshard.io/rpc/v0_8';
 
 describe('websocket specific endpoints - pathfinder test', () => {
   // account provider
@@ -12,110 +11,99 @@ describe('websocket specific endpoints - pathfinder test', () => {
   // websocket
   let webSocketChannel: WebSocketChannel;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     webSocketChannel = new WebSocketChannel({ nodeUrl: TEST_WS_URL });
-    expect(webSocketChannel.isConnected()).toBe(false);
-    try {
-      await webSocketChannel.waitForConnection();
-    } catch (error: any) {
-      console.log(error.message);
+    await webSocketChannel.waitForConnection();
+  });
+
+  afterEach(async () => {
+    if (webSocketChannel.isConnected()) {
+      webSocketChannel.disconnect();
+      await webSocketChannel.waitForDisconnection();
     }
-    expect(webSocketChannel.isConnected()).toBe(true);
   });
 
-  afterAll(async () => {
-    expect(webSocketChannel.isConnected()).toBe(true);
-    webSocketChannel.disconnect();
-    await expect(webSocketChannel.waitForDisconnection()).resolves.toBe(WebSocket.CLOSED);
+  test('should throw an error when sending on a disconnected socket', async () => {
+    // This test uses its own channel to disable auto-reconnect and isolate the error behavior
+    const testChannel = new WebSocketChannel({ nodeUrl: TEST_WS_URL, autoReconnect: false });
+    await testChannel.waitForConnection();
+
+    testChannel.disconnect();
+    await testChannel.waitForDisconnection();
+
+    // With autoReconnect: false, this should immediately throw, not queue.
+    await expect(testChannel.subscribeNewHeads()).rejects.toThrow(
+      'WebSocketChannel.send() fail due to socket disconnected'
+    );
   });
 
-  test('Test WS Error and edge cases', async () => {
+  test('should allow manual reconnection after a user-initiated disconnect', async () => {
+    // This test uses the default channel from `beforeEach` which has autoReconnect: true
     webSocketChannel.disconnect();
+    await webSocketChannel.waitForDisconnection();
 
-    // should fail as disconnected
-    await expect(webSocketChannel.subscribeNewHeads()).rejects.toThrow();
+    // It should not have auto-reconnected because the disconnect was user-initiated
+    expect(webSocketChannel.isConnected()).toBe(false);
 
-    // should reconnect
+    // Now, manually reconnect
     webSocketChannel.reconnect();
     await webSocketChannel.waitForConnection();
+    expect(webSocketChannel.isConnected()).toBe(true);
 
-    // should succeed after reconnection
-    await expect(webSocketChannel.subscribeNewHeads()).resolves.toEqual(expect.any(Number));
-
-    // should fail because already subscribed
-    await expect(webSocketChannel.subscribeNewHeads()).resolves.toBe(false);
-  });
-
-  test('onUnsubscribe with unsubscribeNewHeads', async () => {
-    const mockOnUnsubscribe = jest.fn().mockImplementation((subId: number) => {
-      expect(subId).toEqual(expect.any(Number));
-    });
-    webSocketChannel.onUnsubscribe = mockOnUnsubscribe;
-
-    await webSocketChannel.subscribeNewHeads();
-    await expect(webSocketChannel.unsubscribeNewHeads()).resolves.toBe(true);
-    await expect(webSocketChannel.unsubscribeNewHeads()).rejects.toThrow();
-
-    expect(mockOnUnsubscribe).toHaveBeenCalled();
-    expect(webSocketChannel.subscriptions.has(WSSubscriptions.NEW_HEADS)).toBeFalsy();
+    // To prove the connection is working, make a simple RPC call.
+    // This avoids the flakiness of creating and tearing down a real subscription.
+    const chainId = await webSocketChannel.sendReceive('starknet_chainId');
+    expect(chainId).toBe(StarknetChainId.SN_SEPOLIA);
   });
 
   test('Test subscribeNewHeads', async () => {
-    await webSocketChannel.subscribeNewHeads();
+    const sub = await webSocketChannel.subscribeNewHeads();
+    expect(sub).toBeInstanceOf(Subscription);
 
     let i = 0;
-    webSocketChannel.onNewHeads = async function (data) {
-      expect(this).toBeInstanceOf(WebSocketChannel);
+    sub.on(async (result) => {
       i += 1;
-      // TODO : Add data format validation
-      expect(data.result).toBeDefined();
+      expect(result).toBeDefined();
       if (i === 2) {
-        const status = await webSocketChannel.unsubscribeNewHeads();
+        const status = await sub.unsubscribe();
         expect(status).toBe(true);
       }
-    };
-    const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.NEW_HEADS);
-    const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
-    expect(subscriptionId).toBe(expectedId);
-    expect(webSocketChannel.subscriptions.get(WSSubscriptions.NEW_HEADS)).toBe(undefined);
+    });
+
+    await webSocketChannel.waitForUnsubscription(sub.id);
   });
 
   test('Test subscribeEvents', async () => {
-    await webSocketChannel.subscribeEvents();
+    const sub = await webSocketChannel.subscribeEvents();
+    expect(sub).toBeInstanceOf(Subscription);
 
     let i = 0;
-    webSocketChannel.onEvents = async (data) => {
+    sub.on(async (result) => {
       i += 1;
-      // TODO : Add data format validation
-      expect(data.result).toBeDefined();
+      expect(result).toBeDefined();
       if (i === 5) {
-        const status = await webSocketChannel.unsubscribeEvents();
+        const status = await sub.unsubscribe();
         expect(status).toBe(true);
       }
-    };
-    const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.EVENTS);
-    const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
-    expect(subscriptionId).toBe(expectedId);
-    expect(webSocketChannel.subscriptions.get(WSSubscriptions.EVENTS)).toBe(undefined);
+    });
+
+    await webSocketChannel.waitForUnsubscription(sub.id);
   });
 
   test('Test subscribePendingTransaction', async () => {
-    await webSocketChannel.subscribePendingTransaction(true);
+    const sub = await webSocketChannel.subscribePendingTransaction(true);
+    expect(sub).toBeInstanceOf(Subscription);
 
     let i = 0;
-    webSocketChannel.onPendingTransaction = async (data) => {
+    sub.on(async (result) => {
       i += 1;
-      // TODO : Add data format validation
-      expect(data.result).toBeDefined();
+      expect(result).toBeDefined();
       if (i === 5) {
-        const status = await webSocketChannel.unsubscribePendingTransaction();
+        const status = await sub.unsubscribe();
         expect(status).toBe(true);
       }
-    };
-    const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.PENDING_TRANSACTION);
-    const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
-    expect(subscriptionId).toBe(expectedId);
-    expect(webSocketChannel.subscriptions.get(WSSubscriptions.PENDING_TRANSACTION)).toBe(undefined);
+    });
+    await webSocketChannel.waitForUnsubscription(sub.id);
   });
 
   test('Test subscribeTransactionStatus', async () => {
@@ -125,49 +113,19 @@ describe('websocket specific endpoints - pathfinder test', () => {
       calldata: [account.address, '10', '0'],
     });
 
+    const sub = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
+    expect(sub).toBeInstanceOf(Subscription);
+
     let i = 0;
-    webSocketChannel.onTransactionStatus = async (data) => {
+    sub.on(async (result) => {
       i += 1;
-      // TODO : Add data format validation
-      expect(data.result).toBeDefined();
-      if (i >= 1) {
-        const status = await webSocketChannel.unsubscribeTransactionStatus();
+      expect(result).toBeDefined();
+      if (i >= 2) {
+        const status = await sub.unsubscribe();
         expect(status).toBe(true);
       }
-    };
-
-    const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
-    expect(subid).toEqual(expect.any(Number));
-    const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
-    const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
-    expect(subscriptionId).toEqual(expectedId);
-    expect(webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)).toBe(undefined);
-  });
-
-  test('Test subscribeTransactionStatus and block_id', async () => {
-    const { transaction_hash } = await account.execute({
-      contractAddress: STRKtokenAddress,
-      entrypoint: 'transfer',
-      calldata: [account.address, '10', '0'],
     });
-
-    let i = 0;
-    webSocketChannel.onTransactionStatus = async (data) => {
-      i += 1;
-      // TODO : Add data format validation
-      expect(data.result).toBeDefined();
-      if (i >= 1) {
-        const status = await webSocketChannel.unsubscribeTransactionStatus();
-        expect(status).toBe(true);
-      }
-    };
-
-    const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
-    expect(subid).toEqual(expect.any(Number));
-    const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
-    const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
-    expect(subscriptionId).toEqual(expectedId);
-    expect(webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)).toBe(undefined);
+    await webSocketChannel.waitForUnsubscription(sub.id);
   });
 });
 
@@ -175,7 +133,7 @@ describe('websocket regular endpoints - pathfinder test', () => {
   let webSocketChannel: WebSocketChannel;
 
   beforeAll(async () => {
-    webSocketChannel = new WebSocketChannel({ nodeUrl });
+    webSocketChannel = new WebSocketChannel({ nodeUrl: TEST_WS_URL });
     expect(webSocketChannel.isConnected()).toBe(false);
     const status = await webSocketChannel.waitForConnection();
     expect(status).toBe(WebSocket.OPEN);
@@ -184,10 +142,236 @@ describe('websocket regular endpoints - pathfinder test', () => {
   afterAll(async () => {
     expect(webSocketChannel.isConnected()).toBe(true);
     webSocketChannel.disconnect();
+    await webSocketChannel.waitForDisconnection();
   });
 
   test('regular rpc endpoint', async () => {
-    const response = await webSocketChannel.sendReceiveAny('starknet_chainId');
+    const response = await webSocketChannel.sendReceive('starknet_chainId');
     expect(response).toBe(StarknetChainId.SN_SEPOLIA);
+  });
+});
+
+describe('WebSocketChannel Buffering with Subscription object', () => {
+  let webSocketChannel: WebSocketChannel;
+  let sub: Subscription;
+
+  afterEach(async () => {
+    if (sub && !sub.isClosed) {
+      await sub.unsubscribe();
+    }
+    if (webSocketChannel && webSocketChannel.isConnected()) {
+      webSocketChannel.disconnect();
+      await webSocketChannel.waitForDisconnection();
+    }
+  });
+
+  test('should buffer events and process upon handler attachment', async () => {
+    // This test is for client-side buffering, so we don't need a real connection.
+    webSocketChannel = new WebSocketChannel({ nodeUrl: 'ws://dummy-url', autoReconnect: false });
+    // Mock unsubscribe to prevent network errors during cleanup in afterEach.
+    jest.spyOn(webSocketChannel, 'unsubscribe').mockResolvedValue(true);
+
+    // Manually create the subscription, bypassing the network.
+    const subId = 'mock_sub_id_buffer';
+    sub = new Subscription(webSocketChannel, 'starknet_subscribeNewHeads', {}, subId, 1000);
+    (webSocketChannel as any).activeSubscriptions.set(subId, sub);
+
+    const mockNewHeadsResult1 = { block_number: 1 };
+    const mockNewHeadsResult2 = { block_number: 2 };
+
+    // 1. Simulate receiving an event BEFORE a handler is attached.
+    sub._handleEvent(mockNewHeadsResult1);
+
+    const handler = jest.fn();
+
+    // 2. Attach handler, which should immediately process the buffer.
+    sub.on(handler);
+
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler).toHaveBeenCalledWith(mockNewHeadsResult1);
+
+    // 3. Simulate another event, which should be processed directly.
+    sub._handleEvent(mockNewHeadsResult2);
+
+    expect(handler).toHaveBeenCalledTimes(2);
+    expect(handler).toHaveBeenCalledWith(mockNewHeadsResult2);
+  });
+
+  test('should drop oldest events when buffer limit is reached', async () => {
+    // No real connection needed for this test.
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: 'ws://dummy-url',
+      maxBufferSize: 2,
+      autoReconnect: false,
+    });
+    jest.spyOn(webSocketChannel, 'unsubscribe').mockResolvedValue(true);
+
+    // Manually create subscription with a buffer size of 2.
+    const subId = 'mock_sub_id_drop';
+    sub = new Subscription(webSocketChannel, 'starknet_subscribeNewHeads', {}, subId, 2);
+    (webSocketChannel as any).activeSubscriptions.set(subId, sub);
+
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    // Simulate 3 events to overflow the buffer.
+    sub._handleEvent({ block_number: 1 });
+    sub._handleEvent({ block_number: 2 });
+    sub._handleEvent({ block_number: 3 }); // This one should cause the oldest to be dropped.
+
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+
+    const handler = jest.fn();
+    sub.on(handler);
+
+    // The handler should be called with the two most recent events.
+    expect(handler).toHaveBeenCalledTimes(2);
+    expect(handler).toHaveBeenCalledWith({ block_number: 2 });
+    expect(handler).toHaveBeenCalledWith({ block_number: 3 });
+    expect(handler).not.toHaveBeenCalledWith({ block_number: 1 }); // The first event was dropped.
+
+    warnSpy.mockRestore();
+  });
+});
+
+describe('WebSocketChannel Auto-Reconnection', () => {
+  let webSocketChannel: WebSocketChannel;
+
+  afterEach(async () => {
+    // Ensure the channel is always disconnected after each test to prevent open handles.
+    if (webSocketChannel) {
+      webSocketChannel.disconnect();
+      await webSocketChannel.waitForDisconnection();
+    }
+  });
+
+  test('should automatically reconnect on connection drop', (done) => {
+    // Set a very short reconnection delay for faster tests
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: TEST_WS_URL,
+      reconnectOptions: { retries: 3, delay: 100 },
+    });
+
+    let hasReconnected = false;
+    webSocketChannel.on('open', () => {
+      // This will be called once on initial connection, and a second time on reconnection.
+      if (hasReconnected) {
+        done(); // Test is successful if we get here
+      } else {
+        // This is the first connection, now we simulate the drop
+        hasReconnected = true;
+        webSocketChannel.websocket.close();
+      }
+    });
+  });
+
+  test('sendReceive should time out if no response is received', async () => {
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: TEST_WS_URL,
+      requestTimeout: 100, // Set a short timeout for testing
+    });
+    await webSocketChannel.waitForConnection();
+
+    // Spy on the 'send' method and prevent it from sending anything.
+    // This guarantees that we will never get a response and the timeout will be triggered.
+    const sendSpy = jest.spyOn(webSocketChannel.websocket, 'send').mockImplementation(() => {});
+
+    // We expect this promise to reject with a timeout error.
+    await expect(
+      webSocketChannel.sendReceive('some_method_that_will_never_get_a_response')
+    ).rejects.toThrow('timed out after 100ms');
+
+    // Restore the original implementation for other tests
+    sendSpy.mockRestore();
+  });
+
+  test('should queue sendReceive requests when reconnecting and process them after', (done) => {
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: TEST_WS_URL,
+      reconnectOptions: { retries: 3, delay: 100 },
+    });
+
+    let hasReconnected = false;
+    webSocketChannel.on('open', () => {
+      if (hasReconnected) {
+        // Reconnected. The promise from the queued sendReceive will resolve now.
+      } else {
+        // 1. First connection, now simulate a drop
+        hasReconnected = true;
+        webSocketChannel.websocket.close();
+
+        // 2. Immediately try to send a request. It should be queued.
+        webSocketChannel.sendReceive('starknet_chainId').then((result) => {
+          // 3. This assertion runs after reconnection, proving the queue was processed.
+          expect(result).toBe(StarknetChainId.SN_SEPOLIA);
+          done(); // 4. Test is done when the queued request has been successfully processed.
+        });
+      }
+    });
+  });
+
+  test('should queue subscribe requests when reconnecting and process them after', (done) => {
+    jest.setTimeout(30000); // Allow time for reconnect and a new block event
+
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: TEST_WS_URL,
+      reconnectOptions: { retries: 3, delay: 100 },
+    });
+
+    let hasReconnected = false;
+    webSocketChannel.on('open', () => {
+      if (hasReconnected) {
+        // Reconnected. The promise from the queued subscribeNewHeads will resolve now.
+      } else {
+        // 1. First connection, now simulate a drop
+        hasReconnected = true;
+        webSocketChannel.websocket.close();
+
+        // 2. Immediately try to subscribe. The request should be queued.
+        webSocketChannel.subscribeNewHeads().then((sub) => {
+          // 3. This should only execute after reconnection.
+          expect(sub).toBeInstanceOf(Subscription);
+          expect(webSocketChannel.isConnected()).toBe(true);
+
+          // 4. To prove it's a real subscription, wait for one event.
+          sub.on((data) => {
+            expect(data).toBeDefined();
+            done();
+          });
+        });
+      }
+    });
+  });
+
+  test('should restore active subscriptions after an automatic reconnection', (done) => {
+    jest.setTimeout(30000); // Allow time for reconnect and new block
+
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: TEST_WS_URL,
+      reconnectOptions: { retries: 3, delay: 100 },
+    });
+
+    let connectionCount = 0;
+
+    const eventHandler = (data: any) => {
+      // The handler is called. If this is after the reconnection (connectionCount > 1),
+      // it proves the subscription was successfully restored.
+      if (connectionCount > 1) {
+        expect(data).toBeDefined();
+        done();
+      }
+    };
+
+    webSocketChannel.on('open', async () => {
+      connectionCount += 1;
+      if (connectionCount === 1) {
+        // First connection: set up the subscription
+        const sub = await webSocketChannel.subscribeNewHeads();
+        sub.on(eventHandler);
+        // Now, simulate a drop
+        webSocketChannel.websocket.close();
+      }
+      // On the second 'open' event (connectionCount === 2), the test will implicitly
+      // be waiting for the eventHandler to be called, which will resolve the test.
+    });
   });
 });

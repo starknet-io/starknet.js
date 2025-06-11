@@ -31,7 +31,7 @@
     "build:iife": "tsup --clean false --format iife --platform browser",
     "build:dts": "tsup --clean false --dts-only",
     "pretest": "npm run lint && npm run ts:check",
-    "test": "jest -i",
+    "test": "jest -i --detectOpenHandles",
     "test:coverage": "jest -i --coverage",
     "posttest": "npm run format -- --log-level warn",
     "test:watch": "jest --watch",
