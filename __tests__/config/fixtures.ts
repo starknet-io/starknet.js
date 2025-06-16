@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { Account, Provider, ProviderInterface, RpcProvider, config, json } from '../../src';
+import { Account, Provider, ProviderInterface, RpcProvider, config, hash, json } from '../../src';
 import {
   CompiledSierra,
   CompiledSierraCasm,
@@ -40,24 +40,24 @@ const mapContractSets = <T extends Record<string, any>>(
 
 // cairo/ contracts are retrieved as a { sierra, casm } set
 const compiledContracts = {
-  OpenZeppelinAccount: readContract('Account'),
-  Erc20: readContract('ERC20'),
-  Erc20Echo: readContract('ERC20-echo'),
-  L1L2: readContract('l1l2_compiled'),
-  TypeTransformation: readContract('contract'),
-  Multicall: readContract('multicall'),
-  TestDapp: readContract('TestDapp'),
-  ComplexSierra: readContractSierra('cairo/complexInput/complexInput'),
+  // OpenZeppelinAccount: readContract('Account'),
+  // Erc20: readContract('ERC20'),
+  // Erc20Echo: readContract('ERC20-echo'),
+  // L1L2: readContract('l1l2_compiled'),
+  // TypeTransformation: readContract('contract'),
+  // Multicall: readContract('multicall'),
+  // TestDapp: readContract('TestDapp'),
+  // ComplexSierra: readContractSierra('cairo/complexInput/complexInput'),
   // cairo/
-  Erc20OZ: 'cairo264/ERC20OZ014',
+  Erc20OZ: 'cairo294/erc20_oz100',
   HashSierra: 'hash/hash',
-  HelloSierra: 'helloSierra/hello',
   C1v2: 'helloCairo2/compiled',
   C210: 'cairo210/cairo210',
   C240: 'cairo240/string',
   Tuple: 'cairo253/tupleResponse',
   C260: 'cairo260/hello260',
   U512: 'cairo260/u512',
+  Minimalist: 'cairo2114/minimalist_NameStarknet',
   NonZero: 'cairo263/zeroable',
   OnlyConstructor: 'onlyConstructor/onlyConstructor',
   C1Account: 'account/accountOZ080',
@@ -132,7 +132,6 @@ export async function createTestProvider(
 }
 
 export const TEST_TX_VERSION = process.env.TX_VERSION as SupportedTransactionVersion;
-console.log({ TEST_TX_VERSION });
 export const { TEST_WS_URL } = process.env;
 
 export const getTestAccount = (
@@ -185,8 +184,8 @@ export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
 export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
 export const describeIfRpc081 = describeIf(process.env.RPC_SPEC_VERSION === '0.8.1');
 export const describeIfRpc071 = describeIf(process.env.RPC_SPEC_VERSION === '0.7.1');
-export const erc20ClassHash: string =
-  '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a'; // Cairo 0
+export const erc20ClassHash: string = hash.computeContractClassHash(contracts.Erc20OZ.sierra); // Cairo 1
+export const C1v2ClassHash: string = hash.computeContractClassHash(contracts.C1v2.sierra); // Cairo 1
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';
 export const ETHtokenAddress = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';
 export const STRKtokenAddress =

@@ -142,7 +142,6 @@ export class Account extends Provider implements AccountInterface {
 
   // provided version or contract based preferred transactionVersion
   protected getPreferredVersion(type12: ETransactionVersion, type3: ETransactionVersion) {
-    console.log('getPreferredVersion, this.transactionVersion =', this.transactionVersion);
     if (this.transactionVersion === ETransactionVersion.V3) return type3;
     if (this.transactionVersion === ETransactionVersion.V2) return type12;
 
@@ -251,12 +250,6 @@ export class Account extends Provider implements AccountInterface {
       cairoVersion: undefined, // unused parameter
       skipValidate,
     });
-
-    console.log(
-      'declareContractTransaction =',
-      { version },
-      v3Details(details, await this.channel.setUpSpecVersion())
-    );
 
     return super.getDeclareEstimateFee(
       declareContractTransaction,
