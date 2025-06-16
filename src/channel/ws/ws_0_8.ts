@@ -15,6 +15,7 @@ import { EventEmitter } from '../../utils/eventEmitter';
 import { TimeoutError, WebSocketNotConnectedError } from '../../utils/errors';
 import WebSocket from '../../utils/connect/ws';
 import { stringify } from '../../utils/json';
+import { isString, isObject } from '../../utils/typed';
 import { bigNumberishArrayToHexadecimalStringArray, toHex } from '../../utils/num';
 import { Block } from '../../utils/provider';
 import { config } from '../../global/config';
@@ -46,7 +47,7 @@ export type WebSocketOptions = {
    * The URL of the WebSocket endpoint of the Starknet node.
    * @example 'ws://localhost:9545'
    */
-  nodeUrl?: string;
+  nodeUrl: string;
   /**
    * This parameter can be used to provide a custom WebSocket implementation.
    * This is useful in environments where the global WebSocket object is not available (e.g., Node.js).
@@ -56,7 +57,7 @@ export type WebSocketOptions = {
    * const channel = new WebSocketChannel({ nodeUrl: '...', websocket: WebSocket });
    * ```
    */
-  websocket?: WebSocket;
+  websocket?: typeof WebSocket;
   /**
    * The maximum number of events to buffer per subscription when no handler is attached.
    * @default 1000
@@ -117,6 +118,9 @@ export class WebSocketChannel {
    */
   public websocket: WebSocket;
 
+  // Store the WebSocket implementation class to allow for custom implementations.
+  private WsImplementation: typeof WebSocket;
+
   // Map of active subscriptions, keyed by their ID.
   private activeSubscriptions: Map<SUBSCRIPTION_ID, Subscription<any>> = new Map();
 
@@ -154,8 +158,8 @@ export class WebSocketChannel {
   private errorListener = (ev: Event) => this.events.emit('error', ev);
 
   /**
-   * JSON RPC latest sent message id
-   * expecting receiving message to contain same id
+   * JSON RPC latest sent message ID.
+   * The receiving message is expected to contain the same ID.
    */
   private sendId: number = 0;
 
@@ -163,10 +167,8 @@ export class WebSocketChannel {
    * Creates an instance of WebSocketChannel.
    * @param {WebSocketOptions} options - The options for configuring the channel.
    */
-  constructor(options: WebSocketOptions = {}) {
-    // provided existing websocket
-    const nodeUrl = options.nodeUrl || 'http://localhost:3000 ';
-    this.nodeUrl = options.websocket ? options.websocket.url : nodeUrl;
+  constructor(options: WebSocketOptions) {
+    this.nodeUrl = options.nodeUrl;
     this.maxBufferSize = options.maxBufferSize ?? 1000;
     this.autoReconnect = options.autoReconnect ?? true;
     this.reconnectOptions = {
@@ -174,7 +176,9 @@ export class WebSocketChannel {
       delay: options.reconnectOptions?.delay ?? 2000,
     };
     this.requestTimeout = options.requestTimeout ?? 60000;
-    this.websocket = options.websocket || config.get('websocket') || new WebSocket(nodeUrl);
+
+    this.WsImplementation = options.websocket || config.get('websocket') || WebSocket;
+    this.websocket = new this.WsImplementation(this.nodeUrl);
 
     this.websocket.addEventListener('open', this.openListener);
     this.websocket.addEventListener('close', this.closeListener);
@@ -183,9 +187,9 @@ export class WebSocketChannel {
   }
 
   private idResolver(id?: number) {
-    // unmanaged user set id
+    // An unmanaged, user-set ID.
     if (id) return id;
-    // managed id, intentional return old and than increment
+    // Managed ID, intentionally returned old and then incremented.
     // eslint-disable-next-line no-plusplus
     return this.sendId++;
   }
@@ -202,7 +206,7 @@ export class WebSocketChannel {
   public send(method: string, params?: object, id?: number) {
     if (!this.isConnected()) {
       throw new WebSocketNotConnectedError(
-        'WebSocketChannel.send() fail due to socket disconnected'
+        'WebSocketChannel.send() failed due to socket being disconnected'
       );
     }
     const usedId = this.idResolver(id);
@@ -251,8 +255,8 @@ export class WebSocketChannel {
       }
 
       const messageHandler = (event: MessageEvent) => {
-        if (typeof event.data !== 'string') {
-          console.warn('WebSocket received non-string message data:', event.data);
+        if (!isString(event.data)) {
+          logger.warn('WebSocket received non-string message data:', event.data);
           return;
         }
         const message: JRPC.ResponseBody = JSON.parse(event.data);
@@ -319,7 +323,7 @@ export class WebSocketChannel {
    * ```
    */
   public async waitForConnection(): Promise<typeof this.websocket.readyState> {
-    // Wait websocket to connect
+    // Wait for the websocket to connect
     if (this.websocket.readyState !== WebSocket.OPEN) {
       return new Promise((resolve, reject) => {
         if (!this.websocket) return;
@@ -353,7 +357,7 @@ export class WebSocketChannel {
    * @returns {Promise<number | Event>} A Promise that resolves with the WebSocket's `readyState` or a `CloseEvent` when disconnected.
    */
   public async waitForDisconnection(): Promise<typeof this.websocket.readyState | Event> {
-    // Wait websocket to disconnect
+    // Wait for the websocket to disconnect
     if (this.websocket.readyState !== WebSocket.CLOSED) {
       return new Promise((resolve, reject) => {
         if (!this.websocket) return;
@@ -410,7 +414,7 @@ export class WebSocketChannel {
    */
   public reconnect() {
     this.userInitiatedClose = false;
-    this.websocket = new WebSocket(this.nodeUrl);
+    this.websocket = new this.WsImplementation(this.nodeUrl);
 
     this.websocket.addEventListener('open', this.openListener);
     this.websocket.addEventListener('close', this.closeListener);
@@ -474,7 +478,7 @@ export class WebSocketChannel {
         this.reconnectAttempts = 0;
         await this._restoreSubscriptions();
         this._processRequestQueue();
-        // Manually trigger the onOpen listeners as the original event is gone.
+        // Manually trigger the onOpen listeners as the original 'open' event was consumed.
         this.events.emit('open', new Event('open'));
       };
 
@@ -508,17 +512,11 @@ export class WebSocketChannel {
       logger.error(
         `WebSocketChannel: Error parsing incoming message: ${event.data}, Error: ${error}`
       );
-      return; // Stop processing this malformed message
+      return; // Stop processing this malformed message.
     }
 
-    // Check if it's a subscription event
-    if (
-      message.method &&
-      'params' in message &&
-      message.params &&
-      typeof message.params === 'object' &&
-      'subscription_id' in message.params
-    ) {
+    // Check if it's a subscription event.
+    if (message.method && isObject(message.params) && 'subscription_id' in message.params) {
       const { result, subscription_id } = message.params as {
         result: any;
         subscription_id: SUBSCRIPTION_ID;
@@ -534,7 +532,7 @@ export class WebSocketChannel {
       }
     }
 
-    // Call the general onMessage handler if provided by the user, for all messages.
+    // Call the general onMessage handler if provided by the user for all messages.
     this.events.emit('message', event);
   }
 
@@ -623,7 +621,7 @@ export class WebSocketChannel {
   }
 
   /**
-   * internal method to remove subscription from active map
+   * Internal method to remove subscription from active map.
    * @internal
    */
   public removeSubscription(id: SUBSCRIPTION_ID) {

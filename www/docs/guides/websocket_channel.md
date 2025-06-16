@@ -39,7 +39,7 @@ const channel = new WebSocketChannel({
   nodeUrl: 'wss://your-starknet-node/rpc/v0_8',
 });
 
-// It's good practice to wait for the initial connection
+// It's good practice to wait for the initial connection.
 await channel.waitForConnection();
 ```
 
@@ -52,6 +52,8 @@ const channel = new WebSocketChannel({
   nodeUrl: '...',
   websocket: WebSocket, // Provide the implementation class
 });
+
+await channel.waitForConnection();
 ```
 
 ### Advanced Configuration
@@ -98,7 +100,7 @@ await sub.unsubscribe();
 
 If you `await` a subscription but don't immediately attach an `.on()` handler, the `Subscription` object will buffer incoming events. Once you attach a handler, all buffered events will be delivered in order before any new events are processed. This prevents event loss during asynchronous setup.
 
-The buffer size is limited by `maxBufferSize` in the channel options. If the buffer is full, the oldest events are dropped.
+The buffer size is limited by the `maxBufferSize` in the channel options. If the buffer is full, the oldest events are dropped.
 
 ## Automatic Reconnection and Queueing
 
@@ -106,7 +108,7 @@ The channel is designed to be resilient. If the connection drops, it will automa
 
 - Any API calls (e.g., `sendReceive`, `subscribeNewHeads`) will be queued.
 - Once the connection is restored, the queue will be processed automatically.
-- All previously active subscriptions will be **automatically re-subscribed**. You do not need to manually handle this.
+- All previously active subscriptions will be **automatically re-subscribed**. The original `Subscription` objects you hold will continue to work without any need for manual intervention.
 
 ## Error Handling
 

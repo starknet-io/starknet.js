@@ -54,6 +54,7 @@ export class Subscription<T = any> {
 
   /**
    * The unique identifier for this subscription.
+   * @internal
    */
   public id: SUBSCRIPTION_ID;
 
@@ -108,7 +109,7 @@ export class Subscription<T = any> {
       this.handler(data);
     } else {
       if (this.buffer.length >= this.maxBufferSize) {
-        const droppedEvent = this.buffer.shift(); // Drop the oldest event
+        const droppedEvent = this.buffer.shift(); // Drop the oldest event.
         logger.warn(`Subscription ${this.id}: Buffer full. Dropping oldest event:`, droppedEvent);
       }
       this.buffer.push(data);
@@ -122,6 +123,7 @@ export class Subscription<T = any> {
    * Subsequent events will be passed directly as they arrive.
    *
    * @param {(data: T) => void} handler - The function to call with event data.
+   * @throws {Error} If a handler is already attached to this subscription.
    */
   public on(handler: (data: T) => void): void {
     if (this.handler) {
@@ -131,7 +133,7 @@ export class Subscription<T = any> {
     }
     this.handler = handler;
 
-    // Process buffer
+    // Process the buffer.
     while (this.buffer.length > 0) {
       const event = this.buffer.shift();
       if (event) {
@@ -153,7 +155,7 @@ export class Subscription<T = any> {
       this._isClosed = true;
       this.channel.removeSubscription(this.id);
       this.events.emit('unsubscribe', undefined);
-      this.events.clear(); // Clean up all listeners
+      this.events.clear(); // Clean up all listeners.
     }
     return success;
   }
