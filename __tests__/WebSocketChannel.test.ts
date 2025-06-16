@@ -8,7 +8,7 @@ const describeIfWs = TEST_WS_URL ? describe : describe.skip;
 const NODE_URL = TEST_WS_URL!;
 
 describeIfWs('E2E WebSocket Tests', () => {
-  describe('websocket specific endpoints - pathfinder test', () => {
+  describe('websocket specific endpoints', () => {
     // account provider
     const provider = new Provider(getTestProvider());
     const account = getTestAccount(provider);
@@ -134,7 +134,7 @@ describeIfWs('E2E WebSocket Tests', () => {
     });
   });
 
-  describe('websocket regular endpoints - pathfinder test', () => {
+  describe('websocket regular endpoints', () => {
     let webSocketChannel: WebSocketChannel;
 
     beforeAll(async () => {

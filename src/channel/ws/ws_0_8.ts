@@ -532,6 +532,8 @@ export class WebSocketChannel {
       }
     }
 
+    logger.debug('onMessageProxy:', event.data);
+
     // Call the general onMessage handler if provided by the user for all messages.
     this.events.emit('message', event);
   }
