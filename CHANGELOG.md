@@ -1,3 +1,9 @@
+## [7.5.1](https://github.com/starknet-io/starknet.js/compare/v7.5.0...v7.5.1) (2025-06-17)
+
+### Bug Fixes
+
+- remove unused Paymaster property in UniversalDetails ([#1414](https://github.com/starknet-io/starknet.js/issues/1414)) ([ff97704](https://github.com/starknet-io/starknet.js/commit/ff9770498e4b2505febc7d326a0d7d0eefe5b53e))
+
 # [7.5.0](https://github.com/starknet-io/starknet.js/compare/v7.4.0...v7.5.0) (2025-06-04)
 
 ### Bug Fixes
