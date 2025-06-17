@@ -5,6 +5,7 @@
  * ref: order of execution jestGlobalSetup.ts -> jest.setup.ts -> fixtures.ts
  */
 
+import 'dotenv/config';
 import strategyResolver from './helpers/strategyResolver';
 
 /**

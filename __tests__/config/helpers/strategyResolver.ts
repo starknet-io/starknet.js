@@ -89,7 +89,6 @@ class StrategyResolver {
       TEST_RPC_URL: process.env.TEST_RPC_URL,
       TEST_WS_URL: process.env.TEST_WS_URL,
       TX_VERSION: process.env.TX_VERSION,
-      SPEC_VERSION: process.env.SPEC_VERSION,
     });
 
     console.table({
@@ -97,6 +96,7 @@ class StrategyResolver {
       IS_RPC: process.env.IS_RPC,
       IS_TESTNET: process.env.IS_TESTNET,
       'Detected Spec Version': process.env.RPC_SPEC_VERSION,
+      DEBUG: process.env.DEBUG,
     });
 
     console.log('Global Test Environment is Ready');
@@ -131,25 +131,26 @@ class StrategyResolver {
     console.log('Global Test Setup Started');
     this.verifyAccountData();
 
-    if (this.hasAllAccountEnvs) {
-      await this.useProvidedSetup();
-      return;
+    if (!this.hasAllAccountEnvs) {
+      // 2. Try to detect devnet setup
+      console.log('Basic test parameters are missing, Auto Setup Started');
+
+      await this.detectDevnet();
+      await accountResolver.execute(this.isDevnet);
+
+      this.verifyAccountData(true);
+      if (!this.hasAllAccountEnvs) console.error('Test Setup Environment is NOT Ready');
     }
 
-    // 2. Try to detect devnet setup
-    console.log('Basic test parameters are missing, Auto Setup Started');
-
-    await this.detectDevnet();
     await this.resolveRpc();
-    await accountResolver.execute(this.isDevnet);
-
-    this.verifyAccountData(true);
-    if (!this.hasAllAccountEnvs) console.error('Test Setup Environment is NOT Ready');
-
     this.defineTestTransactionVersion();
     await this.getNodeSpecVersion();
 
-    this.logConfigInfo();
+    if (this.hasAllAccountEnvs) {
+      await this.useProvidedSetup();
+    } else {
+      this.logConfigInfo();
+    }
   }
 }
 
