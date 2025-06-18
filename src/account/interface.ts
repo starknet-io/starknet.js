@@ -1,8 +1,8 @@
 import { ProviderInterface } from '../provider';
 import { SignerInterface } from '../signer';
 import {
-  Abi,
   AllowArray,
+  BigNumberish,
   BlockIdentifier,
   CairoVersion,
   Call,
@@ -23,6 +23,9 @@ import {
   InvokeFunctionResponse,
   MultiDeployContractResponse,
   Nonce,
+  PaymasterDetails,
+  PaymasterFeeEstimate,
+  PreparedTransaction,
   Signature,
   SimulateTransactionDetails,
   SimulateTransactionResponse,
@@ -210,21 +213,73 @@ export abstract class AccountInterface extends ProviderInterface {
     transactions: AllowArray<Call>,
     transactionsDetail?: InvocationsDetails
   ): Promise<InvokeFunctionResponse>;
+
   /**
-   * @deprecated
-   * @param transactions the invocation object or an array of them, containing:
+   * Estimate Fee for executing a paymaster transaction on starknet
+   *
+   * @param calls the invocation object containing:
    * - contractAddress - the address of the contract
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   * @param abis (optional) the abi of the contract for better displaying
-   * @param {InvocationsDetails} transactionsDetail Additional optional parameters for the transaction
-   * * @returns response from addTransaction
+   *
+   * @param paymasterDetails the paymaster details containing:
+   * - feeMode - the fee mode
+   * - deploymentData - the deployment data (optional)
+   * - timeBounds - the time bounds (optional)
+   *
+   * @returns response extracting fee from buildPaymasterTransaction
    */
-  public abstract execute(
-    transactions: AllowArray<Call>,
-    abis?: Abi[],
-    transactionsDetail?: InvocationsDetails
+  public abstract estimatePaymasterTransactionFee(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<PaymasterFeeEstimate>;
+
+  /**
+   * Build a paymaster transaction
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @param paymasterDetails the paymaster details containing:
+   * - feeMode - the fee mode
+   * - deploymentData - the deployment data (optional)
+   * - timeBounds - the time bounds (optional)
+   *
+   * @returns the prepared transaction
+   */
+  public abstract buildPaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<PreparedTransaction>;
+
+  /**
+   * Execute a paymaster transaction
+   *
+   * Assert that the gas token value is equal to the provided gas fees
+   * Assert that the calls are strictly equal to the returned calls.
+   * Assert that the gas token (in gas token) price is not too high, if provided.
+   * Assert that typedData to signed is strictly equal to the provided typedData.
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @param paymasterDetails the paymaster details containing:
+   * - feeMode - the fee mode (sponsored or default)
+   * - deploymentData - the deployment data (optional)
+   * - timeBounds - the time bounds when the transaction is valid (optional) - executeAfter and executeBefore expected to be in seconds (BLOCK_TIMESTAMP)
+   *
+   * @param maxFeeInGasToken - the max fee acceptable to pay in gas token (optional)
+   *
+   * @returns the tarnsaction hash if successful, otherwise an error is thrown
+   */
+  public abstract executePaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails,
+    maxFeeInGasToken?: BigNumberish
   ): Promise<InvokeFunctionResponse>;
 
   /**

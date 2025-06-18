@@ -35,8 +35,8 @@ Instantiating a new `WalletAccount`:
 
 ```typescript
 import { connect } from '@starknet-io/get-starknet'; // v4.0.3 min
-import { WalletAccount, wallet } from 'starknet'; // v6.18.0 min
-const myFrontendProviderUrl = 'https://free-rpc.nethermind.io/sepolia-juno/v0_7';
+import { WalletAccount, wallet } from 'starknet'; // v7.0.1 min
+const myFrontendProviderUrl = 'https://starknet-sepolia.public.blastapi.io/rpc/v0_8';
 // standard UI to select a wallet:
 const selectedWalletSWO = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
 const myWalletAccount = await WalletAccount.connect(
@@ -145,7 +145,7 @@ The above examples are using the SWO, because it is the simpler way to process.
 
 The `WalletAccount` class is able to interact with all the entrypoints of the Starknet Wallet API, including some functionalities that do not exists in the `Account` class.
 
-A full description of this API can be found [**here**](https://github.com/PhilippeR26/Starknet-WalletAccount/blob/main/doc/walletAPIspec.md).
+A full description of this API can be found [**here**](https://github.com/starknet-io/get-starknet/blob/master/packages/core/documentation/walletAPIdocumentation.md).
 
 Some examples:
 

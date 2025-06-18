@@ -36,7 +36,7 @@ Some cases:
 - When a specific value is reached in a contract, an event can be created to store the fact that this value has been reached at a specific block number.
 - When the L1 network has triggered the execution of a L2 contract, you can store in the event some results and when it occurs.
 
-An event can be useful also when you invoke a contract. When you invoke a Cairo function (meaning to write in the network), the API does not authorize any response (only call functions can provide an answer). To generate an event in the code is a way to provide a response (for example for the creation of an account, an event is generated to return the account address).
+An event can also be useful when you invoke a contract. When you invoke a Cairo function (meaning to write in the network), the API does not authorize any response (only call functions can provide an answer). To generate an event in the code is a way to provide a response (for example for the creation of an account, an event is generated to return the account address).
 
 ## With the Transaction hash
 
@@ -60,7 +60,7 @@ You can recover all the events related to this transaction hash:
 
 ```typescript
 if (txReceipt.isSuccess()) {
-  const listEvents = txReceipt.events;
+  const listEvents = txReceipt.value.events;
 }
 ```
 
@@ -146,7 +146,7 @@ If you don't want to filter by key, you can either remove the `keys` parameter, 
 :::
 
 :::warning CAUTION
-An event can be nested in a Cairo component (See the Cairo code of the contract to verify). In this case, the array of keys will start with additional hashes, and you will have to adapt your code in consequence ; in this example, we have to skip one hash :
+An event can be nested in a Cairo component (See the Cairo code of the contract to verify). In this case, the array of keys will start with additional hashes, and you will have to adapt your code in consequence; in this example, we have to skip one hash :
 
 ```typescript
 const keyFilter = [[], [num.toHex(hash.starknetKeccak('EventPanic'))]];

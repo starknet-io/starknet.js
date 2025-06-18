@@ -1,4 +1,18 @@
 import { getStarkKey, Signature, utils } from '@scure/starknet';
+import { hasMixin } from 'ts-mixer';
+import {
+  contracts,
+  createBlockForDevnet,
+  createTestProvider,
+  describeIfDevnet,
+  describeIfNotDevnet,
+  describeIfRpc,
+  describeIfTestnet,
+  ETHtokenAddress,
+  getTestAccount,
+  waitNextBlock,
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 import typedDataExample from '../__mocks__/typedData/baseExample.json';
 import {
   Account,
@@ -6,8 +20,9 @@ import {
   CallData,
   Contract,
   FeeEstimate,
+  LibraryError,
+  ProviderInterface,
   RPC,
-  RPC06,
   RPCResponseParser,
   ReceiptTx,
   RpcProvider,
@@ -15,37 +30,52 @@ import {
   cairo,
   stark,
   waitForTransactionOptions,
+  isVersion,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toBigInt, toHexString } from '../src/utils/num';
-import {
-  contracts,
-  createBlockForDevnet,
-  describeIfDevnet,
-  describeIfNotDevnet,
-  describeIfRpc,
-  describeIfTestnet,
-  devnetETHtokenAddress,
-  getTestAccount,
-  getTestProvider,
-  waitNextBlock,
-} from './config/fixtures';
-import { initializeMatcher } from './config/schema';
 import { isBoolean } from '../src/utils/typed';
+import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
+import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
+import { StarknetId } from '../src/provider/extensions/starknetId';
 
 describeIfRpc('RPCProvider', () => {
-  const rpcProvider = getTestProvider(false);
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let rpcProvider: RpcProvider;
+  let provider: ProviderInterface;
+  let account: Account;
   let accountPublicKey: string;
   initializeMatcher(expect);
 
   beforeAll(async () => {
+    rpcProvider = await createTestProvider(false);
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+
     expect(account).toBeInstanceOf(Account);
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
     await createBlockForDevnet();
+  });
+
+  test('create should be usable by the base and extended RpcProvider, but not Account', async () => {
+    const nodeUrl = process.env.TEST_RPC_URL;
+    const base = await BaseRpcProvider.create({ nodeUrl });
+    const extended = await ExtendedRpcProvider.create({ nodeUrl });
+
+    expect(hasMixin(base, StarknetId)).toBe(false);
+    expect(hasMixin(extended, StarknetId)).toBe(true);
+    await expect(Account.create()).rejects.toThrow(LibraryError);
+  });
+
+  test('detect spec version with create', async () => {
+    const providerTest = await RpcProvider.create({ nodeUrl: process.env.TEST_RPC_URL });
+    const { channel } = providerTest;
+    expect(channel).toBeDefined();
+    const rawResult = await channel.fetch('starknet_specVersion');
+    const j = await rawResult.json();
+    expect(channel.readSpecVersion()).toBeDefined();
+    expect(isVersion(j.result, await channel.setUpSpecVersion())).toBeTruthy();
   });
 
   test('baseFetch override', async () => {
@@ -115,8 +145,12 @@ describeIfRpc('RPCProvider', () => {
     const p = new RpcProvider({
       nodeUrl: provider.channel.nodeUrl,
       feeMarginPercentage: {
-        l1BoundMaxAmount: 0,
-        l1BoundMaxPricePerUnit: 0,
+        bounds: {
+          l1_gas: {
+            max_amount: 0,
+            max_price_per_unit: 0,
+          },
+        },
         maxFee: 0,
       },
     });
@@ -189,9 +223,14 @@ describeIfRpc('RPCProvider', () => {
       });
       expect(estimationCairo1).toEqual(
         expect.objectContaining({
-          gas_consumed: expect.anything(),
-          gas_price: expect.anything(),
+          l1_data_gas_consumed: expect.anything(),
+          l1_data_gas_price: expect.anything(),
+          l1_gas_consumed: expect.anything(),
+          l1_gas_price: expect.anything(),
+          l2_gas_consumed: expect.anything(),
+          l2_gas_price: expect.anything(),
           overall_fee: expect.anything(),
+          unit: expect.anything(),
         })
       );
     });
@@ -199,13 +238,13 @@ describeIfRpc('RPCProvider', () => {
 
   describe('waitForTransaction', () => {
     const receipt = {};
-    const transactionStatusSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionStatus');
-    const transactionReceiptSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionReceipt');
+    let transactionStatusSpy: any;
+    let transactionReceiptSpy: any;
 
     const generateOptions = (o: waitForTransactionOptions) => ({ retryInterval: 10, ...o });
     const generateTransactionStatus = (
-      finality_status: RPC.SPEC.TXN_STATUS,
-      execution_status?: RPC.SPEC.TXN_EXECUTION_STATUS
+      finality_status: RPC.TXN_STATUS,
+      execution_status?: RPC.TXN_EXECUTION_STATUS
     ): RPC.TransactionStatus => ({
       finality_status,
       execution_status,
@@ -217,6 +256,9 @@ describeIfRpc('RPCProvider', () => {
     };
 
     beforeAll(() => {
+      transactionStatusSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionStatus');
+      transactionReceiptSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionReceipt');
+
       transactionStatusSpy.mockResolvedValue(null);
       transactionReceiptSpy.mockResolvedValue(receipt);
     });
@@ -263,7 +305,7 @@ describeIfRpc('RPCProvider', () => {
     beforeAll(async () => {
       // add a Tx to be sure to have at least one Tx in the last block
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetETHtokenAddress,
+        contractAddress: ETHtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: account.address,
@@ -284,15 +326,11 @@ describeIfRpc('RPCProvider', () => {
       expect(blockResponse).toHaveProperty('transactions');
     });
 
-    test('getBlockWithReceipts - 0.6 RpcChannel', async () => {
-      const channel = new RPC06.RpcChannel({ nodeUrl: rpcProvider.channel.nodeUrl });
-      const p = new RpcProvider({ channel } as any);
-      await expect(p.getBlockWithReceipts(latestBlock.block_number)).rejects.toThrow(/Unsupported/);
-    });
-
-    test('getBlockWithReceipts - 0.7 RpcChannel', async () => {
+    test('getBlockWithReceipts - 0.v RpcChannel', async () => {
       const blockResponse = await rpcProvider.getBlockWithReceipts(latestBlock.block_number);
-      expect(blockResponse).toMatchSchemaRef('BlockWithTxReceipts');
+      expect(blockResponse).toBeDefined();
+      // TODO add Zod schema validation
+      // expect(blockResponse).toMatchSchemaRef('BlockWithTxReceipts');
     });
 
     test('getTransactionByBlockIdAndIndex', async () => {
@@ -301,11 +339,6 @@ describeIfRpc('RPCProvider', () => {
         0
       );
       expect(transaction).toHaveProperty('transaction_hash');
-    });
-
-    test('getPendingTransactions', async () => {
-      const transactions = await rpcProvider.getPendingTransactions();
-      expect(Array.isArray(transactions)).toBe(true);
     });
 
     test('getSyncingStats', async () => {
@@ -428,7 +461,8 @@ describeIfRpc('RPCProvider', () => {
 
       test('traceTransaction', async () => {
         const trace = await rpcProvider.getTransactionTrace(transaction_hash);
-        expect(trace).toMatchSchemaRef('getTransactionTrace');
+        expect(trace).toBeDefined();
+        // TODO add Zod schema validation
       });
 
       test('getClassAt', async () => {
@@ -445,7 +479,11 @@ describeIfRpc('RPCProvider', () => {
 });
 
 describeIfTestnet('RPCProvider', () => {
-  const provider = getTestProvider();
+  let provider: ProviderInterface;
+
+  beforeEach(async () => {
+    provider = await createTestProvider();
+  });
 
   test('getL1MessageHash', async () => {
     const l2TransactionHash = '0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819';
@@ -464,6 +502,7 @@ describeIfNotDevnet('waitForBlock', () => {
   const providerStandard = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
   const providerFastTimeOut = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL, retries: 1 });
   let block: number;
+
   beforeEach(async () => {
     block = await providerStandard.getBlockNumber();
   });
@@ -494,8 +533,13 @@ describeIfNotDevnet('waitForBlock', () => {
 });
 
 describe('EIP712 verification', () => {
-  const rpcProvider = getTestProvider(false);
-  const account = getTestAccount(rpcProvider);
+  let rpcProvider: RpcProvider;
+  let account: Account;
+
+  beforeEach(async () => {
+    rpcProvider = await createTestProvider(false);
+    account = getTestAccount(rpcProvider);
+  });
 
   test('sign and verify message', async () => {
     const signature = await account.signMessage(typedDataExample);

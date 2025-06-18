@@ -2,104 +2,126 @@
 sidebar_position: 101
 ---
 
-# Migrate from v5 to v6
+# Migrate from v6 to v7
 
-This document only covers the features present in v5 which have changed in some significant way in v6.
+This document only covers the features present in v6 which have changed in some significant way in v7.
 
 If you encounter any missing changes, please let us know and we will update this guide.
 
+## Fetch dependencies
+
+`isomorphic-fetch` and `fetch-cookie` have been removed as dependencies.
+
+For users who might require the features of either library, a `baseFetch` override parameter has been enabled for the `RpcProvider` and `RpcChannel` classes, including classes that inherit from them such as `Account` and `WalletAccount`.
+
+```typescript
+import makeFetchCookie from 'fetch-cookie';
+import isomorphicFetch from 'isomorphic-fetch';
+
+const provider = new RpcProvider({
+  baseFetch: makeFetchCookie(isomorphicFetch),
+});
+```
+
+## Rpc compatibility
+
+Starknet.js v6 is compatible with Starknet RPC **0.6** and **0.7** nodes.
+
+Starknet.js v7 drops support for RPC **0.6**, and introduces support for RPC **0.8**, it supports RPC **0.7** and **0.8** nodes.
+
+By default, Starknet.js v7 uses RPC **0.8** with **V3** transactions (STRK fees). This means that you can no longer execute **V1** transactions (ETH fees) by default.
+
+|                   | RPC 0.7  | RPC 0.8 <br /> (default) |
+| ----------------: | :------: | :----------------------: |
+|  V1 tx (ETH fees) | Possible |        Impossible        |
+| V3 tx (STRK fees) | Default  |         Default          |
+
+You can configure your code to use RPC **0.7** with ETH and STRK fees available by using the following options:
+
+- Define `specVersion: '0.7.1'` when instantiating an RpcProvider
+- Use `config.set('legacyMode', true)` to enable **V1** transactions
+- Use `logger.setLogLevel('ERROR')` if you want to remove the warnings when processing **V1** transactions
+
+```typescript
+import { RpcProvider, Account, config, logger, ETransactionVersion } from 'starknet';
+
+const myProvider = new RpcProvider({
+  nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_8',
+  specVersion: '0.7.1',
+});
+
+config.set('legacyMode', true);
+
+logger.setLogLevel('ERROR');
+```
+
+With the above settings the code still uses **V3** transactions with RPC **0.7** by default. To utilize **V1** transactions there are two approaches:
+
+- either configure it at the `Account` instance level by setting the appropriate constructor parameter:
+
+```typescript
+const account0 = new Account(
+  myProvider,
+  accountAddress0,
+  privateKey0,
+  undefined,
+  ETransactionVersion.V2
+);
+```
+
+- or configure it for individual method invocations by setting the corresponding options parameter property:
+
+```typescript
+const res = await account0.execute(myCall, { version: 1 });
+```
+
 ## Transaction receipt
 
-When sending a transaction, the receipt type has changed.
-In V5, it's an object that can have varied definitions, depending on the status and the type of transaction.
-In V6, this object is in `TxR.value`, and several helpers are available (`.statusReceipt`, `isSuccess()`, `isRejected()`, `isReverted()`, `.isError()`, `match`, ...)
+In the `ReceiptTx` class, the status [`isRejected`](https://starknetjs.com/docs/6.23.1/API/classes/ReceiptTx#isrejected) has been removed.
 
-```typescript
-const response = await ethContract.approve(swapContractAddress, cairo.uint256(100000));
-const transactionReceipt = await provider.waitForTransaction(response.transaction_hash);
+## Removed deprecated functionalities
 
-// v5 : transactionReceipt is just an object
-{
-type: 'INVOKE',
-  transaction_hash: '0x5286217518c621581ac85505a99ffe182ce1114abaa8fce8b418d2b27c3c04c',
-  actual_fee: { unit: 'WEI', amount: '0x1c1902fe99800' },
-  messages_sent: [],
-  execution_status: 'SUCCEEDED',
-  finality_status: 'ACCEPTED_ON_L2',
-  // ...
-}
-// v6 : transactionReceipt is an object + helpers
-const receipt = transactionReceipt.value;
-const status: boolean = transactionReceipt.isSuccess();
+### RpcProvider
 
-```
+|                                                     method                                                      | replacement                                                                                                                                                                                                                                                                                                                                                 |
+| :-------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`getPendingTransactions(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getpendingtransactions) | [`getBlockWithTxHashes(BlockTag.PENDING)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getblockwithtxhashes)<br/>[`getBlock(BlockTag.PENDING)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getblock)                                                                                                                               |
+|         [`getEstimateFee(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getestimatefee)         | [`getInvokeEstimateFee(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getinvokeestimatefee)<br/>[`getDeclareEstimateFee(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getdeclareestimatefee)<br/>[`getDeployAccountEstimateFee(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#getdeployaccountestimatefee) |
 
-> See this [guide](./interact.md#transaction-receipt-response)
+### Account
 
-## Long strings
+|                                                                                                    method                                                                                                    | details                                                                                                                                                                                                                                                                                                                                                                                                          |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|                                                               [`execute(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Account#execute)                                                               | The deprecated [`execute(transactions, abis?, transactionsDetail?)`](https://starknetjs.com/docs/6.23.1/API/classes/Account#parameters-20) override with the optional (and unused) `abis` parameter has been removed.<br/><br/> [`execute(transactions, transactionsDetail?)`](https://starknetjs.com/docs/6.23.1/API/classes/Account#parameters-19) now only accepts two parameters and should be used as such. |
+| [`verifyMessage(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Account#verifymessage) <br/><br/> [`verifyMessageHash(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Account#verifymessagehash) | The deprecated `Account` message verification methods have been removed. <br/><br/> The `RpcProvider` [`verifyMessageInStarknet(...)`](https://starknetjs.com/docs/6.23.1/API/classes/Provider#verifymessageinstarknet) method should be used instead.                                                                                                                                                           |
 
-Starknet.js v6 is compatible with Cairo v2.4.0. It means that long strings (>31 characters) are automatically handled and converted to the Cairo `ByteArray` type.
-This means that the approach to convert a long string to an array of felts (for Cairo 0 contracts for example) has changed:
+### WalletAccount
 
-```typescript
-// v5
-const feltArray: BigNumberish[] = CallData.compile(
-  'http://addressOfMyERC721pictures/storage/image1.jpg'
-);
+When initializing a `WalletAccount` instance through the constructor [`new WalletAccount(...)`](https://starknetjs.com/docs/6.23.1/API/classes/WalletAccount#constructor) the `address` parameter has been made mandatory with the deprecated eager address retrieval removed.
 
-// v6
-const feltArray: BigNumberish[] = CallData.compile(
-  shortString.splitLongString('http://addressOfMyERC721pictures/storage/image1.jpg')
-);
-```
+To initialize a `WalletAccount` instance [`WalletAccount.connect(...)`](https://starknetjs.com/docs/6.23.1/API/classes/WalletAccount#connect) should be used.
 
-## Fees
+### Removed namespace
 
-All functions related to gas price and fee estimation have changed output types.
+The `number` namespace alias has been removed in favor of `num` as noted in the v5 migration guide.
 
-For example, if you read the content of a block with v5 the ETH gas price was a top level property, with v6 the same information is nested a level deeper:
+### Removed utility functions
 
-```typescript
-const resp: GetBlockResponse = await myProvider.getBlock('latest');
+|   namespace   |                                                                                                                                                  function                                                                                                                                                   |                                              replacement                                               |
+| :-----------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------: |
+|   `encode`    |                                                                                                 [`stringToArrayBuffer(...)`](https://starknetjs.com/docs/6.23.1/API/namespaces/encode#stringtoarraybuffer)                                                                                                  |        [`utf8ToArray(...)`](https://starknetjs.com/docs/next/API/namespaces/encode#utf8toarray)        |
+|    `json`     |                                                                                                 [`stringifyAlwaysAsBig(...)`](https://starknetjs.com/docs/6.23.1/API/namespaces/json#stringifyalwaysasbig)                                                                                                  |           [`stringify(...)`](https://starknetjs.com/docs/next/API/namespaces/json#stringify)           |
+|    `stark`    |                                                                                                          [`makeAddress(...)`](https://starknetjs.com/docs/6.23.1/API/namespaces/stark#makeaddress)                                                                                                          | [`validateAndParseAddress(...)`](https://starknetjs.com/docs/next/API/modules#validateandparseaddress) |
+| `transaction` | [`fromCallsToExecuteCalldataWithNonce(...)`](https://starknetjs.com/docs/6.23.1/API/namespaces/transaction#fromcallstoexecutecalldatawithnonce) <br/> [`transformCallsToMulticallArrays_cairo1(...)`](https://starknetjs.com/docs/6.23.1/API/namespaces/transaction#transformcallstomulticallarrays_cairo1) |                                                   /                                                    |
 
-// v5
-const gasPrice = resp.gas_price;
+- the [`CallStruct`](https://starknetjs.com/docs/6.23.1/API/interfaces/types.CallStruct) type that was used by the `transaction` methods has also been removed
 
-// v6
-const gasPrice = resp.l1_gas_price.price_in_wei;
-```
+### Removed type alias exports
 
-Another example is `estimateDeclareFee()` where the response object has changed:
+Multiple TypeScript types have had their old location re-exports removed. They are no longer available within their old namespace but are available as direct imports: `import { *type* } from 'starknet'`.
 
-```typescript
-const fee = await account0.estimateDeclareFee({ contract: compiledContract });
-
-// v5 response
-fee = {
-  overall_fee: 247700000000000n,
-  gas_consumed: 2477n,
-  gas_price: 100000000000n,
-  suggestedMaxFee: 371550000000000n,
-};
-
-// v6 response
-fee = {
-  overall_fee: 247700000000000n,
-  gas_consumed: 2477n,
-  gas_price: 100000000000n,
-  unit: undefined,
-  suggestedMaxFee: 371550000000000n,
-  resourceBounds: {
-    l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-    l1_gas: { max_amount: '0xaa4', max_price_per_unit: '0x22ecb25c00' },
-  },
-};
-```
-
-You have to adapt your code to all these new entries.
-In general, pay attention to the result types of methods that return a response from an RPC node.
-
-<br/>
-<hr/>
-
-For the old v4 to v5 migration instructions check [here](./migrate_v4).
+|  namespace  |                                                                                                                                                                                                                                                                                                            type                                                                                                                                                                                                                                                                                                             |
+| :---------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|    `num`    |                                                                                                                                                                                                                                                                    [`BigNumberish`](https://starknetjs.com/docs/6.23.1/API/namespaces/num#bignumberish)                                                                                                                                                                                                                                                                     |
+| `typedData` | [`TypedDataRevision`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#typeddatarevision) <br/> [`StarknetEnumType`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#starknetenumtype) <br/> [`StarknetMerkleType`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#starknetmerkletype) <br/> [`StarknetType`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#starknettype) <br/> [`StarknetDomain`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#starknetdomain) <br/> [`TypedData`](https://starknetjs.com/docs/6.23.1/API/namespaces/typedData#typeddata) |
+|  `uint256`  |                                                                                                                                                                                                                   [`UINT_128_MAX`](https://starknetjs.com/docs/6.23.1/API/namespaces/uint256#uint_128_max) <br/> [`UINT_256_MAX`](https://starknetjs.com/docs/6.23.1/API/namespaces/uint256#uint_256_max)                                                                                                                                                                                                                   |
