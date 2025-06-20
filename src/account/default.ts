@@ -92,6 +92,7 @@ import { isString, isUndefined } from '../utils/typed';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 import { defaultPaymaster, PaymasterInterface, PaymasterRpc } from '../paymaster';
+import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -363,13 +364,6 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: UniversalDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const calls = Array.isArray(transactions) ? transactions : [transactions];
-    if (transactionsDetail.paymaster) {
-      return this.executePaymasterTransaction(
-        calls,
-        transactionsDetail.paymaster,
-        transactionsDetail.maxFee
-      );
-    }
     const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3), // TODO: does this depend on cairo version ?
@@ -414,7 +408,7 @@ export class Account extends Provider implements AccountInterface {
     );
   }
 
-  private async buildPaymasterTransaction(
+  public async buildPaymasterTransaction(
     calls: Call[],
     paymasterDetails: PaymasterDetails
   ): Promise<PreparedTransaction> {
@@ -425,7 +419,6 @@ export class Account extends Provider implements AccountInterface {
         throw Error('Account is not compatible with SNIP-9');
       }
     }
-
     const parameters: ExecutionParameters = {
       version: '0x1',
       feeMode: paymasterDetails.feeMode,
@@ -462,15 +455,9 @@ export class Account extends Provider implements AccountInterface {
     return preparedTransaction.fee;
   }
 
-  public async executePaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails,
-    maxFee?: BigNumberish
-  ): Promise<InvokeFunctionResponse> {
-    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
-    if (maxFee && preparedTransaction.fee.gas_token_price_in_strk > maxFee) {
-      throw Error('Gas token price is too high');
-    }
+  public async preparePaymasterTransaction(
+    preparedTransaction: PreparedTransaction
+  ): Promise<ExecutableUserTransaction> {
     let transaction: ExecutableUserTransaction;
     switch (preparedTransaction.type) {
       case 'deploy_and_invoke': {
@@ -508,6 +495,32 @@ export class Account extends Provider implements AccountInterface {
       default:
         throw Error('Invalid transaction type');
     }
+    return transaction;
+  }
+
+  public async executePaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails,
+    maxFeeInGasToken?: BigNumberish
+  ): Promise<InvokeFunctionResponse> {
+    // Build the transaction
+    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
+
+    // Check the transaction is safe
+    // Check gas fee value & gas token address
+    // Check that provided calls and builded calls are strictly equal
+    assertPaymasterTransactionSafety(
+      preparedTransaction,
+      calls,
+      paymasterDetails,
+      maxFeeInGasToken
+    );
+
+    // Prepare the transaction, tx is safe here
+    const transaction: ExecutableUserTransaction =
+      await this.preparePaymasterTransaction(preparedTransaction);
+
+    // Execute the transaction
     return this.paymaster
       .executeTransaction(transaction, preparedTransaction.parameters)
       .then((response) => ({ transaction_hash: response.transaction_hash }));

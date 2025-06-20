@@ -4,13 +4,12 @@ import type {
   NetworkChangeEventHandler,
   Signature,
   WatchAssetParameters,
-} from 'starknet-types-08';
+} from '@starknet-io/starknet-types-08';
 
 import { Account, AccountInterface } from '../account';
 import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
 import {
-  Abi,
   AllowArray,
   CairoVersion,
   Call,
@@ -20,7 +19,6 @@ import {
   ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
-  UniversalDetails,
 } from '../types';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
@@ -107,19 +105,7 @@ export class WalletAccount extends Account implements AccountInterface {
   /**
    * ACCOUNT METHODS
    */
-  override execute(
-    calls: AllowArray<Call>,
-    arg2?: Abi[] | UniversalDetails,
-    transactionsDetail: UniversalDetails = {}
-  ) {
-    const details = arg2 === undefined || Array.isArray(arg2) ? transactionsDetail : arg2;
-    if (details.paymaster) {
-      return this.executePaymasterTransaction(
-        Array.isArray(calls) ? calls : [calls],
-        details.paymaster
-      );
-    }
-
+  override execute(calls: AllowArray<Call>) {
     const txCalls = [].concat(calls as any).map((it) => {
       const { contractAddress, entrypoint, calldata } = it;
       return {

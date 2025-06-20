@@ -1,4 +1,4 @@
-import { SUBSCRIPTION_BLOCK_TAG } from 'starknet-types-08';
+import { SUBSCRIPTION_BLOCK_TAG } from '@starknet-io/starknet-types-08';
 import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode } from '../api';

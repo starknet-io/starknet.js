@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "7.3.0",
+  "version": "7.5.1",
   "description": "JavaScript library for Starknet",
   "license": "MIT",
   "repository": {
@@ -31,7 +31,7 @@
     "build:iife": "tsup --clean false --format iife --platform browser",
     "build:dts": "tsup --clean false --dts-only",
     "pretest": "npm run lint && npm run ts:check",
-    "test": "jest -i",
+    "test": "jest -i --detectOpenHandles",
     "test:coverage": "jest -i --coverage",
     "posttest": "npm run format -- --log-level warn",
     "test:watch": "jest --watch",
@@ -105,8 +105,8 @@
     "abi-wan-kanabi": "2.2.4",
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
-    "starknet-types-07": "npm:@starknet-io/types-js@~0.7.10",
-    "starknet-types-08": "npm:@starknet-io/types-js@~0.8.3",
+    "@starknet-io/starknet-types-07": "npm:@starknet-io/types-js@~0.7.10",
+    "@starknet-io/starknet-types-08": "npm:@starknet-io/types-js@~0.8.4",
     "ts-mixer": "^6.0.3"
   },
   "engines": {

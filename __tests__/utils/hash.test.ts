@@ -72,7 +72,7 @@ describe('L1->L2 messaging', () => {
   });
 
   test('getL2MessageHash', () => {
-    // https://sepolia.starkscan.co/message/0x2e350fa9d830482605cb68be4fdb9f0cb3e1f95a0c51623ac1a5d1bd997c2090#messagelogs
+    // L1-> L2 https://sepolia.starkscan.co/message/0x2e350fa9d830482605cb68be4fdb9f0cb3e1f95a0c51623ac1a5d1bd997c2090#messagelogs
     const l1ToL2MessageHash = hash.getL2MessageHash(
       l1FromAddress,
       l2ToAddress,
@@ -86,7 +86,7 @@ describe('L1->L2 messaging', () => {
   });
 
   test('calculateL2MessageTxHash', () => {
-    // https://sepolia.starkscan.co/tx/0x067d959200d65d4ad293aa4b0da21bb050a1f669bce37d215c6edbf041269c07
+    // L1->L2 https://sepolia.starkscan.co/tx/0x067d959200d65d4ad293aa4b0da21bb050a1f669bce37d215c6edbf041269c07
     const l2TxHash = hash.calculateL2MessageTxHash(
       l1FromAddress,
       l2ToAddress,
@@ -96,5 +96,22 @@ describe('L1->L2 messaging', () => {
       l1Nonce
     );
     expect(l2TxHash).toBe('0x67d959200d65d4ad293aa4b0da21bb050a1f669bce37d215c6edbf041269c07');
+  });
+
+  test('L1MessageHash', () => {
+    // L2->L1 https://sepolia.voyager.online/message/0x2eace1d0ab5dbe354a93fb0a59c6b98f26e6a0fe7c33f87329f8fc9829058b8b
+    const fromL2Address = '0x04c5772d1914fe6ce891b64eb35bf3522aeae1315647314aac58b01137607f3f';
+    const toL1Address = '0x8453fc6cd1bcfe8d4dfc069c400b433054d47bdc';
+    const payloadMessage = [
+      0n,
+      1270393329865452722422775477982592488490549769359n,
+      4543560n,
+      200000000000000,
+      0n,
+    ];
+    const l2ToL1MessageHash = hash.getL1MessageHash(fromL2Address, toL1Address, payloadMessage);
+    expect(l2ToL1MessageHash).toBe(
+      '0x2eace1d0ab5dbe354a93fb0a59c6b98f26e6a0fe7c33f87329f8fc9829058b8b'
+    );
   });
 });

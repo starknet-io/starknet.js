@@ -1,3 +1,33 @@
+## [7.5.1](https://github.com/starknet-io/starknet.js/compare/v7.5.0...v7.5.1) (2025-06-17)
+
+### Bug Fixes
+
+- remove unused Paymaster property in UniversalDetails ([#1414](https://github.com/starknet-io/starknet.js/issues/1414)) ([ff97704](https://github.com/starknet-io/starknet.js/commit/ff9770498e4b2505febc7d326a0d7d0eefe5b53e))
+
+# [7.5.0](https://github.com/starknet-io/starknet.js/compare/v7.4.0...v7.5.0) (2025-06-04)
+
+### Bug Fixes
+
+- snip29 - timeBounds seconds (number), public preparePaymasterTransaction ([#1408](https://github.com/starknet-io/starknet.js/issues/1408)) ([8cd4fa8](https://github.com/starknet-io/starknet.js/commit/8cd4fa810c71300f23bab2896151afa18febbaff))
+
+### Features
+
+- rename internal types-js alias to include organization scope ([#1410](https://github.com/starknet-io/starknet.js/issues/1410)) ([d19cb57](https://github.com/starknet-io/starknet.js/commit/d19cb57c651bcbf3f48b8682572f74ff03faa451))
+
+# [7.4.0](https://github.com/starknet-io/starknet.js/compare/v7.3.0...v7.4.0) (2025-05-27)
+
+### Bug Fixes
+
+- add max_fee warning to v3 tx, remove discontinued nethermind fre… ([#1402](https://github.com/starknet-io/starknet.js/issues/1402)) ([2c6f3e3](https://github.com/starknet-io/starknet.js/commit/2c6f3e3fd347636f2b5930b62d9e526c332d753e))
+- isSuccess, isError, isReverted type predicate of ReceiptTx, GetTransactionReceiptResponse ([#1392](https://github.com/starknet-io/starknet.js/issues/1392)) ([8bc65a0](https://github.com/starknet-io/starknet.js/commit/8bc65a0b543d1673df29b8d7a1d50f49c5a930e1))
+- legacy Program interface with missing properties ([#1378](https://github.com/starknet-io/starknet.js/issues/1378)) ([de3e336](https://github.com/starknet-io/starknet.js/commit/de3e336b299f49f9cad31aec1e08ded7850888e2))
+- parseEvents should not modify ref event object ([#1399](https://github.com/starknet-io/starknet.js/issues/1399)) ([5091541](https://github.com/starknet-io/starknet.js/commit/509154148d52b4746258729c3bf2c9ef2d17c148))
+
+### Features
+
+- getL1MessageHash() ([#1401](https://github.com/starknet-io/starknet.js/issues/1401)) ([7ba427e](https://github.com/starknet-io/starknet.js/commit/7ba427ef6acf1038cddf173831d9c215e65dee30))
+- snip29 safety checks ([#1403](https://github.com/starknet-io/starknet.js/issues/1403)) ([d348f74](https://github.com/starknet-io/starknet.js/commit/d348f740e905e7cdb3af5b4411a9e2f166f0ba42))
+
 # [7.3.0](https://github.com/starknet-io/starknet.js/compare/v7.2.0...v7.3.0) (2025-05-20)
 
 ### Bug Fixes

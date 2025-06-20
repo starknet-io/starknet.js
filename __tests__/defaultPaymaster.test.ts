@@ -1,4 +1,4 @@
-import { OutsideExecutionTypedData } from 'starknet-types-08';
+import { OutsideExecutionTypedData } from '@starknet-io/starknet-types-08';
 import {
   RpcError,
   PaymasterRpc,
