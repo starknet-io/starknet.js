@@ -40,15 +40,7 @@ const mapContractSets = <T extends Record<string, any>>(
 
 // cairo/ contracts are retrieved as a { sierra, casm } set
 const compiledContracts = {
-  // OpenZeppelinAccount: readContract('Account'),
-  // Erc20: readContract('ERC20'),
-  // Erc20Echo: readContract('ERC20-echo'),
-  // L1L2: readContract('l1l2_compiled'),
-  // TypeTransformation: readContract('contract'),
-  // Multicall: readContract('multicall'),
-  // TestDapp: readContract('TestDapp'),
-  // ComplexSierra: readContractSierra('cairo/complexInput/complexInput'),
-  // cairo/
+  ComplexSierra: readContractSierra('cairo/complexInput/complexInput'),
   Erc20OZ: 'cairo294/erc20_oz100',
   HashSierra: 'hash/hash',
   C1v2: 'helloCairo2/compiled',
@@ -57,7 +49,7 @@ const compiledContracts = {
   Tuple: 'cairo253/tupleResponse',
   C260: 'cairo260/hello260',
   U512: 'cairo260/u512',
-  Minimalist: 'cairo2114/minimalist_NameStarknet',
+  Minimalist: 'cairo2114/minimalist',
   NonZero: 'cairo263/zeroable',
   OnlyConstructor: 'onlyConstructor/onlyConstructor',
   C1Account: 'account/accountOZ080',
@@ -78,6 +70,8 @@ const compiledContracts = {
   ),
   U96: 'cairo282/u96',
   fixedArray: 'cairo292/fixed_array',
+  TypeTransformation: 'cairo2114/contract',
+  echo: 'cairo2114/echo',
 };
 export const contracts = mapContractSets(compiledContracts);
 

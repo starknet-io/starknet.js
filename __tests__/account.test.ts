@@ -105,7 +105,7 @@ describe('deploy and test Account', () => {
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
-          amount: cairo.uint256(5 * 10 ** 16),
+          amount: cairo.uint256(5n * 10n ** 16n),
         },
       });
       await account.waitForTransaction(transaction_hash);

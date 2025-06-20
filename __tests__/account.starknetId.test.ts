@@ -1,5 +1,5 @@
 import { Account, Provider, num, shortString } from '../src';
-import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
+import { contracts, createTestProvider, getTestAccount, STRKtokenAddress } from './config/fixtures';
 
 const { hexToDecimalString } = num;
 
@@ -9,7 +9,6 @@ describe('deploy and test Wallet', () => {
   let identityAddress: string;
   let namingAddress: string;
   let multicallAddress: string;
-  const devnetERC20Address = '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
 
   beforeAll(async () => {
     provider = new Provider(await createTestProvider());
@@ -27,7 +26,7 @@ describe('deploy and test Wallet', () => {
     const pricingResponse = await account.declareAndDeploy({
       contract: contracts.starknetId.Pricing.sierra,
       casm: contracts.starknetId.Pricing.casm,
-      constructorCalldata: [devnetERC20Address],
+      constructorCalldata: [STRKtokenAddress],
     });
     const pricingAddress = pricingResponse.deploy.contract_address;
 
@@ -48,7 +47,7 @@ describe('deploy and test Wallet', () => {
 
     const { transaction_hash } = await account.execute([
       {
-        contractAddress: devnetERC20Address,
+        contractAddress: STRKtokenAddress,
         entrypoint: 'approve',
         calldata: [namingAddress, 0, 1], // Price of domain
       },

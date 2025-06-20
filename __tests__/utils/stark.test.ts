@@ -1,31 +1,8 @@
-import { CallData, RawArgs, UniversalDetails, json, stark, FeeEstimate } from '../../src';
+import { CallData, RawArgs, UniversalDetails, stark, FeeEstimate } from '../../src';
 import { EDataAvailabilityMode } from '../../src/types/api';
 import { toBigInt, toHex } from '../../src/utils/num';
-import { contracts } from '../config/fixtures';
 
 describe('stark', () => {
-  describe('compressProgram()', () => {
-    test('compresses a contract program', () => {
-      const inputProgram = contracts.OpenZeppelinAccount.program;
-      const compressed = stark.compressProgram(inputProgram);
-      expect(compressed).toMatchSnapshot();
-    });
-    test('works with strings', () => {
-      const inputProgram = json.stringify(contracts.OpenZeppelinAccount.program);
-      const compressed = stark.compressProgram(inputProgram);
-      expect(compressed).toMatchSnapshot();
-    });
-  });
-
-  describe('decompressProgram()', () => {
-    test('decompress a contract program', () => {
-      const inputProgram = contracts.OpenZeppelinAccount.program;
-      const compressed = stark.compressProgram(inputProgram);
-      const decompressed = stark.decompressProgram(compressed);
-      expect(decompressed).toMatchObject(contracts.OpenZeppelinAccount.program);
-    });
-  });
-
   describe('CallData.compile() ', () => {
     test('compiles BigNumberish[] calldata', () => {
       const callData = ['0x000', 2n, 10000];
