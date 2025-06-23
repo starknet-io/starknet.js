@@ -7,6 +7,7 @@ import {
   TransactionExecutionStatus,
   ProviderInterface,
   Account,
+  type EstimateFee,
 } from '../src';
 import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
 
@@ -54,7 +55,10 @@ describe('Transaction receipt utility - RPC 0.7 - V2', () => {
 
   test('test for Reverted variant', async () => {
     const myCall: Call = contract.populate('test_fail', { p1: 10 }); // reverted if not 100
-    const res = await account.execute(myCall, { maxFee: 1 * 10 ** 15 }); // maxFee needed to not throw error in getEstimateFee
+    const estim: EstimateFee = await account.estimateInvokeFee(
+      contract.populate('test_fail', { p1: 100 })
+    );
+    const res = await account.execute(myCall, { ...estim }); // maxFee needed to not throw error in getEstimateFee
     const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.REVERTED);
     expect(txR.statusReceipt).toBe('reverted');

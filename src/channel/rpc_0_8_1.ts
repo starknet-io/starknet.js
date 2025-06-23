@@ -694,9 +694,9 @@ export class RpcChannel {
   ): RPC.BaseTransaction {
     const defaultVersions = getVersionsByType(versionType);
     let details;
-
     if (!isV3Tx(invocation)) {
       // V0,V1,V2
+      // console.log({ invocation });
       throw Error('v0,v1,v2 tx are not supported on RPC 0.8');
     } else {
       // V3
