@@ -1,4 +1,10 @@
-import { isVersion, toAnyPatchVersion, isSupportedSpecVersion, constants } from '../../src';
+import {
+  isVersion,
+  toAnyPatchVersion,
+  isSupportedSpecVersion,
+  constants,
+  toApiVersion,
+} from '../../src';
 
 describe('isVersion', () => {
   it('matches exact versions', () => {
@@ -55,6 +61,10 @@ describe('isVersion', () => {
     expect(isVersion('*.3.5', '2.3.4')).toBe(false);
     expect(isVersion('*.3.4', '2.3.4')).toBe(true);
   });
+
+  it('handles shorter provided version', () => {
+    expect(isVersion('0.7.1', '0.7')).toBe(false);
+  });
 });
 
 describe('toAnyPatchVersion', () => {
@@ -63,6 +73,10 @@ describe('toAnyPatchVersion', () => {
     expect(toAnyPatchVersion('1.2.3')).toBe('1.2.*');
     expect(toAnyPatchVersion('0.8')).toBe('0.8');
     expect(toAnyPatchVersion('2.0')).toBe('2.0');
+  });
+
+  it('handles versions with pre-release tags', () => {
+    expect(toAnyPatchVersion('1.2.3-rc1')).toBe('1.2.*');
   });
 
   it('handles invalid or empty version strings', () => {
@@ -80,11 +94,10 @@ describe('toAnyPatchVersion', () => {
 
 describe('isSupportedSpecVersion', () => {
   it('returns true for supported spec versions', () => {
-    expect(isSupportedSpecVersion('0.7')).toBe(false);
-    expect(isSupportedSpecVersion('0.8')).toBe(false);
     expect(isSupportedSpecVersion('0.7.1')).toBe(true);
     expect(isSupportedSpecVersion('0.8.1')).toBe(true);
-    expect(isSupportedSpecVersion('1.0')).toBe(false);
+    expect(isSupportedSpecVersion('0.7', { allowAnyPatchVersion: true })).toBe(true);
+    expect(isSupportedSpecVersion('0.8', { allowAnyPatchVersion: true })).toBe(true);
   });
 
   it('returns false for unsupported spec versions', () => {
@@ -110,7 +123,7 @@ describe('isSupportedSpecVersion', () => {
     });
 
     it('returns true for supported version with allowAnyPatchVersion=true', () => {
-      expect(isSupportedSpecVersion('0.7.1', { allowAnyPatchVersion: true })).toBe(true);
+      expect(isSupportedSpecVersion('0.7.5', { allowAnyPatchVersion: true })).toBe(true);
     });
 
     it('returns false for supported version with allowAnyPatchVersion=false and mismatched patch', () => {
@@ -147,5 +160,15 @@ describe('isSupportedSpecVersion', () => {
       expect(isSupportedSpecVersion('1.2.3', { allowAnyPatchVersion: true })).toBe(false);
       expect(isSupportedSpecVersion('1.2.3', { allowAnyPatchVersion: false })).toBe(false);
     });
+  });
+});
+
+describe('toApiVersion', () => {
+  it('converts version strings like "0.8.1" or "0.8" to "v0_8"', () => {
+    expect(toApiVersion('0.8.1')).toBe('v0_8');
+    expect(toApiVersion('0.8')).toBe('v0_8');
+    expect(toApiVersion('1.2.3')).toBe('v1_2');
+    expect(toApiVersion('1.2')).toBe('v1_2');
+    expect(toApiVersion('v0.7.0')).toBe('v0_7');
   });
 });
