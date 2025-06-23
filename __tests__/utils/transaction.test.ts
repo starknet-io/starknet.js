@@ -1,5 +1,6 @@
 import { Call } from '../../src/types';
-import { fromCallsToExecuteCalldata_cairo1 } from '../../src/utils/transaction';
+import { fromCallsToExecuteCalldata_cairo1, getVersionsByType } from '../../src/utils/transaction';
+import { ETransactionVersion } from '../../src';
 
 describe('fromCallsToExecuteCalldata_cairo1', () => {
   it('should return an array with a length of one when given an empty input', () => {
@@ -32,5 +33,34 @@ describe('fromCallsToExecuteCalldata_cairo1', () => {
       '10000000',
     ];
     expect(fromCallsToExecuteCalldata_cairo1(calls)).toEqual(expected);
+  });
+});
+
+describe('getVersionsByType', () => {
+  it("should return fee versions when versionType is 'fee'", () => {
+    const versions = getVersionsByType('fee');
+    expect(versions).toEqual({
+      v1: ETransactionVersion.F1,
+      v2: ETransactionVersion.F2,
+      v3: ETransactionVersion.F3,
+    });
+  });
+
+  it("should return transaction versions when versionType is 'transaction'", () => {
+    const versions = getVersionsByType('transaction');
+    expect(versions).toEqual({
+      v1: ETransactionVersion.V1,
+      v2: ETransactionVersion.V2,
+      v3: ETransactionVersion.V3,
+    });
+  });
+
+  it('should return transaction versions when versionType is undefined', () => {
+    const versions = getVersionsByType();
+    expect(versions).toEqual({
+      v1: ETransactionVersion.V1,
+      v2: ETransactionVersion.V2,
+      v3: ETransactionVersion.V3,
+    });
   });
 });
