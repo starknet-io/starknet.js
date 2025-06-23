@@ -1,7 +1,6 @@
 import { Provider } from '../src';
 import { SupportedRpcVersion } from '../src/global/constants';
 import { getDefaultNodes, getSupportedRpcVersions } from '../src/utils/provider';
-import { describeIfTestnet } from './config/fixtures';
 
 describe('unit tests', () => {
   describe('getDefaultNodes', () => {
@@ -37,7 +36,7 @@ describe('unit tests', () => {
   });
 });
 
-describeIfTestnet('Default RPC Nodes', () => {
+describe('Default RPC Nodes', () => {
   test('All Default RPC Nodes support Spec Versions', async () => {
     const supportedVersions = getSupportedRpcVersions();
     const finalResult = await Promise.all(
