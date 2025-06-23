@@ -85,6 +85,17 @@ export function toAnyPatchVersion(version: string) {
 }
 
 /**
+ * Convert version to API format.
+ * ex. '0.8.1' -> 'v0_8', '0.8' -> 'v0_8'
+ * @param {string} version
+ * @returns {string}
+ */
+export function toApiVersion(version: string): string {
+  const [major, minor] = version.replace(/^v/, '').split('.');
+  return `v${major}_${minor}`;
+}
+
+/**
  * Guard Pending Block
  * @param {GetBlockResponse} response answer of myProvider.getBlock()
  * @return {boolean} true if block is the pending block

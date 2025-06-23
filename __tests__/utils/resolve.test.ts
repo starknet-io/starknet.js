@@ -1,4 +1,10 @@
-import { isVersion, toAnyPatchVersion, isSupportedSpecVersion, constants } from '../../src';
+import {
+  isVersion,
+  toAnyPatchVersion,
+  isSupportedSpecVersion,
+  constants,
+  toApiVersion,
+} from '../../src';
 
 describe('isVersion', () => {
   it('matches exact versions', () => {
@@ -154,5 +160,15 @@ describe('isSupportedSpecVersion', () => {
       expect(isSupportedSpecVersion('1.2.3', { allowAnyPatchVersion: true })).toBe(false);
       expect(isSupportedSpecVersion('1.2.3', { allowAnyPatchVersion: false })).toBe(false);
     });
+  });
+});
+
+describe('toApiVersion', () => {
+  it('converts version strings like "0.8.1" or "0.8" to "v0_8"', () => {
+    expect(toApiVersion('0.8.1')).toBe('v0_8');
+    expect(toApiVersion('0.8')).toBe('v0_8');
+    expect(toApiVersion('1.2.3')).toBe('v1_2');
+    expect(toApiVersion('1.2')).toBe('v1_2');
+    expect(toApiVersion('v0.7.0')).toBe('v0_7');
   });
 });
