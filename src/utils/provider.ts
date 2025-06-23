@@ -14,6 +14,7 @@ import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
 import { isHex, toHex } from './num';
+import { toApiVersion } from './resolve';
 import { isDecimalString } from './shortString';
 import { compressProgram } from './stark';
 import { isBigInt, isNumber, isString } from './typed';
@@ -132,18 +133,23 @@ export const getDefaultNodeUrl = (
  * return Defaults RPC Nodes endpoints
  */
 export function getDefaultNodes(rpcVersion: SupportedRpcVersion) {
-  const vToUrl = (versionString: SupportedRpcVersion) =>
-    `v${versionString.replace(/^v/, '').replace(/\./g, '_')}`;
-
   const nodes: any = { ...RPC_DEFAULT_NODES };
 
   Object.keys(nodes).forEach(function (key, _) {
     nodes[key] = nodes[key].map((it: any) => {
-      return `${it}${vToUrl(rpcVersion)}`;
+      return `${it}${toApiVersion(rpcVersion)}`;
     });
   });
 
   return nodes;
+}
+
+/**
+ * Return supported RPC versions
+ * @returns {SupportedRpcVersion[]} available RPC versions
+ */
+export function getSupportedRpcVersions(): SupportedRpcVersion[] {
+  return [...new Set(Object.values(SupportedRpcVersion))];
 }
 
 export const validBlockTags = Object.values(BlockTag);

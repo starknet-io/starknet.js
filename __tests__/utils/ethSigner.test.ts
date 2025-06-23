@@ -15,16 +15,13 @@ import {
   getLedgerPathBuffer221,
   hash,
   num,
-  stark,
   type DeclareContractPayload,
 } from '../../src';
 import { validateAndParseEthAddress } from '../../src/utils/eth';
-import { ETransactionVersion } from '../../src/types/api';
 import {
   contracts,
   createTestProvider,
   describeIfDevnet,
-  ETHtokenAddress,
   getTestAccount,
   STRKtokenAddress,
 } from '../config/fixtures';
@@ -100,107 +97,8 @@ describe('Ethereum signer', () => {
     });
   });
 
-  describeIfDevnet('ETH account tx V2', () => {
-    // devnet only because estimateFee in Sepolia v0.13.1 are producing widely different numbers.
-    let provider: ProviderInterface;
-    let account: Account;
-    let ethAccount: Account;
-
-    beforeAll(async () => {
-      provider = new Provider(await createTestProvider());
-      account = getTestAccount(provider);
-
-      const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
-        contract: contracts.EthAccount.sierra,
-        casm: contracts.EthAccount.casm,
-      });
-      if (declTH) {
-        await provider.waitForTransaction(declTH);
-      }
-      const privateKeyETH = eth.ethRandomPrivateKey();
-      const ethSigner = new EthSigner(privateKeyETH);
-      const ethFullPublicKey = await ethSigner.getPubKey();
-      const pubKeyETHx = cairo.uint256(
-        addAddressPadding(encode.addHexPrefix(ethFullPublicKey.slice(4, -64)))
-      );
-      const salt = pubKeyETHx.low;
-      const myCallData = new CallData(contracts.EthAccount.sierra.abi);
-      const accountETHconstructorCalldata = myCallData.compile('constructor', {
-        public_key: ethFullPublicKey,
-      });
-      const contractETHAccountAddress = hash.calculateContractAddressFromHash(
-        salt,
-        decClassHash,
-        accountETHconstructorCalldata,
-        0
-      );
-
-      ethAccount = new Account(
-        provider,
-        contractETHAccountAddress,
-        ethSigner,
-        undefined,
-        ETransactionVersion.V2
-      );
-      const deployPayload = {
-        classHash: decClassHash,
-        constructorCalldata: accountETHconstructorCalldata,
-        addressSalt: salt,
-      };
-      const { suggestedMaxFee: feeDeploy } =
-        await ethAccount.estimateAccountDeployFee(deployPayload);
-      // fund account with ETH
-      const { transaction_hash } = await account.execute({
-        contractAddress: ETHtokenAddress,
-        entrypoint: 'transfer',
-        calldata: {
-          recipient: contractETHAccountAddress,
-          amount: cairo.uint256(3n * 10n ** 16n),
-        },
-      });
-      await account.waitForTransaction(transaction_hash);
-
-      const { transaction_hash: txH2, contract_address } = await ethAccount.deployAccount(
-        deployPayload,
-        { maxFee: stark.estimatedFeeToMaxFee(feeDeploy, 300) }
-      );
-      await provider.waitForTransaction(txH2);
-      expect(contract_address).toBe(contractETHAccountAddress);
-    });
-
-    test('ETH account transaction V2', async () => {
-      const ethContract2 = new Contract(contracts.Erc20.abi, ETHtokenAddress, ethAccount);
-      const respTransfer = await ethContract2
-        .withOptions({ maxFee: 1 * 10 ** 16 })
-        .transfer(account.address, cairo.uint256(1 * 10 ** 4));
-      const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
-      if (txR.isSuccess()) {
-        // TODO: @PhilippeR26 Why this is not working, fix 'as any' hotfix
-        expect((txR as any).execution_status).toBe('SUCCEEDED');
-      } else {
-        fail('txR not success');
-      }
-    });
-
-    test('ETH account declaration V2', async () => {
-      const accountTestSierra = contracts.Dummy1Eth.sierra;
-      const accountTestCasm = contracts.Dummy1Eth.casm;
-      const { transaction_hash: declTH2, class_hash: decClassHash2 } =
-        await ethAccount.declareIfNot(
-          { contract: accountTestSierra, casm: accountTestCasm },
-          { maxFee: 1 * 10 ** 16 }
-        );
-      if (declTH2) {
-        await provider.waitForTransaction(declTH2);
-      }
-      expect(decClassHash2).toBe(
-        '0x4f8989ac63c9266a3038eee607c23a4496210e426ce01079cdda6faad1d7733'
-      );
-    });
-  });
-
   describeIfDevnet('ETH account tx V3', () => {
-    // devnet only because estimateFee in Sepolia v0.13.1 are producing widely different numbers.
+    // devnet only because fee cost is high
     let provider: Provider;
     let account: Account;
     let ethAccount: Account;
@@ -235,13 +133,7 @@ describe('Ethereum signer', () => {
         0
       );
 
-      ethAccount = new Account(
-        provider,
-        contractETHAccountAddress,
-        ethSigner,
-        undefined,
-        ETransactionVersion.V3
-      );
+      ethAccount = new Account(provider, contractETHAccountAddress, ethSigner);
       const feeEstimation = await ethAccount.estimateAccountDeployFee({
         classHash: decClassHash,
         addressSalt: salt,
@@ -253,7 +145,7 @@ describe('Ethereum signer', () => {
         entrypoint: 'transfer',
         calldata: {
           recipient: contractETHAccountAddress,
-          amount: cairo.uint256(30n * 10n ** 16n), // 0.3 STRK
+          amount: cairo.uint256(1n * 10n ** 18n), // 1 STRK of fees
         },
       });
       await account.waitForTransaction(transaction_hash);
@@ -265,11 +157,24 @@ describe('Ethereum signer', () => {
         },
         {
           resourceBounds: {
-            l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-            l1_gas: {
-              max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l1_gas.max_amount) * 2n),
+            l2_gas: {
+              max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l2_gas.max_amount) * 20n),
               max_price_per_unit: num.toHex(
-                BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit)
+                BigInt(feeEstimation.resourceBounds.l2_gas.max_price_per_unit) * 20n
+              ),
+            },
+            l1_gas: {
+              max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l1_gas.max_amount) * 20n),
+              max_price_per_unit: num.toHex(
+                BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit) * 20n
+              ),
+            },
+            l1_data_gas: {
+              max_amount: num.toHex(
+                BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_amount) * 20n
+              ),
+              max_price_per_unit: num.toHex(
+                BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_price_per_unit) * 20n
               ),
             },
           },
@@ -280,18 +185,37 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account transaction V3', async () => {
-      const strkContract2 = new Contract(contracts.Erc20.abi, STRKtokenAddress, ethAccount);
+      const strkContract2 = new Contract(
+        contracts.Erc20OZ.sierra.abi,
+        STRKtokenAddress,
+        ethAccount
+      );
       const txCallData = strkContract2.populate('transfer', [
         account.address,
         cairo.uint256(1 * 10 ** 4),
       ]);
-      const feeTransfer = await ethAccount.estimateInvokeFee(txCallData);
+      const feeEstimation = await ethAccount.estimateInvokeFee(txCallData, { skipValidate: false });
       const respTransfer = await ethAccount.execute(txCallData, {
         resourceBounds: {
-          l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+          l2_gas: {
+            max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l2_gas.max_amount) * 2n),
+            max_price_per_unit: num.toHex(
+              BigInt(feeEstimation.resourceBounds.l2_gas.max_price_per_unit) * 2n
+            ),
+          },
           l1_gas: {
-            max_amount: num.toHex(BigInt(feeTransfer.resourceBounds.l1_gas.max_amount) * 3n),
-            max_price_per_unit: num.toHex(feeTransfer.resourceBounds.l1_gas.max_price_per_unit),
+            max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l1_gas.max_amount) * 2n),
+            max_price_per_unit: num.toHex(
+              BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit) * 2n
+            ),
+          },
+          l1_data_gas: {
+            max_amount: num.toHex(
+              BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_amount) * 2n
+            ),
+            max_price_per_unit: num.toHex(
+              BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_price_per_unit) * 2n
+            ),
           },
         },
       });
@@ -316,16 +240,29 @@ describe('Ethereum signer', () => {
         await provider.getClassByHash(declareContractPayload.classHash);
         expect(true).toBeTruthy(); // test skipped if class already declared
       } catch {
-        const feeDeclare = await ethAccount.estimateDeclareFee(payload);
+        const feeEstimation = await ethAccount.estimateDeclareFee(payload, { skipValidate: false });
         const { transaction_hash: declTH2, class_hash: decClassHash2 } = await ethAccount.declare(
           payload,
           {
             resourceBounds: {
-              l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-              l1_gas: {
-                max_amount: num.toHex(BigInt(feeDeclare.resourceBounds.l1_gas.max_amount) * 2n),
+              l2_gas: {
+                max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l2_gas.max_amount) * 2n),
                 max_price_per_unit: num.toHex(
-                  BigInt(feeDeclare.resourceBounds.l1_gas.max_price_per_unit)
+                  BigInt(feeEstimation.resourceBounds.l2_gas.max_price_per_unit) * 2n
+                ),
+              },
+              l1_gas: {
+                max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l1_gas.max_amount) * 2n),
+                max_price_per_unit: num.toHex(
+                  BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit) * 2n
+                ),
+              },
+              l1_data_gas: {
+                max_amount: num.toHex(
+                  BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_amount) * 2n
+                ),
+                max_price_per_unit: num.toHex(
+                  BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_price_per_unit) * 2n
                 ),
               },
             },

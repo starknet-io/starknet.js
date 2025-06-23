@@ -211,14 +211,14 @@ describe('PaymasterRpc', () => {
       const client = new PaymasterRpc();
       const rpc_response = [
         {
-          address: '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080',
+          token_address: '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080',
           decimals: 6,
           price_in_strk: '0x38aea',
         },
       ];
       const expected = [
         {
-          address: '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080',
+          token_address: '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080',
           decimals: 6,
           priceInStrk: BigInt('0x38aea'),
         },
@@ -230,7 +230,6 @@ describe('PaymasterRpc', () => {
 
       // When
       const result = await client.getSupportedTokens();
-
       // Then
       expect(result).toEqual(expected);
     });

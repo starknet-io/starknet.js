@@ -113,7 +113,7 @@ describe('getAbiEvents', () => {
     );
   });
 
-  test('should return Cairo0 ABI events', () => {
+  test('should return Cairo ABI events', () => {
     const abiCairoEventStruct: AbiEvent = {
       kind: 'struct',
       members: [
