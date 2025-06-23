@@ -1,8 +1,16 @@
 import { OutsideCallV2, OutsideExecutionTypedDataV2 } from '@starknet-io/starknet-types-08';
-import { Account, Signature, Call, PaymasterDetails, OutsideExecutionVersion } from '../src';
+import {
+  Account,
+  Signature,
+  Call,
+  PaymasterDetails,
+  OutsideExecutionVersion,
+  logger,
+} from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 
 jest.mock('../src/paymaster/rpc');
+logger.setLogLevel('ERROR');
 
 describe('Account - Paymaster integration', () => {
   let account: Account | null = null;

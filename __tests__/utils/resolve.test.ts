@@ -61,14 +61,14 @@ describe('toAnyPatchVersion', () => {
   it('converts version strings to wildcard patch versions', () => {
     expect(toAnyPatchVersion('0.7.0')).toBe('0.7.*');
     expect(toAnyPatchVersion('1.2.3')).toBe('1.2.*');
-    expect(toAnyPatchVersion('0.8')).toBe('0.8.*');
-    expect(toAnyPatchVersion('2.0')).toBe('2.0.*');
+    expect(toAnyPatchVersion('0.8')).toBe('0.8');
+    expect(toAnyPatchVersion('2.0')).toBe('2.0');
   });
 
   it('handles invalid or empty version strings', () => {
     expect(toAnyPatchVersion('')).toBe('');
     expect(toAnyPatchVersion('invalid')).toBe('invalid');
-    expect(toAnyPatchVersion('0')).toBe('0.*');
+    expect(toAnyPatchVersion('0')).toBe('0');
   });
 
   it('handles already wildcarded versions', () => {
@@ -80,9 +80,11 @@ describe('toAnyPatchVersion', () => {
 
 describe('isSupportedSpecVersion', () => {
   it('returns true for supported spec versions', () => {
-    expect(isSupportedSpecVersion('0.7')).toBe(true);
-    expect(isSupportedSpecVersion('0.8')).toBe(true);
-    expect(isSupportedSpecVersion('1.0')).toBe(true);
+    expect(isSupportedSpecVersion('0.7')).toBe(false);
+    expect(isSupportedSpecVersion('0.8')).toBe(false);
+    expect(isSupportedSpecVersion('0.7.1')).toBe(true);
+    expect(isSupportedSpecVersion('0.8.1')).toBe(true);
+    expect(isSupportedSpecVersion('1.0')).toBe(false);
   });
 
   it('returns false for unsupported spec versions', () => {

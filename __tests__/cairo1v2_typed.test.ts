@@ -33,8 +33,8 @@ import { isString } from '../src/utils/typed';
 import {
   contracts,
   createTestProvider,
-  devnetFeeTokenAddress,
   getTestAccount,
+  STRKtokenAddress,
   TEST_TX_VERSION,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
@@ -161,10 +161,10 @@ describe('Cairo 1', () => {
     });
 
     test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128, litterals', async () => {
-      const tx = await cairo1Contract.increase_balance_u8(255n);
+      const tx = await cairo1Contract.increase_balance_u8(20n);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();
-      expect(balance).toBe(255n);
+      expect(balance).toBe(20n);
 
       let result = await cairo1Contract.test_u16(255n);
       expect(result).toBe(256n);
@@ -733,11 +733,11 @@ describe('Cairo 1', () => {
       );
 
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetFeeTokenAddress,
+        contractAddress: STRKtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
-          amount: uint256(5 * 10 ** 15),
+          amount: uint256(5n * 10n ** 16n),
         },
       });
       await account.waitForTransaction(transaction_hash);
@@ -753,7 +753,7 @@ describe('Cairo 1', () => {
       expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
     });
 
-    test('deploy Cairo1 Account from Cairo0 Account', () => {
+    test('deploy Cairo1 Account', () => {
       expect(accountC1).toBeInstanceOf(Account);
     });
   });

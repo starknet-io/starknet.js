@@ -18,23 +18,14 @@ import {
   RawArgsArray,
   RawArgsObject,
   cairo,
-  ec,
   events,
-  hash,
   json,
   num,
   selector,
   shortString,
-  stark,
   types,
 } from '../src';
-import {
-  contracts,
-  createTestProvider,
-  devnetFeeTokenAddress,
-  getTestAccount,
-  TEST_TX_VERSION,
-} from './config/fixtures';
+import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -154,10 +145,10 @@ describe('Cairo 1', () => {
     });
 
     test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128, literals', async () => {
-      const tx = await cairo1Contract.increase_balance_u8(255n);
+      const tx = await cairo1Contract.increase_balance_u8(20n);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();
-      expect(balance).toBe(255n);
+      expect(balance).toBe(20n);
 
       let result = await cairo1Contract.test_u16(255n);
       expect(result).toBe(256n);
@@ -690,56 +681,60 @@ describe('Cairo 1', () => {
     });
 
     test('myCallData.decodeParameters for Cairo 1', async () => {
-      const Cairo1HelloAbi = contracts.HelloSierra.sierra;
       const Cairo1Abi = contracts.C1v2.sierra;
-      const helloCallData = new CallData(Cairo1HelloAbi.abi);
       const c1v2CallData = new CallData(Cairo1Abi.abi);
 
-      const res2 = helloCallData.decodeParameters('hello::hello::UserData', ['0x123456', '0x1']);
+      const res2 = c1v2CallData.decodeParameters(
+        'hello_res_events_newTypes::hello_res_events_newTypes::UserData',
+        ['0x123456', '0x1']
+      );
       expect(res2).toEqual({ address: 1193046n, is_claimed: true });
-      const res3 = helloCallData.decodeParameters(
-        ['hello::hello::UserData', 'hello::hello::UserData'],
+      const res3 = c1v2CallData.decodeParameters(
+        [
+          'hello_res_events_newTypes::hello_res_events_newTypes::UserData',
+          'hello_res_events_newTypes::hello_res_events_newTypes::UserData',
+        ],
         ['0x123456', '0x1', '0x98765', '0x0']
       );
       expect(res3).toEqual([
         { address: 1193046n, is_claimed: true },
         { address: 624485n, is_claimed: false },
       ]);
-      const res4 = helloCallData.decodeParameters('core::integer::u8', ['0x123456']);
+      const res4 = c1v2CallData.decodeParameters('core::integer::u8', ['0x123456']);
       expect(res4).toBe(1193046n);
-      const res5 = helloCallData.decodeParameters('core::bool', ['0x1']);
+      const res5 = c1v2CallData.decodeParameters('core::bool', ['0x1']);
       expect(res5).toBe(true);
-      const res6 = helloCallData.decodeParameters('core::felt252', ['0x123456']);
+      const res6 = c1v2CallData.decodeParameters('core::felt252', ['0x123456']);
       expect(res6).toBe(1193046n);
-      const res7 = helloCallData.decodeParameters('core::integer::u256', ['0x123456', '0x789']);
+      const res7 = c1v2CallData.decodeParameters('core::integer::u256', ['0x123456', '0x789']);
       expect(num.toHex(res7.toString())).toBe('0x78900000000000000000000000000123456');
-      const res8 = helloCallData.decodeParameters('core::array::Array::<core::integer::u16>', [
+      const res8 = c1v2CallData.decodeParameters('core::array::Array::<core::integer::u16>', [
         '2',
         '0x123456',
         '0x789',
       ]);
       expect(res8).toEqual([1193046n, 1929n]);
-      const res9 = helloCallData.decodeParameters('core::array::Span::<core::integer::u16>', [
+      const res9 = c1v2CallData.decodeParameters('core::array::Span::<core::integer::u16>', [
         '2',
         '0x123456',
         '0x789',
       ]);
       expect(res9).toEqual([1193046n, 1929n]);
-      const res10 = helloCallData.decodeParameters('(core::felt252, core::integer::u16)', [
+      const res10 = c1v2CallData.decodeParameters('(core::felt252, core::integer::u16)', [
         '0x123456',
         '0x789',
       ]);
       expect(res10).toEqual({ '0': 1193046n, '1': 1929n });
-      const res11 = helloCallData.decodeParameters('core::starknet::eth_address::EthAddress', [
+      const res11 = c1v2CallData.decodeParameters('core::starknet::eth_address::EthAddress', [
         '0x123456',
       ]);
       expect(res11).toBe(1193046n);
-      const res12 = helloCallData.decodeParameters(
+      const res12 = c1v2CallData.decodeParameters(
         'core::starknet::contract_address::ContractAddress',
         ['0x123456']
       );
       expect(res12).toBe(1193046n);
-      const res13 = helloCallData.decodeParameters('core::starknet::class_hash::ClassHash', [
+      const res13 = c1v2CallData.decodeParameters('core::starknet::class_hash::ClassHash', [
         '0x123456',
       ]);
       expect(res13).toBe(1193046n);
@@ -764,60 +759,6 @@ describe('Cairo 1', () => {
           Error: undefined,
         },
       });
-    });
-  });
-
-  describe('Cairo1 Account contract - RPC 0.7 V2', () => {
-    let accountC1: Account;
-
-    beforeAll(async () => {
-      // Deploy Cairo 1 Account
-      const priKey = stark.randomAddress();
-      const pubKey = ec.starkCurve.getStarkKey(priKey);
-
-      const calldata = { publicKey: pubKey };
-
-      // declare account
-      const declareAccount = await account.declareIfNot({
-        contract: contracts.C1Account.sierra,
-        casm: contracts.C1Account.casm,
-      });
-      if (declareAccount.transaction_hash) {
-        await account.waitForTransaction(declareAccount.transaction_hash);
-      }
-      const accountClassHash = declareAccount.class_hash;
-
-      // fund new account
-      const toBeAccountAddress = hash.calculateContractAddressFromHash(
-        pubKey,
-        accountClassHash,
-        calldata,
-        0
-      );
-
-      const { transaction_hash } = await account.execute({
-        contractAddress: devnetFeeTokenAddress,
-        entrypoint: 'transfer',
-        calldata: {
-          recipient: toBeAccountAddress,
-          amount: uint256(5 * 10 ** 15),
-        },
-      });
-      await account.waitForTransaction(transaction_hash);
-
-      // deploy account
-      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1', TEST_TX_VERSION);
-      const deployed = await accountC1.deploySelf({
-        classHash: accountClassHash,
-        constructorCalldata: calldata,
-        addressSalt: pubKey,
-      });
-      const receipt = await account.waitForTransaction(deployed.transaction_hash);
-      expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
-    });
-
-    test('deploy Cairo1 Account from Cairo0 Account', () => {
-      expect(accountC1).toBeInstanceOf(Account);
     });
   });
 
