@@ -241,6 +241,16 @@
           "$ref": "starknet_api_openrpc#/components/schemas/PENDING_BLOCK_WITH_RECEIPTS"
         }
       ]
+    },
+    "BlockWithTxReceipts071": {
+      "oneOf": [
+        {
+          "$ref": "starknet_api_openrpc071#/components/schemas/BLOCK_WITH_RECEIPTS"
+        },
+        {
+          "$ref": "starknet_api_openrpc071#/components/schemas/PENDING_BLOCK_WITH_RECEIPTS"
+        }
+      ]
     }
   }
 }
