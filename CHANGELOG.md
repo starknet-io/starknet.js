@@ -1,3 +1,9 @@
+## [7.6.2](https://github.com/starknet-io/starknet.js/compare/v7.6.1...v7.6.2) (2025-06-24)
+
+### Bug Fixes
+
+- enable passing UniversalDetails into ContractOptions ([#1427](https://github.com/starknet-io/starknet.js/issues/1427)) ([4cde813](https://github.com/starknet-io/starknet.js/commit/4cde813afffe08681d61bd624a3429ca3b47cc6e))
+
 ## [7.6.1](https://github.com/starknet-io/starknet.js/compare/v7.6.0...v7.6.1) (2025-06-24)
 
 ### Bug Fixes
