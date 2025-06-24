@@ -1,3 +1,9 @@
+## [7.6.1](https://github.com/starknet-io/starknet.js/compare/v7.6.0...v7.6.1) (2025-06-24)
+
+### Bug Fixes
+
+- verification of signature in a Braavos account with a juno node … ([#1426](https://github.com/starknet-io/starknet.js/issues/1426)) ([e3dca62](https://github.com/starknet-io/starknet.js/commit/e3dca628ee08d98522a98dc9748d841c5e9f075c))
+
 # [7.6.0](https://github.com/starknet-io/starknet.js/compare/v7.5.1...v7.6.0) (2025-06-23)
 
 ### Bug Fixes
