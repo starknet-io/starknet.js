@@ -16,6 +16,7 @@ import {
   num,
   byteArray,
   type EstimateFee,
+  RpcError,
 } from '../src';
 
 import {
@@ -1038,6 +1039,29 @@ describe('Complex interaction', () => {
       const result = await echoContract.iecho(CallData.compile(request));
       const transactionR = await provider.waitForTransaction(result.transaction_hash);
       expect(transactionR.isSuccess()).toBe(true);
+    });
+
+    test('invoke with resourceBounds options', async () => {
+      await expect(
+        echoContract
+          .withOptions({
+            resourceBounds: {
+              l1_gas: {
+                max_amount: '0',
+                max_price_per_unit: '0',
+              },
+              l1_data_gas: {
+                max_amount: '0',
+                max_price_per_unit: '0',
+              },
+              l2_gas: {
+                max_amount: '0',
+                max_price_per_unit: '0',
+              },
+            },
+          })
+          .iecho(CallData.compile(request))
+      ).rejects.toThrow(RpcError);
     });
 
     test('invoke unit test arguments', async () => {
