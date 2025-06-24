@@ -37,6 +37,9 @@ export type AccountInvocationsFactoryDetails = {
 export interface UniversalDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
+  /**
+   * Max fee to pay for V2 transaction
+   */
   maxFee?: BigNumberish; // ignored on estimate
   tip?: BigNumberish;
   paymasterData?: BigNumberish[];

@@ -7,6 +7,8 @@ import {
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
+  describeIfRpc071,
+  describeIfRpc081,
   describeIfTestnet,
   ETHtokenAddress,
   getTestAccount,
@@ -183,26 +185,50 @@ describeIfRpc('RPCProvider', () => {
       await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
     });
 
-    test('estimate message fee Cairo 1', async () => {
-      const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
-      const estimationCairo1 = await rpcProvider.estimateMessageFee({
-        from_address: L1_ADDRESS,
-        to_address: l1l2ContractCairo1Address,
-        entry_point_selector: 'increase_bal',
-        payload: ['100'],
+    describeIfRpc081('estimate message fee rpc 0.8', () => {
+      test('estimate message fee Cairo 1', async () => {
+        const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
+        const estimationCairo1 = await rpcProvider.estimateMessageFee({
+          from_address: L1_ADDRESS,
+          to_address: l1l2ContractCairo1Address,
+          entry_point_selector: 'increase_bal',
+          payload: ['100'],
+        });
+        expect(estimationCairo1).toEqual(
+          expect.objectContaining({
+            l1_data_gas_consumed: expect.anything(),
+            l1_data_gas_price: expect.anything(),
+            l1_gas_consumed: expect.anything(),
+            l1_gas_price: expect.anything(),
+            l2_gas_consumed: expect.anything(),
+            l2_gas_price: expect.anything(),
+            overall_fee: expect.anything(),
+            unit: expect.anything(),
+          })
+        );
       });
-      expect(estimationCairo1).toEqual(
-        expect.objectContaining({
-          l1_data_gas_consumed: expect.anything(),
-          l1_data_gas_price: expect.anything(),
-          l1_gas_consumed: expect.anything(),
-          l1_gas_price: expect.anything(),
-          l2_gas_consumed: expect.anything(),
-          l2_gas_price: expect.anything(),
-          overall_fee: expect.anything(),
-          unit: expect.anything(),
-        })
-      );
+    });
+
+    describeIfRpc071('estimate message fee rpc 0.7', () => {
+      test('estimate message fee Cairo 1', async () => {
+        const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
+        const estimationCairo1 = await rpcProvider.estimateMessageFee({
+          from_address: L1_ADDRESS,
+          to_address: l1l2ContractCairo1Address,
+          entry_point_selector: 'increase_bal',
+          payload: ['100'],
+        });
+        expect(estimationCairo1).toEqual(
+          expect.objectContaining({
+            data_gas_consumed: expect.anything(),
+            data_gas_price: expect.anything(),
+            gas_consumed: expect.anything(),
+            gas_price: expect.anything(),
+            overall_fee: expect.anything(),
+            unit: expect.anything(),
+          })
+        );
+      });
     });
   });
 
