@@ -577,9 +577,12 @@ export class RpcProvider implements ProviderInterface {
         '0x00', // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
       ],
       error: [
-        'argent/invalid-signature', // ArgentX 0.3.0 to 0.3.1
-        'is invalid, with respect to the public key', // OpenZeppelin until 0.6.1, Braavos 0.0.11
-        'INVALID_SIG', // Braavos 1.0.0
+        'argent/invalid-signature',
+        '0x617267656e742f696e76616c69642d7369676e6174757265', // ArgentX 0.3.0 to 0.3.1
+        'is invalid, with respect to the public key',
+        '0x697320696e76616c6964', // OpenZeppelin until 0.6.1, Braavos 0.0.11
+        'INVALID_SIG',
+        '0x494e56414c49445f534947', // Braavos 1.0.0
       ],
     };
     let error: any;
