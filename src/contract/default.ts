@@ -256,7 +256,7 @@ export class Contract implements ContractInterface {
   public invoke(
     method: string,
     args: ArgsOrCalldata = [],
-    { parseRequest = true, maxFee, nonce, signature }: InvokeOptions = {}
+    { parseRequest = true, signature, ...RestInvokeOptions }: InvokeOptions = {}
   ): Promise<InvokeFunctionResponse> {
     assert(this.address !== null, 'contract is not connected to an address');
 
@@ -276,12 +276,12 @@ export class Contract implements ContractInterface {
     };
     if ('execute' in this.providerOrAccount) {
       return this.providerOrAccount.execute(invocation, {
-        maxFee,
-        nonce,
+        ...RestInvokeOptions,
       });
     }
 
-    if (!nonce) throw new Error(`Nonce is required when invoking a function without an account`);
+    if (!RestInvokeOptions.nonce)
+      throw new Error(`Nonce is required when invoking a function without an account`);
     logger.warn(`Invoking ${method} without an account. This will not work on a public node.`);
 
     return this.providerOrAccount.invokeFunction(
@@ -290,7 +290,8 @@ export class Contract implements ContractInterface {
         signature,
       },
       {
-        nonce,
+        ...RestInvokeOptions,
+        nonce: RestInvokeOptions.nonce,
       }
     );
   }
