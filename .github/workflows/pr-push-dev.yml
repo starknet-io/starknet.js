@@ -46,13 +46,13 @@ jobs:
       matrix:
         include:
           - name: rpc-devnet
-            TEST_RPC_URL: http://127.0.0.1:5050/rpc
+            TEST_NODE_URL: http://127.0.0.1:5050/rpc
 
     uses: ./.github/workflows/_test.yml
     with:
-      use-devnet: ${{ matrix.TEST_RPC_URL != '' }}
+      use-devnet: ${{ matrix.TEST_NODE_URL != '' }}
     secrets:
-      TEST_RPC_URL: ${{ matrix.TEST_RPC_URL }}
+      TEST_NODE_URL: ${{ matrix.TEST_NODE_URL }}
 
   release:
     name: Release

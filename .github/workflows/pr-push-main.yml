@@ -34,19 +34,26 @@ jobs:
           cancel_others: 'true'
 
   tests:
-    name: Run test on ${{ matrix.name }}
+    name: Run test on ${{ matrix.node }} ${{ matrix.protocol }} ${{ matrix.version }}
     needs: [skip_check]
     if: needs.skip_check.outputs.should_skip != 'true'
     strategy:
       max-parallel: 1
+      fail-fast: false
       matrix:
-        name: [rpc-sepolia]
+        protocol: [RPC, WS]
+        node: [Juno, Pathfinder]
+        version: [v0_7, v0_8]
+        exclude:
+          - version: v0_7
+            protocol: WS
 
     uses: ./.github/workflows/_test.yml
-    secrets:
-      TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
-      TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
-      TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
+    with:
+      protocol: ${{ matrix.protocol }}
+      node: ${{ matrix.node }}
+      version: ${{ matrix.version }}
+    secrets: inherit
 
   release:
     name: Release
