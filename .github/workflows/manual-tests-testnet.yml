@@ -6,19 +6,29 @@ on:
         description: 'Ignore scripts'
         type: boolean
         default: false
+      fail-fast:
+        description: 'Fail fast'
+        type: boolean
+        default: false
 
 jobs:
   tests:
-    name: Run test on ${{ matrix.name }}
+    name: Run test on ${{ matrix.node }} ${{ matrix.protocol }} ${{ matrix.version }}
     strategy:
       max-parallel: 1
+      fail-fast: ${{ inputs.fail-fast }}
       matrix:
-        name: [rpc-sepolia]
+        protocol: [RPC, WS]
+        node: [Juno, Pathfinder]
+        version: [v0_7, v0_8]
+        exclude:
+          - version: v0_7
+            protocol: WS
 
     uses: ./.github/workflows/_test.yml
     with:
       ignore-scripts: ${{ inputs.ignore-scripts }}
-    secrets:
-      TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
-      TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
-      TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
+      protocol: ${{ matrix.protocol }}
+      node: ${{ matrix.node }}
+      version: ${{ matrix.version }}
+    secrets: inherit
