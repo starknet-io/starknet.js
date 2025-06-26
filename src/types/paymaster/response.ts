@@ -93,7 +93,7 @@ export type ExecutionParameters = {
   timeBounds?: PaymasterTimeBounds;
 };
 
-// executeBefore & executeAfter are in seconds, and is compared to the current block timestamp (see https://docs.starknet.io/architecture-and-concepts/network-architecture/block-structure/)
+// executeBefore & executeAfter are in seconds, and is compared to the current block timestamp (see https://docs.starknet.io/architecture-and-concepts/blocks/)
 export interface PaymasterTimeBounds {
   executeAfter?: number; // executeAfter is optional, if not provided, it will be set to 1, meaning the transaction can be executed immediately
   executeBefore: number; // executeBefore is mandatory if timeBounds is provided
