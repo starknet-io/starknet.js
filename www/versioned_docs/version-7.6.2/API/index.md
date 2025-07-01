@@ -32,7 +32,7 @@ Contracts [**API**](./classes/Contract.md) can do data transformations in JavaSc
 
 Contracts allow you to transform Cairo values, like `Uint256` to `BigNumber`. It could also allow users to pass their own transformers, similar to `JSON.parse`.
 
-Guide is [**here**](../guides/create_contract.md).
+Guide is [**here**](../guides/contracts/create_contract.md).
 
 ## Signer
 
