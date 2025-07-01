@@ -1,0 +1,8 @@
+{
+  "label": "Contracts",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Learn how to interact with smart contracts on Starknet using starknet.js"
+  }
+}
