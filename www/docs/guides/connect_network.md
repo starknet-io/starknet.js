@@ -41,7 +41,9 @@ The Starknet.js version must align with the RPC version supported by the chosen 
 |            v0.8.0             | Starknet.js v7.0.1            |
 
 :::note
+
 From version 6.x.x, Starknet.js is compatible with two RPC spec versions.
+
 :::
 
 With the `RpcProvider` class, you define the Starknet RPC node to use:
@@ -84,7 +86,9 @@ import { RpcProvider } from 'starknet';
 | starknet-devnet v0.3.0 |      v0_8       |     N/A      |
 
 :::note
+
 This status has been verified 02/apr/2025.
+
 :::
 
 ### Default RPC node
@@ -138,6 +142,7 @@ const providerLavaMainnet = new RpcProvider({
 > Take care to safely manage your API key. It's a confidential item!
 
 :::tip
+
 If the RPC version of the node is 0.7, the `specVersion` parameter must be set:
 
 ```typescript
@@ -154,12 +159,15 @@ const myProvider = await RpcProvider.create({ nodeUrl: `${myNodeUrl}` });
 ```
 
 Note that this approach is slower, it performs a request to the node.
+
 :::
 
 ### Goerli Testnet
 
 :::info
+
 The Goerli Testnet is no longer in service.
+
 :::
 
 ### Sepolia Testnet

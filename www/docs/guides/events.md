@@ -83,7 +83,9 @@ const nameHash = num.toHex(hash.starknetKeccak('EventPanic'));
 ```
 
 :::info
+
 In some cases (when an event is coded in a Cairo component, without the `#[flat]` flag), this hash is handled in several numbers.
+
 :::
 
 The second parameter is the `errorType` variable content (stored in keys array because of the `#[key]` flag in the Cairo code).
@@ -138,14 +140,19 @@ const eventsList = await provider.getEvents({
 ```
 
 :::info
+
 `address, from_block, to_block, keys` are all optional parameters.
+
 :::
 
 :::tip
+
 If you don't want to filter by key, you can either remove the `keys` parameter, or affect it this way: `[[]]` .
+
 :::
 
 :::warning CAUTION
+
 An event can be nested in a Cairo component (See the Cairo code of the contract to verify). In this case, the array of keys will start with additional hashes, and you will have to adapt your code in consequence; in this example, we have to skip one hash :
 
 ```typescript

@@ -202,5 +202,7 @@ console.log('✅ Test Completed.');
 ```
 
 :::tip
+
 If the class is already declared, `declare()` will fail. You can also use `declareIfNot()` to not fail in this case.
+
 :::

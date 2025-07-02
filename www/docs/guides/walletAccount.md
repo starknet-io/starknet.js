@@ -8,10 +8,12 @@ sidebar_position: 9
 
 The [`WalletAccount`](../API/classes/WalletAccount) class is similar to the regular [`Account`](../API/classes/Account) class, with the added ability to ask a browser wallet to sign and send transactions. Some other cool functionalities will be detailed hereunder.
 
-The private key of a `WalletAccount` is held in a browser wallet (such as ArgentX, Braavos, etc.), and any signature is managed by the wallet. With this approach DAPPs don't need to manage the security for any private key.
+The private key of a `WalletAccount` is held in a browser wallet (such as Ready, Braavos, etc.), and any signature is managed by the wallet. With this approach DAPPs don't need to manage the security for any private key.
 
 :::caution
+
 This class functions only within the scope of a DAPP. It can't be used in a Node.js script.
+
 :::
 
 ## Architecture
@@ -137,8 +139,10 @@ selectedWalletSWO.off('networkChanged', handleNetwork);
 ```
 
 :::info
+
 You can subscribe both with the SWO or with a `WalletAccount` instance.  
 The above examples are using the SWO, because it is the simpler way to process.
+
 :::
 
 ## Direct access to the wallet API entry points
@@ -199,5 +203,7 @@ useEffect(
 When you change the network or the account address a `WalletAccount` instance is automatically updated, however, this can lead to unexpected behavior if one is not careful (reads and writes targeting different networks, problems with Cairo versions of the accounts, ...).
 
 :::warning RECOMMENDATION
+
 It is strongly recommended to create a new `WalletAccount` instance each time the network or the account address is changed.
+
 :::

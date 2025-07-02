@@ -162,7 +162,7 @@ const feesDetails: PaymasterDetails = {
 
 :::warning important
 
-If the account selected in the Wallet extension (Braavos, ArgentX, ...) is not deployed, you can't process a Paymaster transaction.
+If the account selected in the Wallet extension (Braavos, Ready, ...) is not deployed, you can't process a Paymaster transaction.
 
 :::
 
