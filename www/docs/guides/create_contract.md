@@ -1,1 +1,0 @@
-contracts/create_contract.md

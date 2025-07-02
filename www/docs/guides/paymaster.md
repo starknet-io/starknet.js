@@ -95,7 +95,7 @@ console.log(supported);
 
 ## Sending a Transaction with a Paymaster
 
-To send a [`Call`](./define_call_message.md#call-or-call) (result of [`myContract.populate()`](./define_call_message.md#object-with-abi-conformity-check) or `myCallData.compile()`), here for a `default` paymaster transaction:
+To send a [`Call`](./contracts/define_call_message.md#call-or-call) (result of [`myContract.populate()`](./contracts/define_call_message.md#object-with-abi-conformity-check) or `myCallData.compile()`), here for a `default` paymaster transaction:
 
 ```typescript
 const gasToken = '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080'; // USDC in Testnet
@@ -306,3 +306,5 @@ const App: FC = () => {
 
 export default App;
 ```
+
+For more information about defining call messages and parameters, see [this guide](./contracts/define_call_message.md).

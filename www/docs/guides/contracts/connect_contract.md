@@ -2,183 +2,351 @@
 sidebar_position: 1
 ---
 
-# 🔌 Connect and Interact with a Deployed Contract
+# Contract Instance
 
-Once you have a `Provider` or `Account` initialized, you can interact with contracts deployed on the Starknet network.
+This guide explains how to connect to and interact with smart contracts on Starknet using starknet.js.
 
-To connect to a contract, you primarily need two pieces of information:
-
-- The contract's address.
-- The contract's ABI (Application Binary Interface).
-
-The ABI can be obtained from the compiled contract JSON file.
-
-## Loading Contract Artifacts
-
-It's recommended to load the compiled contract information from a local JSON file. Starknet.js provides a custom `json` utility to correctly parse `BigInt` values.
+## Quick Start
 
 ```typescript
-import fs from 'fs';
-import { json } from 'starknet';
+import { Contract, Provider } from 'starknet';
 
-const compiledErc20 = json.parse(
-  fs.readFileSync('./compiledContracts/erc20.json').toString('ascii')
-);
-```
-
-If you don't have the ABI file, you can fetch it from the network using a provider, but this should be done sparingly. It's best to save it locally for future use.
-
-```typescript
-import fs from 'fs';
-import { json } from 'starknet';
-
-// Note: This is a network intensive operation
-const compressedContract = await provider.getClassAt(contractAddress);
-fs.writeFileSync('./myAbi.json', json.stringify(compressedContract.abi, undefined, 2));
-```
-
-## Connecting to a Contract
-
-To create a contract instance, you provide the ABI, address, and a `Provider` or an `Account`.
-
-- A **Provider** connection is read-only. You can only call view functions.
-- An **Account** connection allows you to both read from and write to the contract (i.e., send transactions).
-
-```typescript
-import { Contract, Provider, Account } from 'starknet';
-
-// Read-only connection
+// Initialize provider
 const provider = new Provider({ rpc: { nodeUrl: 'YOUR_NODE_URL' } });
-const erc20Address = '0x...';
-const erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
-// Read-write connection
-const account = new Account(provider, '0x...', '0x...');
-const erc20_rw = new Contract(compiledErc20.abi, erc20Address, account);
+// Connect to contract
+const contract = new Contract(abi, contractAddress, provider);
+
+// Read contract state
+const result = await contract.my_view_function();
+
+// Write to contract (requires Account)
+const account = new Account(provider, accountAddress, privateKey);
+const { transaction_hash } = await contract.connect(account).my_write_function(params);
 ```
 
-Once connected, the `Contract` object will automatically populate its methods based on the ABI.
+## Prerequisites
 
-## Reading from a Contract (Calls)
+Before connecting to a contract, you need:
 
-If a contract method is a `view` function, calling it will not create a transaction and will return the contract's state.
+- ✅ A configured `Provider` or `Account` instance
+- ✅ The contract's address
+- ✅ The contract's ABI (Application Binary Interface)
 
-Starknet.js provides several ways to call a view function. The most direct way is to call the method on the contract instance:
+## Loading Contract ABI
+
+### Method 1: From Local File (Recommended)
+
+Use Starknet.js's `json` utility to correctly parse contract artifacts, including `BigInt` values:
 
 ```typescript
-// Direct call
-const balance = await erc20.balanceOf(my_address);
-console.log('Balance is:', balance);
+import fs from 'fs';
+import { json } from 'starknet';
+
+const contractArtifact = json.parse(fs.readFileSync('./path/to/contract.json').toString('ascii'));
 ```
 
-This returns the result, with numbers automatically parsed into `BigInt`.
+### Method 2: From Network (Fallback)
 
-You can also use the generic `call` method, which is useful for dynamic function calls:
+Fetch the ABI directly from the network (use sparingly):
 
 ```typescript
-// Using contract.call()
-const balance1 = await erc20.call('balanceOf', [my_address]);
+import fs from 'fs';
+import { json } from 'starknet';
+
+// ⚠️ Network intensive operation
+const { abi } = await provider.getClassAt(contractAddress);
+// Save for future use
+fs.writeFileSync('./contract-abi.json', json.stringify(abi, null, 2));
 ```
 
-## Writing to a Contract (Invokes)
+## Creating Contract Instances
 
-To execute a function that modifies the contract's state (an "invoke"), you must connect the contract to an `Account`.
+### Read-Only Access
 
-Similar to calls, the most direct way is to call the method on the instance:
+For reading contract state (view functions):
 
 ```typescript
-// The 'transfer' function will be executed as a transaction
-const { transaction_hash } = await erc20_rw.transfer(recipient_address, amount);
+import { Contract, Provider } from 'starknet';
 
-// You can wait for the transaction to be accepted
-await account.waitForTransaction(transaction_hash);
+const provider = new Provider({ rpc: { nodeUrl: 'YOUR_NODE_URL' } });
+const contract = new Contract(abi, contractAddress, provider);
+
+// Call view functions
+const result = await contract.get_balance();
 ```
 
-### Passing Arguments
+### Read-Write Access
 
-Starknet.js automatically compiles JavaScript data types into Cairo-compatible calldata. You can pass numbers, strings, BigInts, and objects directly.
+For full contract interaction (including state modifications):
 
-For a function that takes a struct:
+```typescript
+import { Contract, Account } from 'starknet';
 
-```cairo
-// Cairo struct
-struct MyStruct {
-    a: felt252,
-    b: u256,
+const account = new Account(provider, accountAddress, privateKey);
+const contract = new Contract(abi, contractAddress, account);
+
+// Now you can both read and write
+const balance = await contract.get_balance();
+const tx = await contract.set_balance(newBalance);
+```
+
+## Reading Contract State
+
+### Direct Method Calls
+
+```typescript
+// Using contract methods (recommended)
+const balance = await contract.get_balance(address);
+console.log('Balance:', balance.toString());
+
+// Using generic call
+const result = await contract.call('get_balance', [address]);
+```
+
+### Handling Complex Return Types
+
+```typescript
+// Struct return value
+const { amount, owner } = await contract.get_token_info(tokenId);
+
+// Array return value
+const holders = await contract.get_all_holders();
+for (const holder of holders) {
+  console.log('Holder:', holder);
 }
 ```
 
-You can pass a simple JavaScript object:
+## Writing to Contracts
+
+### Basic Transaction
 
 ```typescript
-import { cairo } from 'starknet';
+// Send a transaction
+const { transaction_hash } = await contract.transfer(recipient, amount);
 
-await myContract.my_func({
-  a: 123,
-  b: cairo.uint256(456),
+// Wait for confirmation
+await provider.waitForTransaction(transaction_hash);
+```
+
+### Handling Complex Parameters
+
+#### Structs
+
+```typescript
+// Cairo struct
+/* 
+struct TokenInfo {
+    amount: felt252,
+    owner: ContractAddress,
+}
+*/
+
+// JavaScript object
+await contract.set_token_info({
+  amount: 1000n,
+  owner: '0x123...',
 });
 ```
 
-The `cairo` helper provides utilities for complex types like `uint256`, `tuple`, etc. However, for many common types, you can use plain JS equivalents:
-
-- `uint256` can be a `BigInt` or an object `{ low: ..., high: ... }`.
-- `tuples` can be an object with numeric keys `{ 0: ..., 1: ... }`.
-
-## Advanced Interaction
-
-### Estimating Fees
-
-You can estimate the fee for a transaction before sending it using the `estimateFee` property:
+#### Arrays and Tuples
 
 ```typescript
-const fee = await erc20_rw.estimateFee.transfer(recipient_address, amount);
-console.log('Estimated fee:', fee);
+// Arrays
+await contract.set_values([1, 2, 3]);
+
+// Tuples
+await contract.set_coordinate({ x: 10, y: 20 });
 ```
 
-### Populating Transactions
+## Advanced Features
 
-If you need more control, you can prepare a transaction without executing it. This is useful for building multi-call transactions with `account.execute()`.
+### Using withOptions
 
-```typescript
-const transferCall = erc20_rw.populateTransaction.transfer(recipient_address, amount);
-
-// transferCall is now an object: { contractAddress, entrypoint, calldata }
-// It can be used in a multicall
-const { transaction_hash } = await account.execute([transferCall, ...]);
-```
-
-### Call Options (`withOptions`)
-
-For the next call/invoke only, you can provide special options using `withOptions`. This is how you set `resourceBounds` for a V3 transaction.
+The `withOptions` method allows you to customize how the next contract interaction is processed. These options only apply to the immediately following operation and don't persist for subsequent calls. For a complete list of available options, see the [ContractOptions API reference](../../API/namespaces/types.md#contractoptions).
 
 ```typescript
-const { transaction_hash } = await myContract
+// Example: Multiple options for a transaction
+const result = await contract
   .withOptions({
+    // Block identifier for reading state
+    blockIdentifier: 'latest',
+
+    // Request/Response parsing
+    parseRequest: true, // Parse and validate input arguments
+    parseResponse: true, // Parse response into structured data
+
+    // Custom response formatting
+    formatResponse: {
+      balance: uint256ToBN, // Convert uint256 to BigNumber
+      tokens: (arr) => arr.map(Number), // Convert array elements to numbers
+    },
+
+    // Transaction details (for writes)
+    maxFee: 1000n,
+    nonce: '0x1',
+    version: '0x1',
+
+    // V3 transaction resource bounds
     resourceBounds: {
       l1_gas: { max_amount: '0x186a0', max_price_per_unit: '0x1' },
       l2_gas: { max_amount: '0x186a0', max_price_per_unit: '0x1' },
       l1_data_gas: { max_amount: '0x186a0', max_price_per_unit: '0x1' },
     },
   })
-  .my_invoke_function(arg1);
+  .myFunction(arg1, arg2);
 ```
 
-You can also control request and response parsing with `withOptions`.
+#### Common Use Cases
 
-### Parsing Transaction Events
-
-The `Contract` instance can parse the events from a transaction receipt for you, based on its ABI:
+1. **Reading Historical State**:
 
 ```typescript
-const receipt = await account.waitForTransaction(tx_hash);
-const parsedEvents = myContract.parseEvents(receipt);
-console.log(parsedEvents);
+const pastBalance = await contract
+  .withOptions({ blockIdentifier: '0x123...' })
+  .get_balance(address);
 ```
 
-This will return an array of events emitted by `myContract` in that transaction, decoded into readable objects.
+2. **Custom Response Formatting**:
 
-## Type-checking and Autocompletion
+```typescript
+const { tokens, owner } = await contract
+  .withOptions({
+    formatResponse: {
+      tokens: (arr) => arr.map(BigInt),
+      owner: (addr) => addr.toLowerCase(),
+    },
+  })
+  .get_token_info();
+```
 
-For an enhanced development experience with full type-safety and autocompletion on your contract methods, you can use `abi-wan-kanabi`.
+3. **Raw Data Mode**:
 
-See [this guide](./automatic_cairo_ABI_parsing.md) for more details.
+```typescript
+const rawResult = await contract
+  .withOptions({
+    parseRequest: false,
+    parseResponse: false,
+  })
+  .my_function();
+```
+
+4. **V3 Transaction with Resource Bounds**:
+
+```typescript
+const tx = await contract
+  .withOptions({
+    version: '0x3',
+    resourceBounds: {
+      l1_gas: { max_amount: '0x186a0', max_price_per_unit: '0x1' },
+      l2_gas: { max_amount: '0x186a0', max_price_per_unit: '0x1' },
+      l1_data_gas: { max_amount: '0x186a0', max_price_per_unit: '0x1' },
+    },
+  })
+  .transfer(recipient, amount);
+```
+
+### Fee Estimation
+
+```typescript
+// Estimate before sending
+const { suggestedMaxFee } = await contract.estimateFee.transfer(recipient, amount);
+console.log('Estimated fee:', suggestedMaxFee.toString());
+
+// Use in transaction
+const tx = await contract.transfer(recipient, amount, {
+  maxFee: suggestedMaxFee,
+});
+```
+
+### Transaction Building
+
+```typescript
+// Prepare transaction without sending
+const tx = contract.populateTransaction.transfer(recipient, amount);
+
+// Use in multicall
+const { transaction_hash } = await account.execute([
+  tx,
+  anotherContract.populateTransaction.approve(spender, amount),
+]);
+```
+
+### Event Handling
+
+```typescript
+// Listen for events
+const receipt = await provider.waitForTransaction(tx.transaction_hash);
+const events = contract.parseEvents(receipt);
+
+// Process events
+for (const event of events) {
+  console.log('Event:', {
+    name: event.name,
+    data: event.data,
+  });
+}
+```
+
+## Type Safety
+
+For enhanced development experience with TypeScript:
+
+- ✨ Full type checking
+- 💡 IDE autocompletion
+- 🐛 Compile-time error detection
+
+See our [TypeScript Integration Guide](./abi_typescript.md) for details.
+
+## Best Practices
+
+1. **ABI Management**
+
+   - Store ABIs locally instead of fetching from network
+   - Use version control for ABI files
+   - **Always update your local ABI when recompiling contracts**:
+
+   - Using outdated ABIs can cause unexpected errors, especially if you've:
+     - Added or removed functions
+     - Changed function parameters
+     - Modified function visibility
+     - Updated Cairo version
+
+2. **Error Handling**
+
+   ```typescript
+   try {
+     const tx = await contract.transfer(recipient, amount);
+     await provider.waitForTransaction(tx.transaction_hash);
+   } catch (error) {
+     if (error.message.includes('insufficient balance')) {
+       console.error('Not enough funds!');
+     } else {
+       console.error('Transaction failed:', error);
+     }
+   }
+   ```
+
+3. **Transaction Monitoring**
+
+   ```typescript
+   const tx = await contract.transfer(recipient, amount);
+   const receipt = await provider.waitForTransaction(tx.transaction_hash, {
+     retryInterval: 2000,
+     successStates: ['ACCEPTED_ON_L2'],
+   });
+   ```
+
+4. **Resource Management**
+   - Always estimate fees before transactions
+   - Set appropriate gas limits
+   - Consider using `withOptions` for fine-grained control
+
+## Common Issues and Solutions
+
+| Issue                | Solution                                  |
+| -------------------- | ----------------------------------------- |
+| Transaction Reverted | Check parameters and contract state       |
+| Insufficient Fee     | Use `estimateFee` and add buffer          |
+| Nonce Too Low        | Wait for previous transaction to complete |
+| Contract Not Found   | Verify address and network                |
