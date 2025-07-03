@@ -119,6 +119,9 @@ class StrategyResolver {
   private async useProvidedSetup(): Promise<void> {
     setIfNullish('IS_DEVNET', false);
     setIfNullish('IS_RPC', !!process.env.TEST_RPC_URL);
+    if (!process.env.RPC_SPEC_VERSION) {
+      await this.getNodeSpecVersion();
+    }
     setIfNullish('IS_TESTNET', await this.isTestnet);
 
     this.logConfigInfo();

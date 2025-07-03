@@ -7,6 +7,8 @@ import {
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
+  describeIfRpc071,
+  describeIfRpc081,
   describeIfTestnet,
   ETHtokenAddress,
   getTestAccount,
@@ -28,13 +30,12 @@ import {
   RpcProvider,
   TransactionExecutionStatus,
   cairo,
+  num,
   stark,
   waitForTransactionOptions,
   isVersion,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
-import { felt, uint256 } from '../src/utils/calldata/cairo';
-import { toBigInt, toHexString } from '../src/utils/num';
 import { isBoolean } from '../src/utils/typed';
 import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
 import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
@@ -172,35 +173,6 @@ describeIfRpc('RPCProvider', () => {
     estimateSpy.mockRestore();
   });
 
-  describeIfDevnet('Test Estimate message fee Cairo 0', () => {
-    // declaration of Cairo 0 contract is no more authorized in Sepolia Testnet
-    let l1l2ContractCairo0Address: string;
-
-    beforeAll(async () => {
-      const { deploy } = await account.declareAndDeploy({
-        contract: contracts.L1L2,
-      });
-      l1l2ContractCairo0Address = deploy.contract_address;
-    });
-
-    test('estimate message fee Cairo 0', async () => {
-      const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
-      const estimationCairo0 = await rpcProvider.estimateMessageFee({
-        from_address: L1_ADDRESS,
-        to_address: l1l2ContractCairo0Address,
-        entry_point_selector: 'deposit',
-        payload: ['556', '123'],
-      });
-      expect(estimationCairo0).toEqual(
-        expect.objectContaining({
-          gas_consumed: expect.anything(),
-          gas_price: expect.anything(),
-          overall_fee: expect.anything(),
-        })
-      );
-    });
-  });
-
   describe('Test Estimate message fee Cairo 1', () => {
     let l1l2ContractCairo1Address: string;
 
@@ -213,26 +185,50 @@ describeIfRpc('RPCProvider', () => {
       await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
     });
 
-    test('estimate message fee Cairo 1', async () => {
-      const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
-      const estimationCairo1 = await rpcProvider.estimateMessageFee({
-        from_address: L1_ADDRESS,
-        to_address: l1l2ContractCairo1Address,
-        entry_point_selector: 'increase_bal',
-        payload: ['100'],
+    describeIfRpc081('estimate message fee rpc 0.8', () => {
+      test('estimate message fee Cairo 1', async () => {
+        const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
+        const estimationCairo1 = await rpcProvider.estimateMessageFee({
+          from_address: L1_ADDRESS,
+          to_address: l1l2ContractCairo1Address,
+          entry_point_selector: 'increase_bal',
+          payload: ['100'],
+        });
+        expect(estimationCairo1).toEqual(
+          expect.objectContaining({
+            l1_data_gas_consumed: expect.anything(),
+            l1_data_gas_price: expect.anything(),
+            l1_gas_consumed: expect.anything(),
+            l1_gas_price: expect.anything(),
+            l2_gas_consumed: expect.anything(),
+            l2_gas_price: expect.anything(),
+            overall_fee: expect.anything(),
+            unit: expect.anything(),
+          })
+        );
       });
-      expect(estimationCairo1).toEqual(
-        expect.objectContaining({
-          l1_data_gas_consumed: expect.anything(),
-          l1_data_gas_price: expect.anything(),
-          l1_gas_consumed: expect.anything(),
-          l1_gas_price: expect.anything(),
-          l2_gas_consumed: expect.anything(),
-          l2_gas_price: expect.anything(),
-          overall_fee: expect.anything(),
-          unit: expect.anything(),
-        })
-      );
+    });
+
+    describeIfRpc071('estimate message fee rpc 0.7', () => {
+      test('estimate message fee Cairo 1', async () => {
+        const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
+        const estimationCairo1 = await rpcProvider.estimateMessageFee({
+          from_address: L1_ADDRESS,
+          to_address: l1l2ContractCairo1Address,
+          entry_point_selector: 'increase_bal',
+          payload: ['100'],
+        });
+        expect(estimationCairo1).toEqual(
+          expect.objectContaining({
+            data_gas_consumed: expect.anything(),
+            data_gas_price: expect.anything(),
+            gas_consumed: expect.anything(),
+            gas_price: expect.anything(),
+            overall_fee: expect.anything(),
+            unit: expect.anything(),
+          })
+        );
+      });
     });
   });
 
@@ -252,7 +248,6 @@ describeIfRpc('RPCProvider', () => {
     const response = {
       successful: generateTransactionStatus('ACCEPTED_ON_L1', 'SUCCEEDED'),
       reverted: generateTransactionStatus('ACCEPTED_ON_L2', 'REVERTED'),
-      rejected: generateTransactionStatus('REJECTED'),
     };
 
     beforeAll(() => {
@@ -276,13 +271,6 @@ describeIfRpc('RPCProvider', () => {
     test('reverted - default', async () => {
       transactionStatusSpy.mockResolvedValueOnce(response.reverted);
       await expect(rpcProvider.waitForTransaction(0)).resolves.toBeInstanceOf(ReceiptTx);
-    });
-
-    test('rejected - default', async () => {
-      transactionStatusSpy.mockResolvedValueOnce(response.rejected);
-      await expect(rpcProvider.waitForTransaction(0)).rejects.toThrow(
-        `${undefined}: ${RPC.ETransactionStatus.REJECTED}`
-      );
     });
 
     test('reverted - as error state', async () => {
@@ -353,33 +341,33 @@ describeIfRpc('RPCProvider', () => {
 
     describeIfDevnet('devnet only', () => {
       test('getEvents ', async () => {
+        const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
+        const erc20ConstructorParams = {
+          name: 'Token',
+          symbol: 'ERC20',
+          amount: 1000n,
+          recipient: account.address,
+          owner: account.address,
+        };
+        const erc20Constructor = erc20CallData.compile('constructor', erc20ConstructorParams);
         const randomWallet = stark.randomAddress();
-        const classHash = '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3';
-        const transferSelector = toHexString(
+        const transferSelector = num.toHexString(
           '271746229759260285552388728919865295615886751538523744128730118297934206697'
         );
 
         const { deploy } = await account.declareAndDeploy({
-          contract: contracts.Erc20Echo,
-          classHash,
-          constructorCalldata: CallData.compile({
-            name: felt('Token'),
-            symbol: felt('ERC20'),
-            decimals: felt('18'),
-            initial_supply: uint256('1000000000'),
-            recipient: felt(account.address),
-            signers: [],
-            threshold: 1,
-          }),
+          contract: contracts.Erc20OZ.sierra,
+          casm: contracts.Erc20OZ.casm,
+          constructorCalldata: erc20Constructor,
         });
 
         const erc20EchoContract = new Contract(
-          contracts.Erc20Echo.abi,
+          contracts.Erc20OZ.sierra.abi,
           deploy.contract_address!,
           account
         );
-        await erc20EchoContract.transfer(randomWallet, uint256(1));
-        await erc20EchoContract.transfer(randomWallet, uint256(1));
+        await erc20EchoContract.transfer(randomWallet, cairo.uint256(1));
+        await erc20EchoContract.transfer(randomWallet, cairo.uint256(1));
 
         const blockNumber = await rpcProvider.getBlockNumber();
         const result = await rpcProvider.getEvents({
@@ -424,7 +412,8 @@ describeIfRpc('RPCProvider', () => {
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
-          contract: contracts.OpenZeppelinAccount,
+          contract: contracts.C1Account.sierra,
+          casm: contracts.C1Account.casm,
           constructorCalldata: [accountPublicKey],
           salt: accountPublicKey,
         });
@@ -467,12 +456,12 @@ describeIfRpc('RPCProvider', () => {
 
       test('getClassAt', async () => {
         const classAt = await rpcProvider.getClassAt(contract_address);
-        expect(classAt).toMatchSchemaRef('LegacyContractClass');
+        expect(classAt).toMatchSchemaRef('SierraContractClass');
       });
 
       test('getClass classHash', async () => {
         const contractClass = await rpcProvider.getClass(ozClassHash);
-        expect(contractClass).toMatchSchemaRef('LegacyContractClass');
+        expect(contractClass).toMatchSchemaRef('SierraContractClass');
       });
     });
   });
@@ -564,8 +553,8 @@ describe('EIP712 verification', () => {
     const [r, s] = stark.formatSignature(signature);
 
     // change the signature to make it invalid
-    const r2 = toBigInt(r) + 123n;
-    const wrongSignature = new Signature(toBigInt(r2.toString()), toBigInt(s));
+    const r2 = num.toBigInt(r) + 123n;
+    const wrongSignature = new Signature(num.toBigInt(r2.toString()), num.toBigInt(s));
     if (!wrongSignature) return;
     const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
       typedDataExample,

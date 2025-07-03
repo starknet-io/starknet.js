@@ -1,3 +1,25 @@
+## [7.6.2](https://github.com/starknet-io/starknet.js/compare/v7.6.1...v7.6.2) (2025-06-24)
+
+### Bug Fixes
+
+- enable passing UniversalDetails into ContractOptions ([#1427](https://github.com/starknet-io/starknet.js/issues/1427)) ([4cde813](https://github.com/starknet-io/starknet.js/commit/4cde813afffe08681d61bd624a3429ca3b47cc6e))
+
+## [7.6.1](https://github.com/starknet-io/starknet.js/compare/v7.6.0...v7.6.1) (2025-06-24)
+
+### Bug Fixes
+
+- verification of signature in a Braavos account with a juno node … ([#1426](https://github.com/starknet-io/starknet.js/issues/1426)) ([e3dca62](https://github.com/starknet-io/starknet.js/commit/e3dca628ee08d98522a98dc9748d841c5e9f075c))
+
+# [7.6.0](https://github.com/starknet-io/starknet.js/compare/v7.5.1...v7.6.0) (2025-06-23)
+
+### Bug Fixes
+
+- flex. simulate version, resolver, getVersionsByType tet ([1e3b2b4](https://github.com/starknet-io/starknet.js/commit/1e3b2b48efc132dfa60ef3595d1f1fabe0efde56))
+
+### Features
+
+- totoApiVersion, getSupportedRpcVersions, tests ([9d41966](https://github.com/starknet-io/starknet.js/commit/9d4196692bf3d5279ccdbeb656418618866415dd))
+
 ## [7.5.1](https://github.com/starknet-io/starknet.js/compare/v7.5.0...v7.5.1) (2025-06-17)
 
 ### Bug Fixes

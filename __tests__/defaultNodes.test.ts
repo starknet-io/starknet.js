@@ -1,12 +1,46 @@
 import { Provider } from '../src';
 import { SupportedRpcVersion } from '../src/global/constants';
-import { getDefaultNodes } from '../src/utils/provider';
-import { describeIfTestnet } from './config/fixtures';
+import { getDefaultNodes, getSupportedRpcVersions } from '../src/utils/provider';
 
-describeIfTestnet('Default RPC Nodes', () => {
+describe('unit tests', () => {
+  describe('getDefaultNodes', () => {
+    it('constructs correct URLs for all supported RPC versions', () => {
+      const supportedVersions = getSupportedRpcVersions();
+      supportedVersions.forEach((version) => {
+        const rpcNodes = getDefaultNodes(version);
+        const [major, minor] = version.replace(/^v/, '').split('.');
+        const expectedEnding = `v${major}_${minor}`;
+        Object.values(rpcNodes).forEach((networkNodes: any) => {
+          networkNodes.forEach((nodeUrl: string) => {
+            expect(nodeUrl.endsWith(expectedEnding)).toBe(true);
+          });
+        });
+      });
+    });
+  });
+  describe('getSupportedRpcVersions', () => {
+    it('should return a non-empty array of strings', () => {
+      const versions = getSupportedRpcVersions();
+      expect(Array.isArray(versions)).toBe(true);
+      expect(versions.length).toBeGreaterThan(0);
+      versions.forEach((version) => {
+        expect(typeof version).toBe('string');
+      });
+    });
+
+    it('should return an array with unique values', () => {
+      const versions = getSupportedRpcVersions();
+      const uniqueVersions = [...new Set(versions)];
+      expect(versions.length).toEqual(uniqueVersions.length);
+    });
+  });
+});
+
+describe('Default RPC Nodes', () => {
   test('All Default RPC Nodes support Spec Versions', async () => {
+    const supportedVersions = getSupportedRpcVersions();
     const finalResult = await Promise.all(
-      Object.keys(SupportedRpcVersion).map(async (rpcv) => {
+      supportedVersions.map(async (rpcv) => {
         const rpcNodes = getDefaultNodes(rpcv as SupportedRpcVersion);
 
         const result = await Promise.all(

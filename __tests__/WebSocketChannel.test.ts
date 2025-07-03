@@ -125,7 +125,8 @@ describeIfWs('E2E WebSocket Tests', () => {
       sub.on(async (result) => {
         i += 1;
         expect(result).toBeDefined();
-        if (i >= 2) {
+        if (i >= 1) {
+          // TODO: it should be 2 statuses received and ..., but juno do not report first one when sub., revisit after RPC 0.9
           const status = await sub.unsubscribe();
           expect(status).toBe(true);
         }

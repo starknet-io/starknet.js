@@ -694,9 +694,9 @@ export class RpcChannel {
   ): RPC.BaseTransaction {
     const defaultVersions = getVersionsByType(versionType);
     let details;
-
     if (!isV3Tx(invocation)) {
       // V0,V1,V2
+      // console.log({ invocation });
       throw Error('v0,v1,v2 tx are not supported on RPC 0.8');
     } else {
       // V3
@@ -718,7 +718,7 @@ export class RpcChannel {
         type: RPC.ETransactionType.INVOKE,
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
-        version: toHex(defaultVersions.v3),
+        version: toHex(invocation.version || defaultVersions.v3), // invocation.version as simulate can use fee and normal version
         ...details,
       } as RPC.BROADCASTED_INVOKE_TXN;
     }
@@ -736,7 +736,7 @@ export class RpcChannel {
         },
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,
-        version: toHex(defaultVersions.v3),
+        version: toHex(invocation.version || defaultVersions.v3), // invocation.version as simulate can use fee and normal version
         ...details,
       } as RPC.BROADCASTED_DECLARE_TXN;
     }
@@ -749,7 +749,7 @@ export class RpcChannel {
         constructor_calldata: CallData.toHex(invocation.constructorCalldata || []),
         class_hash: toHex(invocation.classHash),
         contract_address_salt: toHex(invocation.addressSalt || 0),
-        version: toHex(defaultVersions.v3),
+        version: toHex(invocation.version || defaultVersions.v3), // invocation.version as simulate can use fee and normal version
         ...restDetails,
       } as RPC.BROADCASTED_DEPLOY_ACCOUNT_TXN;
     }
