@@ -11,6 +11,31 @@ on:
         type: boolean
         default: false
 
+      matrix-node-juno:
+        description: 'Node: Juno'
+        type: boolean
+        default: true
+      matrix-node-pathfinder:
+        description: 'Node: Pathfinder'
+        type: boolean
+        default: true
+      matrix-protocol-rpc:
+        description: 'Protocol: RPC'
+        type: boolean
+        default: true
+      matrix-protocol-ws:
+        description: 'Protocol: WS'
+        type: boolean
+        default: true
+      matrix-version-v0_7:
+        description: 'RPC version: 0.7'
+        type: boolean
+        default: true
+      matrix-version-v0_8:
+        description: 'RPC version: 0.8'
+        type: boolean
+        default: true
+
 jobs:
   tests:
     name: Run test on ${{ matrix.node }} ${{ matrix.protocol }} ${{ matrix.version }}
