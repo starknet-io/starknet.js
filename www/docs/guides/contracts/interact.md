@@ -14,7 +14,7 @@ Once your provider, contract, and account are connected, you can interact with t
 
 Your account should be funded enough to pay fees (20 STRK should be enough to start).
 
-![](./pictures/Interact_contract.png)
+![](./pictures/contract-interaction.svg)
 
 Here we will interact with a `test.cairo` contract (Cairo 1) already deployed in Sepolia Testnet at the address:
 

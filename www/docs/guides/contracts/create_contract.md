@@ -1,206 +1,326 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 
-# Create a new contract
+# Deploy
 
-When you have compiled your new Cairo contract, you can deploy it in the network.
+## Overview
 
-In Starknet, a new contract has to be added in two phases:
+In Starknet, deploying a smart contract involves two distinct phases:
 
-1. Create the contract class.
-2. Deploy an instance of the contract.
+1. **Declaring the contract class** - Publishing the contract's logic and code on the network
+2. **Deploying a contract instance** - Creating a specific instance with its own storage and address
 
-> You must first declare your contract class and only then deploy a new instance of it!
+This two-phase deployment model is unique to Starknet and offers several advantages:
 
-![](./pictures/createContract.png)
+- Cost efficiency: Multiple instances can reuse the same declared class
+- Storage optimization: Contract code is stored once per class
+- Upgradability: New instances can be deployed from existing classes
 
-> Both declaration and deployment will cost fees. That's why these functions are methods of the `Account` object. The account should be funded enough to be able to process everything.
+![Contract Creation Process](./pictures/DeclareDeploy.svg)
 
-- The contract class contains the logic of the contract. A contract class is identified by its Class Hash.
-- The contract instance contains the memory storage of this instance. A contract instance is identified by its contract address. You will interact with the contract instance by using this address.
+:::tip Important Concepts
 
-You will have only one Class Hash for one contract code, but you can have as many contract instances as you need.
+- **Contract Class**: Contains the logic and code (identified by Class Hash)
+- **Contract Instance**: Contains the state/storage (identified by Contract Address)
+- **Fees**: Both declaration and deployment incur fees, paid by the declaring account
+  :::
 
-Other users of the network can use your declared contract. It means that if somebody has already declared a contract class (and paid this declaration), and if you would like to have your own instance of this contract, you have only to deploy (and pay) a new instance.
+## Using ContractFactory
 
-Example: if you want an ERC20 contract, and somebody has already declared an ERC20 contract that conforms to your needs, you have just to deploy a new instance of this contract class.
+ContractFactory provides a more object-oriented way to deploy and manage contracts. It's particularly useful when you need to:
+
+- Deploy multiple instances of the same contract
+- Manage contract deployments with consistent configurations
+- Create reusable contract deployment patterns
+
+### Creating a ContractFactory
 
 ```typescript
-import { RpcProvider, Account, Contract, json, stark, uint256, shortString } from 'starknet';
+import { ContractFactory, type ContractFactoryParams } from 'starknet';
+
+const factory = new ContractFactory({
+  compiledContract: compiledSierra, // Your compiled Sierra contract
+  account, // Account that will deploy contracts
+  casm: compiledCasm, // Optional: CASM file for the contract
+  classHash, // Optional: Known class hash
+  contractOptions: {
+    // Optional: Contract options
+    addressSalt: '0x...', // Custom salt for address generation
+    parseRequest: true, // Enable/disable request parsing
+  },
+});
 ```
 
-## `declareAndDeploy()` your new contract
-
-Starknet.js proposes a function to perform both operations in one step: `declareAndDeploy()`.
-
-Here, to declare & deploy a `Test.cairo` smart contract, in Devnet:
+### Deploying Contracts
 
 ```typescript
-// connect provider
-const provider = new RpcProvider({ baseUrl: 'http://127.0.0.1:5050/rpc' });
-// connect your account. To adapt to your own account:
-const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
-const account0Address: string = '0x123....789';
-const account0 = new Account(provider, account0Address, privateKey0);
+// 1. Deploy with constructor arguments
+const myContract = await factory.deploy(
+  CallData.compile({
+    name: 'MyToken',
+    symbol: 'MTK',
+    decimals: 18,
+    initialSupply: uint256.bnToUint256(1000n * 10n ** 18n),
+  })
+);
 
-// Declare & deploy Test contract in Devnet
-const compiledTestSierra = json.parse(
-  fs.readFileSync('./compiledContracts/test.contract_class.json').toString('ascii')
+// 2. Wait for deployment to complete
+await myContract.deployed();
+
+// 3. Start using the contract
+const balance = await myContract.balanceOf(account.address);
+```
+
+### Factory Features
+
+1. **Connect to Different Accounts**
+
+```typescript
+// Switch to a different account
+const newFactory = factory.connect(newAccount);
+```
+
+2. **Attach to Existing Contracts**
+
+```typescript
+// Create contract instance at known address
+const existingContract = factory.attach(contractAddress);
+```
+
+3. **Reuse for Multiple Deployments**
+
+```typescript
+// Deploy multiple instances with different parameters
+const token1 = await factory.deploy(
+  CallData.compile({ name: 'Token1', symbol: 'TK1', decimals: 18 })
 );
-const compiledTestCasm = json.parse(
-  fs.readFileSync('./compiledContracts/test.compiled_contract_class.json').toString('ascii')
+const token2 = await factory.deploy(
+  CallData.compile({ name: 'Token2', symbol: 'TK2', decimals: 18 })
 );
-const deployResponse = await account0.declareAndDeploy({
-  contract: compiledTestSierra,
-  casm: compiledTestCasm,
+```
+
+### Best Practices with ContractFactory
+
+1. **Reuse for Similar Contracts**
+
+```typescript
+// Create a factory for your standard token deployment
+const tokenFactory = new ContractFactory({
+  compiledContract: erc20Sierra,
+  casm: erc20Casm,
+  account,
+  contractOptions: {
+    parseRequest: true, // Enable ABI validation
+  },
 });
 
-// Connect the new contract instance:
-const myTestContract = new Contract(
-  compiledTestSierra.abi,
-  deployResponse.deploy.contract_address,
-  provider
-);
-console.log('Test Contract Class Hash =', deployResponse.declare.class_hash);
-console.log('✅ Test Contract connected at =', myTestContract.address);
+// Deploy multiple tokens with consistent configuration
+const tokens = await Promise.all([
+  tokenFactory.deploy(token1Params),
+  tokenFactory.deploy(token2Params),
+  tokenFactory.deploy(token3Params),
+]);
 ```
 
-## `deployContract()` for a new instance
-
-If the contract class is already declared, it's faster and cheaper: just use `deployContract()`.
+2. **Handle Deployment Errors**
 
 ```typescript
-// connect provider
-const provider = new RpcProvider({ baseUrl: 'http://127.0.0.1:5050/rpc' });
-// connect your account. To adapt to your own account:
-const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
-const account0Address: string = '0x123....789';
-
-const account0 = new Account(provider, account0Address, privateKey0);
-
-// Deploy Test contract in Devnet
-// ClassHash of the already declared contract
-const testClassHash = '0xff0378becffa6ad51c67ac968948dbbd110b8a8550397cf17866afebc6c17d';
-
-const deployResponse = await account0.deployContract({ classHash: testClassHash });
-await provider.waitForTransaction(deployResponse.transaction_hash);
-
-// read the ABI of the Test contract
-const { abi: testAbi } = await provider.getClassByHash(testClassHash);
-if (testAbi === undefined) {
-  throw new Error('no abi.');
+try {
+  const contract = await factory.deploy(constructorParams);
+  await contract.deployed();
+} catch (error) {
+  if (error.message.includes('Class hash not declared')) {
+    // Handle declaration needed
+  } else if (error.message.includes('Insufficient funds')) {
+    // Handle insufficient funds
+  } else {
+    // Handle other errors
+  }
 }
-
-// Connect the new contract instance:
-const myTestContract = new Contract(testAbi, deployResponse.contract_address, provider);
-console.log('✅ Test Contract connected at =', myTestContract.address);
 ```
 
-## Construct the constructor
-
-If your contract has a constructor with inputs, you have to provide these inputs in the `deployContract` or `declareAndDeploy` commands.
-For example, with this contract constructor:
-
-```json
-    "name": "constructor",
-    "inputs": [
-      {
-        "name": "text",
-        "type": "core::felt252"
-      },
-      {
-        "name": "longText",
-        "type": "core::array::Array::<core::felt252>"
-      },
-      {
-        "name": "array1",
-        "type": "core::array::Array::<core::felt252>"
-      }
-    ],
-```
-
-You have several ways to define these inputs:
-
-### myCalldata.compile
-
-This is the recommended way to proceed:
+3. **Validate Before Deployment**
 
 ```typescript
-const myArray1: RawCalldata = ['0x0a', 24, 36n];
-const contractCallData: CallData = new CallData(compiledContractSierra.abi);
-const contractConstructor: Calldata = contractCallData.compile('constructor', {
-  text: 'niceToken',
-  longText: 'http://addressOfMyERC721pictures/image1.jpg',
-  array1: myArray1,
+// Create factory with validation
+const factory = new ContractFactory({
+  compiledContract,
+  account,
+  contractOptions: {
+    parseRequest: true, // Enables constructor argument validation
+  },
 });
-const deployResponse = await account0.deployContract({
-  classHash: contractClassHash,
-  constructorCalldata: contractConstructor,
-});
-```
 
-Starknet.js will perform a full verification of conformity with the abi. Properties can be unordered. Do not use properties for array_len, it will be handled automatically by Starknet.js.
-
-### CallData.compile
-
-For very simple constructors, you can use `CallData.compile`:
-
-```typescript
-const myArray1: RawCalldata = ['0x0a', 24, 36n];
-const contractConstructor: Calldata = CallData.compile({
-  text: 'niceToken',
-  longText: 'http://addressOfMyERC721pictures/image1.jpg', // for Cairo v2.4.0 onwards
-  array1: myArray1,
-});
-// with older Cairo, use:   longText: shortString.splitLongString("http://addressOfMyERC721pictures/image1.jpg"),
-const deployResponse = await account0.deployContract({
-  classHash: contractClassHash,
-  constructorCalldata: contractConstructor,
-});
-```
-
-Properties have to be ordered in conformity with the ABI.
-
-Even easier:
-
-```typescript
-const contractConstructor: Calldata = CallData.compile([
-  'niceToken',
-  'http://addressOfMyERC721pictures/image1.jpg',
-  myArray1,
-]); // for Cairo v2.4.0 onwards
-```
-
-## `declare()` for a new class
-
-If you want only declare a new Contract Class, use `declare()`.
-
-```typescript
-// connect provider
-const provider = new RpcProvider({ baseUrl: 'http://127.0.0.1:5050/rpc' });
-// connect your account. To adapt to your own account:
-const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
-const account0Address: string = '0x123....789';
-
-const account0 = new Account(provider, account0Address, privateKey0);
-
-// Declare Test contract in Devnet
-const compiledTestSierra = json.parse(
-  fs.readFileSync('./compiledContracts/test.sierra').toString('ascii')
+// Deploy with type checking
+const contract = await factory.deploy(
+  CallData.compile({
+    name: shortString.encodeShortString('MyToken'),
+    symbol: shortString.encodeShortString('MTK'),
+    decimals: 18,
+  })
 );
-const compiledTestCasm = json.parse(
-  fs.readFileSync('./compiledContracts/test.casm').toString('ascii')
-);
-const declareResponse = await account0.declare({
-  contract: compiledTestSierra,
-  casm: compiledTestCasm,
-});
-console.log('Test Contract declared with classHash =', declareResponse.class_hash);
-await provider.waitForTransaction(declareResponse.transaction_hash);
-console.log('✅ Test Completed.');
 ```
 
 :::tip
-If the class is already declared, `declare()` will fail. You can also use `declareIfNot()` to not fail in this case.
+ContractFactory is particularly useful in testing environments where you need to deploy multiple contract instances with different parameters.
 :::
+
+## Using Account Methods Directly
+
+If you need more fine-grained control over the deployment process, you can use the Account methods directly.
+
+### Quick Start: `declareAndDeploy()`
+
+The fastest way to get your contract on Starknet is using the `declareAndDeploy()` method, which handles both phases in one transaction.
+
+```typescript
+import {
+  RpcProvider,
+  Account,
+  Contract,
+  json,
+  stark,
+  uint256,
+  shortString,
+  type RawCalldata,
+  type Calldata,
+} from 'starknet';
+
+// 1. Setup Provider & Account
+const provider = new RpcProvider({ baseUrl: 'http://127.0.0.1:5050/rpc' });
+const account = new Account(
+  provider,
+  process.env.ACCOUNT_ADDRESS!, // Your account address
+  process.env.PRIVATE_KEY! // Your private key
+);
+
+// 2. Load Compiled Contract
+const compiledSierra = json.parse(
+  fs.readFileSync('./compiledContracts/test.contract_class.json').toString('ascii')
+);
+const compiledCasm = json.parse(
+  fs.readFileSync('./compiledContracts/test.compiled_contract_class.json').toString('ascii')
+);
+
+// 3. Declare & Deploy
+const response = await account.declareAndDeploy({
+  contract: compiledSierra,
+  casm: compiledCasm,
+});
+
+// 4. Create Contract Instance
+const myContract = new Contract(compiledSierra.abi, response.deploy.contract_address, provider);
+
+console.log('Contract Class Hash:', response.declare.class_hash);
+console.log('Contract Address:', myContract.address);
+```
+
+### Deploying from Existing Classes
+
+If you want to deploy a new instance of an already declared contract class (e.g., a standard ERC20), use `deployContract()`:
+
+```typescript
+// 1. Setup (provider & account setup same as above)
+
+// 2. Deploy using existing class hash
+const existingClassHash = '0xff0378becffa6ad51c67ac968948dbbd110b8a8550397cf17866afebc6c17d';
+const deployResponse = await account.deployContract({
+  classHash: existingClassHash,
+});
+
+// 3. Wait for deployment
+await provider.waitForTransaction(deployResponse.transaction_hash);
+
+// 4. Get contract ABI and create instance
+const { abi } = await provider.getClassByHash(existingClassHash);
+if (!abi) throw new Error('Contract ABI not found');
+
+const myContract = new Contract(abi, deployResponse.contract_address, provider);
+```
+
+### Working with Constructors
+
+Many contracts require constructor arguments during deployment. Here are the recommended ways to handle constructor parameters:
+
+#### 1. Using `myCalldata.compile` (Recommended)
+
+This method provides type safety and automatic validation against the contract's ABI:
+
+```typescript
+// Example constructor with multiple parameter types
+const myArray: RawCalldata = ['0x0a', 24, 36n];
+const contractCallData = new CallData(compiledContractSierra.abi);
+
+const constructorParams = contractCallData.compile('constructor', {
+  name: 'MyToken',
+  symbol: 'MTK',
+  decimals: 18,
+  initialSupply: uint256.bnToUint256(1000n * 10n ** 18n),
+  array: myArray,
+});
+
+const deployResponse = await account.deployContract({
+  classHash: contractClassHash,
+  constructorCalldata: constructorParams,
+});
+```
+
+#### 2. Using `CallData.compile` (Simple Cases)
+
+For straightforward constructors, you can use the simpler `CallData.compile`:
+
+```typescript
+// Named parameters (must match ABI order)
+const constructorParams = CallData.compile({
+  name: 'MyToken',
+  symbol: 'MTK',
+  decimals: 18,
+});
+
+// OR array format
+const constructorParams = CallData.compile(['MyToken', 'MTK', 18]);
+```
+
+:::tip String Handling
+For Cairo 2.4.0+, you can pass strings directly. For older versions, use:
+
+```typescript
+shortString.splitLongString('Your long string here');
+```
+
+:::
+
+### Declaring New Contract Classes
+
+To only declare a new contract class without deployment, use `declare()`:
+
+```typescript
+const declareResponse = await account.declare({
+  contract: compiledSierra,
+  casm: compiledCasm,
+});
+
+await provider.waitForTransaction(declareResponse.transaction_hash);
+console.log('Class Hash:', declareResponse.class_hash);
+```
+
+:::tip Avoiding Duplicate Declarations
+Use `declareIfNot()` to prevent errors when declaring an already existing contract class:
+
+```typescript
+const declareResponse = await account.declareIfNot({
+  contract: compiledSierra,
+  casm: compiledCasm,
+});
+```
+
+:::
+
+## Best Practices
+
+1. **Always wait for transactions**: Use `provider.waitForTransaction()` after deployments
+2. **Error handling**: Implement proper try-catch blocks for network issues
+3. **Gas estimation**: Consider estimating fees before deployment
+4. **Contract verification**: Verify your contract's bytecode after deployment
+5. **Environment management**: Use different provider URLs for testnet/mainnet
