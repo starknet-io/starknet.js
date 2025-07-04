@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 3
 ---
 
 # Interact with your contract
@@ -14,7 +14,7 @@ Once your provider, contract, and account are connected, you can interact with t
 
 Your account should be funded enough to pay fees (20 STRK should be enough to start).
 
-![](./pictures/Interact_contract.png)
+![](./pictures/contract-interaction.svg)
 
 Here we will interact with a `test.cairo` contract (Cairo 1) already deployed in Sepolia Testnet at the address:
 
@@ -153,14 +153,9 @@ const tx = await cairo1Contract.array2d_ex(data);
 const tx1 = await cairo1Contract.array2d_ex(data);
 ```
 
-Be sure to use `waitForTransaction` between the calls, because you may experience issues with the nonce not incrementing:
+Be sure to use `waitForTransaction` between the calls, because you may experience issues with the nonce not incrementing. For more details about multicalls, see [this guide](./multiCall.md).
 
-```typescript
-const tx = await cairo1Contract.array2d_ex(data);
-await provider.waitForTransaction(tx.transaction_hash);
-const tx1 = await cairo1Contract.array2d_ex(data);
-await provider.waitForTransaction(tx1.transaction_hash);
-```
+For more information about defining call messages and parameters, see [this guide](./define_call_message.md).
 
 ## Write several operations, with Account.execute
 
@@ -207,7 +202,7 @@ const specialParameters: Calldata = ['2036735872918048433518', '5130580', '18'];
 const getResponse = await myAccount.call('get_bal', specialParameters, { parseRequest: false });
 ```
 
-You provide the low-level numbers expected by Starknet, without any parsing or checking. See more details [here](define_call_message.md#parse-configuration).
+You provide the low-level numbers expected by Starknet, without any parsing or checking. See more details [here](./define_call_message.md#parse-configuration).
 
 ## Transaction receipt response
 

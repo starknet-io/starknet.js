@@ -1,8 +1,8 @@
 ---
-sidebar_position: 10
+sidebar_position: 4
 ---
 
-# Data transformation
+# Data types
 
 This guide is the most important of all this documentation. Take your time, and read it carefully...
 

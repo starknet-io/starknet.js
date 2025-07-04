@@ -1,8 +1,8 @@
 ---
-sidebar_position: 16
+sidebar_position: 7
 ---
 
-# Interact with more than one contract within one transaction
+# Interact with Multiple Contracts
 
 Interacting with more than one contract with one transaction is one of Starknet's features. To use this feature, two contracts are required.
 
