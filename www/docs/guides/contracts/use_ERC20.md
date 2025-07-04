@@ -1,8 +1,8 @@
 ---
-sidebar_position: 4
+sidebar_position: 5
 ---
 
-# Work with ERC20 tokens
+# ERC20 tokens
 
 Based on what has been seen in the previous pages of this guide, we will use an ERC20 contract.
 

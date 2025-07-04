@@ -1,8 +1,10 @@
 ---
-sidebar_position: 4
+sidebar_position: 1
 ---
 
-# 🔌 Connect to an existing account
+# Instance
+
+![Starknet.js Architecture](./pictures/Account-instance.svg)
 
 Once your provider is initialized, you can connect an existing account.
 

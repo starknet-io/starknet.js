@@ -1,8 +1,12 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 ---
 
-# RpcProvider object 🔌 connect to the network
+# Provider
+
+![Starknet.js Architecture](./pictures/provider.svg)
+
+RpcProvider object connect's your app to the network
 
 The first thing to do is to define with which network you want to interact (Mainnet, Testnet, Devnet, ...).
 
