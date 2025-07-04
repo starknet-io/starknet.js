@@ -10,6 +10,7 @@ import {
   EDataAvailabilityMode,
   ETransactionVersion,
   isRPC08_FeeEstimate,
+  isRPC08_ResourceBounds,
   ResourceBounds,
   ResourceBoundsOverhead,
   ResourceBoundsOverheadRPC07,
@@ -22,6 +23,7 @@ import {
   Program,
   Signature,
   UniversalDetails,
+  type EstimateFee,
 } from '../../types';
 import {
   addHexPrefix,
@@ -40,7 +42,11 @@ import {
 import { isVersion } from '../resolve';
 import { isBigInt, isString } from '../typed';
 import { estimateFeeToBounds as estimateFeeToBoundsRPC07 } from './rpc07';
-import { estimateFeeToBounds as estimateFeeToBoundsRPC08 } from './rpc08';
+import {
+  estimateFeeToBounds as estimateFeeToBoundsRPC08,
+  setResourceBounds as setResourceBoundsRPC08,
+} from './rpc08';
+import assert from '../assert';
 
 type V3Details = Required<
   Pick<
@@ -227,6 +233,18 @@ export function estimateFeeToBounds(
     return estimateFeeToBoundsRPC08(estimate, overhead as ResourceBoundsOverheadRPC08); // TODO: remove as
   }
   return estimateFeeToBoundsRPC07(estimate, overhead as ResourceBoundsOverheadRPC07); // TODO: remove as
+}
+
+export function setResourceBounds(
+  estimate: EstimateFee,
+  percentage: number,
+  pricePercentage?: number
+): ResourceBounds {
+  assert(
+    isRPC08_ResourceBounds(estimate.resourceBounds),
+    'setResourceBound() available only for rpc 0.8 onwards.'
+  );
+  return setResourceBoundsRPC08(estimate, percentage, pricePercentage);
 }
 
 export type feeOverhead = ResourceBounds;
