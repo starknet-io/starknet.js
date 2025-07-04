@@ -63,7 +63,9 @@ You have to invoke Starknet, with the use of the meta-class method: `contract.fu
 > After the invoke, you have to wait the incorporation of the modification of Balance in the network, with `await provider.waitForTransaction(transaction_hash)`
 
 :::note
+
 By default, you are executing transactions that use the STRK token to pay the fees.
+
 :::
 
 Here is an example of how to increase and check the balance:

@@ -201,6 +201,7 @@ const myTpl = { '0': '0x0a', '1': 200 };
 ### Named tuple
 
 :::warning Only for Cairo 0
+
 :::
 
 Starknet is waiting for a list of felts.  
@@ -222,7 +223,9 @@ await myContract.my_function(namedTup);
 ```
 
 :::tip
+
 It's not mandatory to create manually an object conform to the Cairo 0 named tuple ; you can just use the `cairo.tuple()` function.
+
 :::
 
 ### Ethereum public key
@@ -286,7 +289,9 @@ await myContract.my_function(myArray);
 ```
 
 :::danger important
+
 Do not add the `array_len` parameter before your array. Starknet.js will manage this element automatically.
+
 :::
 
 > It's also applicable for Cairo `Span` type.
@@ -303,6 +308,7 @@ await myContract.my_function(myArray);
 ```
 
 :::caution
+
 The fixed arrays are automatically handled only by the functions that uses the contract ABI. So, when using `CallData.compile()`, you have to use the `CairoFixedArray` class:
 
 ```typescript
@@ -380,7 +386,9 @@ await myContract[functionName](...myParams);
 ```
 
 :::warning important
+
 Objects properties have to be ordered in accordance with the ABI.
+
 :::
 
 ### Object (without ABI conformity check)
@@ -402,7 +410,9 @@ const deployResponse = await myAccount.deployContract({
 This type is available for: `CallData.compile(), hash.calculateContractAddressFromHash, account.deployContract, account.deployAccount, account.execute`
 
 :::warning important
+
 Objects properties have to be ordered in accordance with the ABI.
+
 :::
 
 ### Object (with ABI conformity check)
