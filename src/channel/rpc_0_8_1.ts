@@ -81,7 +81,7 @@ export class RpcChannel {
 
   private transactionRetryIntervalFallback?: number;
 
-  private batchClient?: BatchClient;
+  private batchClient?: BatchClient<RPC.Methods>;
 
   private baseFetch: NonNullable<RpcProviderOptions['baseFetch']>;
 
@@ -125,11 +125,12 @@ export class RpcChannel {
     this.requestId = 0;
 
     if (typeof batch === 'number') {
-      this.batchClient = new BatchClient({
+      this.batchClient = new BatchClient<RPC.Methods>({
         nodeUrl: this.nodeUrl,
         headers: this.headers,
         interval: batch,
         baseFetch: this.baseFetch,
+        rpcMethods: {} as RPC.Methods, // Type information only, not used at runtime
       });
     }
 

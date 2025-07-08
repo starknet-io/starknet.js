@@ -90,8 +90,10 @@ export { _TransactionHashPrefix as TransactionHashPrefix };
 const _SupportedRpcVersion = {
   '0.7.1': '0.7.1',
   '0.8.1': '0.8.1',
+  '0.9.0': '0.9.0',
   v0_7_1: '0.7.1',
   v0_8_1: '0.8.1',
+  v0_9_0: '0.9.0',
 } as const;
 type _SupportedRpcVersion = ValuesType<typeof _SupportedRpcVersion>;
 export { _SupportedRpcVersion as SupportedRpcVersion };
@@ -111,7 +113,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   websocket: any;
 } = {
   legacyMode: false,
-  rpcVersion: '0.8.1',
+  rpcVersion: '0.9.0',
   transactionVersion: ETransactionVersion.V3,
   logLevel: 'INFO',
   feeMarginPercentage: {
@@ -149,8 +151,8 @@ export const PAYMASTER_RPC_NODES = {
 export const SYSTEM_MESSAGES = {
   legacyTxWarningMessage:
     'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
-  legacyTxRPC08Message: 'RPC 0.8 do not support legacy transactions',
-  SWOldV3: 'RPC 0.7 V3 tx (improper resource bounds) not supported in RPC 0.8',
+  legacyTxRPC08Message: 'RPC 0.8+ do not support legacy transactions',
+  SWOldV3: 'RPC 0.7 V3 tx (improper resource bounds) not supported in RPC 0.8+',
   channelVersionMismatch:
     'Channel specification version is not compatible with the connected node Specification Version',
   unsupportedSpecVersion:

@@ -5,22 +5,24 @@ import {
   createTestProvider,
   describeIfRpc071,
   describeIfRpc081,
+  getTestProvider,
 } from '../config/fixtures';
 import { initializeMatcher } from '../config/schema';
-import { ProviderInterface } from '../../src';
+import { RPC } from '../../src/types';
 
-describe('Batch Client', () => {
+describe('BatchClient', () => {
   initializeMatcher(expect);
-  let provider: ProviderInterface;
-  let batchClient: BatchClient;
+  const provider = getTestProvider();
 
-  beforeAll(async () => {
-    provider = await createTestProvider(false);
-    batchClient = new BatchClient({
+  let batchClient: BatchClient<RPC.Methods>;
+
+  beforeEach(() => {
+    batchClient = new BatchClient<RPC.Methods>({
       nodeUrl: provider.channel.nodeUrl,
       headers: provider.channel.headers,
       interval: 0,
       baseFetch: fetch,
+      rpcMethods: {} as RPC.Methods, // Type information only, not used at runtime
     });
   });
 
