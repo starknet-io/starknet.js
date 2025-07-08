@@ -1,4 +1,4 @@
-import { RPC07, RPC08 } from '../channel';
+import { RPC07, RPC08, RPC09 } from '../channel';
 import { config } from '../global/config';
 import { SupportedRpcVersion } from '../global/constants';
 import { logger } from '../global/logger';
@@ -64,7 +64,7 @@ import type {
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
 
-  public channel: RPC07.RpcChannel | RPC08.RpcChannel;
+  public channel: RPC07.RpcChannel | RPC08.RpcChannel | RPC09.RpcChannel;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
@@ -691,8 +691,14 @@ export class RpcProvider implements ProviderInterface {
   /**
    * Given an l1 tx hash, returns the associated l1_handler tx hashes and statuses for all L1 -> L2 messages sent by the l1 transaction, ordered by the l1 tx sending order
    */
-  public async getL1MessagesStatus(transactionHash: BigNumberish): Promise<RPC.L1L2MessagesStatus> {
+  public async getL1MessagesStatus(
+    transactionHash: BigNumberish
+  ): Promise<RPC.RPCSPEC08.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus> {
     if (this.channel instanceof RPC08.RpcChannel) {
+      return this.channel.getMessagesStatus(transactionHash);
+    }
+
+    if (this.channel instanceof RPC09.RpcChannel) {
       return this.channel.getMessagesStatus(transactionHash);
     }
 
