@@ -20,10 +20,10 @@ import {
   STATE_UPDATE,
   DeclaredTransaction,
   InvokedTransaction,
-  ResourceBounds,
-  SimulateTransaction,
   TransactionWithHash,
   Simplify,
+  ResourceBoundsBN,
+  TransactionTrace,
 } from './spec.type';
 
 import { TransactionReceipt } from '../../types/api';
@@ -44,22 +44,16 @@ export type L1HandlerTransactionReceiptResponse = IsType<TransactionReceipt, 'L1
 
 export type GetTransactionResponse = TransactionWithHash;
 
-export type EstimateFeeResponse = {
+/**
+ * Estimate fee response with overhead
+ */
+export type EstimateFeeResponseOverhead = {
+  resourceBounds: ResourceBoundsBN;
   overall_fee: bigint;
   unit: PRICE_UNIT;
-
-  l1_gas_consumed: bigint;
-  l1_gas_price: bigint;
-  l2_gas_consumed: bigint | undefined;
-  l2_gas_price: bigint | undefined;
-  l1_data_gas_consumed: bigint;
-  l1_data_gas_price: bigint;
-
-  suggestedMaxFee: bigint;
-  resourceBounds: ResourceBounds;
 };
 
-export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
+export type EstimateFeeResponseBulkOverhead = Array<EstimateFeeResponseOverhead>;
 
 export type InvokeFunctionResponse = InvokedTransaction;
 
@@ -74,12 +68,11 @@ export type Nonce = string;
 // export type { SIMULATION_FLAG };
 export type SimulationFlags = Array<SIMULATION_FLAG>;
 
-export type SimulatedTransaction = SimulateTransaction & {
-  suggestedMaxFee: bigint;
-  resourceBounds: ResourceBounds;
-};
+export type SimulateTransactionOverhead = {
+  transaction_trace: TransactionTrace;
+} & EstimateFeeResponseOverhead;
 
-export type SimulateTransactionResponse = SimulatedTransaction[];
+export type SimulateTransactionOverheadResponse = SimulateTransactionOverhead[];
 
 export type StateUpdateResponse = StateUpdate | PendingStateUpdate;
 export type StateUpdate = STATE_UPDATE;

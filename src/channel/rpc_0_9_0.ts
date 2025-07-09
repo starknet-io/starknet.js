@@ -17,12 +17,13 @@ import {
   getSimulateTransactionOptions,
   Invocation,
   InvocationsDetailsWithNonce,
+  isRPC08Plus_ResourceBoundsBN,
   RPC_ERROR,
   RpcProviderOptions,
-  TransactionType,
   waitForTransactionOptions,
 } from '../types';
-import { JRPC, RPCSPEC09 as RPC } from '../types/api';
+import assert from '../utils/assert';
+import { ETransactionType, JRPC, RPCSPEC09 as RPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -39,16 +40,20 @@ import {
 } from '../utils/num';
 import { Block, getDefaultNodeUrl, wait } from '../utils/provider';
 import { isSupportedSpecVersion, isV3Tx, isVersion } from '../utils/resolve';
-import { decompressProgram, signatureToHexArray } from '../utils/stark';
+import {
+  decompressProgram,
+  signatureToHexArray,
+  toStringResourceBound,
+  toTransactionVersion,
+} from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
-import { isRPC08_ResourceBounds } from '../provider/types/spec.type';
 import { config } from '../global/config';
 // TODO: check if we can filet type before entering to this method, as so to specify here only RPC 0.8 types
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: BlockTag.PENDING,
+  blockIdentifier: BlockTag.PRE_CONFIRMED,
   retries: 200,
 };
 
@@ -400,12 +405,7 @@ export class RpcChannel {
     let onchain = false;
     let isErrorState = false;
     const retryInterval = options?.retryInterval ?? this.transactionRetryIntervalDefault;
-    const errorStates: any = options?.errorStates ?? [
-      RPC.ETransactionStatus.REJECTED,
-      // TODO: commented out to preserve the long-standing behavior of "reverted" not being treated as an error by default
-      // should decide which behavior to keep in the future
-      // RPC.ETransactionExecutionStatus.REVERTED,
-    ];
+    const errorStates: any = options?.errorStates;
     const successStates: any = options?.successStates ?? [
       RPC.ETransactionExecutionStatus.SUCCEEDED,
       RPC.ETransactionStatus.ACCEPTED_ON_L2,
@@ -546,94 +546,58 @@ export class RpcChannel {
   }
 
   public async invoke(functionInvocation: Invocation, details: InvocationsDetailsWithNonce) {
-    let promise;
-    if (isV3Tx(details)) {
-      if (isRPC08_ResourceBounds(details.resourceBounds)) {
-        // V3
-        promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
-          invoke_transaction: {
-            type: RPC.ETransactionType.INVOKE,
-            sender_address: functionInvocation.contractAddress,
-            calldata: CallData.toHex(functionInvocation.calldata),
-            version: RPC.ETransactionVersion.V3,
-            signature: signatureToHexArray(functionInvocation.signature),
-            nonce: toHex(details.nonce),
-            resource_bounds: details.resourceBounds,
-            tip: toHex(details.tip),
-            paymaster_data: details.paymasterData.map((it) => toHex(it)),
-            account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
-            nonce_data_availability_mode: details.nonceDataAvailabilityMode,
-            fee_data_availability_mode: details.feeDataAvailabilityMode,
-          },
-        });
-      } else throw Error(SYSTEM_MESSAGES.SWOldV3);
-    } else throw Error(SYSTEM_MESSAGES.legacyTxRPC08Message);
+    const transaction = this.buildTransaction(
+      {
+        type: ETransactionType.INVOKE,
+        ...functionInvocation,
+        ...details,
+      },
+      'transaction'
+    );
+
+    const promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
+      invoke_transaction: transaction,
+    });
 
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
 
   public async declare(
-    { contract, signature, senderAddress, compiledClassHash }: DeclareContractTransaction,
+    declareTransaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    let promise;
-    if (isSierra(contract) && isV3Tx(details)) {
-      if (isRPC08_ResourceBounds(details.resourceBounds)) {
-        // V3 Cairo1
-        promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
-          declare_transaction: {
-            type: RPC.ETransactionType.DECLARE,
-            sender_address: senderAddress,
-            compiled_class_hash: compiledClassHash || '',
-            version: RPC.ETransactionVersion.V3,
-            signature: signatureToHexArray(signature),
-            nonce: toHex(details.nonce),
-            contract_class: {
-              sierra_program: decompressProgram(contract.sierra_program),
-              contract_class_version: contract.contract_class_version,
-              entry_points_by_type: contract.entry_points_by_type,
-              abi: contract.abi,
-            },
-            resource_bounds: details.resourceBounds,
-            tip: toHex(details.tip),
-            paymaster_data: details.paymasterData.map((it) => toHex(it)),
-            account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
-            nonce_data_availability_mode: details.nonceDataAvailabilityMode,
-            fee_data_availability_mode: details.feeDataAvailabilityMode,
-          },
-        });
-      } else throw Error(SYSTEM_MESSAGES.SWOldV3);
-    } else throw Error(SYSTEM_MESSAGES.legacyTxRPC08Message);
+    const transaction = this.buildTransaction(
+      {
+        type: ETransactionType.DECLARE,
+        ...declareTransaction,
+        ...details,
+      },
+      'transaction'
+    );
+
+    const promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
+      declare_transaction: transaction,
+    });
 
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
 
   public async deployAccount(
-    { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
+    deployAccountTransaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    let promise;
-    if (isV3Tx(details)) {
-      if (isRPC08_ResourceBounds(details.resourceBounds)) {
-        promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
-          deploy_account_transaction: {
-            type: RPC.ETransactionType.DEPLOY_ACCOUNT,
-            version: RPC.ETransactionVersion.V3,
-            signature: signatureToHexArray(signature),
-            nonce: toHex(details.nonce),
-            contract_address_salt: toHex(addressSalt || 0),
-            constructor_calldata: CallData.toHex(constructorCalldata || []),
-            class_hash: toHex(classHash),
-            resource_bounds: details.resourceBounds,
-            tip: toHex(details.tip),
-            paymaster_data: details.paymasterData.map((it) => toHex(it)),
-            nonce_data_availability_mode: details.nonceDataAvailabilityMode,
-            fee_data_availability_mode: details.feeDataAvailabilityMode,
-          },
-        });
-      } else throw Error(SYSTEM_MESSAGES.SWOldV3);
-      // v3
-    } else throw Error(SYSTEM_MESSAGES.legacyTxRPC08Message);
+    const transaction = this.buildTransaction(
+      {
+        type: ETransactionType.DEPLOY_ACCOUNT,
+        ...deployAccountTransaction,
+        ...details,
+      },
+      'transaction'
+    );
+
+    const promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
+      deploy_account_transaction: transaction,
+    });
 
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
@@ -689,47 +653,54 @@ export class RpcChannel {
     return this.fetchEndpoint('starknet_getEvents', { filter: eventFilter });
   }
 
-  public buildTransaction(
-    invocation: AccountInvocationItem,
+  // Generic buildTransaction that automatically narrows return type based on input
+  public buildTransaction<T extends AccountInvocationItem>(
+    invocation: T,
     versionType?: 'fee' | 'transaction'
-  ): RPC.BaseTransaction {
+  ): T extends { type: typeof ETransactionType.INVOKE }
+    ? RPC.INVOKE_TXN_V3
+    : T extends { type: typeof ETransactionType.DECLARE }
+      ? RPC.BROADCASTED_DECLARE_TXN_V3
+      : T extends { type: typeof ETransactionType.DEPLOY_ACCOUNT }
+        ? RPC.DEPLOY_ACCOUNT_TXN_V3
+        : never {
     const defaultVersions = getVersionsByType(versionType);
-    let details;
-    if (!isV3Tx(invocation)) {
-      // V0,V1,V2
-      // console.log({ invocation });
-      throw Error('v0,v1,v2 tx are not supported on RPC 0.8');
-    } else {
-      // V3
-      details = {
-        signature: signatureToHexArray(invocation.signature),
-        nonce: toHex(invocation.nonce),
-        resource_bounds: invocation.resourceBounds,
-        tip: toHex(invocation.tip),
-        paymaster_data: invocation.paymasterData.map((it) => toHex(it)),
-        nonce_data_availability_mode: invocation.nonceDataAvailabilityMode,
-        fee_data_availability_mode: invocation.feeDataAvailabilityMode,
-        account_deployment_data: invocation.accountDeploymentData.map((it) => toHex(it)),
-      };
-    }
 
-    if (invocation.type === TransactionType.INVOKE) {
-      return {
-        // V3
+    // V0,V1,V2 not supported on RPC 0.9
+    assert(isV3Tx(invocation), SYSTEM_MESSAGES.legacyTxRPC08Message);
+
+    // V3 - Add resource bounds validation for transaction building (not fee estimation)
+    assert(
+      versionType !== 'transaction' || isRPC08Plus_ResourceBoundsBN(invocation.resourceBounds),
+      SYSTEM_MESSAGES.SWOldV3
+    );
+
+    const details = {
+      signature: signatureToHexArray(invocation.signature),
+      nonce: toHex(invocation.nonce),
+      resource_bounds: toStringResourceBound(invocation.resourceBounds),
+      tip: toHex(invocation.tip),
+      paymaster_data: invocation.paymasterData.map((it) => toHex(it)),
+      nonce_data_availability_mode: invocation.nonceDataAvailabilityMode,
+      fee_data_availability_mode: invocation.feeDataAvailabilityMode,
+      account_deployment_data: invocation.accountDeploymentData.map((it) => toHex(it)),
+      version: toTransactionVersion(defaultVersions.v3, invocation.version),
+    };
+
+    if (invocation.type === ETransactionType.INVOKE) {
+      const btx: RPC.INVOKE_TXN_V3 = {
         type: RPC.ETransactionType.INVOKE,
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
-        version: toHex(invocation.version || defaultVersions.v3), // invocation.version as simulate can use fee and normal version
         ...details,
-      } as RPC.BROADCASTED_INVOKE_TXN;
+      };
+      return btx as any; // This 'as any' is internal to the generic function - the external API is type-safe
     }
-    if (invocation.type === TransactionType.DECLARE) {
-      if (!isSierra(invocation.contract)) {
-        logger.error('Cairo 0 -  non Sierra v1 tx are not supported');
-        throw Error('Declaring non Sierra contract using RPC 0.8');
-      }
-      return {
-        // Cairo - V3
+    if (invocation.type === ETransactionType.DECLARE) {
+      // Sierra contracts required for DECLARE transactions in RPC 0.9
+      assert(isSierra(invocation.contract), 'Declaring non Sierra contract using RPC 0.9');
+
+      const btx: RPC.BROADCASTED_DECLARE_TXN_V3 = {
         type: invocation.type,
         contract_class: {
           ...invocation.contract,
@@ -737,22 +708,21 @@ export class RpcChannel {
         },
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,
-        version: toHex(invocation.version || defaultVersions.v3), // invocation.version as simulate can use fee and normal version
         ...details,
-      } as RPC.BROADCASTED_DECLARE_TXN;
+      };
+      return btx as any; // This 'as any' is internal to the generic function - the external API is type-safe
     }
-    if (invocation.type === TransactionType.DEPLOY_ACCOUNT) {
+    if (invocation.type === ETransactionType.DEPLOY_ACCOUNT) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { account_deployment_data, ...restDetails } = details;
-      // V3
-      return {
+      const btx: RPC.DEPLOY_ACCOUNT_TXN_V3 = {
         type: invocation.type,
         constructor_calldata: CallData.toHex(invocation.constructorCalldata || []),
         class_hash: toHex(invocation.classHash),
         contract_address_salt: toHex(invocation.addressSalt || 0),
-        version: toHex(invocation.version || defaultVersions.v3), // invocation.version as simulate can use fee and normal version
         ...restDetails,
-      } as RPC.BROADCASTED_DEPLOY_ACCOUNT_TXN;
+      };
+      return btx as any; // This 'as any' is internal to the generic function - the external API is type-safe
     }
     throw Error('RPC buildTransaction received unknown TransactionType');
   }

@@ -19,10 +19,9 @@ import {
   InvocationsDetailsWithNonce,
   RPC_ERROR,
   RpcProviderOptions,
-  TransactionType,
   waitForTransactionOptions,
 } from '../types';
-import { JRPC, RPCSPEC08 as RPC } from '../types/api';
+import { JRPC, RPCSPEC08 as RPC, RPCSPEC08 } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -39,16 +38,16 @@ import {
 } from '../utils/num';
 import { Block, getDefaultNodeUrl, wait } from '../utils/provider';
 import { isSupportedSpecVersion, isV3Tx, isVersion } from '../utils/resolve';
-import { decompressProgram, signatureToHexArray } from '../utils/stark';
+import { decompressProgram, signatureToHexArray, toStringResourceBound } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
-import { isRPC08_ResourceBounds } from '../provider/types/spec.type';
+import { isRPC08Plus_ResourceBoundsBN } from '../provider/types/spec.type';
 import { config } from '../global/config';
 // TODO: check if we can filet type before entering to this method, as so to specify here only RPC 0.8 types
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: BlockTag.PENDING,
+  blockIdentifier: BlockTag.PRE_CONFIRMED,
   retries: 200,
 };
 
@@ -548,7 +547,7 @@ export class RpcChannel {
   public async invoke(functionInvocation: Invocation, details: InvocationsDetailsWithNonce) {
     let promise;
     if (isV3Tx(details)) {
-      if (isRPC08_ResourceBounds(details.resourceBounds)) {
+      if (isRPC08Plus_ResourceBoundsBN(details.resourceBounds)) {
         // V3
         promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
           invoke_transaction: {
@@ -558,7 +557,7 @@ export class RpcChannel {
             version: RPC.ETransactionVersion.V3,
             signature: signatureToHexArray(functionInvocation.signature),
             nonce: toHex(details.nonce),
-            resource_bounds: details.resourceBounds,
+            resource_bounds: toStringResourceBound(details.resourceBounds),
             tip: toHex(details.tip),
             paymaster_data: details.paymasterData.map((it) => toHex(it)),
             account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
@@ -578,7 +577,7 @@ export class RpcChannel {
   ) {
     let promise;
     if (isSierra(contract) && isV3Tx(details)) {
-      if (isRPC08_ResourceBounds(details.resourceBounds)) {
+      if (isRPC08Plus_ResourceBoundsBN(details.resourceBounds)) {
         // V3 Cairo1
         promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
           declare_transaction: {
@@ -594,7 +593,7 @@ export class RpcChannel {
               entry_points_by_type: contract.entry_points_by_type,
               abi: contract.abi,
             },
-            resource_bounds: details.resourceBounds,
+            resource_bounds: toStringResourceBound(details.resourceBounds),
             tip: toHex(details.tip),
             paymaster_data: details.paymasterData.map((it) => toHex(it)),
             account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
@@ -614,7 +613,7 @@ export class RpcChannel {
   ) {
     let promise;
     if (isV3Tx(details)) {
-      if (isRPC08_ResourceBounds(details.resourceBounds)) {
+      if (isRPC08Plus_ResourceBoundsBN(details.resourceBounds)) {
         promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
           deploy_account_transaction: {
             type: RPC.ETransactionType.DEPLOY_ACCOUNT,
@@ -624,7 +623,7 @@ export class RpcChannel {
             contract_address_salt: toHex(addressSalt || 0),
             constructor_calldata: CallData.toHex(constructorCalldata || []),
             class_hash: toHex(classHash),
-            resource_bounds: details.resourceBounds,
+            resource_bounds: toStringResourceBound(details.resourceBounds),
             tip: toHex(details.tip),
             paymaster_data: details.paymasterData.map((it) => toHex(it)),
             nonce_data_availability_mode: details.nonceDataAvailabilityMode,
@@ -685,7 +684,7 @@ export class RpcChannel {
    * Returns all events matching the given filter
    * @returns events and the pagination of the events
    */
-  public getEvents(eventFilter: RPC.EventFilter) {
+  public getEvents(eventFilter: RPCSPEC08.EventFilter) {
     return this.fetchEndpoint('starknet_getEvents', { filter: eventFilter });
   }
 
@@ -704,7 +703,7 @@ export class RpcChannel {
       details = {
         signature: signatureToHexArray(invocation.signature),
         nonce: toHex(invocation.nonce),
-        resource_bounds: invocation.resourceBounds,
+        resource_bounds: toStringResourceBound(invocation.resourceBounds),
         tip: toHex(invocation.tip),
         paymaster_data: invocation.paymasterData.map((it) => toHex(it)),
         nonce_data_availability_mode: invocation.nonceDataAvailabilityMode,
@@ -713,7 +712,7 @@ export class RpcChannel {
       };
     }
 
-    if (invocation.type === TransactionType.INVOKE) {
+    if (invocation.type === RPCSPEC08.ETransactionType.INVOKE) {
       return {
         // V3
         type: RPC.ETransactionType.INVOKE,
@@ -723,7 +722,7 @@ export class RpcChannel {
         ...details,
       } as RPC.BROADCASTED_INVOKE_TXN;
     }
-    if (invocation.type === TransactionType.DECLARE) {
+    if (invocation.type === RPCSPEC08.ETransactionType.DECLARE) {
       if (!isSierra(invocation.contract)) {
         logger.error('Cairo 0 -  non Sierra v1 tx are not supported');
         throw Error('Declaring non Sierra contract using RPC 0.8');
@@ -741,7 +740,7 @@ export class RpcChannel {
         ...details,
       } as RPC.BROADCASTED_DECLARE_TXN;
     }
-    if (invocation.type === TransactionType.DEPLOY_ACCOUNT) {
+    if (invocation.type === RPCSPEC08.ETransactionType.DEPLOY_ACCOUNT) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { account_deployment_data, ...restDetails } = details;
       // V3

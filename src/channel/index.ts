@@ -1,4 +1,3 @@
-export * as RPC07 from './rpc_0_7_1';
 export * as RPC08 from './rpc_0_8_1';
 export * as RPC09 from './rpc_0_9_0';
 // Default channel

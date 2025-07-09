@@ -3,17 +3,16 @@ import { gzip, ungzip } from 'pako';
 
 import { PRICE_UNIT } from '@starknet-io/starknet-types-08';
 import { config } from '../../global/config';
-import { SupportedRpcVersion, ZERO } from '../../global/constants';
+import { ZERO } from '../../global/constants';
 import { FeeEstimate } from '../../provider/types/index.type';
 import {
   EDAMode,
   EDataAvailabilityMode,
   ETransactionVersion,
-  isRPC08_FeeEstimate,
+  ETransactionVersion3,
   ResourceBounds,
+  ResourceBoundsBN,
   ResourceBoundsOverhead,
-  ResourceBoundsOverheadRPC07,
-  ResourceBoundsOverheadRPC08,
 } from '../../provider/types/spec.type';
 import {
   ArraySignatureType,
@@ -37,10 +36,7 @@ import {
   bigNumberishArrayToHexadecimalStringArray,
   toHex,
 } from '../num';
-import { isVersion } from '../resolve';
 import { isBigInt, isString } from '../typed';
-import { estimateFeeToBounds as estimateFeeToBoundsRPC07 } from './rpc07';
-import { estimateFeeToBounds as estimateFeeToBoundsRPC08 } from './rpc08';
 
 type V3Details = Required<
   Pick<
@@ -182,59 +178,96 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
 }
 
 /**
- * Convert estimated fee to max fee including a margin
- * @param {BigNumberish} estimatedFee - The estimated fee
- * @param {number} [overhead] - The overhead added to the gas
- * @returns {bigint} The maximum fee with the margin
- * @example
- * ```typescript
- * const result = stark.estimatedFeeToMaxFee("8982300000000", 50);
- * // result = "13473450000000n"
- * ```
- */
-export function estimatedFeeToMaxFee(
-  estimatedFee: BigNumberish,
-  overhead: number = config.get('feeMarginPercentage').maxFee
-): bigint {
-  return addPercent(estimatedFee, overhead);
-}
-
-/**
  * Calculates the maximum resource bounds for fee estimation.
  *
- * @param {FeeEstimate | 0n} estimate The estimate for the fee. If a BigInt is provided, the returned bounds will be set to '0x0'.
+ * @param {FeeEstimate | 0n} estimate The estimate for the fee. If a BigInt is provided, the returned bounds will be set to 0n.
  * @param {ResourceBoundsOverhead} [overhead] - The percentage overhead added to the max units and max price per unit.
- * @returns {ResourceBounds} The resource bounds with overhead.
+ * @returns {ResourceBoundsBN} The resource bounds with overhead represented as BigInt.
  * @throws {Error} If the estimate object is undefined or does not have the required properties.
  */
-export function estimateFeeToBounds(
+export function toOverheadResourceBounds(
   estimate: FeeEstimate | 0n,
-  overhead: ResourceBoundsOverhead = config.get('feeMarginPercentage').bounds,
-  specVersion?: SupportedRpcVersion
-): ResourceBounds {
+  overhead: ResourceBoundsOverhead = config.get('resourceBoundsOverhead')
+): ResourceBoundsBN {
   if (isBigInt(estimate)) {
     return {
-      l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-      l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-      ...(specVersion &&
-        isVersion('0.8', specVersion) && {
-          l1_data_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-        }),
+      l2_gas: {
+        max_amount: 0n,
+        max_price_per_unit: 0n,
+      },
+      l1_gas: {
+        max_amount: 0n,
+        max_price_per_unit: 0n,
+      },
+      l1_data_gas: {
+        max_amount: 0n,
+        max_price_per_unit: 0n,
+      },
     };
   }
 
-  if (isRPC08_FeeEstimate(estimate)) {
-    return estimateFeeToBoundsRPC08(estimate, overhead as ResourceBoundsOverheadRPC08); // TODO: remove as
-  }
-  return estimateFeeToBoundsRPC07(estimate, overhead as ResourceBoundsOverheadRPC07); // TODO: remove as
+  return {
+    l2_gas: {
+      max_amount: addPercent(estimate.l2_gas_consumed, overhead.l2_gas.max_amount),
+      max_price_per_unit: addPercent(estimate.l2_gas_price, overhead.l2_gas.max_price_per_unit),
+    },
+    l1_gas: {
+      max_amount: addPercent(estimate.l1_gas_consumed, overhead.l1_gas.max_amount),
+      max_price_per_unit: addPercent(estimate.l1_gas_price, overhead.l1_gas.max_price_per_unit),
+    },
+    l1_data_gas: {
+      max_amount: addPercent(estimate.l1_data_gas_consumed, overhead.l1_data_gas.max_amount),
+      max_price_per_unit: addPercent(
+        estimate.l1_data_gas_price,
+        overhead.l1_data_gas.max_price_per_unit
+      ),
+    },
+  };
 }
 
-export type feeOverhead = ResourceBounds;
+/**
+ * Calculates the overall fee for a transaction based on resource consumption and prices.
+ *
+ * The estimated fee for the transaction (in wei or fri, depending on the tx version), equals to:
+ * l1_gas_consumed*l1_gas_price + l1_data_gas_consumed*l1_data_gas_price + l2_gas_consumed*l2_gas_price
+ *
+ * @param {FeeEstimate} estimate - The fee estimate containing gas consumption and price data
+ * @param {ResourceBoundsOverhead} overhead - The overhead percentage (currently unused in calculation)
+ * @returns {bigint} The calculated overall fee in wei or fri
+ * @example
+ * ```typescript
+ * const estimate = {
+ *   l1_gas_consumed: 1000n,
+ *   l1_gas_price: 100n,
+ *   l1_data_gas_consumed: 500n,
+ *   l1_data_gas_price: 50n,
+ *   l2_gas_consumed: 200n,
+ *   l2_gas_price: 20n
+ * };
+ * const result = stark.toOverheadOverallFee(estimate, overhead);
+ * // result = 1000n * 100n + 500n * 50n + 200n * 20n = 129000n
+ * ```
+ */
+export function toOverheadOverallFee(
+  estimate: FeeEstimate,
+  overhead: ResourceBoundsOverhead = config.get('resourceBoundsOverhead')
+): bigint {
+  return (
+    addPercent(estimate.l1_gas_consumed, overhead.l1_gas.max_amount) *
+      addPercent(estimate.l1_gas_price, overhead.l1_gas.max_price_per_unit) +
+    addPercent(estimate.l1_data_gas_consumed, overhead.l1_data_gas.max_amount) *
+      addPercent(estimate.l1_data_gas_price, overhead.l1_data_gas.max_price_per_unit) +
+    addPercent(estimate.l2_gas_consumed, overhead.l2_gas.max_amount) *
+      addPercent(estimate.l2_gas_price, overhead.l2_gas.max_price_per_unit)
+  );
+}
+
+// export type feeOverhead = ResourceBounds;
 
 /**
  * Mock zero fee response
  */
-export function ZEROFee(specVersion: SupportedRpcVersion) {
+export function ZEROFee() {
   return {
     l1_gas_consumed: 0n,
     l1_gas_price: 0n,
@@ -245,9 +278,9 @@ export function ZEROFee(specVersion: SupportedRpcVersion) {
     overall_fee: ZERO,
     unit: 'FRI' as PRICE_UNIT,
     suggestedMaxFee: ZERO,
-    resourceBounds: estimateFeeToBounds(ZERO, undefined, specVersion),
+    resourceBounds: toOverheadResourceBounds(ZERO, undefined),
   };
-}
+} // TODO: TT promjenjena je struktura dali ovo i dalje vrijedi
 
 /**
  * Converts the data availability mode from EDataAvailabilityMode to EDAMode.
@@ -268,33 +301,29 @@ export function intDAM(dam: EDataAvailabilityMode): EDAMode {
 }
 
 /**
- * Convert to ETransactionVersion or throw an error.
- * Return providedVersion is specified else return defaultVersion
- * @param {BigNumberish} defaultVersion default estimate transaction version
- * @param {BigNumberish} [providedVersion] estimate transaction version
- * @returns {ETransactionVersion} if providedVersion is not provided, returns the default estimate version, else return the provided version
- * @throws {Error} if estimate transaction version or default estimate transaction version is unknown
+ * Convert input versions to ETransactionVersion or throw an error.
+ * Returns providedVersion if specified, otherwise returns defaultVersion.
+ * @param {BigNumberish} defaultVersion - The default transaction version to use if providedVersion is not specified
+ * @param {BigNumberish} [providedVersion] - Optional transaction version that takes precedence if provided
+ * @returns {ETransactionVersion} The transaction version - either providedVersion if specified or defaultVersion
+ * @throws {Error} If either version is not a valid ETransactionVersion
  * @example
  * ```typescript
  * const result = stark.toTransactionVersion("0x100000000000000000000000000000003", stark.toFeeVersion(2));
  * // result = "0x100000000000000000000000000000002"
  * ```
  */
-export function toTransactionVersion(
-  defaultVersion: BigNumberish,
-  providedVersion?: BigNumberish
-): ETransactionVersion {
-  const providedVersion0xs = providedVersion ? toHex(providedVersion) : undefined;
-  const defaultVersion0xs = toHex(defaultVersion);
+export function toTransactionVersion(defaultVersion: BigNumberish, providedVersion?: BigNumberish) {
+  const version = providedVersion ? toHex(providedVersion) : toHex(defaultVersion);
+  const validVersions = Object.values(ETransactionVersion3);
 
-  if (providedVersion && !Object.values(ETransactionVersion).includes(providedVersion0xs as any)) {
-    throw Error(`providedVersion ${providedVersion} is not ETransactionVersion`);
-  }
-  if (!Object.values(ETransactionVersion).includes(defaultVersion0xs as any)) {
-    throw Error(`defaultVersion ${defaultVersion} is not ETransactionVersion`);
+  if (!validVersions.includes(version as ETransactionVersion3)) {
+    throw Error(
+      `${providedVersion ? 'providedVersion' : 'defaultVersion'} ${version} is not ETransactionVersion`
+    );
   }
 
-  return (providedVersion ? providedVersion0xs : defaultVersion0xs) as ETransactionVersion;
+  return version as ETransactionVersion3;
 }
 
 /**
@@ -342,35 +371,15 @@ export function toFeeVersion(providedVersion?: BigNumberish): ETransactionVersio
  * ```
  */
 
-export function v3Details(details: UniversalDetails, specVersion?: SupportedRpcVersion): V3Details {
+export function v3Details(details: UniversalDetails): V3Details {
   return {
     tip: details.tip || 0,
     paymasterData: details.paymasterData || [],
     accountDeploymentData: details.accountDeploymentData || [],
     nonceDataAvailabilityMode: details.nonceDataAvailabilityMode || EDataAvailabilityMode.L1,
     feeDataAvailabilityMode: details.feeDataAvailabilityMode || EDataAvailabilityMode.L1,
-    resourceBounds: details.resourceBounds ?? estimateFeeToBounds(ZERO, undefined, specVersion),
+    resourceBounds: details.resourceBounds ?? toOverheadResourceBounds(ZERO, undefined),
   };
-}
-
-/**
- * It will reduce V2 to V1, else (V3) stay the same
- * F2 -> F1
- * V2 -> V1
- * F3 -> F3
- * V3 -> V3
- * @param {ETransactionVersion} providedVersion
- * @returns {ETransactionVersion} if v2 then returns v1. if v3 then return v3
- * @example
- * ```typescript
- * const result = stark.reduceV2(constants.TRANSACTION_VERSION.V2);
- * // result = "0x1"
- * ```
- */
-export function reduceV2(providedVersion: ETransactionVersion): ETransactionVersion {
-  if (providedVersion === ETransactionVersion.F2) return ETransactionVersion.F1;
-  if (providedVersion === ETransactionVersion.V2) return ETransactionVersion.V1;
-  return providedVersion;
 }
 
 /**
@@ -387,4 +396,42 @@ export function getFullPublicKey(privateKey: BigNumberish): string {
   const privKey = toHex(privateKey);
   const fullPrivKey = addHexPrefix(buf2hex(getPublicKey(privKey, false)));
   return fullPrivKey;
+}
+
+/**
+ * Converts ResourceBoundsBN (with bigint values) to ResourceBounds (with string values)
+ *
+ * @param {ResourceBoundsBN} resourceBoundsBN The resource bounds with bigint values
+ * @returns {ResourceBounds} The resource bounds with hex string values
+ * @example
+ * ```typescript
+ * const resourceBoundsBN = {
+ *   l1_gas: { max_amount: 1000n, max_price_per_unit: 100n },
+ *   l2_gas: { max_amount: 2000n, max_price_per_unit: 200n },
+ *   l1_data_gas: { max_amount: 500n, max_price_per_unit: 50n }
+ * };
+ * const result = stark.toStringResourceBound(resourceBoundsBN);
+ * // result = {
+ * //   l1_gas: { max_amount: '0x3e8', max_price_per_unit: '0x64' },
+ * //   l2_gas: { max_amount: '0x7d0', max_price_per_unit: '0xc8' },
+ * //   l1_data_gas: { max_amount: '0x1f4', max_price_per_unit: '0x32' }
+ * // }
+ * ```
+ */
+export function toStringResourceBound(resourceBoundsBN: ResourceBoundsBN): ResourceBounds {
+  const convertBigIntToHex = (obj: any): any => {
+    if (isBigInt(obj)) {
+      return toHex(obj);
+    }
+    if (obj && typeof obj === 'object') {
+      const result: any = {};
+      Object.keys(obj).forEach((key) => {
+        result[key] = convertBigIntToHex(obj[key]);
+      });
+      return result;
+    }
+    return obj;
+  };
+
+  return convertBigIntToHex(resourceBoundsBN) as ResourceBounds;
 }

@@ -1,34 +1,17 @@
-import { EDataAvailabilityMode, ETransactionVersion, PAYMASTER_API } from './api';
-import {
-  AllowArray,
-  BigNumberish,
-  BlockIdentifier,
-  Call,
-  DeclareContractPayload,
-  DeployAccountContractPayload,
-  TransactionType,
-  UniversalDeployerContractPayload,
-  V3TransactionDetails,
-} from './lib';
+import { EDataAvailabilityMode, ETransactionVersion3, PAYMASTER_API } from './api';
+import { BigNumberish, BlockIdentifier, V3TransactionDetails } from './lib';
 import {
   DeclareTransactionReceiptResponse,
-  EstimateFeeResponse,
+  EstimateFeeResponseOverhead,
 } from '../provider/types/index.type';
-import { ResourceBounds } from '../provider/types/spec.type';
+import { ResourceBoundsBN } from '../provider/types/spec.type';
 import { FeeMode, PaymasterTimeBounds } from './paymaster';
 
-export interface EstimateFee extends EstimateFeeResponse {}
-
-export type UniversalSuggestedFee = {
-  maxFee: BigNumberish;
-  resourceBounds: ResourceBounds;
-};
-
-export type EstimateFeeBulk = Array<EstimateFee>;
+export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;
 
 // TODO: This is too wide generic with optional params
 export type AccountInvocationsFactoryDetails = {
-  versions: Array<`${ETransactionVersion}`>;
+  versions: Array<`${ETransactionVersion3}`>;
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
@@ -37,17 +20,13 @@ export type AccountInvocationsFactoryDetails = {
 export interface UniversalDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
-  /**
-   * Max fee to pay for V2 transaction
-   */
-  maxFee?: BigNumberish; // ignored on estimate
   tip?: BigNumberish;
   paymasterData?: BigNumberish[];
   accountDeploymentData?: BigNumberish[];
   nonceDataAvailabilityMode?: EDataAvailabilityMode;
   feeDataAvailabilityMode?: EDataAvailabilityMode;
   version?: BigNumberish;
-  resourceBounds?: ResourceBounds; // ignored on estimate
+  resourceBounds?: ResourceBoundsBN; // ignored on estimate
   skipValidate?: boolean; // ignored on non-estimate
 }
 
@@ -94,24 +73,6 @@ export type SimulateTransactionDetails = {
   skipValidate?: boolean;
   skipExecute?: boolean;
 } & Partial<V3TransactionDetails>;
-
-export type EstimateFeeAction =
-  | {
-      type: typeof TransactionType.INVOKE;
-      payload: AllowArray<Call>;
-    }
-  | {
-      type: typeof TransactionType.DECLARE;
-      payload: DeclareContractPayload;
-    }
-  | {
-      type: typeof TransactionType.DEPLOY_ACCOUNT;
-      payload: DeployAccountContractPayload;
-    }
-  | {
-      type: typeof TransactionType.DEPLOY;
-      payload: UniversalDeployerContractPayload;
-    };
 
 export type StarkProfile = {
   name?: string;
