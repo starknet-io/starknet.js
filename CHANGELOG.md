@@ -1,3 +1,9 @@
+## [7.6.4](https://github.com/starknet-io/starknet.js/compare/v7.6.3...v7.6.4) (2025-07-10)
+
+### Bug Fixes
+
+- allow numeric revision value for typed data ([d4c9627](https://github.com/starknet-io/starknet.js/commit/d4c962749fa994a654057a930087529c13fa9562))
+
 ## [7.6.3](https://github.com/starknet-io/starknet.js/compare/v7.6.2...v7.6.3) (2025-07-10)
 
 ### Bug Fixes
