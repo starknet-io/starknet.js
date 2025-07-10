@@ -70,7 +70,10 @@ function assertRange(data: unknown, type: string, { min, max }: { min: bigint; m
 }
 
 function identifyRevision({ types, domain }: TypedData) {
-  if (revisionConfiguration[Revision.ACTIVE].domain in types && domain.revision === Revision.ACTIVE)
+  if (
+    revisionConfiguration[Revision.ACTIVE].domain in types &&
+    domain.revision?.toString() === Revision.ACTIVE
+  )
     return Revision.ACTIVE;
 
   if (
