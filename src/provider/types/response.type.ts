@@ -25,7 +25,6 @@ import {
   ResourceBoundsBN,
   TransactionTrace,
 } from './spec.type';
-
 import { TransactionReceipt } from '../../types/api';
 
 export type Block = Simplify<BLOCK_WITH_TX_HASHES>;
@@ -76,6 +75,9 @@ export type SimulateTransactionOverheadResponse = SimulateTransactionOverhead[];
 
 export type StateUpdateResponse = StateUpdate | PendingStateUpdate;
 export type StateUpdate = STATE_UPDATE;
+/**
+ * PreConfirmedStateUpdate but left old name
+ */
 export type PendingStateUpdate = PENDING_STATE_UPDATE;
 
 /**

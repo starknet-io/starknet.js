@@ -160,7 +160,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getBlock(): Promise<PendingBlock>;
-  public async getBlock(blockIdentifier: 'pending'): Promise<PendingBlock>;
+  public async getBlock(blockIdentifier: 'pre_confirmed'): Promise<PendingBlock>;
   public async getBlock(blockIdentifier: 'latest'): Promise<Block>;
   public async getBlock(blockIdentifier?: BlockIdentifier): Promise<GetBlockResponse>;
   public async getBlock(blockIdentifier?: BlockIdentifier) {
@@ -195,17 +195,17 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * Pause the execution of the script until a specified block is created.
-   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberish) or 'pending' or 'latest'.
+   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberish) or tag
    * Use of 'latest" or of a block already created will generate no pause.
    * @param {number} [retryInterval] number of milliseconds between 2 requests to the node
    * @example
    * ```typescript
    * await myProvider.waitForBlock();
-   * // wait the creation of the pending block
+   * // wait the creation of the block
    * ```
    */
   public async waitForBlock(
-    blockIdentifier: BlockIdentifier = 'pending',
+    blockIdentifier: BlockIdentifier = BlockTag.LATEST,
     retryInterval: number = 5000
   ) {
     if (blockIdentifier === BlockTag.LATEST) return;
@@ -263,7 +263,7 @@ export class RpcProvider implements ProviderInterface {
   public getStateUpdate = this.getBlockStateUpdate;
 
   public async getBlockStateUpdate(): Promise<PendingStateUpdate>;
-  public async getBlockStateUpdate(blockIdentifier: 'pending'): Promise<PendingStateUpdate>;
+  public async getBlockStateUpdate(blockIdentifier: 'pre_confirmed'): Promise<PendingStateUpdate>;
   public async getBlockStateUpdate(blockIdentifier: 'latest'): Promise<StateUpdate>;
   public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
   public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier) {
@@ -696,15 +696,7 @@ export class RpcProvider implements ProviderInterface {
   public async getL1MessagesStatus(
     transactionHash: BigNumberish
   ): Promise<RPC.RPCSPEC08.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus> {
-    if (this.channel instanceof RPC08.RpcChannel) {
-      return this.channel.getMessagesStatus(transactionHash);
-    }
-
-    if (this.channel instanceof RPC09.RpcChannel) {
-      return this.channel.getMessagesStatus(transactionHash);
-    }
-
-    throw new LibraryError('Unsupported method for RPC version');
+    return this.channel.getMessagesStatus(transactionHash);
   }
 
   /**
@@ -716,26 +708,18 @@ export class RpcProvider implements ProviderInterface {
     contractsStorageKeys: RPC.CONTRACT_STORAGE_KEYS[],
     blockIdentifier?: BlockIdentifier
   ): Promise<RPC.StorageProof> {
-    if (this.channel instanceof RPC08.RpcChannel) {
-      return this.channel.getStorageProof(
-        classHashes,
-        contractAddresses,
-        contractsStorageKeys,
-        blockIdentifier
-      );
-    }
-
-    throw new LibraryError('Unsupported method for RPC version');
+    return this.channel.getStorageProof(
+      classHashes,
+      contractAddresses,
+      contractsStorageKeys,
+      blockIdentifier
+    );
   }
 
   /**
    * Get the contract class definition in the given block associated with the given hash
    */
   public async getCompiledCasm(classHash: BigNumberish): Promise<RPC.CASM_COMPILED_CONTRACT_CLASS> {
-    if (this.channel instanceof RPC08.RpcChannel) {
-      return this.channel.getCompiledCasm(classHash);
-    }
-
-    throw new LibraryError('Unsupported method for RPC version');
+    return this.channel.getCompiledCasm(classHash);
   }
 }

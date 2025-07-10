@@ -7,7 +7,7 @@ import {
   TransactionExecutionStatus,
   ProviderInterface,
   Account,
-  type EstimateFee,
+  EstimateFeeResponseOverhead,
 } from '../src';
 import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
 
@@ -34,7 +34,13 @@ describe('Transaction receipt utility - RPC 0.7 - V2', () => {
 
   test('test for Success variant', async () => {
     const myCall: Call = contract.populate('test_fail', { p1: 100 });
-    const res = await account.execute(myCall, { maxFee: 1 * 10 ** 15 }); // maxFee needed to not throw error in getEstimateFee
+    const res = await account.execute(myCall, {
+      resourceBounds: {
+        l1_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
+        l2_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
+        l1_data_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
+      },
+    }); // maxFee needed to not throw error in getEstimateFee
     const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.SUCCEEDED);
     expect(txR.statusReceipt).toBe('success');
@@ -55,7 +61,7 @@ describe('Transaction receipt utility - RPC 0.7 - V2', () => {
 
   test('test for Reverted variant', async () => {
     const myCall: Call = contract.populate('test_fail', { p1: 10 }); // reverted if not 100
-    const estim: EstimateFee = await account.estimateInvokeFee(
+    const estim: EstimateFeeResponseOverhead = await account.estimateInvokeFee(
       contract.populate('test_fail', { p1: 100 })
     );
     const res = await account.execute(myCall, { ...estim }); // maxFee needed to not throw error in getEstimateFee
@@ -80,7 +86,13 @@ describe('Transaction receipt utility - RPC 0.7 - V2', () => {
   test('test for deploy Success variant', async () => {
     const res = await account.deployContract(
       { classHash: dd.declare.class_hash },
-      { maxFee: 1 * 10 ** 15 }
+      {
+        resourceBounds: {
+          l1_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
+          l2_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
+          l1_data_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
+        },
+      }
     ); // maxFee needed to not throw error in getEstimateFee
     const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.SUCCEEDED);

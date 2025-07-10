@@ -7,7 +7,6 @@ import {
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
-  describeIfRpc071,
   describeIfRpc081,
   describeIfTestnet,
   ETHtokenAddress,
@@ -145,29 +144,35 @@ describeIfRpc('RPCProvider', () => {
   test('configurable margin', async () => {
     const p = new RpcProvider({
       nodeUrl: provider.channel.nodeUrl,
-      feeMarginPercentage: {
-        bounds: {
-          l1_gas: {
-            max_amount: 0,
-            max_price_per_unit: 0,
-          },
+      resourceBoundsOverhead: {
+        l1_gas: {
+          max_amount: 0,
+          max_price_per_unit: 0,
         },
-        maxFee: 0,
+        l2_gas: {
+          max_amount: 0,
+          max_price_per_unit: 0,
+        },
+        l1_data_gas: {
+          max_amount: 0,
+          max_price_per_unit: 0,
+        },
       },
     });
     const estimateSpy = jest.spyOn(p.channel as any, 'getEstimateFee');
     const mockFeeEstimate: FeeEstimate = {
-      gas_consumed: '0x2',
-      gas_price: '0x1',
-      data_gas_consumed: '0x2',
-      data_gas_price: '0x1',
+      l1_gas_consumed: '0x2',
+      l1_gas_price: '0x1',
+      l2_gas_consumed: '0x2',
+      l2_gas_price: '0x1',
+      l1_data_gas_consumed: '0x2',
+      l1_data_gas_price: '0x1',
       overall_fee: '0x4',
       unit: 'WEI',
     };
     estimateSpy.mockResolvedValue([mockFeeEstimate]);
     const result = (await p.getEstimateFeeBulk([{} as any], {}))[0];
     expect(estimateSpy).toHaveBeenCalledTimes(1);
-    expect(result.suggestedMaxFee).toBe(4n);
     expect(result.resourceBounds.l1_gas.max_amount).toBe('0x4');
     expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe('0x1');
     estimateSpy.mockRestore();
@@ -209,7 +214,7 @@ describeIfRpc('RPCProvider', () => {
       });
     });
 
-    describeIfRpc071('estimate message fee rpc 0.7', () => {
+    /*     describeIfRpc071('estimate message fee rpc 0.7', () => {
       test('estimate message fee Cairo 1', async () => {
         const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
         const estimationCairo1 = await rpcProvider.estimateMessageFee({
@@ -229,7 +234,7 @@ describeIfRpc('RPCProvider', () => {
           })
         );
       });
-    });
+    }); */
   });
 
   describe('waitForTransaction', () => {

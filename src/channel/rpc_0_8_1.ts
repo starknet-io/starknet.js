@@ -38,7 +38,7 @@ import {
 } from '../utils/num';
 import { Block, getDefaultNodeUrl, wait } from '../utils/provider';
 import { isSupportedSpecVersion, isV3Tx, isVersion } from '../utils/resolve';
-import { decompressProgram, signatureToHexArray, toStringResourceBound } from '../utils/stark';
+import { decompressProgram, resourceBoundsToHexString, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
 import { isRPC08Plus_ResourceBoundsBN } from '../provider/types/spec.type';
@@ -47,7 +47,7 @@ import { config } from '../global/config';
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: BlockTag.PRE_CONFIRMED,
+  blockIdentifier: BlockTag.LATEST,
   retries: 200,
 };
 
@@ -557,7 +557,7 @@ export class RpcChannel {
             version: RPC.ETransactionVersion.V3,
             signature: signatureToHexArray(functionInvocation.signature),
             nonce: toHex(details.nonce),
-            resource_bounds: toStringResourceBound(details.resourceBounds),
+            resource_bounds: resourceBoundsToHexString(details.resourceBounds),
             tip: toHex(details.tip),
             paymaster_data: details.paymasterData.map((it) => toHex(it)),
             account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
@@ -593,7 +593,7 @@ export class RpcChannel {
               entry_points_by_type: contract.entry_points_by_type,
               abi: contract.abi,
             },
-            resource_bounds: toStringResourceBound(details.resourceBounds),
+            resource_bounds: resourceBoundsToHexString(details.resourceBounds),
             tip: toHex(details.tip),
             paymaster_data: details.paymasterData.map((it) => toHex(it)),
             account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
@@ -623,7 +623,7 @@ export class RpcChannel {
             contract_address_salt: toHex(addressSalt || 0),
             constructor_calldata: CallData.toHex(constructorCalldata || []),
             class_hash: toHex(classHash),
-            resource_bounds: toStringResourceBound(details.resourceBounds),
+            resource_bounds: resourceBoundsToHexString(details.resourceBounds),
             tip: toHex(details.tip),
             paymaster_data: details.paymasterData.map((it) => toHex(it)),
             nonce_data_availability_mode: details.nonceDataAvailabilityMode,
@@ -703,7 +703,7 @@ export class RpcChannel {
       details = {
         signature: signatureToHexArray(invocation.signature),
         nonce: toHex(invocation.nonce),
-        resource_bounds: toStringResourceBound(invocation.resourceBounds),
+        resource_bounds: resourceBoundsToHexString(invocation.resourceBounds),
         tip: toHex(invocation.tip),
         paymaster_data: invocation.paymasterData.map((it) => toHex(it)),
         nonce_data_availability_mode: invocation.nonceDataAvailabilityMode,

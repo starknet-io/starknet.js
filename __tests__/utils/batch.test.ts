@@ -3,7 +3,6 @@ import { BatchClient } from '../../src/utils/batch';
 import {
   createBlockForDevnet,
   createTestProvider,
-  describeIfRpc071,
   describeIfRpc081,
   getTestProvider,
 } from '../config/fixtures';
@@ -45,7 +44,7 @@ describe('BatchClient', () => {
     });
   });
 
-  describeIfRpc071('should batch two requests RPC0.7.1', () => {
+  /*   describeIfRpc071('should batch two requests RPC0.7.1', () => {
     test('should batch two requests', async () => {
       await createBlockForDevnet();
 
@@ -62,7 +61,7 @@ describe('BatchClient', () => {
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       fetchSpy.mockRestore();
     });
-  });
+  }); */
 
   test('batch request using Provider', async () => {
     const myBatchProvider = await createTestProvider(false, { batch: 0 });

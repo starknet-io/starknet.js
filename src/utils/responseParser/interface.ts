@@ -1,5 +1,4 @@
 import {
-  FeeEstimate,
   CallContractResponse,
   DeclareContractResponse,
   DeployContractResponse,
@@ -8,7 +7,6 @@ import {
   InvokeFunctionResponse,
   BlockWithTxHashes,
   SimulateTransactionOverheadResponse,
-  EstimateFeeResponseOverhead,
 } from '../../types';
 import type { GetTransactionReceiptResponse } from '../transactionReceipt/transactionReceipt.type';
 
@@ -18,8 +16,6 @@ export abstract class ResponseParser {
   abstract parseGetTransactionResponse(res: any): GetTransactionResponse;
 
   abstract parseGetTransactionReceiptResponse(res: any): GetTransactionReceiptResponse;
-
-  abstract parseFeeEstimateResponse(res: FeeEstimate[]): EstimateFeeResponseOverhead;
 
   abstract parseCallContractResponse(res: any): CallContractResponse;
 

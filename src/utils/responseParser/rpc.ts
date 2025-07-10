@@ -5,7 +5,6 @@
 import type {
   ContractClassPayload,
   ContractClassResponse,
-  EstimateFeeResponseOverhead,
   GetBlockResponse,
   GetTxReceiptResponseWithoutHelper,
   RpcProviderOptions,
@@ -50,15 +49,6 @@ export class RPCResponseParser
     return res as GetTxReceiptResponseWithoutHelper;
   }
 
-  public parseFeeEstimateResponse(res: ApiEstimateFeeResponse): EstimateFeeResponseOverhead {
-    const val = res[0];
-    return {
-      resourceBounds: toOverheadResourceBounds(val, this.resourceBoundsOverhead),
-      overall_fee: toOverheadOverallFee(val, this.resourceBoundsOverhead),
-      unit: val.unit,
-    };
-  }
-
   public parseFeeEstimateBulkResponse(
     res: ApiEstimateFeeResponse
   ): EstimateFeeResponseBulkOverhead {
@@ -75,7 +65,9 @@ export class RPCResponseParser
     return res.map((it: SimulateTransaction) => {
       return {
         transaction_trace: it.transaction_trace,
-        ...this.parseFeeEstimateResponse([it.fee_estimation]),
+        resourceBounds: toOverheadResourceBounds(it.fee_estimation, this.resourceBoundsOverhead),
+        overall_fee: toOverheadOverallFee(it.fee_estimation, this.resourceBoundsOverhead),
+        unit: it.fee_estimation.unit,
       };
     });
   }

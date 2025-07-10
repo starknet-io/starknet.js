@@ -1,11 +1,15 @@
 import { SUBSCRIPTION_BLOCK_TAG } from '@starknet-io/starknet-types-08';
 import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
-import { EDataAvailabilityMode, ETransactionType, RPCSPEC09 } from '../api';
+import { EDataAvailabilityMode, ETransactionType } from '../api';
 import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
-import { ValuesType } from '../helpers/valuesType';
-import { ResourceBoundsBN } from '../../provider/types/spec.type';
+import {
+  BlockTag,
+  ResourceBoundsBN,
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
+} from '../../provider/types/spec.type';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
@@ -183,7 +187,7 @@ export type InvocationsDetailsWithNonce =
 
 export type TransactionStatus = ValuesType<typeof TransactionStatus>; */
 
-export const TransactionFinalityStatus = {
+/* export const TransactionFinalityStatus = {
   NOT_RECEIVED: 'NOT_RECEIVED',
   RECEIVED: 'RECEIVED',
   ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
@@ -198,20 +202,20 @@ export const TransactionExecutionStatus = {
   SUCCEEDED: 'SUCCEEDED',
 } as const;
 
-export type TransactionExecutionStatus = ValuesType<typeof TransactionExecutionStatus>;
+export type TransactionExecutionStatus = ValuesType<typeof TransactionExecutionStatus>; */
 
-export const BlockStatus = {
+/* export const BlockStatus = {
   PENDING: 'PENDING',
   ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
   ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
   REJECTED: 'REJECTED',
 } as const;
 
-export type BlockStatus = ValuesType<typeof BlockStatus>;
+export type BlockStatus = ValuesType<typeof BlockStatus>; */
 
-export const BlockTag = RPCSPEC09.EBlockTag;
+/* export const BlockTag = RPCSPEC09.EBlockTag;
 
-export type BlockTag = ValuesType<typeof BlockTag>;
+export type BlockTag = ValuesType<typeof BlockTag>; */
 
 export type BlockNumber = BlockTag | null | number;
 

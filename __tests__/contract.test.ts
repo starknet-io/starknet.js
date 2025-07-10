@@ -1,4 +1,3 @@
-import type { ResourceBounds } from '@starknet-io/starknet-types-07';
 import {
   Account,
   Contract,
@@ -15,17 +14,10 @@ import {
   uint256,
   num,
   byteArray,
-  type EstimateFee,
   RpcError,
 } from '../src';
 
-import {
-  contracts,
-  createTestProvider,
-  describeIfRpc071,
-  describeIfRpc081,
-  getTestAccount,
-} from './config/fixtures';
+import { contracts, createTestProvider, describeIfRpc081, getTestAccount } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 describe('contract module', () => {
@@ -161,10 +153,10 @@ describe('contract module', () => {
         });
       });
 
-      describeIfRpc071('Request Type Transformation', () => {
+      /*       describeIfRpc071('Request Type Transformation', () => {
         test('Parsing the felt in request', async () => {
           const myCall = typeTransformedContract.populate('request_felt', [3]);
-          const estim: EstimateFee = await account.estimateInvokeFee(myCall);
+          const estim: EstimateFeeResponseOverhead = await account.estimateInvokeFee(myCall);
           const resourceBounds: ResourceBounds = {
             l1_gas: {
               max_amount: num.toHex(BigInt(estim.resourceBounds.l1_gas.max_amount) * 2n),
@@ -343,7 +335,7 @@ describe('contract module', () => {
           const txR = await provider.waitForTransaction(resp.transaction_hash);
           expect(txR.isSuccess()).toBe(true);
         });
-      });
+      }); */
 
       describe('Response Type Transformation', () => {
         test('Parsing the felt in response', async () => {
@@ -1047,16 +1039,16 @@ describe('Complex interaction', () => {
           .withOptions({
             resourceBounds: {
               l1_gas: {
-                max_amount: '0',
-                max_price_per_unit: '0',
+                max_amount: 0n,
+                max_price_per_unit: 0n,
               },
               l1_data_gas: {
-                max_amount: '0',
-                max_price_per_unit: '0',
+                max_amount: 0n,
+                max_price_per_unit: 0n,
               },
               l2_gas: {
-                max_amount: '0',
-                max_price_per_unit: '0',
+                max_amount: 0n,
+                max_price_per_unit: 0n,
               },
             },
           })

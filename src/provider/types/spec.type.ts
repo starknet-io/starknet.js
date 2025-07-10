@@ -52,14 +52,14 @@ type Merge<T1, T2> = Simplify<
 >;
 
 // Default exports for both RPCs
-export type ETransactionVersion = RPCSPEC08.ETransactionVersion;
-export const { ETransactionVersion } = RPCSPEC08;
+export type ETransactionVersion = RPCSPEC09.ETransactionVersion;
+export const { ETransactionVersion } = RPCSPEC09;
 
-export type ETransactionVersion2 = RPCSPEC08.ETransactionVersion2;
-export const { ETransactionVersion2 } = RPCSPEC08;
+export type ETransactionVersion2 = RPCSPEC09.ETransactionVersion2;
+export const { ETransactionVersion2 } = RPCSPEC09;
 
-export type ETransactionVersion3 = RPCSPEC08.ETransactionVersion3;
-export const { ETransactionVersion3 } = RPCSPEC08;
+export type ETransactionVersion3 = RPCSPEC09.ETransactionVersion3;
+export const { ETransactionVersion3 } = RPCSPEC09;
 
 // MERGES
 export type BLOCK_HASH = Merge<RPCSPEC08.BLOCK_HASH, RPCSPEC09.BLOCK_HASH>;
@@ -128,7 +128,9 @@ export type Receipt = Merge<
   RPCSPEC09.TransactionReceiptProductionBlock
 >;
 
-// One of
+/**
+ * original response from estimate fee without parsing
+ */
 export type FeeEstimate = Merge<RPCSPEC08.FEE_ESTIMATE, RPCSPEC09.FEE_ESTIMATE>;
 export type ApiEstimateFeeResponse = FeeEstimate[]; // 0.8 and 0.9
 
@@ -142,7 +144,6 @@ export function isRPC08Plus_ResourceBoundsBN(entry: ResourceBoundsBN): entry is 
   return 'l1_data_gas' in entry;
 }
 
-// One of
 export type ResourceBounds = Merge<RPCSPEC08.ResourceBounds, RPCSPEC09.ResourceBounds>; // same sa rpc0.8
 
 /**
@@ -203,57 +204,17 @@ export const { ETransactionExecutionStatus } = RPCSPEC08;
 export type FEE_ESTIMATE = Merge<RPCSPEC08.FEE_ESTIMATE, RPCSPEC09.FEE_ESTIMATE>;
 export type EVENTS_CHUNK = Merge<RPCSPEC08.EVENTS_CHUNK, RPCSPEC09.EVENTS_CHUNK>;
 
-// ////////////////////////
+export type TransactionType = RPCSPEC09.ETransactionType;
+export const { ETransactionType: TransactionType } = RPCSPEC09;
 
-/* type Equals<X, Y> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
+export type BlockStatus = RPCSPEC09.EBlockStatus;
+export const { EBlockStatus: BlockStatus } = RPCSPEC09;
 
-type AllEqual<A, B, C> =
-  Equals<A, B> extends true ? (Equals<B, C> extends true ? true : false) : false;
+export type TransactionFinalityStatus = RPCSPEC09.ETransactionFinalityStatus;
+export const { ETransactionFinalityStatus: TransactionFinalityStatus } = RPCSPEC09;
 
-type Test3 = AllEqual<
-  RPCSPEC09.FEE_ESTIMATE,
-  RPCSPEC08.FEE_ESTIMATE,
-  RPCSPEC09.MESSAGE_FEE_ESTIMATE
->;
+export type TransactionExecutionStatus = RPCSPEC09.ETransactionExecutionStatus;
+export const { ETransactionExecutionStatus: TransactionExecutionStatus } = RPCSPEC09;
 
-//---
-// Find keys that exist in T but not in U
-type Diff<T, U> = Omit<T, keyof U>;
-
-// Find keys that exist in U but not in T
-type Missing<T, U> = Omit<U, keyof T>;
-
-// Check if properties have different types
-type DifferentProps<T, U> = {
-  [K in keyof T & keyof U]: T[K] extends U[K]
-    ? U[K] extends T[K]
-      ? never
-      : { expected: T[K]; actual: U[K] }
-    : { expected: T[K]; actual: U[K] };
-};
-
-// Remove 'never' properties
-type CleanDiff<T> = {
-  [K in keyof T as T[K] extends never ? never : K]: T[K];
-};
-
-type PropDiffs<T, U> = CleanDiff<DifferentProps<T, U>>;
-
-type CompareTypes<T, U> = {
-  onlyInT: Diff<T, U>;
-  onlyInU: Missing<T, U>;
-  differentTypes: PropDiffs<T, U>;
-  identical: Equals<T, U>;
-};
-
-type sA = Simplify<RPCSPEC08.TRANSACTION_TRACE>;
-
-type PropDifferences = PropDiffs<
-  Simplify<RPCSPEC08.TRANSACTION_TRACE>,
-  Simplify<RPCSPEC09.TRANSACTION_TRACE>
->;
-type Comparison = CompareTypes<
-  Simplify<RPCSPEC08.TRANSACTION_TRACE>,
-  Simplify<RPCSPEC09.TRANSACTION_TRACE>
->; */
+export type BlockTag = RPCSPEC09.EBlockTag;
+export const { EBlockTag: BlockTag } = RPCSPEC09;

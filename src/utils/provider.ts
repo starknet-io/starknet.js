@@ -202,7 +202,7 @@ export class Block {
     } else if (isNumber(__identifier)) {
       this.number = __identifier;
     } else {
-      this.tag = BlockTag.PRE_CONFIRMED;
+      this.tag = BlockTag.LATEST;
     }
 
     if (isNumber(this.number) && this.number < 0) {

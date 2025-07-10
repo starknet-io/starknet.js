@@ -381,7 +381,7 @@ describe('Account and OutsideExecution', () => {
     );
     const outsideExecutionCall: Call[] =
       outsideExecution.buildExecuteFromOutsideCall(outsideTransaction);
-    const estimateFee = await executorAccount.estimateFee(outsideExecutionCall);
+    const estimateFee = await executorAccount.estimateInvokeFee(outsideExecutionCall);
     expect(Object.keys(estimateFee).sort()).toEqual(
       [
         'overall_fee',

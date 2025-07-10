@@ -1,9 +1,6 @@
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
-
-import { PRICE_UNIT } from '@starknet-io/starknet-types-08';
 import { config } from '../../global/config';
-import { ZERO } from '../../global/constants';
 import { FeeEstimate } from '../../provider/types/index.type';
 import {
   EDAMode,
@@ -186,26 +183,9 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
  * @throws {Error} If the estimate object is undefined or does not have the required properties.
  */
 export function toOverheadResourceBounds(
-  estimate: FeeEstimate | 0n,
+  estimate: FeeEstimate,
   overhead: ResourceBoundsOverhead = config.get('resourceBoundsOverhead')
 ): ResourceBoundsBN {
-  if (isBigInt(estimate)) {
-    return {
-      l2_gas: {
-        max_amount: 0n,
-        max_price_per_unit: 0n,
-      },
-      l1_gas: {
-        max_amount: 0n,
-        max_price_per_unit: 0n,
-      },
-      l1_data_gas: {
-        max_amount: 0n,
-        max_price_per_unit: 0n,
-      },
-    };
-  }
-
   return {
     l2_gas: {
       max_amount: addPercent(estimate.l2_gas_consumed, overhead.l2_gas.max_amount),
@@ -267,20 +247,18 @@ export function toOverheadOverallFee(
 /**
  * Mock zero fee response
  */
-export function ZEROFee() {
+export function ZeroFeeEstimate(): FeeEstimate {
   return {
-    l1_gas_consumed: 0n,
-    l1_gas_price: 0n,
-    l1_data_gas_consumed: 0n,
-    l1_data_gas_price: 0n,
-    l2_gas_consumed: 0n,
-    l2_gas_price: 0n,
-    overall_fee: ZERO,
-    unit: 'FRI' as PRICE_UNIT,
-    suggestedMaxFee: ZERO,
-    resourceBounds: toOverheadResourceBounds(ZERO, undefined),
+    l1_gas_consumed: '0',
+    l1_gas_price: '0',
+    l1_data_gas_consumed: '0',
+    l1_data_gas_price: '0',
+    l2_gas_consumed: '0',
+    l2_gas_price: '0',
+    overall_fee: '0',
+    unit: 'FRI',
   };
-} // TODO: TT promjenjena je struktura dali ovo i dalje vrijedi
+}
 
 /**
  * Converts the data availability mode from EDataAvailabilityMode to EDAMode.
@@ -378,7 +356,8 @@ export function v3Details(details: UniversalDetails): V3Details {
     accountDeploymentData: details.accountDeploymentData || [],
     nonceDataAvailabilityMode: details.nonceDataAvailabilityMode || EDataAvailabilityMode.L1,
     feeDataAvailabilityMode: details.feeDataAvailabilityMode || EDataAvailabilityMode.L1,
-    resourceBounds: details.resourceBounds ?? toOverheadResourceBounds(ZERO, undefined),
+    resourceBounds:
+      details.resourceBounds ?? toOverheadResourceBounds(ZeroFeeEstimate(), undefined),
   };
 }
 
@@ -410,7 +389,7 @@ export function getFullPublicKey(privateKey: BigNumberish): string {
  *   l2_gas: { max_amount: 2000n, max_price_per_unit: 200n },
  *   l1_data_gas: { max_amount: 500n, max_price_per_unit: 50n }
  * };
- * const result = stark.toStringResourceBound(resourceBoundsBN);
+ * const result = stark.resourceBoundsToHexString(resourceBoundsBN);
  * // result = {
  * //   l1_gas: { max_amount: '0x3e8', max_price_per_unit: '0x64' },
  * //   l2_gas: { max_amount: '0x7d0', max_price_per_unit: '0xc8' },
@@ -418,7 +397,7 @@ export function getFullPublicKey(privateKey: BigNumberish): string {
  * // }
  * ```
  */
-export function toStringResourceBound(resourceBoundsBN: ResourceBoundsBN): ResourceBounds {
+export function resourceBoundsToHexString(resourceBoundsBN: ResourceBoundsBN): ResourceBounds {
   const convertBigIntToHex = (obj: any): any => {
     if (isBigInt(obj)) {
       return toHex(obj);
@@ -434,4 +413,42 @@ export function toStringResourceBound(resourceBoundsBN: ResourceBoundsBN): Resou
   };
 
   return convertBigIntToHex(resourceBoundsBN) as ResourceBounds;
+}
+
+/**
+ * Converts ResourceBounds (with string values) to ResourceBoundsBN (with BigInt values)
+ *
+ * @param {ResourceBounds} resourceBounds The resource bounds with string values
+ * @returns {ResourceBoundsBN} The resource bounds with BigInt values
+ * @example
+ * ```typescript
+ * const resourceBounds = {
+ *   l1_gas: { max_amount: '0x3e8', max_price_per_unit: '0x64' },
+ *   l2_gas: { max_amount: '0x7d0', max_price_per_unit: '0xc8' },
+ *   l1_data_gas: { max_amount: '0x1f4', max_price_per_unit: '0x32' }
+ * };
+ * const result = stark.resourceBoundsToBigInt(resourceBounds);
+ * // result = {
+ * //   l1_gas: { max_amount: 1000n, max_price_per_unit: 100n },
+ * //   l2_gas: { max_amount: 2000n, max_price_per_unit: 200n },
+ * //   l1_data_gas: { max_amount: 500n, max_price_per_unit: 50n }
+ * // }
+ * ```
+ */
+export function resourceBoundsToBigInt(resourceBounds: ResourceBounds): ResourceBoundsBN {
+  const convertStringToBigInt = (obj: any): any => {
+    if (typeof obj === 'string') {
+      return BigInt(obj);
+    }
+    if (obj && typeof obj === 'object') {
+      const result: any = {};
+      Object.keys(obj).forEach((key) => {
+        result[key] = convertStringToBigInt(obj[key]);
+      });
+      return result;
+    }
+    return obj;
+  };
+
+  return convertStringToBigInt(resourceBounds) as ResourceBoundsBN;
 }

@@ -244,6 +244,16 @@ export class Account extends Provider implements AccountInterface {
     details: UniversalDetails = {}
   ): Promise<EstimateFeeBulk> {
     if (!invocations.length) throw TypeError('Invocations should be non-empty array');
+    // skip estimating bounds if user provide bounds
+    if (details.resourceBounds)
+      return [
+        {
+          resourceBounds: details.resourceBounds,
+          overall_fee: 0n,
+          unit: 'FRI',
+        },
+      ];
+
     const { nonce, blockIdentifier, version: providedVersion, skipValidate } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),

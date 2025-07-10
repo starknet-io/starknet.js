@@ -43,7 +43,7 @@ import { isSupportedSpecVersion, isV3Tx, isVersion } from '../utils/resolve';
 import {
   decompressProgram,
   signatureToHexArray,
-  toStringResourceBound,
+  resourceBoundsToHexString,
   toTransactionVersion,
 } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
@@ -53,7 +53,7 @@ import { config } from '../global/config';
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: BlockTag.PRE_CONFIRMED,
+  blockIdentifier: BlockTag.LATEST,
   retries: 200,
 };
 
@@ -405,7 +405,7 @@ export class RpcChannel {
     let onchain = false;
     let isErrorState = false;
     const retryInterval = options?.retryInterval ?? this.transactionRetryIntervalDefault;
-    const errorStates: any = options?.errorStates;
+    const errorStates: any = options?.errorStates ?? [];
     const successStates: any = options?.successStates ?? [
       RPC.ETransactionExecutionStatus.SUCCEEDED,
       RPC.ETransactionStatus.ACCEPTED_ON_L2,
@@ -678,7 +678,7 @@ export class RpcChannel {
     const details = {
       signature: signatureToHexArray(invocation.signature),
       nonce: toHex(invocation.nonce),
-      resource_bounds: toStringResourceBound(invocation.resourceBounds),
+      resource_bounds: resourceBoundsToHexString(invocation.resourceBounds),
       tip: toHex(invocation.tip),
       paymaster_data: invocation.paymasterData.map((it) => toHex(it)),
       nonce_data_availability_mode: invocation.nonceDataAvailabilityMode,
