@@ -1,5 +1,5 @@
 ---
-sidebar_position: 101
+sidebar_position: 11
 ---
 
 # Migrate from v6 to v7

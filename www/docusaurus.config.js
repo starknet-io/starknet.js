@@ -26,7 +26,6 @@ const config = {
   favicon: 'img/favicon.ico',
   organizationName: 'starknet-io', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
-
   presets: [
     [
       'classic',
@@ -41,7 +40,12 @@ const config = {
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    {
+    ({
+      colorMode: {
+        defaultMode: 'dark',
+        disableSwitch: false,
+        respectPrefersColorScheme: false,
+      },
       algolia: {
         // The application ID provided by Algolia
         appId: '86VVNRI64B',
@@ -155,7 +159,7 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
       },
-    },
+    }),
 
   plugins: [
     [

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2.1
+sidebar_position: 3
 ---
 
 # Configuration
@@ -17,7 +17,7 @@ Custom keys can also be used to store and use arbitrary values during runtime.
 import { config } from 'starknet';
 
 // Set existing or custom global property
-config.set('mode', 'DEFAULT');
+config.set('rpcVersion', '0.8.1');
 
 // Retrieve entire configuration
 config.getAll();
@@ -41,14 +41,50 @@ config.hasKey('newKey');
 ### Global parameters and Default Global Configuration
 
 Default global configuration is the initial state that global configuration starts with.
-
-Details can be found in [global/constants.ts](https://github.com/starknet-io/starknet.js/blob/develop/src/global/constants.ts)
+Here are all the available configuration properties:
 
 ```ts
-  logLevel: 'INFO', // verbosity levels of the system logger, more details under logger
-  accountTxVersion: ETransactionVersion.V2, // by default use V2 transactions in Account class instances
-  legacyMode: false, // enable legacy transaction types (note: this could break the code depending on the Starknet version used by the network)
+{
+  // Enable/disable legacy transaction types (note: this could break the code depending on the Starknet version used by the network)
+  legacyMode: false,
+
+  // RPC version to use when communicating with nodes ('0.7.1' or '0.8.1')
+  rpcVersion: '0.8.1',
+
+  // Transaction version to use (V2 or V3, where V3 is recommended)
+  transactionVersion: ETransactionVersion.V3,
+
+  // Verbosity levels of the system logger (more details under logger section)
+  logLevel: 'INFO',
+
+  // Fee margin percentage configuration for transaction fee estimation
+  feeMarginPercentage: {
+    bounds: {
+      l1_gas: {
+        max_amount: 50,    // Maximum percentage increase for L1 gas amount
+        max_price_per_unit: 50,  // Maximum percentage increase for L1 gas price
+      },
+      l1_data_gas: {
+        max_amount: 50,    // Maximum percentage increase for L1 data gas amount
+        max_price_per_unit: 50,  // Maximum percentage increase for L1 data gas price
+      },
+      l2_gas: {
+        max_amount: 50,    // Maximum percentage increase for L2 gas amount
+        max_price_per_unit: 50,  // Maximum percentage increase for L2 gas price
+      },
+    },
+    maxFee: 50,  // Maximum percentage increase for overall fee
+  },
+
+  // Custom fetch implementation (optional)
+  fetch: undefined,
+
+  // Custom websocket implementation (optional)
+  websocket: undefined
+}
 ```
+
+Details can be found in [global/constants.ts](https://github.com/starknet-io/starknet.js/blob/develop/src/global/constants.ts)
 
 ## Logger
 
