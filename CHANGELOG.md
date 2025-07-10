@@ -1,3 +1,9 @@
+## [7.6.3](https://github.com/starknet-io/starknet.js/compare/v7.6.2...v7.6.3) (2025-07-10)
+
+### Bug Fixes
+
+- check for the existence of window.WebSocket before bind ([ba7428b](https://github.com/starknet-io/starknet.js/commit/ba7428be4e6560106b8332ad8688a8f7e99a221b))
+
 ## [7.6.2](https://github.com/starknet-io/starknet.js/compare/v7.6.1...v7.6.2) (2025-06-24)
 
 ### Bug Fixes
