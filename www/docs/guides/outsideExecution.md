@@ -22,8 +22,8 @@ At early-2025:
 
 |       account       | compatibility |
 | :-----------------: | :-----------: |
-|   ArgentX v0.3.0    |      v1       |
-|   ArgentX v0.4.0    |      v2       |
+|    Ready v0.3.0     |      v1       |
+|    Ready v0.4.0     |      v2       |
 |   Braavos v1.1.0    |      v2       |
 | OpenZeppelin v1.0.0 |    v2 (\*)    |
 
@@ -42,8 +42,10 @@ if (version === OutsideExecutionVersion.UNSUPPORTED) {
 ```
 
 :::info
+
 The account that will sign the transaction needs to be compatible with SNIP-9.  
 Nevertheless, the account that will execute the transaction do not needs to be SNIP-9 compatible ; it just needs to have enough fees to pay the transaction.
+
 :::
 
 ### Create an `OutsideTransaction` Object
@@ -75,7 +77,9 @@ const callOptions: OutsideExecutionOptions = {
 ```
 
 :::warning
+
 You can use the string `"ANY_CALLER"` as content of the `caller` property. To use with care, as anybody that get your `OutsideTransaction` object and execute it.
+
 :::
 
 To create the `OutsideTransaction` object, you just have to use:
@@ -88,6 +92,7 @@ const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTr
 ```
 
 :::note
+
 In the same `OutsideTransaction` object, you can include several transactions. So, with only one signature of the signer Account, you can generate an `OutsideTransaction` object that performs many things:
 
 ```typescript
@@ -131,18 +136,21 @@ await provider.waitForTransaction(response.transaction_hash);
 ```
 
 :::info
+
 If you have created several `OutsideTransaction` objects using the same signer account, you can execute them in any order (no nonce problems).
+
 :::
 
 :::note
+
 In the same command, you can use several `OutsideTransaction` objects created by several signer accounts, even if they are not compatible with the same version of SNIP-9 (V1 or V2):
 
 ```typescript
-const outsideTransaction1: OutsideTransaction = await accountAX3.getOutsideTransaction(
+const outsideTransaction1: OutsideTransaction = await accountRe3.getOutsideTransaction(
   callOptions,
   call1
 ); // V1 compatible
-const outsideTransaction2: OutsideTransaction = await accountAX4.getOutsideTransaction(
+const outsideTransaction2: OutsideTransaction = await accountRe4.getOutsideTransaction(
   callOptions,
   call2
 ); // V2 compatible
@@ -267,7 +275,9 @@ The balances are finally :
 |                Account2 | 1006.0      |
 
 :::info
+
 The complete code of this example is available [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/Starknet131/Starknet131-devnet/17.outsideExecuteLedger.ts).
+
 :::
 
 ## Estimate fees for an outside execution:

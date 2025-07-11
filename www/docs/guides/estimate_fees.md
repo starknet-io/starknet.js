@@ -25,7 +25,9 @@ const { suggestedMaxFee, unit } = await account0.estimateInvokeFee({
 The result is in `suggestedMaxFee`, of type BigInt. The corresponding unit for this number is in `unit`. It's WEI for "legacy" transactions, and FRI for V3 transactions.
 
 :::tip
+
 More details about the complex subject of Starknet fees in [Starknet docs](https://docs.starknet.io/architecture-and-concepts/network-architecture/fee-mechanism/)
+
 :::
 
 The complete answer for an RPC 0.7 "legacy" transaction:
@@ -154,7 +156,8 @@ config.set('feeMarginPercentage', {
 
 - Values are additional percentage: 75 means 75% additional fees.
 - To get back to normal values: set all values to 50.
-  :::
+
+:::
 
 Example for declaring, with 80% additional fees:
 

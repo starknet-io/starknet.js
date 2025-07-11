@@ -11,7 +11,7 @@ Unlike in Ethereum where a wallet is created with a public and private key pair,
 Account contracts on Starknet cannot be deployed without paying a fee.
 Creating an account is a bit tricky; you have several steps:
 
-1. Decide on your account type (OpenZeppelin, ArgentX, Braavos, ...).
+1. Decide on your account type (OpenZeppelin, Ready, Braavos, ...).
 2. Compute the address of your future account.
 3. Send funds to this pre-computed address. The funds will be used to pay for the account contract deployment and remains will fund the new account.
 4. Actual deployment of the Account
@@ -85,12 +85,14 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
-## Create an Argent account
+## Create a Ready account
 
-Here, we will create a wallet with the Argent smart contract v0.4.0. The contract class is already implemented in the networks.
+Here, we will create a wallet with the Ready smart contract v0.4.0. The contract class is already implemented in the networks.
 
 :::caution
-Smart ArgentX accounts can't be used outside of the ArgentX wallet. With Starknet.js, use only standard ArgentX accounts.
+
+Smart Ready accounts can't be used outside of the Ready wallet. With Starknet.js, use only standard Ready accounts.
+
 :::
 
 ```typescript
@@ -114,30 +116,29 @@ import {
 // connect RPC 0.8 provider
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
-//new Argent X account v0.4.0
-const argentXaccountClassHash =
-  '0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f';
+//new Ready account v0.4.0
+const readyAccountClassHash = '0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f';
 
 // Generate public and private key pair.
-const privateKeyAX = stark.randomAddress();
-console.log('AX_ACCOUNT_PRIVATE_KEY=', privateKeyAX);
-const starkKeyPubAX = ec.starkCurve.getStarkKey(privateKeyAX);
-console.log('AX_ACCOUNT_PUBLIC_KEY=', starkKeyPubAX);
+const privateKeyRe = stark.randomAddress();
+console.log('RE_ACCOUNT_PRIVATE_KEY=', privateKeyRe);
+const starkKeyPubRe = ec.starkCurve.getStarkKey(privateKeyRe);
+console.log('RE_ACCOUNT_PUBLIC_KEY=', starkKeyPubRe);
 
-// Calculate future address of the ArgentX account
-const axSigner = new CairoCustomEnum({ Starknet: { pubkey: starkKeyPubAX } });
-const axGuardian = new CairoOption<unknown>(CairoOptionVariant.None);
-const AXConstructorCallData = CallData.compile({
+// Calculate future address of the Ready account
+const reSigner = new CairoCustomEnum({ Starknet: { pubkey: starkKeyPubRe } });
+const reGuardian = new CairoOption<unknown>(CairoOptionVariant.None);
+const reConstructorCallData = CallData.compile({
   owner: axSigner,
   guardian: axGuardian,
 });
-const AXcontractAddress = hash.calculateContractAddressFromHash(
-  starkKeyPubAX,
-  argentXaccountClassHash,
-  AXConstructorCallData,
+const reContractAddress = hash.calculateContractAddressFromHash(
+  starkKeyPubRe,
+  readyAccountClassHash,
+  reConstructorCallData,
   0
 );
-console.log('Precalculated account address=', AXcontractAddress);
+console.log('Precalculated account address=', reContractAddress);
 ```
 
 If you want a specific private key, replace `stark.randomAddress()` with a value of your choice.
@@ -149,18 +150,18 @@ Then you have to fund this address.
 If you have sent enough STRK to this new address, you can go forward to the final step:
 
 ```typescript
-const accountAX = new Account(provider, AXcontractAddress, privateKeyAX);
+const accountRe = new Account(provider, reContractAddress, privateKeyRe);
 
 const deployAccountPayload = {
-  classHash: argentXaccountClassHash,
-  constructorCalldata: AXConstructorCallData,
-  contractAddress: AXcontractAddress,
-  addressSalt: starkKeyPubAX,
+  classHash: readyAccountClassHash,
+  constructorCalldata: reConstructorCallData,
+  contractAddress: reContractAddress,
+  addressSalt: starkKeyPubRe,
 };
 
-const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } =
-  await accountAX.deployAccount(deployAccountPayload);
-console.log('✅ ArgentX wallet deployed at:', AXcontractFinalAddress);
+const { transaction_hash: redAth, contract_address: reContractFinalAddress } =
+  await accountRe.deployAccount(deployAccountPayload);
+console.log('✅ Ready wallet deployed at:', reContractFinalAddress);
 ```
 
 ## Create a Braavos account
@@ -398,5 +399,5 @@ console.log('✅ New customized account created.\n   address =', contract_addres
 
 ## Account update
 
-For ArgentX and Braavos wallets, if you have created the private key inside the browser wallet, necessary upgrades will be automatically managed in the wallet.  
+For Ready and Braavos wallets, if you have created the private key inside the browser wallet, necessary upgrades will be automatically managed in the wallet.  
 However, if you have created the private key by yourself, it becomes your responsibility to update the account implementation class when it's necessary. It can be done with the `upgrade` function of the implementation class.
