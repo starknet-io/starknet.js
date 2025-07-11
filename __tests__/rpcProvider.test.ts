@@ -33,6 +33,7 @@ import {
   stark,
   waitForTransactionOptions,
   isVersion,
+  toAnyPatchVersion,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { isBoolean } from '../src/utils/typed';
@@ -75,7 +76,7 @@ describeIfRpc('RPCProvider', () => {
     const rawResult = await channel.fetch('starknet_specVersion');
     const j = await rawResult.json();
     expect(channel.readSpecVersion()).toBeDefined();
-    expect(isVersion(j.result, await channel.setUpSpecVersion())).toBeTruthy();
+    expect(isVersion(toAnyPatchVersion(j.result), await channel.setUpSpecVersion())).toBeTruthy();
   });
 
   test('baseFetch override', async () => {
@@ -141,7 +142,7 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof spec).toBe('string');
   });
 
-  test('configurable margin', async () => {
+  test('configurable fee overhead on instance', async () => {
     const p = new RpcProvider({
       nodeUrl: provider.channel.nodeUrl,
       resourceBoundsOverhead: {
@@ -173,8 +174,8 @@ describeIfRpc('RPCProvider', () => {
     estimateSpy.mockResolvedValue([mockFeeEstimate]);
     const result = (await p.getEstimateFeeBulk([{} as any], {}))[0];
     expect(estimateSpy).toHaveBeenCalledTimes(1);
-    expect(result.resourceBounds.l1_gas.max_amount).toBe('0x4');
-    expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe('0x1');
+    expect(result.resourceBounds.l1_gas.max_amount).toBe(2n);
+    expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe(1n);
     estimateSpy.mockRestore();
   });
 
