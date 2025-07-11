@@ -1183,15 +1183,15 @@ describe('Complex interaction', () => {
       const gas2 = await echoContract.estimateFee.iecho(...args);
       const gas3 = await echoContract.estimate('iecho', calldata);
       const gas4 = await echoContract.estimate('iecho', args);
-      expect(gas1).toMatchSchemaRef('EstimateFee');
-      expect(gas2).toMatchSchemaRef('EstimateFee');
-      expect(gas3).toMatchSchemaRef('EstimateFee');
-      expect(gas4).toMatchSchemaRef('EstimateFee');
+      expect(gas1).toMatchSchemaRef('EstimateFeeResponseOverhead');
+      expect(gas2).toMatchSchemaRef('EstimateFeeResponseOverhead');
+      expect(gas3).toMatchSchemaRef('EstimateFeeResponseOverhead');
+      expect(gas4).toMatchSchemaRef('EstimateFeeResponseOverhead');
     });
 
     test('estimate fee transfer', async () => {
       const gas = await erc20Contract.estimateFee.transfer(stark.randomAddress(), cairo.uint256(1));
-      expect(gas).toMatchSchemaRef('EstimateFee');
+      expect(gas).toMatchSchemaRef('EstimateFeeResponseOverhead');
     });
   });
 });

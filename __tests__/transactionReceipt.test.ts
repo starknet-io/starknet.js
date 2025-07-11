@@ -36,9 +36,9 @@ describe('Transaction receipt utility - RPC 0.7 - V2', () => {
     const myCall: Call = contract.populate('test_fail', { p1: 100 });
     const res = await account.execute(myCall, {
       resourceBounds: {
-        l1_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
-        l2_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
-        l1_data_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
+        l1_gas: { max_amount: 10n ** 10n, max_price_per_unit: 10n ** 10n },
+        l2_gas: { max_amount: 10n ** 10n, max_price_per_unit: 10n ** 10n },
+        l1_data_gas: { max_amount: 10n ** 10n, max_price_per_unit: 10n ** 10n },
       },
     }); // maxFee needed to not throw error in getEstimateFee
     const txR = await provider.waitForTransaction(res.transaction_hash);
@@ -88,9 +88,9 @@ describe('Transaction receipt utility - RPC 0.7 - V2', () => {
       { classHash: dd.declare.class_hash },
       {
         resourceBounds: {
-          l1_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
-          l2_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
-          l1_data_gas: { max_amount: 1n * 10n ** 15n, max_price_per_unit: 1n * 10n ** 15n },
+          l1_gas: { max_amount: 10n ** 10n, max_price_per_unit: 10n ** 10n },
+          l2_gas: { max_amount: 10n ** 10n, max_price_per_unit: 10n ** 10n },
+          l1_data_gas: { max_amount: 10n ** 10n, max_price_per_unit: 10n ** 10n },
         },
       }
     ); // maxFee needed to not throw error in getEstimateFee
