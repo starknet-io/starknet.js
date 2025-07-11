@@ -98,12 +98,12 @@ describe('new Block()', () => {
   });
 
   test('string `pending` BlockIdentifier', () => {
-    const block1 = new Block('pending');
-    expect(block1.identifier).toBe('pending');
-    expect(block1.queryIdentifier).toBe('blockNumber=pending');
+    const block1 = new Block('pre_confirmed');
+    expect(block1.identifier).toBe('pre_confirmed');
+    expect(block1.queryIdentifier).toBe('blockNumber=pre_confirmed');
     expect(block1.hash).toBe(null);
     expect(block1.number).toBe(null);
-    expect(block1.tag).toBe('pending');
+    expect(block1.tag).toBe('pre_confirmed');
   });
 
   test('string `latest` BlockIdentifier', () => {
@@ -124,10 +124,10 @@ describe('new Block()', () => {
 
   test('null BlockIdentifier', () => {
     const block1 = new Block(null);
-    expect(block1.identifier).toBe('pending');
-    expect(block1.queryIdentifier).toBe('blockNumber=pending');
+    expect(block1.identifier).toBe('latest');
+    expect(block1.queryIdentifier).toBe('blockNumber=latest');
     expect(block1.hash).toBe(null);
     expect(block1.number).toBe(null);
-    expect(block1.tag).toBe('pending');
+    expect(block1.tag).toBe('latest');
   });
 });

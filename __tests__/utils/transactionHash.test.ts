@@ -1,5 +1,4 @@
-import { constants, hash, shortString, types, v2hash, v3hash } from '../../src';
-import { ResourceBounds } from '../../src/provider/types/spec.type';
+import { constants, v2hash } from '../../src';
 
 describe('TxV2 Hash Tests', () => {
   describe('calculateTransactionHashCommon()', () => {
@@ -18,7 +17,8 @@ describe('TxV2 Hash Tests', () => {
   });
 });
 
-describe('TxV3 Hash Tests', () => {
+// TODO: create new tests with rpc0.8+ v3 tx
+/* describe('TxV3Old Hash Tests', () => {
   test('DaMode', () => {
     const result = v3hash.hashDAMode(types.RPC.EDAMode.L1, types.RPC.EDAMode.L1);
     expect(result.toString(16)).toBe('0');
@@ -31,23 +31,6 @@ describe('TxV3 Hash Tests', () => {
 
     const result3 = v3hash.hashDAMode(types.RPC.EDAMode.L2, types.RPC.EDAMode.L2);
     expect(result3.toString(16)).toBe('100000001');
-  });
-
-  test('hashFeeField', () => {
-    const bound1: ResourceBounds = {
-      l2_gas: {
-        max_amount: '0',
-        max_price_per_unit: '0',
-      },
-      l1_gas: {
-        max_amount: '0x7c9',
-        max_price_per_unit: '0x1',
-      },
-    };
-    const result1 = v3hash.hashFeeField(0, bound1);
-    expect(result1.toString(16)).toBe(
-      '7be65f04548dfe645c70f07d1f8ead572c09e0e6e125c47d4cc22b4de3597cc'
-    );
   });
 
   test('calculateInvokeTransactionHash Demo', () => {
@@ -196,4 +179,4 @@ describe('TxV3 Hash Tests', () => {
 
     expect(result).toBe('0x61bfaf480ac824971ad1bdc316fa821f58afd6b47e037242ef265d0aaea7c78');
   });
-});
+}); */

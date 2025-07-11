@@ -1,23 +1,63 @@
 {
   "$id": "accountSchemas",
   "definitions": {
-    "EstimateFee": {
+    "ResourceBoundsBN": {
       "type": "object",
       "properties": {
+        "l1_gas": {
+          "type": "object",
+          "properties": {
+            "max_amount": {
+              "isBigInt": "true"
+            },
+            "max_price_per_unit": {
+              "isBigInt": "true"
+            }
+          },
+          "required": ["max_amount", "max_price_per_unit"]
+        },
+        "l2_gas": {
+          "type": "object",
+          "properties": {
+            "max_amount": {
+              "isBigInt": "true"
+            },
+            "max_price_per_unit": {
+              "isBigInt": "true"
+            }
+          },
+          "required": ["max_amount", "max_price_per_unit"]
+        },
+        "l1_data_gas": {
+          "type": "object",
+          "properties": {
+            "max_amount": {
+              "isBigInt": "true"
+            },
+            "max_price_per_unit": {
+              "isBigInt": "true"
+            }
+          },
+          "required": ["max_amount", "max_price_per_unit"]
+        }
+      },
+      "required": ["l1_gas", "l2_gas", "l1_data_gas"]
+    },
+    "EstimateFeeResponseOverhead": {
+      "type": "object",
+      "properties": {
+        "resourceBounds": {
+          "$ref": "accountSchemas#/definitions/ResourceBoundsBN"
+        },
         "overall_fee": {
           "isBigInt": "true"
         },
-        "suggestedMaxFee": {
-          "isBigInt": "true"
-        },
-        "gas_consumed": {
-          "isBigInt": "true"
-        },
-        "gas_price": {
-          "isBigInt": "true"
+        "unit": {
+          "type": "string",
+          "enum": ["WEI", "FRI"]
         }
       },
-      "required": ["overall_fee", "suggestedMaxFee"]
+      "required": ["resourceBounds", "overall_fee", "unit"]
     },
     "MultiDeployContractResponse": {
       "type": "object",
@@ -138,6 +178,27 @@
             "fee_estimation": {
               "title": "the transaction's resources and fee",
               "$ref": "accountSchemas#/definitions/EstimateFee"
+            }
+          },
+          "required": ["fee_estimation", "transaction_trace"]
+        }
+      }
+    },
+    "SimulateTransactionOverheadResponse": {
+      "name": "simulated_transactions_overhead",
+      "description": "The execution trace and consumed resources of the required transactions with overhead fee estimation",
+      "type": "array",
+      "items": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "transaction_trace": {
+              "title": "the transaction's trace",
+              "$ref": "starknet_trace_api_openrpc#/components/schemas/TRANSACTION_TRACE"
+            },
+            "fee_estimation": {
+              "title": "the transaction's resources and fee with overhead",
+              "$ref": "accountSchemas#/definitions/EstimateFeeResponseOverhead"
             }
           },
           "required": ["fee_estimation", "transaction_trace"]

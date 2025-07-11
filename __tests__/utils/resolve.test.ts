@@ -94,9 +94,9 @@ describe('toAnyPatchVersion', () => {
 
 describe('isSupportedSpecVersion', () => {
   it('returns true for supported spec versions', () => {
-    expect(isSupportedSpecVersion('0.7.1')).toBe(true);
+    expect(isSupportedSpecVersion('0.9.0')).toBe(true);
     expect(isSupportedSpecVersion('0.8.1')).toBe(true);
-    expect(isSupportedSpecVersion('0.7', { allowAnyPatchVersion: true })).toBe(true);
+    expect(isSupportedSpecVersion('0.9', { allowAnyPatchVersion: true })).toBe(true);
     expect(isSupportedSpecVersion('0.8', { allowAnyPatchVersion: true })).toBe(true);
   });
 
@@ -115,7 +115,7 @@ describe('isSupportedSpecVersion', () => {
 
   describe('isSupportedSpecVersion', () => {
     it('returns true for exact supported version', () => {
-      expect(isSupportedSpecVersion(constants.SupportedRpcVersion.v0_7_1)).toBe(true);
+      expect(isSupportedSpecVersion(constants.SupportedRpcVersion.v0_9_0)).toBe(true);
     });
 
     it('returns false for unsupported version', () => {
@@ -123,7 +123,7 @@ describe('isSupportedSpecVersion', () => {
     });
 
     it('returns true for supported version with allowAnyPatchVersion=true', () => {
-      expect(isSupportedSpecVersion('0.7.5', { allowAnyPatchVersion: true })).toBe(true);
+      expect(isSupportedSpecVersion('0.9.5', { allowAnyPatchVersion: true })).toBe(true);
     });
 
     it('returns false for supported version with allowAnyPatchVersion=false and mismatched patch', () => {
@@ -132,7 +132,7 @@ describe('isSupportedSpecVersion', () => {
 
     it('returns true for supported version with wildcard in SupportedRpcVersion', () => {
       // Simulate a SupportedRpcVersion with a wildcard
-      expect(isSupportedSpecVersion('0.7.123', { allowAnyPatchVersion: true })).toBe(true);
+      expect(isSupportedSpecVersion('0.9.123', { allowAnyPatchVersion: true })).toBe(true);
     });
 
     it('returns false for empty version', () => {
@@ -144,7 +144,7 @@ describe('isSupportedSpecVersion', () => {
     });
 
     it('returns true for supported version with allowAnyPatchVersion explicitly set to true', () => {
-      expect(isSupportedSpecVersion('0.7.2', { allowAnyPatchVersion: true })).toBe(true);
+      expect(isSupportedSpecVersion('0.9.2', { allowAnyPatchVersion: true })).toBe(true);
     });
 
     it('returns false for supported version with allowAnyPatchVersion explicitly set to false', () => {
@@ -152,8 +152,8 @@ describe('isSupportedSpecVersion', () => {
     });
 
     it('returns true for supported version when options is omitted (defaults to false)', () => {
-      expect(isSupportedSpecVersion('0.7.1')).toBe(true);
-      expect(isSupportedSpecVersion('0.7.0')).toBe(false);
+      expect(isSupportedSpecVersion('0.9.0')).toBe(true);
+      expect(isSupportedSpecVersion('0.9.11')).toBe(false);
     });
 
     it('returns false for unsupported version regardless of options', () => {

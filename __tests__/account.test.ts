@@ -544,7 +544,7 @@ describe('deploy and test Account', () => {
         addressSalt: starkKeyPub,
         contractAddress: precalculatedAddress,
       });
-      expect(result).toMatchSchemaRef('EstimateFee');
+      expect(result).toMatchSchemaRef('EstimateFeeResponseOverhead');
     });
 
     test('estimate fee bulk on empty invocations', async () => {
@@ -574,7 +574,7 @@ describe('deploy and test Account', () => {
       ]);
 
       estimatedFeeBulk.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFee');
+        expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
       });
       expect(estimatedFeeBulk.length).toEqual(2);
       // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
@@ -617,7 +617,7 @@ describe('deploy and test Account', () => {
       ]);
       expect(res).toHaveLength(2);
       res.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFee');
+        expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
       });
     });
 
@@ -672,7 +672,7 @@ describe('deploy and test Account', () => {
 
         const res = await account.estimateFeeBulk(invocations);
         res.forEach((value) => {
-          expect(value).toMatchSchemaRef('EstimateFee');
+          expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
         });
       });
 
@@ -713,7 +713,7 @@ describe('deploy and test Account', () => {
 
         const res = await account.estimateFeeBulk(invocations);
         res.forEach((value) => {
-          expect(value).toMatchSchemaRef('EstimateFee');
+          expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
         });
       });
     });
@@ -735,7 +735,7 @@ describe('deploy and test Account', () => {
         calldata: ['Hello'],
       });
 
-      expect(result).toMatchSchemaRef('EstimateFee');
+      expect(result).toMatchSchemaRef('EstimateFeeResponseOverhead');
       // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
       // innerInvokeEstFeeSpy.mockClear();
     });

@@ -8,7 +8,9 @@ describe('Configuration', () => {
 
   describe('Initial Configuration', () => {
     it('should initialize with default values', () => {
-      expect(config.get('legacyMode')).toBe(constants.DEFAULT_GLOBAL_CONFIG.legacyMode);
+      expect(config.get('transactionVersion')).toBe(
+        constants.DEFAULT_GLOBAL_CONFIG.transactionVersion
+      );
       expect(config.get('logLevel')).toBe(constants.DEFAULT_GLOBAL_CONFIG.logLevel);
     });
   });
@@ -51,8 +53,8 @@ describe('Configuration', () => {
   describe('getAll()', () => {
     it('should return a copy of the configuration', () => {
       const all = config.getAll();
-      all.legacyMode = true; // Modify the copy
-      expect(config.get('legacyMode')).toBe(false); // Original remains unaffected
+      all.rpcVersion = '0.8.1'; // Modify the copy
+      expect(config.get('rpcVersion')).toBe('0.9.0'); // Original remains unaffected
     });
   });
 

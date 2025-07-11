@@ -256,9 +256,7 @@ export function buildUDCCall(
 export function getVersionsByType(versionType?: 'fee' | 'transaction') {
   return versionType === 'fee'
     ? {
-        v1: ETransactionVersion.F1,
-        v2: ETransactionVersion.F2,
         v3: ETransactionVersion.F3,
       }
-    : { v1: ETransactionVersion.V1, v2: ETransactionVersion.V2, v3: ETransactionVersion.V3 };
+    : { v3: ETransactionVersion.V3 };
 }

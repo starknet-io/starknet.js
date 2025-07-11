@@ -158,24 +158,19 @@ describe('Ethereum signer', () => {
         {
           resourceBounds: {
             l2_gas: {
-              max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l2_gas.max_amount) * 20n),
-              max_price_per_unit: num.toHex(
-                BigInt(feeEstimation.resourceBounds.l2_gas.max_price_per_unit) * 20n
-              ),
+              max_amount: BigInt(feeEstimation.resourceBounds.l2_gas.max_amount) * 20n,
+              max_price_per_unit:
+                BigInt(feeEstimation.resourceBounds.l2_gas.max_price_per_unit) * 20n,
             },
             l1_gas: {
-              max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l1_gas.max_amount) * 20n),
-              max_price_per_unit: num.toHex(
-                BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit) * 20n
-              ),
+              max_amount: (BigInt(feeEstimation.resourceBounds.l1_gas.max_amount) + 20n) * 20n,
+              max_price_per_unit:
+                BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit) * 20n,
             },
             l1_data_gas: {
-              max_amount: num.toHex(
-                BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_amount) * 20n
-              ),
-              max_price_per_unit: num.toHex(
-                BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_price_per_unit) * 20n
-              ),
+              max_amount: BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_amount) * 20n,
+              max_price_per_unit:
+                BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_price_per_unit) * 20n,
             },
           },
         }
@@ -196,28 +191,7 @@ describe('Ethereum signer', () => {
       ]);
       const feeEstimation = await ethAccount.estimateInvokeFee(txCallData, { skipValidate: false });
       const respTransfer = await ethAccount.execute(txCallData, {
-        resourceBounds: {
-          l2_gas: {
-            max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l2_gas.max_amount) * 2n),
-            max_price_per_unit: num.toHex(
-              BigInt(feeEstimation.resourceBounds.l2_gas.max_price_per_unit) * 2n
-            ),
-          },
-          l1_gas: {
-            max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l1_gas.max_amount) * 2n),
-            max_price_per_unit: num.toHex(
-              BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit) * 2n
-            ),
-          },
-          l1_data_gas: {
-            max_amount: num.toHex(
-              BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_amount) * 2n
-            ),
-            max_price_per_unit: num.toHex(
-              BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_price_per_unit) * 2n
-            ),
-          },
-        },
+        resourceBounds: feeEstimation.resourceBounds,
       });
 
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
@@ -246,24 +220,19 @@ describe('Ethereum signer', () => {
           {
             resourceBounds: {
               l2_gas: {
-                max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l2_gas.max_amount) * 2n),
-                max_price_per_unit: num.toHex(
-                  BigInt(feeEstimation.resourceBounds.l2_gas.max_price_per_unit) * 2n
-                ),
+                max_amount: BigInt(feeEstimation.resourceBounds.l2_gas.max_amount) * 2n,
+                max_price_per_unit:
+                  BigInt(feeEstimation.resourceBounds.l2_gas.max_price_per_unit) * 2n,
               },
               l1_gas: {
-                max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l1_gas.max_amount) * 2n),
-                max_price_per_unit: num.toHex(
-                  BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit) * 2n
-                ),
+                max_amount: BigInt(feeEstimation.resourceBounds.l1_gas.max_amount) * 2n,
+                max_price_per_unit:
+                  BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit) * 2n,
               },
               l1_data_gas: {
-                max_amount: num.toHex(
-                  BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_amount) * 2n
-                ),
-                max_price_per_unit: num.toHex(
-                  BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_price_per_unit) * 2n
-                ),
+                max_amount: BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_amount) * 2n,
+                max_price_per_unit:
+                  BigInt(feeEstimation.resourceBounds.l1_data_gas!.max_price_per_unit) * 2n,
               },
             },
           }

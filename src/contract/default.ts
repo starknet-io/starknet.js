@@ -13,7 +13,6 @@ import {
   Calldata,
   ContractFunction,
   ContractOptions,
-  EstimateFeeResponse,
   FunctionAbi,
   InvokeFunctionResponse,
   InvokeOptions,
@@ -23,6 +22,7 @@ import {
   Result,
   ValidateType,
   type SuccessfulTransactionReceiptResponse,
+  EstimateFeeResponseOverhead,
 } from '../types';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
@@ -296,7 +296,10 @@ export class Contract implements ContractInterface {
     );
   }
 
-  public async estimate(method: string, args: ArgsOrCalldata = []): Promise<EstimateFeeResponse> {
+  public async estimate(
+    method: string,
+    args: ArgsOrCalldata = []
+  ): Promise<EstimateFeeResponseOverhead> {
     assert(this.address !== null, 'contract is not connected to an address');
 
     if (!getCalldata(args, () => false)) {

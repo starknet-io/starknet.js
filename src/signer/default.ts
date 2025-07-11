@@ -5,14 +5,11 @@ import {
   InvocationsSignerDetails,
   Signature,
   TypedData,
-  V2DeclareSignerDetails,
-  V2DeployAccountSignerDetails,
-  V2InvocationsSignerDetails,
   V3DeclareSignerDetails,
   V3DeployAccountSignerDetails,
   V3InvocationsSignerDetails,
 } from '../types';
-import { ETransactionVersion2, ETransactionVersion3 } from '../types/api';
+import { ETransactionVersion3 } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { starkCurve } from '../utils/ec';
 import { buf2hex } from '../utils/encode';
@@ -51,15 +48,7 @@ export class Signer implements SignerInterface {
     let msgHash;
 
     // TODO: How to do generic union discriminator for all like this
-    if (Object.values(ETransactionVersion2).includes(details.version as any)) {
-      const det = details as V2InvocationsSignerDetails;
-      msgHash = calculateInvokeTransactionHash({
-        ...det,
-        senderAddress: det.walletAddress,
-        compiledCalldata,
-        version: det.version,
-      });
-    } else if (Object.values(ETransactionVersion3).includes(details.version as any)) {
+    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
       const det = details as V3InvocationsSignerDetails;
       msgHash = calculateInvokeTransactionHash({
         ...det,
@@ -83,15 +72,7 @@ export class Signer implements SignerInterface {
     /*     const version = BigInt(details.version).toString(); */
     let msgHash;
 
-    if (Object.values(ETransactionVersion2).includes(details.version as any)) {
-      const det = details as V2DeployAccountSignerDetails;
-      msgHash = calculateDeployAccountTransactionHash({
-        ...det,
-        salt: det.addressSalt,
-        constructorCalldata: compiledConstructorCalldata,
-        version: det.version,
-      });
-    } else if (Object.values(ETransactionVersion3).includes(details.version as any)) {
+    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
       const det = details as V3DeployAccountSignerDetails;
       msgHash = calculateDeployAccountTransactionHash({
         ...det,
@@ -114,13 +95,7 @@ export class Signer implements SignerInterface {
   ): Promise<Signature> {
     let msgHash;
 
-    if (Object.values(ETransactionVersion2).includes(details.version as any)) {
-      const det = details as V2DeclareSignerDetails;
-      msgHash = calculateDeclareTransactionHash({
-        ...det,
-        version: det.version,
-      });
-    } else if (Object.values(ETransactionVersion3).includes(details.version as any)) {
+    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
       const det = details as V3DeclareSignerDetails;
       msgHash = calculateDeclareTransactionHash({
         ...det,

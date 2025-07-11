@@ -1,6 +1,6 @@
 import * as starkCurve from '@scure/starknet';
 
-import { constants, ec, hash, num, stark, units } from '../../src';
+import { constants, ec, hash, num, units } from '../../src';
 import { ETHtokenAddress } from '../config/fixtures';
 
 const { IS_BROWSER } = constants;
@@ -79,17 +79,6 @@ describe('computeHashOnElements()', () => {
     expect(res).toMatchInlineSnapshot(
       `"0x7b422405da6571242dfc245a43de3b0fe695e7021c148b918cd9cdb462cac59"`
     );
-  });
-});
-
-describe('estimatedFeeToMaxFee()', () => {
-  test('should return maxFee for 0', () => {
-    const res = stark.estimatedFeeToMaxFee(0, 15);
-    expect(res).toBe(0n);
-  });
-  test('should return maxFee for 10_000', () => {
-    const res = stark.estimatedFeeToMaxFee(10_000, 15);
-    expect(res).toBe(11500n);
   });
 });
 

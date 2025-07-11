@@ -12,7 +12,7 @@ import {
   Calldata,
   ContractFunction,
   ContractVersion,
-  EstimateFeeResponse,
+  EstimateFeeResponseOverhead,
   Invocation,
   InvokeFunctionResponse,
   InvokeOptions,
@@ -127,7 +127,7 @@ export abstract class ContractInterface {
     options?: {
       blockIdentifier?: BlockIdentifier;
     }
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Calls a method on a contract

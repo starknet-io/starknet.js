@@ -1,15 +1,16 @@
 import { stringify } from '../json';
-import { RPC, RpcProviderOptions } from '../../types';
+import { RpcProviderOptions } from '../../types';
 import { JRPC } from '../../types/api';
 
-export type BatchClientOptions = {
+export type BatchClientOptions<T extends { [key: string]: { params?: any; result?: any } }> = {
   nodeUrl: string;
   headers: object;
   interval: number;
   baseFetch: NonNullable<RpcProviderOptions['baseFetch']>;
+  rpcMethods: T;
 };
 
-export class BatchClient {
+export class BatchClient<T extends { [key: string]: { params?: any; result?: any } }> {
   public nodeUrl: string;
 
   public headers: object;
@@ -28,13 +29,16 @@ export class BatchClient {
 
   private delayPromiseResolve?: () => void;
 
-  private baseFetch: BatchClientOptions['baseFetch'];
+  private baseFetch: BatchClientOptions<T>['baseFetch'];
 
-  constructor(options: BatchClientOptions) {
+  private rpcMethods: T;
+
+  constructor(options: BatchClientOptions<T>) {
     this.nodeUrl = options.nodeUrl;
     this.headers = options.headers;
     this.interval = options.interval;
     this.baseFetch = options.baseFetch;
+    this.rpcMethods = options.rpcMethods;
   }
 
   private async wait(): Promise<void> {
@@ -63,15 +67,15 @@ export class BatchClient {
     return this.delayPromise;
   }
 
-  private addPendingRequest<T extends keyof RPC.Methods>(
-    method: T,
-    params?: RPC.Methods[T]['params'],
+  private addPendingRequest<M extends keyof T>(
+    method: M,
+    params?: T[M]['params'],
     id?: string | number
   ) {
     const request: JRPC.RequestBody = {
       id: id ?? `batched_${(this.requestId += 1)}`,
       jsonrpc: '2.0',
-      method,
+      method: (method as symbol).description || String(method),
       params: params ?? undefined,
     };
 
@@ -98,12 +102,12 @@ export class BatchClient {
    * @returns JSON-RPC Response
    */
   public async fetch<
-    T extends keyof RPC.Methods,
+    M extends keyof T,
     TResponse extends JRPC.ResponseBody & {
-      result?: RPC.Methods[T]['result'];
+      result?: T[M]['result'];
       error?: JRPC.Error;
     },
-  >(method: T, params?: RPC.Methods[T]['params'], id?: string | number): Promise<TResponse> {
+  >(method: M, params?: T[M]['params'], id?: string | number): Promise<TResponse> {
     const requestId = this.addPendingRequest(method, params, id);
 
     // Wait for the interval to pass before sending the batch
@@ -126,7 +130,8 @@ export class BatchClient {
 
     // Find this request in the results and return it
     const result = results.find((res: any) => res.id === requestId);
-    if (!result) throw new Error(`Couldn't find the result for the request. Method: ${method}`);
+    if (!result)
+      throw new Error(`Couldn't find the result for the request. Method: ${String(method)}`);
 
     return result as TResponse;
   }
