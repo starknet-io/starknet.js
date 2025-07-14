@@ -55,9 +55,12 @@ describe('contract module', () => {
           constructorCalldata: erc20Constructor,
         });
         erc20Address = deploy.address;
-        erc20Contract = new Contract(contracts.Erc20OZ.sierra.abi, erc20Address, provider);
+        erc20Contract = new Contract({
+          abi: contracts.Erc20OZ.sierra.abi,
+          address: erc20Address,
+          providerOrAccount: provider,
+        });
       });
-
       test('getCairoVersion', async () => {
         const version = await erc20Contract.getVersion();
         expect(version).toEqual({ cairo: '1', compiler: '2' });
@@ -98,11 +101,11 @@ describe('contract module', () => {
           casm: contracts.TypeTransformation.casm,
         });
 
-        typeTransformedContract = new Contract(
-          contracts.TypeTransformation.sierra.abi,
-          deploy.contract_address!,
-          account
-        );
+        typeTransformedContract = new Contract({
+          abi: contracts.TypeTransformation.sierra.abi,
+          address: deploy.contract_address,
+          providerOrAccount: account,
+        });
       });
 
       describeIfRpc081('Request Type Transformation', () => {

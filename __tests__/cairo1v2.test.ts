@@ -53,17 +53,21 @@ describe('Cairo 1', () => {
         contract: contracts.C1v2.sierra,
         casm: contracts.C1v2.casm,
       });
-      cairo1Contract = new Contract(contracts.C1v2.sierra.abi, dd.deploy.contract_address, account);
+      cairo1Contract = new Contract({
+        abi: contracts.C1v2.sierra.abi,
+        address: dd.deploy.contract_address,
+        providerOrAccount: account,
+      });
 
       dd2 = await account.declareAndDeploy({
         contract: contracts.C210.sierra,
         casm: contracts.C210.casm,
       });
-      cairo210Contract = new Contract(
-        contracts.C210.sierra.abi,
-        dd2.deploy.contract_address,
-        account
-      );
+      cairo210Contract = new Contract({
+        abi: contracts.C210.sierra.abi,
+        address: dd2.deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
@@ -796,7 +800,11 @@ describe('Cairo 1', () => {
         casm: contracts.C1v2.casm,
       });
 
-      eventContract = new Contract(contracts.C1v2.sierra.abi, deploy.contract_address!, account);
+      eventContract = new Contract({
+        abi: contracts.C1v2.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('parse event returning a regular struct', async () => {

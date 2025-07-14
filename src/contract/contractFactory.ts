@@ -5,7 +5,7 @@ import {
   ArgsOrCalldata,
   CairoAssembly,
   CompiledContract,
-  ContractOptions,
+  ExecuteOptions,
   ValidateType,
 } from '../types';
 import assert from '../utils/assert';
@@ -19,7 +19,7 @@ export type ContractFactoryParams = {
   classHash?: string;
   compiledClassHash?: string;
   abi?: Abi;
-  contractOptions?: ContractOptions;
+  executeOptions?: ExecuteOptions;
 };
 
 export class ContractFactory {
@@ -29,6 +29,8 @@ export class ContractFactory {
 
   abi: Abi;
 
+  address: string | undefined;
+
   classHash?: string;
 
   casm?: CairoAssembly;
@@ -37,7 +39,7 @@ export class ContractFactory {
 
   private CallData: CallData;
 
-  public contractOptions?: ContractOptions;
+  public executeOptions?: ExecuteOptions;
 
   /**
    * @param params CFParams
@@ -56,7 +58,7 @@ export class ContractFactory {
     this.classHash = params.classHash;
     this.compiledClassHash = params.compiledClassHash;
     this.CallData = new CallData(this.abi);
-    this.contractOptions = params.contractOptions;
+    this.executeOptions = params.executeOptions;
   }
 
   /**
@@ -68,7 +70,7 @@ export class ContractFactory {
     // const { args: param, options = { parseRequest: true } } = args; // splitArgsAndOptions(args);
 
     const constructorCalldata = getCalldata(args, () => {
-      if (this.contractOptions?.parseRequest) {
+      if (this.executeOptions?.parseRequest) {
         this.CallData.validate(ValidateType.DEPLOY, 'constructor', args);
         return this.CallData.compile('constructor', args);
       }
@@ -84,15 +86,17 @@ export class ContractFactory {
       classHash: this.classHash,
       compiledClassHash: this.compiledClassHash,
       constructorCalldata,
-      salt: this.contractOptions?.addressSalt,
+      salt: this.executeOptions?.salt,
     });
     assert(Boolean(contract_address), 'Deployment of the contract failed');
 
-    const contractInstance = new Contract(
-      this.compiledContract.abi,
-      contract_address!,
-      this.account
-    );
+    this.address = contract_address;
+
+    const contractInstance = new Contract({
+      abi: this.compiledContract.abi,
+      address: contract_address,
+      providerOrAccount: this.account,
+    });
     contractInstance.deployTransactionHash = transaction_hash;
 
     return contractInstance;
@@ -103,16 +107,23 @@ export class ContractFactory {
    *
    * @param account - new Account to attach to
    */
-  connect(account: AccountInterface): ContractFactory {
-    this.account = account;
-    return this;
+  connect(account: AccountInterface): Contract {
+    return new Contract({
+      abi: this.abi,
+      address: this.address!,
+      providerOrAccount: account,
+    });
   }
 
   /**
    * Attaches current abi and account to the new address
    */
   attach(address: string): Contract {
-    return new Contract(this.abi, address, this.account);
+    return new Contract({
+      abi: this.abi,
+      address,
+      providerOrAccount: this.account,
+    });
   }
 
   // ethers.js' getDeployTransaction can't be supported as it requires the account or signer to return a signed transaction which is not possible with the current implementation

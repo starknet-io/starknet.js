@@ -28,7 +28,11 @@ describe('Transaction receipt utility - RPC 0.7 - V2', () => {
       casm: contracts.TestReject.casm,
     });
     await provider.waitForTransaction(dd.deploy.transaction_hash);
-    contract = new Contract(contracts.TestReject.sierra.abi, dd.deploy.contract_address, account);
+    contract = new Contract({
+      abi: contracts.TestReject.sierra.abi,
+      address: dd.deploy.contract_address,
+      providerOrAccount: account,
+    });
     contract.connect(account);
   });
 

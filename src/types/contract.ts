@@ -1,23 +1,18 @@
-import { BlockHash, TransactionHash } from '@starknet-io/starknet-types-07';
-import { CairoEnum } from './cairoEnum';
-import {
-  BlockIdentifier,
-  BlockNumber,
-  Calldata,
-  ParsedStruct,
-  RawArgsArray,
-  Signature,
-} from './lib';
-import { UniversalDetails } from './account';
+import type { BlockHash, TransactionHash } from '@starknet-io/starknet-types-07';
+import type { CairoEnum } from './cairoEnum';
+import type { Abi, BlockNumber, Calldata, ParsedStruct, RawArgsArray, Signature } from './lib';
+import type { UniversalDetails } from './account';
+import type { ProviderInterface } from '../provider';
+import type { AccountInterface } from '../account/interface';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
 
-export type Result =
+export type CallResult =
   | {
       [key: string]: any;
     }
-  | Result[]
+  | CallResult[]
   | bigint
   | string
   | boolean
@@ -54,41 +49,46 @@ export type ArgsOrCalldataWithOptions =
   | [...Calldata]
   | [...Calldata, ContractOptions];
 
-export type ContractOptions = {
-  blockIdentifier?: BlockIdentifier;
+type CommonContractOptions = {
   /**
    * compile and validate arguments
+   * @default true
    */
   parseRequest?: boolean;
   /**
    * Parse elements of the response array and structuring them into response object
+   * @default true
    */
   parseResponse?: boolean;
+};
+
+export type ContractOptions = {
+  abi: Abi;
+  address: string;
   /**
-   * Advance formatting used to get js types data as result
-   * @description https://starknetjs.com/docs/guides/define_call_message/#formatresponse
-   * @example
-   * ```typescript
-   * // assign custom or existing method to resulting data
-   * formatResponse: { balance: uint256ToBN },
-   * ```
-   * @example
-   * ```typescript
-   * // define resulting data js types
-   * const formatAnswer = { id: 'number', description: 'string' };
-   * ```
+   * Connect account to read and write methods
+   * Connect provider to read methods
+   * @default defaultProvider
    */
-  formatResponse?: { [key: string]: any };
+  providerOrAccount?: ProviderOrAccount;
+} & CommonContractOptions;
+
+export type ExecuteOptions = Pick<CommonContractOptions, 'parseRequest'> & {
+  /**
+   * Used when invoking with only provider
+   */
   signature?: Signature;
-  addressSalt?: string;
+  /**
+   * UDC salt
+   */
+  salt?: string;
 } & Partial<UniversalDetails>;
 
-export type CallOptions = Pick<
-  ContractOptions,
-  'blockIdentifier' | 'parseRequest' | 'parseResponse' | 'formatResponse'
->;
+export type CallOptions = CommonContractOptions & {
+  formatResponse?: FormatResponse;
+} & Pick<UniversalDetails, 'blockIdentifier' | 'version'>;
 
-export type InvokeOptions = ContractOptions;
+export type WithOptions = ExecuteOptions & CallOptions;
 
 export type ParsedEvent = { [name: string]: ParsedStruct } & {
   block_hash?: BlockHash;
@@ -97,3 +97,33 @@ export type ParsedEvent = { [name: string]: ParsedStruct } & {
 };
 
 export type ParsedEvents = Array<ParsedEvent>;
+
+// TODO: This should be in formatResponse type
+/**
+ * Advance formatting used to get js types data as result
+ * @description https://starknetjs.com/docs/guides/define_call_message/#formatresponse
+ * @example
+ * ```typescript
+ * // assign custom or existing method to resulting data
+ * formatResponse: { balance: uint256ToBN },
+ * ```
+ * @example
+ * ```typescript
+ * // define resulting data js types
+ * const formatAnswer = { id: 'number', description: 'string' };
+ * ```
+ */
+export type FormatResponse = { [key: string]: any };
+
+export type ProviderOrAccount = ProviderInterface | AccountInterface;
+
+/**
+ * Type guard to narrow ProviderOrAccount to AccountInterface
+ * @param providerOrAccount - The object to check
+ * @returns true if the object is an AccountInterface
+ */
+export function isAccount(
+  providerOrAccount: ProviderOrAccount
+): providerOrAccount is AccountInterface {
+  return 'execute' in providerOrAccount;
+}

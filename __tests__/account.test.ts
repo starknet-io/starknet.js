@@ -65,7 +65,11 @@ describe('deploy and test Account', () => {
       constructorCalldata: erc20Constructor,
     });
     erc20Address = dd.deploy.contract_address;
-    erc20 = new Contract(contracts.Erc20OZ.sierra.abi, erc20Address, provider);
+    erc20 = new Contract({
+      abi: contracts.Erc20OZ.sierra.abi,
+      address: erc20Address,
+      providerOrAccount: provider,
+    });
 
     const balance = await erc20.balanceOf(account.address);
     expect(balance).toStrictEqual(1000n);
@@ -75,7 +79,11 @@ describe('deploy and test Account', () => {
       casm: contracts.C1v2.casm,
     });
 
-    dapp = new Contract(contracts.C1v2.sierra.abi, dappResponse.deploy.contract_address, provider);
+    dapp = new Contract({
+      abi: contracts.C1v2.sierra.abi,
+      address: dappResponse.deploy.contract_address,
+      providerOrAccount: provider,
+    });
     dappClassHash = num.toHex(dappResponse.declare.class_hash);
   });
 

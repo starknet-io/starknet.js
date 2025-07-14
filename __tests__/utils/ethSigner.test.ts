@@ -75,11 +75,11 @@ describe('Ethereum signer', () => {
         casm: contracts.EthPubk.casm,
       });
 
-      ethPubKContract = new Contract(
-        contracts.EthPubk.sierra.abi,
-        deploy.contract_address,
-        account
-      );
+      ethPubKContract = new Contract({
+        abi: contracts.EthPubk.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('secp256k1', async () => {
@@ -180,11 +180,11 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account transaction V3', async () => {
-      const strkContract2 = new Contract(
-        contracts.Erc20OZ.sierra.abi,
-        STRKtokenAddress,
-        ethAccount
-      );
+      const strkContract2 = new Contract({
+        abi: contracts.Erc20OZ.sierra.abi,
+        address: STRKtokenAddress,
+        providerOrAccount: ethAccount,
+      });
       const txCallData = strkContract2.populate('transfer', [
         account.address,
         cairo.uint256(1 * 10 ** 4),

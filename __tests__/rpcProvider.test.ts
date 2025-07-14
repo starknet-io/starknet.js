@@ -367,11 +367,11 @@ describeIfRpc('RPCProvider', () => {
           constructorCalldata: erc20Constructor,
         });
 
-        const erc20EchoContract = new Contract(
-          contracts.Erc20OZ.sierra.abi,
-          deploy.contract_address!,
-          account
-        );
+        const erc20EchoContract = new Contract({
+          abi: contracts.Erc20OZ.sierra.abi,
+          address: deploy.contract_address,
+          providerOrAccount: account,
+        });
         await erc20EchoContract.transfer(randomWallet, cairo.uint256(1));
         await erc20EchoContract.transfer(randomWallet, cairo.uint256(1));
 

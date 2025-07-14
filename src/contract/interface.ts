@@ -1,7 +1,5 @@
 import type { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
 
-import { AccountInterface } from '../account';
-import { ProviderInterface } from '../provider';
 import {
   Abi,
   ArgsOrCalldata,
@@ -15,11 +13,12 @@ import {
   EstimateFeeResponseOverhead,
   Invocation,
   InvokeFunctionResponse,
-  InvokeOptions,
   ParsedEvents,
   RawArgs,
-  Result,
+  CallResult,
   Uint256,
+  ExecuteOptions,
+  ProviderOrAccount,
 } from '../types';
 import { CairoCustomEnum } from '../utils/calldata/enum/CairoCustomEnum';
 import { CairoOption } from '../utils/calldata/enum/CairoOption';
@@ -38,7 +37,7 @@ declare module 'abi-wan-kanabi' {
     Enum: CairoCustomEnum;
     Calldata: RawArgs | Calldata;
     CallOptions: CallOptions;
-    InvokeOptions: InvokeOptions;
+    InvokeOptions: ExecuteOptions;
     InvokeFunctionResponse: InvokeFunctionResponse;
   }
 }
@@ -50,7 +49,7 @@ export abstract class ContractInterface {
 
   public abstract address: string;
 
-  public abstract providerOrAccount: ProviderInterface | AccountInterface;
+  public abstract providerOrAccount: ProviderOrAccount;
 
   public abstract deployTransactionHash?: string;
 
@@ -76,7 +75,7 @@ export abstract class ContractInterface {
    *
    * @param providerOrAccount - new Provider or Account to attach to
    */
-  public abstract connect(providerOrAccount: ProviderInterface | AccountInterface): void;
+  public abstract connect(providerOrAccount: ProviderOrAccount): void;
 
   /**
    * Resolves when contract is deployed on the network or when no deployment transaction is found
@@ -98,7 +97,7 @@ export abstract class ContractInterface {
     method: string,
     args?: ArgsOrCalldata,
     options?: CallOptions
-  ): Promise<Result>;
+  ): Promise<CallResult>;
 
   /**
    * Invokes a method on a contract
@@ -111,7 +110,7 @@ export abstract class ContractInterface {
   public abstract invoke(
     method: string,
     args?: ArgsOrCalldata,
-    options?: InvokeOptions
+    options?: ExecuteOptions
   ): Promise<InvokeFunctionResponse>;
 
   /**

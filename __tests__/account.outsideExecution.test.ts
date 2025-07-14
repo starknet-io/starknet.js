@@ -55,8 +55,11 @@ describe('Account and OutsideExecution', () => {
     provider = new Provider(await createTestProvider());
     executorAccount = getTestAccount(provider);
     recipientAccount = executorAccount;
-    strkContract = new Contract(contracts.Erc20OZ.sierra.abi, STRKtokenAddress, provider);
-
+    strkContract = new Contract({
+      abi: contracts.Erc20OZ.sierra.abi,
+      address: STRKtokenAddress,
+      providerOrAccount: provider,
+    });
     call1 = {
       contractAddress: STRKtokenAddress,
       entrypoint: 'transfer',
