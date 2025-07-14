@@ -147,7 +147,7 @@ export type CompleteDeclareContractPayload = {
   contract: CompiledContract | string;
   classHash: string;
   casm?: CompiledSierraCasm;
-  compiledClassHash?: string;
+  compiledClassHash: string;
 };
 
 export type DeclareAndDeployContractPayload = Omit<UniversalDeployerContractPayload, 'classHash'> &

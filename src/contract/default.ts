@@ -215,6 +215,34 @@ export class Contract implements ContractInterface {
     }
   }
 
+  /**
+   * Factory method to declare and deploy a contract creating a new Contract instance
+   *
+   * It handles the entire lifecycle: compiles constructor calldata, declares the contract class,
+   * deploys an instance, and returns a ready-to-use Contract object.
+   *
+   * @param params - Factory parameters containing Contract Class details and deployment options
+   * @returns Promise that resolves to a deployed Contract instance with address and transaction hash
+   * @throws Error if deployment fails or contract_address is not returned
+   * @example
+   * ```typescript
+   * // Deploy an ERC20 contract
+   * const contract = await Contract.factory({
+   *   compiledContract: erc20CompiledContract,
+   *   account: myAccount,
+   *   casm: erc20Casm,
+   *   constructorArguments: {
+   *     name: 'MyToken',
+   *     symbol: 'MTK',
+   *     decimals: 18,
+   *     initial_supply: { low: 1000000, high: 0 },
+   *     recipient: myAccount.address
+   *   }
+   * });
+   *
+   * console.log('Contract deployed at:', contract.address);
+   * ```\
+   */
   static async factory(params: FactoryParams): Promise<Contract> {
     const abi = params.abi ?? params.compiledContract.abi;
     const calldataClass = new CallData(abi);
@@ -262,6 +290,7 @@ export class Contract implements ContractInterface {
     return contractInstance;
   }
 
+  // TODO: why this is needed ? And why we cant use address to confirm cairo instance is deployed ?
   public async deployed(): Promise<Contract> {
     if (this.deployTransactionHash) {
       await this.providerOrAccount.waitForTransaction(this.deployTransactionHash);
