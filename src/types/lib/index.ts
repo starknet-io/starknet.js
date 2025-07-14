@@ -99,12 +99,44 @@ export type DeployAccountContractTransaction = Omit<
   signature?: Signature;
 };
 
-export type DeclareContractPayload = {
+/**
+ * Base payload for declaring a contract on Starknet
+ */
+type BaseDeclareContractPayload = {
+  /** The compiled contract (JSON object) or path to compiled contract file */
   contract: CompiledContract | string;
+  /**
+   * Class hash of the contract. Optional optimization - if not provided,
+   * it will be computed from the contract
+   */
   classHash?: string;
-  casm?: CompiledSierraCasm;
+};
+
+/**
+ * Declare contract with CASM code
+ */
+type DeclareWithCasm = BaseDeclareContractPayload & {
+  /** Compiled Sierra Assembly (CASM) code */
+  casm: CompiledSierraCasm;
+  /** Hash of the compiled CASM. Optional - will be computed from casm if not provided */
   compiledClassHash?: string;
 };
+
+/**
+ * Declare contract with pre-computed compiled class hash (optimization)
+ */
+type DeclareWithCompiledClassHash = BaseDeclareContractPayload & {
+  /** Hash of the compiled CASM */
+  compiledClassHash: string;
+  /** CASM is not needed when compiledClassHash is provided */
+  casm?: never;
+};
+
+/**
+ * Payload for declaring a contract on Starknet.
+ * Either provide CASM code, or a pre-computed compiledClassHash for optimization.
+ */
+export type DeclareContractPayload = DeclareWithCasm | DeclareWithCompiledClassHash;
 
 /**
  * DeclareContractPayload with classHash or contract defined
