@@ -6,19 +6,86 @@ on:
         description: 'Ignore scripts'
         type: boolean
         default: false
+      fail-fast:
+        description: 'Fail fast'
+        type: boolean
+        default: false
+      # alternative approach in case the input limit is reached
+      # requires custom parsing
+      # matrix-node:
+      #   description: 'Node:'
+      #   type: string
+      #   default: 'Juno Pathfinder'
+      matrix-node-juno:
+        description: 'Node: Juno'
+        type: boolean
+        default: true
+      matrix-node-pathfinder:
+        description: 'Node: Pathfinder'
+        type: boolean
+        default: true
+      matrix-protocol-rpc:
+        description: 'Protocol: RPC'
+        type: boolean
+        default: true
+      matrix-protocol-ws:
+        description: 'Protocol: WS'
+        type: boolean
+        default: true
+      matrix-version-v0_7:
+        description: 'RPC version: 0.7'
+        type: boolean
+        default: true
+      matrix-version-v0_8:
+        description: 'RPC version: 0.8'
+        type: boolean
+        default: true
 
 jobs:
+  prepare-matrix:
+    name: Prepare matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.process-inputs.outputs.result }}
+    steps:
+      - id: process-inputs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // console.log(context)
+            const adjustType = {
+              node: (t) => t[0].toUpperCase() + t.slice(1),
+              protocol: (t) => t.toUpperCase(),
+              version: (t) => t
+            };
+            //
+            const groupInputs = (i) => Object.entries(i).reduce((grouped, [key, isSelected]) => {
+              const [prefix, group, type] = key.split('-');
+              if (prefix !== 'matrix' || isSelected !== 'true') return grouped;
+
+              (grouped[group] ??= []).push(adjustType[group](type));
+              return grouped;
+            }, {});
+            //
+            return groupInputs(context.payload.inputs);
   tests:
-    name: Run test on ${{ matrix.name }}
+    name: Run test on ${{ matrix.node }} ${{ matrix.protocol }} ${{ matrix.version }}
+    needs: [prepare-matrix]
     strategy:
       max-parallel: 1
+      fail-fast: ${{ inputs.fail-fast }}
       matrix:
-        name: [rpc-sepolia]
+        node: ${{ fromJson(needs.prepare-matrix.outputs.matrix).node }}
+        protocol: ${{ fromJson(needs.prepare-matrix.outputs.matrix).protocol }}
+        version: ${{ fromJson(needs.prepare-matrix.outputs.matrix).version }}
+        exclude:
+          - version: v0_7
+            protocol: WS
 
     uses: ./.github/workflows/_test.yml
     with:
       ignore-scripts: ${{ inputs.ignore-scripts }}
-    secrets:
-      TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
-      TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
-      TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
+      protocol: ${{ matrix.protocol }}
+      node: ${{ matrix.node }}
+      version: ${{ matrix.version }}
+    secrets: inherit

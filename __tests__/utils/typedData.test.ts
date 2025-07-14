@@ -34,6 +34,8 @@ import {
 
 const exampleAddress = '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826';
 
+const copyMock = <T>(o: T) => JSON.parse(JSON.stringify(o)) as T;
+
 describe('typedData', () => {
   test('should get right type encoding', () => {
     let encoded: string;
@@ -328,6 +330,13 @@ describe('typedData', () => {
       `"0xdb7829db8909c0c5496f5952bcfc4fc894341ce01842537fc4f448743480b6"`
     );
 
+    // support for numeric revision value
+    const previousMessageHash = messageHash;
+    const exampleBaseTypesCopy = copyMock(exampleBaseTypes);
+    exampleBaseTypesCopy.domain.revision = 1 as any;
+    messageHash = getMessageHash(exampleBaseTypesCopy, exampleAddress);
+    expect(messageHash).toMatch(previousMessageHash);
+
     messageHash = getMessageHash(examplePresetTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
       `"0x185b339d5c566a883561a88fb36da301051e2c0225deb325c91bb7aa2f3473a"`
@@ -351,7 +360,7 @@ describe('typedData', () => {
 
   describe('should fail validation', () => {
     const baseTypes = (type: string, value: any = PRIME) => {
-      const copy = JSON.parse(JSON.stringify(exampleBaseTypes)) as typeof exampleBaseTypes;
+      const copy = copyMock(exampleBaseTypes);
       const property = copy.types.Example.find((e) => e.type === type)!.name;
       (copy.message as any)[property] = value;
       return copy;
