@@ -23,6 +23,7 @@ import {
   ProviderOrAccount,
   isAccount,
   WithOptions,
+  FactoryParams,
 } from '../types';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
@@ -115,9 +116,9 @@ export class Contract implements ContractInterface {
    */
   deployTransactionHash?: string;
 
-  protected readonly structs: { [name: string]: AbiStruct };
+  private structs: { [name: string]: AbiStruct };
 
-  protected readonly events: AbiEvents;
+  private events: AbiEvents;
 
   readonly functions!: { [name: string]: AsyncContractFunction };
 
@@ -208,12 +209,57 @@ export class Contract implements ContractInterface {
     this.address = address;
     if (abi) {
       this.abi = abi;
+      this.callData = new CallData(abi);
+      this.structs = CallData.getAbiStruct(abi);
+      this.events = getAbiEvents(abi);
     }
   }
 
-  public connect(providerOrAccount: ProviderOrAccount) {
-    // TODO: provider or account can be modified directly i don't see any point in this method
-    this.providerOrAccount = providerOrAccount;
+  static async factory(params: FactoryParams): Promise<Contract> {
+    const abi = params.abi ?? params.compiledContract.abi;
+    const calldataClass = new CallData(abi);
+    const {
+      compiledContract,
+      account,
+      casm,
+      classHash,
+      compiledClassHash,
+      parseRequest = true,
+      salt,
+      constructorArguments = [],
+    } = params;
+
+    const constructorCalldata = getCalldata(constructorArguments, () => {
+      if (parseRequest) {
+        // Convert object based raw js arguments to ...args array
+        const rawArgs = Object.values(constructorArguments);
+        calldataClass.validate(ValidateType.DEPLOY, 'constructor', rawArgs);
+        return calldataClass.compile('constructor', rawArgs);
+      }
+      logger.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
+      return constructorArguments;
+    });
+
+    const {
+      deploy: { contract_address, transaction_hash },
+    } = await account.declareAndDeploy({
+      contract: compiledContract,
+      casm,
+      classHash,
+      compiledClassHash,
+      constructorCalldata,
+      salt,
+    });
+    assert(Boolean(contract_address), 'Deployment of the contract failed');
+
+    const contractInstance = new Contract({
+      abi: compiledContract.abi,
+      address: contract_address,
+      providerOrAccount: account,
+    });
+    contractInstance.deployTransactionHash = transaction_hash;
+
+    return contractInstance;
   }
 
   public async deployed(): Promise<Contract> {

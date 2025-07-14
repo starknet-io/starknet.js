@@ -1,6 +1,16 @@
 import type { BlockHash, TransactionHash } from '@starknet-io/starknet-types-07';
 import type { CairoEnum } from './cairoEnum';
-import type { Abi, BlockNumber, Calldata, ParsedStruct, RawArgsArray, Signature } from './lib';
+import type {
+  Abi,
+  BlockNumber,
+  CairoAssembly,
+  Calldata,
+  CompiledContract,
+  ParsedStruct,
+  RawArgs,
+  RawArgsArray,
+  Signature,
+} from './lib';
 import type { UniversalDetails } from './account';
 import type { ProviderInterface } from '../provider';
 import type { AccountInterface } from '../account/interface';
@@ -127,3 +137,22 @@ export function isAccount(
 ): providerOrAccount is AccountInterface {
   return 'execute' in providerOrAccount;
 }
+
+export type FactoryParams = {
+  compiledContract: CompiledContract;
+  account: any;
+  casm?: CairoAssembly;
+  classHash?: string;
+  compiledClassHash?: string;
+  abi?: Abi;
+  executeOptions?: ExecuteOptions;
+
+  constructorArguments?: RawArgs;
+  /**
+   * Parse arguments to calldata.
+   * optimization when calldata are already validated and compiled.
+   * @default true
+   */
+  parseRequest?: boolean;
+  salt?: string;
+};

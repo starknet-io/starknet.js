@@ -67,15 +67,9 @@ export abstract class ContractInterface {
    * Saves the address of the contract deployed on network that will be used for interaction
    *
    * @param address - address of the contract
+   * @param abi - optional new abi to use with the contract
    */
-  public abstract attach(address: string): void;
-
-  /**
-   * Attaches to new Provider or Account
-   *
-   * @param providerOrAccount - new Provider or Account to attach to
-   */
-  public abstract connect(providerOrAccount: ProviderOrAccount): void;
+  public abstract attach(address: string, abi?: Abi): void;
 
   /**
    * Resolves when contract is deployed on the network or when no deployment transaction is found

@@ -1,7 +1,6 @@
 import {
   Account,
   Contract,
-  ContractFactory,
   ProviderInterface,
   RawArgs,
   hash,
@@ -25,6 +24,7 @@ describe('contract module', () => {
   let provider: ProviderInterface;
   let account: Account;
   const erc20ClassHash = hash.computeContractClassHash(contracts.Erc20OZ.sierra);
+  const erc20CompiledClassHash = hash.computeCompiledClassHash(contracts.Erc20OZ.casm);
   const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
   let erc20Constructor: Calldata;
   let erc20ConstructorParams: RawArgs;
@@ -386,7 +386,7 @@ describe('contract module', () => {
     });
   });
 
-  describe('class ContractFactory {}', () => {
+  describe('class static factory()', () => {
     beforeAll(async () => {
       await account.declareAndDeploy({
         contract: contracts.Erc20OZ.sierra,
@@ -394,41 +394,48 @@ describe('contract module', () => {
         constructorCalldata: erc20Constructor,
       });
     });
-    test('deployment of new contract', async () => {
-      const factory = new ContractFactory({
+
+    test('factory deployment of new contract with constructor arguments as js params', async () => {
+      const erc20 = await Contract.factory({
         compiledContract: contracts.Erc20OZ.sierra,
-        casm: contracts.Erc20OZ.casm,
-        classHash: erc20ClassHash,
+        compiledClassHash: erc20CompiledClassHash,
         account,
+        constructorArguments: erc20ConstructorParams,
       });
-      const erc20 = await factory.deploy(...erc20Constructor);
       expect(erc20).toBeInstanceOf(Contract);
     });
-    test('wait for deployment transaction', async () => {
-      const factory = new ContractFactory({
+
+    test('factory deployment of new contract with constructor arguments as already compiled calldata', async () => {
+      const erc20 = await Contract.factory({
         compiledContract: contracts.Erc20OZ.sierra,
         casm: contracts.Erc20OZ.casm,
         classHash: erc20ClassHash,
         account,
+        constructorArguments: erc20Constructor,
       });
-      const contract = await factory.deploy(
-        CallData.compile({
-          name: byteArray.byteArrayFromString('Token'),
-          symbol: byteArray.byteArrayFromString('ERC20'),
-          amount: cairo.uint256(1000n),
-          recipient: account.address,
-          owner: account.address,
-        })
-      );
-      await expect(contract.deployed()).resolves.not.toThrow();
+      expect(erc20).toBeInstanceOf(Contract);
     });
-    test('attach new contract', async () => {
-      const factory = new ContractFactory({
+
+    test('optimization, factory deployment of new contract with constructor arguments as already compiled calldata', async () => {
+      const erc20 = await Contract.factory({
         compiledContract: contracts.Erc20OZ.sierra,
+        casm: contracts.Erc20OZ.casm,
         classHash: erc20ClassHash,
         account,
+        constructorArguments: erc20Constructor,
+        parseRequest: false, // optimization when calldata are already validated and compiled.
       });
-      const erc20 = factory.attach(erc20Address);
+      expect(erc20).toBeInstanceOf(Contract);
+    });
+
+    test('factory deployment of declared contract with constructor arguments as js params', async () => {
+      const erc20 = await Contract.factory({
+        compiledContract: contracts.Erc20OZ.sierra,
+        casm: contracts.Erc20OZ.casm,
+        classHash: erc20ClassHash,
+        account,
+        constructorArguments: erc20ConstructorParams,
+      });
       expect(erc20).toBeInstanceOf(Contract);
     });
   });
@@ -440,37 +447,30 @@ describe('Complex interaction', () => {
   let provider: ProviderInterface;
   let account: Account;
   const classHash = hash.computeContractClassHash(contracts.Erc20OZ.sierra);
-  let factory: ContractFactory;
-  let echoFactory: ContractFactory;
-  const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
-  let erc20Constructor: Calldata;
-  let erc20ConstructorParams: RawArgs;
 
   beforeAll(async () => {
     provider = await createTestProvider();
     account = getTestAccount(provider);
-    erc20ConstructorParams = {
-      name: 'TEST',
-      symbol: 'TST',
-      amount: 1000n,
-      recipient: account.address,
-      owner: account.address,
-    };
-    erc20Constructor = erc20CallData.compile('constructor', erc20ConstructorParams);
 
-    factory = new ContractFactory({
+    erc20Contract = await Contract.factory({
       compiledContract: contracts.Erc20OZ.sierra,
       casm: contracts.Erc20OZ.casm,
       classHash,
       account,
+      constructorArguments: {
+        name: 'TEST',
+        symbol: 'TST',
+        amount: 1000n,
+        recipient: account.address,
+        owner: account.address,
+      },
     });
-    erc20Contract = await factory.deploy(erc20Constructor);
-    echoFactory = new ContractFactory({
+
+    echoContract = await Contract.factory({
       compiledContract: contracts.echo.sierra,
       casm: contracts.echo.casm,
       account,
     });
-    echoContract = await echoFactory.deploy();
   });
 
   test('contractFactory.deploy with raw arguments - all types constructor params', () => {
@@ -481,15 +481,20 @@ describe('Complex interaction', () => {
 
   test('contractFactory.deploy with callData - all types constructor params', async () => {
     // Deploy with callData - OK
-    const erc20Contract2 = await factory.deploy(
-      CallData.compile({
+    const erc20Contract2 = await Contract.factory({
+      compiledContract: contracts.Erc20OZ.sierra,
+      casm: contracts.Erc20OZ.casm,
+      classHash,
+      account,
+      constructorArguments: CallData.compile({
         name: byteArray.byteArrayFromString('Token'),
         symbol: byteArray.byteArrayFromString('ERC20'),
         amount: cairo.uint256('1000000000'),
         recipient: account.address,
         owner: '0x823d5a0c0eefdc9a6a1cb0e064079a6284f3b26566b677a32c71bbe7bf9f8c',
-      })
-    );
+      }),
+    });
+
     expect(erc20Contract2).toBeInstanceOf(Contract);
   });
 
