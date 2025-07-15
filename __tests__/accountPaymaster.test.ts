@@ -1,13 +1,13 @@
-import { OutsideCallV2, OutsideExecutionTypedDataV2 } from '@starknet-io/starknet-types-08';
+import type { OutsideCallV2, OutsideExecutionTypedDataV2 } from '../src/types/api';
 import {
   Account,
-  Signature,
-  Call,
-  PaymasterDetails,
   OutsideExecutionVersion,
   logger,
+  hash,
+  type Call,
+  type PaymasterDetails,
+  type Signature,
 } from '../src';
-import { getSelectorFromName } from '../src/utils/hash';
 
 jest.mock('../src/paymaster/rpc');
 logger.setLogLevel('ERROR');
@@ -30,7 +30,7 @@ describe('Account - Paymaster integration', () => {
   const originalCallsAsOutsideCalls: OutsideCallV2[] = [
     {
       To: '0x123',
-      Selector: getSelectorFromName('transfer'),
+      Selector: hash.getSelectorFromName('transfer'),
       Calldata: [],
     },
   ];
@@ -48,7 +48,7 @@ describe('Account - Paymaster integration', () => {
         ...originalCallsAsOutsideCalls,
         {
           To: '0x456',
-          Selector: getSelectorFromName('transfer'),
+          Selector: hash.getSelectorFromName('transfer'),
           Calldata: ['0xcaller', '1200', '0'],
         },
       ],
@@ -79,7 +79,7 @@ describe('Account - Paymaster integration', () => {
         ...originalCallsAsOutsideCalls,
         {
           To: '0x4567',
-          Selector: getSelectorFromName('transfer'),
+          Selector: hash.getSelectorFromName('transfer'),
           Calldata: ['0xcaller', '1200', '0'],
         },
       ],
@@ -94,7 +94,7 @@ describe('Account - Paymaster integration', () => {
         ...originalCallsAsOutsideCalls,
         {
           To: '0x456',
-          Selector: getSelectorFromName('transfer'),
+          Selector: hash.getSelectorFromName('transfer'),
           Calldata: ['0xcaller', '13000', '0'],
         },
       ],
@@ -109,12 +109,12 @@ describe('Account - Paymaster integration', () => {
         ...originalCallsAsOutsideCalls,
         {
           To: '0x456',
-          Selector: getSelectorFromName('transfer'),
+          Selector: hash.getSelectorFromName('transfer'),
           Calldata: ['0xcaller', '13000', '0'],
         },
         {
           To: '0x456',
-          Selector: getSelectorFromName('transfer'),
+          Selector: hash.getSelectorFromName('transfer'),
           Calldata: ['0xcaller', '13000', '0'],
         },
       ],

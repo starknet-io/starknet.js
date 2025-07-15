@@ -162,7 +162,7 @@ export class RpcProvider implements ProviderInterface {
   public async getBlock(): Promise<PendingBlock>;
   public async getBlock(blockIdentifier: 'pre_confirmed'): Promise<PendingBlock>;
   public async getBlock(blockIdentifier: 'latest'): Promise<Block>;
-  public async getBlock(blockIdentifier?: BlockIdentifier): Promise<GetBlockResponse>;
+  public async getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
   public async getBlock(blockIdentifier?: BlockIdentifier) {
     return this.channel
       .getBlockWithTxHashes(blockIdentifier)

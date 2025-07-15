@@ -1,15 +1,7 @@
-import type {
-  AccountChangeEventHandler,
-  AddStarknetChainParameters,
-  NetworkChangeEventHandler,
-  Signature,
-  WatchAssetParameters,
-} from '@starknet-io/starknet-types-08';
-
 import { Account, AccountInterface } from '../account';
 import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
-import {
+import type {
   AllowArray,
   CairoVersion,
   Call,
@@ -38,6 +30,13 @@ import {
 import type { StarknetWalletProvider, WalletAccountOptions } from './types/index.type';
 import type { PaymasterOptions } from '../paymaster/types/index.type';
 import type { PaymasterInterface } from '../paymaster';
+import {
+  AccountChangeEventHandler,
+  NetworkChangeEventHandler,
+  WatchAssetParameters,
+  AddStarknetChainParameters,
+  Signature,
+} from '../types/api';
 
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {

@@ -6,4 +6,4 @@ export {
   type StarknetType,
   type StarknetDomain,
   type TypedData,
-} from '@starknet-io/starknet-types-07';
+} from './api';

@@ -1,4 +1,4 @@
-import type { BlockHash, TransactionHash } from '@starknet-io/starknet-types-07';
+import type { BlockHash, TransactionHash } from '../../types/api';
 import type { CairoEnum } from '../../types/cairoEnum';
 import type {
   Abi,

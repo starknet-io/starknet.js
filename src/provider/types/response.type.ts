@@ -5,12 +5,13 @@
 
 import {
   BLOCK_WITH_TX_HASHES,
-  BlockWithTxHashes,
   IsReverted,
   IsSucceeded,
   IsType,
-  PENDING_BLOCK_WITH_TX_HASHES,
-} from '@starknet-io/starknet-types-08';
+  RPCSPEC08,
+  TransactionReceipt,
+} from '../../types/api';
+
 import { CompiledSierra, LegacyContractClass } from '../../types/lib';
 import {
   FELT,
@@ -24,11 +25,11 @@ import {
   Simplify,
   ResourceBoundsBN,
   TransactionTrace,
+  BlockWithTxHashes,
 } from './spec.type';
-import { TransactionReceipt } from '../../types/api';
 
 export type Block = Simplify<BLOCK_WITH_TX_HASHES>;
-export type PendingBlock = Simplify<PENDING_BLOCK_WITH_TX_HASHES>;
+export type PendingBlock = Simplify<RPCSPEC08.PENDING_BLOCK_WITH_TX_HASHES>;
 export type GetBlockResponse = Simplify<BlockWithTxHashes>;
 
 export type GetTxReceiptResponseWithoutHelper = TransactionReceipt;

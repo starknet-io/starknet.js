@@ -1,7 +1,6 @@
-import { SUBSCRIPTION_BLOCK_TAG } from '@starknet-io/starknet-types-08';
 import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
-import { EDataAvailabilityMode, ETransactionType } from '../api';
+import { EDataAvailabilityMode, ETransactionType, SUBSCRIPTION_BLOCK_TAG } from '../api';
 import { CairoEnum } from '../cairoEnum';
 import { Abi, CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 import {

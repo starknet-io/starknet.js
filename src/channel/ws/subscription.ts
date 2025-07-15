@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import type { SUBSCRIPTION_ID } from '@starknet-io/starknet-types-08';
+import type { SUBSCRIPTION_ID } from '../../types/api';
 import { logger } from '../../global/logger';
 import type { WebSocketChannel } from './ws_0_8';
 import { EventEmitter } from '../../utils/eventEmitter';
