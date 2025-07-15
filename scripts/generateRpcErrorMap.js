@@ -17,7 +17,7 @@ const errorNameCodeMap = Object.fromEntries(
     ...starknet_write_api.components.errors,
     ...starknet_ws_api.components.errors,
   })
-    .map((e) => [e[0], e[1].code])
+    .map(([name, { code }]) => [name, code])
     .sort((a, b) => a[1] - b[1])
 );
 
