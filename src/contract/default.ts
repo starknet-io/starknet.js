@@ -104,12 +104,6 @@ export class Contract implements ContractInterface {
 
   providerOrAccount: ProviderOrAccount;
 
-  /**
-   * Transaction hash of the deploy tx, used to confirm the contract is deployed.
-   * TODO: Why cant we confirm this from the contract address ? Check with contract factory
-   */
-  deployTransactionHash?: string;
-
   classHash?: string;
 
   private structs: { [name: string]: AbiStruct };
@@ -139,6 +133,7 @@ export class Contract implements ContractInterface {
    *  - parseResponse?: Parse elements of the response array and structuring them into response object (optional, default true)
    */
   constructor(options: ContractOptions) {
+    // TODO: HUGE_REFACTOR: move from legacy format and add support for legacy format
     const parser = createAbiParser(options.abi);
     // Must have params
     this.address = options.address && options.address.toLowerCase();
@@ -147,7 +142,6 @@ export class Contract implements ContractInterface {
 
     // Optional params
     this.classHash = options.classHash;
-    this.deployTransactionHash = options.deployTransactionHash;
 
     // Init
     this.callData = new CallData(options.abi);
@@ -206,10 +200,10 @@ export class Contract implements ContractInterface {
   }
 
   public attach(address: string, abi?: Abi): void {
-    // TODO: if changing address, probably changing abi also !? Also nonsense method as if you change abi and address, you need to create a new contract instance. This could be useful only if contract can be created empty without any params.
+    // TODO: if changing address, probably changing abi also !? Also nonsense method as if you change abi and address, you need to create a new contract instance.
     this.address = address;
     if (abi) {
-      this.abi = abi;
+      this.abi = createAbiParser(abi).getLegacyFormat();
       this.callData = new CallData(abi);
       this.structs = CallData.getAbiStruct(abi);
       this.events = getAbiEvents(abi);
@@ -251,7 +245,7 @@ export class Contract implements ContractInterface {
 
     const {
       declare: { class_hash },
-      deploy: { contract_address, transaction_hash },
+      deploy: { contract_address },
     } = await account.declareAndDeploy(
       {
         ...params,
@@ -266,16 +260,17 @@ export class Contract implements ContractInterface {
       address: contract_address,
       providerOrAccount: account,
       classHash: class_hash.toString(),
-      deployTransactionHash: transaction_hash,
     });
   }
 
-  // TODO: why this is needed ? And why we cant use address to confirm cairo instance is deployed ?
-  public async deployed(): Promise<Contract> {
-    if (this.deployTransactionHash) {
-      await this.providerOrAccount.waitForTransaction(this.deployTransactionHash);
-      this.deployTransactionHash = undefined;
+  public async isDeployed(): Promise<Contract> {
+    try {
+      await this.providerOrAccount.getClassHashAt(this.address);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Contract not deployed at address ${this.address}: ${errorMessage}`);
     }
+
     return this;
   }
 

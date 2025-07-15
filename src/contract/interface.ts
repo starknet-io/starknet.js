@@ -51,7 +51,7 @@ export abstract class ContractInterface {
 
   public abstract providerOrAccount: ProviderOrAccount;
 
-  public abstract deployTransactionHash?: string;
+  public abstract classHash?: string;
 
   readonly functions!: { [name: string]: AsyncContractFunction };
 
@@ -72,12 +72,12 @@ export abstract class ContractInterface {
   public abstract attach(address: string, abi?: Abi): void;
 
   /**
-   * Resolves when contract is deployed on the network or when no deployment transaction is found
+   * Verifies that the contract is deployed at the configured address
    *
-   * @returns Promise that resolves when contract is deployed on the network or when no deployment transaction is found
-   * @throws When deployment fails
+   * @returns Promise that resolves when contract is confirmed to exist at the address
+   * @throws Error if the contract is not deployed at the address
    */
-  public abstract deployed(): Promise<ContractInterface>;
+  public abstract isDeployed(): Promise<ContractInterface>;
 
   /**
    * Calls a method on a contract

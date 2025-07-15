@@ -90,6 +90,23 @@ describe('contract module', () => {
         const balance = await erc20Contract.balanceOf(account.address);
         expect(balance).toStrictEqual(1000n);
       });
+
+      test('isDeployed should return contract when deployed', async () => {
+        const result = await erc20Contract.isDeployed();
+        expect(result).toBe(erc20Contract);
+      });
+
+      test('isDeployed should throw error when contract not deployed', async () => {
+        const nonExistentContract = new Contract({
+          abi: contracts.Erc20OZ.sierra.abi,
+          address: '0x123456789abcdef123456789abcdef123456789abcdef123456789abcdef1234',
+          providerOrAccount: provider,
+        });
+
+        await expect(nonExistentContract.isDeployed()).rejects.toThrow(
+          /Contract not deployed at address/
+        );
+      });
     });
 
     describe('Type Transformation', () => {

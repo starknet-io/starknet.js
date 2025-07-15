@@ -1,5 +1,7 @@
 import type { ENUM_EVENT, EVENT_FIELD, STRUCT_EVENT } from '@starknet-io/starknet-types-07';
 
+// TODO: Inherit from RPC 0.9 with addition to Legacy
+
 /** ABI */
 export type Abi = ReadonlyArray<FunctionAbi | AbiEvent | AbiStruct | InterfaceAbi | any>;
 
