@@ -561,14 +561,13 @@ export class Account extends Provider implements AccountInterface {
     payload: DeclareAndDeployContractPayload,
     details: UniversalDetails = {}
   ): Promise<DeclareDeployUDCResponse> {
-    const { constructorCalldata, salt, unique } = payload;
     let declare = await this.declareIfNot(payload, details);
     if (declare.transaction_hash !== '') {
       const tx = await this.waitForTransaction(declare.transaction_hash);
       declare = { ...declare, ...tx };
     }
     const deploy = await this.deployContract(
-      { classHash: declare.class_hash, salt, unique, constructorCalldata },
+      { ...payload, classHash: declare.class_hash },
       details
     );
     return { declare: { ...declare }, deploy };
@@ -840,7 +839,7 @@ export class Account extends Provider implements AccountInterface {
           ...details,
           ...v3Details(details),
           classHash,
-          compiledClassHash: compiledClassHash as string, // TODO: TS, cast because optional for v2 and required for v3, thrown if not present
+          compiledClassHash,
           senderAddress: details.walletAddress,
         })
       : [];

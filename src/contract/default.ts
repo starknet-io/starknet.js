@@ -24,6 +24,7 @@ import {
   isAccount,
   WithOptions,
   FactoryParams,
+  UniversalDetails,
 } from '../types';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
@@ -33,6 +34,8 @@ import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
 import { logger } from '../global/logger';
 import { defaultProvider } from '../provider';
+import { getCompiledCalldata } from '../utils/transaction';
+import { extractAbi, parseContract } from '../utils/provider';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -94,15 +97,6 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
     return contract.estimate(functionAbi.name, args);
   };
 }
-
-export function getCalldata(args: RawArgs, callback: Function): Calldata {
-  // Check if Calldata in args or args[0] else compile
-  if (Array.isArray(args) && '__compiled__' in args) return args as Calldata;
-  if (Array.isArray(args) && Array.isArray(args[0]) && '__compiled__' in args[0])
-    return args[0] as Calldata;
-  return callback();
-}
-
 export class Contract implements ContractInterface {
   abi: Abi;
 
@@ -115,6 +109,8 @@ export class Contract implements ContractInterface {
    * TODO: Why cant we confirm this from the contract address ? Check with contract factory
    */
   deployTransactionHash?: string;
+
+  classHash?: string;
 
   private structs: { [name: string]: AbiStruct };
 
@@ -144,11 +140,16 @@ export class Contract implements ContractInterface {
    */
   constructor(options: ContractOptions) {
     const parser = createAbiParser(options.abi);
-
+    // Must have params
     this.address = options.address && options.address.toLowerCase();
     this.abi = parser.getLegacyFormat();
     this.providerOrAccount = options.providerOrAccount ?? defaultProvider;
 
+    // Optional params
+    this.classHash = options.classHash;
+    this.deployTransactionHash = options.deployTransactionHash;
+
+    // Init
     this.callData = new CallData(options.abi);
     this.structs = CallData.getAbiStruct(options.abi);
     this.events = getAbiEvents(options.abi);
@@ -243,51 +244,30 @@ export class Contract implements ContractInterface {
    * console.log('Contract deployed at:', contract.address);
    * ```\
    */
-  static async factory(params: FactoryParams): Promise<Contract> {
-    const abi = params.abi ?? params.compiledContract.abi;
-    const calldataClass = new CallData(abi);
-    const {
-      compiledContract,
-      account,
-      casm,
-      classHash,
-      compiledClassHash,
-      parseRequest = true,
-      salt,
-      constructorArguments = [],
-    } = params;
-
-    const constructorCalldata = getCalldata(constructorArguments, () => {
-      if (parseRequest) {
-        // Convert object based raw js arguments to ...args array
-        const rawArgs = Object.values(constructorArguments);
-        calldataClass.validate(ValidateType.DEPLOY, 'constructor', rawArgs);
-        return calldataClass.compile('constructor', rawArgs);
-      }
-      logger.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
-      return constructorArguments;
-    });
+  static async factory(params: FactoryParams, details: UniversalDetails = {}): Promise<Contract> {
+    const contract = parseContract(params.contract);
+    const { account, parseRequest = true } = params;
+    const abi = params.abi ? params.abi : extractAbi(contract);
 
     const {
+      declare: { class_hash },
       deploy: { contract_address, transaction_hash },
-    } = await account.declareAndDeploy({
-      contract: compiledContract,
-      casm,
-      classHash,
-      compiledClassHash,
-      constructorCalldata,
-      salt,
-    });
+    } = await account.declareAndDeploy(
+      {
+        ...params,
+        abi: parseRequest ? abi : undefined,
+      },
+      details
+    );
     assert(Boolean(contract_address), 'Deployment of the contract failed');
 
-    const contractInstance = new Contract({
-      abi: compiledContract.abi,
+    return new Contract({
+      abi,
       address: contract_address,
       providerOrAccount: account,
+      classHash: class_hash.toString(),
+      deployTransactionHash: transaction_hash,
     });
-    contractInstance.deployTransactionHash = transaction_hash;
-
-    return contractInstance;
   }
 
   // TODO: why this is needed ? And why we cant use address to confirm cairo instance is deployed ?
@@ -311,7 +291,7 @@ export class Contract implements ContractInterface {
   ): Promise<CallResult> {
     assert(this.address !== null, 'contract is not connected to an address');
 
-    const calldata = getCalldata(args, () => {
+    const calldata = getCompiledCalldata(args, () => {
       if (parseRequest) {
         this.callData.validate(ValidateType.CALL, method, args);
         return this.callData.compile(method, args);
@@ -347,7 +327,7 @@ export class Contract implements ContractInterface {
   ): Promise<InvokeFunctionResponse> {
     assert(this.address !== null, 'contract is not connected to an address');
 
-    const calldata = getCalldata(args, () => {
+    const calldata = getCompiledCalldata(args, () => {
       if (parseRequest) {
         this.callData.validate(ValidateType.INVOKE, method, args);
         return this.callData.compile(method, args);
@@ -389,7 +369,7 @@ export class Contract implements ContractInterface {
   ): Promise<EstimateFeeResponseOverhead> {
     assert(this.address !== null, 'contract is not connected to an address');
 
-    if (!getCalldata(args, () => false)) {
+    if (!getCompiledCalldata(args, () => false)) {
       this.callData.validate(ValidateType.INVOKE, method, args);
     }
 
@@ -401,7 +381,7 @@ export class Contract implements ContractInterface {
   }
 
   public populate(method: string, args: RawArgs = []): Call {
-    const calldata: Calldata = getCalldata(args, () => this.callData.compile(method, args));
+    const calldata: Calldata = getCompiledCalldata(args, () => this.callData.compile(method, args));
     return {
       contractAddress: this.address,
       entrypoint: method,

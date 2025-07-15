@@ -3,11 +3,9 @@ import type { CairoEnum } from './cairoEnum';
 import type {
   Abi,
   BlockNumber,
-  CairoAssembly,
   Calldata,
-  CompiledContract,
+  DeclareAndDeployContractPayload,
   ParsedStruct,
-  RawArgs,
   RawArgsArray,
   Signature,
 } from './lib';
@@ -81,6 +79,12 @@ export type ContractOptions = {
    * @default defaultProvider
    */
   providerOrAccount?: ProviderOrAccount;
+
+  /**
+   * Class hash of the contract
+   */
+  classHash?: string;
+  deployTransactionHash?: string;
 } & CommonContractOptions;
 
 export type ExecuteOptions = Pick<CommonContractOptions, 'parseRequest'> & {
@@ -138,21 +142,12 @@ export function isAccount(
   return 'execute' in providerOrAccount;
 }
 
-export type FactoryParams = {
-  compiledContract: CompiledContract;
-  account: any;
-  casm?: CairoAssembly;
-  classHash?: string;
-  compiledClassHash?: string;
-  abi?: Abi;
-  executeOptions?: ExecuteOptions;
-
-  constructorArguments?: RawArgs;
+export type FactoryParams = DeclareAndDeployContractPayload & {
+  account: AccountInterface;
   /**
    * Parse arguments to calldata.
    * optimization when calldata are already validated and compiled.
    * @default true
    */
   parseRequest?: boolean;
-  salt?: string;
 };

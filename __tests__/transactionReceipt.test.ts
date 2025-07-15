@@ -33,7 +33,7 @@ describe('Transaction receipt utility - RPC 0.7 - V2', () => {
       address: dd.deploy.contract_address,
       providerOrAccount: account,
     });
-    contract.connect(account);
+    contract.providerOrAccount = account;
   });
 
   test('test for Success variant', async () => {

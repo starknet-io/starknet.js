@@ -3,7 +3,7 @@ import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ETransactionType } from '../api';
 import { CairoEnum } from '../cairoEnum';
-import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
+import { Abi, CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 import {
   BlockTag,
   ResourceBoundsBN,
@@ -83,6 +83,7 @@ export type UniversalDeployerContractPayload = {
   salt?: string;
   unique?: boolean;
   constructorCalldata?: RawArgs;
+  abi?: Abi; // TODO: check chain of usage in Account
 };
 
 export type DeployAccountContractPayload = {
@@ -104,7 +105,7 @@ export type DeployAccountContractTransaction = Omit<
  */
 type BaseDeclareContractPayload = {
   /** The compiled contract (JSON object) or path to compiled contract file */
-  contract: CompiledContract | string;
+  contract: CompiledContract | string; // TODO: check if description is ok
   /**
    * Class hash of the contract. Optional optimization - if not provided,
    * it will be computed from the contract

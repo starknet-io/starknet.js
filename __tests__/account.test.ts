@@ -87,6 +87,11 @@ describe('deploy and test Account', () => {
     dappClassHash = num.toHex(dappResponse.declare.class_hash);
   });
 
+  test('declare and deploy', async () => {
+    expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
+    expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
+  });
+
   describeIfDevnet('Test on Devnet', () => {
     test('deployAccount with rawArgs - test on devnet', async () => {
       const privKey = stark.randomAddress();
@@ -425,7 +430,7 @@ describe('deploy and test Account', () => {
 
     test('change from provider to account', async () => {
       expect(erc20.providerOrAccount).toBeInstanceOf(Provider);
-      erc20.connect(account);
+      erc20.providerOrAccount = account;
       expect(erc20.providerOrAccount).toBeInstanceOf(Account);
     });
 

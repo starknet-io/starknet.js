@@ -397,32 +397,32 @@ describe('contract module', () => {
 
     test('factory deployment of new contract with constructor arguments as js params', async () => {
       const erc20 = await Contract.factory({
-        compiledContract: contracts.Erc20OZ.sierra,
+        contract: contracts.Erc20OZ.sierra,
         compiledClassHash: erc20CompiledClassHash,
         account,
-        constructorArguments: erc20ConstructorParams,
+        constructorCalldata: erc20ConstructorParams,
       });
       expect(erc20).toBeInstanceOf(Contract);
     });
 
     test('factory deployment of new contract with constructor arguments as already compiled calldata', async () => {
       const erc20 = await Contract.factory({
-        compiledContract: contracts.Erc20OZ.sierra,
+        contract: contracts.Erc20OZ.sierra,
         casm: contracts.Erc20OZ.casm,
         classHash: erc20ClassHash,
         account,
-        constructorArguments: erc20Constructor,
+        constructorCalldata: erc20Constructor,
       });
       expect(erc20).toBeInstanceOf(Contract);
     });
 
     test('optimization, factory deployment of new contract with constructor arguments as already compiled calldata', async () => {
       const erc20 = await Contract.factory({
-        compiledContract: contracts.Erc20OZ.sierra,
+        contract: contracts.Erc20OZ.sierra,
         casm: contracts.Erc20OZ.casm,
         classHash: erc20ClassHash,
         account,
-        constructorArguments: erc20Constructor,
+        constructorCalldata: erc20Constructor,
         parseRequest: false, // optimization when calldata are already validated and compiled.
       });
       expect(erc20).toBeInstanceOf(Contract);
@@ -430,11 +430,11 @@ describe('contract module', () => {
 
     test('factory deployment of declared contract with constructor arguments as js params', async () => {
       const erc20 = await Contract.factory({
-        compiledContract: contracts.Erc20OZ.sierra,
+        contract: contracts.Erc20OZ.sierra,
         casm: contracts.Erc20OZ.casm,
         classHash: erc20ClassHash,
         account,
-        constructorArguments: erc20ConstructorParams,
+        constructorCalldata: erc20ConstructorParams,
       });
       expect(erc20).toBeInstanceOf(Contract);
     });
@@ -453,11 +453,11 @@ describe('Complex interaction', () => {
     account = getTestAccount(provider);
 
     erc20Contract = await Contract.factory({
-      compiledContract: contracts.Erc20OZ.sierra,
+      contract: contracts.Erc20OZ.sierra,
       casm: contracts.Erc20OZ.casm,
       classHash,
       account,
-      constructorArguments: {
+      constructorCalldata: {
         name: 'TEST',
         symbol: 'TST',
         amount: 1000n,
@@ -467,7 +467,7 @@ describe('Complex interaction', () => {
     });
 
     echoContract = await Contract.factory({
-      compiledContract: contracts.echo.sierra,
+      contract: contracts.echo.sierra,
       casm: contracts.echo.casm,
       account,
     });
@@ -482,11 +482,11 @@ describe('Complex interaction', () => {
   test('contractFactory.deploy with callData - all types constructor params', async () => {
     // Deploy with callData - OK
     const erc20Contract2 = await Contract.factory({
-      compiledContract: contracts.Erc20OZ.sierra,
+      contract: contracts.Erc20OZ.sierra,
       casm: contracts.Erc20OZ.casm,
       classHash,
       account,
-      constructorArguments: CallData.compile({
+      constructorCalldata: CallData.compile({
         name: byteArray.byteArrayFromString('Token'),
         symbol: byteArray.byteArrayFromString('ERC20'),
         amount: cairo.uint256('1000000000'),
