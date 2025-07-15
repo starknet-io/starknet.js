@@ -24,7 +24,7 @@ import { isBigInt, isNumber, isString } from './typed';
  * ```
  */
 export function isHex(hex: string): boolean {
-  return /^0x[0-9a-f]*$/i.test(hex);
+  return /^0x[0-9a-fA-F]*$/.test(hex);
 }
 
 /**
