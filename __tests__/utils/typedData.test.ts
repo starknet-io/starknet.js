@@ -375,7 +375,11 @@ describe('typedData', () => {
     const addr = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
     const privK = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
     const fullPubK = stark.getFullPublicKey(privK);
-    const myAccount = new Account({ nodeUrl: 'fake' }, addr, privK);
+    const myAccount = new Account({
+      provider: { nodeUrl: 'fake' },
+      address: addr,
+      signer: privK,
+    });
     let signedMessage: Signature;
     let hashedMessage: string;
     let arraySign: ArraySignatureType;

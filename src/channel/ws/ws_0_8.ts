@@ -551,7 +551,13 @@ export class WebSocketChannel {
       block_id: blockIdentifier ? new Block(blockIdentifier).identifier : undefined,
     };
     const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
-    const subscription = new Subscription(this, method, params, subId, this.maxBufferSize);
+    const subscription = new Subscription({
+      channel: this,
+      method,
+      params,
+      id: subId,
+      maxBufferSize: this.maxBufferSize,
+    });
     this.activeSubscriptions.set(subId, subscription);
     return subscription;
   }
@@ -575,7 +581,13 @@ export class WebSocketChannel {
       block_id: blockIdentifier ? new Block(blockIdentifier).identifier : undefined,
     };
     const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
-    const subscription = new Subscription(this, method, params, subId, this.maxBufferSize);
+    const subscription = new Subscription({
+      channel: this,
+      method,
+      params,
+      id: subId,
+      maxBufferSize: this.maxBufferSize,
+    });
     this.activeSubscriptions.set(subId, subscription);
     return subscription;
   }
@@ -596,7 +608,13 @@ export class WebSocketChannel {
       block_id: blockIdentifier ? new Block(blockIdentifier).identifier : undefined,
     };
     const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
-    const subscription = new Subscription(this, method, params, subId, this.maxBufferSize);
+    const subscription = new Subscription({
+      channel: this,
+      method,
+      params,
+      id: subId,
+      maxBufferSize: this.maxBufferSize,
+    });
     this.activeSubscriptions.set(subId, subscription);
     return subscription;
   }
@@ -617,7 +635,13 @@ export class WebSocketChannel {
       sender_address: senderAddress && bigNumberishArrayToHexadecimalStringArray(senderAddress),
     };
     const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
-    const subscription = new Subscription(this, method, params, subId, this.maxBufferSize);
+    const subscription = new Subscription({
+      channel: this,
+      method,
+      params,
+      id: subId,
+      maxBufferSize: this.maxBufferSize,
+    });
     this.activeSubscriptions.set(subId, subscription);
     return subscription;
   }

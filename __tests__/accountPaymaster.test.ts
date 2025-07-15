@@ -136,14 +136,11 @@ describe('Account - Paymaster integration', () => {
 
   const getAccount = () => {
     if (!account) {
-      account = new Account(
-        {},
-        '0xabc',
-        { signMessage: mockSignMessage.mockResolvedValue(fakeSignature) } as any,
-        undefined,
-        undefined,
-        undefined
-      );
+      account = new Account({
+        provider: {},
+        address: '0xabc',
+        signer: { signMessage: mockSignMessage.mockResolvedValue(fakeSignature) } as any,
+      });
       // account object is instanciate in the constructor, we need to mock the paymaster methods after paymaster object is instanciate
       account.paymaster.buildTransaction = mockBuildTransaction;
       account.paymaster.executeTransaction = mockExecuteTransaction;

@@ -3,18 +3,22 @@ import {
   OutsideExecutionCallerAny,
   SNIP9_V1_INTERFACE_ID,
   SNIP9_V2_INTERFACE_ID,
-  SupportedTransactionVersion,
   SYSTEM_MESSAGES,
   UDC,
   ZERO,
 } from '../global/constants';
 import { logger } from '../global/logger';
-import { LibraryError, Provider, ProviderInterface } from '../provider';
+import { LibraryError, Provider } from '../provider';
 import { ETransactionVersion, ETransactionVersion3 } from '../provider/types/spec.type';
-import { Signer, SignerInterface } from '../signer';
+import { Signer, type SignerInterface } from '../signer';
 import {
+  // Runtime values
+  OutsideExecutionVersion,
+} from '../types';
+import type {
   AccountInvocations,
   AccountInvocationsFactoryDetails,
+  AccountOptions,
   AllowArray,
   BigNumberish,
   BlockIdentifier,
@@ -30,35 +34,31 @@ import {
   DeployContractResponse,
   DeployContractUDCResponse,
   DeployTransactionReceiptResponse,
+  EstimateFeeResponseOverhead,
   EstimateFeeBulk,
+  ExecutableUserTransaction,
+  ExecutionParameters,
   Invocation,
   Invocations,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
   Nonce,
-  ProviderOptions,
+  OutsideExecution,
+  OutsideExecutionOptions,
+  OutsideTransaction,
+  PaymasterDetails,
+  PaymasterFeeEstimate,
+  PreparedTransaction,
   Signature,
   SimulateTransactionDetails,
+  SimulateTransactionOverheadResponse,
   TypedData,
   UniversalDeployerContractPayload,
   UniversalDetails,
-  PaymasterDetails,
-  PreparedTransaction,
-  PaymasterOptions,
-  PaymasterFeeEstimate,
-  EstimateFeeResponseOverhead,
-  SimulateTransactionOverheadResponse,
-} from '../types';
-import {
-  OutsideExecutionVersion,
-  type OutsideExecution,
-  type OutsideExecutionOptions,
-  type OutsideTransaction,
-  ExecutionParameters,
   UserTransaction,
-  ExecutableUserTransaction,
 } from '../types';
+import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
@@ -81,11 +81,10 @@ import {
 import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { isString, isUndefined } from '../utils/typed';
 import { getMessageHash } from '../utils/typedData';
-import { AccountInterface } from './interface';
-import { defaultPaymaster, PaymasterInterface, PaymasterRpc } from '../paymaster';
+import { type AccountInterface } from './interface';
+import { defaultPaymaster, type PaymasterInterface, PaymasterRpc } from '../paymaster';
 import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
-import { ETransactionType } from '../types/api';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -98,25 +97,16 @@ export class Account extends Provider implements AccountInterface {
 
   public paymaster: PaymasterInterface;
 
-  constructor(
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    address: string,
-    pkOrSigner: Uint8Array | string | SignerInterface,
-    cairoVersion?: CairoVersion,
-    transactionVersion: SupportedTransactionVersion = config.get('transactionVersion'),
-    paymaster?: PaymasterOptions | PaymasterInterface
-  ) {
-    super(providerOrOptions);
+  constructor(options: AccountOptions) {
+    const { provider, address, signer, cairoVersion, transactionVersion, paymaster } = options;
+    super(provider);
     this.address = address.toLowerCase();
-    this.signer =
-      isString(pkOrSigner) || pkOrSigner instanceof Uint8Array
-        ? new Signer(pkOrSigner)
-        : pkOrSigner;
+    this.signer = isString(signer) || signer instanceof Uint8Array ? new Signer(signer) : signer;
 
     if (cairoVersion) {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
-    this.transactionVersion = transactionVersion;
+    this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
     this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
 
     logger.debug('Account setup', {

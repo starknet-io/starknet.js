@@ -1,11 +1,43 @@
-import { EDataAvailabilityMode, ETransactionVersion3, PAYMASTER_API } from './api';
-import { BigNumberish, BlockIdentifier, V3TransactionDetails } from './lib';
-import {
+import type { EDataAvailabilityMode, ETransactionVersion3, PAYMASTER_API } from '../../types/api';
+import type {
+  BigNumberish,
+  BlockIdentifier,
+  CairoVersion,
+  V3TransactionDetails,
+} from '../../types/lib';
+import type {
   DeclareTransactionReceiptResponse,
   EstimateFeeResponseOverhead,
-} from '../provider/types/index.type';
-import { ResourceBoundsBN } from '../provider/types/spec.type';
-import { FeeMode, PaymasterTimeBounds } from './paymaster';
+  ProviderOptions,
+} from '../../provider/types/index.type';
+import type { ResourceBoundsBN } from '../../provider/types/spec.type';
+import type {
+  FeeMode,
+  PaymasterOptions,
+  PaymasterTimeBounds,
+} from '../../paymaster/types/index.type';
+import type { SignerInterface } from '../../signer';
+import type { SupportedTransactionVersion } from '../../global/constants';
+import type { PaymasterInterface } from '../../paymaster';
+import type { ProviderInterface } from '../../provider/interface';
+
+/**
+ * Configuration options for creating an Account instance
+ */
+export type AccountOptions = {
+  /** Provider instance or configuration for blockchain interaction */
+  provider: ProviderOptions | ProviderInterface;
+  /** Account address on the Starknet network */
+  address: string;
+  /** Private key or Signer Class instance for signing transactions */
+  signer: Uint8Array | string | SignerInterface;
+  /** Cairo version to use for this account (optional, auto-detected if not provided) */
+  cairoVersion?: CairoVersion;
+  /** Transaction version to use for sending transactions (optional) */
+  transactionVersion?: SupportedTransactionVersion;
+  /** Paymaster configuration for sponsored transactions (optional) */
+  paymaster?: PaymasterOptions | PaymasterInterface;
+};
 
 export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;
 

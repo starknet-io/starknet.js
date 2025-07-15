@@ -132,13 +132,12 @@ export const getTestAccount = (
   provider: ProviderInterface,
   txVersion?: SupportedTransactionVersion
 ) => {
-  return new Account(
+  return new Account({
     provider,
-    toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
-    process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
-    undefined,
-    txVersion ?? TEST_TX_VERSION
-  );
+    address: toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
+    signer: process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
+    transactionVersion: txVersion ?? TEST_TX_VERSION,
+  });
 };
 
 export const createBlockForDevnet = async (): Promise<void> => {

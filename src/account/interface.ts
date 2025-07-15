@@ -1,6 +1,6 @@
-import { ProviderInterface } from '../provider';
-import { SignerInterface } from '../signer';
-import {
+import { ProviderInterface } from '../provider/interface';
+import type { SignerInterface } from '../signer';
+import type {
   AllowArray,
   BigNumberish,
   BlockIdentifier,
@@ -29,7 +29,7 @@ import {
   SimulateTransactionOverheadResponse,
   TypedData,
   UniversalDeployerContractPayload,
-} from '../types';
+} from '../types/index';
 
 export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;

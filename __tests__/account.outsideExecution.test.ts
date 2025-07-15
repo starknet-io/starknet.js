@@ -92,7 +92,11 @@ describe('Account and OutsideExecution', () => {
       constructorCalldata: constructorAXCallData,
     });
     const targetAddress = response.deploy.contract_address;
-    signerAccount = new Account(provider, targetAddress, targetPK);
+    signerAccount = new Account({
+      provider,
+      address: targetAddress,
+      signer: targetPK,
+    });
 
     // Transfer dust of STRK token to the signer account
     const transferCall = {

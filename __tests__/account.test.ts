@@ -124,13 +124,12 @@ describe('deploy and test Account', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      const accountOZ = new Account(
+      const accountOZ = new Account({
         provider,
-        toBeAccountAddress,
-        privKey,
-        undefined,
-        TEST_TX_VERSION
-      );
+        address: toBeAccountAddress,
+        signer: privKey,
+        transactionVersion: TEST_TX_VERSION,
+      });
       const deployed = await accountOZ.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
@@ -300,7 +299,11 @@ describe('deploy and test Account', () => {
         { publicKey: starkKeyPub },
         0
       );
-      const newAccount = new Account(provider, precalculatedAddress, privateKey);
+      const newAccount = new Account({
+        provider,
+        address: precalculatedAddress,
+        signer: privateKey,
+      });
 
       const res = await newAccount.simulateTransaction([
         {
@@ -392,13 +395,12 @@ describe('deploy and test Account', () => {
       );
       expect(verifyMessageResponse).toBe(false);
 
-      const wrongAccount = new Account(
+      const wrongAccount = new Account({
         provider,
-        '0x037891',
-        '0x026789',
-        undefined,
-        TEST_TX_VERSION
-      ); // non existing account
+        address: '0x037891',
+        signer: '0x026789',
+        transactionVersion: TEST_TX_VERSION,
+      }); // non existing account
       await expect(
         wrongAccount.verifyMessageInStarknet(typedDataExample, signature2, wrongAccount.address)
       ).rejects.toThrow();
@@ -547,7 +549,11 @@ describe('deploy and test Account', () => {
         { publicKey: starkKeyPub },
         0
       );
-      newAccount = new Account(provider, precalculatedAddress, privateKey);
+      newAccount = new Account({
+        provider,
+        address: precalculatedAddress,
+        signer: privateKey,
+      });
     });
 
     test('estimateAccountDeployFee Cairo 1', async () => {

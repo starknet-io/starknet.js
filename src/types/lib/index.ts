@@ -164,7 +164,6 @@ export type DeclareContractTransaction = {
 export type CallDetails = {
   contractAddress: string;
   calldata?: RawArgs | Calldata;
-  entrypoint?: string; // TODO: Invoke should not have an entrypoint
 };
 
 export type Invocation = CallDetails & { signature?: Signature };

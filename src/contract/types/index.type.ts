@@ -1,5 +1,5 @@
 import type { BlockHash, TransactionHash } from '@starknet-io/starknet-types-07';
-import type { CairoEnum } from './cairoEnum';
+import type { CairoEnum } from '../../types/cairoEnum';
 import type {
   Abi,
   BlockNumber,
@@ -8,10 +8,10 @@ import type {
   ParsedStruct,
   RawArgsArray,
   Signature,
-} from './lib';
-import type { UniversalDetails } from './account';
-import type { ProviderInterface } from '../provider';
-import type { AccountInterface } from '../account/interface';
+} from '../../types/lib';
+import type { UniversalDetails } from '../../account/types/index.type';
+import type { ProviderInterface } from '../../provider';
+import type { AccountInterface } from '../../account/interface';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;

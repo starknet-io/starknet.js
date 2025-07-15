@@ -133,7 +133,11 @@ describe('Ethereum signer', () => {
         0
       );
 
-      ethAccount = new Account(provider, contractETHAccountAddress, ethSigner);
+      ethAccount = new Account({
+        provider,
+        address: contractETHAccountAddress,
+        signer: ethSigner,
+      });
       const feeEstimation = await ethAccount.estimateAccountDeployFee({
         classHash: decClassHash,
         addressSalt: salt,

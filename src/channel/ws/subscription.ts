@@ -11,6 +11,22 @@ type SubscriptionEvents<T> = {
 };
 
 /**
+ * Options for creating a new Subscription instance
+ */
+export type SubscriptionOptions = {
+  /** The containing WebSocketChannel instance */
+  channel: WebSocketChannel;
+  /** The JSON-RPC method used to create this subscription */
+  method: string;
+  /** The parameters used to create this subscription (optional, defaults to empty object) */
+  params?: object;
+  /** The unique identifier for this subscription */
+  id: SUBSCRIPTION_ID;
+  /** The maximum number of events to buffer */
+  maxBufferSize: number;
+};
+
+/**
  * Represents an active WebSocket subscription.
  *
  * This class should not be instantiated directly. It is returned by the
@@ -70,24 +86,14 @@ export class Subscription<T = any> {
 
   /**
    * @internal
-   * @param {WebSocketChannel} channel - The WebSocketChannel instance.
-   * @param {string} method - The RPC method used for the subscription.
-   * @param {any} params - The parameters for the subscription.
-   * @param {SUBSCRIPTION_ID} id - The subscription ID.
-   * @param {number} maxBufferSize - The maximum number of events to buffer.
+   * @param options - Subscription configuration options
    */
-  constructor(
-    channel: WebSocketChannel,
-    method: string,
-    params: object,
-    id: SUBSCRIPTION_ID,
-    maxBufferSize: number
-  ) {
-    this.channel = channel;
-    this.method = method;
-    this.params = params;
-    this.id = id;
-    this.maxBufferSize = maxBufferSize;
+  constructor(options: SubscriptionOptions) {
+    this.channel = options.channel;
+    this.method = options.method;
+    this.params = options.params ?? {};
+    this.id = options.id;
+    this.maxBufferSize = options.maxBufferSize;
   }
 
   /**
