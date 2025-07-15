@@ -14,6 +14,7 @@ import {
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  type GasPrices,
   GetBlockResponse,
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
@@ -30,6 +31,7 @@ import {
   type Signature,
   StateUpdate,
   StateUpdateResponse,
+  type TipStats,
   TransactionType,
   type TypedData,
   waitForTransactionOptions,
@@ -243,6 +245,47 @@ export class RpcProvider implements ProviderInterface {
     return this.channel
       .getBlockWithTxHashes(blockIdentifier)
       .then(this.responseParser.parseL1GasPriceResponse);
+  }
+
+  /**
+   * Get Statistics of `tip` values in a range of blocks.
+   * Calculation starts from `blockIdentifier` and go backwards,
+   * up until `maxBlocks` blocks are processed,
+   * or at least `minTxsNecessary` INVOKE V3 transactions are processed.
+   * @param {BlockIdentifier} [blockIdentifier = this.blockIdentifier] Optional-higher block scanned. Can be 'pending', 'latest' or a block number (an integer type).
+   * @param {number} [maxBlocks = 3] Optional-Maximum number of blocks scanned.
+   * @param {number} [minTxsNecessary = 10] Optional-Minimum number of Invoke V3 transactions scanned.
+   * @returns {TipStats | undefined} an object with min, max, average tip properties (all bigint type), or if no transaction was found, returns `undefined`.
+   * @example
+   * ```ts
+   * const result = await myProvider.getTipStatsFromBlock(BlockTag.LATEST);
+   * // result = { minTip: 0n, maxTip: 2000000000n, averageTip: 608695652n }
+   */
+  public async getTipStatsFromBlocks(
+    blockIdentifier: BlockIdentifier = this.channel.blockIdentifier,
+    maxBlocks: number = 3,
+    minTxsNecessary: number = 10
+  ): Promise<TipStats | undefined> {
+    if (this.channel instanceof RPC08.RpcChannel)
+      return this.channel.getTipStatsFromBlocks(blockIdentifier, maxBlocks, minTxsNecessary);
+    throw new LibraryError('Unsupported method for RPC version');
+  }
+
+  /**
+   * Get the gas prices related to a block.
+   * @param {BlockIdentifier} [blockIdentifier = this.identifier] - Optional. Can be 'pending', 'latest' or a block number (an integer type).
+   * @returns {Promise<GasPrices>} an object with l1DataGasPrice, l1GasPrice, l2GasPrice properties (all bigint type).
+   * @example
+   * ```ts
+   * const result = await myProvider.getGasPrices();
+   * // result = { l1DataGasPrice: 3039n, l1GasPrice: 55590341542890n, l2GasPrice: 8441845008n }
+   * ```
+   */
+  public async getGasPrices(
+    blockIdentifier: BlockIdentifier = this.channel.blockIdentifier
+  ): Promise<GasPrices> {
+    if (this.channel instanceof RPC08.RpcChannel) return this.channel.getGasPrices(blockIdentifier);
+    throw new LibraryError('Unsupported method for RPC version');
   }
 
   public async getL1MessageHash(l2TxHash: BigNumberish): Promise<string> {
