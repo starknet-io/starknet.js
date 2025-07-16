@@ -28,11 +28,11 @@ import type {
   DeclareContractPayload,
   DeclareContractResponse,
   DeclareContractTransaction,
-  DeclareDeployUDCResponse,
+  DeclareDeployDCResponse,
   DeployAccountContractPayload,
   DeployAccountContractTransaction,
   DeployContractResponse,
-  DeployContractUDCResponse,
+  DeployContractDCResponse,
   DeployTransactionReceiptResponse,
   EstimateFeeResponseOverhead,
   EstimateFeeBulk,
@@ -57,11 +57,12 @@ import type {
   UniversalDeployerContractPayload,
   UniversalDetails,
   UserTransaction,
+  DeployerDefinition,
 } from '../types';
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
-import { parseUDCEvent } from '../utils/events';
+import { parseDeployerEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
 import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
 import {
@@ -78,7 +79,7 @@ import {
   toTransactionVersion,
   v3Details,
 } from '../utils/stark';
-import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
+import { buildDeployerCall, getExecuteCalldata } from '../utils/transaction';
 import { isString, isUndefined } from '../utils/typed';
 import { getMessageHash } from '../utils/typedData';
 import { type AccountInterface } from './interface';
@@ -97,6 +98,8 @@ export class Account extends Provider implements AccountInterface {
 
   public paymaster: PaymasterInterface;
 
+  public deployer: DeployerDefinition;
+
   constructor(options: AccountOptions) {
     const { provider, address, signer, cairoVersion, transactionVersion, paymaster } = options;
     super(provider);
@@ -108,6 +111,7 @@ export class Account extends Provider implements AccountInterface {
     }
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
     this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
+    this.deployer = options.customDeployer ?? UDC;
 
     logger.debug('Account setup', {
       transactionVersion: this.transactionVersion,
@@ -225,7 +229,7 @@ export class Account extends Provider implements AccountInterface {
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
     // TODO: TT optional safty check that classHash is from Cairo1 contract and not Cairo0
-    const calls = this.buildUDCContractPayload(payload);
+    const calls = this.buildDeployerContractPayload(payload);
     return this.estimateInvokeFee(calls, details);
   }
 
@@ -529,7 +533,7 @@ export class Account extends Provider implements AccountInterface {
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
   ): Promise<MultiDeployContractResponse> {
-    const { calls, addresses } = buildUDCCall(payload, this.address);
+    const { calls, addresses } = buildDeployerCall(payload, this.address, this.deployer);
     const invokeResponse = await this.execute(calls, details);
 
     return {
@@ -541,16 +545,19 @@ export class Account extends Provider implements AccountInterface {
   public async deployContract(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
-  ): Promise<DeployContractUDCResponse> {
+  ): Promise<DeployContractDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
-    return parseUDCEvent(txReceipt as unknown as DeployTransactionReceiptResponse);
+    return parseDeployerEvent(
+      txReceipt as unknown as DeployTransactionReceiptResponse,
+      this.deployer
+    );
   }
 
   public async declareAndDeploy(
     payload: DeclareAndDeployContractPayload,
     details: UniversalDetails = {}
-  ): Promise<DeclareDeployUDCResponse> {
+  ): Promise<DeclareDeployDCResponse> {
     let declare = await this.declareIfNot(payload, details);
     if (declare.transaction_hash !== '') {
       const tx = await this.waitForTransaction(declare.transaction_hash);
@@ -876,7 +883,7 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
-  public buildUDCContractPayload(
+  public buildDeployerContractPayload(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Call[] {
     const calls = [].concat(payload as []).map((it) => {
@@ -889,8 +896,8 @@ export class Account extends Provider implements AccountInterface {
       const compiledConstructorCallData = CallData.compile(constructorCalldata);
 
       return {
-        contractAddress: UDC.ADDRESS,
-        entrypoint: UDC.ENTRYPOINT,
+        contractAddress: toHex(this.deployer.address),
+        entrypoint: this.deployer.entryPoint,
         calldata: [
           classHash,
           salt,
@@ -950,7 +957,7 @@ export class Account extends Provider implements AccountInterface {
           };
         }
         if (transaction.type === ETransactionType.DEPLOY) {
-          const calls = this.buildUDCContractPayload(txPayload);
+          const calls = this.buildDeployerContractPayload(txPayload);
           const payload = await this.buildInvocation(calls, signerDetails);
           return {
             ...common,

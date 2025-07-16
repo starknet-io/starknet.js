@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import type { ResourceBoundsOverhead } from '../types';
+import type { DeployerDefinition, ResourceBoundsOverhead } from '../types';
 import { ETransactionVersion } from '../types/api';
 import { ValuesType } from '../types/helpers/valuesType';
 import type { LogLevel } from './logger.type';
@@ -26,9 +26,9 @@ export const RANGE_FELT = range(ZERO, PRIME - 1n);
 export const RANGE_I128 = range(-(2n ** 127n), 2n ** 127n - 1n);
 export const RANGE_U128 = range(ZERO, 2n ** 128n - 1n);
 
-export const UDC = {
-  ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
-  ENTRYPOINT: 'deployContract',
+export const UDC: DeployerDefinition = {
+  address: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
+  entryPoint: 'deployContract',
 } as const;
 
 export const OutsideExecutionCallerAny = '0x414e595f43414c4c4552'; // encodeShortString('ANY_CALLER')

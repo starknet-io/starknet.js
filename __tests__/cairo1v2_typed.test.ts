@@ -12,7 +12,7 @@ import {
   Calldata,
   CompiledSierra,
   Contract,
-  DeclareDeployUDCResponse,
+  DeclareDeployDCResponse,
   ProviderInterface,
   RawArgsArray,
   RawArgsObject,
@@ -53,9 +53,9 @@ describe('Cairo 1', () => {
   });
 
   describe('API &  Contract interactions', () => {
-    let dd: DeclareDeployUDCResponse;
+    let dd: DeclareDeployDCResponse;
     let cairo1Contract: TypedContractV2<typeof tAbi>;
-    let dd2: DeclareDeployUDCResponse;
+    let dd2: DeclareDeployDCResponse;
     let cairo210Contract: TypedContractV2<typeof tAbi>;
     initializeMatcher(expect);
 

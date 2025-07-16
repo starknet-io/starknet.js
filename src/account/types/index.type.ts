@@ -21,6 +21,13 @@ import type { SupportedTransactionVersion } from '../../global/constants';
 import type { PaymasterInterface } from '../../paymaster';
 import type { ProviderInterface } from '../../provider/interface';
 
+export type DeployerDefinition = {
+  /** Address of a custom account deployer contract */
+  address: BigNumberish;
+  /** Deployer function name to deploy a contract */
+  entryPoint: string;
+};
+
 /**
  * Configuration options for creating an Account instance
  */
@@ -37,6 +44,8 @@ export type AccountOptions = {
   transactionVersion?: SupportedTransactionVersion;
   /** Paymaster configuration for sponsored transactions (optional) */
   paymaster?: PaymasterOptions | PaymasterInterface;
+  /** Use of a custom account deployer contract  (optional) */
+  customDeployer?: DeployerDefinition;
 };
 
 export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;
@@ -80,7 +89,7 @@ export type MultiDeployContractResponse = {
   transaction_hash: string;
 };
 
-export type DeployContractUDCResponse = {
+export type DeployContractDCResponse = {
   contract_address: string;
   transaction_hash: string;
   address: string;
@@ -92,11 +101,11 @@ export type DeployContractUDCResponse = {
   salt: string;
 };
 
-export type DeclareDeployUDCResponse = {
+export type DeclareDeployDCResponse = {
   declare: {
     class_hash: BigNumberish;
   } & Partial<DeclareTransactionReceiptResponse>;
-  deploy: DeployContractUDCResponse;
+  deploy: DeployContractDCResponse;
 };
 
 export type SimulateTransactionDetails = {

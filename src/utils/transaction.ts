@@ -9,11 +9,12 @@ import {
   RawArgs,
   UniversalDeployerContractPayload,
   ValidateType,
+  type DeployerDefinition,
 } from '../types';
 import { CallData } from './calldata';
 import { starkCurve } from './ec';
 import { calculateContractAddressFromHash, getSelectorFromName } from './hash';
-import { toBigInt, toCairoBool } from './num';
+import { toBigInt, toCairoBool, toHex } from './num';
 import { randomAddress } from './stark';
 
 /**
@@ -188,7 +189,7 @@ export function getCompiledCalldata(constructorArguments: RawArgs, callback: Fun
 }
 
 /**
- * Builds a UDCCall object.
+ * Builds a UDC Call object.
  *
  * @param {UniversalDeployerContractPayload | UniversalDeployerContractPayload[]} payload the payload data for the UDCCall. Can be a single payload object or an array of payload objects.
  * @param {string} address the address to be used in the UDCCall
@@ -218,6 +219,43 @@ export function buildUDCCall(
   payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
   address: string
 ) {
+  return buildDeployerCall(payload, address, UDC);
+}
+
+/**
+ * Builds a Deployer Call object.
+ *
+ * @param {UniversalDeployerContractPayload | UniversalDeployerContractPayload[]} payload the payload data for the Deployer Call. Can be a single payload object or an array of payload objects.
+ * @param {string} address the address to be used in the Deployer Call
+ * @returns { calls: Call[], addresses: string[] } the Deployer Call object containing an array of calls and an array of addresses.
+ * @example
+ * ```typescript
+ * const payload: UniversalDeployerContractPayload = {
+ * classHash: "0x1234567890123456789012345678901234567890",
+ * salt: "0x0987654321098765432109876543210987654321",
+ * unique:true,
+ * constructorCalldata: [1, 2, 3]
+ * };
+ * const customDeployer = {address: "0x1234", entryPoint: "deployContract"};
+ * const address = "0xABCDEF1234567890ABCDEF1234567890ABCDEF12";
+ * const result  = transaction.buildDeployerCall(payload, address, customDeployer);
+ * // result = {
+ * // 	calls: [
+ * //			{
+ * //			contractAddress: "0xABCDEF1234567890ABCDEF1234567890ABCDEF12",
+ * //			entrypoint: "functionName",
+ * //			calldata: [classHash, salt, true, 3, 1, 2, 3]
+ * //		}],
+ * //	addresses: ["0x6fD084B56a7EDc5C06B3eB40f97Ae5A0C707A865"]
+ * // }
+ * ```
+ */
+
+export function buildDeployerCall(
+  payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
+  address: string,
+  deployer: DeployerDefinition
+) {
   const params = [].concat(payload as []).map((it) => {
     const {
       classHash,
@@ -244,8 +282,8 @@ export function buildUDCCall(
 
     return {
       call: {
-        contractAddress: UDC.ADDRESS,
-        entrypoint: UDC.ENTRYPOINT,
+        contractAddress: toHex(deployer.address),
+        entrypoint: deployer.entryPoint,
         calldata: [
           classHash,
           deploySalt,
@@ -258,7 +296,7 @@ export function buildUDCCall(
         unique ? starkCurve.pedersen(address, deploySalt) : deploySalt,
         classHash,
         compiledConstructorCallData,
-        unique ? UDC.ADDRESS : 0
+        unique ? deployer.address : 0
       ),
     };
   });

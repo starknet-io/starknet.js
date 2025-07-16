@@ -72,6 +72,7 @@ const compiledContracts = {
   fixedArray: 'cairo292/fixed_array',
   TypeTransformation: 'cairo2114/contract',
   echo: 'cairo2114/echo',
+  deployer: 'cairo2100/deployer',
 };
 export const contracts = mapContractSets(compiledContracts);
 

@@ -9,10 +9,10 @@ import type {
   DeclareAndDeployContractPayload,
   DeclareContractPayload,
   DeclareContractResponse,
-  DeclareDeployUDCResponse,
+  DeclareDeployDCResponse,
   DeployAccountContractPayload,
   DeployContractResponse,
-  DeployContractUDCResponse,
+  DeployContractDCResponse,
   EstimateFeeDetails,
   EstimateFeeResponseBulkOverhead,
   EstimateFeeResponseOverhead,
@@ -118,8 +118,8 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<EstimateFeeResponseOverhead>;
 
   /**
-   * Estimate Fee for executing a UDC DEPLOY transaction on starknet
-   * This is different from the normal DEPLOY transaction as it goes through the Universal Deployer Contract (UDC)
+   * Estimate Fee for executing a Deployer DEPLOY transaction on starknet
+   * This is different from the normal DEPLOY transaction as it goes through a Deployer Contract
 
   * @param deployContractPayload array or singular
    * - classHash: computed class hash of compiled contract
@@ -286,7 +286,7 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<DeclareContractResponse>;
 
   /**
-   * Deploys a declared contract to starknet - using Universal Deployer Contract (UDC)
+   * Deploys a declared contract to starknet - using a Deployer Contract
    * support multicall
    *
    * @param payload -
@@ -306,7 +306,7 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<MultiDeployContractResponse>;
 
   /**
-   * Simplify deploy simulating old DeployContract with same response + UDC specific response
+   * Simplify deploy simulating old DeployContract with same response + Deployer specific response
    * Internal wait for L2 transaction, support multicall
    *
    * @param payload -
@@ -330,10 +330,10 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract deployContract(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details?: InvocationsDetails
-  ): Promise<DeployContractUDCResponse>;
+  ): Promise<DeployContractDCResponse>;
 
   /**
-   * Declares and Deploy a given compiled contract (json) to starknet using UDC
+   * Declares and Deploy a given compiled contract (json) to starknet using a Deployer.
    * Internal wait for L2 transaction, do not support multicall
    * Method will pass even if contract is already declared (internal using DeclareIfNot)
    *
@@ -364,7 +364,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract declareAndDeploy(
     payload: DeclareAndDeployContractPayload,
     details?: InvocationsDetails
-  ): Promise<DeclareDeployUDCResponse>;
+  ): Promise<DeclareDeployDCResponse>;
 
   /**
    * Deploy the account on Starknet
