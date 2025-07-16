@@ -329,7 +329,15 @@ describeIfRpc('RPCProvider', () => {
     });
 
     test('getTransactionByBlockIdAndIndex', async () => {
-      const transaction = await rpcProvider.getTransactionByBlockIdAndIndex(1044204, 0);
+      // Find a block with transactions
+      let block: any = latestBlock; // TODO: fix this type
+      let blockNumber = latestBlock.block_number;
+      while (block.transactions.length === 0 && blockNumber > latestBlock.block_number - 20) {
+        blockNumber -= 1;
+        // eslint-disable-next-line no-await-in-loop
+        block = await provider.getBlock(blockNumber);
+      }
+      const transaction = await rpcProvider.getTransactionByBlockIdAndIndex(blockNumber, 0);
       expect(transaction).toHaveProperty('transaction_hash');
     });
 
