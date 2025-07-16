@@ -1,4 +1,4 @@
-import { EDataAvailabilityMode, ETransactionVersion } from './api';
+import { EDataAvailabilityMode, ETransactionVersion, PAYMASTER_API } from './api';
 import {
   AllowArray,
   BigNumberish,
@@ -15,6 +15,7 @@ import {
   EstimateFeeResponse,
 } from '../provider/types/index.type';
 import { ResourceBounds } from '../provider/types/spec.type';
+import { FeeMode, PaymasterTimeBounds } from './paymaster';
 
 export interface EstimateFee extends EstimateFeeResponse {}
 
@@ -36,6 +37,9 @@ export type AccountInvocationsFactoryDetails = {
 export interface UniversalDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
+  /**
+   * Max fee to pay for V2 transaction
+   */
   maxFee?: BigNumberish; // ignored on estimate
   tip?: BigNumberish;
   paymasterData?: BigNumberish[];
@@ -45,6 +49,12 @@ export interface UniversalDetails {
   version?: BigNumberish;
   resourceBounds?: ResourceBounds; // ignored on estimate
   skipValidate?: boolean; // ignored on non-estimate
+}
+
+export interface PaymasterDetails {
+  feeMode: FeeMode;
+  deploymentData?: PAYMASTER_API.AccountDeploymentData;
+  timeBounds?: PaymasterTimeBounds;
 }
 
 export interface EstimateFeeDetails extends UniversalDetails {}

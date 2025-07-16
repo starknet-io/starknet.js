@@ -1,4 +1,7 @@
-import { RPC08, RPC07 } from '../channel';
+import { RPC07, RPC08 } from '../channel';
+import { config } from '../global/config';
+import { SupportedRpcVersion } from '../global/constants';
+import { logger } from '../global/logger';
 import {
   AccountInvocations,
   BigNumberish,
@@ -6,31 +9,45 @@ import {
   BlockIdentifier,
   BlockTag,
   Call,
-  ContractClassResponse,
   ContractClassIdentifier,
+  ContractClassResponse,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   GetBlockResponse,
+  getContractVersionOptions,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
+  GetTransactionReceiptResponse,
   GetTxReceiptResponseWithoutHelper,
   Invocation,
   Invocations,
   InvocationsDetailsWithNonce,
   PendingBlock,
   PendingStateUpdate,
+  RPC,
   RpcProviderOptions,
+  type Signature,
   StateUpdate,
   StateUpdateResponse,
   TransactionType,
-  getContractVersionOptions,
-  getEstimateFeeBulkOptions,
-  getSimulateTransactionOptions,
-  type Signature,
   type TypedData,
   waitForTransactionOptions,
-  GetTransactionReceiptResponse,
-  RPC,
 } from '../types';
+import assert from '../utils/assert';
+import { CallData } from '../utils/calldata';
+import { getAbiContractVersion } from '../utils/calldata/cairo';
+import { extractContractHashes, isSierra } from '../utils/contract';
+import { LibraryError } from '../utils/errors';
+import { solidityUint256PackedKeccak256 } from '../utils/hash';
+import { isBigNumberish, toBigInt, toHex } from '../utils/num';
+import { wait } from '../utils/provider';
+import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
+import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { formatSignature } from '../utils/stark';
+import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
+import { getMessageHash, validateTypedData } from '../utils/typedData';
+import { ProviderInterface } from './interface';
 import type {
   DeclaredTransaction,
   DeployedAccountTransaction,
@@ -43,20 +60,6 @@ import type {
   TRANSACTION_TRACE,
   TransactionWithHash,
 } from './types/spec.type';
-import assert from '../utils/assert';
-import { CallData } from '../utils/calldata';
-import { getAbiContractVersion } from '../utils/calldata/cairo';
-import { extractContractHashes, isSierra } from '../utils/contract';
-import { solidityUint256PackedKeccak256 } from '../utils/hash';
-import { isBigNumberish, toBigInt, toHex } from '../utils/num';
-import { isVersion, wait } from '../utils/provider';
-import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { formatSignature } from '../utils/stark';
-import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
-import { getMessageHash, validateTypedData } from '../utils/typedData';
-import { LibraryError } from '../utils/errors';
-import { ProviderInterface } from './interface';
-import { config } from '../global/config';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -79,8 +82,10 @@ export class RpcProvider implements ProviderInterface {
         } else
           throw new Error(`unsupported channel for spec version: ${optionsOrProvider.specVersion}`);
       } else if (isVersion('0.8', config.get('rpcVersion'))) {
+        // default channel when unspecified
         this.channel = new RPC08.RpcChannel({ ...optionsOrProvider, waitMode: false });
       } else if (isVersion('0.7', config.get('rpcVersion'))) {
+        // default channel when unspecified
         this.channel = new RPC07.RpcChannel({ ...optionsOrProvider, waitMode: false });
       } else throw new Error('unable to define spec version for channel');
 
@@ -92,18 +97,35 @@ export class RpcProvider implements ProviderInterface {
    * auto configure channel based on provided node
    * leave space for other async before constructor
    */
-  static async create(optionsOrProvider?: RpcProviderOptions) {
+  // NOTE: the generic T and 'this' reference are used so that the expanded class is generated when a mixin is applied
+  static async create<T extends RpcProvider>(
+    this: { new (...args: ConstructorParameters<typeof RpcProvider>): T },
+    optionsOrProvider?: RpcProviderOptions
+  ): Promise<T> {
     const channel = new RPC07.RpcChannel({ ...optionsOrProvider });
     const spec = await channel.getSpecVersion();
 
-    if (isVersion('0.7', spec)) {
-      return new RpcProvider({ ...optionsOrProvider, specVersion: '0.7' });
-    }
-    if (isVersion('0.8', spec)) {
-      return new RpcProvider({ ...optionsOrProvider, specVersion: '0.8' });
+    // Optimistic Warning in case of the patch version
+    if (!isSupportedSpecVersion(spec)) {
+      logger.warn(`Using incompatible node spec version ${spec}`);
     }
 
-    throw new Error('unable to detect specification version');
+    if (isVersion('0.7', spec)) {
+      return new this({
+        ...optionsOrProvider,
+        specVersion: SupportedRpcVersion.v0_7_1,
+      }) as T;
+    }
+    if (isVersion('0.8', spec)) {
+      return new this({
+        ...optionsOrProvider,
+        specVersion: SupportedRpcVersion.v0_8_1,
+      }) as T;
+    }
+
+    throw new LibraryError(
+      `Provided RPC node specification version ${spec} is not compatible with the SDK. SDK supported RPC versions ${Object.keys(SupportedRpcVersion).toString()}`
+    );
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
@@ -115,17 +137,24 @@ export class RpcProvider implements ProviderInterface {
   }
 
   /**
-   * return spec version in format "M.m"
+   * read channel spec version
+   */
+  public readSpecVersion() {
+    return this.channel.readSpecVersion();
+  }
+
+  /**
+   * get channel spec version
    */
   public async getSpecVersion() {
     return this.channel.getSpecVersion();
   }
 
   /**
-   * @returns return spec version in format 'M.m.p-rc'
+   * setup channel spec version and return it
    */
-  public async getSpecificationVersion() {
-    return this.channel.getSpecificationVersion();
+  public setUpSpecVersion() {
+    return this.channel.setUpSpecVersion();
   }
 
   public async getNonceForAddress(
@@ -548,9 +577,12 @@ export class RpcProvider implements ProviderInterface {
         '0x00', // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
       ],
       error: [
-        'argent/invalid-signature', // ArgentX 0.3.0 to 0.3.1
-        'is invalid, with respect to the public key', // OpenZeppelin until 0.6.1, Braavos 0.0.11
-        'INVALID_SIG', // Braavos 1.0.0
+        'argent/invalid-signature',
+        '0x617267656e742f696e76616c69642d7369676e6174757265', // ArgentX 0.3.0 to 0.3.1
+        'is invalid, with respect to the public key',
+        '0x697320696e76616c6964', // OpenZeppelin until 0.6.1, Braavos 0.0.11
+        'INVALID_SIG',
+        '0x494e56414c49445f534947', // Braavos 1.0.0
       ],
     };
     let error: any;
@@ -659,9 +691,9 @@ export class RpcProvider implements ProviderInterface {
   /**
    * Given an l1 tx hash, returns the associated l1_handler tx hashes and statuses for all L1 -> L2 messages sent by the l1 transaction, ordered by the l1 tx sending order
    */
-  public getL1MessagesStatus(transactionHash: BigNumberish) {
+  public async getL1MessagesStatus(transactionHash: BigNumberish): Promise<RPC.L1L2MessagesStatus> {
     if (this.channel instanceof RPC08.RpcChannel) {
-      this.channel.getMessagesStatus(transactionHash);
+      return this.channel.getMessagesStatus(transactionHash);
     }
 
     throw new LibraryError('Unsupported method for RPC version');
@@ -670,14 +702,14 @@ export class RpcProvider implements ProviderInterface {
   /**
    * Get merkle paths in one of the state tries: global state, classes, individual contract
    */
-  public getStorageProof(
+  public async getStorageProof(
     classHashes: BigNumberish[],
     contractAddresses: BigNumberish[],
     contractsStorageKeys: RPC.CONTRACT_STORAGE_KEYS[],
     blockIdentifier?: BlockIdentifier
-  ) {
+  ): Promise<RPC.StorageProof> {
     if (this.channel instanceof RPC08.RpcChannel) {
-      this.channel.getStorageProof(
+      return this.channel.getStorageProof(
         classHashes,
         contractAddresses,
         contractsStorageKeys,
@@ -691,9 +723,9 @@ export class RpcProvider implements ProviderInterface {
   /**
    * Get the contract class definition in the given block associated with the given hash
    */
-  public getCompiledCasm(classHash: BigNumberish) {
+  public async getCompiledCasm(classHash: BigNumberish): Promise<RPC.CASM_COMPILED_CONTRACT_CLASS> {
     if (this.channel instanceof RPC08.RpcChannel) {
-      this.channel.getCompiledCasm(classHash);
+      return this.channel.getCompiledCasm(classHash);
     }
 
     throw new LibraryError('Unsupported method for RPC version');

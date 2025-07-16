@@ -202,12 +202,13 @@ export function parseEvents(
   const ret = providerReceivedEvents
     .flat()
     .reduce((acc, recEvent: RPC.EmittedEvent | RPC.Event) => {
-      let abiEvent: AbiEvent | AbiEvents = abiEvents[recEvent.keys.shift() ?? 0];
+      const currentEvent: RPC.EmittedEvent | RPC.Event = JSON.parse(JSON.stringify(recEvent));
+      let abiEvent: AbiEvent | AbiEvents = abiEvents[currentEvent.keys.shift() ?? 0];
       if (!abiEvent) {
         return acc;
       }
       while (!abiEvent.name) {
-        const hashName = recEvent.keys.shift();
+        const hashName = currentEvent.keys.shift();
         assert(!!hashName, 'Not enough data in "keys" property of this event.');
         abiEvent = (abiEvent as AbiEvents)[hashName];
       }
@@ -215,8 +216,8 @@ export function parseEvents(
       const parsedEvent: ParsedEvent = {};
       parsedEvent[abiEvent.name as string] = {};
       // Remove the event's name hashed from the keys array
-      const keysIter = recEvent.keys[Symbol.iterator]();
-      const dataIter = recEvent.data[Symbol.iterator]();
+      const keysIter = currentEvent.keys[Symbol.iterator]();
+      const dataIter = currentEvent.data[Symbol.iterator]();
 
       const abiEventKeys =
         (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'key') ||
@@ -244,9 +245,10 @@ export function parseEvents(
           parsedEvent[abiEvent.name as string]
         );
       });
-      if ('block_hash' in recEvent) parsedEvent.block_hash = recEvent.block_hash;
-      if ('block_number' in recEvent) parsedEvent.block_number = recEvent.block_number;
-      if ('transaction_hash' in recEvent) parsedEvent.transaction_hash = recEvent.transaction_hash;
+      if ('block_hash' in currentEvent) parsedEvent.block_hash = currentEvent.block_hash;
+      if ('block_number' in currentEvent) parsedEvent.block_number = currentEvent.block_number;
+      if ('transaction_hash' in currentEvent)
+        parsedEvent.transaction_hash = currentEvent.transaction_hash;
       acc.push(parsedEvent);
       return acc;
     }, [] as ParsedEvents);

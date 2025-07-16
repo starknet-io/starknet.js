@@ -4,7 +4,7 @@ import type {
   NetworkChangeEventHandler,
   Signature,
   WatchAssetParameters,
-} from 'starknet-types-08';
+} from '@starknet-io/starknet-types-08';
 
 import { Account, AccountInterface } from '../account';
 import { StarknetChainId } from '../global/constants';
@@ -36,6 +36,8 @@ import {
   watchAsset,
 } from './connect';
 import { StarknetWalletProvider } from './types';
+import { PaymasterOptions } from '../types/paymaster';
+import { PaymasterInterface } from '../paymaster';
 
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
@@ -45,9 +47,10 @@ export class WalletAccount extends Account implements AccountInterface {
     providerOrOptions: ProviderOptions | ProviderInterface,
     walletProvider: StarknetWalletProvider,
     address: string,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface
   ) {
-    super(providerOrOptions, address, '', cairoVersion); // At this point unknown address
+    super(providerOrOptions, address, '', cairoVersion, undefined, paymaster); // At this point unknown address
     this.walletProvider = walletProvider;
 
     // Update Address on change
@@ -162,18 +165,20 @@ export class WalletAccount extends Account implements AccountInterface {
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
-    return new WalletAccount(provider, walletProvider, accountAddress, cairoVersion);
+    return new WalletAccount(provider, walletProvider, accountAddress, cairoVersion, paymaster);
   }
 
   static async connectSilent(
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface
   ) {
-    return WalletAccount.connect(provider, walletProvider, cairoVersion, true);
+    return WalletAccount.connect(provider, walletProvider, cairoVersion, paymaster, true);
   }
 
   // TODO: MISSING ESTIMATES

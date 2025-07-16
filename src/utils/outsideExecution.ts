@@ -1,3 +1,4 @@
+import { OutsideCallV1, OutsideCallV2 } from '@starknet-io/starknet-types-08';
 import { CallData } from './calldata';
 import { Call, type AllowArray, type BigNumberish, type Calldata } from '../types/lib';
 import {
@@ -12,6 +13,17 @@ import {
 import { getSelectorFromName } from './hash/selector';
 import { formatSignature } from './stark';
 import { toHex } from './num';
+
+export function toOutsideCallV2(call: OutsideCallV1 | OutsideCallV2): OutsideCallV2 {
+  if ('calldata_len' in call) {
+    return {
+      To: call.to,
+      Selector: call.selector,
+      Calldata: call.calldata,
+    };
+  }
+  return call;
+}
 
 /**
  * Converts a Call object to an OutsideCall object that can be used for an Outside Execution.

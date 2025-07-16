@@ -1,7 +1,6 @@
-import { BlockHash, TransactionHash } from 'starknet-types-07';
+import { BlockHash, TransactionHash } from '@starknet-io/starknet-types-07';
 import { CairoEnum } from './cairoEnum';
 import {
-  BigNumberish,
   BlockIdentifier,
   BlockNumber,
   Calldata,
@@ -9,6 +8,7 @@ import {
   RawArgsArray,
   Signature,
 } from './lib';
+import { UniversalDetails } from './account';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
@@ -79,21 +79,16 @@ export type ContractOptions = {
    * ```
    */
   formatResponse?: { [key: string]: any };
-  maxFee?: BigNumberish;
-  nonce?: BigNumberish;
   signature?: Signature;
   addressSalt?: string;
-};
+} & Partial<UniversalDetails>;
 
 export type CallOptions = Pick<
   ContractOptions,
   'blockIdentifier' | 'parseRequest' | 'parseResponse' | 'formatResponse'
 >;
 
-export type InvokeOptions = Pick<
-  ContractOptions,
-  'maxFee' | 'nonce' | 'signature' | 'parseRequest'
->;
+export type InvokeOptions = ContractOptions;
 
 export type ParsedEvent = { [name: string]: ParsedStruct } & {
   block_hash?: BlockHash;

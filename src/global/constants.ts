@@ -1,5 +1,7 @@
+/* eslint-disable no-underscore-dangle */
 import type { FeeMarginPercentage } from '../types';
 import { ETransactionVersion, RPCSPEC08 } from '../types/api';
+import { ValuesType } from '../types/helpers/valuesType';
 import type { LogLevel } from './logger.type';
 
 export { IS_BROWSER } from '../utils/encode';
@@ -32,29 +34,6 @@ export const RANGE_FELT = range(ZERO, PRIME - 1n);
 export const RANGE_I128 = range(-(2n ** 127n), 2n ** 127n - 1n);
 export const RANGE_U128 = range(ZERO, 2n ** 128n - 1n);
 
-export enum BaseUrl {
-  SN_MAIN = 'https://alpha-mainnet.starknet.io',
-  SN_SEPOLIA = 'https://alpha-sepolia.starknet.io',
-}
-
-export enum NetworkName {
-  SN_MAIN = 'SN_MAIN',
-  SN_SEPOLIA = 'SN_SEPOLIA',
-}
-
-export enum StarknetChainId {
-  SN_MAIN = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
-  SN_SEPOLIA = '0x534e5f5345504f4c4941', // encodeShortString('SN_SEPOLIA')
-}
-
-export enum TransactionHashPrefix {
-  DECLARE = '0x6465636c617265', // encodeShortString('declare'),
-  DEPLOY = '0x6465706c6f79', // encodeShortString('deploy'),
-  DEPLOY_ACCOUNT = '0x6465706c6f795f6163636f756e74', // encodeShortString('deploy_account'),
-  INVOKE = '0x696e766f6b65', // encodeShortString('invoke'),
-  L1_HANDLER = '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
-}
-
 export const UDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
@@ -72,14 +51,50 @@ export const HARDENING_BYTE = 128;
 // 0x80000000
 export const HARDENING_4BYTES = 2147483648n;
 
-/**
- * dot formate rpc versions
- */
-export const SupportedRpcVersion = {
-  0.7: '0.7',
-  0.8: '0.8',
+// NOTE: the enum alias exports are made so both the 'const' and 'type' are reachable in the published '.d.ts' file,
+// otherwise the last export hides the preceding export with the same name in this file
+const _BaseUrl = {
+  SN_MAIN: 'https://alpha-mainnet.starknet.io',
+  SN_SEPOLIA: 'https://alpha-sepolia.starknet.io',
 } as const;
-export type SupportedRpcVersion = (typeof SupportedRpcVersion)[keyof typeof SupportedRpcVersion];
+type _BaseUrl = ValuesType<typeof _BaseUrl>;
+export { _BaseUrl as BaseUrl };
+
+const _NetworkName = {
+  SN_MAIN: 'SN_MAIN',
+  SN_SEPOLIA: 'SN_SEPOLIA',
+} as const;
+type _NetworkName = ValuesType<typeof _NetworkName>;
+export { _NetworkName as NetworkName };
+
+const _StarknetChainId = {
+  SN_MAIN: '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
+  SN_SEPOLIA: '0x534e5f5345504f4c4941', // encodeShortString('SN_SEPOLIA')
+} as const;
+type _StarknetChainId = ValuesType<typeof _StarknetChainId>;
+export { _StarknetChainId as StarknetChainId };
+
+const _TransactionHashPrefix = {
+  DECLARE: '0x6465636c617265', // encodeShortString('declare'),
+  DEPLOY: '0x6465706c6f79', // encodeShortString('deploy'),
+  DEPLOY_ACCOUNT: '0x6465706c6f795f6163636f756e74', // encodeShortString('deploy_account'),
+  INVOKE: '0x696e766f6b65', // encodeShortString('invoke'),
+  L1_HANDLER: '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
+} as const;
+type _TransactionHashPrefix = ValuesType<typeof _TransactionHashPrefix>;
+export { _TransactionHashPrefix as TransactionHashPrefix };
+
+/**
+ * dot format rpc versions
+ */
+const _SupportedRpcVersion = {
+  '0.7.1': '0.7.1',
+  '0.8.1': '0.8.1',
+  v0_7_1: '0.7.1',
+  v0_8_1: '0.8.1',
+} as const;
+type _SupportedRpcVersion = ValuesType<typeof _SupportedRpcVersion>;
+export { _SupportedRpcVersion as SupportedRpcVersion };
 
 export type SupportedTransactionVersion =
   | typeof ETransactionVersion.V2
@@ -89,12 +104,14 @@ export type SupportedTransactionVersion =
 export const DEFAULT_GLOBAL_CONFIG: {
   legacyMode: boolean;
   logLevel: LogLevel;
-  rpcVersion: SupportedRpcVersion;
+  rpcVersion: _SupportedRpcVersion;
   transactionVersion: SupportedTransactionVersion;
   feeMarginPercentage: FeeMarginPercentage;
+  fetch: any;
+  websocket: any;
 } = {
   legacyMode: false,
-  rpcVersion: '0.8',
+  rpcVersion: '0.8.1',
   transactionVersion: ETransactionVersion.V3,
   logLevel: 'INFO',
   feeMarginPercentage: {
@@ -114,17 +131,18 @@ export const DEFAULT_GLOBAL_CONFIG: {
     },
     maxFee: 50,
   },
+  fetch: undefined,
+  websocket: undefined,
 };
 
 export const RPC_DEFAULT_NODES = {
-  SN_MAIN: [
-    `https://starknet-mainnet.public.blastapi.io/rpc/`,
-    `https://free-rpc.nethermind.io/mainnet-juno/`,
-  ],
-  SN_SEPOLIA: [
-    `https://starknet-sepolia.public.blastapi.io/rpc/`,
-    `https://free-rpc.nethermind.io/sepolia-juno/`,
-  ],
+  SN_MAIN: [`https://starknet-mainnet.public.blastapi.io/rpc/`],
+  SN_SEPOLIA: [`https://starknet-sepolia.public.blastapi.io/rpc/`],
+} as const;
+
+export const PAYMASTER_RPC_NODES = {
+  SN_MAIN: [`https://starknet.paymaster.avnu.fi`],
+  SN_SEPOLIA: [`https://sepolia.paymaster.avnu.fi`],
 } as const;
 
 // Default system messages
@@ -133,4 +151,9 @@ export const SYSTEM_MESSAGES = {
     'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
   legacyTxRPC08Message: 'RPC 0.8 do not support legacy transactions',
   SWOldV3: 'RPC 0.7 V3 tx (improper resource bounds) not supported in RPC 0.8',
+  channelVersionMismatch:
+    'Channel specification version is not compatible with the connected node Specification Version',
+  unsupportedSpecVersion:
+    'The connected node specification version is not supported by this library',
+  maxFeeInV3: 'maxFee is not supported in V3 transactions, use resourceBounds instead',
 };
