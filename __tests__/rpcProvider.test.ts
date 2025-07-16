@@ -34,6 +34,7 @@ import {
   waitForTransactionOptions,
   isVersion,
   toAnyPatchVersion,
+  BlockTag,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { isBoolean } from '../src/utils/typed';
@@ -328,10 +329,7 @@ describeIfRpc('RPCProvider', () => {
     });
 
     test('getTransactionByBlockIdAndIndex', async () => {
-      const transaction = await rpcProvider.getTransactionByBlockIdAndIndex(
-        latestBlock.block_number,
-        0
-      );
+      const transaction = await rpcProvider.getTransactionByBlockIdAndIndex(1044204, 0);
       expect(transaction).toHaveProperty('transaction_hash');
     });
 
@@ -524,6 +522,9 @@ describeIfNotDevnet('waitForBlock', () => {
   test('waitForBlock pending', async () => {
     await providerStandard.waitForBlock('pending');
     expect(true).toBe(true); // answer without timeout Error (blocks have to be spaced with 16 minutes maximum : 200 retries * 5000ms)
+
+    await providerStandard.waitForBlock(BlockTag.PRE_CONFIRMED);
+    expect(true).toBe(true);
   });
 });
 

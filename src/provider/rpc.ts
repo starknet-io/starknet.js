@@ -209,6 +209,7 @@ export class RpcProvider implements ProviderInterface {
     retryInterval: number = 5000
   ) {
     if (blockIdentifier === BlockTag.LATEST) return;
+    if (blockIdentifier === 'pending') return; // For RPC 0.8.1
     const currentBlock = await this.getBlockNumber();
     const targetBlock =
       blockIdentifier === BlockTag.PRE_CONFIRMED

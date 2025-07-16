@@ -406,7 +406,7 @@ export class RpcChannel {
       // RPC.ETransactionExecutionStatus.REVERTED,
     ];
     const successStates: any = options?.successStates ?? [
-      RPC.ETransactionExecutionStatus.SUCCEEDED,
+      // RPC.ETransactionExecutionStatus.SUCCEEDED, Starknet 0.14.0 this one can have incomplete events
       RPC.ETransactionStatus.ACCEPTED_ON_L2,
       RPC.ETransactionStatus.ACCEPTED_ON_L1,
     ];
