@@ -3,24 +3,25 @@ import { BatchClient } from '../../src/utils/batch';
 import {
   createBlockForDevnet,
   createTestProvider,
-  describeIfRpc071,
   describeIfRpc081,
+  getTestProvider,
 } from '../config/fixtures';
 import { initializeMatcher } from '../config/schema';
-import { ProviderInterface } from '../../src';
+import { RPC } from '../../src/types';
 
-describe('Batch Client', () => {
+describe('BatchClient', () => {
   initializeMatcher(expect);
-  let provider: ProviderInterface;
-  let batchClient: BatchClient;
+  const provider = getTestProvider();
 
-  beforeAll(async () => {
-    provider = await createTestProvider(false);
-    batchClient = new BatchClient({
+  let batchClient: BatchClient<RPC.Methods>;
+
+  beforeEach(() => {
+    batchClient = new BatchClient<RPC.Methods>({
       nodeUrl: provider.channel.nodeUrl,
       headers: provider.channel.headers,
       interval: 0,
       baseFetch: fetch,
+      rpcMethods: {} as RPC.Methods, // Type information only, not used at runtime
     });
   });
 
@@ -43,7 +44,7 @@ describe('Batch Client', () => {
     });
   });
 
-  describeIfRpc071('should batch two requests RPC0.7.1', () => {
+  /*   describeIfRpc071('should batch two requests RPC0.7.1', () => {
     test('should batch two requests', async () => {
       await createBlockForDevnet();
 
@@ -60,7 +61,7 @@ describe('Batch Client', () => {
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       fetchSpy.mockRestore();
     });
-  });
+  }); */
 
   test('batch request using Provider', async () => {
     const myBatchProvider = await createTestProvider(false, { batch: 0 });

@@ -7,7 +7,6 @@ import {
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
-  describeIfRpc071,
   describeIfRpc081,
   describeIfTestnet,
   ETHtokenAddress,
@@ -34,6 +33,8 @@ import {
   stark,
   waitForTransactionOptions,
   isVersion,
+  toAnyPatchVersion,
+  BlockTag,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { isBoolean } from '../src/utils/typed';
@@ -76,7 +77,7 @@ describeIfRpc('RPCProvider', () => {
     const rawResult = await channel.fetch('starknet_specVersion');
     const j = await rawResult.json();
     expect(channel.readSpecVersion()).toBeDefined();
-    expect(isVersion(j.result, await channel.setUpSpecVersion())).toBeTruthy();
+    expect(isVersion(toAnyPatchVersion(j.result), await channel.setUpSpecVersion())).toBeTruthy();
   });
 
   test('baseFetch override', async () => {
@@ -142,34 +143,40 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof spec).toBe('string');
   });
 
-  test('configurable margin', async () => {
+  test('configurable fee overhead on instance', async () => {
     const p = new RpcProvider({
       nodeUrl: provider.channel.nodeUrl,
-      feeMarginPercentage: {
-        bounds: {
-          l1_gas: {
-            max_amount: 0,
-            max_price_per_unit: 0,
-          },
+      resourceBoundsOverhead: {
+        l1_gas: {
+          max_amount: 0,
+          max_price_per_unit: 0,
         },
-        maxFee: 0,
+        l2_gas: {
+          max_amount: 0,
+          max_price_per_unit: 0,
+        },
+        l1_data_gas: {
+          max_amount: 0,
+          max_price_per_unit: 0,
+        },
       },
     });
     const estimateSpy = jest.spyOn(p.channel as any, 'getEstimateFee');
     const mockFeeEstimate: FeeEstimate = {
-      gas_consumed: '0x2',
-      gas_price: '0x1',
-      data_gas_consumed: '0x2',
-      data_gas_price: '0x1',
+      l1_gas_consumed: '0x2',
+      l1_gas_price: '0x1',
+      l2_gas_consumed: '0x2',
+      l2_gas_price: '0x1',
+      l1_data_gas_consumed: '0x2',
+      l1_data_gas_price: '0x1',
       overall_fee: '0x4',
       unit: 'WEI',
     };
     estimateSpy.mockResolvedValue([mockFeeEstimate]);
     const result = (await p.getEstimateFeeBulk([{} as any], {}))[0];
     expect(estimateSpy).toHaveBeenCalledTimes(1);
-    expect(result.suggestedMaxFee).toBe(4n);
-    expect(result.resourceBounds.l1_gas.max_amount).toBe('0x4');
-    expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe('0x1');
+    expect(result.resourceBounds.l1_gas.max_amount).toBe(2n);
+    expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe(1n);
     estimateSpy.mockRestore();
   });
 
@@ -209,7 +216,7 @@ describeIfRpc('RPCProvider', () => {
       });
     });
 
-    describeIfRpc071('estimate message fee rpc 0.7', () => {
+    /*     describeIfRpc071('estimate message fee rpc 0.7', () => {
       test('estimate message fee Cairo 1', async () => {
         const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
         const estimationCairo1 = await rpcProvider.estimateMessageFee({
@@ -229,7 +236,7 @@ describeIfRpc('RPCProvider', () => {
           })
         );
       });
-    });
+    }); */
   });
 
   describe('waitForTransaction', () => {
@@ -322,10 +329,15 @@ describeIfRpc('RPCProvider', () => {
     });
 
     test('getTransactionByBlockIdAndIndex', async () => {
-      const transaction = await rpcProvider.getTransactionByBlockIdAndIndex(
-        latestBlock.block_number,
-        0
-      );
+      // Find a block with transactions
+      let block: any = latestBlock; // TODO: fix this type
+      let blockNumber = latestBlock.block_number;
+      while (block.transactions.length === 0 && blockNumber > latestBlock.block_number - 20) {
+        blockNumber -= 1;
+        // eslint-disable-next-line no-await-in-loop
+        block = await provider.getBlock(blockNumber);
+      }
+      const transaction = await rpcProvider.getTransactionByBlockIdAndIndex(blockNumber, 0);
       expect(transaction).toHaveProperty('transaction_hash');
     });
 
@@ -361,11 +373,11 @@ describeIfRpc('RPCProvider', () => {
           constructorCalldata: erc20Constructor,
         });
 
-        const erc20EchoContract = new Contract(
-          contracts.Erc20OZ.sierra.abi,
-          deploy.contract_address!,
-          account
-        );
+        const erc20EchoContract = new Contract({
+          abi: contracts.Erc20OZ.sierra.abi,
+          address: deploy.contract_address,
+          providerOrAccount: account,
+        });
         await erc20EchoContract.transfer(randomWallet, cairo.uint256(1));
         await erc20EchoContract.transfer(randomWallet, cairo.uint256(1));
 
@@ -518,6 +530,9 @@ describeIfNotDevnet('waitForBlock', () => {
   test('waitForBlock pending', async () => {
     await providerStandard.waitForBlock('pending');
     expect(true).toBe(true); // answer without timeout Error (blocks have to be spaced with 16 minutes maximum : 200 retries * 5000ms)
+
+    await providerStandard.waitForBlock(BlockTag.PRE_CONFIRMED);
+    expect(true).toBe(true);
   });
 });
 

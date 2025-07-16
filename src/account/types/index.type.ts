@@ -1,34 +1,49 @@
-import { EDataAvailabilityMode, ETransactionVersion, PAYMASTER_API } from './api';
-import {
-  AllowArray,
+import type { EDataAvailabilityMode, ETransactionVersion3, PAYMASTER_API } from '../../types/api';
+import type {
   BigNumberish,
   BlockIdentifier,
-  Call,
-  DeclareContractPayload,
-  DeployAccountContractPayload,
-  TransactionType,
-  UniversalDeployerContractPayload,
+  CairoVersion,
   V3TransactionDetails,
-} from './lib';
-import {
+} from '../../types/lib';
+import type {
   DeclareTransactionReceiptResponse,
-  EstimateFeeResponse,
-} from '../provider/types/index.type';
-import { ResourceBounds } from '../provider/types/spec.type';
-import { FeeMode, PaymasterTimeBounds } from './paymaster';
+  EstimateFeeResponseOverhead,
+  ProviderOptions,
+} from '../../provider/types/index.type';
+import type { ResourceBoundsBN } from '../../provider/types/spec.type';
+import type {
+  FeeMode,
+  PaymasterOptions,
+  PaymasterTimeBounds,
+} from '../../paymaster/types/index.type';
+import type { SignerInterface } from '../../signer';
+import type { SupportedTransactionVersion } from '../../global/constants';
+import type { PaymasterInterface } from '../../paymaster';
+import type { ProviderInterface } from '../../provider/interface';
 
-export interface EstimateFee extends EstimateFeeResponse {}
-
-export type UniversalSuggestedFee = {
-  maxFee: BigNumberish;
-  resourceBounds: ResourceBounds;
+/**
+ * Configuration options for creating an Account instance
+ */
+export type AccountOptions = {
+  /** Provider instance or configuration for blockchain interaction */
+  provider: ProviderOptions | ProviderInterface;
+  /** Account address on the Starknet network */
+  address: string;
+  /** Private key or Signer Class instance for signing transactions */
+  signer: Uint8Array | string | SignerInterface;
+  /** Cairo version to use for this account (optional, auto-detected if not provided) */
+  cairoVersion?: CairoVersion;
+  /** Transaction version to use for sending transactions (optional) */
+  transactionVersion?: SupportedTransactionVersion;
+  /** Paymaster configuration for sponsored transactions (optional) */
+  paymaster?: PaymasterOptions | PaymasterInterface;
 };
 
-export type EstimateFeeBulk = Array<EstimateFee>;
+export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;
 
 // TODO: This is too wide generic with optional params
 export type AccountInvocationsFactoryDetails = {
-  versions: Array<`${ETransactionVersion}`>;
+  versions: Array<`${ETransactionVersion3}`>;
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
@@ -37,17 +52,13 @@ export type AccountInvocationsFactoryDetails = {
 export interface UniversalDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
-  /**
-   * Max fee to pay for V2 transaction
-   */
-  maxFee?: BigNumberish; // ignored on estimate
   tip?: BigNumberish;
   paymasterData?: BigNumberish[];
   accountDeploymentData?: BigNumberish[];
   nonceDataAvailabilityMode?: EDataAvailabilityMode;
   feeDataAvailabilityMode?: EDataAvailabilityMode;
   version?: BigNumberish;
-  resourceBounds?: ResourceBounds; // ignored on estimate
+  resourceBounds?: ResourceBoundsBN; // ignored on estimate
   skipValidate?: boolean; // ignored on non-estimate
 }
 
@@ -94,24 +105,6 @@ export type SimulateTransactionDetails = {
   skipValidate?: boolean;
   skipExecute?: boolean;
 } & Partial<V3TransactionDetails>;
-
-export type EstimateFeeAction =
-  | {
-      type: typeof TransactionType.INVOKE;
-      payload: AllowArray<Call>;
-    }
-  | {
-      type: typeof TransactionType.DECLARE;
-      payload: DeclareContractPayload;
-    }
-  | {
-      type: typeof TransactionType.DEPLOY_ACCOUNT;
-      payload: DeployAccountContractPayload;
-    }
-  | {
-      type: typeof TransactionType.DEPLOY;
-      payload: UniversalDeployerContractPayload;
-    };
 
 export type StarkProfile = {
   name?: string;

@@ -65,7 +65,11 @@ describe('deploy and test Account', () => {
       constructorCalldata: erc20Constructor,
     });
     erc20Address = dd.deploy.contract_address;
-    erc20 = new Contract(contracts.Erc20OZ.sierra.abi, erc20Address, provider);
+    erc20 = new Contract({
+      abi: contracts.Erc20OZ.sierra.abi,
+      address: erc20Address,
+      providerOrAccount: provider,
+    });
 
     const balance = await erc20.balanceOf(account.address);
     expect(balance).toStrictEqual(1000n);
@@ -75,8 +79,17 @@ describe('deploy and test Account', () => {
       casm: contracts.C1v2.casm,
     });
 
-    dapp = new Contract(contracts.C1v2.sierra.abi, dappResponse.deploy.contract_address, provider);
+    dapp = new Contract({
+      abi: contracts.C1v2.sierra.abi,
+      address: dappResponse.deploy.contract_address,
+      providerOrAccount: provider,
+    });
     dappClassHash = num.toHex(dappResponse.declare.class_hash);
+  });
+
+  test('declare and deploy', async () => {
+    expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
+    expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
   });
 
   describeIfDevnet('Test on Devnet', () => {
@@ -111,13 +124,12 @@ describe('deploy and test Account', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      const accountOZ = new Account(
+      const accountOZ = new Account({
         provider,
-        toBeAccountAddress,
-        privKey,
-        undefined,
-        TEST_TX_VERSION
-      );
+        address: toBeAccountAddress,
+        signer: privKey,
+        transactionVersion: TEST_TX_VERSION,
+      });
       const deployed = await accountOZ.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
@@ -287,7 +299,11 @@ describe('deploy and test Account', () => {
         { publicKey: starkKeyPub },
         0
       );
-      const newAccount = new Account(provider, precalculatedAddress, privateKey);
+      const newAccount = new Account({
+        provider,
+        address: precalculatedAddress,
+        signer: privateKey,
+      });
 
       const res = await newAccount.simulateTransaction([
         {
@@ -379,13 +395,12 @@ describe('deploy and test Account', () => {
       );
       expect(verifyMessageResponse).toBe(false);
 
-      const wrongAccount = new Account(
+      const wrongAccount = new Account({
         provider,
-        '0x037891',
-        '0x026789',
-        undefined,
-        TEST_TX_VERSION
-      ); // non existing account
+        address: '0x037891',
+        signer: '0x026789',
+        transactionVersion: TEST_TX_VERSION,
+      }); // non existing account
       await expect(
         wrongAccount.verifyMessageInStarknet(typedDataExample, signature2, wrongAccount.address)
       ).rejects.toThrow();
@@ -417,7 +432,7 @@ describe('deploy and test Account', () => {
 
     test('change from provider to account', async () => {
       expect(erc20.providerOrAccount).toBeInstanceOf(Provider);
-      erc20.connect(account);
+      erc20.providerOrAccount = account;
       expect(erc20.providerOrAccount).toBeInstanceOf(Account);
     });
 
@@ -534,7 +549,11 @@ describe('deploy and test Account', () => {
         { publicKey: starkKeyPub },
         0
       );
-      newAccount = new Account(provider, precalculatedAddress, privateKey);
+      newAccount = new Account({
+        provider,
+        address: precalculatedAddress,
+        signer: privateKey,
+      });
     });
 
     test('estimateAccountDeployFee Cairo 1', async () => {
@@ -544,7 +563,7 @@ describe('deploy and test Account', () => {
         addressSalt: starkKeyPub,
         contractAddress: precalculatedAddress,
       });
-      expect(result).toMatchSchemaRef('EstimateFee');
+      expect(result).toMatchSchemaRef('EstimateFeeResponseOverhead');
     });
 
     test('estimate fee bulk on empty invocations', async () => {
@@ -574,7 +593,7 @@ describe('deploy and test Account', () => {
       ]);
 
       estimatedFeeBulk.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFee');
+        expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
       });
       expect(estimatedFeeBulk.length).toEqual(2);
       // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
@@ -617,7 +636,7 @@ describe('deploy and test Account', () => {
       ]);
       expect(res).toHaveLength(2);
       res.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFee');
+        expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
       });
     });
 
@@ -672,7 +691,7 @@ describe('deploy and test Account', () => {
 
         const res = await account.estimateFeeBulk(invocations);
         res.forEach((value) => {
-          expect(value).toMatchSchemaRef('EstimateFee');
+          expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
         });
       });
 
@@ -713,7 +732,7 @@ describe('deploy and test Account', () => {
 
         const res = await account.estimateFeeBulk(invocations);
         res.forEach((value) => {
-          expect(value).toMatchSchemaRef('EstimateFee');
+          expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
         });
       });
     });
@@ -735,7 +754,7 @@ describe('deploy and test Account', () => {
         calldata: ['Hello'],
       });
 
-      expect(result).toMatchSchemaRef('EstimateFee');
+      expect(result).toMatchSchemaRef('EstimateFeeResponseOverhead');
       // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
       // innerInvokeEstFeeSpy.mockClear();
     });

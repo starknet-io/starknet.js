@@ -1,8 +1,8 @@
 import {
   Account,
+  Block,
   BlockNumber,
   CallData,
-  GetBlockResponse,
   isPendingStateUpdate,
   LibraryError,
   Provider,
@@ -26,7 +26,7 @@ describe('defaultProvider', () => {
   let account: Account;
   let exampleTransactionHash: string;
   let erc20ContractAddress: string;
-  let exampleBlock: GetBlockResponse;
+  let exampleBlock: Block;
   let exampleBlockNumber: BlockNumber;
   let exampleBlockHash: string;
   let erc20Constructor: Calldata;

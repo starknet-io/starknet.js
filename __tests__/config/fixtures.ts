@@ -132,13 +132,12 @@ export const getTestAccount = (
   provider: ProviderInterface,
   txVersion?: SupportedTransactionVersion
 ) => {
-  return new Account(
+  return new Account({
     provider,
-    toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
-    process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
-    undefined,
-    txVersion ?? TEST_TX_VERSION
-  );
+    address: toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
+    signer: process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
+    transactionVersion: txVersion ?? TEST_TX_VERSION,
+  });
 };
 
 export const createBlockForDevnet = async (): Promise<void> => {
@@ -177,7 +176,7 @@ export const describeIfNotDevnet = describeIf(process.env.IS_DEVNET === 'false')
 export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
 export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
 export const describeIfRpc081 = describeIf(process.env.RPC_SPEC_VERSION === '0.8.1');
-export const describeIfRpc071 = describeIf(process.env.RPC_SPEC_VERSION === '0.7.1');
+export const describeIfRpc09 = describeIf(process.env.RPC_SPEC_VERSION === '0.9.0');
 export const erc20ClassHash: string = hash.computeContractClassHash(contracts.Erc20OZ.sierra); // Cairo 1
 export const C1v2ClassHash: string = hash.computeContractClassHash(contracts.C1v2.sierra); // Cairo 1
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';

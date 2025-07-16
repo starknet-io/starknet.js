@@ -326,7 +326,12 @@ describe('Unit Test: WebSocketChannel Buffering', () => {
 
     // Manually create the subscription, bypassing the network.
     const subId = 'mock_sub_id_buffer';
-    sub = new Subscription(webSocketChannel, 'starknet_subscribeNewHeads', {}, subId, 1000);
+    sub = new Subscription({
+      channel: webSocketChannel,
+      method: 'starknet_subscribeNewHeads',
+      id: subId,
+      maxBufferSize: 1000,
+    });
     (webSocketChannel as any).activeSubscriptions.set(subId, sub);
 
     const mockNewHeadsResult1 = { block_number: 1 };
@@ -361,7 +366,12 @@ describe('Unit Test: WebSocketChannel Buffering', () => {
 
     // Manually create subscription with a buffer size of 2.
     const subId = 'mock_sub_id_drop';
-    sub = new Subscription(webSocketChannel, 'starknet_subscribeNewHeads', {}, subId, 2);
+    sub = new Subscription({
+      channel: webSocketChannel,
+      method: 'starknet_subscribeNewHeads',
+      id: subId,
+      maxBufferSize: 2,
+    });
     (webSocketChannel as any).activeSubscriptions.set(subId, sub);
 
     const warnSpy = jest.spyOn(logger, 'warn').mockImplementation(() => {});
@@ -397,7 +407,12 @@ describe('Unit Test: Subscription Class', () => {
     mockChannel.unsubscribe = jest.fn().mockResolvedValue(true);
     mockChannel.removeSubscription = jest.fn();
 
-    subscription = new Subscription(mockChannel, 'test_method', {}, 'sub_123', 100);
+    subscription = new Subscription({
+      channel: mockChannel,
+      method: 'test_method',
+      id: 'sub_123',
+      maxBufferSize: 100,
+    });
   });
 
   test('should throw an error if .on() is called more than once', () => {

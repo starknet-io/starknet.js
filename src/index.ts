@@ -54,3 +54,9 @@ export * as wallet from './wallet/connect';
 export * from './global/config';
 export * from './global/logger';
 export * from './global/logger.type';
+
+/**
+ * Backward compatibility utilities
+ * @deprecated These methods are provided for backward compatibility. Use the new object-based APIs instead.
+ */
+export * from './utils/backward';

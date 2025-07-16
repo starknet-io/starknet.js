@@ -1,4 +1,3 @@
-import { OutsideCallV1, OutsideCallV2 } from '@starknet-io/starknet-types-08';
 import { CallData } from './calldata';
 import { Call, type AllowArray, type BigNumberish, type Calldata } from '../types/lib';
 import {
@@ -13,6 +12,7 @@ import {
 import { getSelectorFromName } from './hash/selector';
 import { formatSignature } from './stark';
 import { toHex } from './num';
+import type { OutsideCallV1, OutsideCallV2 } from '../types/api';
 
 export function toOutsideCallV2(call: OutsideCallV1 | OutsideCallV2): OutsideCallV2 {
   if ('calldata_len' in call) {

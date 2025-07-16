@@ -1,4 +1,6 @@
-import type { ENUM_EVENT, EVENT_FIELD, STRUCT_EVENT } from '@starknet-io/starknet-types-07';
+// TODO: Inherit from RPC 0.9 with addition to Legacy
+
+import { CONTRACT } from '../../api';
 
 /** ABI */
 export type Abi = ReadonlyArray<FunctionAbi | AbiEvent | AbiStruct | InterfaceAbi | any>;
@@ -59,12 +61,12 @@ export type AbiEvent = CairoEvent | LegacyEvent;
 // CairoEvent is CairoEventDefinition type if we have a leaf (end of the arborescence for an event), otherwise a new node level is created. Only for Cairo 1
 export type CairoEvent = CairoEventDefinition | AbiEvents;
 
-export type CairoEventDefinition = STRUCT_EVENT & {
+export type CairoEventDefinition = CONTRACT.STRUCT_EVENT & {
   name: string;
   type: 'event';
 };
 
-export type CairoEventVariant = ENUM_EVENT & {
+export type CairoEventVariant = CONTRACT.ENUM_EVENT & {
   name: string;
   type: string;
 };
@@ -72,6 +74,6 @@ export type CairoEventVariant = ENUM_EVENT & {
 export type LegacyEvent = {
   name: string;
   type: 'event';
-  data: EVENT_FIELD[];
-  keys: EVENT_FIELD[];
+  data: CONTRACT.EVENT_FIELD[];
+  keys: CONTRACT.EVENT_FIELD[];
 };

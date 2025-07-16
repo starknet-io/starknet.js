@@ -1,4 +1,4 @@
-import { RPC08, RPC07 } from '../channel';
+import { RPC08, RPC09 } from '../channel';
 import { StarknetChainId } from '../global/constants';
 import type {
   AccountInvocations,
@@ -14,8 +14,8 @@ import type {
   DeployAccountContractPayload,
   DeployAccountContractTransaction,
   DeployContractResponse,
-  EstimateFeeResponse,
-  EstimateFeeResponseBulk,
+  EstimateFeeResponseOverhead,
+  EstimateFeeResponseBulkOverhead,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
@@ -24,17 +24,17 @@ import type {
   InvokeFunctionResponse,
   Nonce,
   PendingBlock,
-  SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
+  SimulateTransactionOverheadResponse,
 } from '../types';
 
 export abstract class ProviderInterface {
-  public abstract channel: RPC07.RpcChannel | RPC08.RpcChannel;
+  public abstract channel: RPC08.RpcChannel | RPC09.RpcChannel;
 
   /**
    * Gets the Starknet chain Id
@@ -61,7 +61,8 @@ export abstract class ProviderInterface {
    * @param blockIdentifier block identifier
    * @returns the block object
    */
-  public abstract getBlock(blockIdentifier?: 'pending'): Promise<PendingBlock>;
+  public abstract getBlock(): Promise<PendingBlock>;
+  public abstract getBlock(blockIdentifier: 'pre_confirmed'): Promise<PendingBlock>;
   public abstract getBlock(blockIdentifier: 'latest'): Promise<Block>;
   public abstract getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
 
@@ -180,9 +181,9 @@ export abstract class ProviderInterface {
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
+   * - entrypoint - (optional) the entrypoint of the contract
+   * - calldata - (optional, defaults to []) the calldata
+   * - signature - (optional, defaults to []) the signature
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
@@ -216,22 +217,30 @@ export abstract class ProviderInterface {
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
+   * - entrypoint - (optional) the entrypoint of the contract
+   * - calldata - (optional, defaults to []) the calldata
+   * - signature - (optional, defaults to []) the signature
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
    * @param blockIdentifier - (optional) block identifier
    * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
+   * @deprecated Consider using getEstimateFeeBulk for multiple transactions
+   * @example
+   * ```typescript
+   * const feeEstimate = await provider.getInvokeEstimateFee(invocation, details);
+   * // Equivalent to:
+   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.INVOKE, ...invocation, ...details }], options);
+   * ```
+   * @alias getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
   public abstract getInvokeEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Estimates the fee for a given DECLARE transaction
@@ -247,13 +256,21 @@ export abstract class ProviderInterface {
    * @param blockIdentifier - (optional) block identifier
    * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
+   * @deprecated Consider using getEstimateFeeBulk for multiple transactions
+   * @example
+   * ```typescript
+   * const feeEstimate = await provider.getDeclareEstimateFee(transaction, details);
+   * // Equivalent to:
+   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.DECLARE, ...transaction, ...details }], options);
+   * ```
+   * @alias getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
   public abstract getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Estimates the fee for a given DEPLOY_ACCOUNT transaction
@@ -270,13 +287,21 @@ export abstract class ProviderInterface {
    * @param blockIdentifier - (optional) block identifier
    * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
+   * @deprecated Consider using getEstimateFeeBulk for multiple transactions
+   * @example
+   * ```typescript
+   * const feeEstimate = await provider.getDeployAccountEstimateFee(transaction, details);
+   * // Equivalent to:
+   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.DEPLOY_ACCOUNT, ...transaction, ...details }], options);
+   * ```
+   * @alias getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Estimates the fee for a list of INVOKE transaction
@@ -289,7 +314,7 @@ export abstract class ProviderInterface {
   public abstract getEstimateFeeBulk(
     invocations: AccountInvocations,
     options?: getEstimateFeeBulkOptions
-  ): Promise<EstimateFeeResponseBulk>;
+  ): Promise<EstimateFeeResponseBulkOverhead>;
 
   /**
    * Wait for the transaction to be accepted
@@ -317,7 +342,7 @@ export abstract class ProviderInterface {
   public abstract getSimulateTransaction(
     invocations: AccountInvocations,
     options?: getSimulateTransactionOptions
-  ): Promise<SimulateTransactionResponse>;
+  ): Promise<SimulateTransactionOverheadResponse>;
 
   /**
    * Gets the state changes in a specific block (result of executing the requested block)

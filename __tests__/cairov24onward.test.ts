@@ -39,7 +39,11 @@ describe('Cairo v2.4 onwards', () => {
         casm: contracts.C240.casm,
       });
 
-      stringContract = new Contract(contracts.C240.sierra.abi, deploy.contract_address, account);
+      stringContract = new Contract({
+        abi: contracts.C240.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('bytes31', async () => {
@@ -107,7 +111,11 @@ describe('Cairo v2.4 onwards', () => {
         casm: contracts.Tuple.casm,
       });
 
-      tupleContract = new Contract(contracts.Tuple.sierra.abi, deploy.contract_address, account);
+      tupleContract = new Contract({
+        abi: contracts.Tuple.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
       myCallData = new CallData(tupleContract.abi);
     });
 
@@ -246,7 +254,11 @@ describe('Cairo v2.4 onwards', () => {
         casm: contracts.U512.casm,
       });
 
-      u512Contract = new Contract(contracts.U512.sierra.abi, deploy.contract_address, account);
+      u512Contract = new Contract({
+        abi: contracts.U512.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('u512 compile', async () => {
@@ -321,11 +333,11 @@ describe('Cairo v2.4 onwards', () => {
         contract: contracts.NonZero.sierra,
         casm: contracts.NonZero.casm,
       });
-      nonZeroContract = new Contract(
-        contracts.NonZero.sierra.abi,
-        deploy.contract_address,
-        account
-      );
+      nonZeroContract = new Contract({
+        abi: contracts.NonZero.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('NonZero helpers', async () => {
@@ -392,7 +404,11 @@ describe('Cairo v2.4 onwards', () => {
         contract: contracts.U96.sierra,
         casm: contracts.U96.casm,
       });
-      u96Contract = new Contract(contracts.U96.sierra.abi, deploy.contract_address, account);
+      u96Contract = new Contract({
+        abi: contracts.U96.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('u96 compile', async () => {
@@ -427,11 +443,11 @@ describe('Cairo v2.4 onwards', () => {
         contract: contracts.fixedArray.sierra,
         casm: contracts.fixedArray.casm,
       });
-      fixedArrayContract = new Contract(
-        contracts.fixedArray.sierra.abi,
-        deploy.contract_address,
-        account
-      );
+      fixedArrayContract = new Contract({
+        abi: contracts.fixedArray.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('Fixed array compile [core::integer::u32; 8]', async () => {
