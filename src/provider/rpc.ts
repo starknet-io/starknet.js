@@ -45,6 +45,7 @@ import { wait } from '../utils/provider';
 import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { formatSignature } from '../utils/stark';
+import { getTipStatsFromBlocks, TipAnalysisOptions } from '../utils/tip';
 import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
 import { getMessageHash, validateTypedData } from '../utils/typedData';
 import { ProviderInterface } from './interface';
@@ -722,5 +723,9 @@ export class RpcProvider implements ProviderInterface {
    */
   public async getCompiledCasm(classHash: BigNumberish): Promise<RPC.CASM_COMPILED_CONTRACT_CLASS> {
     return this.channel.getCompiledCasm(classHash);
+  }
+
+  public async getEstimateTip(blockIdentifier?: BlockIdentifier, options: TipAnalysisOptions = {}) {
+    return getTipStatsFromBlocks(this, blockIdentifier, options);
   }
 }
