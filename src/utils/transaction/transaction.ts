@@ -172,6 +172,7 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
 /**
  * Builds a UDC Call object.
  *
+ * @deprecated Use Deployer class.
  * @param {UniversalDeployerContractPayload | UniversalDeployerContractPayload[]} payload the payload data for the UDCCall. Can be a single payload object or an array of payload objects.
  * @param {string} address the address to be used in the UDCCall
  * @returns { calls: Call[], addresses: string[] } the UDCCall object containing an array of calls and an array of addresses.

@@ -257,8 +257,8 @@ export function parseEvents(
 /**
  * Parse Transaction Receipt Event from UDC invoke transaction and
  * create DeployContractResponse compatible response with addition of the UDC Event data
+ * @deprecated Use Deployer class.
  * @param {InvokeTransactionReceiptResponse} txReceipt
- *
  * @returns {DeployContractDCResponse} parsed UDC event data
  */
 export function parseUDCEvent(

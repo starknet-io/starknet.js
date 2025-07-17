@@ -83,7 +83,7 @@ import { type AccountInterface } from './interface';
 import { defaultPaymaster, type PaymasterInterface, PaymasterRpc } from '../paymaster';
 import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
-import { Deployer } from '../deployer';
+import { defaultDeployer, Deployer } from '../deployer';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -109,7 +109,7 @@ export class Account extends Provider implements AccountInterface {
     }
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
     this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
-    this.deployer = options.customDeployer ?? new Deployer();
+    this.deployer = options.customDeployer ?? defaultDeployer;
 
     logger.debug('Account setup', {
       transactionVersion: this.transactionVersion,
