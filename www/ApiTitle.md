@@ -1,5 +1,3 @@
-This API is based on the <ins>[Starknet.js V3](https://github.com/starknet-io/starknet.js/discussions/102)</ins> Interface write up by <ins>[Janek](https://twitter.com/0xjanek)</ins> of <ins>[Argent](https://www.argent.xyz/)</ins>
-
 ## Provider
 
 The Provider [**API**](./classes/Provider.md) allows you to interact with the Starknet network, without signing transactions or messages.
@@ -16,7 +14,7 @@ It also introduces new methods that allow Accounts to create and verify signatur
 
 This [**API**](./classes/Account.md) is the primary way to interact with an account contract on Starknet.
 
-Guide is [**here**](../guides/create_account.md).
+Guide is [**here**](../guides/account/create_account.md).
 
 ## Contract
 
@@ -24,11 +22,11 @@ Contracts [**API**](./classes/Contract.md) can do data transformations in JavaSc
 
 Contracts allow you to transform Cairo values, like `Uint256` to `BigNumber`. It could also allow users to pass their own transformers, similar to `JSON.parse`.
 
-Guide is [**here**](../guides/create_contract.md).
+Guide is [**here**](../guides/contract/create_contract.md).
 
 ## Signer
 
-The Signer [**API**](./classes/Signer.md) allows you to sign transactions and messages, and also allows you to get the public key.
+The Signer [**API**](./classes/account/Signer.md) allows you to sign transactions and messages, and also allows you to get the public key.
 
 ## Utils
 
