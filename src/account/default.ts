@@ -4,7 +4,6 @@ import {
   SNIP9_V1_INTERFACE_ID,
   SNIP9_V2_INTERFACE_ID,
   SYSTEM_MESSAGES,
-  UDC,
   ZERO,
 } from '../global/constants';
 import { logger } from '../global/logger';
@@ -57,12 +56,10 @@ import type {
   UniversalDeployerContractPayload,
   UniversalDetails,
   UserTransaction,
-  DeployerDefinition,
 } from '../types';
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
-import { parseDeployerEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
 import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
 import {
@@ -79,13 +76,14 @@ import {
   toTransactionVersion,
   v3Details,
 } from '../utils/stark';
-import { buildDeployerCall, getExecuteCalldata } from '../utils/transaction';
+import { getExecuteCalldata } from '../utils/transaction/transaction';
 import { isString, isUndefined } from '../utils/typed';
 import { getMessageHash } from '../utils/typedData';
 import { type AccountInterface } from './interface';
 import { defaultPaymaster, type PaymasterInterface, PaymasterRpc } from '../paymaster';
 import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
+import { Deployer } from '../deployer';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -98,7 +96,7 @@ export class Account extends Provider implements AccountInterface {
 
   public paymaster: PaymasterInterface;
 
-  public deployer: DeployerDefinition;
+  public deployer: Deployer;
 
   constructor(options: AccountOptions) {
     const { provider, address, signer, cairoVersion, transactionVersion, paymaster } = options;
@@ -111,7 +109,7 @@ export class Account extends Provider implements AccountInterface {
     }
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
     this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
-    this.deployer = options.customDeployer ?? UDC;
+    this.deployer = options.customDeployer ?? new Deployer();
 
     logger.debug('Account setup', {
       transactionVersion: this.transactionVersion,
@@ -533,7 +531,7 @@ export class Account extends Provider implements AccountInterface {
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
   ): Promise<MultiDeployContractResponse> {
-    const { calls, addresses } = buildDeployerCall(payload, this.address, this.deployer);
+    const { calls, addresses } = this.deployer.buildDeployerCall(payload, this.address);
     const invokeResponse = await this.execute(calls, details);
 
     return {
@@ -548,9 +546,8 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeployContractDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
-    return parseDeployerEvent(
-      txReceipt as unknown as DeployTransactionReceiptResponse,
-      this.deployer
+    return this.deployer.parseDeployerEvent(
+      txReceipt as unknown as DeployTransactionReceiptResponse
     );
   }
 

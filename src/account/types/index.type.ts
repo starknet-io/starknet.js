@@ -20,13 +20,7 @@ import type { SignerInterface } from '../../signer';
 import type { SupportedTransactionVersion } from '../../global/constants';
 import type { PaymasterInterface } from '../../paymaster';
 import type { ProviderInterface } from '../../provider/interface';
-
-export type DeployerDefinition = {
-  /** Address of a custom account deployer contract */
-  address: BigNumberish;
-  /** Deployer function name to deploy a contract */
-  entryPoint: string;
-};
+import type { Deployer } from '../../deployer';
 
 /**
  * Configuration options for creating an Account instance
@@ -44,8 +38,8 @@ export type AccountOptions = {
   transactionVersion?: SupportedTransactionVersion;
   /** Paymaster configuration for sponsored transactions (optional) */
   paymaster?: PaymasterOptions | PaymasterInterface;
-  /** Use of a custom account deployer contract  (optional) */
-  customDeployer?: DeployerDefinition;
+  /** Use of a custom account deployer contract (optional) */
+  customDeployer?: Deployer;
 };
 
 export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;

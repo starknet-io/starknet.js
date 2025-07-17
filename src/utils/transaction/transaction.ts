@@ -1,5 +1,6 @@
-import { UDC } from '../global/constants';
-import { ETransactionVersion } from '../provider/types/spec.type';
+import { Deployer } from '../../deployer';
+import type { DeployerCall } from '../../deployer/types/index.type';
+import { ETransactionVersion } from '../../provider/types/spec.type';
 import {
   BigNumberish,
   CairoVersion,
@@ -7,15 +8,11 @@ import {
   Calldata,
   ParsedStruct,
   RawArgs,
-  UniversalDeployerContractPayload,
-  ValidateType,
-  type DeployerDefinition,
-} from '../types';
-import { CallData } from './calldata';
-import { starkCurve } from './ec';
-import { calculateContractAddressFromHash, getSelectorFromName } from './hash';
-import { toBigInt, toCairoBool, toHex } from './num';
-import { randomAddress } from './stark';
+  type UniversalDeployerContractPayload,
+} from '../../types';
+import { CallData } from '../calldata';
+import { getSelectorFromName } from '../hash';
+import { toBigInt } from '../num';
 
 /**
  * Transforms a list of Calls, each with their own calldata, into
@@ -173,22 +170,6 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
 };
 
 /**
- * Extract compiled calldata from args or execute callback
- */
-export function getCompiledCalldata(constructorArguments: RawArgs, callback: Function): Calldata {
-  // Check if Calldata in args or args[0] else compile
-  if (Array.isArray(constructorArguments) && '__compiled__' in constructorArguments)
-    return constructorArguments as Calldata;
-  if (
-    Array.isArray(constructorArguments) &&
-    Array.isArray(constructorArguments[0]) &&
-    '__compiled__' in constructorArguments[0]
-  )
-    return constructorArguments[0] as Calldata;
-  return callback();
-}
-
-/**
  * Builds a UDC Call object.
  *
  * @param {UniversalDeployerContractPayload | UniversalDeployerContractPayload[]} payload the payload data for the UDCCall. Can be a single payload object or an array of payload objects.
@@ -218,93 +199,9 @@ export function getCompiledCalldata(constructorArguments: RawArgs, callback: Fun
 export function buildUDCCall(
   payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
   address: string
-) {
-  return buildDeployerCall(payload, address, UDC);
-}
-
-/**
- * Builds a Deployer Call object.
- *
- * @param {UniversalDeployerContractPayload | UniversalDeployerContractPayload[]} payload the payload data for the Deployer Call. Can be a single payload object or an array of payload objects.
- * @param {string} address the address to be used in the Deployer Call
- * @returns { calls: Call[], addresses: string[] } the Deployer Call object containing an array of calls and an array of addresses.
- * @example
- * ```typescript
- * const payload: UniversalDeployerContractPayload = {
- * classHash: "0x1234567890123456789012345678901234567890",
- * salt: "0x0987654321098765432109876543210987654321",
- * unique:true,
- * constructorCalldata: [1, 2, 3]
- * };
- * const customDeployer = {address: "0x1234", entryPoint: "deployContract"};
- * const address = "0xABCDEF1234567890ABCDEF1234567890ABCDEF12";
- * const result  = transaction.buildDeployerCall(payload, address, customDeployer);
- * // result = {
- * // 	calls: [
- * //			{
- * //			contractAddress: "0xABCDEF1234567890ABCDEF1234567890ABCDEF12",
- * //			entrypoint: "functionName",
- * //			calldata: [classHash, salt, true, 3, 1, 2, 3]
- * //		}],
- * //	addresses: ["0x6fD084B56a7EDc5C06B3eB40f97Ae5A0C707A865"]
- * // }
- * ```
- */
-
-export function buildDeployerCall(
-  payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-  address: string,
-  deployer: DeployerDefinition
-) {
-  const params = [].concat(payload as []).map((it) => {
-    const {
-      classHash,
-      salt,
-      unique = true,
-      constructorCalldata = [],
-      abi,
-    } = it as UniversalDeployerContractPayload;
-
-    const compiledConstructorCallData = getCompiledCalldata(constructorCalldata, () => {
-      // compile with abi
-      if (abi) {
-        const calldataClass = new CallData(abi);
-        // Convert object based raw js arguments to ...args array
-        const rawArgs = Object.values(constructorCalldata);
-        calldataClass.validate(ValidateType.DEPLOY, 'constructor', rawArgs);
-        return calldataClass.compile('constructor', rawArgs);
-      }
-      // compile without abi
-      return CallData.compile(constructorCalldata);
-    });
-
-    const deploySalt = salt ?? randomAddress();
-
-    return {
-      call: {
-        contractAddress: toHex(deployer.address),
-        entrypoint: deployer.entryPoint,
-        calldata: [
-          classHash,
-          deploySalt,
-          toCairoBool(unique),
-          compiledConstructorCallData.length,
-          ...compiledConstructorCallData,
-        ],
-      },
-      address: calculateContractAddressFromHash(
-        unique ? starkCurve.pedersen(address, deploySalt) : deploySalt,
-        classHash,
-        compiledConstructorCallData,
-        unique ? deployer.address : 0
-      ),
-    };
-  });
-
-  return {
-    calls: params.map((it) => it.call),
-    addresses: params.map((it) => it.address),
-  };
+): DeployerCall {
+  const deployer = new Deployer();
+  return deployer.buildDeployerCall(payload, address);
 }
 
 /**

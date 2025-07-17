@@ -1,4 +1,4 @@
-import { UDC } from '../../global/constants';
+import { Deployer } from '../../deployer';
 import {
   Abi,
   AbiEnums,
@@ -12,17 +12,15 @@ import {
   RPC,
   type CairoEventDefinition,
   type CairoEventVariant,
-  type InvokeTransactionReceiptResponse,
   type AbiEntry,
-  DeployContractDCResponse,
-  type DeployerDefinition,
+  type DeployContractDCResponse,
+  type InvokeTransactionReceiptResponse,
 } from '../../types';
 import assert from '../assert';
 import { isCairo1Abi } from '../calldata/cairo';
 import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
-import { cleanHex, toHex } from '../num';
 import { isUndefined, isObject } from '../typed';
 
 /**
@@ -257,39 +255,6 @@ export function parseEvents(
 }
 
 /**
- * Parse Transaction Receipt Event from a Deployer contract transaction and
- * create DeployContractResponse compatible response with addition of the Deployer Event data
- * @param {InvokeTransactionReceiptResponse} txReceipt Transaction receipt
- * @param {DeployerDefinition} deployer Deployer contract definition
- *
- * @returns {DeployContractDCResponse} parsed Deployer event data
- */
-export function parseDeployerEvent(
-  txReceipt: InvokeTransactionReceiptResponse,
-  deployer: DeployerDefinition
-): DeployContractDCResponse {
-  if (!txReceipt.events?.length) {
-    throw new Error('Deployer emitted event is empty');
-  }
-  const event = txReceipt.events.find(
-    (it: any) => cleanHex(it.from_address) === cleanHex(toHex(deployer.address))
-  ) || {
-    data: [],
-  };
-  return {
-    transaction_hash: txReceipt.transaction_hash,
-    contract_address: event.data[0],
-    address: event.data[0],
-    deployer: event.data[1],
-    unique: event.data[2],
-    classHash: event.data[3],
-    calldata_len: event.data[4],
-    calldata: event.data.slice(5, 5 + parseInt(event.data[4], 16)),
-    salt: event.data[event.data.length - 1],
-  };
-}
-
-/**
  * Parse Transaction Receipt Event from UDC invoke transaction and
  * create DeployContractResponse compatible response with addition of the UDC Event data
  * @param {InvokeTransactionReceiptResponse} txReceipt
@@ -299,5 +264,6 @@ export function parseDeployerEvent(
 export function parseUDCEvent(
   txReceipt: InvokeTransactionReceiptResponse
 ): DeployContractDCResponse {
-  return parseDeployerEvent(txReceipt, UDC);
+  const deployer = new Deployer();
+  return deployer.parseDeployerEvent(txReceipt);
 }

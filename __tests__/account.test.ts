@@ -15,8 +15,8 @@ import {
   stark,
   type Calldata,
   type InvokeTransactionReceiptResponse,
-  type DeployerDefinition,
 } from '../src';
+import { Deployer } from '../src/deployer';
 import {
   C1v2ClassHash,
   TEST_TX_VERSION,
@@ -767,20 +767,15 @@ describe('deploy and test Account', () => {
         contract: contracts.deployer.sierra,
         casm: contracts.deployer.casm,
       });
-      const customDeployer = new Contract({
-        abi: contracts.deployer.sierra.abi,
-        address: deployerResponse.deploy.contract_address,
-        providerOrAccount: provider,
-      });
-      const customDeployerDefinition: DeployerDefinition = {
-        address: customDeployer.address,
-        entryPoint: 'deploy_contract',
-      };
+      const customDeployer = new Deployer(
+        deployerResponse.deploy.contract_address,
+        'deploy_contract'
+      );
       accountCustomDeployer = new Account({
         address: account.address,
         provider,
         signer: account.signer,
-        customDeployer: customDeployerDefinition,
+        customDeployer,
       });
     });
     test('Deploy contract', async () => {
