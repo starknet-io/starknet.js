@@ -1,4 +1,4 @@
-import { UDC } from '../../global/constants';
+import { legacyDeployer } from '../../deployer';
 import {
   Abi,
   AbiEnums,
@@ -12,16 +12,15 @@ import {
   RPC,
   type CairoEventDefinition,
   type CairoEventVariant,
-  type InvokeTransactionReceiptResponse,
   type AbiEntry,
-  DeployContractUDCResponse,
+  type DeployContractDCResponse,
+  type InvokeTransactionReceiptResponse,
 } from '../../types';
 import assert from '../assert';
 import { isCairo1Abi } from '../calldata/cairo';
 import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
-import { cleanHex } from '../num';
 import { isUndefined, isObject } from '../typed';
 
 /**
@@ -258,30 +257,13 @@ export function parseEvents(
 /**
  * Parse Transaction Receipt Event from UDC invoke transaction and
  * create DeployContractResponse compatible response with addition of the UDC Event data
+ * @deprecated Use Deployer class.
  * @param {InvokeTransactionReceiptResponse} txReceipt
- *
- * @returns {DeployContractUDCResponse} parsed UDC event data
+ * @returns {DeployContractDCResponse} parsed UDC event data
  */
 export function parseUDCEvent(
   txReceipt: InvokeTransactionReceiptResponse
-): DeployContractUDCResponse {
-  if (!txReceipt.events?.length) {
-    throw new Error('UDC emitted event is empty');
-  }
-  const event = txReceipt.events.find(
-    (it: any) => cleanHex(it.from_address) === cleanHex(UDC.ADDRESS)
-  ) || {
-    data: [],
-  };
-  return {
-    transaction_hash: txReceipt.transaction_hash,
-    contract_address: event.data[0],
-    address: event.data[0],
-    deployer: event.data[1],
-    unique: event.data[2],
-    classHash: event.data[3],
-    calldata_len: event.data[4],
-    calldata: event.data.slice(5, 5 + parseInt(event.data[4], 16)),
-    salt: event.data[event.data.length - 1],
-  };
+): DeployContractDCResponse {
+  const deployer = legacyDeployer;
+  return deployer.parseDeployerEvent(txReceipt);
 }

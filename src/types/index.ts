@@ -10,5 +10,6 @@ export * from './signer';
 export * from '../utils/transactionReceipt/transactionReceipt.type';
 export * from './typedData';
 export * from '../paymaster/types/index.type';
+export * from '../deployer/types/index.type';
 
 export * as RPC from './api';

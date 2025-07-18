@@ -93,7 +93,7 @@ export type ExecuteOptions = Pick<CommonContractOptions, 'parseRequest'> & {
    */
   signature?: Signature;
   /**
-   * UDC salt
+   * Deployer contract salt
    */
   salt?: string;
 } & Partial<UniversalDetails>;

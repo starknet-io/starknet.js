@@ -3,7 +3,7 @@ import {
   Account,
   CallData,
   Contract,
-  DeclareDeployUDCResponse,
+  DeclareDeployDCResponse,
   Provider,
   ProviderInterface,
   TransactionType,
@@ -16,6 +16,7 @@ import {
   type Calldata,
   type InvokeTransactionReceiptResponse,
 } from '../src';
+import { Deployer } from '../src/deployer';
 import {
   C1v2ClassHash,
   TEST_TX_VERSION,
@@ -42,7 +43,7 @@ describe('deploy and test Account', () => {
   let erc20Address: string;
   let dapp: Contract;
   let dappClassHash: string;
-  let dd: DeclareDeployUDCResponse;
+  let dd: DeclareDeployDCResponse;
 
   beforeAll(async () => {
     initializeMatcher(expect);
@@ -742,7 +743,7 @@ describe('deploy and test Account', () => {
     test('estimateInvokeFee Cairo 1', async () => {
       // TODO @dhruvkelawala check expectation for feeTransactionVersion
       // Cairo 1 contract
-      const ddc1: DeclareDeployUDCResponse = await account.declareAndDeploy({
+      const ddc1: DeclareDeployDCResponse = await account.declareAndDeploy({
         contract: contracts.C260.sierra,
         casm: contracts.C260.casm,
       });
@@ -757,6 +758,32 @@ describe('deploy and test Account', () => {
       expect(result).toMatchSchemaRef('EstimateFeeResponseOverhead');
       // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
       // innerInvokeEstFeeSpy.mockClear();
+    });
+  });
+  describe('Custom Cairo 1 Deployer', () => {
+    let accountCustomDeployer: Account;
+    beforeAll(async () => {
+      const deployerResponse = await account.declareAndDeploy({
+        contract: contracts.deployer.sierra,
+        casm: contracts.deployer.casm,
+      });
+      const customDeployer = new Deployer(
+        deployerResponse.deploy.contract_address,
+        'deploy_contract'
+      );
+      accountCustomDeployer = new Account({
+        address: account.address,
+        provider,
+        signer: account.signer,
+        customDeployer,
+      });
+    });
+    test('Deploy contract', async () => {
+      const deployResponse = await accountCustomDeployer.deployContract({
+        classHash: erc20ClassHash,
+        constructorCalldata: erc20Constructor,
+      });
+      expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
     });
   });
 });

@@ -14,7 +14,6 @@ import type {
 } from '../types';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
-import { buildUDCCall } from '../utils/transaction';
 import {
   addDeclareTransaction,
   addInvokeTransaction,
@@ -141,7 +140,7 @@ export class WalletAccount extends Account implements AccountInterface {
   override async deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Promise<MultiDeployContractResponse> {
-    const { calls, addresses } = buildUDCCall(payload, this.address);
+    const { calls, addresses } = this.deployer.buildDeployerCall(payload, this.address);
     const invokeResponse = await this.execute(calls);
 
     return {

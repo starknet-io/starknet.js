@@ -438,6 +438,6 @@ describe('parseUDCEvent', () => {
       events: [],
     };
 
-    expect(() => parseUDCEvent(txReceipt)).toThrow(new Error('UDC emitted event is empty'));
+    expect(() => parseUDCEvent(txReceipt)).toThrow(new Error('Deployer emitted event is empty'));
   });
 });
