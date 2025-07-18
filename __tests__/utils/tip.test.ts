@@ -124,6 +124,12 @@ describe('Tip Analysis', () => {
         medianTip: 25n, // (20+30)/2 = 25
         modeTip: 20n, // appears twice
         recommendedTip: 25n, // median tip directly (no buffer)
+        p90Tip: expect.any(BigInt), // 90th percentile
+        p95Tip: expect.any(BigInt), // 95th percentile
+        metrics: expect.objectContaining({
+          blocksAnalyzed: expect.any(Number),
+          transactionsFound: expect.any(Number),
+        }),
       });
     });
 
@@ -147,6 +153,12 @@ describe('Tip Analysis', () => {
         medianTip: 200n,
         modeTip: 100n, // First occurrence when all have same count
         recommendedTip: 200n, // median tip directly (no buffer)
+        p90Tip: expect.any(BigInt), // 90th percentile
+        p95Tip: expect.any(BigInt), // 95th percentile
+        metrics: expect.objectContaining({
+          blocksAnalyzed: expect.any(Number),
+          transactionsFound: expect.any(Number),
+        }),
       });
     });
 
@@ -208,16 +220,27 @@ describe('Tip Analysis', () => {
       expect(result.averageTip).toBe(20n); // (10+20+30)/3 = 20
     });
 
-    test('should throw error when insufficient transaction data', async () => {
+    test('should return zero values when insufficient transaction data', async () => {
       const transactions = [createMockInvokeTransaction('10'), createMockInvokeTransaction('20')]; // Only 2 transactions, and we'll test with default minTxsNecessary of 10
 
       const mockBlock = createMockBlock(100, transactions);
       mockProvider.getBlockWithTxs.mockResolvedValue(mockBlock);
 
-      await expect(getTipStatsFromBlocks(mockProvider, 'latest')).rejects.toThrow(LibraryError);
-      await expect(getTipStatsFromBlocks(mockProvider, 'latest')).rejects.toThrow(
-        'Insufficient transaction data'
-      );
+      const result = await getTipStatsFromBlocks(mockProvider, 'latest');
+      expect(result).toEqual({
+        recommendedTip: 0n,
+        medianTip: 0n,
+        modeTip: 0n,
+        averageTip: 0n,
+        minTip: 0n,
+        maxTip: 0n,
+        p90Tip: 0n,
+        p95Tip: 0n,
+        metrics: expect.objectContaining({
+          blocksAnalyzed: expect.any(Number),
+          transactionsFound: expect.any(Number),
+        }),
+      });
     });
 
     test('should respect custom minTxsNecessary', async () => {
@@ -301,9 +324,21 @@ describe('Tip Analysis', () => {
       const emptyBlock = createMockBlock(100, []);
       mockProvider.getBlockWithTxs.mockResolvedValue(emptyBlock);
 
-      await expect(getTipStatsFromBlocks(mockProvider, 'latest')).rejects.toThrow(
-        'Insufficient transaction data: found 0 transactions'
-      );
+      const result = await getTipStatsFromBlocks(mockProvider, 'latest');
+      expect(result).toEqual({
+        recommendedTip: 0n,
+        medianTip: 0n,
+        modeTip: 0n,
+        averageTip: 0n,
+        minTip: 0n,
+        maxTip: 0n,
+        p90Tip: 0n,
+        p95Tip: 0n,
+        metrics: expect.objectContaining({
+          blocksAnalyzed: expect.any(Number),
+          transactionsFound: expect.any(Number),
+        }),
+      });
     });
 
     test('should calculate median correctly for even number of values', async () => {

@@ -14,6 +14,9 @@ import { LibraryError } from './errors';
  * @param {bigint} medianTip - median (middle value) tip encountered in the analyzed blocks.
  * @param {bigint} modeTip - mode (most frequent) tip encountered in the analyzed blocks.
  * @param {bigint} recommendedTip - suggested tip amount (median tip) for optimal inclusion probability.
+ * @param {bigint} p90Tip - 90th percentile tip (90% of tips are below this value).
+ * @param {bigint} p95Tip - 95th percentile tip (95% of tips are below this value).
+ * @param {object} metrics - Optional performance metrics for the analysis.
  */
 export type TipEstimate = {
   minTip: bigint;
@@ -22,6 +25,12 @@ export type TipEstimate = {
   medianTip: bigint;
   modeTip: bigint;
   recommendedTip: bigint;
+  p90Tip: bigint;
+  p95Tip: bigint;
+  metrics?: {
+    blocksAnalyzed: number;
+    transactionsFound: number;
+  };
 };
 
 /**
@@ -81,9 +90,59 @@ function extractTipsFromBlock(blockData: BlockWithTxs, includeZeroTips: boolean 
 }
 
 /**
+ * Creates a TipEstimate object with all zero values for insufficient data cases.
+ * @param blocksAnalyzed Number of blocks that were analyzed
+ * @param transactionsFound Number of transactions found
+ * @returns TipEstimate object with all zero values
+ */
+function createZeroTipEstimate(blocksAnalyzed: number, transactionsFound: number): TipEstimate {
+  return {
+    minTip: 0n,
+    maxTip: 0n,
+    averageTip: 0n,
+    medianTip: 0n,
+    modeTip: 0n,
+    recommendedTip: 0n,
+    p90Tip: 0n,
+    p95Tip: 0n,
+    metrics: {
+      blocksAnalyzed,
+      transactionsFound,
+    },
+  };
+}
+
+/**
+ * Calculates a specific percentile from a sorted array.
+ * @param sortedArray Sorted array of values
+ * @param percentile Percentile to calculate (0-100)
+ * @returns The percentile value
+ */
+function calculatePercentile(sortedArray: bigint[], percentile: number): bigint {
+  const index = (percentile / 100) * (sortedArray.length - 1);
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+
+  if (lower === upper) {
+    return sortedArray[lower];
+  }
+
+  // Interpolate between the two values
+  const weight = index - lower;
+  const lowerValue = sortedArray[lower];
+  const upperValue = sortedArray[upper];
+
+  // For bigint interpolation, we need to handle the fractional part carefully
+  const diff = upperValue - lowerValue;
+  const weightedDiff = (diff * BigInt(Math.round(weight * 1000))) / 1000n;
+
+  return lowerValue + weightedDiff;
+}
+
+/**
  * Calculates tip statistics from collected tip values.
  * @param tips Array of tip values
- * @returns TipEstimate object with min, max, average, median, mode, and recommended tip
+ * @returns TipEstimate object with min, max, average, median, mode, percentiles, and recommended tip
  */
 function calculateTipStats(tips: bigint[]): TipEstimate {
   assert(tips.length > 0, 'Cannot calculate statistics from empty tip array');
@@ -123,10 +182,14 @@ function calculateTipStats(tips: bigint[]): TipEstimate {
     { maxCount: 0, modeTip: 0n }
   );
 
+  // Calculate percentiles
+  const p90Tip = calculatePercentile(sortedTips, 90);
+  const p95Tip = calculatePercentile(sortedTips, 95);
+
   // Use median tip directly as recommended tip
   const recommendedTip = medianTip;
 
-  return { minTip, maxTip, averageTip, medianTip, modeTip, recommendedTip };
+  return { minTip, maxTip, averageTip, medianTip, modeTip, recommendedTip, p90Tip, p95Tip };
 }
 
 /**
@@ -239,22 +302,26 @@ async function getTipStatsParallel(
       .filter((blockData) => blockData !== null)
       .flatMap((blockData) => extractTipsFromBlock(blockData, includeZeroTips));
 
+    const analyzedBlocks = blocks.filter((b) => b !== null).length;
+
     // Handle insufficient transaction data
     if (allTips.length < minTxsNecessary) {
       logger.error(
-        `Insufficient transaction data: found ${allTips.length} transactions, but ${minTxsNecessary} required for reliable statistics. Consider reducing minTxsNecessary or increasing maxBlocks.`
+        `Insufficient transaction data: found ${allTips.length} V3 transactions with tips in ${analyzedBlocks} blocks ` +
+          `(block range: ${Math.max(0, startingBlockNumber - maxBlocks + 1)}-${startingBlockNumber}). ` +
+          `Required: ${minTxsNecessary} transactions. Consider reducing minTxsNecessary or increasing maxBlocks.`
       );
-      return {
-        minTip: 0n,
-        maxTip: 0n,
-        averageTip: 0n,
-        medianTip: 0n,
-        modeTip: 0n,
-        recommendedTip: 0n,
-      };
+      return createZeroTipEstimate(analyzedBlocks, allTips.length);
     }
 
-    return calculateTipStats(allTips);
+    const tipStats = calculateTipStats(allTips);
+    return {
+      ...tipStats,
+      metrics: {
+        blocksAnalyzed: analyzedBlocks,
+        transactionsFound: allTips.length,
+      },
+    };
   } catch (error) {
     throw new LibraryError(
       `Failed to analyze tip statistics (parallel): ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -285,6 +352,7 @@ async function getTipStatsSequential(
     const blockNumbers = generateBlockNumbers(startingBlockNumber, maxBlocks);
 
     const allTips: bigint[] = [];
+    let blocksAnalyzed = 0;
 
     // Process blocks sequentially to avoid overwhelming the RPC and enable early exit
     // eslint-disable-next-line no-restricted-syntax
@@ -293,6 +361,7 @@ async function getTipStatsSequential(
       const blockData = await fetchBlockSafely(provider, blockNumber);
 
       if (blockData) {
+        blocksAnalyzed += 1;
         const tips = extractTipsFromBlock(blockData, includeZeroTips);
         allTips.push(...tips);
 
@@ -306,19 +375,21 @@ async function getTipStatsSequential(
     // Handle insufficient transaction data
     if (allTips.length < minTxsNecessary) {
       logger.error(
-        `Insufficient transaction data: found ${allTips.length} transactions, but ${minTxsNecessary} required for reliable statistics. Consider reducing minTxsNecessary or increasing maxBlocks.`
+        `Insufficient transaction data: found ${allTips.length} V3 transactions with tips in ${blocksAnalyzed} blocks ` +
+          `(block range: ${Math.max(0, startingBlockNumber - maxBlocks + 1)}-${startingBlockNumber}). ` +
+          `Required: ${minTxsNecessary} transactions. Consider reducing minTxsNecessary or increasing maxBlocks.`
       );
-      return {
-        minTip: 0n,
-        maxTip: 0n,
-        averageTip: 0n,
-        medianTip: 0n,
-        modeTip: 0n,
-        recommendedTip: 0n,
-      };
+      return createZeroTipEstimate(blocksAnalyzed, allTips.length);
     }
 
-    return calculateTipStats(allTips);
+    const tipStats = calculateTipStats(allTips);
+    return {
+      ...tipStats,
+      metrics: {
+        blocksAnalyzed,
+        transactionsFound: allTips.length,
+      },
+    };
   } catch (error) {
     throw new LibraryError(
       `Failed to analyze tip statistics (sequential): ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -359,26 +430,43 @@ async function getTipStatsSequential(
  *
  * // Basic usage - automatically uses best strategy
  * const tipStats = await getTipStatsFromBlocks(provider, 'latest');
- * console.log(`Recommended tip: ${tipStats.recommendedTip}`);
+ * console.log(`Recommended tip (median): ${tipStats.recommendedTip}`);
+ * console.log(`90th percentile tip: ${tipStats.p90Tip}`);
+ * console.log(`95th percentile tip: ${tipStats.p95Tip}`);
  *
  * // Advanced usage with custom options
- * try {
- *   const tipStats = await getTipStatsFromBlocks(
- *     provider,
- *     'latest',
- *     {
- *       maxBlocks: 5,
- *       minTxsNecessary: 20,
- *     }
- *   );
+ * const tipStats = await getTipStatsFromBlocks(
+ *   provider,
+ *   'latest',
+ *   {
+ *     maxBlocks: 10,
+ *     minTxsNecessary: 5,
+ *     includeZeroTips: true
+ *   }
+ * );
+ *
+ * // Check if we have sufficient data
+ * if (tipStats.recommendedTip === 0n) {
+ *   console.log('Insufficient transaction data for reliable tip estimation');
+ * } else {
  *   console.log(`Recommended tip: ${tipStats.recommendedTip}`);
  *   console.log(`Average tip: ${tipStats.averageTip}`);
  *   console.log(`Median tip: ${tipStats.medianTip}`);
  *   console.log(`Mode tip: ${tipStats.modeTip}`);
  *   console.log(`Min tip: ${tipStats.minTip}, Max tip: ${tipStats.maxTip}`);
- * } catch (error) {
- *   console.log('Not enough transaction data:', error.message);
+ *   console.log(`P90 tip: ${tipStats.p90Tip} (90% of tips are below this)`);
+ *   console.log(`P95 tip: ${tipStats.p95Tip} (95% of tips are below this)`);
+ *
+ *   // Access performance metrics if available
+ *   if (tipStats.metrics) {
+ *     console.log(`Analyzed ${tipStats.metrics.transactionsFound} transactions`);
+ *     console.log(`Across ${tipStats.metrics.blocksAnalyzed} blocks`);
+ *   }
  * }
+ *
+ * // Using specific block number
+ * const blockNumber = 650000;
+ * const historicalTips = await getTipStatsFromBlocks(provider, blockNumber);
  * ```
  */
 export async function getTipStatsFromBlocks(

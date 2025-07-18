@@ -42,6 +42,26 @@ import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
 import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
 import { StarknetId } from '../src/provider/extensions/starknetId';
 
+/**
+ * Helper function to create expected zero tip estimate for tests
+ */
+function expectZeroTipEstimate() {
+  return {
+    minTip: 0n,
+    maxTip: 0n,
+    averageTip: 0n,
+    medianTip: 0n,
+    modeTip: 0n,
+    recommendedTip: 0n,
+    p90Tip: 0n,
+    p95Tip: 0n,
+    metrics: expect.objectContaining({
+      blocksAnalyzed: expect.any(Number),
+      transactionsFound: expect.any(Number),
+    }),
+  };
+}
+
 describeIfRpc('RPCProvider', () => {
   let rpcProvider: RpcProvider;
   let provider: ProviderInterface;
@@ -481,31 +501,37 @@ describeIfRpc('RPCProvider', () => {
   describe('Tip Estimation', () => {
     describeIfRpc('getEstimateTip', () => {
       test('should estimate tip from latest block or handle insufficient data', async () => {
-        try {
-          const tipEstimate = await rpcProvider.getEstimateTip('latest', {
-            minTxsNecessary: 1, // Use low threshold for test reliability
-            maxBlocks: 10, // Use more blocks to increase chance of finding data
-          });
+        const tipEstimate = await rpcProvider.getEstimateTip('latest', {
+          minTxsNecessary: 1, // Use low threshold for test reliability
+          maxBlocks: 10, // Use more blocks to increase chance of finding data
+        });
 
-          expect(tipEstimate).toBeDefined();
-          expect(tipEstimate).toEqual({
-            minTip: expect.any(BigInt),
-            maxTip: expect.any(BigInt),
-            averageTip: expect.any(BigInt),
-            medianTip: expect.any(BigInt),
-            modeTip: expect.any(BigInt),
-            recommendedTip: expect.any(BigInt),
-          });
+        expect(tipEstimate).toBeDefined();
+        expect(tipEstimate).toEqual({
+          minTip: expect.any(BigInt),
+          maxTip: expect.any(BigInt),
+          averageTip: expect.any(BigInt),
+          medianTip: expect.any(BigInt),
+          modeTip: expect.any(BigInt),
+          recommendedTip: expect.any(BigInt),
+          p90Tip: expect.any(BigInt),
+          p95Tip: expect.any(BigInt),
+          metrics: expect.objectContaining({
+            blocksAnalyzed: expect.any(Number),
+            transactionsFound: expect.any(Number),
+          }),
+        });
 
+        // If there's insufficient data, all values should be 0n
+        if (tipEstimate.recommendedTip === 0n) {
+          expect(tipEstimate).toEqual(expectZeroTipEstimate());
+        } else {
           // Verify tip relationships
           expect(tipEstimate.minTip).toBeLessThanOrEqual(tipEstimate.maxTip);
           expect(tipEstimate.recommendedTip).toBeGreaterThan(0n);
 
           // Verify recommended tip is median tip (no buffer)
           expect(tipEstimate.recommendedTip).toBe(tipEstimate.medianTip);
-        } catch (error) {
-          // In test environments, there might not be enough V3 invoke transactions with tips
-          expect((error as Error).message).toContain('Insufficient transaction data');
         }
       });
 
@@ -549,26 +575,28 @@ describeIfRpc('RPCProvider', () => {
       });
 
       test('should work with custom maxBlocks or handle insufficient data', async () => {
-        try {
-          const tipEstimate = await rpcProvider.getEstimateTip('latest', {
-            minTxsNecessary: 1,
-            maxBlocks: 20, // Analyze more blocks
-          });
+        const tipEstimate = await rpcProvider.getEstimateTip('latest', {
+          minTxsNecessary: 1,
+          maxBlocks: 20, // Analyze more blocks
+        });
 
-          expect(tipEstimate).toBeDefined();
+        expect(tipEstimate).toBeDefined();
+
+        // If there's insufficient data, all values should be 0n
+        if (tipEstimate.recommendedTip === 0n) {
+          expect(tipEstimate).toEqual(expectZeroTipEstimate());
+        } else {
           expect(tipEstimate.recommendedTip).toBeGreaterThan(0n);
-        } catch (error) {
-          expect((error as Error).message).toContain('Insufficient transaction data');
         }
       });
 
-      test('should throw error with insufficient transaction data', async () => {
-        await expect(
-          rpcProvider.getEstimateTip('latest', {
-            minTxsNecessary: 1000, // Unreasonably high requirement
-            maxBlocks: 1,
-          })
-        ).rejects.toThrow('Insufficient transaction data');
+      test('should return zero values with insufficient transaction data', async () => {
+        const tipEstimate = await rpcProvider.getEstimateTip('latest', {
+          minTxsNecessary: 1000, // Unreasonably high requirement
+          maxBlocks: 1,
+        });
+
+        expect(tipEstimate).toEqual(expectZeroTipEstimate());
       });
 
       describeIfDevnet('with devnet transactions', () => {
@@ -628,27 +656,31 @@ describeIfRpc('RPCProvider', () => {
             await createBlockForDevnet();
           }
 
-          try {
-            // Test with different block ranges
-            const smallRange = await rpcProvider.getEstimateTip('latest', {
-              minTxsNecessary: 1,
-              maxBlocks: 1,
-            });
+          // Test with different block ranges
+          const smallRange = await rpcProvider.getEstimateTip('latest', {
+            minTxsNecessary: 1,
+            maxBlocks: 1,
+          });
 
-            const largeRange = await rpcProvider.getEstimateTip('latest', {
-              minTxsNecessary: 1,
-              maxBlocks: 10,
-            });
+          const largeRange = await rpcProvider.getEstimateTip('latest', {
+            minTxsNecessary: 1,
+            maxBlocks: 10,
+          });
 
-            expect(smallRange).toBeDefined();
-            expect(largeRange).toBeDefined();
+          expect(smallRange).toBeDefined();
+          expect(largeRange).toBeDefined();
 
-            // Both should have valid recommendations
+          // If insufficient data, values should be 0n
+          if (smallRange.recommendedTip === 0n) {
+            expect(smallRange).toEqual(expectZeroTipEstimate());
+          } else {
             expect(smallRange.recommendedTip).toBeGreaterThan(0n);
+          }
+
+          if (largeRange.recommendedTip === 0n) {
+            expect(largeRange).toEqual(expectZeroTipEstimate());
+          } else {
             expect(largeRange.recommendedTip).toBeGreaterThan(0n);
-          } catch (error) {
-            // Expected if devnet transactions don't include tips
-            expect((error as Error).message).toContain('Insufficient transaction data');
           }
         });
       });
@@ -660,27 +692,34 @@ describeIfRpc('RPCProvider', () => {
           batch: 50, // Enable batching
         });
 
-        try {
-          const tipEstimate = await batchedProvider.getEstimateTip('latest', {
-            minTxsNecessary: 1,
-            maxBlocks: 10,
-          });
+        const tipEstimate = await batchedProvider.getEstimateTip('latest', {
+          minTxsNecessary: 1,
+          maxBlocks: 10,
+        });
 
-          expect(tipEstimate).toBeDefined();
+        expect(tipEstimate).toBeDefined();
+
+        // Verify the structure is correct
+        expect(tipEstimate).toEqual({
+          minTip: expect.any(BigInt),
+          maxTip: expect.any(BigInt),
+          averageTip: expect.any(BigInt),
+          medianTip: expect.any(BigInt),
+          modeTip: expect.any(BigInt),
+          recommendedTip: expect.any(BigInt),
+          p90Tip: expect.any(BigInt),
+          p95Tip: expect.any(BigInt),
+          metrics: expect.objectContaining({
+            blocksAnalyzed: expect.any(Number),
+            transactionsFound: expect.any(Number),
+          }),
+        });
+
+        // If insufficient data, values should be 0n
+        if (tipEstimate.recommendedTip === 0n) {
+          expect(tipEstimate).toEqual(expectZeroTipEstimate());
+        } else {
           expect(tipEstimate.recommendedTip).toBeGreaterThan(0n);
-
-          // Verify the structure is the same as non-batched
-          expect(tipEstimate).toEqual({
-            minTip: expect.any(BigInt),
-            maxTip: expect.any(BigInt),
-            averageTip: expect.any(BigInt),
-            medianTip: expect.any(BigInt),
-            modeTip: expect.any(BigInt),
-            recommendedTip: expect.any(BigInt),
-          });
-        } catch (error) {
-          // Batching doesn't change data availability
-          expect((error as Error).message).toContain('Insufficient transaction data');
         }
       });
 
