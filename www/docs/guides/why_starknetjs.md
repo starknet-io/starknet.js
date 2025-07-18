@@ -30,12 +30,39 @@ This architecture enables:
 Key components and their interactions:
 
 1. **Your dApp** interacts with Starknet.js through its JavaScript/TypeScript interface
-2. **Starknet.js Core Components**:
-   - Provider handles network communication
-   - Account manages wallet operations and transactions
-   - Contract facilitates smart contract interactions
-   - Utilities provide support functions
+2. **Starknet.js** comprises several classes and utilities that abstract and simplify interacting with Starknet
 3. **Starknet Network** processes transactions and maintains the blockchain state
+
+## Starknet.js Core Components
+
+### 1. Provider & Channel
+
+- Both handle communication with the network at different levels.
+- **`Provider`**: Your main connection to Starknet nodes. Handles high-level communication. Available as the `RpcProvider` class.
+- **`Channel`**: Handles low-level communication. Available as the `RpcChannel` and `WebSocketChannel` classes that support HTTP and WebSocket connections, respectively.
+
+### 2. Account
+
+The `Account` class is your primary interface for:
+
+- 💼 Managing wallets and tokens
+- 💰 Handling transaction fees
+- 📝 Signing and sending transactions
+- 🔐 Managing account security
+
+### 3. Contract
+
+The `Contract` class provides:
+
+- 📖 Reading smart contract state
+- ✍️ Writing to contracts
+- 🔄 Handling contract events
+- 🧪 Testing contract interactions
+
+### 4. Utility Tools
+
+- `Utils`: Helper functions for data conversion and formatting
+- `Signer`: Cryptographic operations and message signing
 
 ## Network Compatibility
 
@@ -51,38 +78,6 @@ You can also connect to:
 
 - Custom Starknet deployments
 - Local Starknet nodes (connected to mainnet or testnet)
-
-## Core Components
-
-### 1. Provider & Channel
-
-- `RpcProvider`: Your connection to Starknet nodes
-- `RpcChannel`: Handles low-level communication with the network
-- Support for both HTTP and WebSocket connections
-
-### 2. Account Management
-
-The `Account` class is your primary interface for:
-
-- 💼 Managing wallets and tokens
-- 💰 Handling transaction fees
-- 📝 Signing and sending transactions
-- 🔐 Managing account security
-
-### 3. Contract Interaction
-
-The `Contract` class provides:
-
-- 📖 Reading contract state
-- ✍️ Writing to contracts
-- 🔄 Handling contract events
-- 🧪 Testing contract interactions
-
-### 4. Utility Tools
-
-- `Signer`: Cryptographic operations and message signing
-- `Utils`: Helper functions for data conversion and formatting
-- `CallData`: Smart contract interaction utilities
 
 ## Prerequisites
 

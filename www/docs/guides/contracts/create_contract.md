@@ -24,7 +24,8 @@ This two-phase deployment model is unique to Starknet and offers several advanta
 - **Contract Class**: Contains the logic and code (identified by Class Hash)
 - **Contract Instance**: Contains the state/storage (identified by Contract Address)
 - **Fees**: Both declaration and deployment incur fees, paid by the declaring account
-  :::
+
+:::
 
 ## Using ContractFactory
 
@@ -37,11 +38,11 @@ ContractFactory provides a more object-oriented way to deploy and manage contrac
 ### Creating a ContractFactory
 
 ```typescript
-import { ContractFactory, type ContractFactoryParams } from 'starknet';
+import { ContractFactory } from 'starknet';
 
 const factory = new ContractFactory({
   compiledContract: compiledSierra, // Your compiled Sierra contract
-  account, // Account that will deploy contracts
+  account: myAccount, // Account that will deploy contracts
   casm: compiledCasm, // Optional: CASM file for the contract
   classHash, // Optional: Known class hash
   contractOptions: {
@@ -61,7 +62,7 @@ const myContract = await factory.deploy(
     name: 'MyToken',
     symbol: 'MTK',
     decimals: 18,
-    initialSupply: uint256.bnToUint256(1000n * 10n ** 18n),
+    initialSupply: 1000n * 10n ** 18n,
   })
 );
 
@@ -69,7 +70,7 @@ const myContract = await factory.deploy(
 await myContract.deployed();
 
 // 3. Start using the contract
-const balance = await myContract.balanceOf(account.address);
+const balance = await myContract.balanceOf(myAccount.address);
 ```
 
 ### Factory Features
@@ -78,6 +79,7 @@ const balance = await myContract.balanceOf(account.address);
 
 ```typescript
 // Switch to a different account
+// NOTE: newFactory references the same object as factory
 const newFactory = factory.connect(newAccount);
 ```
 
@@ -127,8 +129,8 @@ const tokens = await Promise.all([
 
 ```typescript
 try {
-  const contract = await factory.deploy(constructorParams);
-  await contract.deployed();
+  const myContract = await factory.deploy(constructorParams);
+  await myContract.deployed();
 } catch (error) {
   if (error.message.includes('Class hash not declared')) {
     // Handle declaration needed
@@ -153,7 +155,7 @@ const factory = new ContractFactory({
 });
 
 // Deploy with type checking
-const contract = await factory.deploy(
+const myContract = await factory.deploy(
   CallData.compile({
     name: shortString.encodeShortString('MyToken'),
     symbol: shortString.encodeShortString('MTK'),
@@ -188,9 +190,9 @@ import {
 } from 'starknet';
 
 // 1. Setup Provider & Account
-const provider = new RpcProvider({ baseUrl: 'http://127.0.0.1:5050/rpc' });
-const account = new Account(
-  provider,
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
+const myAccount = new Account(
+  myProvider,
   process.env.ACCOUNT_ADDRESS!, // Your account address
   process.env.PRIVATE_KEY! // Your private key
 );
@@ -204,13 +206,13 @@ const compiledCasm = json.parse(
 );
 
 // 3. Declare & Deploy
-const response = await account.declareAndDeploy({
+const response = await myAccount.declareAndDeploy({
   contract: compiledSierra,
   casm: compiledCasm,
 });
 
 // 4. Create Contract Instance
-const myContract = new Contract(compiledSierra.abi, response.deploy.contract_address, provider);
+const myContract = new Contract(compiledSierra.abi, response.deploy.contract_address, myProvider);
 
 console.log('Contract Class Hash:', response.declare.class_hash);
 console.log('Contract Address:', myContract.address);
@@ -225,18 +227,18 @@ If you want to deploy a new instance of an already declared contract class (e.g.
 
 // 2. Deploy using existing class hash
 const existingClassHash = '0xff0378becffa6ad51c67ac968948dbbd110b8a8550397cf17866afebc6c17d';
-const deployResponse = await account.deployContract({
+const deployResponse = await myAccount.deployContract({
   classHash: existingClassHash,
 });
 
 // 3. Wait for deployment
-await provider.waitForTransaction(deployResponse.transaction_hash);
+await myProvider.waitForTransaction(deployResponse.transaction_hash);
 
 // 4. Get contract ABI and create instance
-const { abi } = await provider.getClassByHash(existingClassHash);
+const { abi } = await myProvider.getClassByHash(existingClassHash);
 if (!abi) throw new Error('Contract ABI not found');
 
-const myContract = new Contract(abi, deployResponse.contract_address, provider);
+const myContract = new Contract(abi, deployResponse.contract_address, myProvider);
 ```
 
 ### Working with Constructors
@@ -256,11 +258,11 @@ const constructorParams = contractCallData.compile('constructor', {
   name: 'MyToken',
   symbol: 'MTK',
   decimals: 18,
-  initialSupply: uint256.bnToUint256(1000n * 10n ** 18n),
+  initialSupply: 1000n * 10n ** 18n,
   array: myArray,
 });
 
-const deployResponse = await account.deployContract({
+const deployResponse = await myAccount.deployContract({
   classHash: contractClassHash,
   constructorCalldata: constructorParams,
 });
@@ -271,7 +273,7 @@ const deployResponse = await account.deployContract({
 For straightforward constructors, you can use the simpler `CallData.compile`:
 
 ```typescript
-// Named parameters (must match ABI order)
+// Named parameters
 const constructorParams = CallData.compile({
   name: 'MyToken',
   symbol: 'MTK',
@@ -281,6 +283,10 @@ const constructorParams = CallData.compile({
 // OR array format
 const constructorParams = CallData.compile(['MyToken', 'MTK', 18]);
 ```
+
+:::warning
+Unlike `myCalldata.compile`, even the named parameters must match their order in the ABI since `CallData.compile` doesn't have access to the ABI to verify and enforce its constraints.
+:::
 
 :::tip String Handling
 For Cairo 2.4.0+, you can pass strings directly. For older versions, use:
@@ -296,12 +302,12 @@ shortString.splitLongString('Your long string here');
 To only declare a new contract class without deployment, use `declare()`:
 
 ```typescript
-const declareResponse = await account.declare({
+const declareResponse = await myAccount.declare({
   contract: compiledSierra,
   casm: compiledCasm,
 });
 
-await provider.waitForTransaction(declareResponse.transaction_hash);
+await myProvider.waitForTransaction(declareResponse.transaction_hash);
 console.log('Class Hash:', declareResponse.class_hash);
 ```
 
@@ -309,7 +315,7 @@ console.log('Class Hash:', declareResponse.class_hash);
 Use `declareIfNot()` to prevent errors when declaring an already existing contract class:
 
 ```typescript
-const declareResponse = await account.declareIfNot({
+const declareResponse = await myAccount.declareIfNot({
   contract: compiledSierra,
   casm: compiledCasm,
 });
@@ -319,8 +325,7 @@ const declareResponse = await account.declareIfNot({
 
 ## Best Practices
 
-1. **Always wait for transactions**: Use `provider.waitForTransaction()` after deployments
+1. **Always wait for transactions**: Use `myProvider.waitForTransaction()` after deployments
 2. **Error handling**: Implement proper try-catch blocks for network issues
 3. **Gas estimation**: Consider estimating fees before deployment
-4. **Contract verification**: Verify your contract's bytecode after deployment
-5. **Environment management**: Use different provider URLs for testnet/mainnet
+4. **Contract verification**: Verify your contract works as intended on Devnet and/or Testnet before deploying to Mainnet

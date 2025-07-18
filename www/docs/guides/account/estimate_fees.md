@@ -154,7 +154,8 @@ config.set('feeMarginPercentage', {
 
 - Values are additional percentage: 75 means 75% additional fees.
 - To get back to normal values: set all values to 50.
-  :::
+
+:::
 
 Example for declaring, with 80% additional fees:
 
@@ -184,7 +185,7 @@ const declareResponse = await account0.declareIfNot({ contract: testSierra, casm
 After a transaction has been processed, you can read the fees that have actually been paid:
 
 ```typescript
-const txR = await provider.waitForTransaction(declareResponse.transaction_hash);
+const txR = await myProvider.waitForTransaction(declareResponse.transaction_hash);
 txR.match({
   success: (txR: SuccessfulTransactionReceiptResponse) => {
     console.log('Fees paid =', txR.actual_fee);

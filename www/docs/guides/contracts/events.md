@@ -51,7 +51,7 @@ const transactionHash = myContract.invoke('emitEventPanic', [8, 'Mega Panic.']);
 Then get the transaction receipt:
 
 ```typescript
-const txReceipt = await provider.waitForTransaction(transactionHash);
+const txReceipt = await myProvider.waitForTransaction(transactionHash);
 ```
 
 ### Raw response
@@ -125,10 +125,10 @@ In this example, if you want to read the events recorded in the last 10 blocks, 
 
 ```typescript
 import { RpcProvider } from 'starknet';
-const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-const lastBlock = await provider.getBlock('latest');
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
+const lastBlock = await myProvider.getBlock('latest');
 const keyFilter = [[num.toHex(hash.starknetKeccak('EventPanic')), '0x8']];
-const eventsList = await provider.getEvents({
+const eventsList = await myProvider.getEvents({
   address: myContractAddress,
   from_block: { block_number: lastBlock.block_number - 9 },
   to_block: { block_number: lastBlock.block_number },
@@ -146,7 +146,7 @@ If you don't want to filter by key, you can either remove the `keys` parameter, 
 :::
 
 :::warning CAUTION
-An event can be nested in a Cairo component (See the Cairo code of the contract to verify). In this case, the array of keys will start with additional hashes, and you will have to adapt your code in consequence; in this example, we have to skip one hash :
+An event can be nested in a Cairo component (See the Cairo code of the contract to verify). In this case, the array of keys will start with additional hashes, and you will have to adapt your code in consequence; in this example, we have to skip one hash:
 
 ```typescript
 const keyFilter = [[], [num.toHex(hash.starknetKeccak('EventPanic'))]];
@@ -167,13 +167,13 @@ Hereunder a code to read all the chunks of a request:
 
 ```typescript
 const keyFilter = [num.toHex(hash.starknetKeccak('EventPanic')), '0x8'];
-let block = await provider.getBlock('latest');
+let block = await myProvider.getBlock('latest');
 console.log('bloc #', block.block_number);
 
 let continuationToken: string | undefined = '0';
 let chunkNum: number = 1;
 while (continuationToken) {
-  const eventsRes = await providerRPC.getEvents({
+  const eventsRes = await myProvider.getEvents({
     from_block: {
       block_number: block.block_number - 30,
     },
@@ -206,7 +206,7 @@ while (continuationToken) {
 }
 ```
 
-If you want to parse an array of events of the same contract (abi of the contract available) :
+If you want to parse an array of events of the same contract (abi of the contract available):
 
 ```typescript
 const abiEvents = events.getAbiEvents(abi);

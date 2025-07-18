@@ -60,12 +60,12 @@ const isValid2 = ec.starkCurve.verify(signature1, msgHash, fullPublicKey);
 Read the Public Key of the account:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' }); //devnet
+const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' }); //devnet
 const compiledAccount = json.parse(
   fs.readFileSync('./__mocks__/cairo/account/accountOZ080.json').toString('ascii')
 );
 const accountAddress = '0x....'; // account of sender
-const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);
+const contractAccount = new Contract(compiledAccount.abi, accountAddress, myProvider);
 const pubKey3 = await contractAccount.call('getPublicKey');
 ```
 
@@ -211,10 +211,10 @@ console.log('signature message =', sig0);
 Starknet.js has a support for Ledger Nano S+ or X, to sign your Starknet transactions.
 You have to use a transporter to interact with the Ledger Nano. Depending if you use an USB or a Bluetooth connection, depending on your framework (Node, Web, Mobile), you have to use the appropriate library to create your transporter.
 
-The Ledger documentation lists all the available cases :
+The Ledger documentation lists all the available cases:
 ![](./pictures/LedgerConnectivity.png)
 
-The libs available are :
+The libs available are:
 
 ```typescript
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
@@ -253,9 +253,9 @@ const ledgerAccount = new Account(myProvider, ledger0addr, myLedgerSigner);
 
 :::
 
-Some complete examples :  
-A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/10.testLedger231-rpc08.ts).  
-A test Web DAPP, to use in devnet-rs network : [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
+Some complete examples:  
+A Node script: [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/10.testLedger231-rpc08.ts).  
+A test Web DAPP, to use in devnet-rs network: [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
 
 If you want to read the version of the Ledger Starknet APP:
 
@@ -272,7 +272,7 @@ You also have in Starknet.js a signer for the old v1.1.1 Ledger Starknet APP.
 const myLedgerSigner = new LedgerSigner111(myLedgerTransport, 0);
 ```
 
-If you want to use the accounts created with the v1.1.1, using the v2.3.1 signer :
+If you want to use the accounts created with the v1.1.1, using the v2.3.1 signer:
 
 ```typescript
 const myLedgerSigner = new LedgerSigner231(myLedgerTransport, 0, undefined, getLedgerPathBuffer111);

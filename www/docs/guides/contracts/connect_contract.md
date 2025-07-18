@@ -4,25 +4,25 @@ sidebar_position: 2
 
 # Contract Instance
 
-This guide explains how to connect to and interact with smart contracts on Starknet using starknet.js.
+This guide explains how to connect to and interact with smart contracts on Starknet using Starknet.js.
 
 ## Quick Start
 
 ```typescript
-import { Contract, Provider } from 'starknet';
+import { Contract, RpcProvider } from 'starknet';
 
 // Initialize provider
-const provider = new Provider({ rpc: { nodeUrl: 'YOUR_NODE_URL' } });
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
 // Connect to contract
-const contract = new Contract(abi, contractAddress, provider);
+const myContract = new Contract(abi, contractAddress, myProvider);
 
 // Read contract state
-const result = await contract.my_view_function();
+const result = await myContract.my_view_function();
 
 // Write to contract (requires Account)
-const account = new Account(provider, accountAddress, privateKey);
-const { transaction_hash } = await contract.connect(account).my_write_function(params);
+const myAccount = new Account(myProvider, accountAddress, privateKey);
+const { transaction_hash } = await myContract.connect(myAccount).my_write_function(params);
 ```
 
 ## Prerequisites
@@ -55,7 +55,7 @@ import fs from 'fs';
 import { json } from 'starknet';
 
 // ⚠️ Network intensive operation
-const { abi } = await provider.getClassAt(contractAddress);
+const { abi } = await myProvider.getClassAt(contractAddress);
 // Save for future use
 fs.writeFileSync('./contract-abi.json', json.stringify(abi, null, 2));
 ```
@@ -67,13 +67,13 @@ fs.writeFileSync('./contract-abi.json', json.stringify(abi, null, 2));
 For reading contract state (view functions):
 
 ```typescript
-import { Contract, Provider } from 'starknet';
+import { Contract, RpcProvider } from 'starknet';
 
-const provider = new Provider({ rpc: { nodeUrl: 'YOUR_NODE_URL' } });
-const contract = new Contract(abi, contractAddress, provider);
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
+const myContract = new Contract(abi, contractAddress, myProvider);
 
 // Call view functions
-const result = await contract.get_balance();
+const result = await myContract.get_balance();
 ```
 
 ### Read-Write Access
@@ -83,12 +83,12 @@ For full contract interaction (including state modifications):
 ```typescript
 import { Contract, Account } from 'starknet';
 
-const account = new Account(provider, accountAddress, privateKey);
-const contract = new Contract(abi, contractAddress, account);
+const myAccount = new Account(myProvider, accountAddress, privateKey);
+const myContract = new Contract(abi, contractAddress, myAccount);
 
 // Now you can both read and write
-const balance = await contract.get_balance();
-const tx = await contract.set_balance(newBalance);
+const balance = await myContract.get_balance();
+const tx = await myContract.set_balance(newBalance);
 ```
 
 ## Reading Contract State
@@ -97,21 +97,21 @@ const tx = await contract.set_balance(newBalance);
 
 ```typescript
 // Using contract methods (recommended)
-const balance = await contract.get_balance(address);
+const balance = await myContract.get_balance(address);
 console.log('Balance:', balance.toString());
 
 // Using generic call
-const result = await contract.call('get_balance', [address]);
+const result = await myContract.call('get_balance', [address]);
 ```
 
 ### Handling Complex Return Types
 
 ```typescript
 // Struct return value
-const { amount, owner } = await contract.get_token_info(tokenId);
+const { amount, owner } = await myContract.get_token_info(tokenId);
 
 // Array return value
-const holders = await contract.get_all_holders();
+const holders = await myContract.get_all_holders();
 for (const holder of holders) {
   console.log('Holder:', holder);
 }
@@ -123,10 +123,10 @@ for (const holder of holders) {
 
 ```typescript
 // Send a transaction
-const { transaction_hash } = await contract.transfer(recipient, amount);
+const { transaction_hash } = await myContract.transfer(recipient, amount);
 
 // Wait for confirmation
-await provider.waitForTransaction(transaction_hash);
+await myProvider.waitForTransaction(transaction_hash);
 ```
 
 ### Handling Complex Parameters
@@ -143,7 +143,7 @@ struct TokenInfo {
 */
 
 // JavaScript object
-await contract.set_token_info({
+await myContract.set_token_info({
   amount: 1000n,
   owner: '0x123...',
 });
@@ -153,10 +153,10 @@ await contract.set_token_info({
 
 ```typescript
 // Arrays
-await contract.set_values([1, 2, 3]);
+await myContract.set_values([1, 2, 3]);
 
 // Tuples
-await contract.set_coordinate({ x: 10, y: 20 });
+await myContract.set_coordinate({ x: 10, y: 20 });
 ```
 
 ## Advanced Features
@@ -167,7 +167,7 @@ The `withOptions` method allows you to customize how the next contract interacti
 
 ```typescript
 // Example: Multiple options for a transaction
-const result = await contract
+const result = await myContract
   .withOptions({
     // Block identifier for reading state
     blockIdentifier: 'latest',
@@ -183,11 +183,13 @@ const result = await contract
     },
 
     // Transaction details (for writes)
-    maxFee: 1000n,
     nonce: '0x1',
     version: '0x1',
 
-    // V3 transaction resource bounds
+    // V1 transaction max fee, soon to be deprecated
+    maxFee: 1000n,
+
+    // V3 transaction resource bounds, for RPC 0.8 and later
     resourceBounds: {
       l1_gas: { max_amount: '0x186a0', max_price_per_unit: '0x1' },
       l2_gas: { max_amount: '0x186a0', max_price_per_unit: '0x1' },
@@ -202,7 +204,7 @@ const result = await contract
 1. **Reading Historical State**:
 
 ```typescript
-const pastBalance = await contract
+const pastBalance = await myContract
   .withOptions({ blockIdentifier: '0x123...' })
   .get_balance(address);
 ```
@@ -210,7 +212,7 @@ const pastBalance = await contract
 2. **Custom Response Formatting**:
 
 ```typescript
-const { tokens, owner } = await contract
+const { tokens, owner } = await myContract
   .withOptions({
     formatResponse: {
       tokens: (arr) => arr.map(BigInt),
@@ -223,7 +225,7 @@ const { tokens, owner } = await contract
 3. **Raw Data Mode**:
 
 ```typescript
-const rawResult = await contract
+const rawResult = await myContract
   .withOptions({
     parseRequest: false,
     parseResponse: false,
@@ -234,7 +236,7 @@ const rawResult = await contract
 4. **V3 Transaction with Resource Bounds**:
 
 ```typescript
-const tx = await contract
+const tx = await myContract
   .withOptions({
     version: '0x3',
     resourceBounds: {
@@ -250,23 +252,25 @@ const tx = await contract
 
 ```typescript
 // Estimate before sending
-const { suggestedMaxFee } = await contract.estimateFee.transfer(recipient, amount);
-console.log('Estimated fee:', suggestedMaxFee.toString());
+const { resourceBounds } = await myContract.estimateFee.transfer(recipient, amount);
+console.log('Estimated fee:', json.stringify(resourceBounds));
 
 // Use in transaction
-const tx = await contract.transfer(recipient, amount, {
-  maxFee: suggestedMaxFee,
-});
+const tx = await myContract
+  .withOptions({
+    resourceBounds,
+  })
+  .transfer(recipient, amount);
 ```
 
 ### Transaction Building
 
 ```typescript
 // Prepare transaction without sending
-const tx = contract.populateTransaction.transfer(recipient, amount);
+const tx = myContract.populateTransaction.transfer(recipient, amount);
 
 // Use in multicall
-const { transaction_hash } = await account.execute([
+const { transaction_hash } = await myAccount.execute([
   tx,
   anotherContract.populateTransaction.approve(spender, amount),
 ]);
@@ -276,8 +280,8 @@ const { transaction_hash } = await account.execute([
 
 ```typescript
 // Listen for events
-const receipt = await provider.waitForTransaction(tx.transaction_hash);
-const events = contract.parseEvents(receipt);
+const receipt = await myProvider.waitForTransaction(tx.transaction_hash);
+const events = myContract.parseEvents(receipt);
 
 // Process events
 for (const event of events) {
@@ -316,8 +320,8 @@ See our [TypeScript Integration Guide](./abi_typescript.md) for details.
 
    ```typescript
    try {
-     const tx = await contract.transfer(recipient, amount);
-     await provider.waitForTransaction(tx.transaction_hash);
+     const tx = await myContract.transfer(recipient, amount);
+     await myProvider.waitForTransaction(tx.transaction_hash);
    } catch (error) {
      if (error.message.includes('insufficient balance')) {
        console.error('Not enough funds!');
@@ -330,15 +334,15 @@ See our [TypeScript Integration Guide](./abi_typescript.md) for details.
 3. **Transaction Monitoring**
 
    ```typescript
-   const tx = await contract.transfer(recipient, amount);
-   const receipt = await provider.waitForTransaction(tx.transaction_hash, {
+   const tx = await myContract.transfer(recipient, amount);
+   const receipt = await myProvider.waitForTransaction(tx.transaction_hash, {
      retryInterval: 2000,
      successStates: ['ACCEPTED_ON_L2'],
    });
    ```
 
 4. **Resource Management**
-   - Always estimate fees before transactions
+   - Estimate fees before transactions
    - Set appropriate gas limits
    - Consider using `withOptions` for fine-grained control
 

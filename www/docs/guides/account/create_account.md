@@ -29,7 +29,7 @@ import { Account, constants, ec, json, stark, RpcProvider, hash, CallData } from
 
 ```typescript
 // connect RPC 0.8 provider (Mainnet or Sepolia)
-const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
 // new Open Zeppelin account v0.17.0
 // Generate public and private key pair.
@@ -73,7 +73,7 @@ curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d00155
 If you have sent enough STRK to this new address, you can go forward to the final step:
 
 ```typescript
-const OZaccount = new Account(provider, OZcontractAddress, privateKey);
+const OZaccount = new Account(myProvider, OZcontractAddress, privateKey);
 
 const { transaction_hash, contract_address } = await OZaccount.deployAccount({
   classHash: OZaccountClassHash,
@@ -81,7 +81,7 @@ const { transaction_hash, contract_address } = await OZaccount.deployAccount({
   addressSalt: starkKeyPub,
 });
 
-await provider.waitForTransaction(transaction_hash);
+await myProvider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
@@ -112,7 +112,7 @@ import {
 
 ```typescript
 // connect RPC 0.8 provider
-const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
 //new Argent X account v0.4.0
 const argentXaccountClassHash =
@@ -149,7 +149,7 @@ Then you have to fund this address.
 If you have sent enough STRK to this new address, you can go forward to the final step:
 
 ```typescript
-const accountAX = new Account(provider, AXcontractAddress, privateKeyAX);
+const accountAX = new Account(myProvider, AXcontractAddress, privateKeyAX);
 
 const deployAccountPayload = {
   classHash: argentXaccountClassHash,
@@ -284,7 +284,7 @@ Then you have to fund this address with some STRK.
 If you have sent enough funds to this new address, you can go forward to the final step:
 
 ```typescript
-const ethAccount = new Account(provider, contractETHaddress, ethSigner);
+const ethAccount = new Account(myProvider, contractETHaddress, ethSigner);
 const deployPayload = {
   classHash: accountEthClassHash,
   constructorCalldata: accountETHconstructorCalldata,
@@ -296,7 +296,7 @@ const estimatedFees = await ethAccount.estimateAccountDeployFee(deployPayload, {
 const { transaction_hash, contract_address } = await ethAccount.deployAccount(deployPayload, {
   skipValidate: false,
 });
-await provider.waitForTransaction(transaction_hash);
+await myProvider.waitForTransaction(transaction_hash);
 console.log('✅ New Ethereum account final address =', contract_address);
 ```
 
@@ -334,12 +334,12 @@ import axios from 'axios';
 
 ```typescript
 // connect provider
-const provider = new RpcProvider({ network: 'http://127.0.0.1:5050/rpc' });
+const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 
 // initialize existing pre-deployed account 0 of Devnet
 const privateKey0 = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
 const accountAddress0 = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
-const account0 = new Account(provider, accountAddress0, privateKey0);
+const account0 = new Account(myProvider, accountAddress0, privateKey0);
 
 // new account abstraction
 // Generate public and private key pair.
@@ -358,7 +358,7 @@ const { transaction_hash: declTH, class_hash: decCH } = await account0.declare({
   contract: compiledAAaccount,
 });
 console.log('Customized account class hash =', decCH);
-await provider.waitForTransaction(declTH);
+await myProvider.waitForTransaction(declTH);
 
 // Calculate future address of the account
 const AAaccountConstructorCallData = CallData.compile({
@@ -386,13 +386,13 @@ const { data: answer } = await axios.post(
 console.log('Answer mint =', answer);
 
 // deploy account
-const AAaccount = new Account(provider, AAcontractAddress, AAprivateKey);
+const AAaccount = new Account(myProvider, AAcontractAddress, AAprivateKey);
 const { transaction_hash, contract_address } = await AAaccount.deployAccount({
   classHash: AAaccountClassHash,
   constructorCalldata: AAaccountConstructorCallData,
   addressSalt: AAstarkKeyPub,
 });
-await provider.waitForTransaction(transaction_hash);
+await myProvider.waitForTransaction(transaction_hash);
 console.log('✅ New customized account created.\n   address =', contract_address);
 ```
 

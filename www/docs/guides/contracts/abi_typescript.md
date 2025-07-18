@@ -46,13 +46,13 @@ Use the ABI to create a typed contract instance:
 import { Contract, RpcProvider } from 'starknet';
 
 const address = 'YOUR_CONTRACT_ADDRESS';
-const provider = new RpcProvider({ nodeUrl: `${yourNodeUrl}` });
+const myProvider = new RpcProvider({ nodeUrl: `${yourNodeUrl}` });
 
 // Create a typed contract instance
-const contract = new Contract(ABI, address, provider).typedv2(ABI);
+const myContract = new Contract(ABI, address, myProvider).typedv2(ABI);
 
 // Enjoy autocompletion and type checking!
-const result = await contract.increase_balance(100);
+const result = await myContract.increase_balance(100);
 ```
 
 ## Working with Deployed Contracts
@@ -82,14 +82,14 @@ import { Contract, RpcProvider, constants } from 'starknet';
 import { ABI } from './abi';
 
 const address = '0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b';
-const provider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_MAIN });
+const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_MAIN });
 
 // Create typed contract instance
-const contract = new Contract(ABI, address, provider).typedv2(ABI);
+const myContract = new Contract(ABI, address, myProvider).typedv2(ABI);
 
 // Enjoy type inference and autocompletion
-const primaryInterfaceId = await contract.get_primary_interface_id();
-const protocolFees = await contract.get_protocol_fees_collected('0x1');
+const primaryInterfaceId = await myContract.get_primary_interface_id();
+const protocolFees = await myContract.get_protocol_fees_collected('0x1');
 ```
 
 ## Benefits of Type Safety
