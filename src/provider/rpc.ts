@@ -24,7 +24,7 @@ import {
   Invocations,
   InvocationsDetailsWithNonce,
   PendingBlock,
-  PendingStateUpdate,
+  PreConfirmedStateUpdate,
   RPC,
   RpcProviderOptions,
   type Signature,
@@ -35,18 +35,16 @@ import {
 } from '../types';
 import { ETransactionType, RPCSPEC08, RPCSPEC09 } from '../types/api';
 import assert from '../utils/assert';
-import { CallData } from '../utils/calldata';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { LibraryError } from '../utils/errors';
 import { solidityUint256PackedKeccak256 } from '../utils/hash';
-import { isBigNumberish, toBigInt, toHex } from '../utils/num';
+import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { formatSignature } from '../utils/stark';
+import { getTipStatsFromBlocks, TipAnalysisOptions } from '../utils/modules/tip';
 import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
-import { getMessageHash, validateTypedData } from '../utils/typedData';
 import { ProviderInterface } from './interface';
 import type {
   DeclaredTransaction,
@@ -55,6 +53,7 @@ import type {
   L1_HANDLER_TXN,
   TransactionWithHash,
 } from './types/spec.type';
+import { verifyMessageInStarknet } from '../utils/modules/verifyMessageInStarknet';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -69,22 +68,22 @@ export class RpcProvider implements ProviderInterface {
           ? optionsOrProvider.responseParser
           : new RPCResponseParser();
     } else {
-      if (optionsOrProvider && optionsOrProvider.specVersion) {
-        if (isVersion('0.8', optionsOrProvider.specVersion)) {
-          this.channel = new RPC08.RpcChannel({ ...optionsOrProvider, waitMode: false });
-        } else if (isVersion('0.9', optionsOrProvider.specVersion)) {
-          this.channel = new RPC09.RpcChannel({ ...optionsOrProvider, waitMode: false });
-        } else
-          throw new Error(`unsupported channel for spec version: ${optionsOrProvider.specVersion}`);
+      const options = optionsOrProvider as RpcProviderOptions | undefined;
+      if (options && options.specVersion) {
+        if (isVersion('0.8', options.specVersion)) {
+          this.channel = new RPC08.RpcChannel({ ...options, waitMode: false });
+        } else if (isVersion('0.9', options.specVersion)) {
+          this.channel = new RPC09.RpcChannel({ ...options, waitMode: false });
+        } else throw new Error(`unsupported channel for spec version: ${options.specVersion}`);
       } else if (isVersion('0.8', config.get('rpcVersion'))) {
         // default channel when unspecified
-        this.channel = new RPC08.RpcChannel({ ...optionsOrProvider, waitMode: false });
+        this.channel = new RPC08.RpcChannel({ ...options, waitMode: false });
       } else if (isVersion('0.9', config.get('rpcVersion'))) {
         // default channel when unspecified
-        this.channel = new RPC09.RpcChannel({ ...optionsOrProvider, waitMode: false });
+        this.channel = new RPC09.RpcChannel({ ...options, waitMode: false });
       } else throw new Error('unable to define spec version for channel');
 
-      this.responseParser = new RPCResponseParser(optionsOrProvider?.resourceBoundsOverhead);
+      this.responseParser = new RPCResponseParser(options?.resourceBoundsOverhead);
     }
   }
 
@@ -131,23 +130,14 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getChainId();
   }
 
-  /**
-   * read channel spec version
-   */
   public readSpecVersion() {
     return this.channel.readSpecVersion();
   }
 
-  /**
-   * get channel spec version
-   */
   public async getSpecVersion() {
     return this.channel.getSpecVersion();
   }
 
-  /**
-   * setup channel spec version and return it
-   */
   public setUpSpecVersion() {
     return this.channel.setUpSpecVersion();
   }
@@ -169,18 +159,10 @@ export class RpcProvider implements ProviderInterface {
       .then(this.responseParser.parseGetBlockResponse);
   }
 
-  /**
-   * Get the most recent accepted block hash and number
-   */
   public async getBlockLatestAccepted() {
     return this.channel.getBlockLatestAccepted();
   }
 
-  /**
-   * Get the most recent accepted block number
-   * redundant use getBlockLatestAccepted();
-   * @returns Number of the latest block
-   */
   public async getBlockNumber() {
     return this.channel.getBlockNumber();
   }
@@ -193,17 +175,6 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockWithTxs(blockIdentifier);
   }
 
-  /**
-   * Pause the execution of the script until a specified block is created.
-   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberish) or tag
-   * Use of 'latest" or of a block already created will generate no pause.
-   * @param {number} [retryInterval] number of milliseconds between 2 requests to the node
-   * @example
-   * ```typescript
-   * await myProvider.waitForBlock();
-   * // wait the creation of the block
-   * ```
-   */
   public async waitForBlock(
     blockIdentifier: BlockIdentifier = BlockTag.LATEST,
     retryInterval: number = 5000
@@ -263,8 +234,10 @@ export class RpcProvider implements ProviderInterface {
 
   public getStateUpdate = this.getBlockStateUpdate;
 
-  public async getBlockStateUpdate(): Promise<PendingStateUpdate>;
-  public async getBlockStateUpdate(blockIdentifier: 'pre_confirmed'): Promise<PendingStateUpdate>;
+  public async getBlockStateUpdate(): Promise<StateUpdate>;
+  public async getBlockStateUpdate(
+    blockIdentifier: 'pre_confirmed'
+  ): Promise<PreConfirmedStateUpdate>;
   public async getBlockStateUpdate(blockIdentifier: 'latest'): Promise<StateUpdate>;
   public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
   public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier) {
@@ -304,20 +277,10 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getTransactionTrace(txHash);
   }
 
-  /**
-   * Get the status of a transaction
-   */
   public async getTransactionStatus(transactionHash: BigNumberish) {
     return this.channel.getTransactionStatus(transactionHash);
   }
 
-  /**
-   * @param invocations AccountInvocations
-   * @param options blockIdentifier and flags to skip validation and fee charge<br/>
-   * - blockIdentifier<br/>
-   * - skipValidate (default false)<br/>
-   * - skipFeeCharge (default true)<br/>
-   */
   public async getSimulateTransaction(
     invocations: AccountInvocations,
     options?: getSimulateTransactionOptions
@@ -497,10 +460,6 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.callContract(call, blockIdentifier);
   }
 
-  /**
-   * NEW: Estimate the fee for a message from L1
-   * @param message Message From L1
-   */
   public async estimateMessageFee(
     message: RPCSPEC09.L1Message, // same as spec08.L1Message
     blockIdentifier?: BlockIdentifier
@@ -508,18 +467,10 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.estimateMessageFee(message, blockIdentifier);
   }
 
-  /**
-   * Returns an object about the sync status, or false if the node is not synching
-   * @returns Object with the stats data
-   */
   public async getSyncingStats() {
     return this.channel.getSyncingStats();
   }
 
-  /**
-   * Returns all events matching the given filter
-   * @returns events and the pagination of the events
-   */
   public async getEvents(
     eventFilter: RPCSPEC08.EventFilter | RPCSPEC09.EventFilter
   ): Promise<RPCSPEC08.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK> {
@@ -532,24 +483,6 @@ export class RpcProvider implements ProviderInterface {
     throw new Error('Unsupported channel type');
   }
 
-  /**
-   * Verify in Starknet a signature of a TypedData object or of a given hash.
-   * @param {BigNumberish | TypedData} message TypedData object to be verified, or message hash to be verified.
-   * @param {Signature} signature signature of the message.
-   * @param {BigNumberish} accountAddress address of the account that has signed the message.
-   * @param {string} [signatureVerificationFunctionName] if account contract with non standard account verification function name.
-   * @param { okResponse: string[]; nokResponse: string[]; error: string[] } [signatureVerificationResponse] if account contract with non standard response of verification function.
-   * @returns
-   * ```typescript
-   * const myTypedMessage: TypedMessage = .... ;
-   * const messageHash = typedData.getMessageHash(myTypedMessage,accountAddress);
-   * const sign: WeierstrassSignatureType = ec.starkCurve.sign(messageHash, privateKey);
-   * const accountAddress = "0x43b7240d227aa2fb8434350b3321c40ac1b88c7067982549e7609870621b535";
-   * const result1 = myRpcProvider.verifyMessageInStarknet(myTypedMessage, sign, accountAddress);
-   * const result2 = myRpcProvider.verifyMessageInStarknet(messageHash, sign, accountAddress);
-   * // result1 = result2 = true
-   * ```
-   */
   public async verifyMessageInStarknet(
     message: BigNumberish | TypedData,
     signature: Signature,
@@ -557,88 +490,16 @@ export class RpcProvider implements ProviderInterface {
     signatureVerificationFunctionName?: string,
     signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
   ): Promise<boolean> {
-    const isTypedData = validateTypedData(message);
-    if (!isBigNumberish(message) && !isTypedData) {
-      throw new Error('message has a wrong format.');
-    }
-    if (!isBigNumberish(accountAddress)) {
-      throw new Error('accountAddress shall be a BigNumberish');
-    }
-    const messageHash = isTypedData ? getMessageHash(message, accountAddress) : toHex(message);
-    // HOTFIX: Accounts should conform to SNIP-6
-    // (https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61),
-    // but they don't always conform. Also, the SNIP doesn't standardize the response if the signature isn't valid.
-    const knownSigVerificationFName = signatureVerificationFunctionName
-      ? [signatureVerificationFunctionName]
-      : ['isValidSignature', 'is_valid_signature'];
-    const knownSignatureResponse = signatureVerificationResponse || {
-      okResponse: [
-        // any non-nok response is true
-      ],
-      nokResponse: [
-        '0x0', // Devnet
-        '0x00', // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
-      ],
-      error: [
-        'argent/invalid-signature',
-        '0x617267656e742f696e76616c69642d7369676e6174757265', // ArgentX 0.3.0 to 0.3.1
-        'is invalid, with respect to the public key',
-        '0x697320696e76616c6964', // OpenZeppelin until 0.6.1, Braavos 0.0.11
-        'INVALID_SIG',
-        '0x494e56414c49445f534947', // Braavos 1.0.0
-      ],
-    };
-    let error: any;
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const SigVerificationFName of knownSigVerificationFName) {
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        const resp = await this.callContract({
-          contractAddress: toHex(accountAddress),
-          entrypoint: SigVerificationFName,
-          calldata: CallData.compile({
-            hash: toBigInt(messageHash).toString(),
-            signature: formatSignature(signature),
-          }),
-        });
-        // Response NOK Signature
-        if (knownSignatureResponse.nokResponse.includes(resp[0].toString())) {
-          return false;
-        }
-        // Response OK Signature
-        // Empty okResponse assume all non-nok responses are valid signatures
-        // OpenZeppelin 0.7.0 to 0.9.0, ArgentX 0.3.0 to 0.3.1 & Braavos Cairo 0.0.11 to 1.0.0 valid signature
-        if (
-          knownSignatureResponse.okResponse.length === 0 ||
-          knownSignatureResponse.okResponse.includes(resp[0].toString())
-        ) {
-          return true;
-        }
-        throw Error('signatureVerificationResponse Error: response is not part of known responses');
-      } catch (err) {
-        // Known NOK Errors
-        if (
-          knownSignatureResponse.error.some((errMessage) =>
-            (err as Error).message.includes(errMessage)
-          )
-        ) {
-          return false;
-        }
-        // Unknown Error
-        error = err;
-      }
-    }
-
-    throw Error(`Signature verification Error: ${error}`);
+    return verifyMessageInStarknet(
+      this,
+      message,
+      signature,
+      accountAddress,
+      signatureVerificationFunctionName,
+      signatureVerificationResponse
+    );
   }
 
-  /**
-   * Test if class is already declared from ContractClassIdentifier
-   * Helper method using getClass
-   * @param ContractClassIdentifier
-   * @param blockIdentifier
-   */
   public async isClassDeclared(
     contractClassIdentifier: ContractClassIdentifier,
     blockIdentifier?: BlockIdentifier
@@ -664,12 +525,6 @@ export class RpcProvider implements ProviderInterface {
     }
   }
 
-  /**
-   * Build bulk invocations with auto-detect declared class
-   * 1. Test if class is declared if not declare it preventing already declared class error and not declared class errors
-   * 2. Order declarations first
-   * @param invocations
-   */
   public async prepareInvocations(invocations: Invocations) {
     const bulk: Invocations = [];
     // Build new ordered array
@@ -691,18 +546,12 @@ export class RpcProvider implements ProviderInterface {
     return bulk;
   }
 
-  /**
-   * Given an l1 tx hash, returns the associated l1_handler tx hashes and statuses for all L1 -> L2 messages sent by the l1 transaction, ordered by the l1 tx sending order
-   */
   public async getL1MessagesStatus(
     transactionHash: BigNumberish
   ): Promise<RPC.RPCSPEC08.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus> {
     return this.channel.getMessagesStatus(transactionHash);
   }
 
-  /**
-   * Get merkle paths in one of the state tries: global state, classes, individual contract
-   */
   public async getStorageProof(
     classHashes: BigNumberish[],
     contractAddresses: BigNumberish[],
@@ -717,10 +566,11 @@ export class RpcProvider implements ProviderInterface {
     );
   }
 
-  /**
-   * Get the contract class definition in the given block associated with the given hash
-   */
   public async getCompiledCasm(classHash: BigNumberish): Promise<RPC.CASM_COMPILED_CONTRACT_CLASS> {
     return this.channel.getCompiledCasm(classHash);
+  }
+
+  public async getEstimateTip(blockIdentifier?: BlockIdentifier, options: TipAnalysisOptions = {}) {
+    return getTipStatsFromBlocks(this, blockIdentifier, options);
   }
 }

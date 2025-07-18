@@ -5,6 +5,7 @@
 .eslintcache
 .vscode
 .idea
+.claude
 coverage
 coverage-ts
 dist
