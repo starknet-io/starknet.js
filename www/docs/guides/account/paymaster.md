@@ -95,7 +95,7 @@ console.log(supported);
 
 ## Sending a Transaction with a Paymaster
 
-To send a [`Call`](./contracts/define_call_message.md#call-or-call) (result of [`myContract.populate()`](./contracts/define_call_message.md#object-with-abi-conformity-check) or `myCallData.compile()`), here for a `default` paymaster transaction:
+To send a [`Call`](../contracts/define_call_message.md#call-or-call) (result of [`myContract.populate()`](../contracts/define_call_message.md#object-with-abi-conformity-check) or `myCallData.compile()`), here for a `default` paymaster transaction:
 
 ```typescript
 const gasToken = '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080'; // USDC in Testnet
@@ -114,7 +114,7 @@ const txR = await myProvider.waitForTransaction(res.transaction_hash);
 
 ### Sponsored paymaster
 
-For a sponsored transaction, use :
+For a sponsored transaction, use:
 
 ```typescript
 const myPaymasterRpc = new PaymasterRpc({
@@ -208,7 +208,7 @@ Here are the available methods:
 
 A demo DAPP is available [here](https://starknet-paymaster-snip-29.vercel.app/) (needs some USDC in an account to process).
 
-## Full Example – React + starknet.js + Paymaster
+## Full Example – React + Starknet.js + Paymaster
 
 ```tsx
 import { FC, useEffect, useState } from 'react';
@@ -307,4 +307,4 @@ const App: FC = () => {
 export default App;
 ```
 
-For more information about defining call messages and parameters, see [this guide](./contracts/define_call_message.md).
+For more information about defining call messages and parameters, see [this guide](../contracts/define_call_message.md).

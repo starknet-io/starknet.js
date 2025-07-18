@@ -46,10 +46,10 @@ const executionParams = {
     message: messageHash,
     domain: {
       name: 'External Execution',
-      chainId: 'SN_GOERLI',
+      chainId: constants.StarknetChainId.SN_SEPOLIA,
     },
   }),
-  nonce: await account.getNonce(),
+  nonce: await myAccount.getNonce(),
   // Other validation parameters
 };
 ```
@@ -59,7 +59,7 @@ const executionParams = {
 Use the execution parameters when calling the contract:
 
 ```typescript
-const result = await account.execute({
+const result = await myAccount.execute({
   contractAddress: targetContract,
   entrypoint: 'externalExecute',
   calldata: [
@@ -75,11 +75,11 @@ const result = await account.execute({
 Here's a complete example of implementing delegated execution:
 
 ```typescript
-import { Account, Contract, Provider, Signer, constants } from 'starknet';
+import { Account, Contract, RpcProvider, Signer, constants } from 'starknet';
 
-async function executeDelegated(account: Account, delegateSigner: Signer, transaction: any) {
+async function executeDelegated(chosenAccount: Account, delegateSigner: Signer, transaction: any) {
   // Get current nonce
-  const nonce = await account.getNonce();
+  const nonce = await chosenAccount.getNonce();
 
   // Create message hash
   const messageHash = hash.computeHashOnElements([
@@ -94,12 +94,12 @@ async function executeDelegated(account: Account, delegateSigner: Signer, transa
     message: messageHash,
     domain: {
       name: 'Delegate Execution',
-      chainId: constants.NetworkName.SN_GOERLI,
+      chainId: constants.StarknetChainId.SN_SEPOLIA,
     },
   });
 
   // Execute with signature
-  const result = await account.execute({
+  const result = await chosenAccount.execute({
     contractAddress: transaction.contractAddress,
     entrypoint: 'executeFromDelegate',
     calldata: [
@@ -115,8 +115,8 @@ async function executeDelegated(account: Account, delegateSigner: Signer, transa
 }
 
 // Usage
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
-const account = new Account(provider, accountAddress, accountPrivateKey);
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
+const myAccount = new Account(myProvider, accountAddress, accountPrivateKey);
 const delegateSigner = new Signer(delegatePrivateKey);
 
 const transaction = {
@@ -125,7 +125,7 @@ const transaction = {
   calldata: ['0x...', '1000'],
 };
 
-const result = await executeDelegated(account, delegateSigner, transaction);
+const result = await executeDelegated(myAccount, delegateSigner, transaction);
 console.log('Transaction hash:', result.transaction_hash);
 ```
 
@@ -134,7 +134,7 @@ console.log('Transaction hash:', result.transaction_hash);
 Implement meta-transactions where a relayer executes transactions:
 
 ```typescript
-import { Account, Provider, Signer, constants, hash } from 'starknet';
+import { Account, RpcProvider, Signer, constants, hash } from 'starknet';
 
 class MetaTransaction {
   constructor(
@@ -166,7 +166,7 @@ class MetaTransaction {
       message: messageHash,
       domain: {
         name: 'Meta Transaction',
-        chainId: constants.NetworkName.SN_GOERLI,
+        chainId: constants.StarknetChainId.SN_SEPOLIA,
       },
     });
 
@@ -177,7 +177,7 @@ class MetaTransaction {
 class Relayer {
   constructor(
     private readonly account: Account,
-    private readonly provider: Provider
+    private readonly provider: RpcProvider
   ) {}
 
   async relay(metaTx: MetaTransaction) {
@@ -199,11 +199,11 @@ class Relayer {
 }
 
 // Usage
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
-const relayerAccount = new Account(provider, relayerAddress, relayerPrivateKey);
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
+const relayerAccount = new Account(myProvider, relayerAddress, relayerPrivateKey);
 const userSigner = new Signer(userPrivateKey);
 
-const relayer = new Relayer(relayerAccount, provider);
+const relayer = new Relayer(relayerAccount, myProvider);
 
 // Create meta-transaction
 const metaTx = await MetaTransaction.create(
@@ -211,7 +211,7 @@ const metaTx = await MetaTransaction.create(
   targetContract,
   'transfer',
   ['0x...', '1000'],
-  await provider.getNonceForAddress(userAddress),
+  await myProvider.getNonceForAddress(userAddress),
   userSigner
 );
 
@@ -236,7 +236,7 @@ Handle common outside execution errors:
 
 ```typescript
 try {
-  const result = await executeDelegated(account, delegateSigner, transaction);
+  const result = await executeDelegated(myAccount, delegateSigner, transaction);
 } catch (error) {
   if (error.message.includes('Invalid delegate signature')) {
     console.error('Delegate signature verification failed');

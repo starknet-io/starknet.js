@@ -5,11 +5,11 @@ sidebar_position: 8
 
 # Messages L1 - L2
 
-This guide explains how to handle communication between Ethereum (Layer 1) and Starknet (Layer 2) using starknet.js. Messages can be exchanged between:
+This guide explains how to handle communication between Ethereum (Layer 1) and Starknet (Layer 2) using Starknet.js. Messages can be exchanged between:
 
 - L2 Starknet Mainnet ↔️ L1 Ethereum
 - L2 Starknet Testnet ↔️ L1 Sepolia ETH testnet
-- L2 local Starknet Devnet ↔️ L1 local ETH testnet (anvil, ...)
+- L2 local Starknet Devnet ↔️ L1 local ETH testnet (Foundry/Anvil, ...)
 
 For a detailed explanation of the messaging architecture, see the [Starknet documentation](https://docs.starknet.io/architecture/messaging/).
 
@@ -34,10 +34,10 @@ You can estimate the L2 fee (the extra fee) with this function:
 import { RpcProvider, constants } from 'starknet';
 
 // Initialize provider for testnet
-const provider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_SEPOLIA });
+const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_SEPOLIA });
 
 // Estimate the L2 part of the message fee
-const messageFee = await provider.estimateMessageFee({
+const messageFee = await myProvider.estimateMessageFee({
   from_address: l1ContractAddress, // The L1 contract address
   to_address: l2ContractAddress, // The L2 contract address
   entry_point_selector: 'handle_l1_message', // The L2 function name
@@ -100,7 +100,7 @@ You can check the status of L1-L2 messages:
 
 ```typescript
 // For L1->L2 messages
-const l1MessagesStatus = await provider.getL1MessagesStatus(l1TransactionHash);
+const l1MessagesStatus = await myProvider.getL1MessagesStatus(l1TransactionHash);
 ```
 
 ### 5. Hashes and Verification
@@ -136,7 +136,7 @@ const l1ToL2MessageHash = hash.getL2MessageHash(
 
 ```typescript
 const l2TransactionHash = '0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819';
-const l1MessageHash = await provider.getL1MessageHash(l2TransactionHash);
+const l1MessageHash = await myProvider.getL1MessageHash(l2TransactionHash);
 // Verify at: https://sepolia.voyager.online/tx/0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819#messages
 ```
 
@@ -186,7 +186,7 @@ const tx = await account0.execute({
 });
 
 // Wait for the transaction to be accepted
-await provider.waitForTransaction(tx.transaction_hash);
+await myProvider.waitForTransaction(tx.transaction_hash);
 ```
 
 ### 3. Consuming

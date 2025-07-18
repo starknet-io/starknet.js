@@ -18,7 +18,7 @@ For users who might require the features of either library, a `baseFetch` overri
 import makeFetchCookie from 'fetch-cookie';
 import isomorphicFetch from 'isomorphic-fetch';
 
-const provider = new RpcProvider({
+const myProvider = new RpcProvider({
   baseFetch: makeFetchCookie(isomorphicFetch),
 });
 ```
