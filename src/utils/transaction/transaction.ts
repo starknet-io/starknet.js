@@ -1,4 +1,4 @@
-import { Deployer } from '../../deployer';
+import { legacyDeployer } from '../../deployer';
 import type { DeployerCall } from '../../deployer/types/index.type';
 import { ETransactionVersion } from '../../provider/types/spec.type';
 import {
@@ -201,7 +201,7 @@ export function buildUDCCall(
   payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
   address: string
 ): DeployerCall {
-  const deployer = new Deployer();
+  const deployer = legacyDeployer;
   return deployer.buildDeployerCall(payload, address);
 }
 
