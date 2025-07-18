@@ -103,7 +103,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   websocket: any;
 } = {
   rpcVersion: '0.9.0',
-  transactionVersion: ETransactionVersion.V3, // Starknet 0.14.0 has only V3 transactions
+  transactionVersion: ETransactionVersion.V3, // Starknet 0.14.0 only V3 transactions
   logLevel: 'INFO',
   resourceBoundsOverhead: {
     l1_gas: {
