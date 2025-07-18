@@ -1,10 +1,10 @@
-import { RANGE_FELT } from '../global/constants';
-import { logger } from '../global/logger';
-import type { RpcProvider } from '../provider/rpc';
-import { BlockTag, type BlockIdentifier, type RPC } from '../types';
-import type { BlockWithTxs } from '../types/api';
-import assert from './assert';
-import { LibraryError } from './errors';
+import { RANGE_FELT } from '../../global/constants';
+import { logger } from '../../global/logger';
+import type { ProviderInterface } from '../../provider';
+import { BlockTag, type BlockIdentifier, type RPC } from '../../types';
+import type { BlockWithTxs } from '../../types/api';
+import assert from '../assert';
+import { LibraryError } from '../errors';
 
 /**
  * Result of provider.getTipStatsFromBlocks().
@@ -72,7 +72,7 @@ function isV3TransactionWithTip(tx: RPC.TXN_WITH_HASH): tx is RPC.TXN_WITH_HASH 
  * @param provider RPC provider to check
  * @returns true if batching is enabled, false otherwise
  */
-function isBatchingEnabled(provider: RpcProvider): boolean {
+function isBatchingEnabled(provider: ProviderInterface): boolean {
   return !!(provider.channel as any).batchClient;
 }
 
@@ -199,7 +199,7 @@ function calculateTipStats(tips: bigint[]): TipEstimate {
  * @returns Block number to start analysis from
  */
 async function getStartingBlockNumber(
-  provider: RpcProvider,
+  provider: ProviderInterface,
   blockIdentifier: BlockIdentifier
 ): Promise<number> {
   try {
@@ -226,7 +226,7 @@ async function getStartingBlockNumber(
  * @returns Block data or null if failed
  */
 async function fetchBlockSafely(
-  provider: RpcProvider,
+  provider: ProviderInterface,
   blockNumber: number
 ): Promise<BlockWithTxs | null> {
   try {
@@ -257,7 +257,7 @@ function generateBlockNumbers(startingBlockNumber: number, maxBlocks: number): n
  * @returns Array of BlockWithTxs data (nulls for failed fetches)
  */
 async function fetchBlocksInParallel(
-  provider: RpcProvider,
+  provider: ProviderInterface,
   blockNumbers: number[]
 ): Promise<(BlockWithTxs | null)[]> {
   const fetchPromises = blockNumbers.map(async (blockNumber) => {
@@ -283,7 +283,7 @@ async function fetchBlocksInParallel(
  * @returns Promise resolving to TipEstimate object (returns zero values if insufficient data)
  */
 async function getTipStatsParallel(
-  provider: RpcProvider,
+  provider: ProviderInterface,
   blockIdentifier: BlockIdentifier,
   options: TipAnalysisOptions
 ): Promise<TipEstimate> {
@@ -340,7 +340,7 @@ async function getTipStatsParallel(
  * @returns Promise resolving to TipEstimate object (returns zero values if insufficient data)
  */
 async function getTipStatsSequential(
-  provider: RpcProvider,
+  provider: ProviderInterface,
   blockIdentifier: BlockIdentifier,
   options: TipAnalysisOptions
 ): Promise<TipEstimate> {
@@ -470,7 +470,7 @@ async function getTipStatsSequential(
  * ```
  */
 export async function getTipStatsFromBlocks(
-  provider: RpcProvider,
+  provider: ProviderInterface,
   blockIdentifier: BlockIdentifier = BlockTag.LATEST,
   options: TipAnalysisOptions = {}
 ): Promise<TipEstimate> {

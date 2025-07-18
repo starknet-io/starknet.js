@@ -26,6 +26,7 @@ import {
   ResourceBoundsBN,
   TransactionTrace,
   BlockWithTxHashes,
+  PRE_CONFIRMED_STATE_UPDATE,
 } from './spec.type';
 
 export type Block = Simplify<BLOCK_WITH_TX_HASHES>;
@@ -74,8 +75,9 @@ export type SimulateTransactionOverhead = {
 
 export type SimulateTransactionOverheadResponse = SimulateTransactionOverhead[];
 
-export type StateUpdateResponse = StateUpdate | PendingStateUpdate;
+export type PreConfirmedStateUpdate = PRE_CONFIRMED_STATE_UPDATE;
 export type StateUpdate = STATE_UPDATE;
+export type StateUpdateResponse = StateUpdate | PreConfirmedStateUpdate;
 /**
  * PreConfirmedStateUpdate but left old name
  */

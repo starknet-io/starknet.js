@@ -1,8 +1,10 @@
-import { getTipStatsFromBlocks, type TipAnalysisOptions } from '../../src/utils/tip';
-import { RpcProvider } from '../../src/provider/rpc';
-import { LibraryError } from '../../src/utils/errors';
-import type { BlockWithTxs } from '../../src/types/api';
-import type { RPC } from '../../src/types';
+import {
+  getTipStatsFromBlocks,
+  type TipAnalysisOptions,
+  RpcProvider,
+  LibraryError,
+  type RPC,
+} from '../../src';
 
 // Mock the RpcProvider
 jest.mock('../../src/provider/rpc');
@@ -24,7 +26,7 @@ describe('Tip Analysis', () => {
     const createMockBlock = (
       blockNumber: number,
       transactions: Array<Partial<RPC.TXN_WITH_HASH>>
-    ): BlockWithTxs =>
+    ): RPC.BlockWithTxs =>
       ({
         status: 'ACCEPTED_ON_L1',
         block_number: blockNumber,

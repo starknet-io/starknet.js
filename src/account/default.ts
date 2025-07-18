@@ -97,8 +97,18 @@ export class Account extends Provider implements AccountInterface {
 
   public paymaster: PaymasterInterface;
 
+  public defaultTipType: string;
+
   constructor(options: AccountOptions) {
-    const { provider, address, signer, cairoVersion, transactionVersion, paymaster } = options;
+    const {
+      provider,
+      address,
+      signer,
+      cairoVersion,
+      transactionVersion,
+      paymaster,
+      defaultTipType,
+    } = options;
     super(provider);
     this.address = address.toLowerCase();
     this.signer = isString(signer) || signer instanceof Uint8Array ? new Signer(signer) : signer;
@@ -108,6 +118,7 @@ export class Account extends Provider implements AccountInterface {
     }
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
     this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
+    this.defaultTipType = defaultTipType ?? config.get('defaultTipType');
 
     logger.debug('Account setup', {
       transactionVersion: this.transactionVersion,
@@ -148,7 +159,7 @@ export class Account extends Provider implements AccountInterface {
       this.cairoVersion = cairo;
     }
     return this.cairoVersion;
-  } // TODO: TT Cairo version is not necessary as only CAIRO1 is supported
+  } // TODO: TT Cairo version is still needed for invoke on existing contracts
 
   public async estimateInvokeFee(
     calls: AllowArray<Call>,
@@ -193,7 +204,6 @@ export class Account extends Provider implements AccountInterface {
     }: DeployAccountContractPayload,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
-    // TODO: TT optional safty check that classHash is from Cairo1 contract and not Cairo0
     const compiledCalldata = CallData.compile(constructorCalldata);
     const contractAddressFinal =
       contractAddress ??
@@ -219,7 +229,6 @@ export class Account extends Provider implements AccountInterface {
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
-    // TODO: TT optional safty check that classHash is from Cairo1 contract and not Cairo0
     const calls = this.buildUDCContractPayload(payload);
     return this.estimateInvokeFee(calls, details);
   }
