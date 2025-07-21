@@ -1,41 +1,10 @@
 import { hash } from '../../src';
-import { contracts, erc20ClassHash } from '../config/fixtures';
+import { contracts } from '../config/fixtures';
 
 describe('Hash Tester', () => {
   test('Test getSelectorFromName', () => {
     const hash0 = hash.getSelectorFromName('__validate__');
     expect(hash0).toEqual('0x162da33a4585851fe8d3af3c2a9c60b557814e221e0d4f30ff0b2189d9c7775');
-  });
-
-  describe('Compute ClassHash of various contracts Cairo0', () => {
-    test('ERC20 Contract ClassHash', () => {
-      const classHash = hash.computeContractClassHash(contracts.Erc20);
-
-      expect(classHash).toEqual(erc20ClassHash);
-      expect(classHash).toMatchInlineSnapshot(
-        `"0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a"`
-      );
-      const hintedClassH = hash.computeHintedClassHash(contracts.Erc20);
-      expect(hintedClassH).toBe(
-        '0x2819cbfc03fb25e1816c2aa6ec990062539a4470a8f57b78d27a6efbd8e1446'
-      );
-    });
-
-    test('OZ ERC20 Contract ClassHash', () => {
-      const classHash = hash.computeContractClassHash(contracts.OpenZeppelinAccount);
-
-      expect(classHash).toMatchInlineSnapshot(
-        `"0x36c7e49a16f8fc760a6fbdf71dde543d98be1fee2eda5daff59a0eeae066ed9"`
-      );
-    });
-
-    test('Test DApp Contract ClassHash', () => {
-      const classHash = hash.computeContractClassHash(contracts.TestDapp);
-
-      expect(classHash).toMatchInlineSnapshot(
-        `"0x4367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5"`
-      );
-    });
   });
 
   describe('Compute CompiledClassHash & ClassHash Cairo1', () => {

@@ -22,10 +22,18 @@ export type TransactionReceiptCallbacks =
   | TransactionReceiptCallbacksDefined
   | TransactionReceiptCallbacksDefault;
 
-export type GetTransactionReceiptResponse = {
-  readonly statusReceipt: TransactionReceiptStatus;
-  readonly value: TransactionReceiptValue;
+type TransactionReceiptStatusFromMethod<T extends `is${Capitalize<TransactionReceiptStatus>}`> =
+  T extends `is${infer R}` ? Uncapitalize<R> : never;
+
+export type GetTransactionReceiptResponse<
+  T extends TransactionReceiptStatus = TransactionReceiptStatus,
+> = {
+  readonly statusReceipt: T;
+  readonly value: TransactionStatusReceiptSets[T];
   match(callbacks: TransactionReceiptCallbacks): void;
 } & {
-  [key in `is${Capitalize<TransactionReceiptStatus>}`]: () => boolean;
+  // @ts-ignore - seems to be needed only for docs, check again after the doc dependencies are updated
+  [key in `is${Capitalize<TransactionReceiptStatus>}`]: () => this is GetTransactionReceiptResponse<
+    TransactionReceiptStatusFromMethod<key>
+  >;
 };

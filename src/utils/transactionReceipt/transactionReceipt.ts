@@ -6,10 +6,10 @@ import {
   TransactionExecutionStatus,
 } from '../../types';
 import type {
+  GetTransactionReceiptResponse,
   TransactionReceiptCallbacks,
   TransactionReceiptCallbacksDefault,
   TransactionReceiptStatus,
-  GetTransactionReceiptResponse,
   TransactionReceiptValue,
 } from './transactionReceipt.type';
 
@@ -63,11 +63,11 @@ export class ReceiptTx implements GetTransactionReceiptResponse {
     return (callbacks as TransactionReceiptCallbacksDefault)._();
   }
 
-  isSuccess(): this is SuccessfulTransactionReceiptResponse {
+  isSuccess(): this is GetTransactionReceiptResponse<'success'> {
     return this.statusReceipt === 'success';
   }
 
-  isReverted(): this is RevertedTransactionReceiptResponse {
+  isReverted(): this is GetTransactionReceiptResponse<'reverted'> {
     return this.statusReceipt === 'reverted';
   }
 
@@ -78,7 +78,7 @@ export class ReceiptTx implements GetTransactionReceiptResponse {
     return this.statusReceipt === 'rejected';
   } */
 
-  isError() {
+  isError(): this is GetTransactionReceiptResponse<'error'> {
     return this.statusReceipt === 'error';
   }
 

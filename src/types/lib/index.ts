@@ -1,11 +1,14 @@
-import { SUBSCRIPTION_BLOCK_TAG } from 'starknet-types-08';
 import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
-import { EDataAvailabilityMode } from '../api';
+import { EDataAvailabilityMode, ETransactionType, SUBSCRIPTION_BLOCK_TAG } from '../api';
 import { CairoEnum } from '../cairoEnum';
-import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
-import { ValuesType } from '../helpers/valuesType';
-import { ResourceBounds } from '../../provider/types/spec.type';
+import { Abi, CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
+import {
+  BlockTag,
+  ResourceBoundsBN,
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
+} from '../../provider/types/spec.type';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
@@ -79,6 +82,7 @@ export type UniversalDeployerContractPayload = {
   salt?: string;
   unique?: boolean;
   constructorCalldata?: RawArgs;
+  abi?: Abi; // TODO: check chain of usage in Account
 };
 
 export type DeployAccountContractPayload = {
@@ -95,12 +99,44 @@ export type DeployAccountContractTransaction = Omit<
   signature?: Signature;
 };
 
-export type DeclareContractPayload = {
-  contract: CompiledContract | string;
+/**
+ * Base payload for declaring a contract on Starknet
+ */
+type BaseDeclareContractPayload = {
+  /** The compiled contract (JSON object) or path to compiled contract file */
+  contract: CompiledContract | string; // TODO: check if description is ok
+  /**
+   * Class hash of the contract. Optional optimization - if not provided,
+   * it will be computed from the contract
+   */
   classHash?: string;
-  casm?: CompiledSierraCasm;
+};
+
+/**
+ * Declare contract with CASM code
+ */
+type DeclareWithCasm = BaseDeclareContractPayload & {
+  /** Compiled Sierra Assembly (CASM) code */
+  casm: CompiledSierraCasm;
+  /** Hash of the compiled CASM. Optional - will be computed from casm if not provided */
   compiledClassHash?: string;
 };
+
+/**
+ * Declare contract with pre-computed compiled class hash (optimization)
+ */
+type DeclareWithCompiledClassHash = BaseDeclareContractPayload & {
+  /** Hash of the compiled CASM */
+  compiledClassHash: string;
+  /** CASM is not needed when compiledClassHash is provided */
+  casm?: never;
+};
+
+/**
+ * Payload for declaring a contract on Starknet.
+ * Either provide CASM code, or a pre-computed compiledClassHash for optimization.
+ */
+export type DeclareContractPayload = DeclareWithCasm | DeclareWithCompiledClassHash;
 
 /**
  * DeclareContractPayload with classHash or contract defined
@@ -111,7 +147,7 @@ export type CompleteDeclareContractPayload = {
   contract: CompiledContract | string;
   classHash: string;
   casm?: CompiledSierraCasm;
-  compiledClassHash?: string;
+  compiledClassHash: string;
 };
 
 export type DeclareAndDeployContractPayload = Omit<UniversalDeployerContractPayload, 'classHash'> &
@@ -127,7 +163,6 @@ export type DeclareContractTransaction = {
 export type CallDetails = {
   contractAddress: string;
   calldata?: RawArgs | Calldata;
-  entrypoint?: string;
 };
 
 export type Invocation = CallDetails & { signature?: Signature };
@@ -146,7 +181,7 @@ export type InvocationsDetails = {
 export type V3TransactionDetails = {
   nonce: BigNumberish;
   version: BigNumberish;
-  resourceBounds: ResourceBounds;
+  resourceBounds: ResourceBoundsBN;
   tip: BigNumberish;
   paymasterData: BigNumberish[];
   accountDeploymentData: BigNumberish[];
@@ -168,15 +203,6 @@ export type InvocationsDetailsWithNonce =
   | (InvocationsDetails & { nonce: BigNumberish })
   | V3TransactionDetails;
 
-export const TransactionType = {
-  DECLARE: 'DECLARE',
-  DEPLOY: 'DEPLOY',
-  DEPLOY_ACCOUNT: 'DEPLOY_ACCOUNT',
-  INVOKE: 'INVOKE_FUNCTION',
-} as const;
-
-export type TransactionType = ValuesType<typeof TransactionType>;
-
 /**
  * new statuses are defined by props: finality_status and execution_status
  * to be #deprecated
@@ -192,7 +218,7 @@ export type TransactionType = ValuesType<typeof TransactionType>;
 
 export type TransactionStatus = ValuesType<typeof TransactionStatus>; */
 
-export const TransactionFinalityStatus = {
+/* export const TransactionFinalityStatus = {
   NOT_RECEIVED: 'NOT_RECEIVED',
   RECEIVED: 'RECEIVED',
   ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
@@ -207,23 +233,20 @@ export const TransactionExecutionStatus = {
   SUCCEEDED: 'SUCCEEDED',
 } as const;
 
-export type TransactionExecutionStatus = ValuesType<typeof TransactionExecutionStatus>;
+export type TransactionExecutionStatus = ValuesType<typeof TransactionExecutionStatus>; */
 
-export const BlockStatus = {
+/* export const BlockStatus = {
   PENDING: 'PENDING',
   ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
   ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
   REJECTED: 'REJECTED',
 } as const;
 
-export type BlockStatus = ValuesType<typeof BlockStatus>;
+export type BlockStatus = ValuesType<typeof BlockStatus>; */
 
-export const BlockTag = {
-  PENDING: 'pending',
-  LATEST: 'latest',
-} as const;
+/* export const BlockTag = RPCSPEC09.EBlockTag;
 
-export type BlockTag = ValuesType<typeof BlockTag>;
+export type BlockTag = ValuesType<typeof BlockTag>; */
 
 export type BlockNumber = BlockTag | null | number;
 
@@ -244,9 +267,9 @@ export type SubscriptionBlockIdentifier = SUBSCRIPTION_BLOCK_TAG | (string & {})
  * items used by AccountInvocations
  */
 export type AccountInvocationItem = (
-  | ({ type: typeof TransactionType.DECLARE } & DeclareContractTransaction)
-  | ({ type: typeof TransactionType.DEPLOY_ACCOUNT } & DeployAccountContractTransaction)
-  | ({ type: typeof TransactionType.INVOKE } & Invocation)
+  | ({ type: typeof ETransactionType.DECLARE } & DeclareContractTransaction)
+  | ({ type: typeof ETransactionType.DEPLOY_ACCOUNT } & DeployAccountContractTransaction)
+  | ({ type: typeof ETransactionType.INVOKE } & Invocation)
 ) &
   InvocationsDetailsWithNonce;
 
@@ -259,14 +282,14 @@ export type AccountInvocations = AccountInvocationItem[];
  * Invocations array user provide to bulk method (simulate)
  */
 export type Invocations = Array<
-  | ({ type: typeof TransactionType.DECLARE } & OptionalPayload<DeclareContractPayload>)
-  | ({ type: typeof TransactionType.DEPLOY } & OptionalPayload<
+  | ({ type: typeof ETransactionType.DECLARE } & OptionalPayload<DeclareContractPayload>)
+  | ({ type: typeof ETransactionType.DEPLOY } & OptionalPayload<
       AllowArray<UniversalDeployerContractPayload>
     >)
   | ({
-      type: typeof TransactionType.DEPLOY_ACCOUNT;
+      type: typeof ETransactionType.DEPLOY_ACCOUNT;
     } & OptionalPayload<DeployAccountContractPayload>)
-  | ({ type: typeof TransactionType.INVOKE } & OptionalPayload<AllowArray<Call>>)
+  | ({ type: typeof ETransactionType.INVOKE } & OptionalPayload<AllowArray<Call>>)
 >;
 
 export type Tupled = { element: any; type: string };
