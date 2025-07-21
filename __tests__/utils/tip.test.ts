@@ -165,7 +165,7 @@ describe('Tip Analysis', () => {
       });
     });
 
-    test('should exclude zero tips by default', async () => {
+    test('should include zero tips by default', async () => {
       const transactions = [
         createMockInvokeTransaction('0'),
         createMockInvokeTransaction('10'),
@@ -179,8 +179,8 @@ describe('Tip Analysis', () => {
       const options: TipAnalysisOptions = { minTxsNecessary: 3 };
       const result = await getTipStatsFromBlocks(mockProvider, 'latest', options);
 
-      expect(result.minTip).toBe(10n); // Zero tip excluded
-      expect(result.averageTip).toBe(20n); // (10+20+30)/3 = 20
+      expect(result.minTip).toBe(0n); // Zero tip excluded
+      expect(result.averageTip).toBe(15n); // (0+10+20+30)/4 = 15
     });
 
     test('should include zero tips when specified', async () => {
