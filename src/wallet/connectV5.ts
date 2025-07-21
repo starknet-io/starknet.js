@@ -14,7 +14,7 @@ import {
   AccountDeploymentData,
   Signature,
   SpecVersion,
-} from 'starknet-types-08';
+} from '@starknet-io/starknet-types-08';
 
 /**
  * Request Permission for wallet account, return addresses that are allowed by user

@@ -27,7 +27,7 @@ import {
   switchStarknetChain,
   watchAsset,
 } from './connect';
-import type { StarknetWalletProvider, WalletAccountOptions } from './types/index.type';
+import type { StarknetWalletProvider, WalletAccountV4Options } from './types/index.type';
 import type { PaymasterOptions } from '../paymaster/types/index.type';
 import type { PaymasterInterface } from '../paymaster';
 import {
@@ -42,7 +42,7 @@ import {
 export class WalletAccount extends Account implements AccountInterface {
   public walletProvider: StarknetWalletProvider;
 
-  constructor(options: WalletAccountOptions) {
+  constructor(options: WalletAccountV4Options) {
     super({ ...options, signer: '' }); // At this point unknown address
     this.walletProvider = options.walletProvider;
 

@@ -2,7 +2,7 @@ import type {
   AddStarknetChainParameters,
   Signature,
   WatchAssetParameters,
-} from 'starknet-types-08';
+} from '@starknet-io/starknet-types-08';
 
 import type { WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard/features';
 import type { StandardEventsChangeProperties } from '@wallet-standard/features';
@@ -17,9 +17,9 @@ import {
   CompiledSierra,
   DeclareContractPayload,
   MultiDeployContractResponse,
-  ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
+  type PaymasterOptions,
 } from '../types';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
@@ -35,6 +35,8 @@ import {
   switchStarknetChain,
   watchAsset,
 } from './connectV5';
+import type { WalletAccountV5Options } from './types/index.type';
+import type { PaymasterInterface } from '../paymaster';
 
 /**
  * WalletAccountV5 class.
@@ -49,18 +51,9 @@ export class WalletAccountV5 extends Account implements AccountInterface {
    */
   private unsubscribe: () => void;
 
-  constructor(
-    /* Node that will be used to READ Starknet */
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    /* the get-starknet v5 wallet that will WRITE Starknet */
-    walletProvider: WalletWithStarknetFeatures,
-    /* Optional. To use when address is known */
-    address: string,
-    /* Optional cairo version of the account ("0" | "1") */
-    cairoVersion?: CairoVersion
-  ) {
-    super(providerOrOptions, address, '', cairoVersion); // At this point unknown address
-    this.walletProvider = walletProvider;
+  constructor(options: WalletAccountV5Options) {
+    super({ ...options, signer: '' }); // At this point unknown address
+    this.walletProvider = options.walletProvider;
 
     // Update Address/network on change
     this.unsubscribe = this.walletProvider.features['standard:events'].on(
@@ -165,18 +158,26 @@ export class WalletAccountV5 extends Account implements AccountInterface {
     provider: ProviderInterface,
     walletProvider: WalletWithStarknetFeatures,
     cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
-    return new WalletAccountV5(provider, walletProvider, accountAddress, cairoVersion);
+    return new WalletAccountV5({
+      provider,
+      walletProvider,
+      address: accountAddress,
+      cairoVersion,
+      paymaster,
+    });
   }
 
   static async connectSilent(
     provider: ProviderInterface,
     walletProvider: WalletWithStarknetFeatures,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface
   ) {
-    return WalletAccountV5.connect(provider, walletProvider, cairoVersion, true);
+    return WalletAccountV5.connect(provider, walletProvider, cairoVersion, paymaster, true);
   }
 
   // TODO: MISSING ESTIMATES
