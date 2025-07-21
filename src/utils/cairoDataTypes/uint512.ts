@@ -7,6 +7,7 @@ import { BigNumberish, type Uint512 } from '../../types';
 import { addHexPrefix } from '../encode';
 import { CairoFelt } from './felt';
 import { UINT_128_MAX } from './uint256';
+import { isObject } from '../typed';
 
 export const UINT_512_MAX = (1n << 512n) - 1n;
 export const UINT_512_MIN = 0n;
@@ -44,7 +45,7 @@ export class CairoUint512 {
 
   public constructor(...arr: any[]) {
     if (
-      typeof arr[0] === 'object' &&
+      isObject(arr[0]) &&
       arr.length === 1 &&
       'limb0' in arr[0] &&
       'limb1' in arr[0] &&

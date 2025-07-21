@@ -30,6 +30,7 @@ import { validateAndParseEthAddress } from '../utils/eth';
 import fetch from '../utils/connect/fetch';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
+import { isNumber } from '../utils/typed';
 import {
   bigNumberishArrayToHexadecimalStringArray,
   getHexStringArray,
@@ -123,7 +124,7 @@ export class RpcChannel {
 
     this.requestId = 0;
 
-    if (typeof batch === 'number') {
+    if (isNumber(batch)) {
       this.batchClient = new BatchClient<RPC.Methods>({
         nodeUrl: this.nodeUrl,
         headers: this.headers,

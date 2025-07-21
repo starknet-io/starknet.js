@@ -33,7 +33,7 @@ import {
   bigNumberishArrayToHexadecimalStringArray,
   toHex,
 } from '../num';
-import { isBigInt, isString } from '../typed';
+import { isBigInt, isObject, isString } from '../typed';
 
 type V3Details = Required<
   Pick<
@@ -402,7 +402,7 @@ export function resourceBoundsToHexString(resourceBoundsBN: ResourceBoundsBN): R
     if (isBigInt(obj)) {
       return toHex(obj);
     }
-    if (obj && typeof obj === 'object') {
+    if (isObject(obj)) {
       const result: any = {};
       Object.keys(obj).forEach((key) => {
         result[key] = convertBigIntToHex(obj[key]);
@@ -437,10 +437,10 @@ export function resourceBoundsToHexString(resourceBoundsBN: ResourceBoundsBN): R
  */
 export function resourceBoundsToBigInt(resourceBounds: ResourceBounds): ResourceBoundsBN {
   const convertStringToBigInt = (obj: any): any => {
-    if (typeof obj === 'string') {
+    if (isString(obj)) {
       return BigInt(obj);
     }
-    if (obj && typeof obj === 'object') {
+    if (isObject(obj)) {
       const result: any = {};
       Object.keys(obj).forEach((key) => {
         result[key] = convertStringToBigInt(obj[key]);
