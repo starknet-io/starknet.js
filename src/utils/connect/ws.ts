@@ -2,7 +2,7 @@ import { LibraryError } from '../errors';
 
 export default (typeof WebSocket !== 'undefined' && WebSocket) ||
   (typeof globalThis !== 'undefined' && globalThis.WebSocket) ||
-  (typeof window !== 'undefined' && window.WebSocket.bind(window)) ||
+  (typeof window !== 'undefined' && window.WebSocket && window.WebSocket.bind(window)) ||
   (typeof global !== 'undefined' && global.WebSocket) ||
   (class {
     constructor() {

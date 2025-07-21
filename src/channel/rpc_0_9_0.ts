@@ -407,9 +407,9 @@ export class RpcChannel {
     const retryInterval = options?.retryInterval ?? this.transactionRetryIntervalDefault;
     const errorStates: any = options?.errorStates ?? [];
     const successStates: any = options?.successStates ?? [
-      RPC.ETransactionExecutionStatus.SUCCEEDED,
-      RPC.ETransactionStatus.ACCEPTED_ON_L2,
-      RPC.ETransactionStatus.ACCEPTED_ON_L1,
+      // RPC.ETransactionExecutionStatus.SUCCEEDED, // UDC  on SUCCEEDED + pre_confirmed had no proper events to parse UDC
+      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
+      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
     ];
 
     let txStatus: RPC.TransactionStatus;

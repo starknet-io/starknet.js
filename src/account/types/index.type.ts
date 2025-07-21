@@ -21,6 +21,7 @@ import type { SupportedTransactionVersion } from '../../global/constants';
 import type { PaymasterInterface } from '../../paymaster';
 import type { ProviderInterface } from '../../provider/interface';
 import type { DeployerInterface } from '../../deployer';
+import type { TipEstimate } from '../../utils/modules';
 
 /**
  * Configuration options for creating an Account instance
@@ -40,6 +41,11 @@ export type AccountOptions = {
   paymaster?: PaymasterOptions | PaymasterInterface;
   /** Use of a custom account deployer contract (optional) */
   customDeployer?: DeployerInterface;
+  /**
+   * Default tip type to use for sending transactions (optional)
+   * @default 'recommendedTip'
+   */
+  defaultTipType?: Exclude<keyof TipEstimate, 'metrics'>;
 };
 
 export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;

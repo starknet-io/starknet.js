@@ -12,7 +12,8 @@ import {
   Calldata,
   CompiledSierra,
   Contract,
-  DeclareDeployDCResponse,
+  DeclareDeployUDCResponse,
+  ParsedEvents,
   ProviderInterface,
   RawArgsArray,
   RawArgsObject,
@@ -25,7 +26,6 @@ import {
   selector,
   shortString,
   stark,
-  types,
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
@@ -813,7 +813,7 @@ describe('Cairo 1', () => {
         simpleDataStruct,
         simpleDataArray
       );
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
@@ -835,7 +835,7 @@ describe('Cairo 1', () => {
         nestedKeyStruct,
         nestedDataStruct
       );
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventNested': {
             nestedKeyStruct,
@@ -850,7 +850,7 @@ describe('Cairo 1', () => {
 
     test('parse tx returning multiple similar events', async () => {
       const anotherKeyVariable = 100n;
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
@@ -895,7 +895,7 @@ describe('Cairo 1', () => {
       expect(events[1]).toMatchEventStructure(shouldBe[1]);
     });
     test('parse tx returning multiple different events', async () => {
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,

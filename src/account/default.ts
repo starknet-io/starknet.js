@@ -97,9 +97,19 @@ export class Account extends Provider implements AccountInterface {
   public paymaster: PaymasterInterface;
 
   public deployer: Deployer;
+  
+  public defaultTipType: string;
 
   constructor(options: AccountOptions) {
-    const { provider, address, signer, cairoVersion, transactionVersion, paymaster } = options;
+    const {
+      provider,
+      address,
+      signer,
+      cairoVersion,
+      transactionVersion,
+      paymaster,
+      defaultTipType,
+    } = options;
     super(provider);
     this.address = address.toLowerCase();
     this.signer = isString(signer) || signer instanceof Uint8Array ? new Signer(signer) : signer;
@@ -110,6 +120,7 @@ export class Account extends Provider implements AccountInterface {
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
     this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
     this.deployer = options.customDeployer ?? defaultDeployer;
+    this.defaultTipType = defaultTipType ?? config.get('defaultTipType');
 
     logger.debug('Account setup', {
       transactionVersion: this.transactionVersion,
@@ -150,19 +161,17 @@ export class Account extends Provider implements AccountInterface {
       this.cairoVersion = cairo;
     }
     return this.cairoVersion;
-  } // TODO: TT Cairo version is not necessary as only CAIRO1 is supported
+  } // TODO: TT Cairo version is still needed for invoke on existing contracts
 
   public async estimateInvokeFee(
     calls: AllowArray<Call>,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
-    const transactions = Array.isArray(calls) ? calls : [calls];
-
     // Transform all calls into a single invocation
     const invocations = [
       {
         type: ETransactionType.INVOKE,
-        payload: transactions,
+        payload: [calls].flat(),
       },
     ];
     const estimateBulk = await this.estimateFeeBulk(invocations, details);
@@ -177,14 +186,11 @@ export class Account extends Provider implements AccountInterface {
       isSierra(payload.contract),
       'Declare fee estimation is not supported for Cairo0 contracts'
     );
-
-    const declareContractPayload = extractContractHashes(payload);
-
     // Transform into invocations for bulk estimation
     const invocations = [
       {
         type: ETransactionType.DECLARE,
-        payload: declareContractPayload,
+        payload: extractContractHashes(payload),
       },
     ];
     const estimateBulk = await this.estimateFeeBulk(invocations, details);
@@ -200,7 +206,6 @@ export class Account extends Provider implements AccountInterface {
     }: DeployAccountContractPayload,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
-    // TODO: TT optional safty check that classHash is from Cairo1 contract and not Cairo0
     const compiledCalldata = CallData.compile(constructorCalldata);
     const contractAddressFinal =
       contractAddress ??
@@ -226,7 +231,6 @@ export class Account extends Provider implements AccountInterface {
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
-    // TODO: TT optional safty check that classHash is from Cairo1 contract and not Cairo0
     const calls = this.buildDeployerContractPayload(payload);
     return this.estimateInvokeFee(calls, details);
   }
@@ -248,7 +252,10 @@ export class Account extends Provider implements AccountInterface {
 
     const { nonce, blockIdentifier, version: providedVersion, skipValidate } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
-      ...v3Details(details),
+      ...v3Details({
+        ...details,
+        tip: details.tip ?? (await this.getEstimateTip()).recommendedTip, // TODO: Test how estimate diff with and without tip
+      }),
       versions: [
         toTransactionVersion(
           toFeeVersion(this.transactionVersion) || ETransactionVersion3.F3,
@@ -279,7 +286,10 @@ export class Account extends Provider implements AccountInterface {
       version: providedVersion,
     } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
-      ...v3Details(details),
+      ...v3Details({
+        ...details,
+        tip: details.tip ?? (await this.getEstimateTip()).recommendedTip, // TODO: Test how simulate diff with and without tip
+      }),
       versions: [
         toTransactionVersion(this.transactionVersion || ETransactionVersion3.V3, providedVersion),
       ],
@@ -299,13 +309,17 @@ export class Account extends Provider implements AccountInterface {
     transactions: AllowArray<Call>,
     transactionsDetail: UniversalDetails = {}
   ): Promise<InvokeFunctionResponse> {
-    const calls = Array.isArray(transactions) ? transactions : [transactions];
+    const calls = [transactions].flat();
     const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       this.transactionVersion || ETransactionVersion3.V3,
       transactionsDetail.version
     );
 
+    const transactionsDetailWithTip = {
+      ...transactionsDetail,
+      tip: transactionsDetail.tip ?? (await this.getEstimateTip()).recommendedTip,
+    };
     // Transform all calls into a single invocation
     const invocations = [
       {
@@ -313,13 +327,13 @@ export class Account extends Provider implements AccountInterface {
         payload: calls, // Pass all calls as the payload
       },
     ];
-    const estimateBulk = await this.estimateFeeBulk(invocations, transactionsDetail);
+    const estimateBulk = await this.estimateFeeBulk(invocations, transactionsDetailWithTip);
     const estimate = estimateBulk[0]; // Get the first (and only) estimate
 
     const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
-      ...v3Details(transactionsDetail),
+      ...v3Details(transactionsDetailWithTip),
       resourceBounds: estimate.resourceBounds,
       walletAddress: this.address,
       nonce,
@@ -335,7 +349,7 @@ export class Account extends Provider implements AccountInterface {
     return this.invokeFunction(
       { contractAddress: this.address, calldata, signature },
       {
-        ...v3Details(transactionsDetail),
+        ...v3Details(transactionsDetailWithTip),
         resourceBounds: estimate.resourceBounds,
         nonce,
         version,
@@ -495,6 +509,10 @@ export class Account extends Provider implements AccountInterface {
       this.transactionVersion || ETransactionVersion3.V3,
       providedVersion
     );
+    const detailsWithTip = {
+      ...details,
+      tip: details.tip ?? (await this.getEstimateTip()).recommendedTip,
+    };
 
     // Transform into invocations for bulk estimation
     const invocations = [
@@ -504,13 +522,13 @@ export class Account extends Provider implements AccountInterface {
       },
     ];
     const estimateBulk = await this.estimateFeeBulk(invocations, {
-      ...details,
+      ...detailsWithTip,
       version,
     });
     const estimate = estimateBulk[0]; // Get the first (and only) estimate
 
     const declareDetails: InvocationsSignerDetails = {
-      ...v3Details(details),
+      ...v3Details(detailsWithTip),
       resourceBounds: estimate.resourceBounds,
       nonce: toBigInt(nonce ?? (await this.getNonce())),
       version,
@@ -584,6 +602,10 @@ export class Account extends Provider implements AccountInterface {
     );
     const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
     const chainId = await this.getChainId();
+    const detailsWithTip = {
+      ...details,
+      tip: details.tip ?? (await this.getEstimateTip()).recommendedTip,
+    };
 
     const compiledCalldata = CallData.compile(constructorCalldata); // TODO: TT check if we should add abi here to safe compile
     const contractAddress =
@@ -602,11 +624,11 @@ export class Account extends Provider implements AccountInterface {
         },
       },
     ];
-    const estimateBulk = await this.estimateFeeBulk(invocations, details);
+    const estimateBulk = await this.estimateFeeBulk(invocations, detailsWithTip);
     const estimate = estimateBulk[0]; // Get the first (and only) estimate
 
     const signature = await this.signer.signDeployAccountTransaction({
-      ...v3Details(details),
+      ...v3Details(detailsWithTip),
       classHash,
       constructorCalldata: compiledCalldata,
       contractAddress,
@@ -620,7 +642,7 @@ export class Account extends Provider implements AccountInterface {
     return super.deployAccountContract(
       { classHash, addressSalt, constructorCalldata, signature },
       {
-        ...v3Details(details),
+        ...v3Details(detailsWithTip),
         nonce,
         resourceBounds: estimate.resourceBounds,
         version,
@@ -737,7 +759,7 @@ export class Account extends Provider implements AccountInterface {
       throw new Error(`The caller ${options.caller} is not valid.`);
     }
     const codedCaller: string = isHex(options.caller) ? options.caller : OutsideExecutionCallerAny;
-    const myCalls: Call[] = Array.isArray(calls) ? calls : [calls];
+    const myCalls: Call[] = [calls].flat();
     const supportedVersion = version ?? (await this.getSnip9Version());
     if (!supportedVersion) {
       throw new Error('This account is not handling outside transactions.');

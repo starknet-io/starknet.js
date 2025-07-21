@@ -1,3 +1,48 @@
+# [8.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v8.0.0-beta.1...v8.0.0-beta.2) (2025-07-21)
+
+### Features
+
+- customize tip type, cleanup, account interface update, remove types namespace export ([586ffde](https://github.com/starknet-io/starknet.js/commit/586ffdeb9ddcd38da4f93b2f579ad296a349fca5))
+- tip metric, test update ([e665389](https://github.com/starknet-io/starknet.js/commit/e665389c4fe8de6e7b386d6598ecc46b9a3d37c4))
+- tip raw impl in account, tests ([07d4e73](https://github.com/starknet-io/starknet.js/commit/07d4e738ef3e7c6c3c50b9ea3ceb9c3a76310eb4))
+
+# [8.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v7.6.4...v8.0.0-beta.1) (2025-07-16)
+
+- feat!: bump version ([0afb3f8](https://github.com/starknet-io/starknet.js/commit/0afb3f8e82b147bcc7084c417826313c1e488053))
+
+### Bug Fixes
+
+- factory jsdocs, CompleteDeclareContractPayload type update for Cairo1 ([06920cb](https://github.com/starknet-io/starknet.js/commit/06920cbcb52c70fe01d8161d27d6f0e32be94627))
+- import all types from ./api, remove 07 package ([68ac49c](https://github.com/starknet-io/starknet.js/commit/68ac49ceab4de5738671fd9d05757056a8c980df))
+- improve DeclareContractPayload type ([00835ca](https://github.com/starknet-io/starknet.js/commit/00835caf9406e8a9afd2cde22b43e5d3e2773990))
+- sepolia Pathfinder tests PASS ([0c41fc2](https://github.com/starknet-io/starknet.js/commit/0c41fc222c33077c7aad45c79af06852a0db3f69))
+
+### Features
+
+- await Contract.factory() with rawArgs support, del connect(), del contractFactory Class ([c108160](https://github.com/starknet-io/starknet.js/commit/c108160e9b14df7411fa27e8587129d9deaae85e))
+- contract & factory type-sync with Account, fix SierraContractClass abi, buildUDCCall with abi ([20a732a](https://github.com/starknet-io/starknet.js/commit/20a732a47f8312206c1ab946bd99f37c57d92075))
+- introduce roc09, made batchClient generic ([c49dd10](https://github.com/starknet-io/starknet.js/commit/c49dd1011ddf1ddec7c1e4403235338ab347b7a0))
+- main modifications without tests ([3407201](https://github.com/starknet-io/starknet.js/commit/34072010ce0a47fe94b80b29288ee129cce2bae1))
+- new channel init ([ffec346](https://github.com/starknet-io/starknet.js/commit/ffec346463f26b3aca8cb77d15d4440a08948e5b))
+- object-base API Account,WalletAccount, backward support methods ([06a3760](https://github.com/starknet-io/starknet.js/commit/06a37606fdde521d862f1608aa4ccf77eebba55c))
+- second swipe update, clean or commented tests ([92185f5](https://github.com/starknet-io/starknet.js/commit/92185f5674f8f1ded18c2aeb3ac273341bb3b117))
+
+### BREAKING CHANGES
+
+- starknet version 0.14:
+
+## [7.6.4](https://github.com/starknet-io/starknet.js/compare/v7.6.3...v7.6.4) (2025-07-10)
+
+### Bug Fixes
+
+- allow numeric revision value for typed data ([d4c9627](https://github.com/starknet-io/starknet.js/commit/d4c962749fa994a654057a930087529c13fa9562))
+
+## [7.6.3](https://github.com/starknet-io/starknet.js/compare/v7.6.2...v7.6.3) (2025-07-10)
+
+### Bug Fixes
+
+- check for the existence of window.WebSocket before bind ([ba7428b](https://github.com/starknet-io/starknet.js/commit/ba7428be4e6560106b8332ad8688a8f7e99a221b))
+
 ## [7.6.2](https://github.com/starknet-io/starknet.js/compare/v7.6.1...v7.6.2) (2025-06-24)
 
 ### Bug Fixes
