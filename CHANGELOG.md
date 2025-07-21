@@ -1,3 +1,11 @@
+# [8.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v8.0.0-beta.1...v8.0.0-beta.2) (2025-07-21)
+
+### Features
+
+- customize tip type, cleanup, account interface update, remove types namespace export ([586ffde](https://github.com/starknet-io/starknet.js/commit/586ffdeb9ddcd38da4f93b2f579ad296a349fca5))
+- tip metric, test update ([e665389](https://github.com/starknet-io/starknet.js/commit/e665389c4fe8de6e7b386d6598ecc46b9a3d37c4))
+- tip raw impl in account, tests ([07d4e73](https://github.com/starknet-io/starknet.js/commit/07d4e738ef3e7c6c3c50b9ea3ceb9c3a76310eb4))
+
 # [8.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v7.6.4...v8.0.0-beta.1) (2025-07-16)
 
 - feat!: bump version ([0afb3f8](https://github.com/starknet-io/starknet.js/commit/0afb3f8e82b147bcc7084c417826313c1e488053))
