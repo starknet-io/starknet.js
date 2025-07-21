@@ -8,10 +8,7 @@ export * from './paymaster';
 export * from './provider';
 export * from './signer';
 export * from './channel';
-
-// TODO: decide on final export style
 export * from './types';
-export * as types from './types';
 
 /**
  * Utils
@@ -54,6 +51,7 @@ export * as wallet from './wallet/connect';
 export * from './global/config';
 export * from './global/logger';
 export * from './global/logger.type';
+export * from './utils/modules';
 
 /**
  * Backward compatibility utilities

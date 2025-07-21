@@ -20,6 +20,7 @@ import type { SignerInterface } from '../../signer';
 import type { SupportedTransactionVersion } from '../../global/constants';
 import type { PaymasterInterface } from '../../paymaster';
 import type { ProviderInterface } from '../../provider/interface';
+import type { TipEstimate } from '../../utils/modules';
 
 /**
  * Configuration options for creating an Account instance
@@ -37,6 +38,11 @@ export type AccountOptions = {
   transactionVersion?: SupportedTransactionVersion;
   /** Paymaster configuration for sponsored transactions (optional) */
   paymaster?: PaymasterOptions | PaymasterInterface;
+  /**
+   * Default tip type to use for sending transactions (optional)
+   * @default 'recommendedTip'
+   */
+  defaultTipType?: Exclude<keyof TipEstimate, 'metrics'>;
 };
 
 export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;
