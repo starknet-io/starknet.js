@@ -12,7 +12,6 @@ import {
   Calldata,
   CompiledSierra,
   Contract,
-  DeclareDeployUDCResponse,
   ParsedEvents,
   ProviderInterface,
   RawArgsArray,
@@ -26,6 +25,7 @@ import {
   selector,
   shortString,
   stark,
+  type DeclareDeployDCResponse,
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';

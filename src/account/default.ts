@@ -97,7 +97,7 @@ export class Account extends Provider implements AccountInterface {
   public paymaster: PaymasterInterface;
 
   public deployer: Deployer;
-  
+
   public defaultTipType: string;
 
   constructor(options: AccountOptions) {
