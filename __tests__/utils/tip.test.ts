@@ -4,6 +4,7 @@ import {
   RpcProvider,
   LibraryError,
   type RPC,
+  type TipEstimate,
 } from '../../src';
 
 // Mock the RpcProvider
@@ -117,7 +118,7 @@ describe('Tip Analysis', () => {
       mockProvider.getBlockWithTxs.mockResolvedValue(mockBlock);
 
       const options: TipAnalysisOptions = { minTxsNecessary: 6 };
-      const result = await getTipStatsFromBlocks(mockProvider, 'latest', options);
+      const result: TipEstimate = await getTipStatsFromBlocks(mockProvider, 'latest', options);
 
       expect(result).toEqual({
         minTip: 10n,
@@ -130,7 +131,7 @@ describe('Tip Analysis', () => {
         p95Tip: expect.any(BigInt), // 95th percentile
         metrics: expect.objectContaining({
           blocksAnalyzed: expect.any(Number),
-          transactionsFound: expect.any(Number),
+          transactionsTipsFound: expect.any(Array),
         }),
       });
     });
@@ -159,7 +160,7 @@ describe('Tip Analysis', () => {
         p95Tip: expect.any(BigInt), // 95th percentile
         metrics: expect.objectContaining({
           blocksAnalyzed: expect.any(Number),
-          transactionsFound: expect.any(Number),
+          transactionsTipsFound: expect.any(Array),
         }),
       });
     });
@@ -240,7 +241,7 @@ describe('Tip Analysis', () => {
         p95Tip: 0n,
         metrics: expect.objectContaining({
           blocksAnalyzed: expect.any(Number),
-          transactionsFound: expect.any(Number),
+          transactionsTipsFound: expect.any(Array),
         }),
       });
     });
@@ -338,7 +339,7 @@ describe('Tip Analysis', () => {
         p95Tip: 0n,
         metrics: expect.objectContaining({
           blocksAnalyzed: expect.any(Number),
-          transactionsFound: expect.any(Number),
+          transactionsTipsFound: expect.any(Array),
         }),
       });
     });

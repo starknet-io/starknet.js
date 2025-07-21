@@ -5,6 +5,7 @@ import { BlockTag, type BlockIdentifier, type RPC } from '../../types';
 import type { BlockWithTxs } from '../../types/api';
 import assert from '../assert';
 import { LibraryError } from '../errors';
+import { isNumber, isString } from '../typed';
 
 /**
  * Result of provider.getTipStatsFromBlocks().
@@ -29,7 +30,7 @@ export type TipEstimate = {
   p95Tip: bigint;
   metrics?: {
     blocksAnalyzed: number;
-    transactionsFound: number;
+    transactionsTipsFound: bigint[];
   };
 };
 
@@ -49,7 +50,7 @@ export type TipAnalysisOptions = {
   minTxsNecessary?: number;
   /**
    * Whether to include transactions with zero tips in the analysis.
-   * @default false
+   * @default true
    */
   includeZeroTips?: boolean;
 };
@@ -62,7 +63,7 @@ function isV3TransactionWithTip(tx: RPC.TXN_WITH_HASH): tx is RPC.TXN_WITH_HASH 
   return (
     tx.version === '0x3' &&
     'tip' in tx &&
-    typeof (tx as any).tip === 'string' &&
+    isString(tx.tip) &&
     (tx.type === 'INVOKE' || tx.type === 'DECLARE' || tx.type === 'DEPLOY_ACCOUNT')
   );
 }
@@ -73,7 +74,10 @@ function isV3TransactionWithTip(tx: RPC.TXN_WITH_HASH): tx is RPC.TXN_WITH_HASH 
  * @returns true if batching is enabled, false otherwise
  */
 function isBatchingEnabled(provider: ProviderInterface): boolean {
-  return !!(provider.channel as any).batchClient;
+  // Type assertion needed because batchClient is a private property in RPC channel classes
+  // This checks if the channel has a batchClient property to determine if batching is enabled
+  const channel = provider.channel as unknown as { batchClient?: unknown };
+  return !!channel.batchClient;
 }
 
 /**
@@ -82,20 +86,23 @@ function isBatchingEnabled(provider: ProviderInterface): boolean {
  * @param includeZeroTips Whether to include transactions with zero tips
  * @returns Array of tip values as bigints
  */
-function extractTipsFromBlock(blockData: BlockWithTxs, includeZeroTips: boolean = false): bigint[] {
+function extractTipsFromBlock(blockData: BlockWithTxs, includeZeroTips: boolean = true): bigint[] {
   return blockData.transactions
     .filter(isV3TransactionWithTip)
-    .map((tx) => BigInt((tx as any).tip))
+    .map((tx) => BigInt(tx.tip))
     .filter((tip) => includeZeroTips || tip > 0n);
 }
 
 /**
  * Creates a TipEstimate object with all zero values for insufficient data cases.
  * @param blocksAnalyzed Number of blocks that were analyzed
- * @param transactionsFound Number of transactions found
+ * @param transactionsTipsFound Array of transaction tips found
  * @returns TipEstimate object with all zero values
  */
-function createZeroTipEstimate(blocksAnalyzed: number, transactionsFound: number): TipEstimate {
+function createZeroTipEstimate(
+  blocksAnalyzed: number,
+  transactionsTipsFound: bigint[]
+): TipEstimate {
   return {
     minTip: 0n,
     maxTip: 0n,
@@ -107,7 +114,7 @@ function createZeroTipEstimate(blocksAnalyzed: number, transactionsFound: number
     p95Tip: 0n,
     metrics: {
       blocksAnalyzed,
-      transactionsFound,
+      transactionsTipsFound,
     },
   };
 }
@@ -205,7 +212,7 @@ async function getStartingBlockNumber(
   try {
     const blockData = (await provider.getBlockWithTxs(blockIdentifier)) as BlockWithTxs;
 
-    if (typeof blockData.block_number === 'number') {
+    if (isNumber(blockData.block_number)) {
       return blockData.block_number;
     }
 
@@ -287,7 +294,7 @@ async function getTipStatsParallel(
   blockIdentifier: BlockIdentifier,
   options: TipAnalysisOptions
 ): Promise<TipEstimate> {
-  const { maxBlocks = 3, minTxsNecessary = 10, includeZeroTips = false } = options;
+  const { maxBlocks = 3, minTxsNecessary = 10, includeZeroTips = true } = options;
 
   try {
     // Determine the starting block number
@@ -311,7 +318,7 @@ async function getTipStatsParallel(
           `(block range: ${Math.max(0, startingBlockNumber - maxBlocks + 1)}-${startingBlockNumber}). ` +
           `Required: ${minTxsNecessary} transactions. Consider reducing minTxsNecessary or increasing maxBlocks.`
       );
-      return createZeroTipEstimate(analyzedBlocks, allTips.length);
+      return createZeroTipEstimate(analyzedBlocks, allTips);
     }
 
     const tipStats = calculateTipStats(allTips);
@@ -319,7 +326,7 @@ async function getTipStatsParallel(
       ...tipStats,
       metrics: {
         blocksAnalyzed: analyzedBlocks,
-        transactionsFound: allTips.length,
+        transactionsTipsFound: allTips,
       },
     };
   } catch (error) {
@@ -344,7 +351,7 @@ async function getTipStatsSequential(
   blockIdentifier: BlockIdentifier,
   options: TipAnalysisOptions
 ): Promise<TipEstimate> {
-  const { maxBlocks = 3, minTxsNecessary = 10, includeZeroTips = false } = options;
+  const { maxBlocks = 3, minTxsNecessary = 10, includeZeroTips = true } = options;
 
   try {
     // Determine the starting block number
@@ -379,7 +386,7 @@ async function getTipStatsSequential(
           `(block range: ${Math.max(0, startingBlockNumber - maxBlocks + 1)}-${startingBlockNumber}). ` +
           `Required: ${minTxsNecessary} transactions. Consider reducing minTxsNecessary or increasing maxBlocks.`
       );
-      return createZeroTipEstimate(blocksAnalyzed, allTips.length);
+      return createZeroTipEstimate(blocksAnalyzed, allTips);
     }
 
     const tipStats = calculateTipStats(allTips);
@@ -387,7 +394,7 @@ async function getTipStatsSequential(
       ...tipStats,
       metrics: {
         blocksAnalyzed,
-        transactionsFound: allTips.length,
+        transactionsTipsFound: allTips,
       },
     };
   } catch (error) {

@@ -57,7 +57,7 @@ function expectZeroTipEstimate() {
     p95Tip: 0n,
     metrics: expect.objectContaining({
       blocksAnalyzed: expect.any(Number),
-      transactionsFound: expect.any(Number),
+      transactionsTipsFound: expect.any(Array),
     }),
   };
 }
@@ -518,7 +518,7 @@ describeIfRpc('RPCProvider', () => {
           p95Tip: expect.any(BigInt),
           metrics: expect.objectContaining({
             blocksAnalyzed: expect.any(Number),
-            transactionsFound: expect.any(Number),
+            transactionsTipsFound: expect.any(Array),
           }),
         });
 
@@ -711,7 +711,7 @@ describeIfRpc('RPCProvider', () => {
           p95Tip: expect.any(BigInt),
           metrics: expect.objectContaining({
             blocksAnalyzed: expect.any(Number),
-            transactionsFound: expect.any(Number),
+            transactionsTipsFound: expect.any(Array),
           }),
         });
 
