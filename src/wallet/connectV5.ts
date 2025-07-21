@@ -1,5 +1,5 @@
+import type { WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard/features';
 import type { StandardEventsChangeProperties } from '@wallet-standard/features';
-import type { WalletWithStarknetFeatures } from 'getSnStandard/features';
 import {
   type WatchAssetParameters,
   type AddDeclareTransactionParameters,

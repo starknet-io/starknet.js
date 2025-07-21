@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "7.1.0",
+  "version": "7.1.0-beta",
   "description": "JavaScript library for Starknet",
   "license": "MIT",
   "repository": {
@@ -102,9 +102,8 @@
     "@noble/hashes": "1.6.0",
     "@scure/base": "1.2.1",
     "@scure/starknet": "1.1.0",
-    "@wallet-standard/features": "^1.1.0",
+    "@starknet-io/get-starknet-wallet-standard": "^5.0.0-beta.0",
     "abi-wan-kanabi": "2.2.4",
-    "@starknet-io/get-starknet/wallet-standard/features": "^5.0.0",
     "isows": "^1.0.6",
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
