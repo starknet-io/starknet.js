@@ -1,7 +1,8 @@
-import { ProviderInterface } from '../provider';
-import { SignerInterface } from '../signer';
-import {
+import { ProviderInterface } from '../provider/interface';
+import type { SignerInterface } from '../signer';
+import type {
   AllowArray,
+  BigNumberish,
   BlockIdentifier,
   CairoVersion,
   Call,
@@ -12,22 +13,23 @@ import {
   DeployAccountContractPayload,
   DeployContractResponse,
   DeployContractUDCResponse,
-  EstimateFee,
-  EstimateFeeAction,
   EstimateFeeDetails,
-  EstimateFeeResponse,
-  EstimateFeeResponseBulk,
+  EstimateFeeResponseBulkOverhead,
+  EstimateFeeResponseOverhead,
   Invocations,
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
   Nonce,
+  PaymasterDetails,
+  PaymasterFeeEstimate,
+  PreparedTransaction,
   Signature,
   SimulateTransactionDetails,
-  SimulateTransactionResponse,
+  SimulateTransactionOverheadResponse,
   TypedData,
   UniversalDeployerContractPayload,
-} from '../types';
+} from '../types/index';
 
 export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
@@ -60,7 +62,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateInvokeFee(
     calls: AllowArray<Call>,
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Estimate Fee for executing a DECLARE transaction on starknet
@@ -87,7 +89,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateDeclareFee(
     contractPayload: DeclareContractPayload,
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Estimate Fee for executing a DEPLOY_ACCOUNT transaction on starknet
@@ -113,7 +115,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateAccountDeployFee(
     contractPayload: DeployAccountContractPayload,
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Estimate Fee for executing a UDC DEPLOY transaction on starknet
@@ -139,7 +141,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateDeployFee(
     deployContractPayload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Estimate Fee for executing a list of transactions on starknet
@@ -165,19 +167,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateFeeBulk(
     invocations: Invocations,
     details?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponseBulk>;
-
-  /**
-   * Gets Suggested Max Fee based on the transaction type
-   *
-   * @param  {EstimateFeeAction} estimateFeeAction
-   * @param  {EstimateFeeDetails} details
-   * @returns EstimateFee (...response, resourceBounds, suggestedMaxFee)
-   */
-  public abstract getSuggestedFee(
-    estimateFeeAction: EstimateFeeAction,
-    details: EstimateFeeDetails
-  ): Promise<EstimateFee>;
+  ): Promise<EstimateFeeResponseBulkOverhead>;
 
   /**
    * Simulates an array of transaction and returns an array of transaction trace and estimated fee.
@@ -191,7 +181,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract simulateTransaction(
     invocations: Invocations,
     details?: SimulateTransactionDetails
-  ): Promise<SimulateTransactionResponse>;
+  ): Promise<SimulateTransactionOverheadResponse>;
 
   /**
    * Invoke execute function in account contract
@@ -208,6 +198,74 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract execute(
     transactions: AllowArray<Call>,
     transactionsDetail?: InvocationsDetails
+  ): Promise<InvokeFunctionResponse>;
+
+  /**
+   * Estimate Fee for executing a paymaster transaction on starknet
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @param paymasterDetails the paymaster details containing:
+   * - feeMode - the fee mode
+   * - deploymentData - the deployment data (optional)
+   * - timeBounds - the time bounds (optional)
+   *
+   * @returns response extracting fee from buildPaymasterTransaction
+   */
+  public abstract estimatePaymasterTransactionFee(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<PaymasterFeeEstimate>;
+
+  /**
+   * Build a paymaster transaction
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @param paymasterDetails the paymaster details containing:
+   * - feeMode - the fee mode
+   * - deploymentData - the deployment data (optional)
+   * - timeBounds - the time bounds (optional)
+   *
+   * @returns the prepared transaction
+   */
+  public abstract buildPaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<PreparedTransaction>;
+
+  /**
+   * Execute a paymaster transaction
+   *
+   * Assert that the gas token value is equal to the provided gas fees
+   * Assert that the calls are strictly equal to the returned calls.
+   * Assert that the gas token (in gas token) price is not too high, if provided.
+   * Assert that typedData to signed is strictly equal to the provided typedData.
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @param paymasterDetails the paymaster details containing:
+   * - feeMode - the fee mode (sponsored or default)
+   * - deploymentData - the deployment data (optional)
+   * - timeBounds - the time bounds when the transaction is valid (optional) - executeAfter and executeBefore expected to be in seconds (BLOCK_TIMESTAMP)
+   *
+   * @param maxFeeInGasToken - the max fee acceptable to pay in gas token (optional)
+   *
+   * @returns the tarnsaction hash if successful, otherwise an error is thrown
+   */
+  public abstract executePaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails,
+    maxFeeInGasToken?: BigNumberish
   ): Promise<InvokeFunctionResponse>;
 
   /**

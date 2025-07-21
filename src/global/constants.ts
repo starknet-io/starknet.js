@@ -1,8 +1,9 @@
 /* eslint-disable no-underscore-dangle */
-import type { FeeMarginPercentage } from '../types';
-import { ETransactionVersion, RPCSPEC08 } from '../types/api';
+import type { ResourceBoundsOverhead } from '../types';
+import { ETransactionVersion } from '../types/api';
 import { ValuesType } from '../types/helpers/valuesType';
 import type { LogLevel } from './logger.type';
+import type { TipEstimate } from '../utils/modules/tip';
 
 export { IS_BROWSER } from '../utils/encode';
 
@@ -10,14 +11,6 @@ export { IS_BROWSER } from '../utils/encode';
  * Cairo Felt support storing max 31 character
  */
 export const TEXT_TO_FELT_MAX_LEN = 31;
-
-/**
- * Alternatively use directly from api specification
- * types.RPC.ETransactionVersion
- * For BN do BigInt(TRANSACTION_VERSION.*)
- */
-export const { ETransactionVersion: TRANSACTION_VERSION } = RPCSPEC08;
-
 export const ZERO = 0n;
 export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1
 export const MASK_31 = 2n ** 31n - 1n; // 2 ** 31 - 1
@@ -88,64 +81,71 @@ export { _TransactionHashPrefix as TransactionHashPrefix };
  * dot format rpc versions
  */
 const _SupportedRpcVersion = {
-  0.7: '0.7',
-  0.8: '0.8',
-  v07: '0.7',
-  v08: '0.8',
+  '0.8.1': '0.8.1',
+  '0.9.0': '0.9.0',
+  v0_8_1: '0.8.1',
+  v0_9_0: '0.9.0',
 } as const;
 type _SupportedRpcVersion = ValuesType<typeof _SupportedRpcVersion>;
 export { _SupportedRpcVersion as SupportedRpcVersion };
 
-export type SupportedTransactionVersion =
-  | typeof ETransactionVersion.V2
-  | typeof ETransactionVersion.V3;
+export type SupportedTransactionVersion = typeof ETransactionVersion.V3;
+export type SupportedCairoVersion = '1';
 
 // Default initial global config
 export const DEFAULT_GLOBAL_CONFIG: {
-  legacyMode: boolean;
   logLevel: LogLevel;
   rpcVersion: _SupportedRpcVersion;
   transactionVersion: SupportedTransactionVersion;
-  feeMarginPercentage: FeeMarginPercentage;
+  resourceBoundsOverhead: ResourceBoundsOverhead;
+  defaultTipType: Exclude<keyof TipEstimate, 'metrics'>;
+  fetch: any;
+  websocket: any;
 } = {
-  legacyMode: false,
-  rpcVersion: '0.8',
-  transactionVersion: ETransactionVersion.V3,
+  rpcVersion: '0.9.0',
+  transactionVersion: ETransactionVersion.V3, // Starknet 0.14.0 only V3 transactions
   logLevel: 'INFO',
-  feeMarginPercentage: {
-    bounds: {
-      l1_gas: {
-        max_amount: 50,
-        max_price_per_unit: 50,
-      },
-      l1_data_gas: {
-        max_amount: 50,
-        max_price_per_unit: 50,
-      },
-      l2_gas: {
-        max_amount: 50,
-        max_price_per_unit: 50,
-      },
+  resourceBoundsOverhead: {
+    l1_gas: {
+      max_amount: 50,
+      max_price_per_unit: 50,
     },
-    maxFee: 50,
+    l1_data_gas: {
+      max_amount: 50,
+      max_price_per_unit: 50,
+    },
+    l2_gas: {
+      max_amount: 50,
+      max_price_per_unit: 50,
+    },
   },
+  defaultTipType: 'recommendedTip',
+  fetch: undefined,
+  websocket: undefined,
 };
 
 export const RPC_DEFAULT_NODES = {
-  SN_MAIN: [
-    `https://starknet-mainnet.public.blastapi.io/rpc/`,
-    `https://free-rpc.nethermind.io/mainnet-juno/`,
-  ],
-  SN_SEPOLIA: [
-    `https://starknet-sepolia.public.blastapi.io/rpc/`,
-    `https://free-rpc.nethermind.io/sepolia-juno/`,
-  ],
+  SN_MAIN: [`https://starknet-mainnet.public.blastapi.io/rpc/`],
+  SN_SEPOLIA: [`https://starknet-sepolia.public.blastapi.io/rpc/`],
+} as const;
+
+export const PAYMASTER_RPC_NODES = {
+  SN_MAIN: [`https://starknet.paymaster.avnu.fi`],
+  SN_SEPOLIA: [`https://sepolia.paymaster.avnu.fi`],
 } as const;
 
 // Default system messages
 export const SYSTEM_MESSAGES = {
   legacyTxWarningMessage:
     'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
-  legacyTxRPC08Message: 'RPC 0.8 do not support legacy transactions',
-  SWOldV3: 'RPC 0.7 V3 tx (improper resource bounds) not supported in RPC 0.8',
+  legacyTxRPC08Message:
+    'RPC 0.8+ do not support legacy transactions, use RPC 0.8+ v3 transactions!',
+  SWOldV3: 'RPC 0.7 V3 tx (improper resource bounds) not supported in RPC 0.8+',
+  channelVersionMismatch:
+    'Channel specification version is not compatible with the connected node Specification Version',
+  unsupportedSpecVersion:
+    'The connected node specification version is not supported by this library',
+  maxFeeInV3: 'maxFee is not supported in V3 transactions, use resourceBounds instead',
+  declareNonSierra: 'Declaring non Sierra (Cairo0)contract using RPC 0.8+',
+  unsupportedMethodForRpcVersion: 'Unsupported method for RPC version',
 };

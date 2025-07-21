@@ -8,6 +8,7 @@ import {
   ParsedStruct,
   RawArgs,
   UniversalDeployerContractPayload,
+  ValidateType,
 } from '../types';
 import { CallData } from './calldata';
 import { starkCurve } from './ec';
@@ -171,6 +172,22 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
 };
 
 /**
+ * Extract compiled calldata from args or execute callback
+ */
+export function getCompiledCalldata(constructorArguments: RawArgs, callback: Function): Calldata {
+  // Check if Calldata in args or args[0] else compile
+  if (Array.isArray(constructorArguments) && '__compiled__' in constructorArguments)
+    return constructorArguments as Calldata;
+  if (
+    Array.isArray(constructorArguments) &&
+    Array.isArray(constructorArguments[0]) &&
+    '__compiled__' in constructorArguments[0]
+  )
+    return constructorArguments[0] as Calldata;
+  return callback();
+}
+
+/**
  * Builds a UDCCall object.
  *
  * @param {UniversalDeployerContractPayload | UniversalDeployerContractPayload[]} payload the payload data for the UDCCall. Can be a single payload object or an array of payload objects.
@@ -207,9 +224,22 @@ export function buildUDCCall(
       salt,
       unique = true,
       constructorCalldata = [],
+      abi,
     } = it as UniversalDeployerContractPayload;
 
-    const compiledConstructorCallData = CallData.compile(constructorCalldata);
+    const compiledConstructorCallData = getCompiledCalldata(constructorCalldata, () => {
+      // compile with abi
+      if (abi) {
+        const calldataClass = new CallData(abi);
+        // Convert object based raw js arguments to ...args array
+        const rawArgs = Object.values(constructorCalldata);
+        calldataClass.validate(ValidateType.DEPLOY, 'constructor', rawArgs);
+        return calldataClass.compile('constructor', rawArgs);
+      }
+      // compile without abi
+      return CallData.compile(constructorCalldata);
+    });
+
     const deploySalt = salt ?? randomAddress();
 
     return {
@@ -256,9 +286,7 @@ export function buildUDCCall(
 export function getVersionsByType(versionType?: 'fee' | 'transaction') {
   return versionType === 'fee'
     ? {
-        v1: ETransactionVersion.F1,
-        v2: ETransactionVersion.F2,
         v3: ETransactionVersion.F3,
       }
-    : { v1: ETransactionVersion.V1, v2: ETransactionVersion.V2, v3: ETransactionVersion.V3 };
+    : { v3: ETransactionVersion.V3 };
 }

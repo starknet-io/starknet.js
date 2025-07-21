@@ -34,6 +34,8 @@ import {
 
 const exampleAddress = '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826';
 
+const copyMock = <T>(o: T) => JSON.parse(JSON.stringify(o)) as T;
+
 describe('typedData', () => {
   test('should get right type encoding', () => {
     let encoded: string;
@@ -328,6 +330,13 @@ describe('typedData', () => {
       `"0xdb7829db8909c0c5496f5952bcfc4fc894341ce01842537fc4f448743480b6"`
     );
 
+    // support for numeric revision value
+    const previousMessageHash = messageHash;
+    const exampleBaseTypesCopy = copyMock(exampleBaseTypes);
+    exampleBaseTypesCopy.domain.revision = 1 as any;
+    messageHash = getMessageHash(exampleBaseTypesCopy, exampleAddress);
+    expect(messageHash).toMatch(previousMessageHash);
+
     messageHash = getMessageHash(examplePresetTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
       `"0x185b339d5c566a883561a88fb36da301051e2c0225deb325c91bb7aa2f3473a"`
@@ -351,7 +360,7 @@ describe('typedData', () => {
 
   describe('should fail validation', () => {
     const baseTypes = (type: string, value: any = PRIME) => {
-      const copy = JSON.parse(JSON.stringify(exampleBaseTypes)) as typeof exampleBaseTypes;
+      const copy = copyMock(exampleBaseTypes);
       const property = copy.types.Example.find((e) => e.type === type)!.name;
       (copy.message as any)[property] = value;
       return copy;
@@ -375,7 +384,11 @@ describe('typedData', () => {
     const addr = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
     const privK = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
     const fullPubK = stark.getFullPublicKey(privK);
-    const myAccount = new Account({ nodeUrl: 'fake' }, addr, privK);
+    const myAccount = new Account({
+      provider: { nodeUrl: 'fake' },
+      address: addr,
+      signer: privK,
+    });
     let signedMessage: Signature;
     let hashedMessage: string;
     let arraySign: ArraySignatureType;

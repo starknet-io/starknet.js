@@ -4,13 +4,11 @@
 export * from './wallet';
 export * from './account';
 export * from './contract';
+export * from './paymaster';
 export * from './provider';
 export * from './signer';
 export * from './channel';
-
-// TODO: decide on final export style
 export * from './types';
-export * as types from './types';
 
 /**
  * Utils
@@ -31,11 +29,13 @@ export * as shortString from './utils/shortString';
 export * as typedData from './utils/typedData';
 export * as ec from './utils/ec';
 export * as starknetId from './utils/starknetId';
+export * as paymaster from './utils/paymaster';
 export * as provider from './utils/provider';
 export * as selector from './utils/hash/selector';
 export * as events from './utils/events';
 export * as outsideExecution from './utils/outsideExecution';
 export * as src5 from './utils/src5';
+export * from './utils/resolve';
 export * from './utils/batch';
 export * from './utils/responseParser';
 export * from './utils/cairoDataTypes/uint256';
@@ -52,3 +52,10 @@ export * as walletV5 from './wallet/connectV5';
 export * from './global/config';
 export * from './global/logger';
 export * from './global/logger.type';
+export * from './utils/modules';
+
+/**
+ * Backward compatibility utilities
+ * @deprecated These methods are provided for backward compatibility. Use the new object-based APIs instead.
+ */
+export * from './utils/backward';
