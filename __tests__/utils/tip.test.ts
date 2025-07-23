@@ -5,12 +5,14 @@ import {
   LibraryError,
   type RPC,
   type TipEstimate,
+  logger,
 } from '../../src';
 
 // Mock the RpcProvider
 jest.mock('../../src/provider/rpc');
 
 describe('Tip Analysis', () => {
+  logger.setLogLevel('FATAL');
   let mockProvider: jest.Mocked<RpcProvider>;
 
   beforeEach(() => {
@@ -395,5 +397,9 @@ describe('Tip Analysis', () => {
       // When tied, should choose the smaller value (20 < 30)
       expect(result.modeTip).toBe(20n);
     });
+  });
+
+  afterAll(() => {
+    logger.setLogLevel('ERROR');
   });
 });

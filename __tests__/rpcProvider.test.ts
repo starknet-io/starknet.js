@@ -3,14 +3,11 @@ import { hasMixin } from 'ts-mixer';
 import {
   contracts,
   createBlockForDevnet,
-  createTestProvider,
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
   describeIfRpc081,
   describeIfTestnet,
-  ETHtokenAddress,
-  getTestAccount,
   waitNextBlock,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
@@ -35,12 +32,14 @@ import {
   isVersion,
   toAnyPatchVersion,
   BlockTag,
+  logger,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { isBoolean } from '../src/utils/typed';
 import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
 import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
 import { StarknetId } from '../src/provider/extensions/starknetId';
+import { createTestProvider, ETHtokenAddress, getTestAccount } from './config/fixturesInit';
 
 /**
  * Helper function to create expected zero tip estimate for tests
@@ -591,10 +590,12 @@ describeIfRpc('RPCProvider', () => {
       });
 
       test('should return zero values with insufficient transaction data', async () => {
+        logger.setLogLevel('FATAL');
         const tipEstimate = await rpcProvider.getEstimateTip('latest', {
           minTxsNecessary: 1000, // Unreasonably high requirement
           maxBlocks: 1,
         });
+        logger.setLogLevel('ERROR');
 
         expect(tipEstimate).toEqual(expectZeroTipEstimate());
       });
@@ -657,10 +658,12 @@ describeIfRpc('RPCProvider', () => {
           }
 
           // Test with different block ranges
+          logger.setLogLevel('FATAL');
           const smallRange = await rpcProvider.getEstimateTip('latest', {
             minTxsNecessary: 1,
             maxBlocks: 1,
           });
+          logger.setLogLevel('ERROR');
 
           const largeRange = await rpcProvider.getEstimateTip('latest', {
             minTxsNecessary: 1,
@@ -829,7 +832,7 @@ describeIfTestnet('RPCProvider', () => {
   });
 });
 describeIfNotDevnet('If not devnet: waitForBlock', () => {
-  // As Devnet-rs isn't generating automatically blocks at a periodic time, it's excluded of this test.
+  // As Starknet-devnet isn't generating automatically blocks at a periodic time, it's excluded of this test.
   const providerStandard = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
   const providerFastTimeOut = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL, retries: 1 });
   let block: number;
