@@ -33,7 +33,7 @@ export class Deployer implements DeployerInterface {
       const {
         classHash,
         salt,
-        unique = true,
+        unique = true, // not_from_zero on v.2.0.0 but same function. When false v.1 address != v.2 address
         constructorCalldata = [],
         abi,
       } = it as UniversalDeployerContractPayload;

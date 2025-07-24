@@ -34,7 +34,7 @@ export const LegacyUDC = {
 
 export const UDC = {
   ADDRESS: '0x02ceed65a4bd731034c01113685c831b01c15d7d432f71afb1cf1634b53a2125',
-  ENTRYPOINT: 'deployContract',
+  ENTRYPOINT: 'deploy_contract',
 } as const;
 
 export const OutsideExecutionCallerAny = '0x414e595f43414c4c4552'; // encodeShortString('ANY_CALLER')
