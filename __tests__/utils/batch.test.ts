@@ -1,13 +1,9 @@
 import fetch from '../../src/utils/connect/fetch';
 import { BatchClient } from '../../src/utils/batch';
-import {
-  createBlockForDevnet,
-  createTestProvider,
-  describeIfRpc081,
-  getTestProvider,
-} from '../config/fixtures';
+import { createBlockForDevnet, describeIfRpc081, getTestProvider } from '../config/fixtures';
 import { initializeMatcher } from '../config/schema';
 import { RPC } from '../../src/types';
+import { createTestProvider } from '../config/fixturesInit';
 
 describe('BatchClient', () => {
   initializeMatcher(expect);

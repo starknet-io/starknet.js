@@ -5,6 +5,7 @@
  * ref: order of execution jestGlobalSetup.ts -> jest.setup.ts -> fixtures.ts
  */
 
+import { InitDevnetHistory } from './helpers/initDevnetHistory';
 import strategyResolver from './helpers/strategyResolver';
 
 /**
@@ -13,4 +14,7 @@ import strategyResolver from './helpers/strategyResolver';
 
 export default async (_globalConfig: any, _projectConfig: any) => {
   await strategyResolver.execute();
+  if (process.env.IS_DEVNET === 'true') {
+    await InitDevnetHistory();
+  }
 };
