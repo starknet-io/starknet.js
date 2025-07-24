@@ -6,8 +6,8 @@ import {
   type CairoEventVariant,
   type InvokeTransactionReceiptResponse,
   type RPC,
-  defaultDeployer,
   events,
+  legacyDeployer,
 } from '../../src';
 import { getFunctionAbi, getInterfaceAbi, getAbiEntry } from '../factories/abi';
 
@@ -416,7 +416,7 @@ describe('parseUDCEvent', () => {
       ],
     };
 
-    const parsedUDCEvent = defaultDeployer.parseDeployerEvent(txReceipt);
+    const parsedUDCEvent = legacyDeployer.parseDeployerEvent(txReceipt);
     const result = {
       transaction_hash: '0x6eebff0d931f36222268705ca791fd0de8d059eaf01887eecf1ce99a6c27f49',
       contract_address: '0x1f1209f331cda3e84202f5495446028cd8730159ab24e08a5fd96125257673f',
@@ -441,7 +441,7 @@ describe('parseUDCEvent', () => {
       events: [],
     };
 
-    expect(() => defaultDeployer.parseDeployerEvent(txReceipt)).toThrow(
+    expect(() => legacyDeployer.parseDeployerEvent(txReceipt)).toThrow(
       new Error('Deployer emitted event is empty')
     );
   });

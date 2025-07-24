@@ -61,7 +61,7 @@ import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { calculateContractAddressFromHash } from '../utils/hash';
-import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
+import { isHex, toBigInt, toHex } from '../utils/num';
 import {
   buildExecuteFromOutsideCall,
   getOutsideCall,
@@ -224,7 +224,7 @@ export class Account extends Provider implements AccountInterface {
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
-    const calls = this.buildDeployerContractPayload(payload);
+    const { calls } = this.deployer.buildDeployerCall(payload, this.address);
     return this.estimateInvokeFee(calls, details);
   }
 
@@ -788,33 +788,6 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
-  public buildDeployerContractPayload(
-    payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
-  ): Call[] {
-    const calls = [].concat(payload as []).map((it) => {
-      const {
-        classHash,
-        salt = '0',
-        unique = true,
-        constructorCalldata = [],
-      } = it as UniversalDeployerContractPayload;
-      const compiledConstructorCallData = CallData.compile(constructorCalldata);
-
-      return {
-        contractAddress: toHex(this.deployer.address),
-        entrypoint: this.deployer.entryPoint,
-        calldata: [
-          classHash,
-          salt,
-          toCairoBool(unique),
-          compiledConstructorCallData.length,
-          ...compiledConstructorCallData,
-        ],
-      };
-    });
-    return calls;
-  }
-
   public async accountInvocationsFactory(
     invocations: Invocations,
     details: AccountInvocationsFactoryDetails
@@ -862,7 +835,7 @@ export class Account extends Provider implements AccountInterface {
           };
         }
         if (transaction.type === ETransactionType.DEPLOY) {
-          const calls = this.buildDeployerContractPayload(txPayload);
+          const { calls } = this.deployer.buildDeployerCall(txPayload, this.address);
           const payload = await this.buildInvocation(calls, signerDetails);
           return {
             ...common,
