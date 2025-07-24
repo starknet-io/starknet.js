@@ -28,7 +28,7 @@ class StrategyResolver {
     return !!(TEST_ACCOUNT_PRIVATE_KEY && TEST_ACCOUNT_ADDRESS);
   }
 
-  private async isRsDevnet(): Promise<boolean> {
+  private async isStarknetDevnet(): Promise<boolean> {
     const response = await fetch(GS_DEFAULT_TEST_PROVIDER_URL, {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
@@ -39,10 +39,10 @@ class StrategyResolver {
   }
 
   async detectDevnet(): Promise<void> {
-    // if on base url RPC endpoint work it is devnet-rs else it devnet-py
+    // if on base url RPC endpoint work it is Starknet-devnet else it devnet-py
     try {
-      this.isDevnet = await this.isRsDevnet();
-      if (this.isDevnet) console.log('Detected Devnet-RS');
+      this.isDevnet = await this.isStarknetDevnet();
+      if (this.isDevnet) console.log('Detected Starknet-devnet');
     } catch (error) {
       console.log('\x1b[36m%s\x1b[0m', LOCAL_DEVNET_NOT_RUNNING_MESSAGE);
       throw new Error(

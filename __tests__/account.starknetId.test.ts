@@ -1,5 +1,6 @@
 import { Account, Provider, num, shortString } from '../src';
-import { contracts, createTestProvider, getTestAccount, STRKtokenAddress } from './config/fixtures';
+import { contracts } from './config/fixtures';
+import { createTestProvider, getTestAccount, STRKtokenAddress } from './config/fixturesInit';
 
 const { hexToDecimalString } = num;
 

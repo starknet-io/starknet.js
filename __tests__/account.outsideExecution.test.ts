@@ -27,7 +27,13 @@ import {
 } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { getDecimalString } from '../src/utils/num';
-import { contracts, createTestProvider, getTestAccount, STRKtokenAddress } from './config/fixtures';
+import { contracts } from './config/fixtures';
+import {
+  adaptAccountIfDevnet,
+  createTestProvider,
+  getTestAccount,
+  STRKtokenAddress,
+} from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 describe('Account and OutsideExecution', () => {
@@ -92,11 +98,13 @@ describe('Account and OutsideExecution', () => {
       constructorCalldata: constructorAXCallData,
     });
     const targetAddress = response.deploy.contract_address;
-    signerAccount = new Account({
-      provider,
-      address: targetAddress,
-      signer: targetPK,
-    });
+    signerAccount = adaptAccountIfDevnet(
+      new Account({
+        provider,
+        address: targetAddress,
+        signer: targetPK,
+      })
+    );
 
     // Transfer dust of STRK token to the signer account
     const transferCall = {

@@ -1,5 +1,6 @@
 import { LibraryError, RPC09, RpcError } from '../src';
-import { createBlockForDevnet, createTestProvider } from './config/fixtures';
+import { createBlockForDevnet } from './config/fixtures';
+import { createTestProvider } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 // Force RPC 0.9.0 for testing purposes (bypasses auto-detection)

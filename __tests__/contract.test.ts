@@ -16,7 +16,8 @@ import {
   RpcError,
 } from '../src';
 
-import { contracts, createTestProvider, describeIfRpc081, getTestAccount } from './config/fixtures';
+import { contracts, describeIfRpc081 } from './config/fixtures';
+import { createTestProvider, getTestAccount } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 describe('contract module', () => {

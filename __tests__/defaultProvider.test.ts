@@ -12,13 +12,8 @@ import {
   type Calldata,
   type RawArgs,
 } from '../src';
-import {
-  contracts,
-  createTestProvider,
-  erc20ClassHash,
-  getTestAccount,
-  wrongClassHash,
-} from './config/fixtures';
+import { contracts, erc20ClassHash, wrongClassHash } from './config/fixtures';
+import { createTestProvider, getTestAccount } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 describe('defaultProvider', () => {
