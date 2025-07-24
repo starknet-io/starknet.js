@@ -1,7 +1,7 @@
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 import { config } from '../../global/config';
-import { FeeEstimate } from '../../provider/types/index.type';
+import { EstimateFeeResponse, FeeEstimate } from '../../provider/types/index.type';
 import {
   EDAMode,
   EDataAvailabilityMode,
@@ -202,6 +202,20 @@ export function toOverheadResourceBounds(
         overhead.l1_data_gas.max_price_per_unit
       ),
     },
+  };
+}
+
+export function resourceBoundsToEstimateFee(resourceBounds: ResourceBoundsBN): EstimateFeeResponse {
+  return {
+    resourceBounds,
+    /**
+     * maximum overall fee for provided resource bounds
+     */
+    overall_fee:
+      resourceBounds.l1_gas.max_amount * resourceBounds.l1_gas.max_price_per_unit +
+      resourceBounds.l1_data_gas.max_amount * resourceBounds.l1_data_gas.max_price_per_unit +
+      resourceBounds.l2_gas.max_amount * resourceBounds.l2_gas.max_price_per_unit,
+    unit: 'FRI',
   };
 }
 
