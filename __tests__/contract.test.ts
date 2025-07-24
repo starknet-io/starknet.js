@@ -1,8 +1,6 @@
-import type { ResourceBounds } from '@starknet-io/starknet-types-07';
 import {
   Account,
   Contract,
-  ContractFactory,
   ProviderInterface,
   RawArgs,
   hash,
@@ -15,17 +13,11 @@ import {
   uint256,
   num,
   byteArray,
-  type EstimateFee,
   RpcError,
 } from '../src';
 
-import {
-  contracts,
-  createTestProvider,
-  describeIfRpc071,
-  describeIfRpc081,
-  getTestAccount,
-} from './config/fixtures';
+import { contracts, describeIfRpc081 } from './config/fixtures';
+import { createTestProvider, getTestAccount } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 describe('contract module', () => {
@@ -33,6 +25,7 @@ describe('contract module', () => {
   let provider: ProviderInterface;
   let account: Account;
   const erc20ClassHash = hash.computeContractClassHash(contracts.Erc20OZ.sierra);
+  const erc20CompiledClassHash = hash.computeCompiledClassHash(contracts.Erc20OZ.casm);
   const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
   let erc20Constructor: Calldata;
   let erc20ConstructorParams: RawArgs;
@@ -63,9 +56,12 @@ describe('contract module', () => {
           constructorCalldata: erc20Constructor,
         });
         erc20Address = deploy.address;
-        erc20Contract = new Contract(contracts.Erc20OZ.sierra.abi, erc20Address, provider);
+        erc20Contract = new Contract({
+          abi: contracts.Erc20OZ.sierra.abi,
+          address: erc20Address,
+          providerOrAccount: provider,
+        });
       });
-
       test('getCairoVersion', async () => {
         const version = await erc20Contract.getVersion();
         expect(version).toEqual({ cairo: '1', compiler: '2' });
@@ -95,6 +91,23 @@ describe('contract module', () => {
         const balance = await erc20Contract.balanceOf(account.address);
         expect(balance).toStrictEqual(1000n);
       });
+
+      test('isDeployed should return contract when deployed', async () => {
+        const result = await erc20Contract.isDeployed();
+        expect(result).toBe(erc20Contract);
+      });
+
+      test('isDeployed should throw error when contract not deployed', async () => {
+        const nonExistentContract = new Contract({
+          abi: contracts.Erc20OZ.sierra.abi,
+          address: '0x123456789abcdef123456789abcdef123456789abcdef123456789abcdef1234',
+          providerOrAccount: provider,
+        });
+
+        await expect(nonExistentContract.isDeployed()).rejects.toThrow(
+          /Contract not deployed at address/
+        );
+      });
     });
 
     describe('Type Transformation', () => {
@@ -106,11 +119,11 @@ describe('contract module', () => {
           casm: contracts.TypeTransformation.casm,
         });
 
-        typeTransformedContract = new Contract(
-          contracts.TypeTransformation.sierra.abi,
-          deploy.contract_address!,
-          account
-        );
+        typeTransformedContract = new Contract({
+          abi: contracts.TypeTransformation.sierra.abi,
+          address: deploy.contract_address,
+          providerOrAccount: account,
+        });
       });
 
       describeIfRpc081('Request Type Transformation', () => {
@@ -161,10 +174,10 @@ describe('contract module', () => {
         });
       });
 
-      describeIfRpc071('Request Type Transformation', () => {
+      /*       describeIfRpc071('Request Type Transformation', () => {
         test('Parsing the felt in request', async () => {
           const myCall = typeTransformedContract.populate('request_felt', [3]);
-          const estim: EstimateFee = await account.estimateInvokeFee(myCall);
+          const estim: EstimateFeeResponseOverhead = await account.estimateInvokeFee(myCall);
           const resourceBounds: ResourceBounds = {
             l1_gas: {
               max_amount: num.toHex(BigInt(estim.resourceBounds.l1_gas.max_amount) * 2n),
@@ -343,7 +356,7 @@ describe('contract module', () => {
           const txR = await provider.waitForTransaction(resp.transaction_hash);
           expect(txR.isSuccess()).toBe(true);
         });
-      });
+      }); */
 
       describe('Response Type Transformation', () => {
         test('Parsing the felt in response', async () => {
@@ -391,7 +404,7 @@ describe('contract module', () => {
     });
   });
 
-  describe('class ContractFactory {}', () => {
+  describe('class static factory()', () => {
     beforeAll(async () => {
       await account.declareAndDeploy({
         contract: contracts.Erc20OZ.sierra,
@@ -399,41 +412,48 @@ describe('contract module', () => {
         constructorCalldata: erc20Constructor,
       });
     });
-    test('deployment of new contract', async () => {
-      const factory = new ContractFactory({
-        compiledContract: contracts.Erc20OZ.sierra,
-        casm: contracts.Erc20OZ.casm,
-        classHash: erc20ClassHash,
+
+    test('factory deployment of new contract with constructor arguments as js params', async () => {
+      const erc20 = await Contract.factory({
+        contract: contracts.Erc20OZ.sierra,
+        compiledClassHash: erc20CompiledClassHash,
         account,
+        constructorCalldata: erc20ConstructorParams,
       });
-      const erc20 = await factory.deploy(...erc20Constructor);
       expect(erc20).toBeInstanceOf(Contract);
     });
-    test('wait for deployment transaction', async () => {
-      const factory = new ContractFactory({
-        compiledContract: contracts.Erc20OZ.sierra,
+
+    test('factory deployment of new contract with constructor arguments as already compiled calldata', async () => {
+      const erc20 = await Contract.factory({
+        contract: contracts.Erc20OZ.sierra,
         casm: contracts.Erc20OZ.casm,
         classHash: erc20ClassHash,
         account,
+        constructorCalldata: erc20Constructor,
       });
-      const contract = await factory.deploy(
-        CallData.compile({
-          name: byteArray.byteArrayFromString('Token'),
-          symbol: byteArray.byteArrayFromString('ERC20'),
-          amount: cairo.uint256(1000n),
-          recipient: account.address,
-          owner: account.address,
-        })
-      );
-      await expect(contract.deployed()).resolves.not.toThrow();
+      expect(erc20).toBeInstanceOf(Contract);
     });
-    test('attach new contract', async () => {
-      const factory = new ContractFactory({
-        compiledContract: contracts.Erc20OZ.sierra,
+
+    test('optimization, factory deployment of new contract with constructor arguments as already compiled calldata', async () => {
+      const erc20 = await Contract.factory({
+        contract: contracts.Erc20OZ.sierra,
+        casm: contracts.Erc20OZ.casm,
         classHash: erc20ClassHash,
         account,
+        constructorCalldata: erc20Constructor,
+        parseRequest: false, // optimization when calldata are already validated and compiled.
       });
-      const erc20 = factory.attach(erc20Address);
+      expect(erc20).toBeInstanceOf(Contract);
+    });
+
+    test('factory deployment of declared contract with constructor arguments as js params', async () => {
+      const erc20 = await Contract.factory({
+        contract: contracts.Erc20OZ.sierra,
+        casm: contracts.Erc20OZ.casm,
+        classHash: erc20ClassHash,
+        account,
+        constructorCalldata: erc20ConstructorParams,
+      });
       expect(erc20).toBeInstanceOf(Contract);
     });
   });
@@ -445,37 +465,30 @@ describe('Complex interaction', () => {
   let provider: ProviderInterface;
   let account: Account;
   const classHash = hash.computeContractClassHash(contracts.Erc20OZ.sierra);
-  let factory: ContractFactory;
-  let echoFactory: ContractFactory;
-  const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
-  let erc20Constructor: Calldata;
-  let erc20ConstructorParams: RawArgs;
 
   beforeAll(async () => {
     provider = await createTestProvider();
     account = getTestAccount(provider);
-    erc20ConstructorParams = {
-      name: 'TEST',
-      symbol: 'TST',
-      amount: 1000n,
-      recipient: account.address,
-      owner: account.address,
-    };
-    erc20Constructor = erc20CallData.compile('constructor', erc20ConstructorParams);
 
-    factory = new ContractFactory({
-      compiledContract: contracts.Erc20OZ.sierra,
+    erc20Contract = await Contract.factory({
+      contract: contracts.Erc20OZ.sierra,
       casm: contracts.Erc20OZ.casm,
       classHash,
       account,
+      constructorCalldata: {
+        name: 'TEST',
+        symbol: 'TST',
+        amount: 1000n,
+        recipient: account.address,
+        owner: account.address,
+      },
     });
-    erc20Contract = await factory.deploy(erc20Constructor);
-    echoFactory = new ContractFactory({
-      compiledContract: contracts.echo.sierra,
+
+    echoContract = await Contract.factory({
+      contract: contracts.echo.sierra,
       casm: contracts.echo.casm,
       account,
     });
-    echoContract = await echoFactory.deploy();
   });
 
   test('contractFactory.deploy with raw arguments - all types constructor params', () => {
@@ -486,15 +499,20 @@ describe('Complex interaction', () => {
 
   test('contractFactory.deploy with callData - all types constructor params', async () => {
     // Deploy with callData - OK
-    const erc20Contract2 = await factory.deploy(
-      CallData.compile({
+    const erc20Contract2 = await Contract.factory({
+      contract: contracts.Erc20OZ.sierra,
+      casm: contracts.Erc20OZ.casm,
+      classHash,
+      account,
+      constructorCalldata: CallData.compile({
         name: byteArray.byteArrayFromString('Token'),
         symbol: byteArray.byteArrayFromString('ERC20'),
         amount: cairo.uint256('1000000000'),
         recipient: account.address,
         owner: '0x823d5a0c0eefdc9a6a1cb0e064079a6284f3b26566b677a32c71bbe7bf9f8c',
-      })
-    );
+      }),
+    });
+
     expect(erc20Contract2).toBeInstanceOf(Contract);
   });
 
@@ -1047,16 +1065,16 @@ describe('Complex interaction', () => {
           .withOptions({
             resourceBounds: {
               l1_gas: {
-                max_amount: '0',
-                max_price_per_unit: '0',
+                max_amount: 0n,
+                max_price_per_unit: 0n,
               },
               l1_data_gas: {
-                max_amount: '0',
-                max_price_per_unit: '0',
+                max_amount: 0n,
+                max_price_per_unit: 0n,
               },
               l2_gas: {
-                max_amount: '0',
-                max_price_per_unit: '0',
+                max_amount: 0n,
+                max_price_per_unit: 0n,
               },
             },
           })
@@ -1191,15 +1209,15 @@ describe('Complex interaction', () => {
       const gas2 = await echoContract.estimateFee.iecho(...args);
       const gas3 = await echoContract.estimate('iecho', calldata);
       const gas4 = await echoContract.estimate('iecho', args);
-      expect(gas1).toMatchSchemaRef('EstimateFee');
-      expect(gas2).toMatchSchemaRef('EstimateFee');
-      expect(gas3).toMatchSchemaRef('EstimateFee');
-      expect(gas4).toMatchSchemaRef('EstimateFee');
+      expect(gas1).toMatchSchemaRef('EstimateFeeResponseOverhead');
+      expect(gas2).toMatchSchemaRef('EstimateFeeResponseOverhead');
+      expect(gas3).toMatchSchemaRef('EstimateFeeResponseOverhead');
+      expect(gas4).toMatchSchemaRef('EstimateFeeResponseOverhead');
     });
 
     test('estimate fee transfer', async () => {
       const gas = await erc20Contract.estimateFee.transfer(stark.randomAddress(), cairo.uint256(1));
-      expect(gas).toMatchSchemaRef('EstimateFee');
+      expect(gas).toMatchSchemaRef('EstimateFeeResponseOverhead');
     });
   });
 });

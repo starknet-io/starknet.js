@@ -6,6 +6,7 @@
 import { BigNumberish, Uint256 } from '../../types';
 import { addHexPrefix } from '../encode';
 import { CairoFelt } from './felt';
+import { isObject } from '../typed';
 
 export const UINT_128_MAX = (1n << 128n) - 1n;
 export const UINT_256_MAX = (1n << 256n) - 1n;
@@ -37,7 +38,7 @@ export class CairoUint256 {
   public constructor(uint256: Uint256);
 
   public constructor(...arr: any[]) {
-    if (typeof arr[0] === 'object' && arr.length === 1 && 'low' in arr[0] && 'high' in arr[0]) {
+    if (isObject(arr[0]) && arr.length === 1 && 'low' in arr[0] && 'high' in arr[0]) {
       const props = CairoUint256.validateProps(arr[0].low, arr[0].high);
       this.low = props.low;
       this.high = props.high;
