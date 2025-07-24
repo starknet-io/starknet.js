@@ -1,8 +1,8 @@
 ---
-sidebar_position: 12
+sidebar_position: 5
 ---
 
-# Work with ERC20 tokens
+# ERC20 tokens
 
 Based on what has been seen in the previous pages of this guide, we will use an ERC20 contract.
 
@@ -44,12 +44,12 @@ First, let's initialize an existing account:
 
 ```typescript
 // initialize provider
-const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
+const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 // initialize existing pre-deployed account 0 of Devnet
 const privateKey = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
 const accountAddress = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
 
-const account0 = new Account(provider, accountAddress, privateKey);
+const account0 = new Account(myProvider, accountAddress, privateKey);
 ```
 
 Declaration and deployment of the ERC20 contract:
@@ -84,7 +84,7 @@ console.log('ERC20 deployed at address: ', deployERC20Response.deploy.contract_a
 // Get the erc20 contract address
 const erc20Address = deployERC20Response.deploy.contract_address;
 // Create a new erc20 contract object
-const erc20 = new Contract(compiledSierra.abi, erc20Address, provider);
+const erc20 = new Contract(compiledSierra.abi, erc20Address, myProvider);
 erc20.connect(account0);
 ```
 
@@ -108,7 +108,7 @@ const transferCall: Call = erc20.populate('transfer', {
 const { transaction_hash: transferTxHash } = await account0.execute(transferCall);
 // Wait for the invoke transaction to be accepted on Starknet
 console.log(`Waiting for Tx to be Accepted on Starknet - Transfer...`);
-await provider.waitForTransaction(transferTxHash);
+await myProvider.waitForTransaction(transferTxHash);
 
 // Check balance after transfer - should be 19 NIT
 console.log(`Calling Starknet for account balance...`);
