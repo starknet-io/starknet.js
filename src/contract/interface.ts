@@ -1,7 +1,5 @@
 import type { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
 
-import { AccountInterface } from '../account';
-import { ProviderInterface } from '../provider';
 import {
   Abi,
   ArgsOrCalldata,
@@ -12,14 +10,15 @@ import {
   Calldata,
   ContractFunction,
   ContractVersion,
-  EstimateFeeResponse,
+  EstimateFeeResponseOverhead,
   Invocation,
   InvokeFunctionResponse,
-  InvokeOptions,
   ParsedEvents,
   RawArgs,
-  Result,
+  CallResult,
   Uint256,
+  ExecuteOptions,
+  ProviderOrAccount,
 } from '../types';
 import { CairoCustomEnum } from '../utils/calldata/enum/CairoCustomEnum';
 import { CairoOption } from '../utils/calldata/enum/CairoOption';
@@ -38,7 +37,7 @@ declare module 'abi-wan-kanabi' {
     Enum: CairoCustomEnum;
     Calldata: RawArgs | Calldata;
     CallOptions: CallOptions;
-    InvokeOptions: InvokeOptions;
+    InvokeOptions: ExecuteOptions;
     InvokeFunctionResponse: InvokeFunctionResponse;
   }
 }
@@ -50,9 +49,9 @@ export abstract class ContractInterface {
 
   public abstract address: string;
 
-  public abstract providerOrAccount: ProviderInterface | AccountInterface;
+  public abstract providerOrAccount: ProviderOrAccount;
 
-  public abstract deployTransactionHash?: string;
+  public abstract classHash?: string;
 
   readonly functions!: { [name: string]: AsyncContractFunction };
 
@@ -68,23 +67,17 @@ export abstract class ContractInterface {
    * Saves the address of the contract deployed on network that will be used for interaction
    *
    * @param address - address of the contract
+   * @param abi - optional new abi to use with the contract
    */
-  public abstract attach(address: string): void;
+  public abstract attach(address: string, abi?: Abi): void;
 
   /**
-   * Attaches to new Provider or Account
+   * Verifies that the contract is deployed at the configured address
    *
-   * @param providerOrAccount - new Provider or Account to attach to
+   * @returns Promise that resolves when contract is confirmed to exist at the address
+   * @throws Error if the contract is not deployed at the address
    */
-  public abstract connect(providerOrAccount: ProviderInterface | AccountInterface): void;
-
-  /**
-   * Resolves when contract is deployed on the network or when no deployment transaction is found
-   *
-   * @returns Promise that resolves when contract is deployed on the network or when no deployment transaction is found
-   * @throws When deployment fails
-   */
-  public abstract deployed(): Promise<ContractInterface>;
+  public abstract isDeployed(): Promise<ContractInterface>;
 
   /**
    * Calls a method on a contract
@@ -98,7 +91,7 @@ export abstract class ContractInterface {
     method: string,
     args?: ArgsOrCalldata,
     options?: CallOptions
-  ): Promise<Result>;
+  ): Promise<CallResult>;
 
   /**
    * Invokes a method on a contract
@@ -111,7 +104,7 @@ export abstract class ContractInterface {
   public abstract invoke(
     method: string,
     args?: ArgsOrCalldata,
-    options?: InvokeOptions
+    options?: ExecuteOptions
   ): Promise<InvokeFunctionResponse>;
 
   /**
@@ -127,7 +120,7 @@ export abstract class ContractInterface {
     options?: {
       blockIdentifier?: BlockIdentifier;
     }
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Calls a method on a contract

@@ -5,20 +5,22 @@
 import type {
   ContractClassPayload,
   ContractClassResponse,
-  EstimateFeeResponse,
-  EstimateFeeResponseBulk,
-  FeeEstimate,
   GetBlockResponse,
   GetTxReceiptResponseWithoutHelper,
   RpcProviderOptions,
   SimulateTransactionResponse,
   BlockWithTxHashes,
+  SimulateTransactionOverheadResponse,
+  EstimateFeeResponseBulkOverhead,
 } from '../../provider/types/index.type';
-import { toBigInt, tryToBigInt } from '../num';
 import { isString } from '../typed';
-import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
+import { toOverheadOverallFee, toOverheadResourceBounds } from '../stark';
 import { ResponseParser } from './interface';
-import { SimulateTransaction, TransactionReceipt } from '../../provider/types/spec.type';
+import {
+  ApiEstimateFeeResponse,
+  SimulateTransaction,
+  TransactionReceipt,
+} from '../../provider/types/spec.type';
 // import { TransactionReceipt } from '../../types/api/merge';
 
 export class RPCResponseParser
@@ -33,18 +35,10 @@ export class RPCResponseParser
       | 'parseCallContractResponse'
     >
 {
-  private margin: RpcProviderOptions['feeMarginPercentage'];
+  private resourceBoundsOverhead: RpcProviderOptions['resourceBoundsOverhead'];
 
-  constructor(margin?: RpcProviderOptions['feeMarginPercentage']) {
-    this.margin = margin;
-  }
-
-  private estimatedFeeToMaxFee(estimatedFee: Parameters<typeof estimatedFeeToMaxFee>[0]) {
-    return estimatedFeeToMaxFee(estimatedFee, this.margin?.maxFee);
-  }
-
-  private estimateFeeToBounds(estimate: Parameters<typeof estimateFeeToBounds>[0]) {
-    return estimateFeeToBounds(estimate, this.margin?.bounds);
+  constructor(resourceBoundsOverhead?: RpcProviderOptions['resourceBoundsOverhead']) {
+    this.resourceBoundsOverhead = resourceBoundsOverhead;
   }
 
   public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
@@ -55,56 +49,25 @@ export class RPCResponseParser
     return res as GetTxReceiptResponseWithoutHelper;
   }
 
-  public parseFeeEstimateResponse(res: FeeEstimate[]): EstimateFeeResponse {
-    const val = res[0];
-    return {
-      overall_fee: toBigInt(val.overall_fee),
-      unit: val.unit,
-
-      l1_gas_consumed: tryToBigInt(val.l1_gas_consumed) ?? tryToBigInt(val.gas_consumed) ?? 0n,
-      l1_gas_price: tryToBigInt(val.l1_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
-      l2_gas_consumed: tryToBigInt(val.l2_gas_consumed) ?? undefined,
-      l2_gas_price: tryToBigInt(val.l2_gas_price) ?? undefined,
-      l1_data_gas_consumed:
-        tryToBigInt(val.l1_data_gas_consumed) ?? tryToBigInt(val.data_gas_consumed) ?? 0n,
-      l1_data_gas_price: tryToBigInt(val.l1_data_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
-
-      suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
-      resourceBounds: this.estimateFeeToBounds(val),
-    };
-  }
-
-  public parseFeeEstimateBulkResponse(res: FeeEstimate[]): EstimateFeeResponseBulk {
+  public parseFeeEstimateBulkResponse(
+    res: ApiEstimateFeeResponse
+  ): EstimateFeeResponseBulkOverhead {
     return res.map((val) => ({
-      overall_fee: toBigInt(val.overall_fee),
+      resourceBounds: toOverheadResourceBounds(val, this.resourceBoundsOverhead),
+      overall_fee: toOverheadOverallFee(val, this.resourceBoundsOverhead),
       unit: val.unit,
-
-      l1_gas_consumed: tryToBigInt(val.l1_gas_consumed) ?? tryToBigInt(val.gas_consumed) ?? 0n,
-      l1_gas_price: tryToBigInt(val.l1_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
-      l2_gas_consumed: tryToBigInt(val.l2_gas_consumed) ?? undefined,
-      l2_gas_price: tryToBigInt(val.l2_gas_price) ?? undefined,
-      l1_data_gas_consumed:
-        tryToBigInt(val.l1_data_gas_consumed) ?? tryToBigInt(val.data_gas_consumed) ?? 0n,
-      l1_data_gas_price: tryToBigInt(val.l1_data_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
-
-      suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
-      resourceBounds: this.estimateFeeToBounds(val),
     }));
   }
 
   public parseSimulateTransactionResponse(
-    // TODO: revisit
-    // set as 'any' to avoid a mapped type circular recursion error stemming from
-    // merging src/types/api/rpcspec*/components/FUNCTION_INVOCATION.calls
-    //
-    // res: SimulateTransactionResponse
-    res: any
-  ): SimulateTransactionResponse {
+    res: SimulateTransactionResponse
+  ): SimulateTransactionOverheadResponse {
     return res.map((it: SimulateTransaction) => {
       return {
-        ...it,
-        suggestedMaxFee: this.estimatedFeeToMaxFee(it.fee_estimation.overall_fee),
-        resourceBounds: this.estimateFeeToBounds(it.fee_estimation),
+        transaction_trace: it.transaction_trace,
+        resourceBounds: toOverheadResourceBounds(it.fee_estimation, this.resourceBoundsOverhead),
+        overall_fee: toOverheadOverallFee(it.fee_estimation, this.resourceBoundsOverhead),
+        unit: it.fee_estimation.unit,
       };
     });
   }

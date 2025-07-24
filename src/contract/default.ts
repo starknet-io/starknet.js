@@ -1,7 +1,4 @@
 import type { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
-
-import { AccountInterface } from '../account';
-import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
   AbiEvents,
@@ -13,16 +10,21 @@ import {
   Calldata,
   ContractFunction,
   ContractOptions,
-  EstimateFeeResponse,
   FunctionAbi,
   InvokeFunctionResponse,
-  InvokeOptions,
   GetTransactionReceiptResponse,
   ParsedEvents,
   RawArgs,
-  Result,
+  CallResult,
   ValidateType,
   type SuccessfulTransactionReceiptResponse,
+  EstimateFeeResponseOverhead,
+  ExecuteOptions,
+  ProviderOrAccount,
+  isAccount,
+  WithOptions,
+  FactoryParams,
+  UniversalDetails,
 } from '../types';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
@@ -31,6 +33,9 @@ import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/ind
 import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
 import { logger } from '../global/logger';
+import { defaultProvider } from '../provider';
+import { getCompiledCalldata } from '../utils/transaction';
+import { extractAbi, parseContract } from '../utils/provider';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -39,9 +44,9 @@ export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> 
  */
 function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: ArgsOrCalldata): Promise<any> {
-    const options = { ...contract.contractOptions };
+    const options = { ...contract.withOptionsProps };
     // eslint-disable-next-line no-param-reassign
-    contract.contractOptions = undefined;
+    contract.withOptionsProps = undefined;
     return contract.call(functionAbi.name, args, {
       parseRequest: true,
       parseResponse: true,
@@ -55,9 +60,9 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
  */
 function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: ArgsOrCalldata): Promise<any> {
-    const options = { ...contract.contractOptions };
+    const options = { ...contract.withOptionsProps };
     // eslint-disable-next-line no-param-reassign
-    contract.contractOptions = undefined;
+    contract.withOptionsProps = undefined;
     return contract.invoke(functionAbi.name, args, {
       parseRequest: true,
       ...options,
@@ -92,27 +97,18 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
     return contract.estimate(functionAbi.name, args);
   };
 }
-
-export function getCalldata(args: RawArgs, callback: Function): Calldata {
-  // Check if Calldata in args or args[0] else compile
-  if (Array.isArray(args) && '__compiled__' in args) return args as Calldata;
-  if (Array.isArray(args) && Array.isArray(args[0]) && '__compiled__' in args[0])
-    return args[0] as Calldata;
-  return callback();
-}
-
 export class Contract implements ContractInterface {
   abi: Abi;
 
   address: string;
 
-  providerOrAccount: ProviderInterface | AccountInterface;
+  providerOrAccount: ProviderOrAccount;
 
-  deployTransactionHash?: string;
+  classHash?: string;
 
-  protected readonly structs: { [name: string]: AbiStruct };
+  private structs: { [name: string]: AbiStruct };
 
-  protected readonly events: AbiEvents;
+  private events: AbiEvents;
 
   readonly functions!: { [name: string]: AsyncContractFunction };
 
@@ -126,89 +122,155 @@ export class Contract implements ContractInterface {
 
   private callData: CallData;
 
-  public contractOptions?: ContractOptions;
+  public withOptionsProps?: WithOptions;
 
   /**
-   * Contract class to handle contract methods
-   *
-   * @param abi - Abi of the contract object
-   * @param address (optional) - address to connect to
-   * @param providerOrAccount (optional) - Provider or Account to attach to
+   * @param options
+   *  - abi: Abi of the contract object (required)
+   *  - address: address to connect to (required)
+   *  - providerOrAccount?: Provider or Account to attach to (fallback to defaultProvider)
+   *  - parseRequest?: compile and validate arguments (optional, default true)
+   *  - parseResponse?: Parse elements of the response array and structuring them into response object (optional, default true)
    */
-  constructor(
-    abi: Abi,
-    address: string,
-    providerOrAccount: ProviderInterface | AccountInterface = defaultProvider
-  ) {
-    this.address = address && address.toLowerCase();
-    this.providerOrAccount = providerOrAccount;
-    this.callData = new CallData(abi);
-    this.structs = CallData.getAbiStruct(abi);
-    this.events = getAbiEvents(abi);
-    const parser = createAbiParser(abi);
+  constructor(options: ContractOptions) {
+    // TODO: HUGE_REFACTOR: move from legacy format and add support for legacy format
+    const parser = createAbiParser(options.abi);
+    // Must have params
+    this.address = options.address && options.address.toLowerCase();
     this.abi = parser.getLegacyFormat();
+    this.providerOrAccount = options.providerOrAccount ?? defaultProvider;
 
-    const options = { enumerable: true, value: {}, writable: false };
+    // Optional params
+    this.classHash = options.classHash;
+
+    // Init
+    this.callData = new CallData(options.abi);
+    this.structs = CallData.getAbiStruct(options.abi);
+    this.events = getAbiEvents(options.abi);
+
+    // Define methods properties
+    const methodTypes = { enumerable: true, value: {}, writable: false };
     Object.defineProperties(this, {
       functions: { enumerable: true, value: {}, writable: false },
       callStatic: { enumerable: true, value: {}, writable: false },
       populateTransaction: { enumerable: true, value: {}, writable: false },
       estimateFee: { enumerable: true, value: {}, writable: false },
     });
+
+    // Define methods
     this.abi.forEach((abiElement) => {
       if (abiElement.type !== 'function') return;
-      const signature = abiElement.name;
-      if (!this[signature]) {
-        Object.defineProperty(this, signature, {
-          ...options,
+      const methodSignature = abiElement.name;
+      if (!this[methodSignature]) {
+        Object.defineProperty(this, methodSignature, {
+          ...methodTypes,
           value: buildDefault(this, abiElement),
         });
       }
-      if (!this.functions[signature]) {
-        Object.defineProperty(this.functions, signature, {
-          ...options,
+      if (!this.functions[methodSignature]) {
+        Object.defineProperty(this.functions, methodSignature, {
+          ...methodTypes,
           value: buildDefault(this, abiElement),
         });
       }
-      if (!this.callStatic[signature]) {
-        Object.defineProperty(this.callStatic, signature, {
-          ...options,
+      if (!this.callStatic[methodSignature]) {
+        Object.defineProperty(this.callStatic, methodSignature, {
+          ...methodTypes,
           value: buildCall(this, abiElement),
         });
       }
-      if (!this.populateTransaction[signature]) {
-        Object.defineProperty(this.populateTransaction, signature, {
-          ...options,
+      if (!this.populateTransaction[methodSignature]) {
+        Object.defineProperty(this.populateTransaction, methodSignature, {
+          ...methodTypes,
           value: buildPopulate(this, abiElement),
         });
       }
-      if (!this.estimateFee[signature]) {
-        Object.defineProperty(this.estimateFee, signature, {
-          ...options,
+      if (!this.estimateFee[methodSignature]) {
+        Object.defineProperty(this.estimateFee, methodSignature, {
+          ...methodTypes,
           value: buildEstimate(this, abiElement),
         });
       }
     });
   }
 
-  public withOptions(options: ContractOptions) {
-    this.contractOptions = options;
+  public withOptions(options: WithOptions) {
+    this.withOptionsProps = options;
     return this;
   }
 
-  public attach(address: string): void {
+  public attach(address: string, abi?: Abi): void {
+    // TODO: if changing address, probably changing abi also !? Also nonsense method as if you change abi and address, you need to create a new contract instance.
     this.address = address;
-  }
-
-  public connect(providerOrAccount: ProviderInterface | AccountInterface) {
-    this.providerOrAccount = providerOrAccount;
-  }
-
-  public async deployed(): Promise<Contract> {
-    if (this.deployTransactionHash) {
-      await this.providerOrAccount.waitForTransaction(this.deployTransactionHash);
-      this.deployTransactionHash = undefined;
+    if (abi) {
+      this.abi = createAbiParser(abi).getLegacyFormat();
+      this.callData = new CallData(abi);
+      this.structs = CallData.getAbiStruct(abi);
+      this.events = getAbiEvents(abi);
     }
+  }
+
+  /**
+   * Factory method to declare and deploy a contract creating a new Contract instance
+   *
+   * It handles the entire lifecycle: compiles constructor calldata, declares the contract class,
+   * deploys an instance, and returns a ready-to-use Contract object.
+   *
+   * @param params - Factory parameters containing Contract Class details and deployment options
+   * @returns Promise that resolves to a deployed Contract instance with address and transaction hash
+   * @throws Error if deployment fails or contract_address is not returned
+   * @example
+   * ```typescript
+   * // Deploy an ERC20 contract
+   * const contract = await Contract.factory({
+   *   compiledContract: erc20CompiledContract,
+   *   account: myAccount,
+   *   casm: erc20Casm,
+   *   constructorArguments: {
+   *     name: 'MyToken',
+   *     symbol: 'MTK',
+   *     decimals: 18,
+   *     initial_supply: { low: 1000000, high: 0 },
+   *     recipient: myAccount.address
+   *   }
+   * });
+   *
+   * console.log('Contract deployed at:', contract.address);
+   * ```\
+   */
+  static async factory(params: FactoryParams, details: UniversalDetails = {}): Promise<Contract> {
+    const contract = parseContract(params.contract);
+    const { account, parseRequest = true } = params;
+    const abi = params.abi ? params.abi : extractAbi(contract);
+
+    const {
+      declare: { class_hash },
+      deploy: { contract_address },
+    } = await account.declareAndDeploy(
+      {
+        ...params,
+        abi: parseRequest ? abi : undefined,
+      },
+      details
+    );
+    assert(Boolean(contract_address), 'Deployment of the contract failed');
+
+    return new Contract({
+      abi,
+      address: contract_address,
+      providerOrAccount: account,
+      classHash: class_hash.toString(),
+    });
+  }
+
+  public async isDeployed(): Promise<Contract> {
+    try {
+      await this.providerOrAccount.getClassHashAt(this.address);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Contract not deployed at address ${this.address}: ${errorMessage}`);
+    }
+
     return this;
   }
 
@@ -221,10 +283,10 @@ export class Contract implements ContractInterface {
       formatResponse = undefined,
       blockIdentifier = undefined,
     }: CallOptions = {}
-  ): Promise<Result> {
+  ): Promise<CallResult> {
     assert(this.address !== null, 'contract is not connected to an address');
 
-    const calldata = getCalldata(args, () => {
+    const calldata = getCompiledCalldata(args, () => {
       if (parseRequest) {
         this.callData.validate(ValidateType.CALL, method, args);
         return this.callData.compile(method, args);
@@ -256,11 +318,11 @@ export class Contract implements ContractInterface {
   public invoke(
     method: string,
     args: ArgsOrCalldata = [],
-    { parseRequest = true, signature, ...RestInvokeOptions }: InvokeOptions = {}
+    { parseRequest = true, signature, ...RestInvokeOptions }: ExecuteOptions = {}
   ): Promise<InvokeFunctionResponse> {
     assert(this.address !== null, 'contract is not connected to an address');
 
-    const calldata = getCalldata(args, () => {
+    const calldata = getCompiledCalldata(args, () => {
       if (parseRequest) {
         this.callData.validate(ValidateType.INVOKE, method, args);
         return this.callData.compile(method, args);
@@ -274,15 +336,15 @@ export class Contract implements ContractInterface {
       calldata,
       entrypoint: method,
     };
-    if ('execute' in this.providerOrAccount) {
+    if (isAccount(this.providerOrAccount)) {
       return this.providerOrAccount.execute(invocation, {
         ...RestInvokeOptions,
       });
     }
 
     if (!RestInvokeOptions.nonce)
-      throw new Error(`Nonce is required when invoking a function without an account`);
-    logger.warn(`Invoking ${method} without an account. This will not work on a public node.`);
+      throw new Error(`Manual nonce is required when invoking a function without an account`);
+    logger.warn(`Invoking ${method} without an account.`);
 
     return this.providerOrAccount.invokeFunction(
       {
@@ -296,22 +358,25 @@ export class Contract implements ContractInterface {
     );
   }
 
-  public async estimate(method: string, args: ArgsOrCalldata = []): Promise<EstimateFeeResponse> {
+  public async estimate(
+    method: string,
+    args: ArgsOrCalldata = []
+  ): Promise<EstimateFeeResponseOverhead> {
     assert(this.address !== null, 'contract is not connected to an address');
 
-    if (!getCalldata(args, () => false)) {
+    if (!getCompiledCalldata(args, () => false)) {
       this.callData.validate(ValidateType.INVOKE, method, args);
     }
 
     const invocation = this.populate(method, args);
-    if ('estimateInvokeFee' in this.providerOrAccount) {
+    if (isAccount(this.providerOrAccount)) {
       return this.providerOrAccount.estimateInvokeFee(invocation);
     }
     throw Error('Contract must be connected to the account contract to estimate');
   }
 
   public populate(method: string, args: RawArgs = []): Call {
-    const calldata: Calldata = getCalldata(args, () => this.callData.compile(method, args));
+    const calldata: Calldata = getCompiledCalldata(args, () => this.callData.compile(method, args));
     return {
       contractAddress: this.address,
       entrypoint: method,
