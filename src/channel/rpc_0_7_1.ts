@@ -178,16 +178,16 @@ export class RpcChannel {
           params as any, // TODO: fix this temporary cast with some permanent solution
           (this.requestId += 1)
         );
-        this.errorHandler(method, params, error);
+        this.errorHandler(String(method), params, error);
         return result as RPC.Methods[T]['result'];
       }
 
       const rawResult = await this.fetch(method, params, (this.requestId += 1));
       const { error, result } = await rawResult.json();
-      this.errorHandler(method, params, error);
+      this.errorHandler(String(method), params, error);
       return result as RPC.Methods[T]['result'];
     } catch (error: any) {
-      this.errorHandler(method, params, error?.response?.data, error);
+      this.errorHandler(String(method), params, error?.response?.data, error);
       throw error;
     }
   }
