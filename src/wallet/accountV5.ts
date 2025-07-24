@@ -23,7 +23,6 @@ import {
 } from '../types';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
-import { buildUDCCall } from '../utils/transaction';
 import {
   addDeclareTransaction,
   addInvokeTransaction,
@@ -37,6 +36,7 @@ import {
 } from './connectV5';
 import type { WalletAccountV5Options } from './types/index.type';
 import type { PaymasterInterface } from '../paymaster';
+import { defaultDeployer } from '../deployer';
 
 /**
  * WalletAccountV5 class.
@@ -142,7 +142,7 @@ export class WalletAccountV5 extends Account implements AccountInterface {
   override async deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Promise<MultiDeployContractResponse> {
-    const { calls, addresses } = buildUDCCall(payload, this.address);
+    const { calls, addresses } = defaultDeployer.buildDeployerCall(payload, this.address);
     const invokeResponse = await this.execute(calls);
     return {
       ...invokeResponse,
