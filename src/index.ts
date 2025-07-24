@@ -1,8 +1,9 @@
 /**
- * Main
+ * Main Classes
  */
 export * from './wallet';
 export * from './account';
+export * from './deployer';
 export * from './contract';
 export * from './paymaster';
 export * from './provider';
