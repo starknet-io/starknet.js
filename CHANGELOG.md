@@ -1,3 +1,9 @@
+# [8.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v8.0.0-beta.3...v8.0.0-beta.4) (2025-07-24)
+
+### Bug Fixes
+
+- accountInvocationsFactory typing ([a1b1e7f](https://github.com/starknet-io/starknet.js/commit/a1b1e7f60e7abfa43836666a0d801abd33242d7b))
+
 # [8.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v8.0.0-beta.2...v8.0.0-beta.3) (2025-07-24)
 
 ### Bug Fixes
