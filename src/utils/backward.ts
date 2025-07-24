@@ -15,7 +15,7 @@ import type {
   ProviderOrAccount,
 } from '../types';
 import { WalletAccount } from '../wallet';
-import type { StarknetWalletProvider, WalletAccountOptions } from '../wallet/types/index.type';
+import type { StarknetWalletProvider, WalletAccountV4Options } from '../wallet/types/index.type';
 
 /**
  * Backward compatibility method to create Contract instances using the old arguments-based API
@@ -120,7 +120,7 @@ export function createAccount(
  * ```
  */
 export function createWalletAccount(
-  provider: WalletAccountOptions['provider'],
+  provider: WalletAccountV4Options['provider'],
   walletProvider: StarknetWalletProvider,
   address: string,
   cairoVersion?: CairoVersion,
