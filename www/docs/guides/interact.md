@@ -237,7 +237,7 @@ txR.match({
     console.log('Reverted =', txR);
   },
   error: (err: Error) => {
-    console.log('An error occured =', err);
+    console.log('An error occurred =', err);
   },
 });
 ```
