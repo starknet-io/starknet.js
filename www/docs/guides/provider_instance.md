@@ -1,10 +1,14 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 ---
 
-# RpcProvider object 🔌 connect to the network
+# Provider
 
-The first thing to do is to define with which network you want to interact (Mainnet, Testnet, Devnet, ...).
+![Starknet.js Architecture](./pictures/provider.svg)
+
+The `RpcProvider` object connects your DAPP to the network.
+
+The first thing to do is to define which network you want to interact with (Mainnet, Testnet, Devnet, ...).
 
 Then you need to select a node. A node is a safe way to connect with the Starknet blockchain. You can use:
 
@@ -165,16 +169,16 @@ The Goerli Testnet is no longer in service.
 ### Sepolia Testnet
 
 ```typescript
-// Infura node RPC 0.7.0 for Sepolia Testnet :
+// Infura node RPC 0.7.0 for Sepolia Testnet:
 const providerInfuraSepoliaTestnet = new RpcProvider({
   nodeUrl: 'https://starknet-sepolia.infura.io/v3/' + infuraKey,
   specVersion: '0.7.1',
 });
-// Public Blast node RPC 0.8.0 for Sepolia Testnet (0_6 & 0_7 also available) :
+// Public Blast node RPC 0.8.0 for Sepolia Testnet (0_6 & 0_7 also available):
 const providerSepoliaTestnetBlastPublic = new RpcProvider({
   nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_8',
 });
-// Public Lava node RPC 0.8.0 for Sepolia Testnet (0_6 & 0_7 also available) :
+// Public Lava node RPC 0.8.0 for Sepolia Testnet (0_6 & 0_7 also available):
 const providerSepoliaTestnetBlastPublic = new RpcProvider({
   nodeUrl: 'https://rpc.starknet-testnet.lava.build/rpc/v0_8',
 });
@@ -187,14 +191,14 @@ const providerSepoliaTestnetBlastPublic = new RpcProvider({
 For a local [Pathfinder](https://github.com/eqlabs/pathfinder) node:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: '127.0.0.1:9545/rpc/v0_8' });
+const myProvider = new RpcProvider({ nodeUrl: '127.0.0.1:9545/rpc/v0_8' });
 ```
 
 Your node can be located in your local network (example: Pathfinder node running on a computer in your network, launched with this additional option: `--http-rpc 0.0.0.0:9545`).
 You can connect with:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: '192.168.1.99:9545/rpc/v0_8' });
+const myProvider = new RpcProvider({ nodeUrl: '192.168.1.99:9545/rpc/v0_8' });
 ```
 
 ### Juno
@@ -202,7 +206,7 @@ const provider = new RpcProvider({ nodeUrl: '192.168.1.99:9545/rpc/v0_8' });
 For a local [Juno](https://github.com/NethermindEth/juno) node initialize the provider with:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_8' });
+const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_8' });
 ```
 
 > If Juno is running on a separate computer in your local network, don't forget to add the option `--http-host 0.0.0.0` when launching Juno.
@@ -212,14 +216,14 @@ const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_8' });
 Example of a connection to a local development node (RPC 0.8.0), with starknet-devnet v0.3.0:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
+const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 ```
 
 > If you customized the host or port during starknet-devnet initialization, adapt the script accordingly.
 
 ## Batch JSON-RPC
 
-The BatchClient class allows requests to be batched together in a single HTTP request, either by the interval amount or at the end of the callback queue if the batch is set to 0. By batching requests, we can reduce the overhead associated with handling individual requests.
+The `BatchClient` class allows requests to be batched together in a single HTTP request, either by the interval amount or at the end of the callback queue if the batch is set to 0. By batching requests, we can reduce the overhead associated with handling individual requests.
 
 #### Example of usage with RpcProvider
 
@@ -240,18 +244,18 @@ const [getBlockResponse, blockHashAndNumber, txCount] = await Promise.all([
 #### Example of direct usage of underlying BatchClient class
 
 ```typescript
-const provider = new RpcProvider();
+const myProvider = new RpcProvider();
 
-const batchClient = new BatchClient({
-  nodeUrl: provider.channel.nodeUrl,
-  headers: provider.channel.headers,
+const myBatchClient = new BatchClient({
+  nodeUrl: myProvider.channel.nodeUrl,
+  headers: myProvider.channel.headers,
   interval: 0,
 });
 
 const [getBlockResponse, blockHashAndNumber, txCount] = await Promise.all([
-  batchClient.getBlock(),
-  batchClient.getBlockLatestAccepted(),
-  batchClient.getBlockTransactionCount('latest'),
+  myBatchClient.getBlock(),
+  myBatchClient.getBlockLatestAccepted(),
+  myBatchClient.getBlockTransactionCount('latest'),
 ]);
 
 // ... usage of getBlockResponse, blockHashAndNumber, txCount

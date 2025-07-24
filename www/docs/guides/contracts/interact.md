@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 3
 ---
 
 # Interact with your contract
@@ -14,7 +14,7 @@ Once your provider, contract, and account are connected, you can interact with t
 
 Your account should be funded enough to pay fees (20 STRK should be enough to start).
 
-![](./pictures/Interact_contract.png)
+![](./pictures/contract-interaction.svg)
 
 Here we will interact with a `test.cairo` contract (Cairo 1) already deployed in Sepolia Testnet at the address:
 
@@ -36,16 +36,16 @@ You have to call Starknet, with the use of the meta-class method: `contract.func
 
 ```typescript
 //initialize provider with a Sepolia Testnet node
-const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 // Connect the deployed Test contract in Sepolia Testnet
 const testAddress = '0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77';
 
 // read the ABI of the Test contract
-const { abi: testAbi } = await provider.getClassAt(testAddress);
+const { abi: testAbi } = await myProvider.getClassAt(testAddress);
 if (testAbi === undefined) {
   throw new Error('no abi.');
 }
-const myTestContract = new Contract(testAbi, testAddress, provider);
+const myTestContract = new Contract(testAbi, testAddress, myProvider);
 
 // Interaction with the contract with call
 const bal1 = await myTestContract.get_balance();
@@ -60,7 +60,7 @@ To increase the balance, you need in addition a connected and funded Account.
 
 You have to invoke Starknet, with the use of the meta-class method: `contract.function_name(params)`
 
-> After the invoke, you have to wait the incorporation of the modification of Balance in the network, with `await provider.waitForTransaction(transaction_hash)`
+> After the invoke, you have to wait the incorporation of the modification of Balance in the network, with `await myProvider.waitForTransaction(transaction_hash)`
 
 :::note
 By default, you are executing transactions that use the STRK token to pay the fees.
@@ -70,22 +70,22 @@ Here is an example of how to increase and check the balance:
 
 ```typescript
 //initialize provider with a Sepolia Testnet node
-const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 // connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address = '0x123....789';
 
-const account0 = new Account(provider, account0Address, privateKey0);
+const account0 = new Account(myProvider, account0Address, privateKey0);
 
 // Connect the deployed Test contract in Testnet
 const testAddress = '0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77';
 
 // read the ABI of the Test contract
-const { abi: testAbi } = await provider.getClassAt(testAddress);
+const { abi: testAbi } = await myProvider.getClassAt(testAddress);
 if (testAbi === undefined) {
   throw new Error('no abi.');
 }
-const myTestContract = new Contract(testAbi, testAddress, provider);
+const myTestContract = new Contract(testAbi, testAddress, myProvider);
 
 // Connect account with the contract
 myTestContract.connect(account0);
@@ -95,7 +95,7 @@ const bal1 = await myTestContract.get_balance();
 console.log('Initial balance =', bal1); // Cairo 1 contract
 const myCall = myTestContract.populate('increase_balance', [10]);
 const res = await myTestContract.increase_balance(myCall.calldata);
-await provider.waitForTransaction(res.transaction_hash);
+await myProvider.waitForTransaction(res.transaction_hash);
 
 const bal2 = await myTestContract.get_balance();
 console.log('Final balance =', bal2);
@@ -153,14 +153,9 @@ const tx = await cairo1Contract.array2d_ex(data);
 const tx1 = await cairo1Contract.array2d_ex(data);
 ```
 
-Be sure to use `waitForTransaction` between the calls, because you may experience issues with the nonce not incrementing:
+Be sure to use `waitForTransaction` between the calls, because you may experience issues with the nonce not incrementing. For more details about multicalls, see [this guide](./multiCall.md).
 
-```typescript
-const tx = await cairo1Contract.array2d_ex(data);
-await provider.waitForTransaction(tx.transaction_hash);
-const tx1 = await cairo1Contract.array2d_ex(data);
-await provider.waitForTransaction(tx1.transaction_hash);
-```
+For more information about defining call messages and parameters, see [this guide](./define_call_message.md).
 
 ## Write several operations, with Account.execute
 
@@ -173,7 +168,7 @@ We will later see this case in more detail in this dedicated [guide](multiCall.m
 - and an array of parameters for this function
 
 ```typescript
-const result = await account.execute({
+const result = await myAccount.execute({
   contractAddress: myContractAddress,
   entrypoint: 'transfer',
   calldata: CallData.compile({
@@ -181,7 +176,7 @@ const result = await account.execute({
     amount: cairo.uint256(100000n),
   }),
 });
-await provider.waitForTransaction(result.transaction_hash);
+await myProvider.waitForTransaction(result.transaction_hash);
 ```
 
 ## Other existing methods
@@ -207,15 +202,15 @@ const specialParameters: Calldata = ['2036735872918048433518', '5130580', '18'];
 const getResponse = await myAccount.call('get_bal', specialParameters, { parseRequest: false });
 ```
 
-You provide the low-level numbers expected by Starknet, without any parsing or checking. See more details [here](define_call_message.md#parse-configuration).
+You provide the low-level numbers expected by Starknet, without any parsing or checking. See more details [here](./define_call_message.md#parse-configuration).
 
 ## Transaction receipt response
 
 You can interpret the transaction receipt response to check whether it succeeded or not.
 
 ```typescript
-const result = await account.execute(myCall);
-const txR = await provider.waitForTransaction(result.transaction_hash);
+const result = await myAccount.execute(myCall);
+const txR = await myProvider.waitForTransaction(result.transaction_hash);
 
 console.log(txR.statusReceipt, txR.value);
 console.log(txR.isSuccess(), txR.isReverted(), txR.isError());

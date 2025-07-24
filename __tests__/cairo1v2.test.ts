@@ -24,8 +24,9 @@ import {
   selector,
   shortString,
 } from '../src';
-import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
+import { contracts } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
+import { createTestProvider, getTestAccount } from './config/fixturesInit';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;

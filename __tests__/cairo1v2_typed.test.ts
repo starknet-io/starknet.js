@@ -30,13 +30,14 @@ import {
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { isString } from '../src/utils/typed';
+import { contracts } from './config/fixtures';
 import {
-  contracts,
   createTestProvider,
   getTestAccount,
   STRKtokenAddress,
+  adaptAccountIfDevnet,
   TEST_TX_VERSION,
-} from './config/fixtures';
+} from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -743,12 +744,14 @@ describe('Cairo 1', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account({
-        provider,
-        address: toBeAccountAddress,
-        signer: priKey,
-        transactionVersion: TEST_TX_VERSION,
-      });
+      accountC1 = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: toBeAccountAddress,
+          signer: priKey,
+          transactionVersion: TEST_TX_VERSION,
+        })
+      );
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,

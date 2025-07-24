@@ -9,7 +9,8 @@ import {
   Account,
   EstimateFeeResponseOverhead,
 } from '../src';
-import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
+import { contracts } from './config/fixtures';
+import { createTestProvider, getTestAccount } from './config/fixturesInit';
 
 // TODO: add RPC 0.7 V3, RPC 0.8 V3
 describe('Transaction receipt utility - RPC 0.8+ - V3', () => {

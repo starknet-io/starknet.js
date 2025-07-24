@@ -54,6 +54,11 @@ export type EstimateFeeResponseOverhead = {
   unit: PRICE_UNIT;
 };
 
+/**
+ * same type as EstimateFeeResponseOverhead but without overhead
+ */
+export type EstimateFeeResponse = EstimateFeeResponseOverhead;
+
 export type EstimateFeeResponseBulkOverhead = Array<EstimateFeeResponseOverhead>;
 
 export type InvokeFunctionResponse = InvokedTransaction;

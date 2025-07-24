@@ -1,8 +1,8 @@
 ---
-sidebar_position: 10
+sidebar_position: 4
 ---
 
-# Data transformation
+# Data types
 
 This guide is the most important of all this documentation. Take your time, and read it carefully...
 
@@ -293,8 +293,8 @@ Do not add the `array_len` parameter before your array. Starknet.js will manage 
 
 ### Fixed array
 
-Starknet type `[type_array; n]` is waiting for an array of `n` items of type `type_array`, without initial length parameter : item1, item2, ...  
-You can send it to Starknet.js the same way than arrays & spans: bigNumberish[].
+Starknet type `[type_array; n]` expects an array of `n` items of type `type_array`, without the initial length parameter: item1, item2, etc.  
+You can send it to Starknet.js the same way as arrays and spans: `bigNumberish[]`.
 
 ```typescript
 // for Cairo type [core::integer::u32; 4]
@@ -501,7 +501,7 @@ const tx = await account0.execute([myCall1, myCall2, myCall3]);
 
 This type is particularly useful when you need the maximum performance and speed in your code; You have no automatic transformation, no checks with ABI, and no parsing.
 
-You provide to starknet.js the low-level data expected by Starknet:
+You provide to Starknet.js the low-level data expected by Starknet:
 
 ```typescript
 const specialParameters: Calldata = [
@@ -638,10 +638,10 @@ The result will be an object, with 2 strings:
 
 ## Tool to learn how to encode/decode
 
-A DAPP has been created to learn how to encode/decode with Starknet.js : **Startnet-encode-decode**.  
+A DAPP has been created to learn how to encode/decode with Starknet.js: **Startnet-encode-decode**.  
 It's also a convenient tool for the exploration of any contract ABI.
 ![](./pictures/encodeFn2.png)
 
-Follow these links :  
-DAPP : https://starknet-encode-decode.vercel.app/  
-Tuto : https://github.com/PhilippeR26/starknet-encode-decode/blob/main/tuto.md
+Follow these links:  
+DAPP: https://starknet-encode-decode.vercel.app/  
+Tuto: https://github.com/PhilippeR26/starknet-encode-decode/blob/main/tuto.md

@@ -19,7 +19,8 @@ import {
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
+import { contracts } from './config/fixtures';
+import { createTestProvider, getTestAccount } from './config/fixturesInit';
 
 describe('Cairo v2.4 onwards', () => {
   let provider: ProviderInterface;

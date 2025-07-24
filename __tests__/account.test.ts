@@ -17,16 +17,14 @@ import {
   type InvokeTransactionReceiptResponse,
 } from '../src';
 import { Deployer } from '../src/deployer';
+import { C1v2ClassHash, contracts, describeIfDevnet, erc20ClassHash } from './config/fixtures';
 import {
-  C1v2ClassHash,
-  TEST_TX_VERSION,
-  contracts,
   createTestProvider,
-  describeIfDevnet,
-  devnetFeeTokenAddress,
-  erc20ClassHash,
   getTestAccount,
-} from './config/fixtures';
+  devnetFeeTokenAddress,
+  adaptAccountIfDevnet,
+  TEST_TX_VERSION,
+} from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 const { cleanHex, hexToDecimalString, toBigInt } = num;
@@ -125,12 +123,14 @@ describe('deploy and test Account', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      const accountOZ = new Account({
-        provider,
-        address: toBeAccountAddress,
-        signer: privKey,
-        transactionVersion: TEST_TX_VERSION,
-      });
+      const accountOZ = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: toBeAccountAddress,
+          signer: privKey,
+          transactionVersion: TEST_TX_VERSION,
+        })
+      );
       const deployed = await accountOZ.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
@@ -300,11 +300,13 @@ describe('deploy and test Account', () => {
         { publicKey: starkKeyPub },
         0
       );
-      const newAccount = new Account({
-        provider,
-        address: precalculatedAddress,
-        signer: privateKey,
-      });
+      const newAccount = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: precalculatedAddress,
+          signer: privateKey,
+        })
+      );
 
       const res = await newAccount.simulateTransaction([
         {
@@ -550,11 +552,13 @@ describe('deploy and test Account', () => {
         { publicKey: starkKeyPub },
         0
       );
-      newAccount = new Account({
-        provider,
-        address: precalculatedAddress,
-        signer: privateKey,
-      });
+      newAccount = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: precalculatedAddress,
+          signer: privateKey,
+        })
+      );
     });
 
     test('estimateAccountDeployFee Cairo 1', async () => {

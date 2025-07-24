@@ -1,8 +1,10 @@
 ---
-sidebar_position: 4
+sidebar_position: 1
 ---
 
-# 🔌 Connect to an existing account
+# Instance
+
+![Starknet.js Architecture](./pictures/Account-instance.svg)
 
 Once your provider is initialized, you can connect an existing account.
 
@@ -34,13 +36,13 @@ Public key : 0x7e52885445756b313ea16849145363ccb73fb4ab0440dbac333cf9d13de82b9
 Then you can use this code:
 
 ```typescript
-// initialize provider for Devnet v0.3.0
-const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
+// initialize provider for Devnet
+const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 // initialize existing account 0 pre-deployed on Devnet
 const accountAddress = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
 const privateKey = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
 
-const account = new Account(provider, accountAddress, privateKey);
+const myAccount = new Account(myProvider, accountAddress, privateKey);
 ```
 
 Your account is now connected, and you can use it.
@@ -60,12 +62,12 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 // initialize RPC v0.8 provider
-const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
+const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 // initialize existing account
 const privateKey = process.env.OZ_NEW_ACCOUNT_PRIVKEY;
 const accountAddress = '0x051158d244c7636dde39ec822873b29e6c9a758c6a9812d005b6287564908667';
 
-const account = new Account(provider, accountAddress, privateKey);
+const myAccount = new Account(myProvider, accountAddress, privateKey);
 ```
 
 :::tip
@@ -73,7 +75,7 @@ If you are connected to an RPC v0.7 node and you want to use ETH as fees for thi
 
 ```typescript
 const myAccount = new Account(
-  provider,
+  myProvider,
   accountAddress,
   privateKey,
   undefined,
@@ -94,5 +96,5 @@ const myEthPrivateKey = '0x525bc68475c0955fae83869beec0996114d4bb27b28b781ed2a20
 const myEthAccountAddressInStarknet =
   '0x65a822fbee1ae79e898688b5a4282dc79e0042cbed12f6169937fddb4c26641';
 const myEthSigner = new EthSigner(myEthPrivateKey);
-const myEthAccount = new Account(provider, myEthAccountAddressInStarknet, myEthSigner);
+const myEthAccount = new Account(myProvider, myEthAccountAddressInStarknet, myEthSigner);
 ```

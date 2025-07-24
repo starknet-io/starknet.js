@@ -18,13 +18,13 @@ import {
   type DeclareContractPayload,
 } from '../../src';
 import { validateAndParseEthAddress } from '../../src/utils/eth';
+import { contracts, describeIfDevnet } from '../config/fixtures';
 import {
-  contracts,
   createTestProvider,
-  describeIfDevnet,
   getTestAccount,
+  adaptAccountIfDevnet,
   STRKtokenAddress,
-} from '../config/fixtures';
+} from '../config/fixturesInit';
 
 describe('Ethereum signer', () => {
   describe('signer', () => {
@@ -133,11 +133,13 @@ describe('Ethereum signer', () => {
         0
       );
 
-      ethAccount = new Account({
-        provider,
-        address: contractETHAccountAddress,
-        signer: ethSigner,
-      });
+      ethAccount = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: contractETHAccountAddress,
+          signer: ethSigner,
+        })
+      );
       const feeEstimation = await ethAccount.estimateAccountDeployFee({
         classHash: decClassHash,
         addressSalt: salt,
