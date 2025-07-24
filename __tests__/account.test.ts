@@ -3,7 +3,7 @@ import {
   Account,
   CallData,
   Contract,
-  DeclareDeployDCResponse,
+  DeclareDeployUDCResponse,
   Provider,
   ProviderInterface,
   TransactionType,
@@ -43,7 +43,7 @@ describe('deploy and test Account', () => {
   let erc20Address: string;
   let dapp: Contract;
   let dappClassHash: string;
-  let dd: DeclareDeployDCResponse;
+  let dd: DeclareDeployUDCResponse;
 
   beforeAll(async () => {
     initializeMatcher(expect);
@@ -743,7 +743,7 @@ describe('deploy and test Account', () => {
     test('estimateInvokeFee Cairo 1', async () => {
       // TODO @dhruvkelawala check expectation for feeTransactionVersion
       // Cairo 1 contract
-      const ddc1: DeclareDeployDCResponse = await account.declareAndDeploy({
+      const ddc1: DeclareDeployUDCResponse = await account.declareAndDeploy({
         contract: contracts.C260.sierra,
         casm: contracts.C260.casm,
       });
@@ -775,7 +775,7 @@ describe('deploy and test Account', () => {
         address: account.address,
         provider,
         signer: account.signer,
-        customDeployer,
+        deployer: customDeployer,
       });
     });
     test('Deploy contract', async () => {

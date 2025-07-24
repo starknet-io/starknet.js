@@ -31,7 +31,7 @@ import type {
   DeployAccountContractPayload,
   DeployAccountContractTransaction,
   DeployContractResponse,
-  DeployContractDCResponse,
+  DeployContractUDCResponse,
   DeployTransactionReceiptResponse,
   EstimateFeeResponseOverhead,
   EstimateFeeBulk,
@@ -119,7 +119,7 @@ export class Account extends Provider implements AccountInterface {
     }
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
     this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
-    this.deployer = options.customDeployer ?? defaultDeployer;
+    this.deployer = options.deployer ?? defaultDeployer;
     this.defaultTipType = defaultTipType ?? config.get('defaultTipType');
 
     logger.debug('Account setup', {
@@ -561,7 +561,7 @@ export class Account extends Provider implements AccountInterface {
   public async deployContract(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
-  ): Promise<DeployContractDCResponse> {
+  ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
     return this.deployer.parseDeployerEvent(

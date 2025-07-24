@@ -25,7 +25,7 @@ import {
   selector,
   shortString,
   stark,
-  type DeclareDeployDCResponse,
+  type DeclareDeployUDCResponse,
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
@@ -53,9 +53,9 @@ describe('Cairo 1', () => {
   });
 
   describe('API &  Contract interactions', () => {
-    let dd: DeclareDeployDCResponse;
+    let dd: DeclareDeployUDCResponse;
     let cairo1Contract: TypedContractV2<typeof tAbi>;
-    let dd2: DeclareDeployDCResponse;
+    let dd2: DeclareDeployUDCResponse;
     let cairo210Contract: TypedContractV2<typeof tAbi>;
     initializeMatcher(expect);
 

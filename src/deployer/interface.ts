@@ -1,6 +1,6 @@
 import type {
   BigNumberish,
-  DeployContractDCResponse,
+  DeployContractUDCResponse,
   InvokeTransactionReceiptResponse,
   UniversalDeployerContractPayload,
 } from '../types/index';
@@ -30,9 +30,9 @@ export abstract class DeployerInterface {
    * @param {InvokeTransactionReceiptResponse} txReceipt Transaction receipt
    * @param {DeployerDefinition} deployer Deployer contract definition
    *
-   * @returns {DeployContractDCResponse} parsed Deployer event data
+   * @returns {DeployContractUDCResponse} parsed Deployer event data
    */
   public abstract parseDeployerEvent(
     txReceipt: InvokeTransactionReceiptResponse
-  ): DeployContractDCResponse;
+  ): DeployContractUDCResponse;
 }

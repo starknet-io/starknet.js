@@ -1,7 +1,7 @@
 import {
   Call,
   Contract,
-  DeclareDeployDCResponse,
+  DeclareDeployUDCResponse,
   RevertedTransactionReceiptResponse,
   SuccessfulTransactionReceiptResponse,
   TransactionExecutionStatus,
@@ -16,7 +16,7 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
   let provider: ProviderInterface;
   let account: Account;
 
-  let dd: DeclareDeployDCResponse;
+  let dd: DeclareDeployUDCResponse;
   let contract: Contract;
 
   beforeAll(async () => {

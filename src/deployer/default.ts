@@ -2,7 +2,7 @@ import { UDC } from '../global/constants';
 import {
   ValidateType,
   type BigNumberish,
-  type DeployContractDCResponse,
+  type DeployContractUDCResponse,
   type InvokeTransactionReceiptResponse,
   type UniversalDeployerContractPayload,
 } from '../types';
@@ -80,7 +80,9 @@ export class Deployer implements DeployerInterface {
     };
   }
 
-  public parseDeployerEvent(txReceipt: InvokeTransactionReceiptResponse): DeployContractDCResponse {
+  public parseDeployerEvent(
+    txReceipt: InvokeTransactionReceiptResponse
+  ): DeployContractUDCResponse {
     if (!txReceipt.events?.length) {
       throw new Error('Deployer emitted event is empty');
     }

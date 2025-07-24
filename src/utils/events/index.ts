@@ -13,7 +13,7 @@ import {
   type CairoEventDefinition,
   type CairoEventVariant,
   type AbiEntry,
-  type DeployContractDCResponse,
+  type DeployContractUDCResponse,
   type InvokeTransactionReceiptResponse,
 } from '../../types';
 import assert from '../assert';
@@ -259,11 +259,11 @@ export function parseEvents(
  * create DeployContractResponse compatible response with addition of the UDC Event data
  * @deprecated Use Deployer class.
  * @param {InvokeTransactionReceiptResponse} txReceipt
- * @returns {DeployContractDCResponse} parsed UDC event data
+ * @returns {DeployContractUDCResponse} parsed UDC event data
  */
 export function parseUDCEvent(
   txReceipt: InvokeTransactionReceiptResponse
-): DeployContractDCResponse {
+): DeployContractUDCResponse {
   const deployer = new Deployer();
   return deployer.parseDeployerEvent(txReceipt);
 }
