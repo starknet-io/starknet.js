@@ -9,14 +9,13 @@ import {
   TransactionType,
   cairo,
   ec,
-  events,
   num,
   hash,
   stark,
   type Calldata,
   type InvokeTransactionReceiptResponse,
+  Deployer,
 } from '../src';
-import { Deployer } from '../src/deployer';
 import { C1v2ClassHash, contracts, describeIfDevnet, erc20ClassHash } from './config/fixtures';
 import {
   createTestProvider,
@@ -492,7 +491,9 @@ describe('deploy and test Account', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = events.parseUDCEvent(txReceipt.value as InvokeTransactionReceiptResponse);
+      const udcEvent = account.deployer.parseDeployerEvent(
+        txReceipt.value as InvokeTransactionReceiptResponse
+      );
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 
@@ -509,7 +510,9 @@ describe('deploy and test Account', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = events.parseUDCEvent(txReceipt.value as InvokeTransactionReceiptResponse);
+      const udcEvent = account.deployer.parseDeployerEvent(
+        txReceipt.value as InvokeTransactionReceiptResponse
+      );
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 

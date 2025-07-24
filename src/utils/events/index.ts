@@ -1,4 +1,3 @@
-import { Deployer } from '../../deployer';
 import {
   Abi,
   AbiEnums,
@@ -13,8 +12,6 @@ import {
   type CairoEventDefinition,
   type CairoEventVariant,
   type AbiEntry,
-  type DeployContractUDCResponse,
-  type InvokeTransactionReceiptResponse,
 } from '../../types';
 import assert from '../assert';
 import { isCairo1Abi } from '../calldata/cairo';
@@ -252,18 +249,4 @@ export function parseEvents(
       return acc;
     }, [] as ParsedEvents);
   return ret;
-}
-
-/**
- * Parse Transaction Receipt Event from UDC invoke transaction and
- * create DeployContractResponse compatible response with addition of the UDC Event data
- * @deprecated Use Deployer class.
- * @param {InvokeTransactionReceiptResponse} txReceipt
- * @returns {DeployContractUDCResponse} parsed UDC event data
- */
-export function parseUDCEvent(
-  txReceipt: InvokeTransactionReceiptResponse
-): DeployContractUDCResponse {
-  const deployer = new Deployer();
-  return deployer.parseDeployerEvent(txReceipt);
 }
