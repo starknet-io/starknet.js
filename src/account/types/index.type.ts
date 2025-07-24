@@ -20,7 +20,9 @@ import type { SignerInterface } from '../../signer';
 import type { SupportedTransactionVersion } from '../../global/constants';
 import type { PaymasterInterface } from '../../paymaster';
 import type { ProviderInterface } from '../../provider/interface';
+import type { DeployerInterface } from '../../deployer';
 import type { TipEstimate } from '../../utils/modules';
+import type { DeployContractUDCResponse } from '../../deployer/types/index.type';
 
 /**
  * Configuration options for creating an Account instance
@@ -38,6 +40,8 @@ export type AccountOptions = {
   transactionVersion?: SupportedTransactionVersion;
   /** Paymaster configuration for sponsored transactions (optional) */
   paymaster?: PaymasterOptions | PaymasterInterface;
+  /** Use of a custom account deployer contract (optional) */
+  deployer?: DeployerInterface;
   /**
    * Default tip type to use for sending transactions (optional)
    * @default 'recommendedTip'
@@ -84,18 +88,6 @@ export interface DeployContractResponse {
 export type MultiDeployContractResponse = {
   contract_address: Array<string>;
   transaction_hash: string;
-};
-
-export type DeployContractUDCResponse = {
-  contract_address: string;
-  transaction_hash: string;
-  address: string;
-  deployer: string;
-  unique: string;
-  classHash: string;
-  calldata_len: string;
-  calldata: Array<string>;
-  salt: string;
 };
 
 export type DeclareDeployUDCResponse = {

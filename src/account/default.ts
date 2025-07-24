@@ -4,7 +4,6 @@ import {
   SNIP9_V1_INTERFACE_ID,
   SNIP9_V2_INTERFACE_ID,
   SYSTEM_MESSAGES,
-  UDC,
   ZERO,
 } from '../global/constants';
 import { logger } from '../global/logger';
@@ -61,9 +60,8 @@ import type {
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
-import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
-import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
+import { isHex, toBigInt, toHex } from '../utils/num';
 import {
   buildExecuteFromOutsideCall,
   getOutsideCall,
@@ -79,13 +77,14 @@ import {
   toTransactionVersion,
   v3Details,
 } from '../utils/stark';
-import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
+import { getExecuteCalldata } from '../utils/transaction/transaction';
 import { isString, isUndefined } from '../utils/typed';
 import { getMessageHash } from '../utils/typedData';
 import { type AccountInterface } from './interface';
 import { defaultPaymaster, type PaymasterInterface, PaymasterRpc } from '../paymaster';
 import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
+import { defaultDeployer, Deployer } from '../deployer';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -97,6 +96,8 @@ export class Account extends Provider implements AccountInterface {
   readonly transactionVersion: typeof ETransactionVersion.V3;
 
   public paymaster: PaymasterInterface;
+
+  public deployer: Deployer;
 
   public defaultTipType: string;
 
@@ -119,6 +120,7 @@ export class Account extends Provider implements AccountInterface {
     }
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
     this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
+    this.deployer = options.deployer ?? defaultDeployer;
     this.defaultTipType = defaultTipType ?? config.get('defaultTipType');
 
     logger.debug('Account setup', {
@@ -222,7 +224,7 @@ export class Account extends Provider implements AccountInterface {
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
-    const calls = this.buildUDCContractPayload(payload);
+    const { calls } = this.deployer.buildDeployerCall(payload, this.address);
     return this.estimateInvokeFee(calls, details);
   }
 
@@ -400,7 +402,7 @@ export class Account extends Provider implements AccountInterface {
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
   ): Promise<MultiDeployContractResponse> {
-    const { calls, addresses } = buildUDCCall(payload, this.address);
+    const { calls, addresses } = this.deployer.buildDeployerCall(payload, this.address);
     const invokeResponse = await this.execute(calls, details);
 
     return {
@@ -415,7 +417,9 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
-    return parseUDCEvent(txReceipt as unknown as DeployTransactionReceiptResponse);
+    return this.deployer.parseDeployerEvent(
+      txReceipt as unknown as DeployTransactionReceiptResponse
+    );
   }
 
   public async declareAndDeploy(
@@ -784,33 +788,6 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
-  public buildUDCContractPayload(
-    payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
-  ): Call[] {
-    const calls = [].concat(payload as []).map((it) => {
-      const {
-        classHash,
-        salt = '0',
-        unique = true,
-        constructorCalldata = [],
-      } = it as UniversalDeployerContractPayload;
-      const compiledConstructorCallData = CallData.compile(constructorCalldata);
-
-      return {
-        contractAddress: UDC.ADDRESS,
-        entrypoint: UDC.ENTRYPOINT,
-        calldata: [
-          classHash,
-          salt,
-          toCairoBool(unique),
-          compiledConstructorCallData.length,
-          ...compiledConstructorCallData,
-        ],
-      };
-    });
-    return calls;
-  }
-
   public async accountInvocationsFactory(
     invocations: Invocations,
     details: AccountInvocationsFactoryDetails
@@ -858,7 +835,7 @@ export class Account extends Provider implements AccountInterface {
           };
         }
         if (transaction.type === ETransactionType.DEPLOY) {
-          const calls = this.buildUDCContractPayload(txPayload);
+          const { calls } = this.deployer.buildDeployerCall(txPayload, this.address);
           const payload = await this.buildInvocation(calls, signerDetails);
           return {
             ...common,
