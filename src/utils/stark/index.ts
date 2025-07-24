@@ -1,7 +1,7 @@
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 import { config } from '../../global/config';
-import { FeeEstimate } from '../../provider/types/index.type';
+import { EstimateFeeResponse, FeeEstimate } from '../../provider/types/index.type';
 import {
   EDAMode,
   EDataAvailabilityMode,
@@ -33,7 +33,7 @@ import {
   bigNumberishArrayToHexadecimalStringArray,
   toHex,
 } from '../num';
-import { isBigInt, isString } from '../typed';
+import { isBigInt, isObject, isString } from '../typed';
 
 type V3Details = Required<
   Pick<
@@ -202,6 +202,20 @@ export function toOverheadResourceBounds(
         overhead.l1_data_gas.max_price_per_unit
       ),
     },
+  };
+}
+
+export function resourceBoundsToEstimateFee(resourceBounds: ResourceBoundsBN): EstimateFeeResponse {
+  return {
+    resourceBounds,
+    /**
+     * maximum overall fee for provided resource bounds
+     */
+    overall_fee:
+      resourceBounds.l1_gas.max_amount * resourceBounds.l1_gas.max_price_per_unit +
+      resourceBounds.l1_data_gas.max_amount * resourceBounds.l1_data_gas.max_price_per_unit +
+      resourceBounds.l2_gas.max_amount * resourceBounds.l2_gas.max_price_per_unit,
+    unit: 'FRI',
   };
 }
 
@@ -402,7 +416,7 @@ export function resourceBoundsToHexString(resourceBoundsBN: ResourceBoundsBN): R
     if (isBigInt(obj)) {
       return toHex(obj);
     }
-    if (obj && typeof obj === 'object') {
+    if (isObject(obj)) {
       const result: any = {};
       Object.keys(obj).forEach((key) => {
         result[key] = convertBigIntToHex(obj[key]);
@@ -437,10 +451,10 @@ export function resourceBoundsToHexString(resourceBoundsBN: ResourceBoundsBN): R
  */
 export function resourceBoundsToBigInt(resourceBounds: ResourceBounds): ResourceBoundsBN {
   const convertStringToBigInt = (obj: any): any => {
-    if (typeof obj === 'string') {
+    if (isString(obj)) {
       return BigInt(obj);
     }
-    if (obj && typeof obj === 'object') {
+    if (isObject(obj)) {
       const result: any = {};
       Object.keys(obj).forEach((key) => {
         result[key] = convertStringToBigInt(obj[key]);

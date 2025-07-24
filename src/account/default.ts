@@ -73,6 +73,7 @@ import { parseContract } from '../utils/provider';
 import { supportsInterface } from '../utils/src5';
 import {
   randomAddress,
+  resourceBoundsToEstimateFee,
   signatureToHexArray,
   toFeeVersion,
   toTransactionVersion,
@@ -166,12 +167,7 @@ export class Account extends Provider implements AccountInterface {
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
     // Transform all calls into a single invocation
-    const invocations = [
-      {
-        type: ETransactionType.INVOKE,
-        payload: [calls].flat(),
-      },
-    ];
+    const invocations = [{ type: ETransactionType.INVOKE, payload: [calls].flat() }];
     const estimateBulk = await this.estimateFeeBulk(invocations, details);
     return estimateBulk[0]; // Get the first (and only) estimate
   }
@@ -186,10 +182,7 @@ export class Account extends Provider implements AccountInterface {
     );
     // Transform into invocations for bulk estimation
     const invocations = [
-      {
-        type: ETransactionType.DECLARE,
-        payload: extractContractHashes(payload),
-      },
+      { type: ETransactionType.DECLARE, payload: extractContractHashes(payload) },
     ];
     const estimateBulk = await this.estimateFeeBulk(invocations, details);
     return estimateBulk[0]; // Get the first (and only) estimate
@@ -239,25 +232,16 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<EstimateFeeBulk> {
     if (!invocations.length) throw TypeError('Invocations should be non-empty array');
     // skip estimating bounds if user provide bounds
-    if (details.resourceBounds)
-      return [
-        {
-          resourceBounds: details.resourceBounds,
-          overall_fee: 0n,
-          unit: 'FRI',
-        },
-      ];
+    if (details.resourceBounds) return [resourceBoundsToEstimateFee(details.resourceBounds)];
 
-    const { nonce, blockIdentifier, version: providedVersion, skipValidate } = details;
+    const { nonce, blockIdentifier, version, skipValidate } = details;
+    const detailsWithTip = await this.resolveDetailsWithTip(details);
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
-      ...v3Details({
-        ...details,
-        tip: details.tip ?? (await this.getEstimateTip()).recommendedTip, // TODO: Test how estimate diff with and without tip
-      }),
+      ...v3Details(detailsWithTip),
       versions: [
         toTransactionVersion(
           toFeeVersion(this.transactionVersion) || ETransactionVersion3.F3,
-          providedVersion
+          version
         ), // sierra
       ],
       nonce,
@@ -283,14 +267,10 @@ export class Account extends Provider implements AccountInterface {
       skipExecute,
       version: providedVersion,
     } = details;
+    const detailsWithTip = await this.resolveDetailsWithTip(details);
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
-      ...v3Details({
-        ...details,
-        tip: details.tip ?? (await this.getEstimateTip()).recommendedTip, // TODO: Test how simulate diff with and without tip
-      }),
-      versions: [
-        toTransactionVersion(this.transactionVersion || ETransactionVersion3.V3, providedVersion),
-      ],
+      ...v3Details(detailsWithTip),
+      versions: [this.resolveTransactionVersion(providedVersion)],
       nonce,
       blockIdentifier,
       skipValidate,
@@ -308,169 +288,43 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: UniversalDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const calls = [transactions].flat();
-    const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
-    const version = toTransactionVersion(
-      this.transactionVersion || ETransactionVersion3.V3,
-      transactionsDetail.version
+    const detailsWithTip = await this.resolveDetailsWithTip(transactionsDetail);
+
+    // Estimate resource bounds if not provided
+    const { resourceBounds: providedResourceBounds } = transactionsDetail;
+    let resourceBounds = providedResourceBounds;
+    if (!resourceBounds) {
+      const estimateResponse = await this.estimateInvokeFee(calls, detailsWithTip);
+      resourceBounds = estimateResponse.resourceBounds;
+    }
+
+    const accountInvocations = await this.accountInvocationsFactory(
+      [{ type: ETransactionType.INVOKE, payload: calls }],
+      {
+        ...v3Details(detailsWithTip),
+        resourceBounds,
+        versions: [this.resolveTransactionVersion(transactionsDetail.version)],
+        nonce: transactionsDetail.nonce,
+        skipValidate: false,
+      }
     );
 
-    const transactionsDetailWithTip = {
-      ...transactionsDetail,
-      tip: transactionsDetail.tip ?? (await this.getEstimateTip()).recommendedTip,
-    };
-    // Transform all calls into a single invocation
-    const invocations = [
-      {
-        type: ETransactionType.INVOKE,
-        payload: calls, // Pass all calls as the payload
-      },
-    ];
-    const estimateBulk = await this.estimateFeeBulk(invocations, transactionsDetailWithTip);
-    const estimate = estimateBulk[0]; // Get the first (and only) estimate
-
-    const chainId = await this.getChainId();
-
-    const signerDetails: InvocationsSignerDetails = {
-      ...v3Details(transactionsDetailWithTip),
-      resourceBounds: estimate.resourceBounds,
-      walletAddress: this.address,
-      nonce,
-      version,
-      chainId,
-      cairoVersion: await this.getCairoVersion(),
-    };
-
-    const signature = await this.signer.signTransaction(calls, signerDetails);
-
-    const calldata = getExecuteCalldata(calls, await this.getCairoVersion());
+    // Type assertion needed due to union type
+    const invocation = accountInvocations[0] as any;
 
     return this.invokeFunction(
-      { contractAddress: this.address, calldata, signature },
       {
-        ...v3Details(transactionsDetailWithTip),
-        resourceBounds: estimate.resourceBounds,
-        nonce,
-        version,
+        contractAddress: invocation.contractAddress,
+        calldata: invocation.calldata,
+        signature: invocation.signature,
+      },
+      {
+        ...v3Details(detailsWithTip),
+        resourceBounds: invocation.resourceBounds,
+        nonce: invocation.nonce,
+        version: invocation.version,
       }
     );
-  }
-
-  public async buildPaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails
-  ): Promise<PreparedTransaction> {
-    // If the account isn't deployed, we can't call the supportsInterface function to know if the account is compatible with SNIP-9
-    if (!paymasterDetails.deploymentData) {
-      const snip9Version = await this.getSnip9Version();
-      if (snip9Version === OutsideExecutionVersion.UNSUPPORTED) {
-        throw Error('Account is not compatible with SNIP-9');
-      }
-    }
-    const parameters: ExecutionParameters = {
-      version: '0x1',
-      feeMode: paymasterDetails.feeMode,
-      timeBounds: paymasterDetails.timeBounds,
-    };
-    let transaction: UserTransaction;
-    if (paymasterDetails.deploymentData) {
-      if (calls.length > 0) {
-        transaction = {
-          type: 'deploy_and_invoke',
-          invoke: { userAddress: this.address, calls },
-          deployment: paymasterDetails.deploymentData,
-        };
-      } else {
-        transaction = {
-          type: 'deploy',
-          deployment: paymasterDetails.deploymentData,
-        };
-      }
-    } else {
-      transaction = {
-        type: 'invoke',
-        invoke: { userAddress: this.address, calls },
-      };
-    }
-    return this.paymaster.buildTransaction(transaction, parameters);
-  }
-
-  public async estimatePaymasterTransactionFee(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails
-  ): Promise<PaymasterFeeEstimate> {
-    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
-    return preparedTransaction.fee;
-  }
-
-  public async preparePaymasterTransaction(
-    preparedTransaction: PreparedTransaction
-  ): Promise<ExecutableUserTransaction> {
-    let transaction: ExecutableUserTransaction;
-    switch (preparedTransaction.type) {
-      case 'deploy_and_invoke': {
-        const signature = await this.signMessage(preparedTransaction.typed_data);
-        transaction = {
-          type: 'deploy_and_invoke',
-          invoke: {
-            userAddress: this.address,
-            typedData: preparedTransaction.typed_data,
-            signature: signatureToHexArray(signature),
-          },
-          deployment: preparedTransaction.deployment,
-        };
-        break;
-      }
-      case 'invoke': {
-        const signature = await this.signMessage(preparedTransaction.typed_data);
-        transaction = {
-          type: 'invoke',
-          invoke: {
-            userAddress: this.address,
-            typedData: preparedTransaction.typed_data,
-            signature: signatureToHexArray(signature),
-          },
-        };
-        break;
-      }
-      case 'deploy': {
-        transaction = {
-          type: 'deploy',
-          deployment: preparedTransaction.deployment,
-        };
-        break;
-      }
-      default:
-        throw Error('Invalid transaction type');
-    }
-    return transaction;
-  }
-
-  public async executePaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails,
-    maxFeeInGasToken?: BigNumberish
-  ): Promise<InvokeFunctionResponse> {
-    // Build the transaction
-    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
-
-    // Check the transaction is safe
-    // Check gas fee value & gas token address
-    // Check that provided calls and builded calls are strictly equal
-    assertPaymasterTransactionSafety(
-      preparedTransaction,
-      calls,
-      paymasterDetails,
-      maxFeeInGasToken
-    );
-
-    // Prepare the transaction, tx is safe here
-    const transaction: ExecutableUserTransaction =
-      await this.preparePaymasterTransaction(preparedTransaction);
-
-    // Execute the transaction
-    return this.paymaster
-      .executeTransaction(transaction, preparedTransaction.parameters)
-      .then((response) => ({ transaction_hash: response.transaction_hash }));
   }
 
   /**
@@ -502,45 +356,44 @@ export class Account extends Provider implements AccountInterface {
     assert(isSierra(payload.contract), SYSTEM_MESSAGES.declareNonSierra);
 
     const declareContractPayload = extractContractHashes(payload);
-    const { nonce, version: providedVersion } = details;
-    const version = toTransactionVersion(
-      this.transactionVersion || ETransactionVersion3.V3,
-      providedVersion
-    );
-    const detailsWithTip = {
-      ...details,
-      tip: details.tip ?? (await this.getEstimateTip()).recommendedTip,
-    };
+    const detailsWithTip = await this.resolveDetailsWithTip(details);
 
-    // Transform into invocations for bulk estimation
-    const invocations = [
+    // Estimate resource bounds if not provided
+    const { resourceBounds: providedResourceBounds } = details;
+    let resourceBounds = providedResourceBounds;
+    if (!resourceBounds) {
+      const estimateResponse = await this.estimateDeclareFee(payload, detailsWithTip);
+      resourceBounds = estimateResponse.resourceBounds;
+    }
+
+    const accountInvocations = await this.accountInvocationsFactory(
+      [{ type: ETransactionType.DECLARE, payload: declareContractPayload }],
       {
-        type: ETransactionType.DECLARE,
-        payload: declareContractPayload,
-      },
-    ];
-    const estimateBulk = await this.estimateFeeBulk(invocations, {
-      ...detailsWithTip,
-      version,
-    });
-    const estimate = estimateBulk[0]; // Get the first (and only) estimate
-
-    const declareDetails: InvocationsSignerDetails = {
-      ...v3Details(detailsWithTip),
-      resourceBounds: estimate.resourceBounds,
-      nonce: toBigInt(nonce ?? (await this.getNonce())),
-      version,
-      chainId: await this.getChainId(),
-      walletAddress: this.address,
-      cairoVersion: undefined,
-    };
-
-    const declareContractTransaction = await this.buildDeclarePayload(
-      declareContractPayload,
-      declareDetails
+        ...v3Details(detailsWithTip),
+        resourceBounds,
+        versions: [this.resolveTransactionVersion(details.version)],
+        nonce: details.nonce,
+        skipValidate: false,
+      }
     );
 
-    return super.declareContract(declareContractTransaction, declareDetails);
+    // Type assertion needed due to union type
+    const declaration = accountInvocations[0] as any;
+
+    return super.declareContract(
+      {
+        senderAddress: declaration.senderAddress,
+        signature: declaration.signature,
+        contract: declaration.contract,
+        compiledClassHash: declaration.compiledClassHash,
+      },
+      {
+        ...v3Details(detailsWithTip),
+        nonce: declaration.nonce,
+        resourceBounds: declaration.resourceBounds,
+        version: declaration.version,
+      }
+    );
   }
 
   public async deploy(
@@ -592,56 +445,65 @@ export class Account extends Provider implements AccountInterface {
     }: DeployAccountContractPayload,
     details: UniversalDetails = {}
   ): Promise<DeployContractResponse> {
-    const version = toTransactionVersion(
-      this.transactionVersion || ETransactionVersion3.V3,
-      details.version
-    );
-    const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
-    const chainId = await this.getChainId();
-    const detailsWithTip = {
-      ...details,
-      tip: details.tip ?? (await this.getEstimateTip()).recommendedTip,
-    };
-
     const compiledCalldata = CallData.compile(constructorCalldata); // TODO: TT check if we should add abi here to safe compile
     const contractAddress =
       providedContractAddress ??
       calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);
 
-    // Transform into invocations for bulk estimation
-    const invocations = [
-      {
-        type: ETransactionType.DEPLOY_ACCOUNT,
-        payload: {
+    const detailsWithTip = await this.resolveDetailsWithTip(details);
+
+    // Estimate resource bounds if not provided
+    const { resourceBounds: providedResourceBounds } = details;
+    let resourceBounds = providedResourceBounds;
+    if (!resourceBounds) {
+      const estimateResponse = await this.estimateAccountDeployFee(
+        {
           classHash,
-          constructorCalldata: compiledCalldata,
+          constructorCalldata,
           addressSalt,
           contractAddress,
         },
-      },
-    ];
-    const estimateBulk = await this.estimateFeeBulk(invocations, detailsWithTip);
-    const estimate = estimateBulk[0]; // Get the first (and only) estimate
+        detailsWithTip
+      );
+      resourceBounds = estimateResponse.resourceBounds;
+    }
 
-    const signature = await this.signer.signDeployAccountTransaction({
-      ...v3Details(detailsWithTip),
-      classHash,
-      constructorCalldata: compiledCalldata,
-      contractAddress,
-      addressSalt,
-      chainId,
-      resourceBounds: estimate.resourceBounds,
-      version,
-      nonce,
-    });
-
-    return super.deployAccountContract(
-      { classHash, addressSalt, constructorCalldata, signature },
+    const accountInvocations = await this.accountInvocationsFactory(
+      [
+        {
+          type: ETransactionType.DEPLOY_ACCOUNT,
+          payload: {
+            classHash,
+            constructorCalldata: compiledCalldata,
+            addressSalt,
+            contractAddress,
+          },
+        },
+      ],
       {
         ...v3Details(detailsWithTip),
-        nonce,
-        resourceBounds: estimate.resourceBounds,
-        version,
+        resourceBounds,
+        versions: [this.resolveTransactionVersion(details.version)],
+        nonce: ZERO, // DEPLOY_ACCOUNT always uses nonce 0
+        skipValidate: false,
+      }
+    );
+
+    // Type assertion needed due to union type
+    const deployment = accountInvocations[0] as any;
+
+    return super.deployAccountContract(
+      {
+        classHash: deployment.classHash,
+        addressSalt: deployment.addressSalt,
+        constructorCalldata: deployment.constructorCalldata,
+        signature: deployment.signature,
+      },
+      {
+        ...v3Details(detailsWithTip),
+        nonce: deployment.nonce,
+        resourceBounds: deployment.resourceBounds,
+        version: deployment.version,
       }
     );
   }
@@ -816,6 +678,30 @@ export class Account extends Provider implements AccountInterface {
   /*
    * Support methods
    */
+
+  /**
+   * Helper method to resolve details with tip estimation
+   * @private
+   */
+  private async resolveDetailsWithTip(
+    details: UniversalDetails
+  ): Promise<UniversalDetails & { tip: BigNumberish }> {
+    return {
+      ...details,
+      tip: details.tip ?? (await this.getEstimateTip()).recommendedTip,
+    };
+  }
+
+  /**
+   * Helper method to resolve transaction version
+   * @private
+   */
+  private resolveTransactionVersion(providedVersion?: BigNumberish) {
+    return toTransactionVersion(
+      this.transactionVersion || ETransactionVersion3.V3,
+      providedVersion
+    );
+  }
 
   public async buildInvocation(
     call: Array<Call>,
@@ -1006,6 +892,138 @@ export class Account extends Provider implements AccountInterface {
     ) as Promise<AccountInvocations>;
   }
 
+  /*
+   * SNIP-29 Paymaster
+   */
+
+  public async buildPaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<PreparedTransaction> {
+    // If the account isn't deployed, we can't call the supportsInterface function to know if the account is compatible with SNIP-9
+    if (!paymasterDetails.deploymentData) {
+      const snip9Version = await this.getSnip9Version();
+      if (snip9Version === OutsideExecutionVersion.UNSUPPORTED) {
+        throw Error('Account is not compatible with SNIP-9');
+      }
+    }
+    const parameters: ExecutionParameters = {
+      version: '0x1',
+      feeMode: paymasterDetails.feeMode,
+      timeBounds: paymasterDetails.timeBounds,
+    };
+    let transaction: UserTransaction;
+    if (paymasterDetails.deploymentData) {
+      if (calls.length > 0) {
+        transaction = {
+          type: 'deploy_and_invoke',
+          invoke: { userAddress: this.address, calls },
+          deployment: paymasterDetails.deploymentData,
+        };
+      } else {
+        transaction = {
+          type: 'deploy',
+          deployment: paymasterDetails.deploymentData,
+        };
+      }
+    } else {
+      transaction = {
+        type: 'invoke',
+        invoke: { userAddress: this.address, calls },
+      };
+    }
+    return this.paymaster.buildTransaction(transaction, parameters);
+  }
+
+  public async estimatePaymasterTransactionFee(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails
+  ): Promise<PaymasterFeeEstimate> {
+    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
+    return preparedTransaction.fee;
+  }
+
+  public async preparePaymasterTransaction(
+    preparedTransaction: PreparedTransaction
+  ): Promise<ExecutableUserTransaction> {
+    let transaction: ExecutableUserTransaction;
+    switch (preparedTransaction.type) {
+      case 'deploy_and_invoke': {
+        const signature = await this.signMessage(preparedTransaction.typed_data);
+        transaction = {
+          type: 'deploy_and_invoke',
+          invoke: {
+            userAddress: this.address,
+            typedData: preparedTransaction.typed_data,
+            signature: signatureToHexArray(signature),
+          },
+          deployment: preparedTransaction.deployment,
+        };
+        break;
+      }
+      case 'invoke': {
+        const signature = await this.signMessage(preparedTransaction.typed_data);
+        transaction = {
+          type: 'invoke',
+          invoke: {
+            userAddress: this.address,
+            typedData: preparedTransaction.typed_data,
+            signature: signatureToHexArray(signature),
+          },
+        };
+        break;
+      }
+      case 'deploy': {
+        transaction = {
+          type: 'deploy',
+          deployment: preparedTransaction.deployment,
+        };
+        break;
+      }
+      default:
+        throw Error('Invalid transaction type');
+    }
+    return transaction;
+  }
+
+  public async executePaymasterTransaction(
+    calls: Call[],
+    paymasterDetails: PaymasterDetails,
+    maxFeeInGasToken?: BigNumberish
+  ): Promise<InvokeFunctionResponse> {
+    // Build the transaction
+    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
+
+    // Check the transaction is safe
+    // Check gas fee value & gas token address
+    // Check that provided calls and builded calls are strictly equal
+    assertPaymasterTransactionSafety(
+      preparedTransaction,
+      calls,
+      paymasterDetails,
+      maxFeeInGasToken
+    );
+
+    // Prepare the transaction, tx is safe here
+    const transaction: ExecutableUserTransaction =
+      await this.preparePaymasterTransaction(preparedTransaction);
+
+    // Execute the transaction
+    return this.paymaster
+      .executeTransaction(transaction, preparedTransaction.parameters)
+      .then((response) => ({ transaction_hash: response.transaction_hash }));
+  }
+
+  /*
+   * External methods
+   */
+
+  /**
+   * Get the Starknet ID for an address
+   * @param address - The address to get the Starknet ID for
+   * @param StarknetIdContract - The Starknet ID contract address (optional)
+   * @returns The Starknet ID for the address
+   */
   public async getStarkName(
     address: BigNumberish = this.address, // default to the wallet address
     StarknetIdContract?: string
