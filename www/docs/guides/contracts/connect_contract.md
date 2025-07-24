@@ -305,7 +305,6 @@ See our [TypeScript Integration Guide](./abi_typescript.md) for details.
 ## Best Practices
 
 1. **ABI Management**
-
    - Store ABIs locally instead of fetching from network
    - Use version control for ABI files
    - **Always update your local ABI when recompiling contracts**:
