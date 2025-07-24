@@ -1,15 +1,7 @@
 /* eslint-disable no-underscore-dangle */
-import type {
-  BLOCK_HEADER,
-  EMITTED_EVENT,
-  NEW_TXN_STATUS,
-  SUBSCRIPTION_ID,
-  TXN_HASH,
-  TXN_WITH_HASH,
-} from '@starknet-io/starknet-types-08';
+import { RPCSPEC08, JRPC } from '../../types/api';
 
 import { BigNumberish, SubscriptionBlockIdentifier } from '../../types';
-import { JRPC } from '../../types/api';
 import { WebSocketEvent } from '../../types/api/jsonrpc';
 import { EventEmitter } from '../../utils/eventEmitter';
 import { TimeoutError, WebSocketNotConnectedError } from '../../utils/errors';
@@ -21,6 +13,14 @@ import { Block } from '../../utils/provider';
 import { config } from '../../global/config';
 import { logger } from '../../global/logger';
 import { Subscription } from './subscription';
+
+// Create type aliases to avoid repeating RPCSPEC08 prefix
+type BLOCK_HEADER = RPCSPEC08.BLOCK_HEADER;
+type EMITTED_EVENT = RPCSPEC08.EMITTED_EVENT;
+type NEW_TXN_STATUS = RPCSPEC08.NEW_TXN_STATUS;
+type SUBSCRIPTION_ID = RPCSPEC08.SUBSCRIPTION_ID;
+type TXN_HASH = RPCSPEC08.TXN_HASH;
+type TXN_WITH_HASH = RPCSPEC08.TXN_WITH_HASH;
 
 /**
  * Options for configuring the automatic reconnection behavior of the WebSocketChannel.
@@ -551,7 +551,13 @@ export class WebSocketChannel {
       block_id: blockIdentifier ? new Block(blockIdentifier).identifier : undefined,
     };
     const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
-    const subscription = new Subscription(this, method, params, subId, this.maxBufferSize);
+    const subscription = new Subscription({
+      channel: this,
+      method,
+      params,
+      id: subId,
+      maxBufferSize: this.maxBufferSize,
+    });
     this.activeSubscriptions.set(subId, subscription);
     return subscription;
   }
@@ -575,7 +581,13 @@ export class WebSocketChannel {
       block_id: blockIdentifier ? new Block(blockIdentifier).identifier : undefined,
     };
     const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
-    const subscription = new Subscription(this, method, params, subId, this.maxBufferSize);
+    const subscription = new Subscription({
+      channel: this,
+      method,
+      params,
+      id: subId,
+      maxBufferSize: this.maxBufferSize,
+    });
     this.activeSubscriptions.set(subId, subscription);
     return subscription;
   }
@@ -596,7 +608,13 @@ export class WebSocketChannel {
       block_id: blockIdentifier ? new Block(blockIdentifier).identifier : undefined,
     };
     const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
-    const subscription = new Subscription(this, method, params, subId, this.maxBufferSize);
+    const subscription = new Subscription({
+      channel: this,
+      method,
+      params,
+      id: subId,
+      maxBufferSize: this.maxBufferSize,
+    });
     this.activeSubscriptions.set(subId, subscription);
     return subscription;
   }
@@ -617,7 +635,13 @@ export class WebSocketChannel {
       sender_address: senderAddress && bigNumberishArrayToHexadecimalStringArray(senderAddress),
     };
     const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
-    const subscription = new Subscription(this, method, params, subId, this.maxBufferSize);
+    const subscription = new Subscription({
+      channel: this,
+      method,
+      params,
+      id: subId,
+      maxBufferSize: this.maxBufferSize,
+    });
     this.activeSubscriptions.set(subId, subscription);
     return subscription;
   }

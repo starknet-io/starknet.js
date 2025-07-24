@@ -3,8 +3,8 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import { BigNumberish, Call } from '../lib';
-import { OutsideExecutionTypedData, PAYMASTER_API } from '../api';
+import type { BigNumberish, Call } from '../../types/lib';
+import type { OutsideExecutionTypedData, PAYMASTER_API } from '../../types/api';
 
 export type PaymasterFeeEstimate = {
   gas_token_price_in_strk: BigNumberish;
