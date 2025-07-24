@@ -27,7 +27,7 @@ import type {
   DeclareContractPayload,
   DeclareContractResponse,
   DeclareContractTransaction,
-  DeclareDeployDCResponse,
+  DeclareDeployUDCResponse,
   DeployAccountContractPayload,
   DeployAccountContractTransaction,
   DeployContractResponse,
@@ -572,7 +572,7 @@ export class Account extends Provider implements AccountInterface {
   public async declareAndDeploy(
     payload: DeclareAndDeployContractPayload,
     details: UniversalDetails = {}
-  ): Promise<DeclareDeployDCResponse> {
+  ): Promise<DeclareDeployUDCResponse> {
     let declare = await this.declareIfNot(payload, details);
     if (declare.transaction_hash !== '') {
       const tx = await this.waitForTransaction(declare.transaction_hash);

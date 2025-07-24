@@ -101,7 +101,7 @@ export type DeployContractDCResponse = {
   salt: string;
 };
 
-export type DeclareDeployDCResponse = {
+export type DeclareDeployUDCResponse = {
   declare: {
     class_hash: BigNumberish;
   } & Partial<DeclareTransactionReceiptResponse>;

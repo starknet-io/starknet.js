@@ -9,7 +9,7 @@ import type {
   DeclareAndDeployContractPayload,
   DeclareContractPayload,
   DeclareContractResponse,
-  DeclareDeployDCResponse,
+  DeclareDeployUDCResponse,
   DeployAccountContractPayload,
   DeployContractResponse,
   DeployContractDCResponse,
@@ -364,7 +364,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract declareAndDeploy(
     payload: DeclareAndDeployContractPayload,
     details?: InvocationsDetails
-  ): Promise<DeclareDeployDCResponse>;
+  ): Promise<DeclareDeployUDCResponse>;
 
   /**
    * Deploy the account on Starknet
