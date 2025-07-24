@@ -39,6 +39,7 @@ import type {
   ExecutionParameters,
   Invocation,
   Invocations,
+  InvocationsDetailsWithNonce,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
@@ -311,8 +312,7 @@ export class Account extends Provider implements AccountInterface {
       }
     );
 
-    // Type assertion needed due to union type
-    const invocation = accountInvocations[0] as any;
+    const invocation = accountInvocations[0];
 
     return this.invokeFunction(
       {
@@ -379,8 +379,7 @@ export class Account extends Provider implements AccountInterface {
       }
     );
 
-    // Type assertion needed due to union type
-    const declaration = accountInvocations[0] as any;
+    const declaration = accountInvocations[0];
 
     return super.declareContract(
       {
@@ -493,8 +492,7 @@ export class Account extends Provider implements AccountInterface {
       }
     );
 
-    // Type assertion needed due to union type
-    const deployment = accountInvocations[0] as any;
+    const deployment = accountInvocations[0];
 
     return super.deployAccountContract(
       {
@@ -788,10 +786,44 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
+  /**
+   * Build account invocations with proper typing based on transaction type
+   * @private
+   */
+  public async accountInvocationsFactory(
+    invocations: [{ type: typeof ETransactionType.INVOKE; payload: AllowArray<Call> }],
+    details: AccountInvocationsFactoryDetails
+  ): Promise<
+    [({ type: typeof ETransactionType.INVOKE } & Invocation) & InvocationsDetailsWithNonce]
+  >;
+  public async accountInvocationsFactory(
+    invocations: [{ type: typeof ETransactionType.DECLARE; payload: DeclareContractPayload }],
+    details: AccountInvocationsFactoryDetails
+  ): Promise<
+    [
+      ({ type: typeof ETransactionType.DECLARE } & DeclareContractTransaction) &
+        InvocationsDetailsWithNonce,
+    ]
+  >;
+  public async accountInvocationsFactory(
+    invocations: [
+      { type: typeof ETransactionType.DEPLOY_ACCOUNT; payload: DeployAccountContractPayload },
+    ],
+    details: AccountInvocationsFactoryDetails
+  ): Promise<
+    [
+      ({ type: typeof ETransactionType.DEPLOY_ACCOUNT } & DeployAccountContractTransaction) &
+        InvocationsDetailsWithNonce,
+    ]
+  >;
   public async accountInvocationsFactory(
     invocations: Invocations,
     details: AccountInvocationsFactoryDetails
-  ) {
+  ): Promise<AccountInvocations>;
+  public async accountInvocationsFactory(
+    invocations: Invocations,
+    details: AccountInvocationsFactoryDetails
+  ): Promise<AccountInvocations> {
     const { nonce, blockIdentifier, skipValidate = true } = details;
     const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
