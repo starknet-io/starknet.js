@@ -5,6 +5,8 @@ import { isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { isBoolean, isString, isBigInt } from '../typed';
 
+export const MAX_FELT = 0x800000000000011000000000000000000000000000000000000000000000001n;
+
 /**
  * Create felt Cairo type (cairo type helper)
  * @returns format: felt-string
@@ -12,6 +14,10 @@ import { isBoolean, isString, isBigInt } from '../typed';
 export function CairoFelt(it: BigNumberish): string {
   // BN or number
   if (isBigInt(it) || Number.isInteger(it)) {
+    const value = BigInt(it);
+    if (value < 0) {
+      return (MAX_FELT + value).toString();
+    }
     return it.toString();
   }
 

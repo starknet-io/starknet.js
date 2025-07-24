@@ -8,6 +8,7 @@ import {
   Literal,
   NON_ZERO_PREFIX,
   Uint,
+  Int,
   Uint256,
   Uint512,
 } from '../../types';
@@ -107,6 +108,12 @@ export const isTypeUint256 = (type: string) => CairoUint256.isAbiType(type);
  * @returns - True if the type is a literal type, false otherwise.
  */
 export const isTypeLiteral = (type: string) => Object.values(Literal).includes(type as Literal);
+/**
+ * Checks if the given type is an Int type.
+ * @param {string} type - The type to check.
+ * @returns - Returns true if the type is an Int type, otherwise false.
+ */
+export const isTypeInt = (type: string) => Object.values(Int).includes(type as Int);
 /**
  * Checks if the given type is a boolean type.
  *
@@ -257,6 +264,14 @@ export const uint256 = (it: BigNumberish): Uint256 => {
  */
 export const uint512 = (it: BigNumberish): Uint512 => {
   return new CairoUint512(it).toUint512DecimalString();
+};
+
+export const int = (it: BigNumberish): bigint => {
+  const value = BigInt(it);
+  if (value < 0) {
+    return value;
+  }
+  return value;
 };
 
 /**

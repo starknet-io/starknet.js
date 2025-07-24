@@ -10,6 +10,7 @@ import {
   EventEntry,
   ParsedStruct,
 } from '../../types';
+import { MAX_FELT } from '../cairoDataTypes/felt';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
@@ -27,6 +28,7 @@ import {
   isTypeBytes31,
   isTypeEnum,
   isTypeEthAddress,
+  isTypeInt,
   isTypeNonZero,
   isTypeSecp256k1Point,
   isTypeTuple,
@@ -76,6 +78,9 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
       const yHigh = removeHexPrefix(it.next().value).padStart(32, '0');
       const pubK = BigInt(addHexPrefix(xHigh + xLow + yHigh + yLow));
       return pubK;
+    case isTypeInt(type):
+      temp = it.next().value;
+      return BigInt(temp) - MAX_FELT;
     default:
       temp = it.next().value;
       return BigInt(temp);

@@ -4,6 +4,7 @@ import {
   AbiStructs,
   BigNumberish,
   FunctionAbi,
+  Int,
   Literal,
   Uint,
 } from '../../types';
@@ -31,6 +32,7 @@ import {
   isTypeStruct,
   isTypeTuple,
   isTypeUint,
+  isTypeInt,
 } from './cairo';
 
 const validateFelt = (parameter: any, input: AbiEntry) => {
@@ -173,6 +175,60 @@ const validateUint = (parameter: any, input: AbiEntry) => {
   }
 };
 
+const validateInt = (parameter: any, input: AbiEntry) => {
+  if (isNumber(parameter)) {
+    assert(
+      Number.MIN_SAFE_INTEGER <= parameter && parameter <= Number.MAX_SAFE_INTEGER,
+      'Validation: Parameter is out of range to be typed as Number use (BigInt or String)'
+    );
+  }
+  assert(
+    isString(parameter) || isNumber(parameter) || isBigInt(parameter),
+    `Validate: arg ${input.name} of cairo type ${
+      input.type
+    } should be type (String, Number or BigInt), but is ${typeof parameter} ${parameter}.`
+  );
+  const param: bigint = toBigInt(parameter);
+  switch (input.type) {
+    case Int.i8:
+      assert(
+        param >= -128n && param <= 127n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [-128 - 127]`
+      );
+      break;
+
+    case Int.i16:
+      assert(
+        param >= -32768n && param <= 32767n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [-32768 - 32767]`
+      );
+      break;
+
+    case Int.i32:
+      assert(
+        param >= -2147483648n && param <= 2147483647n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [-2147483648 - 2147483647]`
+      );
+      break;
+    case Int.i64:
+      assert(
+        param >= -(2n ** 63n) && param <= 2n ** 63n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [-2^63 - 2^63-1]`
+      );
+      break;
+
+    case Int.i128:
+      assert(
+        param >= -(2n ** 127n) && param <= 2n ** 127n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [-2^127 - 2^127-1]`
+      );
+      break;
+
+    default:
+      break;
+  }
+};
+
 const validateBool = (parameter: any, input: AbiEntry) => {
   assert(
     isBoolean(parameter),
@@ -296,6 +352,9 @@ const validateArray = (
       break;
     case isTypeUint(baseType) || isTypeLiteral(baseType):
       parameter.forEach((param: BigNumberish) => validateUint(param, { name: '', type: baseType }));
+      break;
+    case isTypeInt(baseType):
+      parameter.forEach((param: BigNumberish) => validateInt(param, { name: '', type: baseType }));
       break;
     case isTypeBool(baseType):
       parameter.forEach((param: BigNumberish) => validateBool(param, input));
@@ -427,6 +486,9 @@ export default function validateFields(
         break;
       case isTypeUint(input.type) || isTypeLiteral(input.type):
         validateUint(parameter, input);
+        break;
+      case isTypeInt(input.type):
+        validateInt(parameter, input);
         break;
       case isTypeBool(input.type):
         validateBool(parameter, input);
