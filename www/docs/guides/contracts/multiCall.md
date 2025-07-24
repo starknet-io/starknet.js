@@ -1,14 +1,14 @@
 ---
-sidebar_position: 16
+sidebar_position: 7
 ---
 
-# Interact with more than one contract within one transaction
+# Interact with Multiple Contracts
 
 Interacting with more than one contract with one transaction is one of Starknet's features. To use this feature, two contracts are required.
 
 ## Setup
 
-Set up basic stuff before multicall.
+Set up basic prerequisites before multicall.
 
 ```javascript
 // Devnet private key from Account #0 if generated with --seed 0
@@ -21,7 +21,8 @@ const contractAddress_1 = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b156
 // contract address which requires ether
 const contractAddress_2 = '0x078f36c1d59dd29e00a0bb60aa2a9409856f4f9841c47f165aba5bab4225aa6b';
 
-const account = new Account(provider, accountAddress, privateKey);
+const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_SEPOLIA });
+const myAccount = new Account(myProvider, accountAddress, privateKey);
 ```
 
 ## Interact with contracts
@@ -29,7 +30,7 @@ const account = new Account(provider, accountAddress, privateKey);
 Interact with more than one contract by using `account.execute([calls])`. The example is as follows.
 
 ```javascript
-const multiCall = await account.execute([
+const multiCall = await myAccount.execute([
   // Calling the first contract
   {
     contractAddress: contractAddress_1,
@@ -50,5 +51,5 @@ const multiCall = await account.execute([
     }),
   },
 ]);
-await provider.waitForTransaction(multiCall.transaction_hash);
+await myProvider.waitForTransaction(multiCall.transaction_hash);
 ```

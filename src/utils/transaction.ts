@@ -230,11 +230,11 @@ export function buildUDCCall(
     const compiledConstructorCallData = getCompiledCalldata(constructorCalldata, () => {
       // compile with abi
       if (abi) {
-        const calldataClass = new CallData(abi);
+        const calldataInstance = new CallData(abi);
         // Convert object based raw js arguments to ...args array
         const rawArgs = Object.values(constructorCalldata);
-        calldataClass.validate(ValidateType.DEPLOY, 'constructor', rawArgs);
-        return calldataClass.compile('constructor', rawArgs);
+        calldataInstance.validate(ValidateType.DEPLOY, 'constructor', rawArgs);
+        return calldataInstance.compile('constructor', rawArgs);
       }
       // compile without abi
       return CallData.compile(constructorCalldata);

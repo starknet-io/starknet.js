@@ -1,4 +1,5 @@
 import { isHex } from './num';
+import { isBigInt, isString } from './typed';
 
 /**
  * Convert strk to fri or fri to strk
@@ -11,8 +12,8 @@ import { isHex } from './num';
 export function units(amount: string | bigint, simbol: 'fri' | 'strk' = 'fri') {
   if (simbol === 'strk') {
     let numStr = '';
-    if (typeof amount === 'bigint') numStr = amount.toString();
-    else if (typeof amount === 'string') {
+    if (isBigInt(amount)) numStr = amount.toString();
+    else if (isString(amount)) {
       if (isHex(amount)) {
         numStr = BigInt(amount).toString();
       } else {

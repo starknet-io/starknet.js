@@ -1,5 +1,6 @@
 ---
-sidebar_position: 17
+title: Enum type
+sidebar_position: 5
 ---
 
 # Cairo Enums

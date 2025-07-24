@@ -1,5 +1,6 @@
 import { LibraryError, RPC08, RpcError } from '../src';
-import { createBlockForDevnet, createTestProvider, describeIfRpc081 } from './config/fixtures';
+import { createBlockForDevnet, describeIfRpc081 } from './config/fixtures';
+import { createTestProvider } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 describeIfRpc081('RpcChannel', () => {
