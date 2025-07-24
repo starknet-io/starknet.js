@@ -15,18 +15,6 @@ beforeAll(() => {
   expect.extend(customMatchers);
 });
 
-// TODO: remove once devnet supports the Cairo 2 UDC
-if (process.env.IS_DEVNET === 'true') {
-  const deployerPath = '../../src/deployer/index';
-  jest.mock(deployerPath, () => {
-    const actual = <typeof import('../../src/deployer/index')>jest.requireActual(deployerPath);
-    return {
-      ...actual,
-      defaultDeployer: actual.legacyDeployer,
-    };
-  });
-}
-
 const util = require('util');
 
 jest.setTimeout(50 * 60 * 1000);

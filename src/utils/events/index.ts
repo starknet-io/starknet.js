@@ -1,4 +1,4 @@
-import { legacyDeployer } from '../../deployer';
+import { Deployer } from '../../deployer';
 import {
   Abi,
   AbiEnums,
@@ -264,6 +264,6 @@ export function parseEvents(
 export function parseUDCEvent(
   txReceipt: InvokeTransactionReceiptResponse
 ): DeployContractDCResponse {
-  const deployer = legacyDeployer;
+  const deployer = new Deployer();
   return deployer.parseDeployerEvent(txReceipt);
 }
