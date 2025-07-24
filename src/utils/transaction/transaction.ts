@@ -1,15 +1,5 @@
-import { Deployer } from '../../deployer';
-import type { DeployerCall } from '../../deployer/types/index.type';
 import { ETransactionVersion } from '../../provider/types/spec.type';
-import {
-  BigNumberish,
-  CairoVersion,
-  Call,
-  Calldata,
-  ParsedStruct,
-  RawArgs,
-  type UniversalDeployerContractPayload,
-} from '../../types';
+import { BigNumberish, CairoVersion, Call, Calldata, ParsedStruct, RawArgs } from '../../types';
 import { CallData } from '../calldata';
 import { getSelectorFromName } from '../hash';
 import { toBigInt } from '../num';
@@ -168,42 +158,6 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
   }
   return fromCallsToExecuteCalldata(calls);
 };
-
-/**
- * Builds a UDC Call object.
- *
- * @deprecated Use Deployer class.
- * @param {UniversalDeployerContractPayload | UniversalDeployerContractPayload[]} payload the payload data for the UDCCall. Can be a single payload object or an array of payload objects.
- * @param {string} address the address to be used in the UDCCall
- * @returns { calls: Call[], addresses: string[] } the UDCCall object containing an array of calls and an array of addresses.
- * @example
- * ```typescript
- * const payload: UniversalDeployerContractPayload = {
- * classHash: "0x1234567890123456789012345678901234567890",
- * salt: "0x0987654321098765432109876543210987654321",
- * unique:true,
- * constructorCalldata: [1, 2, 3]
- * };
- * const address = "0xABCDEF1234567890ABCDEF1234567890ABCDEF12";
- * const result  = transaction.buildUDCCall(payload, address);
- * // result = {
- * // 	calls: [
- * //			{
- * //			contractAddress: "0xABCDEF1234567890ABCDEF1234567890ABCDEF12",
- * //			entrypoint: "functionName",
- * //			calldata: [classHash, salt, true, 3, 1, 2, 3]
- * //		}],
- * //	addresses: ["0x6fD084B56a7EDc5C06B3eB40f97Ae5A0C707A865"]
- * // }
- * ```
- */
-export function buildUDCCall(
-  payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-  address: string
-): DeployerCall {
-  const deployer = new Deployer();
-  return deployer.buildDeployerCall(payload, address);
-}
 
 /**
  * Return transaction versions based on version type, default version type is 'transaction'.
