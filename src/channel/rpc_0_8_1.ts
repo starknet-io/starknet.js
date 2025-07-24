@@ -1,6 +1,5 @@
 import {
   NetworkName,
-  RANGE_FELT,
   StarknetChainId,
   SupportedRpcVersion,
   SYSTEM_MESSAGES,
@@ -22,18 +21,8 @@ import {
   RpcProviderOptions,
   waitForTransactionOptions,
   type GasPrices,
-  type TipStats,
 } from '../types';
-import { JRPC, RPCSPEC08 as RPC, RPCSPEC08 } from '../types/api';
-import {
-  JRPC,
-  RPCSPEC08 as RPC,
-  TXN_TYPE_INVOKE,
-  type BlockWithTxHashes,
-  type BlockWithTxs,
-  type INVOKE_TXN_V3,
-  type TXN_HASH,
-} from '../types/api';
+import { JRPC, RPCSPEC08 as RPC, RPCSPEC08, type BlockWithTxHashes } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -56,7 +45,6 @@ import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
 import { isRPC08Plus_ResourceBoundsBN } from '../provider/types/spec.type';
 import { config } from '../global/config';
-import assert from '../utils/assert';
 // TODO: check if we can filet type before entering to this method, as so to specify here only RPC 0.8 types
 
 const defaultOptions = {
@@ -556,60 +544,6 @@ export class RpcChannel {
       block_id,
       ...flags,
     });
-  }
-
-  public async getTipStatsFromBlocks(
-    blockIdentifier: BlockIdentifier = this.blockIdentifier,
-    maxBlocks: number = 3,
-    minTxsNecessary: number = 10
-  ): Promise<TipStats | undefined> {
-    assert(Number.isInteger(maxBlocks), 'maxBlocks parameter must be an integer.');
-    assert(maxBlocks >= 1, 'maxBlocks parameter must be greater or equal to 1.');
-    let blockData: BlockWithTxs = (await this.getBlockWithTxs(blockIdentifier)) as BlockWithTxs;
-    let currentBlock: number =
-      typeof blockData.block_number === 'undefined'
-        ? (await this.getBlockLatestAccepted()).block_number + 1
-        : blockData.block_number;
-    const oldestBlock = currentBlock - maxBlocks + 1;
-    let qtyTxsProcessed: number = 0;
-    let maxTip: bigint = 0n;
-    let minTip: bigint = RANGE_FELT.max;
-    let sumTip: bigint = 0n;
-    const previousBlock = async () => {
-      blockData = (await this.getBlockWithTxs(currentBlock)) as BlockWithTxs;
-    };
-    const txsInvoke = blockData.transactions.filter(
-      (tx) => tx.type === TXN_TYPE_INVOKE && tx.version === '0x3'
-    );
-    const getStats = (tx: RPC.TXN_WITH_HASH) => {
-      const txV3 = tx as unknown as INVOKE_TXN_V3 & { transaction_hash: TXN_HASH };
-      const tip = BigInt(txV3.tip);
-      minTip = tip < minTip ? tip : minTip;
-      maxTip = tip > maxTip ? tip : maxTip;
-      sumTip += tip;
-    };
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      if (txsInvoke.length === 0) {
-        currentBlock -= 1;
-        if (currentBlock < oldestBlock) break;
-        // eslint-disable-next-line no-await-in-loop
-        await previousBlock();
-      } else {
-        txsInvoke.forEach(getStats);
-        qtyTxsProcessed += txsInvoke.length;
-        if (qtyTxsProcessed < minTxsNecessary) {
-          currentBlock -= 1;
-          if (currentBlock < oldestBlock) break;
-          // eslint-disable-next-line no-await-in-loop
-          await previousBlock();
-        } else break;
-      }
-    }
-    if (qtyTxsProcessed === 0) return undefined;
-
-    const averageTip = sumTip / BigInt(qtyTxsProcessed);
-    return { minTip, maxTip, averageTip };
   }
 
   public async getGasPrices(
