@@ -57,14 +57,12 @@ Current available services are:
 To instantiate a new account compatible with paymaster:
 
 ```typescript
-const myAccount = new Account(
-  myProvider,
-  accountAddress,
-  privateKey,
-  undefined,
-  undefined,
-  myPaymasterRpc
-);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+  paymaster: myPaymasterRpc,
+});
 ```
 
 ## Getting Supported Gas Tokens
@@ -121,14 +119,12 @@ const myPaymasterRpc = new PaymasterRpc({
   nodeUrl: 'https://sepolia.paymaster.avnu.fi',
   headers: { 'api-key': process.env.PAYMASTER_API_KEY },
 });
-const myAccount = new Account(
-  myProvider,
-  accountAddress,
-  privateKey,
-  undefined,
-  undefined,
-  myPaymasterRpc
-);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+  paymaster: myPaymasterRpc,
+});
 const feesDetails: PaymasterDetails = {
   feeMode: { mode: 'sponsored' },
 };
