@@ -20,9 +20,8 @@ import {
   RPC_ERROR,
   RpcProviderOptions,
   waitForTransactionOptions,
-  type GasPrices,
 } from '../types';
-import { JRPC, RPCSPEC08 as RPC, RPCSPEC08, type BlockWithTxHashes } from '../types/api';
+import { JRPC, RPCSPEC08 as RPC, RPCSPEC08 } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -544,17 +543,6 @@ export class RpcChannel {
       block_id,
       ...flags,
     });
-  }
-
-  public async getGasPrices(
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<GasPrices> {
-    const bl = (await this.getBlockWithTxHashes(blockIdentifier)) as BlockWithTxHashes;
-    return {
-      l1DataGasPrice: BigInt(bl.l1_data_gas_price.price_in_fri),
-      l1GasPrice: BigInt(bl.l1_gas_price.price_in_fri),
-      l2GasPrice: BigInt(bl.l2_gas_price.price_in_fri),
-    } as GasPrices;
   }
 
   public async invoke(functionInvocation: Invocation, details: InvocationsDetailsWithNonce) {

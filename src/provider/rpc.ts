@@ -226,7 +226,7 @@ export class RpcProvider implements ProviderInterface {
   public async getGasPrices(
     blockIdentifier: BlockIdentifier = this.channel.blockIdentifier
   ): Promise<GasPrices> {
-    if (this.channel instanceof RPC08.RpcChannel) return this.channel.getGasPrices(blockIdentifier);
+    if (this.channel instanceof RPC09.RpcChannel) return this.channel.getGasPrices(blockIdentifier);
     throw new LibraryError('Unsupported method for RPC version');
   }
 
