@@ -33,6 +33,7 @@ import {
   toAnyPatchVersion,
   BlockTag,
   logger,
+  type GasPrices,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { isBoolean } from '../src/utils/typed';
@@ -160,6 +161,16 @@ describeIfRpc('RPCProvider', () => {
   test('getSpecVersion', async () => {
     const spec = await rpcProvider.getSpecVersion();
     expect(typeof spec).toBe('string');
+  });
+
+  test('getGasPrices', async () => {
+    const gasPrices: GasPrices = await rpcProvider.getGasPrices('latest');
+    expect(gasPrices).toHaveProperty('l1DataGasPrice');
+    expect(gasPrices).toHaveProperty('l1GasPrice');
+    expect(gasPrices).toHaveProperty('l2GasPrice');
+    expect(typeof gasPrices.l1DataGasPrice).toBe('bigint');
+    expect(typeof gasPrices.l1GasPrice).toBe('bigint');
+    expect(typeof gasPrices.l2GasPrice).toBe('bigint');
   });
 
   test('configurable fee overhead on instance', async () => {
