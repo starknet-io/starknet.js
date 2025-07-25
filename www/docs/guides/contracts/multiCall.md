@@ -22,7 +22,11 @@ const contractAddress_1 = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b156
 const contractAddress_2 = '0x078f36c1d59dd29e00a0bb60aa2a9409856f4f9841c47f165aba5bab4225aa6b';
 
 const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_SEPOLIA });
-const myAccount = new Account(myProvider, accountAddress, privateKey);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+});
 ```
 
 ## Interact with contracts

@@ -45,7 +45,11 @@ const { abi: testAbi } = await myProvider.getClassAt(testAddress);
 if (testAbi === undefined) {
   throw new Error('no abi.');
 }
-const myTestContract = new Contract(testAbi, testAddress, myProvider);
+const myTestContract = new Contract({
+  abi: testAbi,
+  address: testAddress,
+  providerOrAccount: myProvider,
+});
 
 // Interaction with the contract with call
 const bal1 = await myTestContract.get_balance();
@@ -75,7 +79,11 @@ const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address = '0x123....789';
 
-const account0 = new Account(myProvider, account0Address, privateKey0);
+const account0 = new Account({
+  provider: myProvider,
+  address: account0Address,
+  signer: privateKey0,
+});
 
 // Connect the deployed Test contract in Testnet
 const testAddress = '0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77';
@@ -85,10 +93,12 @@ const { abi: testAbi } = await myProvider.getClassAt(testAddress);
 if (testAbi === undefined) {
   throw new Error('no abi.');
 }
-const myTestContract = new Contract(testAbi, testAddress, myProvider);
-
-// Connect account with the contract
-myTestContract.connect(account0);
+// Create contract instance with account for read-write access
+const myTestContract = new Contract({
+  abi: testAbi,
+  address: testAddress,
+  providerOrAccount: account0,
+});
 
 // Interactions with the contract with meta-class
 const bal1 = await myTestContract.get_balance();
@@ -103,46 +113,15 @@ console.log('Final balance =', bal2);
 
 `Contract.populate()` is the recommended method to define the parameters to call/invoke the Cairo functions.
 
-## ✍️ Send a transaction, paying fees with ETH
+:::info
+**v8 Note**: Only V3 transactions with STRK fees are supported in Starknet.js v8. ETH fee transactions (V1/V2) have been removed with Starknet 0.14.
 
-You need to be connected to a node using RPC 0.7:
+All transactions now use V3 transactions with STRK fees by default.
+:::
 
-- Define `specVersion: '0.7.1'` when instantiating an RpcProvider
-- Use `config.set('legacyMode', true)` to enable **V1** transactions (ETH fees)
-- Use `logger.setLogLevel('ERROR')` if you want to remove the warnings when processing **V1** transactions
+## ✍️ Send a transaction, paying fees with ETH or any supported Token
 
-```typescript
-import { RpcProvider, Account, config, logger, ETransactionVersion } from 'starknet';
-
-const myProvider = new RpcProvider({
-  nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
-  specVersion: '0.7.1',
-});
-
-config.set('legacyMode', true);
-
-logger.setLogLevel('ERROR');
-```
-
-With the above settings the code still uses **V3** transactions (STRK fees) with RPC **0.7** by default. To utilize **V1** transactions (ETH fees) there are two approaches:
-
-- either configure it at the `Account` instance level by setting the appropriate constructor parameter:
-
-```typescript
-const account0 = new Account(
-  myProvider,
-  accountAddress0,
-  privateKey0,
-  undefined,
-  ETransactionVersion.V2
-);
-```
-
-- or configure it for individual method invocations by setting the corresponding options parameter property:
-
-```typescript
-const res = await account0.execute(myCall, { version: 1 });
-```
+Check Account Paymaster Section.
 
 ## Sending sequential transactions
 
