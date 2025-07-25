@@ -193,15 +193,8 @@ import {
   type Calldata,
 } from 'starknet';
 
-// 1. Setup Provider & Account
-const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-const myAccount = new Account({
-  provider: myProvider,
-  address: process.env.ACCOUNT_ADDRESS!, // Your account address
-  signer: process.env.PRIVATE_KEY!, // Your private key
-});
-
-// 2. Load Compiled Contract
+// Assuming provider and account are already set up (see Account guide)
+// Load compiled contract files
 const compiledSierra = json.parse(
   fs.readFileSync('./compiledContracts/test.contract_class.json').toString('ascii')
 );
