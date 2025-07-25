@@ -8,9 +8,69 @@ This document covers the features present in v7 which have changed in some signi
 
 If you encounter any missing changes, please let us know and we will update this guide.
 
+## About Starknet 0.14
+
+Starknet.js v8 introduces support for **Starknet protocol version 0.14**, which brings several important network-level changes that affect how you build and interact with Starknet:
+
+### Transaction Version Changes
+
+**Only V3 transactions are supported** - Starknet 0.14 has removed support for legacy transaction versions:
+
+- ❌ **V0, V1, V2 transactions are no longer supported** on the network
+- ✅ **Only V3 transactions work** with the new protocol
+- All transactions now use **STRK fees** instead of ETH fees
+
+```typescript
+// ❌ This will fail on Starknet 0.14
+const account = new Account({
+  provider,
+  address,
+  signer: privateKey,
+  transactionVersion: ETransactionVersion.V2, // No longer supported
+});
+
+// ✅ Correct for Starknet 0.14
+const account = new Account({
+  provider,
+  address,
+  signer: privateKey,
+  transactionVersion: ETransactionVersion.V3, // Default and only option
+});
+```
+
+### Transaction Tips
+
+Starknet 0.14 introduces a **tip mechanism** for transaction prioritization in the mempool:
+
+- Transactions can include tips to prioritize execution
+- Higher tips increase the likelihood of faster inclusion
+- Tips are separate from transaction fees and go to the sequencer
+
+### Block State Changes
+
+**Important block handling changes:**
+
+- ❌ **Pending blocks have been removed** from the protocol
+- ✅ **New decentralized pre-confirmation state** replaces pending blocks
+- Block statuses are now: `PRE_CONFIRMED` → `ACCEPTED_ON_L2` → `ACCEPTED_ON_L1`
+
+### Transaction Waiting Behavior
+
+**Starknet.js v8 now waits for transactions to reach `ACCEPTED_ON_L2` status:**
+
+- `waitForTransaction()` now waits for `ACCEPTED_ON_L2` instead of pending confirmation
+
+```typescript
+// v8 behavior - waits for ACCEPTED_ON_L2
+const txReceipt = await account.waitForTransaction(txHash);
+// Transaction is now confirmed on L2
+```
+
+This affects how you handle transaction states and block confirmations in your applications.
+
 ## Overview
 
-Starknet.js v8 introduces several breaking changes while adding support for Starknet protocol version 0.14 and RPC 0.9. The most significant change is the move from argument-based constructors to object-based APIs for better developer experience and extensibility.
+Starknet.js v8 introduces several breaking changes while adding full support for these Starknet 0.14 protocol changes and RPC 0.9. The most significant change is the move from argument-based constructors to object-based APIs for better developer experience and extensibility.
 
 ## Node.js Requirements
 
