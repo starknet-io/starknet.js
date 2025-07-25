@@ -4,15 +4,14 @@ sidebar_position: 3
 
 # Interact with your contract
 
-Once your provider, contract, and account are connected, you can interact with the contract:
+Once your contract is connected (see [Contract Instance guide](./connect_contract.md)), you can interact with it:
 
-- you can read the memory of the contract, without fees.
-- you can write to memory, but you have to pay fees.
-  - On Mainnet, you have to pay fees with bridged STRK or ETH token.
-  - On Testnet, you have to pay with bridged Sepolia STRK or Sepolia ETH token.
-  - On Devnet, you have to pay with dummy STRK or ETH token.
+- **Read operations**: Free - query contract state without fees
+- **Write operations**: Paid - modify contract state with STRK fees
 
-Your account should be funded enough to pay fees (20 STRK should be enough to start).
+:::info
+Ensure your account has sufficient STRK for transaction fees (20 STRK is a good start).
+:::
 
 ![](./pictures/contract-interaction.svg)
 
@@ -26,92 +25,51 @@ This contract contains a storage variable called `balance`.
 - Balance can be modified with `fn increase_balance(ref self: TContractState, amount: felt252);`
 
 ```typescript
-import { RpcProvider, Contract, Account, ec, json } from 'starknet';
+import { Contract, CallData } from 'starknet';
 ```
 
-## 🔍 Read from contract memory, with meta-class
+## 🔍 Reading Contract State
 
-To read the balance, you need to connect an RpcProvider and a Contract.  
-You have to call Starknet, with the use of the meta-class method: `contract.function_name(params)` (here `params` is not necessary, because there are no parameters for the `get_balance` function).
+Use the contract instance (connected with Provider) to call view functions:
 
 ```typescript
-//initialize provider with a Sepolia Testnet node
-const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-// Connect the deployed Test contract in Sepolia Testnet
-const testAddress = '0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77';
+// Assuming contract is already connected (see connect_contract.md)
+const balance = await myContract.get_balance();
+console.log('Balance:', balance);
 
-// read the ABI of the Test contract
-const { abi: testAbi } = await myProvider.getClassAt(testAddress);
-if (testAbi === undefined) {
-  throw new Error('no abi.');
-}
-const myTestContract = new Contract({
-  abi: testAbi,
-  address: testAddress,
-  providerOrAccount: myProvider,
-});
-
-// Interaction with the contract with call
-const bal1 = await myTestContract.get_balance();
-console.log('Initial balance =', bal1); // Cairo 1 contract
-// With Cairo 0 contract, `bal1.res.toString()` because the return value is called 'res' in the Cairo 0 contract.
-// With Cairo 1 contract, the result value is in `bal1`, as bigint.
+// View functions with parameters
+const userBalance = await myContract.balanceOf(userAddress);
+console.log('User balance:', userBalance);
 ```
 
-## ✍️ Write to contract memory, with meta-class
+:::tip
 
-To increase the balance, you need in addition a connected and funded Account.
+- Cairo 1 contracts return values directly as `bigint`
+- Cairo 0 contracts return objects with named properties (e.g., `result.res`)
+  :::
 
-You have to invoke Starknet, with the use of the meta-class method: `contract.function_name(params)`
+## ✍️ Writing to Contract State
 
-> After the invoke, you have to wait the incorporation of the modification of Balance in the network, with `await myProvider.waitForTransaction(transaction_hash)`
+Use the contract instance (connected with Account) to call state-changing functions:
 
-:::note
-By default, you are executing transactions that use the STRK token to pay the fees.
+```typescript
+// Assuming contract is connected with Account (see connect_contract.md)
+// Direct function call
+const tx = await myContract.increase_balance(10);
+await myProvider.waitForTransaction(tx.transaction_hash);
+
+// Using populate for complex parameters
+const call = myContract.populate('transfer', {
+  recipient: recipientAddress,
+  amount: transferAmount,
+});
+const tx2 = await myContract.transfer(call.calldata);
+await myProvider.waitForTransaction(tx2.transaction_hash);
+```
+
+:::tip
+Use `Contract.populate()` to prepare call data for complex parameters or multicalls.
 :::
-
-Here is an example of how to increase and check the balance:
-
-```typescript
-//initialize provider with a Sepolia Testnet node
-const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-// connect your account. To adapt to your own account:
-const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
-const account0Address = '0x123....789';
-
-const account0 = new Account({
-  provider: myProvider,
-  address: account0Address,
-  signer: privateKey0,
-});
-
-// Connect the deployed Test contract in Testnet
-const testAddress = '0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77';
-
-// read the ABI of the Test contract
-const { abi: testAbi } = await myProvider.getClassAt(testAddress);
-if (testAbi === undefined) {
-  throw new Error('no abi.');
-}
-// Create contract instance with account for read-write access
-const myTestContract = new Contract({
-  abi: testAbi,
-  address: testAddress,
-  providerOrAccount: account0,
-});
-
-// Interactions with the contract with meta-class
-const bal1 = await myTestContract.get_balance();
-console.log('Initial balance =', bal1); // Cairo 1 contract
-const myCall = myTestContract.populate('increase_balance', [10]);
-const res = await myTestContract.increase_balance(myCall.calldata);
-await myProvider.waitForTransaction(res.transaction_hash);
-
-const bal2 = await myTestContract.get_balance();
-console.log('Final balance =', bal2);
-```
-
-`Contract.populate()` is the recommended method to define the parameters to call/invoke the Cairo functions.
 
 :::info
 **v8 Note**: Only V3 transactions with STRK fees are supported in Starknet.js v8. ETH fee transactions (V1/V2) have been removed with Starknet 0.14.
@@ -136,27 +94,27 @@ Be sure to use `waitForTransaction` between the calls, because you may experienc
 
 For more information about defining call messages and parameters, see [this guide](./define_call_message.md).
 
-## Write several operations, with Account.execute
+## Multiple Operations (Multicall)
 
-In a Starknet transaction, you can include several invoke operations. It will be performed with `account.execute`.
-
-We will later see this case in more detail in this dedicated [guide](multiCall.md), but in summary, you use this command with the following parameters:
-
-- address of the contract to invoke
-- name of the function to invoke
-- and an array of parameters for this function
+Execute multiple contract calls in a single transaction:
 
 ```typescript
-const result = await myAccount.execute({
-  contractAddress: myContractAddress,
-  entrypoint: 'transfer',
-  calldata: CallData.compile({
-    recipient: receiverAddress,
-    amount: cairo.uint256(100000n),
-  }),
-});
+const result = await myAccount.execute([
+  {
+    contractAddress: tokenAddress,
+    entrypoint: 'approve',
+    calldata: CallData.compile({ spender: recipient, amount: 1000n }),
+  },
+  {
+    contractAddress: tokenAddress,
+    entrypoint: 'transfer',
+    calldata: CallData.compile({ recipient, amount: 500n }),
+  },
+]);
 await myProvider.waitForTransaction(result.transaction_hash);
 ```
+
+For detailed multicall examples, see the [Multicall guide](./multiCall.md).
 
 ## Other existing methods
 

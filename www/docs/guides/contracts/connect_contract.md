@@ -9,66 +9,51 @@ This guide explains how to connect to and interact with smart contracts on Stark
 ## Quick Start
 
 ```typescript
-import { Contract, RpcProvider } from 'starknet';
+import { Contract, RpcProvider, Account } from 'starknet';
 
-// Initialize provider
-const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-
-// Connect to contract with provider (read-only)
-const myContract = new Contract({
-  abi,
+// For read-only access
+const readOnlyContract = new Contract({
+  abi: contractAbi,
   address: contractAddress,
-  providerOrAccount: myProvider,
+  providerOrAccount: myProvider, // Provider for reading
 });
 
-// Read contract state
-const result = await myContract.my_view_function();
-
-// Write to contract (requires Account)
-const myAccount = new Account({
-  provider: myProvider,
-  address: accountAddress,
-  signer: privateKey,
-});
-// Create contract instance with account for writing
-const myContractWithAccount = new Contract({
-  abi,
+// For read-write access
+const readWriteContract = new Contract({
+  abi: contractAbi,
   address: contractAddress,
-  providerOrAccount: myAccount,
+  providerOrAccount: myAccount, // Account for writing
 });
-const { transaction_hash } = await myContractWithAccount.my_write_function(params);
 ```
 
 ## Prerequisites
 
 Before connecting to a contract, you need:
 
-- ✅ A configured `Provider` or `Account` instance
+- ✅ A configured `Provider` (for read-only) or `Account` (for read-write) - see [Provider guide](../provider_instance.md) and [Account guide](../account/connect_account.md)
 - ✅ The contract's address
 - ✅ The contract's ABI (Application Binary Interface)
 
 ## Loading Contract ABI
 
-### Method 1: From Local File (Recommended)
+### From Local File (Recommended)
 
-Use Starknet.js's `json` utility to correctly parse contract artifacts, including `BigInt` values:
+:::tip Important
+Use Starknet.js's `json` utility to correctly parse contract artifacts with `BigInt` values.
+:::
 
 ```typescript
 import fs from 'fs';
 import { json } from 'starknet';
 
 const contractArtifact = json.parse(fs.readFileSync('./path/to/contract.json').toString('ascii'));
+const abi = contractArtifact.abi;
 ```
 
-### Method 2: From Network (Fallback)
-
-Fetch the ABI directly from the network (use sparingly):
+### From Network (Fallback)
 
 ```typescript
-import fs from 'fs';
-import { json } from 'starknet';
-
-// ⚠️ Network intensive operation
+// ⚠️ Network intensive - avoid in production
 const { abi } = await myProvider.getClassAt(contractAddress);
 // Save for future use
 fs.writeFileSync('./contract-abi.json', json.stringify(abi, null, 2));
@@ -76,47 +61,31 @@ fs.writeFileSync('./contract-abi.json', json.stringify(abi, null, 2));
 
 ## Creating Contract Instances
 
-### Read-Only Access
-
-For reading contract state (view functions):
+### Read-Only Access (Provider)
 
 ```typescript
-import { Contract, RpcProvider } from 'starknet';
-
-const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-const myContract = new Contract({
-  abi,
+const contract = new Contract({
+  abi: contractAbi,
   address: contractAddress,
-  providerOrAccount: myProvider,
+  providerOrAccount: myProvider, // Provider instance
 });
 
-// Call view functions
-const result = await myContract.get_balance();
+// Only view functions work
+const balance = await contract.get_balance();
 ```
 
-### Read-Write Access
-
-For full contract interaction (including state modifications):
+### Read-Write Access (Account)
 
 ```typescript
-import { Contract, Account } from 'starknet';
-
-const myAccount = new Account({
-  provider: myProvider,
-  address: accountAddress,
-  signer: privateKey,
-});
-
-// Create contract instance with account for read-write access
-const myContract = new Contract({
-  abi,
+const contract = new Contract({
+  abi: contractAbi,
   address: contractAddress,
-  providerOrAccount: myAccount,
+  providerOrAccount: myAccount, // Account instance
 });
 
-// Now you can both read and write
-const balance = await myContract.get_balance();
-const tx = await myContract.set_balance(newBalance);
+// Both view and invoke functions work
+const balance = await contract.get_balance();
+const tx = await contract.transfer(recipient, amount);
 ```
 
 ## Reading Contract State
@@ -330,48 +299,20 @@ For enhanced development experience with TypeScript:
 
 See our [TypeScript Integration Guide](./abi_typescript.md) for details.
 
+## Next Steps
+
+- **Deploy contracts**: See [Contract Deployment guide](./create_contract.md)
+- **Interact with contracts**: See [Contract Interaction guide](./interact.md)
+- **Handle complex data types**: See [Data Types guide](./define_call_message.md)
+- **Work with multiple contracts**: See [Multicall guide](./multiCall.md)
+
 ## Best Practices
 
-1. **ABI Management**
-   - Store ABIs locally instead of fetching from network
-   - Use version control for ABI files
-   - **Always update your local ABI when recompiling contracts**:
-
-   - Using outdated ABIs can cause unexpected errors, especially if you've:
-     - Added or removed functions
-     - Changed function parameters
-     - Modified function visibility
-     - Updated Cairo version
-
-2. **Error Handling**
-
-   ```typescript
-   try {
-     const tx = await myContract.transfer(recipient, amount);
-     await myProvider.waitForTransaction(tx.transaction_hash);
-   } catch (error) {
-     if (error.message.includes('insufficient balance')) {
-       console.error('Not enough funds!');
-     } else {
-       console.error('Transaction failed:', error);
-     }
-   }
-   ```
-
-3. **Transaction Monitoring**
-
-   ```typescript
-   const tx = await myContract.transfer(recipient, amount);
-   const receipt = await myProvider.waitForTransaction(tx.transaction_hash, {
-     retryInterval: 2000,
-     successStates: ['ACCEPTED_ON_L2'],
-   });
-   ```
-
-4. **Resource Management**
-   - Estimate fees before transactions
-   - Set appropriate gas limits
-   - Consider using `withOptions` for fine-grained control
+- Store ABIs locally instead of fetching from network
+- Always update ABIs when recompiling contracts
+- Use TypeScript for better type safety (see [TypeScript guide](./abi_typescript.md))
+- Estimate fees before transactions
+- Handle errors appropriately
 
 ## Common Issues and Solutions
 
