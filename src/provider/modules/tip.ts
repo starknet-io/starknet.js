@@ -1,11 +1,11 @@
 import { RANGE_FELT } from '../../global/constants';
 import { logger } from '../../global/logger';
-import type { ProviderInterface } from '../../provider';
+import type { ProviderInterface } from '..';
 import { BlockTag, type BlockIdentifier, type RPC } from '../../types';
 import type { BlockWithTxs } from '../../types/api';
-import assert from '../assert';
-import { LibraryError } from '../errors';
-import { isNumber, isString } from '../typed';
+import assert from '../../utils/assert';
+import { LibraryError } from '../../utils/errors';
+import { isNumber, isString } from '../../utils/typed';
 
 /**
  * Result of provider.getTipStatsFromBlocks().
@@ -33,6 +33,8 @@ export type TipEstimate = {
     transactionsTipsFound: bigint[];
   };
 };
+
+export type TipType = Exclude<keyof TipEstimate, 'metrics'>;
 
 /**
  * Options for customizing tip analysis behavior.

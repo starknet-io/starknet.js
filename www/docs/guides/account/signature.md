@@ -142,7 +142,11 @@ const myTypedData: TypedData = {
   },
 };
 
-const account0 = new Account(myProvider, address, privateKey);
+const account0 = new Account({
+  provider: myProvider,
+  address: address,
+  signer: privateKey,
+});
 const fullPublicKey = stark.getFullPublicKey(privateKey);
 
 const msgHash = await account0.hashMessage(myTypedData);
@@ -242,7 +246,11 @@ const fullPubK = await myLedgerSigner.getFullPubKey();
 // ...
 // deploy here an account related to this public key
 // ...
-const ledgerAccount = new Account(myProvider, ledger0addr, myLedgerSigner);
+const ledgerAccount = new Account({
+  provider: myProvider,
+  address: ledger0addr,
+  signer: myLedgerSigner,
+});
 ```
 
 :::warning important

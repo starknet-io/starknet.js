@@ -116,7 +116,11 @@ async function executeDelegated(chosenAccount: Account, delegateSigner: Signer, 
 
 // Usage
 const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-const myAccount = new Account(myProvider, accountAddress, accountPrivateKey);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: accountPrivateKey,
+});
 const delegateSigner = new Signer(delegatePrivateKey);
 
 const transaction = {
@@ -200,7 +204,11 @@ class Relayer {
 
 // Usage
 const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-const relayerAccount = new Account(myProvider, relayerAddress, relayerPrivateKey);
+const relayerAccount = new Account({
+  provider: myProvider,
+  address: relayerAddress,
+  signer: relayerPrivateKey,
+});
 const userSigner = new Signer(userPrivateKey);
 
 const relayer = new Relayer(relayerAccount, myProvider);

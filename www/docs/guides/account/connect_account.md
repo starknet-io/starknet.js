@@ -8,7 +8,7 @@ sidebar_position: 1
 
 Once your provider is initialized, you can connect an existing account.
 
-You need 2 pieces of data:
+You need:
 
 - the address of the account
 - the private key of this account
@@ -17,20 +17,22 @@ You need 2 pieces of data:
 import { Account, RpcProvider } from 'starknet';
 ```
 
-## Connect to a pre-deployed account in Starknet Devnet
+## Connect to a pre-deployed account (Starknet Devnet)
 
 When you launch `starknet-devnet`, 10 accounts are pre-deployed with 100 dummy ETH and STRK in each.
 
+:::info
+Devnet predeployed accounts will change at each run. To freeze them, launch with: `cargo run --release -- --seed 0` or use docker image -seed0
+:::
+
 Addresses and private keys are displayed on the console at initialization.
 
-> This data will change at each launch, so to freeze them, launch with: `cargo run --release -- --seed 0`.
-
-The result for `account #0`:
-
 ```text
-Address    : 0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691
-Private key: 0x71d7bb07b9a64f6f78ac4c816aff4da9
-Public key : 0x7e52885445756b313ea16849145363ccb73fb4ab0440dbac333cf9d13de82b9
+| Account address |  0x064b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691
+
+| Private key     |  0x0000000000000000000000000000000071d7bb07b9a64f6f78ac4c816aff4da9
+
+| Public key      |  0x039d9e6ce352ad4530a0ef5d5a18fd3303c3606a7fa6ac5b620020ad681cc33b
 ```
 
 Then you can use this code:
@@ -39,15 +41,19 @@ Then you can use this code:
 // initialize provider for Devnet
 const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 // initialize existing account 0 pre-deployed on Devnet
-const accountAddress = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
-const privateKey = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
+const accountAddress = '0x064b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
+const privateKey = '0x0000000000000000000000000000000071d7bb07b9a64f6f78ac4c816aff4da9';
 
-const myAccount = new Account(myProvider, accountAddress, privateKey);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+});
 ```
 
-Your account is now connected, and you can use it.
+Your account is now ready to be used.
 
-## 👛 Connect to an existing account (in any network)
+## 👛 Connect to an existing account (Network)
 
 The code is the same, you just have to:
 
@@ -58,32 +64,48 @@ The code is the same, you just have to:
 For example, to connect an existing account on testnet, with a private key stored in a .env non-archived file:
 
 ```typescript
-import * as dotenv from 'dotenv';
-dotenv.config();
-
-// initialize RPC v0.8 provider
+// initialize RPC v0.9 provider
 const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 // initialize existing account
-const privateKey = process.env.OZ_NEW_ACCOUNT_PRIVKEY;
+const privateKey = process.env.OZ_NEW_ACCOUNT_PRIVATE_KEY;
 const accountAddress = '0x051158d244c7636dde39ec822873b29e6c9a758c6a9812d005b6287564908667';
 
-const myAccount = new Account(myProvider, accountAddress, privateKey);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+});
 ```
 
-:::tip
-If you are connected to an RPC v0.7 node and you want to use ETH as fees for this account:
+:::info
+**v8 Note**: Only V3 transactions are supported in Starknet.js v8. V2 transactions have been removed with Starknet 0.14.
+All accounts now use V3 transactions with Starknet fees by default.
+:::
+
+### Advanced Account Configuration (v8)
+
+Starknet.js v8 introduces additional configuration options for accounts:
 
 ```typescript
-const myAccount = new Account(
-  myProvider,
-  accountAddress,
-  privateKey,
-  undefined,
-  ETransactionVersion.V2
-);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+  cairoVersion: '1', // optional - Cairo version ('1' is default)
+  transactionVersion: ETransactionVersion.V3, // ETransactionVersion.V3 is the default and only option
+  paymaster: undefined, // optional - paymaster for sponsored transactions
+  deployer: defaultDeployer, // optional - custom deployer (defaultDeployer or legacyDeployer)
+  defaultTipType: 'recommendedTip', // optional - tip strategy for transactions
+});
 ```
 
-:::
+### New Parameters Explained
+
+- **`paymaster`**: Configure a paymaster for sponsored transactions (see [Paymaster guide](./paymaster.md))
+- **`deployer`**: Choose between `defaultDeployer` (UDC V2) or `legacyDeployer` (UDC V1)
+- **`defaultTipType`**: Default tip calculation strategy - options include:
+  - `'minTip'`, `'maxTip'`, `'averageTip'`, `'medianTip'`, `'modeTip'`
+  - `'recommendedTip'` (default), `'p90Tip'`, `'p95Tip'`
 
 ## Connect to an account that uses Ethereum signature
 
@@ -96,5 +118,9 @@ const myEthPrivateKey = '0x525bc68475c0955fae83869beec0996114d4bb27b28b781ed2a20
 const myEthAccountAddressInStarknet =
   '0x65a822fbee1ae79e898688b5a4282dc79e0042cbed12f6169937fddb4c26641';
 const myEthSigner = new EthSigner(myEthPrivateKey);
-const myEthAccount = new Account(myProvider, myEthAccountAddressInStarknet, myEthSigner);
+const myEthAccount = new Account({
+  provider: myProvider,
+  address: myEthAccountAddressInStarknet,
+  signer: myEthSigner,
+});
 ```

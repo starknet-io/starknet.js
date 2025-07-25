@@ -36,83 +36,77 @@ const addrETH = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004
 
 ## Deploy an ERC20
 
-Let's dive down the rabbit hole!
+This example shows deploying an ERC20 token. For basic setup (provider, account), see the [Account Connection guide](../account/connect_account.md).
 
-This example works with an ERC20, that we will deploy on Devnet RPC 0.8 (launched with `cargo run --release -- --seed 0`).
-
-First, let's initialize an existing account:
+### Using Contract.factory() (Recommended)
 
 ```typescript
-// initialize provider
-const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
-// initialize existing pre-deployed account 0 of Devnet
-const privateKey = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
-const accountAddress = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
+import { Contract, CallData, cairo } from 'starknet';
 
-const account0 = new Account(myProvider, accountAddress, privateKey);
+// Deploy ERC20 using the factory method
+const erc20Contract = await Contract.factory({
+  compiledContract: compiledSierra,
+  account: myAccount,
+  casm: compiledCasm,
+  constructorArguments: {
+    name: 'niceToken',
+    symbol: 'NIT',
+    fixed_supply: cairo.uint256(20n * 10n ** 18n),
+    recipient: myAccount.address,
+  },
+});
+
+console.log('ERC20 deployed at:', erc20Contract.address);
 ```
 
-Declaration and deployment of the ERC20 contract:
+### Using Account Methods Directly
 
 ```typescript
-// Deploy an ERC20 contract
-console.log('Deployment Tx - ERC20 Contract to Starknet...');
-const compiledSierra = json.parse(
-  fs.readFileSync('./__mocks__/cairo/ERC20-241/ERC20OZ081.sierra.json').toString('ascii')
-);
-const compiledCasm = json.parse(
-  fs.readFileSync('./__mocks__/cairo/ERC20-241/ERC20OZ081.casm.json').toString('ascii')
-);
-const initialTk: Uint256 = cairo.uint256(20n * 10n ** 18n); // 20 NIT
-const erc20CallData: CallData = new CallData(compiledSierra.abi);
-const ERC20ConstructorCallData: Calldata = erc20CallData.compile('constructor', {
+// Alternative: using declareAndDeploy for more control
+const erc20CallData = new CallData(compiledSierra.abi);
+const constructorCallData = erc20CallData.compile('constructor', {
   name: 'niceToken',
   symbol: 'NIT',
-  fixed_supply: initialTk,
-  recipient: account0.address,
+  fixed_supply: cairo.uint256(20n * 10n ** 18n),
+  recipient: myAccount.address,
 });
 
-console.log('constructor=', ERC20ConstructorCallData);
-const deployERC20Response = await account0.declareAndDeploy({
+const deployResponse = await myAccount.declareAndDeploy({
   contract: compiledSierra,
   casm: compiledCasm,
-  constructorCalldata: ERC20ConstructorCallData,
+  constructorCalldata: constructorCallData,
 });
-console.log('ERC20 declared hash: ', deployERC20Response.declare.class_hash);
-console.log('ERC20 deployed at address: ', deployERC20Response.deploy.contract_address);
 
-// Get the erc20 contract address
-const erc20Address = deployERC20Response.deploy.contract_address;
-// Create a new erc20 contract object
-const erc20 = new Contract(compiledSierra.abi, erc20Address, myProvider);
-erc20.connect(account0);
+// Create contract instance
+const erc20 = new Contract({
+  abi: compiledSierra.abi,
+  address: deployResponse.deploy.contract_address,
+  providerOrAccount: myAccount,
+});
 ```
 
 ## Interact with an ERC20
 
-Here we will read the balance and transfer tokens:
+Standard ERC20 operations:
 
 ```typescript
-// Check balance - should be 20 NIT
-console.log(`Calling Starknet for account balance...`);
-const balanceInitial = await erc20.balanceOf(account0.address);
-console.log('account0 has a balance of:', balanceInitial);
+// Check balance
+const balance = await erc20.balanceOf(myAccount.address);
+console.log('Balance:', balance);
 
-// Execute tx transfer of 1 tokens to account 1
-console.log(`Invoke Tx - Transfer 1 tokens to erc20 contract...`);
-const toTransferTk: Uint256 = cairo.uint256(1 * 10 ** 18);
-const transferCall: Call = erc20.populate('transfer', {
-  recipient: '0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1',
-  amount: 1n * 10n ** 18n,
-});
-const { transaction_hash: transferTxHash } = await account0.execute(transferCall);
-// Wait for the invoke transaction to be accepted on Starknet
-console.log(`Waiting for Tx to be Accepted on Starknet - Transfer...`);
-await myProvider.waitForTransaction(transferTxHash);
+// Transfer tokens (direct method call)
+const recipient = '0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1';
+const amount = cairo.uint256(1n * 10n ** 18n); // 1 token
+const tx = await erc20.transfer(recipient, amount);
+await myProvider.waitForTransaction(tx.transaction_hash);
 
-// Check balance after transfer - should be 19 NIT
-console.log(`Calling Starknet for account balance...`);
-const balanceAfterTransfer = await erc20.balanceOf(account0.address);
-console.log('account0 has a balance of:', balanceAfterTransfer);
-console.log('✅ Script completed.');
+// Approve spending
+const spender = '0x...';
+const allowanceAmount = cairo.uint256(5n * 10n ** 18n);
+const approveTx = await erc20.approve(spender, allowanceAmount);
+await myProvider.waitForTransaction(approveTx.transaction_hash);
+
+// Check allowance
+const allowance = await erc20.allowance(myAccount.address, spender);
+console.log('Allowance:', allowance);
 ```

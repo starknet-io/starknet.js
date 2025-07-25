@@ -49,7 +49,11 @@ const address = 'YOUR_CONTRACT_ADDRESS';
 const myProvider = new RpcProvider({ nodeUrl: `${yourNodeUrl}` });
 
 // Create a typed contract instance
-const myContract = new Contract(ABI, address, myProvider).typedv2(ABI);
+const myContract = new Contract({
+  abi: ABI,
+  address,
+  providerOrAccount: myProvider,
+}).typedv2(ABI);
 
 // Enjoy autocompletion and type checking!
 const result = await myContract.increase_balance(100);
@@ -85,7 +89,11 @@ const address = '0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325
 const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_MAIN });
 
 // Create typed contract instance
-const myContract = new Contract(ABI, address, myProvider).typedv2(ABI);
+const myContract = new Contract({
+  abi: ABI,
+  address,
+  providerOrAccount: myProvider,
+}).typedv2(ABI);
 
 // Enjoy type inference and autocompletion
 const primaryInterfaceId = await myContract.get_primary_interface_id();
