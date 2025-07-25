@@ -17,13 +17,17 @@ Custom keys can also be used to store and use arbitrary values during runtime.
 import { config } from 'starknet';
 
 // Set existing or custom global property
-config.set('rpcVersion', '0.8.1');
+config.set('rpcVersion', '0.9.1');
+
+// Set WebSocket implementation for Node.js (if using older than Node.js 22)
+import WebSocket from 'ws';
+config.set('websocket', WebSocket);
 
 // Retrieve entire configuration
 config.getAll();
 
 // Retrieve single global property
-config.get('legacyMode');
+config.get('resourceBoundsOverhead');
 
 // Update (merge) existing configuration with modified or custom property
 config.update({ logLevel: 'DEBUG', newKey: 'value' });
@@ -36,6 +40,22 @@ config.delete('newKey');
 
 // Check existence of the global property
 config.hasKey('newKey');
+
+// Configure resource bounds overhead for fee estimation
+config.set('resourceBoundsOverhead', {
+  l1_gas: {
+    max_amount: 75,
+    max_price_per_unit: 60,
+  },
+  l2_gas: {
+    max_amount: 100,
+    max_price_per_unit: 60,
+  },
+  l1_data_gas: {
+    max_amount: 80,
+    max_price_per_unit: 70,
+  },
+});
 ```
 
 ### Global parameters and Default Global Configuration
@@ -45,35 +65,29 @@ Here are all the available configuration properties:
 
 ```ts
 {
-  // Enable/disable legacy transaction types (note: this could break the code depending on the Starknet version used by the network)
-  legacyMode: false,
+  // RPC version to use when communicating with nodes ('0.8.1' or '0.9.1')
+  rpcVersion: '0.9.1',
 
-  // RPC version to use when communicating with nodes ('0.7.1' or '0.8.1')
-  rpcVersion: '0.8.1',
-
-  // Transaction version to use (V2 or V3, where V3 is recommended)
+  // Transaction version to use (only V3 is supported in v8)
   transactionVersion: ETransactionVersion.V3,
 
   // Verbosity levels of the system logger (more details under logger section)
   logLevel: 'INFO',
 
-  // Fee margin percentage configuration for transaction fee estimation
-  feeMarginPercentage: {
-    bounds: {
-      l1_gas: {
-        max_amount: 50,    // Maximum percentage increase for L1 gas amount
-        max_price_per_unit: 50,  // Maximum percentage increase for L1 gas price
-      },
-      l1_data_gas: {
-        max_amount: 50,    // Maximum percentage increase for L1 data gas amount
-        max_price_per_unit: 50,  // Maximum percentage increase for L1 data gas price
-      },
-      l2_gas: {
-        max_amount: 50,    // Maximum percentage increase for L2 gas amount
-        max_price_per_unit: 50,  // Maximum percentage increase for L2 gas price
-      },
+  // Resource bounds overhead configuration for transaction fee estimation (v8)
+  resourceBoundsOverhead: {
+    l1_gas: {
+      max_amount: 50,    // percentage increase for L1 gas amount
+      max_price_per_unit: 50,  // percentage increase for L1 gas price
     },
-    maxFee: 50,  // Maximum percentage increase for overall fee
+    l1_data_gas: {
+      max_amount: 50,    // percentage increase for L1 data gas amount
+      max_price_per_unit: 50,  // percentage increase for L1 data gas price
+    },
+    l2_gas: {
+      max_amount: 50,    // percentage increase for L2 gas amount
+      max_price_per_unit: 50,  // percentage increase for L2 gas price
+    },
   },
 
   // Custom fetch implementation (optional)
