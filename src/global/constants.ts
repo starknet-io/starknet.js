@@ -3,7 +3,7 @@ import type { ResourceBoundsOverhead } from '../types';
 import { ETransactionVersion } from '../types/api';
 import { ValuesType } from '../types/helpers/valuesType';
 import type { LogLevel } from './logger.type';
-import type { TipEstimate } from '../utils/modules/tip';
+import type { TipType } from '../provider/modules/tip';
 
 export { IS_BROWSER } from '../utils/encode';
 
@@ -103,7 +103,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   rpcVersion: _SupportedRpcVersion;
   transactionVersion: SupportedTransactionVersion;
   resourceBoundsOverhead: ResourceBoundsOverhead;
-  defaultTipType: Exclude<keyof TipEstimate, 'metrics'>;
+  defaultTipType: TipType;
   fetch: any;
   websocket: any;
 } = {

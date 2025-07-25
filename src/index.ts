@@ -52,4 +52,3 @@ export * as wallet from './wallet/connect';
 export * from './global/config';
 export * from './global/logger';
 export * from './global/logger.type';
-export * from './utils/modules';

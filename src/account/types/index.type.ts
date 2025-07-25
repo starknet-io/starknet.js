@@ -21,7 +21,7 @@ import type { SupportedTransactionVersion } from '../../global/constants';
 import type { PaymasterInterface } from '../../paymaster';
 import type { ProviderInterface } from '../../provider/interface';
 import type { DeployerInterface } from '../../deployer';
-import type { TipEstimate } from '../../utils/modules';
+import type { TipType } from '../../provider/modules/tip';
 import type { DeployContractUDCResponse } from '../../deployer/types/index.type';
 
 /**
@@ -46,7 +46,7 @@ export type AccountOptions = {
    * Default tip type to use for sending transactions (optional)
    * @default 'recommendedTip'
    */
-  defaultTipType?: Exclude<keyof TipEstimate, 'metrics'>;
+  defaultTipType?: TipType;
 };
 
 export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;
