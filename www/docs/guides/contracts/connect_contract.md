@@ -14,15 +14,29 @@ import { Contract, RpcProvider } from 'starknet';
 // Initialize provider
 const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
-// Connect to contract
-const myContract = new Contract(abi, contractAddress, myProvider);
+// Connect to contract with provider (read-only)
+const myContract = new Contract({
+  abi,
+  address: contractAddress,
+  providerOrAccount: myProvider,
+});
 
 // Read contract state
 const result = await myContract.my_view_function();
 
 // Write to contract (requires Account)
-const myAccount = new Account(myProvider, accountAddress, privateKey);
-const { transaction_hash } = await myContract.connect(myAccount).my_write_function(params);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+});
+// Create contract instance with account for writing
+const myContractWithAccount = new Contract({
+  abi,
+  address: contractAddress,
+  providerOrAccount: myAccount,
+});
+const { transaction_hash } = await myContractWithAccount.my_write_function(params);
 ```
 
 ## Prerequisites
@@ -70,7 +84,11 @@ For reading contract state (view functions):
 import { Contract, RpcProvider } from 'starknet';
 
 const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-const myContract = new Contract(abi, contractAddress, myProvider);
+const myContract = new Contract({
+  abi,
+  address: contractAddress,
+  providerOrAccount: myProvider,
+});
 
 // Call view functions
 const result = await myContract.get_balance();
@@ -83,8 +101,18 @@ For full contract interaction (including state modifications):
 ```typescript
 import { Contract, Account } from 'starknet';
 
-const myAccount = new Account(myProvider, accountAddress, privateKey);
-const myContract = new Contract(abi, contractAddress, myAccount);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+});
+
+// Create contract instance with account for read-write access
+const myContract = new Contract({
+  abi,
+  address: contractAddress,
+  providerOrAccount: myAccount,
+});
 
 // Now you can both read and write
 const balance = await myContract.get_balance();

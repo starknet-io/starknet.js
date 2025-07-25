@@ -49,7 +49,11 @@ const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 const privateKey = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
 const accountAddress = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
 
-const account0 = new Account(myProvider, accountAddress, privateKey);
+const account0 = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+});
 ```
 
 Declaration and deployment of the ERC20 contract:
@@ -83,9 +87,12 @@ console.log('ERC20 deployed at address: ', deployERC20Response.deploy.contract_a
 
 // Get the erc20 contract address
 const erc20Address = deployERC20Response.deploy.contract_address;
-// Create a new erc20 contract object
-const erc20 = new Contract(compiledSierra.abi, erc20Address, myProvider);
-erc20.connect(account0);
+// Create a new erc20 contract object with account for read-write access
+const erc20 = new Contract({
+  abi: compiledSierra.abi,
+  address: erc20Address,
+  providerOrAccount: account0,
+});
 ```
 
 ## Interact with an ERC20
