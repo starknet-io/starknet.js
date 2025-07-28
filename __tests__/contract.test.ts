@@ -173,191 +173,6 @@ describe('contract module', () => {
           expect(txR.isSuccess()).toBe(true);
         });
       });
-
-      /*       describeIfRpc071('Request Type Transformation', () => {
-        test('Parsing the felt in request', async () => {
-          const myCall = typeTransformedContract.populate('request_felt', [3]);
-          const estim: EstimateFeeResponseOverhead = await account.estimateInvokeFee(myCall);
-          const resourceBounds: ResourceBounds = {
-            l1_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l1_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l1_gas.max_price_per_unit) * 2n
-              ),
-            },
-            l2_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l2_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l2_gas.max_price_per_unit) * 2n
-              ),
-            },
-          };
-          const resp = await account.execute(myCall, {
-            resourceBounds,
-          });
-          const txR = await provider.waitForTransaction(resp.transaction_hash);
-          expect(txR.isSuccess()).toBe(true);
-        });
-
-        test('Parsing the array of felt in request', async () => {
-          const myCall = typeTransformedContract.populate('request_array_of_felts', [[1, 2]]);
-          const estim: EstimateFee = await account.estimateInvokeFee(myCall);
-          const resourceBounds: ResourceBounds = {
-            l1_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l1_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l1_gas.max_price_per_unit) * 2n
-              ),
-            },
-            l2_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l2_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l2_gas.max_price_per_unit) * 2n
-              ),
-            },
-          };
-          const resp = await account.execute(myCall, {
-            resourceBounds,
-          });
-          const txR = await provider.waitForTransaction(resp.transaction_hash);
-          expect(txR.isSuccess()).toBe(true);
-        });
-
-        test('Parsing the struct in request', async () => {
-          const myCall = typeTransformedContract.populate('request_struct', [{ x: 1, y: 2 }]);
-          const estim: EstimateFee = await account.estimateInvokeFee(myCall);
-          const resourceBounds: ResourceBounds = {
-            l1_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l1_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l1_gas.max_price_per_unit) * 2n
-              ),
-            },
-            l2_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l2_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l2_gas.max_price_per_unit) * 2n
-              ),
-            },
-          };
-          const resp = await account.execute(myCall, {
-            resourceBounds,
-          });
-          const txR = await provider.waitForTransaction(resp.transaction_hash);
-          expect(txR.isSuccess()).toBe(true);
-        });
-
-        test('Parsing the array of structs in request', async () => {
-          const myCall = typeTransformedContract.populate('request_array_of_structs', [
-            [{ x: 1, y: 2 }],
-          ]);
-          const estim: EstimateFee = await account.estimateInvokeFee(myCall);
-          const resourceBounds: ResourceBounds = {
-            l1_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l1_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l1_gas.max_price_per_unit) * 2n
-              ),
-            },
-            l2_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l2_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l2_gas.max_price_per_unit) * 2n
-              ),
-            },
-          };
-          const resp = await account.execute(myCall, {
-            resourceBounds,
-          });
-
-          const txR = await provider.waitForTransaction(resp.transaction_hash);
-          expect(txR.isSuccess()).toBe(true);
-        });
-
-        test('Parsing the nested structs in request', async () => {
-          const myCall = typeTransformedContract.populate('request_nested_structs', [
-            {
-              p1: { x: 1, y: 2 },
-              p2: { x: 3, y: 4 },
-              extra: 5,
-            },
-          ]);
-          const estim: EstimateFee = await account.estimateInvokeFee(myCall);
-          const resourceBounds: ResourceBounds = {
-            l1_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l1_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l1_gas.max_price_per_unit) * 2n
-              ),
-            },
-            l2_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l2_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l2_gas.max_price_per_unit) * 2n
-              ),
-            },
-          };
-          const resp = await account.execute(myCall, {
-            resourceBounds,
-          });
-
-          const txR = await provider.waitForTransaction(resp.transaction_hash);
-          expect(txR.isSuccess()).toBe(true);
-        });
-
-        test('Parsing the tuple in request', async () => {
-          const myCall = typeTransformedContract.populate('request_tuple', [cairo.tuple(1, 2)]);
-          const estim: EstimateFee = await account.estimateInvokeFee(myCall);
-          const resourceBounds: ResourceBounds = {
-            l1_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l1_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l1_gas.max_price_per_unit) * 2n
-              ),
-            },
-            l2_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l2_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l2_gas.max_price_per_unit) * 2n
-              ),
-            },
-          };
-          const resp = await account.execute(myCall, {
-            resourceBounds,
-          });
-          const txR = await provider.waitForTransaction(resp.transaction_hash);
-          expect(txR.isSuccess()).toBe(true);
-        });
-
-        test('Parsing the multiple types in request', async () => {
-          const myCall = typeTransformedContract.populate('request_mixed_types', [
-            2,
-            { x: 1, y: 2 },
-            [1],
-          ]);
-          const estim: EstimateFee = await account.estimateInvokeFee(myCall);
-          const resourceBounds: ResourceBounds = {
-            l1_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l1_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l1_gas.max_price_per_unit) * 2n
-              ),
-            },
-            l2_gas: {
-              max_amount: num.toHex(BigInt(estim.resourceBounds.l2_gas.max_amount) * 2n),
-              max_price_per_unit: num.toHex(
-                BigInt(estim.resourceBounds.l2_gas.max_price_per_unit) * 2n
-              ),
-            },
-          };
-          const resp = await account.execute(myCall, {
-            resourceBounds,
-          });
-          const txR = await provider.waitForTransaction(resp.transaction_hash);
-          expect(txR.isSuccess()).toBe(true);
-        });
-      }); */
-
       describe('Response Type Transformation', () => {
         test('Parsing the felt in response', async () => {
           const res = await typeTransformedContract.get_felt();
@@ -1213,6 +1028,16 @@ describe('Complex interaction', () => {
       expect(gas2).toMatchSchemaRef('EstimateFeeResponseOverhead');
       expect(gas3).toMatchSchemaRef('EstimateFeeResponseOverhead');
       expect(gas4).toMatchSchemaRef('EstimateFeeResponseOverhead');
+    });
+
+    test('estimate fee with options (expect to fail due to bad nonce)', async () => {
+      await expect(
+        echoContract
+          .withOptions({
+            nonce: 0,
+          })
+          .estimateFee.iecho(...Object.values(request))
+      ).rejects.toThrow(RpcError);
     });
 
     test('estimate fee transfer', async () => {

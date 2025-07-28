@@ -25,6 +25,7 @@ import {
   WithOptions,
   FactoryParams,
   UniversalDetails,
+  EstimateFeeDetails,
 } from '../types';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
@@ -94,7 +95,10 @@ function buildPopulate(contract: Contract, functionAbi: FunctionAbi): ContractFu
  */
 function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFunction {
   return function (...args: Array<any>): any {
-    return contract.estimate(functionAbi.name, args);
+    const options = { ...contract.withOptionsProps };
+    // eslint-disable-next-line no-param-reassign
+    contract.withOptionsProps = undefined;
+    return contract.estimate(functionAbi.name, args, options);
   };
 }
 export class Contract implements ContractInterface {
@@ -360,7 +364,8 @@ export class Contract implements ContractInterface {
 
   public async estimate(
     method: string,
-    args: ArgsOrCalldata = []
+    args: ArgsOrCalldata = [],
+    estimateDetails: EstimateFeeDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
     assert(this.address !== null, 'contract is not connected to an address');
 
@@ -370,7 +375,7 @@ export class Contract implements ContractInterface {
 
     const invocation = this.populate(method, args);
     if (isAccount(this.providerOrAccount)) {
-      return this.providerOrAccount.estimateInvokeFee(invocation);
+      return this.providerOrAccount.estimateInvokeFee(invocation, estimateDetails);
     }
     throw Error('Contract must be connected to the account contract to estimate');
   }
