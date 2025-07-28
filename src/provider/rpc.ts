@@ -55,6 +55,7 @@ import type {
   TransactionWithHash,
 } from './types/spec.type';
 import { verifyMessageInStarknet } from '../utils/modules/verifyMessageInStarknet';
+import { getGasPrices } from '../utils/modules';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -226,7 +227,8 @@ export class RpcProvider implements ProviderInterface {
   public async getGasPrices(
     blockIdentifier: BlockIdentifier = this.channel.blockIdentifier
   ): Promise<GasPrices> {
-    if (this.channel instanceof RPC09.RpcChannel) return this.channel.getGasPrices(blockIdentifier);
+    if (this.channel instanceof RPC09.RpcChannel)
+      return getGasPrices(this.channel, blockIdentifier);
     throw new LibraryError('Unsupported method for RPC version');
   }
 

@@ -21,8 +21,6 @@ import {
   RPC_ERROR,
   RpcProviderOptions,
   waitForTransactionOptions,
-  type BlockWithTxHashes,
-  type GasPrices,
 } from '../types';
 import assert from '../utils/assert';
 import { ETransactionType, JRPC, RPCSPEC09 as RPC } from '../types/api';
@@ -546,17 +544,6 @@ export class RpcChannel {
       block_id,
       ...flags,
     });
-  }
-
-  public async getGasPrices(
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<GasPrices> {
-    const bl = (await this.getBlockWithTxHashes(blockIdentifier)) as BlockWithTxHashes;
-    return {
-      l1DataGasPrice: BigInt(bl.l1_data_gas_price.price_in_fri),
-      l1GasPrice: BigInt(bl.l1_gas_price.price_in_fri),
-      l2GasPrice: BigInt(bl.l2_gas_price.price_in_fri),
-    } as GasPrices;
   }
 
   public async invoke(functionInvocation: Invocation, details: InvocationsDetailsWithNonce) {
