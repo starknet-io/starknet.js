@@ -119,7 +119,7 @@ For a sponsored transaction, use:
 ```typescript
 const myPaymasterRpc = new PaymasterRpc({
   nodeUrl: 'https://sepolia.paymaster.avnu.fi',
-  headers: { 'api-key': process.env.PAYMASTER_API_KEY },
+  headers: { 'x-paymaster-api-key': process.env.PAYMASTER_API_KEY },
 });
 const myAccount = new Account(
   myProvider,
