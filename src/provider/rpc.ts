@@ -44,7 +44,7 @@ import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { getTipStatsFromBlocks, TipAnalysisOptions } from '../utils/modules/tip';
+import { getTipStatsFromBlocks, TipAnalysisOptions, TipEstimate } from './modules/tip';
 import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
 import { ProviderInterface } from './interface';
 import type {
@@ -54,8 +54,8 @@ import type {
   L1_HANDLER_TXN,
   TransactionWithHash,
 } from './types/spec.type';
-import { verifyMessageInStarknet } from '../utils/modules/verifyMessageInStarknet';
-import { getGasPrices } from '../utils/modules';
+import { verifyMessageInStarknet } from './modules/verifyMessageInStarknet';
+import { getGasPrices } from './modules';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -590,7 +590,10 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getCompiledCasm(classHash);
   }
 
-  public async getEstimateTip(blockIdentifier?: BlockIdentifier, options: TipAnalysisOptions = {}) {
+  public async getEstimateTip(
+    blockIdentifier?: BlockIdentifier,
+    options: TipAnalysisOptions = {}
+  ): Promise<TipEstimate> {
     return getTipStatsFromBlocks(this, blockIdentifier, options);
   }
 }

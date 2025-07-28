@@ -65,7 +65,11 @@ const compiledAccount = json.parse(
   fs.readFileSync('./__mocks__/cairo/account/accountOZ080.json').toString('ascii')
 );
 const accountAddress = '0x....'; // account of sender
-const contractAccount = new Contract(compiledAccount.abi, accountAddress, myProvider);
+const contractAccount = new Contract({
+  abi: compiledAccount.abi,
+  address: accountAddress,
+  providerOrAccount: myProvider,
+});
 const pubKey3 = await contractAccount.call('getPublicKey');
 ```
 
@@ -142,7 +146,11 @@ const myTypedData: TypedData = {
   },
 };
 
-const account0 = new Account(myProvider, address, privateKey);
+const account0 = new Account({
+  provider: myProvider,
+  address: address,
+  signer: privateKey,
+});
 const fullPublicKey = stark.getFullPublicKey(privateKey);
 
 const msgHash = await account0.hashMessage(myTypedData);
@@ -242,7 +250,11 @@ const fullPubK = await myLedgerSigner.getFullPubKey();
 // ...
 // deploy here an account related to this public key
 // ...
-const ledgerAccount = new Account(myProvider, ledger0addr, myLedgerSigner);
+const ledgerAccount = new Account({
+  provider: myProvider,
+  address: ledger0addr,
+  signer: myLedgerSigner,
+});
 ```
 
 :::warning important

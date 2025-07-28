@@ -28,43 +28,7 @@ The result is in `suggestedMaxFee`, of type BigInt. The corresponding unit for t
 More details about the complex subject of Starknet fees in [Starknet docs](https://docs.starknet.io/architecture-and-concepts/network-architecture/fee-mechanism/)
 :::
 
-The complete answer for an RPC 0.7 "legacy" transaction:
-
-```typescript
-{
-  overall_fee: 123900000000000n,
-  unit: 'WEI',
-  l1_gas_consumed: 1047n,
-  l1_gas_price: 100000000000n,
-  l1_data_gas_consumed: 192n,
-  l1_data_gas_price: 100000000000n,
-  suggestedMaxFee: 185850000000000n,
-  resourceBounds: {
-    l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-    l1_gas: { max_amount: '0x742', max_price_per_unit: '0x22ecb25c00' }
-  }
-}
-```
-
-The complete answer for an RPC 0.7 V3 transaction:
-
-```typescript
-{
-  overall_fee: 123900000000000n,
-  unit: 'FRI',
-  l1_gas_consumed: 1047n,
-  l1_gas_price: 100000000000n,
-  l1_data_gas_consumed: 192n,
-  l1_data_gas_price: 100000000000n,
-  suggestedMaxFee: 185850000000000n,
-  resourceBounds: {
-    l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-    l1_gas: { max_amount: '0x742', max_price_per_unit: '0x22ecb25c00' }
-  }
-}
-```
-
-The complete answer for an RPC 0.8 V3 transaction:
+The complete answer for a V3 transaction:
 
 ```typescript
 {
@@ -131,22 +95,19 @@ The result is in `suggestedMaxFee`, of type BigInt. Units and full response form
 In some cases, a transaction can fail due to the fees being underestimated. You can increase these limits by setting a global config setting (default values are 50):
 
 ```typescript
-config.set('feeMarginPercentage', {
-  bounds: {
-    l1_gas: {
-      max_amount: 75,
-      max_price_per_unit: 60,
-    },
-    l2_gas: {
-      max_amount: 100,
-      max_price_per_unit: 60,
-    },
-    l1_data_gas: {
-      max_amount: 80,
-      max_price_per_unit: 70,
-    },
+config.set('resourceBoundsOverhead', {
+  l1_gas: {
+    max_amount: 75,
+    max_price_per_unit: 60,
   },
-  maxFee: 22,
+  l2_gas: {
+    max_amount: 100,
+    max_price_per_unit: 60,
+  },
+  l1_data_gas: {
+    max_amount: 80,
+    max_price_per_unit: 70,
+  },
 });
 ```
 
@@ -154,28 +115,26 @@ config.set('feeMarginPercentage', {
 
 - Values are additional percentage: 75 means 75% additional fees.
 - To get back to normal values: set all values to 50.
+- In v8, `feeMarginPercentage` has been replaced with `resourceBoundsOverhead`.
 
 :::
 
 Example for declaring, with 80% additional fees:
 
 ```typescript
-config.set('feeMarginPercentage', {
-  bounds: {
-    l1_gas: {
-      max_amount: 80,
-      max_price_per_unit: 80,
-    },
-    l2_gas: {
-      max_amount: 80,
-      max_price_per_unit: 80,
-    },
-    l1_data_gas: {
-      max_amount: 80,
-      max_price_per_unit: 80,
-    },
+config.set('resourceBoundsOverhead', {
+  l1_gas: {
+    max_amount: 80,
+    max_price_per_unit: 80,
   },
-  maxFee: 80,
+  l2_gas: {
+    max_amount: 80,
+    max_price_per_unit: 80,
+  },
+  l1_data_gas: {
+    max_amount: 80,
+    max_price_per_unit: 80,
+  },
 });
 const declareResponse = await account0.declareIfNot({ contract: testSierra, casm: testCasm });
 ```
