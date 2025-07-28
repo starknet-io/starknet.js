@@ -1,4 +1,3 @@
-import { OutsideCallV2, OutsideCallV1 } from '@starknet-io/starknet-types-08';
 import { NetworkName, PAYMASTER_RPC_NODES } from '../global/constants';
 import { logger } from '../global/logger';
 import { BigNumberish, PaymasterDetails, PreparedTransaction, Call } from '../types';
@@ -7,6 +6,7 @@ import { CallData } from './calldata';
 import { toOutsideCallV2 } from './outsideExecution';
 import { getSelectorFromName } from './hash';
 import { toBigInt } from './num';
+import type { OutsideCallV1, OutsideCallV2 } from '../types/api';
 
 /**
  * Return randomly select available public paymaster node url

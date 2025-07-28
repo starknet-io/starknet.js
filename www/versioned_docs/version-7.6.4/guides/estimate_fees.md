@@ -154,7 +154,8 @@ config.set('feeMarginPercentage', {
 
 - Values are additional percentage: 75 means 75% additional fees.
 - To get back to normal values: set all values to 50.
-  :::
+
+:::
 
 Example for declaring, with 80% additional fees:
 

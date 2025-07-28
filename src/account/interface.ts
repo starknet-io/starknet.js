@@ -1,6 +1,6 @@
-import { ProviderInterface } from '../provider';
-import { SignerInterface } from '../signer';
-import {
+import { ProviderInterface } from '../provider/interface';
+import type { SignerInterface } from '../signer';
+import type {
   AllowArray,
   BigNumberish,
   BlockIdentifier,
@@ -13,11 +13,9 @@ import {
   DeployAccountContractPayload,
   DeployContractResponse,
   DeployContractUDCResponse,
-  EstimateFee,
-  EstimateFeeAction,
   EstimateFeeDetails,
-  EstimateFeeResponse,
-  EstimateFeeResponseBulk,
+  EstimateFeeResponseBulkOverhead,
+  EstimateFeeResponseOverhead,
   Invocations,
   InvocationsDetails,
   InvokeFunctionResponse,
@@ -28,10 +26,10 @@ import {
   PreparedTransaction,
   Signature,
   SimulateTransactionDetails,
-  SimulateTransactionResponse,
+  SimulateTransactionOverheadResponse,
   TypedData,
   UniversalDeployerContractPayload,
-} from '../types';
+} from '../types/index';
 
 export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
@@ -64,7 +62,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateInvokeFee(
     calls: AllowArray<Call>,
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Estimate Fee for executing a DECLARE transaction on starknet
@@ -91,7 +89,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateDeclareFee(
     contractPayload: DeclareContractPayload,
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Estimate Fee for executing a DEPLOY_ACCOUNT transaction on starknet
@@ -117,11 +115,11 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateAccountDeployFee(
     contractPayload: DeployAccountContractPayload,
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
-   * Estimate Fee for executing a UDC DEPLOY transaction on starknet
-   * This is different from the normal DEPLOY transaction as it goes through the Universal Deployer Contract (UDC)
+   * Estimate Fee for executing a Deployer DEPLOY transaction on starknet
+   * This is different from the normal DEPLOY transaction as it goes through a Deployer Contract
 
   * @param deployContractPayload array or singular
    * - classHash: computed class hash of compiled contract
@@ -143,7 +141,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateDeployFee(
     deployContractPayload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<EstimateFeeResponseOverhead>;
 
   /**
    * Estimate Fee for executing a list of transactions on starknet
@@ -169,19 +167,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateFeeBulk(
     invocations: Invocations,
     details?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponseBulk>;
-
-  /**
-   * Gets Suggested Max Fee based on the transaction type
-   *
-   * @param  {EstimateFeeAction} estimateFeeAction
-   * @param  {EstimateFeeDetails} details
-   * @returns EstimateFee (...response, resourceBounds, suggestedMaxFee)
-   */
-  public abstract getSuggestedFee(
-    estimateFeeAction: EstimateFeeAction,
-    details: EstimateFeeDetails
-  ): Promise<EstimateFee>;
+  ): Promise<EstimateFeeResponseBulkOverhead>;
 
   /**
    * Simulates an array of transaction and returns an array of transaction trace and estimated fee.
@@ -195,7 +181,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract simulateTransaction(
     invocations: Invocations,
     details?: SimulateTransactionDetails
-  ): Promise<SimulateTransactionResponse>;
+  ): Promise<SimulateTransactionOverheadResponse>;
 
   /**
    * Invoke execute function in account contract
@@ -300,7 +286,7 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<DeclareContractResponse>;
 
   /**
-   * Deploys a declared contract to starknet - using Universal Deployer Contract (UDC)
+   * Deploys a declared contract to starknet - using a Deployer Contract
    * support multicall
    *
    * @param payload -
@@ -320,7 +306,7 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<MultiDeployContractResponse>;
 
   /**
-   * Simplify deploy simulating old DeployContract with same response + UDC specific response
+   * Simplify deploy simulating old DeployContract with same response + Deployer specific response
    * Internal wait for L2 transaction, support multicall
    *
    * @param payload -
@@ -347,7 +333,7 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<DeployContractUDCResponse>;
 
   /**
-   * Declares and Deploy a given compiled contract (json) to starknet using UDC
+   * Declares and Deploy a given compiled contract (json) to starknet using a Deployer.
    * Internal wait for L2 transaction, do not support multicall
    * Method will pass even if contract is already declared (internal using DeclareIfNot)
    *

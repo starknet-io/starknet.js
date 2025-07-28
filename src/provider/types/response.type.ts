@@ -5,12 +5,13 @@
 
 import {
   BLOCK_WITH_TX_HASHES,
-  BlockWithTxHashes,
   IsReverted,
   IsSucceeded,
   IsType,
-  PENDING_BLOCK_WITH_TX_HASHES,
-} from '@starknet-io/starknet-types-08';
+  RPCSPEC08,
+  TransactionReceipt,
+} from '../../types/api';
+
 import { CompiledSierra, LegacyContractClass } from '../../types/lib';
 import {
   FELT,
@@ -20,16 +21,16 @@ import {
   STATE_UPDATE,
   DeclaredTransaction,
   InvokedTransaction,
-  ResourceBounds,
-  SimulateTransaction,
   TransactionWithHash,
   Simplify,
+  ResourceBoundsBN,
+  TransactionTrace,
+  BlockWithTxHashes,
+  PRE_CONFIRMED_STATE_UPDATE,
 } from './spec.type';
 
-import { TransactionReceipt } from '../../types/api';
-
 export type Block = Simplify<BLOCK_WITH_TX_HASHES>;
-export type PendingBlock = Simplify<PENDING_BLOCK_WITH_TX_HASHES>;
+export type PendingBlock = Simplify<RPCSPEC08.PENDING_BLOCK_WITH_TX_HASHES>;
 export type GetBlockResponse = Simplify<BlockWithTxHashes>;
 
 export type GetTxReceiptResponseWithoutHelper = TransactionReceipt;
@@ -44,22 +45,21 @@ export type L1HandlerTransactionReceiptResponse = IsType<TransactionReceipt, 'L1
 
 export type GetTransactionResponse = TransactionWithHash;
 
-export type EstimateFeeResponse = {
+/**
+ * Estimate fee response with overhead
+ */
+export type EstimateFeeResponseOverhead = {
+  resourceBounds: ResourceBoundsBN;
   overall_fee: bigint;
   unit: PRICE_UNIT;
-
-  l1_gas_consumed: bigint;
-  l1_gas_price: bigint;
-  l2_gas_consumed: bigint | undefined;
-  l2_gas_price: bigint | undefined;
-  l1_data_gas_consumed: bigint;
-  l1_data_gas_price: bigint;
-
-  suggestedMaxFee: bigint;
-  resourceBounds: ResourceBounds;
 };
 
-export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
+/**
+ * same type as EstimateFeeResponseOverhead but without overhead
+ */
+export type EstimateFeeResponse = EstimateFeeResponseOverhead;
+
+export type EstimateFeeResponseBulkOverhead = Array<EstimateFeeResponseOverhead>;
 
 export type InvokeFunctionResponse = InvokedTransaction;
 
@@ -74,15 +74,18 @@ export type Nonce = string;
 // export type { SIMULATION_FLAG };
 export type SimulationFlags = Array<SIMULATION_FLAG>;
 
-export type SimulatedTransaction = SimulateTransaction & {
-  suggestedMaxFee: bigint;
-  resourceBounds: ResourceBounds;
-};
+export type SimulateTransactionOverhead = {
+  transaction_trace: TransactionTrace;
+} & EstimateFeeResponseOverhead;
 
-export type SimulateTransactionResponse = SimulatedTransaction[];
+export type SimulateTransactionOverheadResponse = SimulateTransactionOverhead[];
 
-export type StateUpdateResponse = StateUpdate | PendingStateUpdate;
+export type PreConfirmedStateUpdate = PRE_CONFIRMED_STATE_UPDATE;
 export type StateUpdate = STATE_UPDATE;
+export type StateUpdateResponse = StateUpdate | PreConfirmedStateUpdate;
+/**
+ * PreConfirmedStateUpdate but left old name
+ */
 export type PendingStateUpdate = PENDING_STATE_UPDATE;
 
 /**

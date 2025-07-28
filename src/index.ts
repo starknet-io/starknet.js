@@ -1,17 +1,15 @@
 /**
- * Main
+ * Main Classes
  */
 export * from './wallet';
 export * from './account';
+export * from './deployer';
 export * from './contract';
 export * from './paymaster';
 export * from './provider';
 export * from './signer';
 export * from './channel';
-
-// TODO: decide on final export style
 export * from './types';
-export * as types from './types';
 
 /**
  * Utils

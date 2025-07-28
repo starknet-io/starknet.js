@@ -13,7 +13,7 @@ import {
   Calldata,
   CompiledSierra,
   Contract,
-  DeclareDeployUDCResponse,
+  ParsedEvents,
   ProviderInterface,
   RawArgsArray,
   RawArgsObject,
@@ -23,10 +23,10 @@ import {
   num,
   selector,
   shortString,
-  types,
 } from '../src';
-import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
+import { contracts } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
+import { createTestProvider, getTestAccount } from './config/fixturesInit';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
@@ -42,33 +42,28 @@ describe('Cairo 1', () => {
   });
 
   describe('API &  Contract interactions', () => {
-    let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
-    let dd2: DeclareDeployUDCResponse;
     let cairo210Contract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
-      dd = await account.declareAndDeploy({
+      // dd
+      cairo1Contract = await Contract.factory({
         contract: contracts.C1v2.sierra,
         casm: contracts.C1v2.casm,
+        account,
       });
-      cairo1Contract = new Contract(contracts.C1v2.sierra.abi, dd.deploy.contract_address, account);
 
-      dd2 = await account.declareAndDeploy({
+      // dd2
+      cairo210Contract = await Contract.factory({
+        abi: contracts.C210.sierra.abi, // optional
         contract: contracts.C210.sierra,
         casm: contracts.C210.casm,
+        account,
       });
-      cairo210Contract = new Contract(
-        contracts.C210.sierra.abi,
-        dd2.deploy.contract_address,
-        account
-      );
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
-      expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
-      expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
       expect(cairo1Contract).toBeInstanceOf(Contract);
       expect(cairo210Contract).toBeInstanceOf(Contract);
     });
@@ -82,8 +77,8 @@ describe('Cairo 1', () => {
     });
 
     xtest('validate TS for redeclare - skip testing', async () => {
-      const cc0 = await account.getClassAt(dd.deploy.address);
-      const cc0_1 = await account.getClassByHash(toHex(dd.declare.class_hash));
+      const cc0 = await account.getClassAt(cairo1Contract.address);
+      const cc0_1 = await account.getClassByHash(toHex(cairo1Contract.classHash!));
 
       await account.declare({
         contract: cc0 as CompiledSierra,
@@ -98,18 +93,18 @@ describe('Cairo 1', () => {
 
     test('deployContract Cairo1', async () => {
       const deploy = await account.deployContract({
-        classHash: dd.deploy.classHash,
+        classHash: cairo1Contract.classHash!,
       });
       expect(deploy).toHaveProperty('address');
     });
 
     test('GetClassByHash', async () => {
-      const classResponse = await provider.getClassByHash(dd.deploy.classHash);
+      const classResponse = await provider.getClassByHash(cairo1Contract.classHash!);
       expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
 
     test('GetClassAt', async () => {
-      const classResponse = await provider.getClassAt(dd.deploy.contract_address);
+      const classResponse = await provider.getClassAt(cairo1Contract.address);
       expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
 
@@ -796,7 +791,11 @@ describe('Cairo 1', () => {
         casm: contracts.C1v2.casm,
       });
 
-      eventContract = new Contract(contracts.C1v2.sierra.abi, deploy.contract_address!, account);
+      eventContract = new Contract({
+        abi: contracts.C1v2.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('parse event returning a regular struct', async () => {
@@ -808,7 +807,7 @@ describe('Cairo 1', () => {
         simpleDataStruct,
         simpleDataArray
       );
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
@@ -830,7 +829,7 @@ describe('Cairo 1', () => {
         nestedKeyStruct,
         nestedDataStruct
       );
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventNested': {
             nestedKeyStruct,
@@ -845,7 +844,7 @@ describe('Cairo 1', () => {
 
     test('parse tx returning multiple similar events', async () => {
       const anotherKeyVariable = 100n;
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
@@ -890,7 +889,7 @@ describe('Cairo 1', () => {
       expect(myEvents[1]).toMatchEventStructure(shouldBe[1]);
     });
     test('parse tx returning multiple different events', async () => {
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,

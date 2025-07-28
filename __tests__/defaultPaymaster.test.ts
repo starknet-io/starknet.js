@@ -1,11 +1,12 @@
-import { OutsideExecutionTypedData } from '@starknet-io/starknet-types-08';
 import {
-  RpcError,
   PaymasterRpc,
-  ExecutionParameters,
-  UserTransaction,
-  ExecutableUserTransaction,
+  RpcError,
+  RPC,
+  type ExecutableUserTransaction,
+  type ExecutionParameters,
+  type UserTransaction,
 } from '../src';
+
 import fetchMock from '../src/utils/connect/fetch';
 import { signatureToHexArray } from '../src/utils/stark';
 
@@ -158,7 +159,7 @@ describe('PaymasterRpc', () => {
       // Given
       const client = new PaymasterRpc();
       const mockSignature = ['0x1', '0x2'];
-      const mockTypedData: OutsideExecutionTypedData = {
+      const mockTypedData: RPC.OutsideExecutionTypedData = {
         domain: {},
         types: {},
         primaryType: '',

@@ -2,6 +2,7 @@ import { config } from '../global/config';
 import { NetworkName, RPC_DEFAULT_NODES, SupportedRpcVersion } from '../global/constants';
 import { logger } from '../global/logger';
 import {
+  Abi,
   BlockIdentifier,
   BlockTag,
   CompiledContract,
@@ -70,6 +71,7 @@ export function createSierraContractClass(contract: CompiledSierra): SierraContr
 
 /**
  * Create a compressed contract from a given compiled Cairo 0 & 1 contract or a string.
+ * Parse contract string to json and compile contract.sierra_program or contract.program property
  * @param {CompiledContract | string} contract - Compiled Cairo 0 or Cairo 1 contract, or string
  * @returns {ContractClass} Cairo 0 or Cairo 1 compressed contract
  * @example
@@ -99,7 +101,17 @@ export function parseContract(contract: CompiledContract | string): ContractClas
     } as LegacyContractClass;
   }
 
-  return createSierraContractClass(parsedContract as CompiledSierra);
+  return createSierraContractClass(parsedContract as CompiledSierra) as SierraContractClass;
+}
+
+// TODO: Check if something like this exist
+/**
+ * Extract the ABI from a given ContractClass.
+ * @param contract ContractClass
+ * @returns Abi
+ */
+export function extractAbi(contract: ContractClass): Abi {
+  return isString(contract.abi) ? parse(contract.abi) : contract.abi;
 }
 
 /**
@@ -202,7 +214,7 @@ export class Block {
     } else if (isNumber(__identifier)) {
       this.number = __identifier;
     } else {
-      this.tag = BlockTag.PENDING;
+      this.tag = BlockTag.LATEST;
     }
 
     if (isNumber(this.number) && this.number < 0) {
