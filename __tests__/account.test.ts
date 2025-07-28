@@ -17,7 +17,13 @@ import {
   Deployer,
   RPC,
 } from '../src';
-import { C1v2ClassHash, contracts, describeIfDevnet, erc20ClassHash } from './config/fixtures';
+import {
+  C1v2ClassHash,
+  contracts,
+  describeIfDevnet,
+  describeIfNotDevnet,
+  erc20ClassHash,
+} from './config/fixtures';
 import {
   createTestProvider,
   getTestAccount,
@@ -470,26 +476,6 @@ describe('deploy and test Account', () => {
       expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
       expect(hexToDecimalString(declareTx.class_hash)).toEqual(hexToDecimalString(erc20ClassHash));
     });
-
-    test('UDC DeployContract - on PRE_CONFIRMED', async () => {
-      const deployResponse = await account.deployContract(
-        {
-          classHash: erc20ClassHash,
-          constructorCalldata: erc20Constructor,
-        },
-        {
-          successStates: [
-            RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
-            RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
-            RPC.ETransactionFinalityStatus.PRE_CONFIRMED,
-          ],
-        }
-      );
-      // TODO: expect based on Sepolia test where UDC events are not Filled with data on pre-confirmed, change if behavior changes
-      expect(deployResponse.address).toBeUndefined();
-      // expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
-    });
-
     test('UDC DeployContract - on default ACCEPTED_ON_L2', async () => {
       const deployResponse = await account.deployContract({
         classHash: erc20ClassHash,
@@ -835,6 +821,27 @@ describe('deploy and test Account', () => {
         constructorCalldata: erc20Constructor,
       });
       expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
+    });
+  });
+
+  describeIfNotDevnet('Not Devnet', () => {
+    test('UDC DeployContract - on PRE_CONFIRMED', async () => {
+      const deployResponse = await account.deployContract(
+        {
+          classHash: erc20ClassHash,
+          constructorCalldata: erc20Constructor,
+        },
+        {
+          successStates: [
+            RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
+            RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
+            RPC.ETransactionFinalityStatus.PRE_CONFIRMED,
+          ],
+        }
+      );
+      // TODO: expect based on Sepolia test where UDC events are not Filled with data on pre-confirmed, change if behavior changes
+      expect(deployResponse.address).toBeUndefined();
+      // expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
     });
   });
 });
