@@ -76,7 +76,11 @@ const resp = await myWalletAccount.execute(claimCall);
 You can connect a `WalletAccount` with a [`Contract`](../API/classes/Contract) instance. All reading actions are performed by the provider of the `WalletAccount`, and all writing actions (that need a signature) are performed by the browser wallet.
 
 ```typescript
-const lendContract = new Contract(contract.abi, contractAddress, myWalletAccount);
+const lendContract = new Contract({
+  abi: contract.abi,
+  address: contractAddress,
+  providerOrAccount: myWalletAccount,
+});
 const qty = await lendContract.get_available_asset(addr); // use of the WalletAccount provider
 const resp = await lendContract.process_lend_asset(addr); // use of the browser wallet
 ```

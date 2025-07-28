@@ -39,7 +39,7 @@ import type {
   Signature,
   TypedData,
 } from '../types';
-import { TipAnalysisOptions, TipEstimate } from '../utils/modules/tip';
+import { TipAnalysisOptions, TipEstimate } from './modules/tip';
 import { RPCSPEC08, RPCSPEC09 } from '../types/api';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 
