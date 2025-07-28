@@ -87,6 +87,7 @@ import { defaultPaymaster, type PaymasterInterface, PaymasterRpc } from '../paym
 import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
 import { defaultDeployer, Deployer } from '../deployer';
+import type { TipType } from '../provider/modules/tip';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -101,7 +102,7 @@ export class Account extends Provider implements AccountInterface {
 
   public deployer: Deployer;
 
-  public defaultTipType: string;
+  public defaultTipType: TipType;
 
   constructor(options: AccountOptions) {
     const {
@@ -691,7 +692,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<UniversalDetails & { tip: BigNumberish }> {
     return {
       ...details,
-      tip: details.tip ?? (await this.getEstimateTip()).recommendedTip,
+      tip: details.tip ?? (await this.getEstimateTip())[this.defaultTipType],
     };
   }
 

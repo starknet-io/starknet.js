@@ -41,9 +41,16 @@ Choose the method that best fits your use case:
 - **Contract.factory()**: Best for most use cases, especially when deploying from existing class hashes
 - **Account methods**: Use when you need maximum control over the deployment process
 
-## Using Contract.factory Static Method
+## Using Contract.factory() Static Method
 
-The `Contract.factory()` static method provides a streamlined approach for both declaring and deploying contracts, or deploying from existing class hashes. It returns a ready-to-use Contract instance.
+The `Contract.factory()` static method provides a streamlined approach for both declaring and deploying contracts, or deploying from existing class hashes. It handles the entire deployment lifecycle: compiling constructor calldata, declaring the contract class, deploying an instance, and returning a ready-to-use Contract object.
+
+This approach is useful when you need to:
+
+- Deploy contracts with automatic declaration and deployment
+- Deploy from existing class hashes with automatic ABI fetching
+- Ensure constructor argument validation against the contract ABI
+- Get a ready-to-use Contract instance immediately after deployment
 
 ### Declare and Deploy Mode
 
@@ -133,6 +140,22 @@ const myContract = await Contract.factory({
 });
 ```
 
+The factory method supports all deployment parameters:
+
+```typescript
+const myContract = await Contract.factory({
+  classHash: '0x1234...',
+  abi: contractAbi, // Optional: will fetch from network if not provided
+  account: myAccount,
+  constructorCalldata: {
+    // Your constructor parameters
+  },
+  salt: '0xabcd...', // Optional: custom salt for address generation
+  unique: false, // Optional: set to false for predictable addresses
+  parseRequest: true, // Optional: enable/disable request parsing (default: true)
+});
+```
+
 ### Error Handling
 
 ```typescript
@@ -142,11 +165,14 @@ try {
     account: myAccount,
     constructorCalldata: constructorParams,
   });
+  console.log('Deployed at:', myContract.address);
 } catch (error) {
   if (error.message.includes('Class hash not declared')) {
     console.error('Class hash does not exist on the network');
   } else if (error.message.includes('ABI not found')) {
     console.error('Could not fetch ABI from network, provide it manually');
+  } else if (error.message.includes('Insufficient funds')) {
+    console.error('Account has insufficient funds for deployment');
   } else {
     console.error('Deployment failed:', error.message);
   }
@@ -180,15 +206,8 @@ import {
   type Calldata,
 } from 'starknet';
 
-// 1. Setup Provider & Account
-const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-const myAccount = new Account(
-  myProvider,
-  process.env.ACCOUNT_ADDRESS!, // Your account address
-  process.env.PRIVATE_KEY! // Your private key
-);
-
-// 2. Load Compiled Contract
+// Assuming provider and account are already set up (see Account guide)
+// Load compiled contract files
 const compiledSierra = json.parse(
   fs.readFileSync('./compiledContracts/test.contract_class.json').toString('ascii')
 );
@@ -203,7 +222,11 @@ const response = await myAccount.declareAndDeploy({
 });
 
 // 4. Create Contract Instance
-const myContract = new Contract(compiledSierra.abi, response.deploy.contract_address, myProvider);
+const myContract = new Contract({
+  abi: compiledSierra.abi,
+  address: response.deploy.contract_address,
+  providerOrAccount: myProvider,
+});
 
 console.log('Contract Class Hash:', response.declare.class_hash);
 console.log('Contract Address:', myContract.address);
@@ -229,7 +252,11 @@ await myProvider.waitForTransaction(deployResponse.transaction_hash);
 const { abi } = await myProvider.getClassByHash(existingClassHash);
 if (!abi) throw new Error('Contract ABI not found');
 
-const myContract = new Contract(abi, deployResponse.contract_address, myProvider);
+const myContract = new Contract({
+  abi,
+  address: deployResponse.contract_address,
+  providerOrAccount: myProvider,
+});
 ```
 
 :::tip Simplified Alternative

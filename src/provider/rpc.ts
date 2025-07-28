@@ -14,6 +14,7 @@ import {
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  type GasPrices,
   GetBlockResponse,
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
@@ -43,7 +44,7 @@ import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { getTipStatsFromBlocks, TipAnalysisOptions } from '../utils/modules/tip';
+import { getTipStatsFromBlocks, TipAnalysisOptions, TipEstimate } from './modules/tip';
 import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
 import { ProviderInterface } from './interface';
 import type {
@@ -53,7 +54,8 @@ import type {
   L1_HANDLER_TXN,
   TransactionWithHash,
 } from './types/spec.type';
-import { verifyMessageInStarknet } from '../utils/modules/verifyMessageInStarknet';
+import { verifyMessageInStarknet } from './modules/verifyMessageInStarknet';
+import { getGasPrices } from './modules';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -210,6 +212,24 @@ export class RpcProvider implements ProviderInterface {
     return this.channel
       .getBlockWithTxHashes(blockIdentifier)
       .then(this.responseParser.parseL1GasPriceResponse);
+  }
+
+  /**
+   * Get the gas prices related to a block.
+   * @param {BlockIdentifier} [blockIdentifier = this.identifier] - Optional. Can be 'pending', 'latest' or a block number (an integer type).
+   * @returns {Promise<GasPrices>} an object with l1DataGasPrice, l1GasPrice, l2GasPrice properties (all bigint type).
+   * @example
+   * ```ts
+   * const result = await myProvider.getGasPrices();
+   * // result = { l1DataGasPrice: 3039n, l1GasPrice: 55590341542890n, l2GasPrice: 8441845008n }
+   * ```
+   */
+  public async getGasPrices(
+    blockIdentifier: BlockIdentifier = this.channel.blockIdentifier
+  ): Promise<GasPrices> {
+    if (this.channel instanceof RPC09.RpcChannel)
+      return getGasPrices(this.channel, blockIdentifier);
+    throw new LibraryError('Unsupported method for RPC version');
   }
 
   public async getL1MessageHash(l2TxHash: BigNumberish): Promise<string> {
@@ -555,7 +575,10 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getCompiledCasm(classHash);
   }
 
-  public async getEstimateTip(blockIdentifier?: BlockIdentifier, options: TipAnalysisOptions = {}) {
+  public async getEstimateTip(
+    blockIdentifier?: BlockIdentifier,
+    options: TipAnalysisOptions = {}
+  ): Promise<TipEstimate> {
     return getTipStatsFromBlocks(this, blockIdentifier, options);
   }
 }

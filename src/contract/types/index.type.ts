@@ -59,7 +59,7 @@ export type ArgsOrCalldataWithOptions =
   | [...Calldata]
   | [...Calldata, ContractOptions];
 
-type CommonContractOptions = {
+export type CommonContractOptions = {
   /**
    * compile and validate arguments
    * @default true
@@ -86,7 +86,6 @@ export type ContractOptions = {
    * Class hash of the contract
    */
   classHash?: string;
-  deployTransactionHash?: string;
 } & CommonContractOptions;
 
 export type ExecuteOptions = Pick<CommonContractOptions, 'parseRequest'> & {
