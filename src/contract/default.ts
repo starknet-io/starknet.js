@@ -213,59 +213,6 @@ export class Contract implements ContractInterface {
     }
   }
 
-  /**
-   * Factory method to declare and deploy a contract creating a new Contract instance
-   *
-   * It handles the entire lifecycle: compiles constructor calldata, declares the contract class,
-   * deploys an instance, and returns a ready-to-use Contract object.
-   *
-   * @param params - Factory parameters containing Contract Class details and deployment options
-   * @returns Promise that resolves to a deployed Contract instance with address and transaction hash
-   * @throws Error if deployment fails or contract_address is not returned
-   * @example
-   * ```typescript
-   * // Deploy an ERC20 contract
-   * const contract = await Contract.factory({
-   *   compiledContract: erc20CompiledContract,
-   *   account: myAccount,
-   *   casm: erc20Casm,
-   *   constructorArguments: {
-   *     name: 'MyToken',
-   *     symbol: 'MTK',
-   *     decimals: 18,
-   *     initial_supply: { low: 1000000, high: 0 },
-   *     recipient: myAccount.address
-   *   }
-   * });
-   *
-   * console.log('Contract deployed at:', contract.address);
-   * ```\
-   */
-  static async factory(params: FactoryParams, details: UniversalDetails = {}): Promise<Contract> {
-    const contract = parseContract(params.contract);
-    const { account, parseRequest = true } = params;
-    const abi = params.abi ? params.abi : extractAbi(contract);
-
-    const {
-      declare: { class_hash },
-      deploy: { contract_address },
-    } = await account.declareAndDeploy(
-      {
-        ...params,
-        abi: parseRequest ? abi : undefined,
-      },
-      details
-    );
-    assert(Boolean(contract_address), 'Deployment of the contract failed');
-
-    return new Contract({
-      abi,
-      address: contract_address,
-      providerOrAccount: account,
-      classHash: class_hash.toString(),
-    });
-  }
-
   public async isDeployed(): Promise<Contract> {
     try {
       await this.providerOrAccount.getClassHashAt(this.address);
@@ -431,5 +378,58 @@ export class Contract implements ContractInterface {
 
   public typedv2<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV2<TAbi> {
     return this as unknown as TypedContractV2<typeof tAbi>;
+  }
+
+  /**
+   * Factory method to declare and deploy a contract creating a new Contract instance
+   *
+   * It handles the entire lifecycle: compiles constructor calldata, declares the contract class,
+   * deploys an instance, and returns a ready-to-use Contract object.
+   *
+   * @param params - Factory parameters containing Contract Class details and deployment options
+   * @returns Promise that resolves to a deployed Contract instance with address and transaction hash
+   * @throws Error if deployment fails or contract_address is not returned
+   * @example
+   * ```typescript
+   * // Deploy an ERC20 contract
+   * const contract = await Contract.factory({
+   *   compiledContract: erc20CompiledContract,
+   *   account: myAccount,
+   *   casm: erc20Casm,
+   *   constructorArguments: {
+   *     name: 'MyToken',
+   *     symbol: 'MTK',
+   *     decimals: 18,
+   *     initial_supply: { low: 1000000, high: 0 },
+   *     recipient: myAccount.address
+   *   }
+   * });
+   *
+   * console.log('Contract deployed at:', contract.address);
+   * ```\
+   */
+  static async factory(params: FactoryParams, details: UniversalDetails = {}): Promise<Contract> {
+    const contract = parseContract(params.contract);
+    const { account, parseRequest = true } = params;
+    const abi = params.abi ? params.abi : extractAbi(contract);
+
+    const {
+      declare: { class_hash },
+      deploy: { contract_address },
+    } = await account.declareAndDeploy(
+      {
+        ...params,
+        abi: parseRequest ? abi : undefined,
+      },
+      details
+    );
+    assert(Boolean(contract_address), 'Deployment of the contract failed');
+
+    return new Contract({
+      abi,
+      address: contract_address,
+      providerOrAccount: account,
+      classHash: class_hash.toString(),
+    });
   }
 }
