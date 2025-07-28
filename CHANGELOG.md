@@ -1,3 +1,41 @@
+# [8.0.0](https://github.com/starknet-io/starknet.js/compare/v7.6.4...v8.0.0) (2025-07-28)
+
+- feat!: bump version ([0afb3f8](https://github.com/starknet-io/starknet.js/commit/0afb3f8e82b147bcc7084c417826313c1e488053))
+
+### Bug Fixes
+
+- accountInvocationsFactory typing ([a1b1e7f](https://github.com/starknet-io/starknet.js/commit/a1b1e7f60e7abfa43836666a0d801abd33242d7b))
+- change DeclareDeployDCResponse name to DeclareDeployUDCResponse ([6498b8b](https://github.com/starknet-io/starknet.js/commit/6498b8b0bbd137658862422031132073f1c42ac3))
+- devenet ([3b2be9d](https://github.com/starknet-io/starknet.js/commit/3b2be9d46beec4931eb96183c0985e0f607e5713))
+- export Deployer, remove old helper parseUDCEvent, fix some tests imports ([c2d0d55](https://github.com/starknet-io/starknet.js/commit/c2d0d5508239f164ec538707bd19625c70dcb604))
+- factory jsdocs, CompleteDeclareContractPayload type update for Cairo1 ([06920cb](https://github.com/starknet-io/starknet.js/commit/06920cbcb52c70fe01d8161d27d6f0e32be94627))
+- import all types from ./api, remove 07 package ([68ac49c](https://github.com/starknet-io/starknet.js/commit/68ac49ceab4de5738671fd9d05757056a8c980df))
+- improve DeclareContractPayload type ([00835ca](https://github.com/starknet-io/starknet.js/commit/00835caf9406e8a9afd2cde22b43e5d3e2773990))
+- remove helper buildUDCCall ([d299f7b](https://github.com/starknet-io/starknet.js/commit/d299f7b3b175c265b218c2d182762ee38f3aa27a))
+- removed duplicated buildDeployerContractPayload ([e7b728d](https://github.com/starknet-io/starknet.js/commit/e7b728ddc6e5e9e3cffea941f4dcc6e20d8df1ff))
+- sepolia Pathfinder tests PASS ([0c41fc2](https://github.com/starknet-io/starknet.js/commit/0c41fc222c33077c7aad45c79af06852a0db3f69))
+- type problem in tests, due to merge in v8 ([fd49e8a](https://github.com/starknet-io/starknet.js/commit/fd49e8af3051b31f105cc82767248b7832df8130))
+- use new entrypoint on the new UDC ([992ee09](https://github.com/starknet-io/starknet.js/commit/992ee09e08533efb3a12ff91abc0fca2acb552f2))
+
+### Features
+
+- add custom Deployer in Account constructor ([7d62e20](https://github.com/starknet-io/starknet.js/commit/7d62e202c3bab698e383a2128f117675f30f38f7))
+- await Contract.factory() with rawArgs support, del connect(), del contractFactory Class ([c108160](https://github.com/starknet-io/starknet.js/commit/c108160e9b14df7411fa27e8587129d9deaae85e))
+- contract & factory type-sync with Account, fix SierraContractClass abi, buildUDCCall with abi ([20a732a](https://github.com/starknet-io/starknet.js/commit/20a732a47f8312206c1ab946bd99f37c57d92075))
+- customize tip type, cleanup, account interface update, remove types namespace export ([586ffde](https://github.com/starknet-io/starknet.js/commit/586ffdeb9ddcd38da4f93b2f579ad296a349fca5))
+- introduce roc09, made batchClient generic ([c49dd10](https://github.com/starknet-io/starknet.js/commit/c49dd1011ddf1ddec7c1e4403235338ab347b7a0))
+- main modifications without tests ([3407201](https://github.com/starknet-io/starknet.js/commit/34072010ce0a47fe94b80b29288ee129cce2bae1))
+- new channel init ([ffec346](https://github.com/starknet-io/starknet.js/commit/ffec346463f26b3aca8cb77d15d4440a08948e5b))
+- object-base API Account,WalletAccount, backward support methods ([06a3760](https://github.com/starknet-io/starknet.js/commit/06a37606fdde521d862f1608aa4ccf77eebba55c))
+- second swipe update, clean or commented tests ([92185f5](https://github.com/starknet-io/starknet.js/commit/92185f5674f8f1ded18c2aeb3ac273341bb3b117))
+- tip metric, test update ([e665389](https://github.com/starknet-io/starknet.js/commit/e665389c4fe8de6e7b386d6598ecc46b9a3d37c4))
+- tip raw impl in account, tests ([07d4e73](https://github.com/starknet-io/starknet.js/commit/07d4e738ef3e7c6c3c50b9ea3ceb9c3a76310eb4))
+- update packages ([a52db43](https://github.com/starknet-io/starknet.js/commit/a52db430f10dd00e04844933c46e400abb8a2833))
+
+### BREAKING CHANGES
+
+- starknet version 0.14:
+
 # [8.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v8.0.0-beta.3...v8.0.0-beta.4) (2025-07-24)
 
 ### Bug Fixes
