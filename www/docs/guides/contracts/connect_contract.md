@@ -160,7 +160,7 @@ await myContract.set_coordinate({ x: 10, y: 20 });
 
 ### Using withOptions
 
-The `withOptions` method allows you to customize how the next contract interaction is processed. These options only apply to the immediately following operation and don't persist for subsequent calls. For a complete list of available options, see the [ContractOptions API reference](../../API/namespaces/types.md#contractoptions).
+The `withOptions` method allows you to customize how the next contract interaction is processed. These options only apply to the immediately following operation and don't persist for subsequent calls. For a complete list of available options, see the [ContractOptions API reference](../../API/modules#contractoptions).
 
 ```typescript
 // Example: Multiple options for a transaction

@@ -20,7 +20,7 @@ Then you need to select a node. A node is a safe way to connect with the Starkne
   > Main development devnets are Starknet Devnet, Madara, ...
 
 Starknet.js communicates with nodes in accordance to a version of the RPC specification. Most nodes are able to use two RPC versions.  
-For example, this node is compatible with v0.8.0 and v0.9.1, using the following entry points:
+For example, this node is compatible with v0.8.x and v0.9.x, using the following entry points:
 
 - "https://starknet-sepolia.public.blastapi.io/rpc/v0_8"
 - "https://starknet-sepolia.public.blastapi.io/rpc/v0_9"
@@ -37,13 +37,9 @@ The Starknet.js version must align with the RPC version supported by the chosen 
 
 | RPC spec version of your node | Starknet.js version to use    |
 | :---------------------------: | ----------------------------- |
-|            v0.4.0             | Starknet.js v5.21.1           |
-|            v0.5.0             | Starknet.js v5.23.0           |
-|            v0.5.1             | Starknet.js v5.29.0 or v6.1.0 |
-|            v0.6.0             | Starknet.js v6.24.1           |
-|            v0.7.1             | Starknet.js v6.24.1 or v7.x.x |
-|            v0.8.0             | Starknet.js v7.x.x or v8.x.x  |
-|            v0.9.1             | Starknet.js v8.x.x            |
+|            v0.7.x             | Starknet.js v6.24.1 or v7.x.x |
+|            v0.8.x             | Starknet.js v7.x.x or v8.x.x  |
+|            v0.9.x             | Starknet.js v8.x.x            |
 
 :::note
 From version 6.x.x, Starknet.js is compatible with two RPC spec versions.
@@ -63,23 +59,23 @@ import { RpcProvider } from 'starknet';
 
 |                     Node | with public url | with API key |
 | -----------------------: | :-------------: | :----------: |
-|                  Alchemy |       No        |  v0_8, v0_9  |
-|                   Infura |       No        |  v0_8, v0_9  |
-|                    Blast |   v0_8, v0_9    |  v0_8, v0_9  |
-|                     Lava |   v0_8, v0_9    |  v0_8, v0_9  |
-| Local Pathfinder v0.16.2 |   v0_8, v0_9    |     N/A      |
-|       Local Juno v0.14.2 |   v0_8, v0_9    |     N/A      |
+|                  Alchemy |       No        |     v0_7     |
+|                   Infura |       No        |     v0_7     |
+|                    Blast |   v0_7, v0_8    |  v0_7, v0_8  |
+|                     Lava |   v0_7, v0_8    |     v0_8     |
+| Local Pathfinder v0.16.2 |   v0_7, v0_8    |     N/A      |
+|       Local Juno v0.14.2 |   v0_7, v0_8    |     N/A      |
 
 **Sepolia Testnet network:**
 
 |                     Node | with public url | with API key |
 | -----------------------: | :-------------: | :----------: |
-|                  Alchemy |       No        |  v0_8, v0_9  |
-|                   Infura |       No        |  v0_8, v0_9  |
-|                    Blast |   v0_8, v0_9    |      No      |
-|                     Lava |   v0_8, v0_9    |      No      |
-| Local Pathfinder v0.16.2 |   v0_8, v0_9    |     N/A      |
-|       Local Juno v0.14.2 |   v0_8, v0_9    |     N/A      |
+|                  Alchemy |       No        |     v0_7     |
+|                   Infura |       No        |     v0_7     |
+|                    Blast |   v0_7, v0_8    |      No      |
+|                     Lava |   v0_7, v0_8    |      No      |
+| Local Pathfinder v0.16.2 |   v0_7, v0_8    |     N/A      |
+|       Local Juno v0.14.2 |   v0_7, v0_8    |     N/A      |
 
 **Local Starknet Devnet network:**
 

@@ -65,7 +65,11 @@ const compiledAccount = json.parse(
   fs.readFileSync('./__mocks__/cairo/account/accountOZ080.json').toString('ascii')
 );
 const accountAddress = '0x....'; // account of sender
-const contractAccount = new Contract(compiledAccount.abi, accountAddress, myProvider);
+const contractAccount = new Contract({
+  abi: compiledAccount.abi,
+  address: accountAddress,
+  providerOrAccount: myProvider,
+});
 const pubKey3 = await contractAccount.call('getPublicKey');
 ```
 

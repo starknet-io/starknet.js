@@ -57,7 +57,7 @@ export type ArgsOrCalldataWithOptions =
   | [...Calldata]
   | [...Calldata, ContractOptions];
 
-type CommonContractOptions = {
+export type CommonContractOptions = {
   /**
    * compile and validate arguments
    * @default true
