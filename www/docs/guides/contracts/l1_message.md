@@ -161,6 +161,9 @@ const l1ToL2TransactionHash = hash.calculateL2MessageTxHash(
 Before sending a message, estimate the fee that will cover both L1 and L2 costs:
 
 ```typescript
+// Assuming account0 is initialized with the v8 object syntax
+// const account0 = new Account({ provider: myProvider, address: accountAddress, signer: privateKey });
+
 const { suggestedMaxFee } = await account0.estimateInvokeFee({
   contractAddress: L2ContractAddress,
   entrypoint: 'send_message_to_l1',

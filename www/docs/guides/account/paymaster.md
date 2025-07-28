@@ -2,7 +2,7 @@
 sidebar_position: 5
 ---
 
-# Execute calls using paymaster
+# Execute calls using Paymaster
 
 ## Overview
 
@@ -11,7 +11,7 @@ STRK.
 
 :::info
 
-There are 2 types of paymaster transaction:
+There are 2 types of Paymaster transactions:
 
 - `default` when the account is paying the fees.
 - `sponsored` when a dApp wants to cover the gas fees on behalf of users.
@@ -40,7 +40,7 @@ By default, a random service is selected in the list of available services:
 const myPaymasterRpc = new PaymasterRpc({ default: true });
 ```
 
-If you want a specific paymaster service:
+If you want a specific Paymaster service:
 
 ```typescript
 const myPaymasterRpc = new PaymasterRpc({ nodeUrl: 'https://sepolia.paymaster.avnu.fi' });
@@ -52,19 +52,17 @@ Current available services are:
 | :--: | :--------------------------------: | :-------------------------------: |
 | AVNU | https://starknet.paymaster.avnu.fi | https://sepolia.paymaster.avnu.fi |
 
-## Account with paymaster feature
+## Account with Paymaster feature
 
-To instantiate a new account compatible with paymaster:
+To instantiate a new account compatible with Paymaster:
 
 ```typescript
-const myAccount = new Account(
-  myProvider,
-  accountAddress,
-  privateKey,
-  undefined,
-  undefined,
-  myPaymasterRpc
-);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+  paymaster: myPaymasterRpc,
+});
 ```
 
 ## Getting Supported Gas Tokens
@@ -95,7 +93,7 @@ console.log(supported);
 
 ## Sending a Transaction with a Paymaster
 
-To send a [`Call`](../contracts/define_call_message.md#call-or-call) (result of [`myContract.populate()`](../contracts/define_call_message.md#object-with-abi-conformity-check) or `myCallData.compile()`), here for a `default` paymaster transaction:
+To send a [`Call`](../contracts/define_call_message.md#call-or-call) (result of [`myContract.populate()`](../contracts/define_call_message.md#object-with-abi-conformity-check) or `myCallData.compile()`), here for a `default` Paymaster transaction:
 
 ```typescript
 const gasToken = '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080'; // USDC in Testnet
@@ -112,7 +110,7 @@ const res = await myAccount.executePaymasterTransaction(
 const txR = await myProvider.waitForTransaction(res.transaction_hash);
 ```
 
-### Sponsored paymaster
+### Sponsored Paymaster
 
 For a sponsored transaction, use:
 
@@ -121,14 +119,12 @@ const myPaymasterRpc = new PaymasterRpc({
   nodeUrl: 'https://sepolia.paymaster.avnu.fi',
   headers: { 'api-key': process.env.PAYMASTER_API_KEY },
 });
-const myAccount = new Account(
-  myProvider,
-  accountAddress,
-  privateKey,
-  undefined,
-  undefined,
-  myPaymasterRpc
-);
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress,
+  signer: privateKey,
+  paymaster: myPaymasterRpc,
+});
 const feesDetails: PaymasterDetails = {
   feeMode: { mode: 'sponsored' },
 };
@@ -200,7 +196,7 @@ Here are the available methods:
 | `isAvailable()   `           | Returns `true` if the Paymaster service is up and running.                      |
 | ` getSupportedTokens()`      | Returns the accepted tokens and their price in STRK.                            |
 | `buildTransaction(...)     ` | Builds the required data (could include a typed data to sign) for the execution |
-| `executeTransaction(...)`    | Calls the paymasters service to execute the transaction                         |
+| `executeTransaction(...)`    | Calls the Paymaster service to execute the transaction                          |
 
 ## Examples
 

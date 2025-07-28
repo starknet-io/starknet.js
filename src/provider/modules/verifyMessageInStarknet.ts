@@ -1,9 +1,9 @@
-import type { ProviderInterface } from '../../provider';
+import type { ProviderInterface } from '..';
 import type { BigNumberish, Signature, TypedData } from '../../types';
-import { isBigNumberish, toBigInt, toHex } from '../num';
-import { CallData } from '../calldata';
-import { formatSignature } from '../stark';
-import { getMessageHash, validateTypedData } from '../typedData';
+import { isBigNumberish, toBigInt, toHex } from '../../utils/num';
+import { CallData } from '../../utils/calldata';
+import { formatSignature } from '../../utils/stark';
+import { getMessageHash, validateTypedData } from '../../utils/typedData';
 
 /**
  * Verify in Starknet a signature of a TypedData object or of a given hash.

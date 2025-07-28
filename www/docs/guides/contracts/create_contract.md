@@ -27,145 +27,149 @@ This two-phase deployment model is unique to Starknet and offers several advanta
 
 :::
 
-## Using ContractFactory
+## Using Contract.factory() Static Method
 
-ContractFactory provides a more object-oriented way to deploy and manage contracts. It's particularly useful when you need to:
+Starknet.js v8 provides a static `Contract.factory()` method for deploying contracts. This method handles the entire deployment lifecycle: compiling constructor calldata, declaring the contract class, deploying an instance, and returning a ready-to-use Contract object.
 
-- Deploy multiple instances of the same contract
-- Manage contract deployments with consistent configurations
-- Create reusable contract deployment patterns
+This approach is useful when you need to:
 
-### Creating a ContractFactory
+- Deploy contracts with automatic declaration and deployment
+- Ensure constructor argument validation against the contract ABI
+- Get a ready-to-use Contract instance immediately after deployment
+
+### Deploying Contracts with Contract.factory()
 
 ```typescript
-import { ContractFactory } from 'starknet';
+import { Contract } from 'starknet';
 
-const factory = new ContractFactory({
+// Deploy with constructor arguments
+const myContract = await Contract.factory({
   compiledContract: compiledSierra, // Your compiled Sierra contract
-  account: myAccount, // Account that will deploy contracts
-  casm: compiledCasm, // Optional: CASM file for the contract
-  classHash, // Optional: Known class hash
-  contractOptions: {
-    // Optional: Contract options
-    addressSalt: '0x...', // Custom salt for address generation
-    parseRequest: true, // Enable/disable request parsing
-  },
-});
-```
-
-### Deploying Contracts
-
-```typescript
-// 1. Deploy with constructor arguments
-const myContract = await factory.deploy(
-  CallData.compile({
+  account: myAccount, // Account that will deploy the contract
+  casm: compiledCasm, // CASM file for the contract
+  constructorArguments: {
     name: 'MyToken',
     symbol: 'MTK',
     decimals: 18,
     initialSupply: 1000n * 10n ** 18n,
-  })
-);
-
-// 2. Wait for deployment to complete
-await myContract.deployed();
-
-// 3. Start using the contract
-const balance = await myContract.balanceOf(myAccount.address);
-```
-
-### Factory Features
-
-1. **Connect to Different Accounts**
-
-```typescript
-// Switch to a different account
-// NOTE: newFactory references the same object as factory
-const newFactory = factory.connect(newAccount);
-```
-
-2. **Attach to Existing Contracts**
-
-```typescript
-// Create contract instance at known address
-const existingContract = factory.attach(contractAddress);
-```
-
-3. **Reuse for Multiple Deployments**
-
-```typescript
-// Deploy multiple instances with different parameters
-const token1 = await factory.deploy(
-  CallData.compile({ name: 'Token1', symbol: 'TK1', decimals: 18 })
-);
-const token2 = await factory.deploy(
-  CallData.compile({ name: 'Token2', symbol: 'TK2', decimals: 18 })
-);
-```
-
-### Best Practices with ContractFactory
-
-1. **Reuse for Similar Contracts**
-
-```typescript
-// Create a factory for your standard token deployment
-const tokenFactory = new ContractFactory({
-  compiledContract: erc20Sierra,
-  casm: erc20Casm,
-  account,
-  contractOptions: {
-    parseRequest: true, // Enable ABI validation
   },
+  parseRequest: true, // Enable ABI validation (default: true)
 });
 
-// Deploy multiple tokens with consistent configuration
-const tokens = await Promise.all([
-  tokenFactory.deploy(token1Params),
-  tokenFactory.deploy(token2Params),
-  tokenFactory.deploy(token3Params),
-]);
+console.log('Contract deployed at:', myContract.address);
 ```
 
-2. **Handle Deployment Errors**
+### Factory Method Features
+
+```typescript
+// The factory method handles both declare and deploy automatically
+const contract = await Contract.factory({
+  compiledContract: contractCode,
+  account: myAccount,
+  casm: compiledCasm,
+  constructorArguments: { owner: myAccount.address },
+});
+
+// Start using the contract immediately - no need to wait for deployment
+const balance = await contract.balanceOf(myAccount.address);
+```
+
+### Advanced Usage
+
+1. **Constructor Argument Validation**
+
+```typescript
+// With parseRequest: true (default), arguments are validated against ABI
+const contract = await Contract.factory({
+  compiledContract: erc20Contract,
+  account: myAccount,
+  casm: erc20Casm,
+  constructorArguments: {
+    name: 'MyToken',
+    symbol: 'MTK',
+    decimals: 18,
+    initial_supply: cairo.uint256(1000000),
+    recipient: myAccount.address,
+  },
+  parseRequest: true, // Validates arguments against contract ABI
+});
+```
+
+2. **Deploy Multiple Instances**
+
+```typescript
+// Deploy multiple instances of the same contract
+const deployMultipleTokens = async () => {
+  const tokens = [];
+
+  const tokenConfigs = [
+    { name: 'Token1', symbol: 'TK1', decimals: 18 },
+    { name: 'Token2', symbol: 'TK2', decimals: 18 },
+  ];
+
+  for (const tokenConfig of tokenConfigs) {
+    const token = await Contract.factory({
+      compiledContract: erc20Contract,
+      account: myAccount,
+      casm: erc20Casm,
+      constructorArguments: tokenConfig,
+    });
+    tokens.push(token);
+  }
+
+  return tokens;
+};
+```
+
+### Best Practices with Contract.factory()
+
+1. **Handle Deployment Errors**
 
 ```typescript
 try {
-  const myContract = await factory.deploy(constructorParams);
-  await myContract.deployed();
+  const myContract = await Contract.factory({
+    compiledContract: contractCode,
+    account: myAccount,
+    casm: compiledCasm,
+    constructorArguments: constructorParams,
+  });
+  console.log('Deployed at:', myContract.address);
 } catch (error) {
   if (error.message.includes('Class hash not declared')) {
-    // Handle declaration needed
+    console.error('Contract class needs to be declared first');
   } else if (error.message.includes('Insufficient funds')) {
-    // Handle insufficient funds
+    console.error('Account has insufficient funds for deployment');
   } else {
-    // Handle other errors
+    console.error('Deployment failed:', error.message);
   }
 }
 ```
 
-3. **Validate Before Deployment**
+2. **Reuse Compiled Contracts**
 
 ```typescript
-// Create factory with validation
-const factory = new ContractFactory({
-  compiledContract,
-  account,
-  contractOptions: {
-    parseRequest: true, // Enables constructor argument validation
-  },
+// Load contracts once, deploy multiple times
+const erc20Contract = json.parse(fs.readFileSync('./ERC20.sierra.json').toString());
+const erc20Casm = json.parse(fs.readFileSync('./ERC20.casm.json').toString());
+
+// Deploy multiple tokens efficiently
+const token1 = await Contract.factory({
+  compiledContract: erc20Contract,
+  account: myAccount,
+  casm: erc20Casm,
+  constructorArguments: { name: 'Token1', symbol: 'TK1' },
 });
 
-// Deploy with type checking
-const myContract = await factory.deploy(
-  CallData.compile({
-    name: shortString.encodeShortString('MyToken'),
-    symbol: shortString.encodeShortString('MTK'),
-    decimals: 18,
-  })
-);
+const token2 = await Contract.factory({
+  compiledContract: erc20Contract,
+  account: myAccount,
+  casm: erc20Casm,
+  constructorArguments: { name: 'Token2', symbol: 'TK2' },
+});
 ```
 
 :::tip
-ContractFactory is particularly useful in testing environments where you need to deploy multiple contract instances with different parameters.
+The `Contract.factory()` method is the simplest way to deploy a new contract and get contract instance.
 :::
 
 ## Using Account Methods Directly
@@ -189,15 +193,8 @@ import {
   type Calldata,
 } from 'starknet';
 
-// 1. Setup Provider & Account
-const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-const myAccount = new Account(
-  myProvider,
-  process.env.ACCOUNT_ADDRESS!, // Your account address
-  process.env.PRIVATE_KEY! // Your private key
-);
-
-// 2. Load Compiled Contract
+// Assuming provider and account are already set up (see Account guide)
+// Load compiled contract files
 const compiledSierra = json.parse(
   fs.readFileSync('./compiledContracts/test.contract_class.json').toString('ascii')
 );
@@ -212,7 +209,11 @@ const response = await myAccount.declareAndDeploy({
 });
 
 // 4. Create Contract Instance
-const myContract = new Contract(compiledSierra.abi, response.deploy.contract_address, myProvider);
+const myContract = new Contract({
+  abi: compiledSierra.abi,
+  address: response.deploy.contract_address,
+  providerOrAccount: myProvider,
+});
 
 console.log('Contract Class Hash:', response.declare.class_hash);
 console.log('Contract Address:', myContract.address);
@@ -238,7 +239,11 @@ await myProvider.waitForTransaction(deployResponse.transaction_hash);
 const { abi } = await myProvider.getClassByHash(existingClassHash);
 if (!abi) throw new Error('Contract ABI not found');
 
-const myContract = new Contract(abi, deployResponse.contract_address, myProvider);
+const myContract = new Contract({
+  abi,
+  address: deployResponse.contract_address,
+  providerOrAccount: myProvider,
+});
 ```
 
 ### Working with Constructors
