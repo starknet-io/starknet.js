@@ -774,6 +774,8 @@ describe('deploy and test Account', () => {
         casm: contracts.C260.casm,
       });
 
+      const latestBlock = await provider.getBlock('latest');
+
       // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
       const result = account.estimateInvokeFee(
         {
@@ -783,7 +785,7 @@ describe('deploy and test Account', () => {
         },
         {
           tip: 0,
-          blockIdentifier: 1242792,
+          blockIdentifier: latestBlock.block_number,
         }
       );
 
@@ -795,7 +797,7 @@ describe('deploy and test Account', () => {
         },
         {
           tip: 1000000000000000000,
-          blockIdentifier: 1242792,
+          blockIdentifier: latestBlock.block_number,
         }
       );
 

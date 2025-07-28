@@ -529,7 +529,7 @@ export class RpcChannel {
 
   public async getEstimateFee(
     invocations: AccountInvocations,
-    { blockIdentifier = this.blockIdentifier, skipValidate = true }: getEstimateFeeBulkOptions
+    { blockIdentifier = this.blockIdentifier, skipValidate = true }: getEstimateFeeBulkOptions = {}
   ) {
     const block_id = new Block(blockIdentifier).identifier;
     const flags = {

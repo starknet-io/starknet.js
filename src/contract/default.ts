@@ -25,7 +25,6 @@ import {
   WithOptions,
   FactoryParams,
   UniversalDetails,
-  EstimateFeeDetails,
 } from '../types';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
@@ -365,7 +364,7 @@ export class Contract implements ContractInterface {
   public async estimate(
     method: string,
     args: ArgsOrCalldata = [],
-    estimateDetails: EstimateFeeDetails = {}
+    estimateDetails: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
     assert(this.address !== null, 'contract is not connected to an address');
 

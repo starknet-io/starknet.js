@@ -428,7 +428,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getEstimateFeeBulk(
     invocations: AccountInvocations,
-    options: getEstimateFeeBulkOptions
+    options?: getEstimateFeeBulkOptions
   ) {
     return this.channel
       .getEstimateFee(invocations, options)

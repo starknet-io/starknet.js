@@ -78,8 +78,6 @@ export interface PaymasterDetails {
   timeBounds?: PaymasterTimeBounds;
 }
 
-export interface EstimateFeeDetails extends UniversalDetails {}
-
 export interface DeployContractResponse {
   contract_address: string;
   transaction_hash: string;
