@@ -2,10 +2,12 @@ import type { BlockHash, TransactionHash } from '../../types/api';
 import type { CairoEnum } from '../../types/cairoEnum';
 import type {
   Abi,
+  BigNumberish,
   BlockNumber,
   Calldata,
   DeclareAndDeployContractPayload,
   ParsedStruct,
+  RawArgs,
   RawArgsArray,
   Signature,
 } from '../../types/lib';
@@ -142,7 +144,7 @@ export function isAccount(
   return 'execute' in providerOrAccount;
 }
 
-export type FactoryParams = DeclareAndDeployContractPayload & {
+type FactoryParamsBase = {
   account: AccountInterface;
   /**
    * Parse arguments to calldata.
@@ -151,3 +153,15 @@ export type FactoryParams = DeclareAndDeployContractPayload & {
    */
   parseRequest?: boolean;
 };
+
+type DeclareAndDeployParams = FactoryParamsBase & DeclareAndDeployContractPayload;
+
+type DeployOnlyParams = FactoryParamsBase & {
+  classHash: BigNumberish;
+  salt?: string;
+  unique?: boolean;
+  constructorCalldata?: RawArgs;
+  abi?: Abi;
+};
+
+export type FactoryParams = DeclareAndDeployParams | DeployOnlyParams;

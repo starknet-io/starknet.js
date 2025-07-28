@@ -271,6 +271,140 @@ describe('contract module', () => {
       });
       expect(erc20).toBeInstanceOf(Contract);
     });
+
+    describe('Deploy-only mode', () => {
+      test('deploy-only mode with classHash and provided ABI', async () => {
+        const erc20 = await Contract.factory({
+          classHash: erc20ClassHash,
+          abi: contracts.Erc20OZ.sierra.abi,
+          account,
+          constructorCalldata: erc20ConstructorParams,
+        });
+
+        expect(erc20).toBeInstanceOf(Contract);
+        expect(erc20.classHash).toBe(erc20ClassHash);
+        expect(erc20.abi).toBeDefined();
+        expect(Array.isArray(erc20.abi)).toBe(true);
+
+        // Verify the contract is functional
+        const balanceResult = await erc20.balanceOf(account.address);
+        expect(balanceResult).toBeDefined();
+      });
+
+      test('deploy-only mode with classHash and ABI fetched from network', async () => {
+        const erc20 = await Contract.factory({
+          classHash: erc20ClassHash,
+          account,
+          constructorCalldata: erc20ConstructorParams,
+        });
+
+        expect(erc20).toBeInstanceOf(Contract);
+        expect(erc20.classHash).toBe(erc20ClassHash);
+        expect(erc20.abi).toBeDefined();
+        expect(Array.isArray(erc20.abi)).toBe(true);
+
+        // Verify the contract is functional with fetched ABI
+        const balanceResult = await erc20.balanceOf(account.address);
+        expect(balanceResult).toBeDefined();
+      });
+
+      test('deploy-only mode with compiled calldata and parseRequest=false', async () => {
+        const erc20 = await Contract.factory({
+          classHash: erc20ClassHash,
+          abi: contracts.Erc20OZ.sierra.abi,
+          account,
+          constructorCalldata: erc20Constructor,
+          parseRequest: false,
+        });
+
+        expect(erc20).toBeInstanceOf(Contract);
+        expect(erc20.classHash).toBe(erc20ClassHash);
+      });
+
+      test('deploy-only mode with salt parameter', async () => {
+        const customSalt = '0x123456789abcdef';
+
+        try {
+          const erc20 = await Contract.factory({
+            classHash: erc20ClassHash,
+            abi: contracts.Erc20OZ.sierra.abi,
+            account,
+            constructorCalldata: erc20ConstructorParams,
+            salt: customSalt,
+          });
+
+          expect(erc20).toBeInstanceOf(Contract);
+          expect(erc20.classHash).toBe(erc20ClassHash);
+        } catch (error: any) {
+          // If the test is run multiple times on the same network,
+          // the salted address will already be occupied - this is expected
+          if (error.message?.includes('contract already deployed at address')) {
+            // This is a valid outcome - the address is already occupied
+            expect(true).toBe(true);
+          } else {
+            // Re-throw unexpected errors
+            throw error;
+          }
+        }
+      });
+
+      test('should throw error when classHash is invalid', async () => {
+        const invalidClassHash = '0x123invalid';
+
+        await expect(
+          Contract.factory({
+            classHash: invalidClassHash,
+            account,
+            constructorCalldata: erc20ConstructorParams,
+          })
+        ).rejects.toThrow();
+      });
+
+      test('should handle BigNumberish classHash and verify internal parameters', async () => {
+        // Use the original ABI for testing
+        const customAbi = contracts.Erc20OZ.sierra.abi;
+
+        // Mock the deployContract method to avoid full deployment
+        const deployContractSpy = jest.spyOn(account, 'deployContract').mockResolvedValue({
+          transaction_hash: '0xmock_hash',
+          contract_address: '0xmock_address',
+          address: '0xmock_address',
+          deployer: '0xmock_deployer',
+          unique: '0x0',
+          classHash: erc20ClassHash,
+          calldata_len: '0x4',
+          calldata: ['0x1', '0x2', '0x3', '0x4'],
+          salt: '0x0',
+        });
+
+        const erc20 = await Contract.factory({
+          classHash: BigInt(erc20ClassHash),
+          abi: customAbi,
+          account,
+          constructorCalldata: erc20ConstructorParams,
+        });
+
+        // Verify internal parameters passed to deployContract
+        expect(deployContractSpy).toHaveBeenCalledWith(
+          {
+            classHash: BigInt(erc20ClassHash).toString(), // BigInt should be converted to string
+            constructorCalldata: erc20ConstructorParams,
+            salt: undefined,
+            unique: undefined,
+            abi: customAbi, // Should use provided ABI
+          },
+          {}
+        );
+
+        expect(erc20).toBeInstanceOf(Contract);
+        expect(erc20.abi).toBeDefined();
+        expect(Array.isArray(erc20.abi)).toBe(true);
+        expect(erc20.classHash).toBe(BigInt(erc20ClassHash).toString()); // BigInt should be stored as string
+
+        // Restore the original method
+        deployContractSpy.mockRestore();
+      });
+    });
   });
 });
 
