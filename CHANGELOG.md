@@ -1,3 +1,17 @@
+# [8.1.0](https://github.com/starknet-io/starknet.js/compare/v8.0.0...v8.1.0) (2025-07-28)
+
+### Bug Fixes
+
+- improve hex string validation in isHex function with support for 0X prefix ([316c12f](https://github.com/starknet-io/starknet.js/commit/316c12f416f3c49c8c2cd3374d3ef1543c3ff43d))
+- interfaces fixes and optional param fix ([86b41a0](https://github.com/starknet-io/starknet.js/commit/86b41a0460683d57ca85ef3ac44a9703bc2f9f58))
+- missing options Acc.-deployContract,declareAndDeploy; Con.-estimate with options, test: False tests for pre-confirm event and estimate with tip ([2bd9305](https://github.com/starknet-io/starknet.js/commit/2bd93053d5e2dfbf0db6af8da7b88653f17ee749))
+- test event on devnet ([50b98f3](https://github.com/starknet-io/starknet.js/commit/50b98f35f3a85c38a1ff7ee6899d238e2df6addb))
+
+### Features
+
+- contract.Factory can deploy contract with only class hash provided ([fe4cba6](https://github.com/starknet-io/starknet.js/commit/fe4cba6a667ad0e8a7e94eabd89554dc9d26dedb))
+- fees and tip helpers ([200318b](https://github.com/starknet-io/starknet.js/commit/200318bda4341cd7816fb0202d8f2965ccb2147a))
+
 # [8.0.0](https://github.com/starknet-io/starknet.js/compare/v7.6.4...v8.0.0) (2025-07-28)
 
 - feat!: bump version ([0afb3f8](https://github.com/starknet-io/starknet.js/commit/0afb3f8e82b147bcc7084c417826313c1e488053))
