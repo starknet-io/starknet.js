@@ -75,9 +75,23 @@ const account0 = new Account(
 const res = await account0.execute(myCall, { version: 1 });
 ```
 
+## Contract method options
+
+In previous versions, the named `Contract` instance methods that correspond to the methods of the Cairo smart contract allow an additional `ContractOptions` parameter.
+
+Support for this parameter has been removed, and the `Contract` methods accept only parameters that align with the parameters of the smart contract. The same functionality is achieved by chaining the [`withOptions`](../API/classes/Contract#withoptions) method before the mapped contract methods.
+
+```typescript
+// v6
+const result = await myContract.some_method(arg1, arg2, options);
+
+// v7
+const result = await myContract.withOptions(options).some_method(arg1, arg2);
+```
+
 ## Transaction receipt
 
-In the `ReceiptTx` class, the status [`isRejected`](https://starknetjs.com/docs/6.23.1/API/classes/ReceiptTx#isrejected) has been removed.
+In the `ReceiptTx` class, the status [`isRejected`](../../6.24.1/API/classes/ReceiptTx#isrejected) has been removed.
 
 ## Removed deprecated functionalities
 

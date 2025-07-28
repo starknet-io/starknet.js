@@ -9,12 +9,12 @@ import {
   TransactionType,
   cairo,
   ec,
-  events,
   num,
   hash,
   stark,
   type Calldata,
   type InvokeTransactionReceiptResponse,
+  Deployer,
 } from '../src';
 import { C1v2ClassHash, contracts, describeIfDevnet, erc20ClassHash } from './config/fixtures';
 import {
@@ -491,7 +491,9 @@ describe('deploy and test Account', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = events.parseUDCEvent(txReceipt.value as InvokeTransactionReceiptResponse);
+      const udcEvent = account.deployer.parseDeployerEvent(
+        txReceipt.value as InvokeTransactionReceiptResponse
+      );
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 
@@ -508,7 +510,9 @@ describe('deploy and test Account', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = events.parseUDCEvent(txReceipt.value as InvokeTransactionReceiptResponse);
+      const udcEvent = account.deployer.parseDeployerEvent(
+        txReceipt.value as InvokeTransactionReceiptResponse
+      );
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 
@@ -761,6 +765,32 @@ describe('deploy and test Account', () => {
       expect(result).toMatchSchemaRef('EstimateFeeResponseOverhead');
       // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
       // innerInvokeEstFeeSpy.mockClear();
+    });
+  });
+  describe('Custom Cairo 1 Deployer', () => {
+    let accountCustomDeployer: Account;
+    beforeAll(async () => {
+      const deployerResponse = await account.declareAndDeploy({
+        contract: contracts.deployer.sierra,
+        casm: contracts.deployer.casm,
+      });
+      const customDeployer = new Deployer(
+        deployerResponse.deploy.contract_address,
+        'deploy_contract'
+      );
+      accountCustomDeployer = new Account({
+        address: account.address,
+        provider,
+        signer: account.signer,
+        deployer: customDeployer,
+      });
+    });
+    test('Deploy contract', async () => {
+      const deployResponse = await accountCustomDeployer.deployContract({
+        classHash: erc20ClassHash,
+        constructorCalldata: erc20Constructor,
+      });
+      expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
     });
   });
 });

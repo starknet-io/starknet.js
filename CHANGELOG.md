@@ -1,3 +1,26 @@
+# [8.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v8.0.0-beta.3...v8.0.0-beta.4) (2025-07-24)
+
+### Bug Fixes
+
+- accountInvocationsFactory typing ([a1b1e7f](https://github.com/starknet-io/starknet.js/commit/a1b1e7f60e7abfa43836666a0d801abd33242d7b))
+
+# [8.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v8.0.0-beta.2...v8.0.0-beta.3) (2025-07-24)
+
+### Bug Fixes
+
+- change DeclareDeployDCResponse name to DeclareDeployUDCResponse ([6498b8b](https://github.com/starknet-io/starknet.js/commit/6498b8b0bbd137658862422031132073f1c42ac3))
+- devenet ([3b2be9d](https://github.com/starknet-io/starknet.js/commit/3b2be9d46beec4931eb96183c0985e0f607e5713))
+- export Deployer, remove old helper parseUDCEvent, fix some tests imports ([c2d0d55](https://github.com/starknet-io/starknet.js/commit/c2d0d5508239f164ec538707bd19625c70dcb604))
+- remove helper buildUDCCall ([d299f7b](https://github.com/starknet-io/starknet.js/commit/d299f7b3b175c265b218c2d182762ee38f3aa27a))
+- removed duplicated buildDeployerContractPayload ([e7b728d](https://github.com/starknet-io/starknet.js/commit/e7b728ddc6e5e9e3cffea941f4dcc6e20d8df1ff))
+- type problem in tests, due to merge in v8 ([fd49e8a](https://github.com/starknet-io/starknet.js/commit/fd49e8af3051b31f105cc82767248b7832df8130))
+- use new entrypoint on the new UDC ([992ee09](https://github.com/starknet-io/starknet.js/commit/992ee09e08533efb3a12ff91abc0fca2acb552f2))
+
+### Features
+
+- add custom Deployer in Account constructor ([7d62e20](https://github.com/starknet-io/starknet.js/commit/7d62e202c3bab698e383a2128f117675f30f38f7))
+- update packages ([a52db43](https://github.com/starknet-io/starknet.js/commit/a52db430f10dd00e04844933c46e400abb8a2833))
+
 # [8.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v8.0.0-beta.1...v8.0.0-beta.2) (2025-07-21)
 
 ### Features

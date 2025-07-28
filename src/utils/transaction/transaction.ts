@@ -1,20 +1,8 @@
-import { UDC } from '../global/constants';
-import { ETransactionVersion } from '../provider/types/spec.type';
-import {
-  BigNumberish,
-  CairoVersion,
-  Call,
-  Calldata,
-  ParsedStruct,
-  RawArgs,
-  UniversalDeployerContractPayload,
-  ValidateType,
-} from '../types';
-import { CallData } from './calldata';
-import { starkCurve } from './ec';
-import { calculateContractAddressFromHash, getSelectorFromName } from './hash';
-import { toBigInt, toCairoBool } from './num';
-import { randomAddress } from './stark';
+import { ETransactionVersion } from '../../provider/types/spec.type';
+import { BigNumberish, CairoVersion, Call, Calldata, ParsedStruct, RawArgs } from '../../types';
+import { CallData } from '../calldata';
+import { getSelectorFromName } from '../hash';
+import { toBigInt } from '../num';
 
 /**
  * Transforms a list of Calls, each with their own calldata, into
@@ -170,104 +158,6 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
   }
   return fromCallsToExecuteCalldata(calls);
 };
-
-/**
- * Extract compiled calldata from args or execute callback
- */
-export function getCompiledCalldata(constructorArguments: RawArgs, callback: Function): Calldata {
-  // Check if Calldata in args or args[0] else compile
-  if (Array.isArray(constructorArguments) && '__compiled__' in constructorArguments)
-    return constructorArguments as Calldata;
-  if (
-    Array.isArray(constructorArguments) &&
-    Array.isArray(constructorArguments[0]) &&
-    '__compiled__' in constructorArguments[0]
-  )
-    return constructorArguments[0] as Calldata;
-  return callback();
-}
-
-/**
- * Builds a UDCCall object.
- *
- * @param {UniversalDeployerContractPayload | UniversalDeployerContractPayload[]} payload the payload data for the UDCCall. Can be a single payload object or an array of payload objects.
- * @param {string} address the address to be used in the UDCCall
- * @returns { calls: Call[], addresses: string[] } the UDCCall object containing an array of calls and an array of addresses.
- * @example
- * ```typescript
- * const payload: UniversalDeployerContractPayload = {
- * classHash: "0x1234567890123456789012345678901234567890",
- * salt: "0x0987654321098765432109876543210987654321",
- * unique:true,
- * constructorCalldata: [1, 2, 3]
- * };
- * const address = "0xABCDEF1234567890ABCDEF1234567890ABCDEF12";
- * const result  = transaction.buildUDCCall(payload, address);
- * // result = {
- * // 	calls: [
- * //			{
- * //			contractAddress: "0xABCDEF1234567890ABCDEF1234567890ABCDEF12",
- * //			entrypoint: "functionName",
- * //			calldata: [classHash, salt, true, 3, 1, 2, 3]
- * //		}],
- * //	addresses: ["0x6fD084B56a7EDc5C06B3eB40f97Ae5A0C707A865"]
- * // }
- * ```
- */
-export function buildUDCCall(
-  payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-  address: string
-) {
-  const params = [].concat(payload as []).map((it) => {
-    const {
-      classHash,
-      salt,
-      unique = true,
-      constructorCalldata = [],
-      abi,
-    } = it as UniversalDeployerContractPayload;
-
-    const compiledConstructorCallData = getCompiledCalldata(constructorCalldata, () => {
-      // compile with abi
-      if (abi) {
-        const calldataInstance = new CallData(abi);
-        // Convert object based raw js arguments to ...args array
-        const rawArgs = Object.values(constructorCalldata);
-        calldataInstance.validate(ValidateType.DEPLOY, 'constructor', rawArgs);
-        return calldataInstance.compile('constructor', rawArgs);
-      }
-      // compile without abi
-      return CallData.compile(constructorCalldata);
-    });
-
-    const deploySalt = salt ?? randomAddress();
-
-    return {
-      call: {
-        contractAddress: UDC.ADDRESS,
-        entrypoint: UDC.ENTRYPOINT,
-        calldata: [
-          classHash,
-          deploySalt,
-          toCairoBool(unique),
-          compiledConstructorCallData.length,
-          ...compiledConstructorCallData,
-        ],
-      },
-      address: calculateContractAddressFromHash(
-        unique ? starkCurve.pedersen(address, deploySalt) : deploySalt,
-        classHash,
-        compiledConstructorCallData,
-        unique ? UDC.ADDRESS : 0
-      ),
-    };
-  });
-
-  return {
-    calls: params.map((it) => it.call),
-    addresses: params.map((it) => it.address),
-  };
-}
 
 /**
  * Return transaction versions based on version type, default version type is 'transaction'.

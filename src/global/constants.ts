@@ -27,9 +27,14 @@ export const RANGE_FELT = range(ZERO, PRIME - 1n);
 export const RANGE_I128 = range(-(2n ** 127n), 2n ** 127n - 1n);
 export const RANGE_U128 = range(ZERO, 2n ** 128n - 1n);
 
-export const UDC = {
+export const LegacyUDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
+} as const;
+
+export const UDC = {
+  ADDRESS: '0x02ceed65a4bd731034c01113685c831b01c15d7d432f71afb1cf1634b53a2125',
+  ENTRYPOINT: 'deploy_contract',
 } as const;
 
 export const OutsideExecutionCallerAny = '0x414e595f43414c4c4552'; // encodeShortString('ANY_CALLER')
