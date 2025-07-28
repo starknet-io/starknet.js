@@ -309,6 +309,7 @@ async function getTipStatsParallel(
     // Extract tips from all successfully fetched blocks
     const allTips: bigint[] = blocks
       .filter((blockData) => blockData !== null)
+      // @ts-ignore - seems to be needed only for docs, check again after the doc dependencies are updated
       .flatMap((blockData) => extractTipsFromBlock(blockData, includeZeroTips));
 
     const analyzedBlocks = blocks.filter((b) => b !== null).length;
