@@ -395,17 +395,12 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ) {
-    const estimates = await this.getEstimateFeeBulk(
-      [
-        {
-          type: ETransactionType.INVOKE,
-          ...invocation,
-          ...details,
-        },
-      ],
-      { blockIdentifier, skipValidate }
-    );
-    return estimates[0]; // Return the first (and only) estimate
+    return (
+      await this.getEstimateFeeBulk(
+        [{ type: ETransactionType.INVOKE, ...invocation, ...details }],
+        { blockIdentifier, skipValidate }
+      )
+    )[0]; // Return the first (and only) estimate
   }
 
   public async getDeclareEstimateFee(
@@ -414,17 +409,12 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ) {
-    const estimates = await this.getEstimateFeeBulk(
-      [
-        {
-          type: ETransactionType.DECLARE,
-          ...invocation,
-          ...details,
-        },
-      ],
-      { blockIdentifier, skipValidate }
-    );
-    return estimates[0]; // Return the first (and only) estimate
+    return (
+      await this.getEstimateFeeBulk(
+        [{ type: ETransactionType.DECLARE, ...invocation, ...details }],
+        { blockIdentifier, skipValidate }
+      )
+    )[0]; // Return the first (and only) estimate
   }
 
   public async getDeployAccountEstimateFee(
@@ -433,22 +423,17 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ) {
-    const estimates = await this.getEstimateFeeBulk(
-      [
-        {
-          type: ETransactionType.DEPLOY_ACCOUNT,
-          ...invocation,
-          ...details,
-        },
-      ],
-      { blockIdentifier, skipValidate }
-    );
-    return estimates[0]; // Return the first (and only) estimate
+    return (
+      await this.getEstimateFeeBulk(
+        [{ type: ETransactionType.DEPLOY_ACCOUNT, ...invocation, ...details }],
+        { blockIdentifier, skipValidate }
+      )
+    )[0]; // Return the first (and only) estimate
   }
 
   public async getEstimateFeeBulk(
     invocations: AccountInvocations,
-    options: getEstimateFeeBulkOptions
+    options?: getEstimateFeeBulkOptions
   ) {
     return this.channel
       .getEstimateFee(invocations, options)

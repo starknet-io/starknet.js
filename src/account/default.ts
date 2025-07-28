@@ -57,6 +57,7 @@ import type {
   UniversalDeployerContractPayload,
   UniversalDetails,
   UserTransaction,
+  waitForTransactionOptions,
 } from '../types';
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
@@ -413,10 +414,10 @@ export class Account extends Provider implements AccountInterface {
 
   public async deployContract(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-    details: UniversalDetails = {}
+    details: UniversalDetails & waitForTransactionOptions = {}
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
-    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
+    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, details);
     return this.deployer.parseDeployerEvent(
       txReceipt as unknown as DeployTransactionReceiptResponse
     );
@@ -424,11 +425,11 @@ export class Account extends Provider implements AccountInterface {
 
   public async declareAndDeploy(
     payload: DeclareAndDeployContractPayload,
-    details: UniversalDetails = {}
+    details: UniversalDetails & waitForTransactionOptions = {}
   ): Promise<DeclareDeployUDCResponse> {
     let declare = await this.declareIfNot(payload, details);
     if (declare.transaction_hash !== '') {
-      const tx = await this.waitForTransaction(declare.transaction_hash);
+      const tx = await this.waitForTransaction(declare.transaction_hash, details);
       declare = { ...declare, ...tx };
     }
     const deploy = await this.deployContract(
