@@ -325,10 +325,15 @@ export class RpcProvider implements ProviderInterface {
   }
 
   /**
-   *
-   * @param txHash
-   * @param options
-   * @returns
+   * Wait up until a new transaction is possible with same the account.
+   * This method is fast, but Events and transaction report are not yet
+   * available. Useful for gaming activity.
+   * - only rpc 0.9 and onwards.
+   * @param {BigNumberish} txHash - transaction hash
+   * @param {string} address - address of the account
+   * @param {bigint} initNonce - initial nonce of the account (before the transaction).
+   * @param {fastWaitForTransactionOptions} [options={retries: 50, retryInterval: 500}] - options to scan the network for the next possible transaction. `retries` is the number of times to retry.
+   * @returns {Promise<boolean>} Returns true if the next transaction is possible, false if the timeout has been reached.
    */
   public async fastWaitForTransaction(
     txHash: BigNumberish,

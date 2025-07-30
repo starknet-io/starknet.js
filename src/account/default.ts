@@ -90,6 +90,7 @@ import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
 import { defaultDeployer, Deployer } from '../deployer';
 import type { TipType } from '../provider/modules/tip';
+import { RPC09 } from '../channel';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -335,18 +336,35 @@ export class Account extends Provider implements AccountInterface {
 
   /**
    * Execute one or multiple calls through the account contract,
-   *  responding as soon a new transaction is possible with the same account.
+   * responding as soon as a new transaction is possible with the same account.
    * Useful for gaming usage.
-   * @param transactions
-   * @param transactionsDetail
-   * @param waitDetail
-   * @returns
+   * - This method requires the provider to be initialized with `pre_confirmed` blockIdentifier option.
+   * - Rpc 0.9 minimum.
+   * - In a normal myAccount.execute() call, followed by myProvider.waitForTransaction(), you have an immediate access to the events and to the transaction report. Here, we are processing consecutive transactions faster, but events & transaction reports are not available immediately.
+   * - As a consequence of the previous point, do not use contract/account deployment with this method.
+   * @param {AllowArray<Call>} transactions - Single call or array of calls to execute
+   * @param {UniversalDetails} [transactionsDetail] - Transaction execution options
+   * @param {fastWaitForTransactionOptions} [waitDetail={retries: 50, retryInterval: 500}] - options to scan the network for the next possible transaction. `retries` is the number of times to retry, `retryInterval` is the time in ms between retries.
+   * @returns {Promise<fastExecuteResponse>} Response containing the transaction result and status for the next transaction. If `isReady` is true, you can execute the next transaction. If false, timeout has been reached before the next transaction was possible.
+   * @example
+   * ```typescript
+   * const myProvider = new RpcProvider({ nodeUrl: url, blockIdentifier: BlockTag.PRE_CONFIRMED });
+   * const myAccount = new Account({ provider: myProvider, address: accountAddress0, signer: privateKey0 });
+   * const resp = await myAccount.fastExecute(
+   *     call, { tip: recommendedTip},
+   *     { retries: 30, retryInterval: 500 });
+   * // if resp.isReady is true, you can launch immediately a new tx.
+   * ```
    */
   public async fastExecute(
     transactions: AllowArray<Call>,
     transactionsDetail: UniversalDetails = {},
     waitDetail: fastWaitForTransactionOptions = {}
   ): Promise<fastExecuteResponse> {
+    assert(
+      this.channel instanceof RPC09.RpcChannel,
+      'Wrong Rpc version in Provider. At least Rpc v0.9 required.'
+    );
     assert(
       this.channel.blockIdentifier === BlockTag.PRE_CONFIRMED,
       'Provider needs to be initialized with `pre_confirmed` blockIdentifier option.'

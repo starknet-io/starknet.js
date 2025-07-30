@@ -484,7 +484,7 @@ export class RpcChannel {
     initNonce: bigint,
     options?: fastWaitForTransactionOptions
   ): Promise<boolean> {
-    let retries = options?.retries ?? this.retries;
+    let retries = options?.retries ?? 50;
     const retryInterval = options?.retryInterval ?? 500; // 0.5s
     let isErrorState = false;
     const errorStates: string[] = [RPC.ETransactionExecutionStatus.REVERTED];

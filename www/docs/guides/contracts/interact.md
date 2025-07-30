@@ -10,7 +10,9 @@ Once your contract is connected (see [Contract Instance guide](./connect_contrac
 - **Write operations**: Paid - modify contract state with STRK fees
 
 :::info
+
 Ensure your account has sufficient STRK for transaction fees (20 STRK is a good start).
+
 :::
 
 ![](./pictures/contract-interaction.svg)
@@ -46,7 +48,8 @@ console.log('User balance:', userBalance);
 
 - Cairo 1 contracts return values directly as `bigint`
 - Cairo 0 contracts return objects with named properties (e.g., `result.res`)
-  :::
+
+:::
 
 ## ✍️ Writing to Contract State
 
@@ -68,13 +71,17 @@ await myProvider.waitForTransaction(tx2.transaction_hash);
 ```
 
 :::tip
+
 Use `Contract.populate()` to prepare call data for complex parameters or multicalls.
+
 :::
 
 :::info
+
 **v8 Note**: Only V3 transactions with STRK fees are supported in Starknet.js v8. ETH fee transactions (V1/V2) have been removed with Starknet 0.14.
 
 All transactions now use V3 transactions with STRK fees by default.
+
 :::
 
 ## ✍️ Send a transaction, paying fees with ETH or any supported Token
@@ -115,6 +122,48 @@ await myProvider.waitForTransaction(result.transaction_hash);
 ```
 
 For detailed multicall examples, see the [Multicall guide](./multiCall.md).
+
+## Fast consecutive transactions
+
+In some cases, it's important to be able to process as fast as possible consecutive transactions. Gaming is fond of this feature.  
+A normal transaction (with `myProvider.waitForTransaction(txH)`) needs more than 10 seconds. To be able to process a transaction each 2-3 seconds, use:
+
+```ts
+const myProvider = new RpcProvider({
+  nodeUrl: url,
+  specVersion: '0.9.0',
+  blockIdentifier: BlockTag.PRE_CONFIRMED,
+});
+const myAccount = new Account({
+  provider: myProvider,
+  address: accountAddress0,
+  signer: privateKey0,
+});
+const call1 = gameContract.populate('decrease_qty_weapons', [5]);
+const tipStats = await myProvider.getEstimateTip();
+const resp = await myAccount.fastExecute(
+  call1,
+  { tip: recommendedTip },
+  { retries: 30, retryInterval: 500 }
+);
+if (resp.isReady) {
+  const call2 = gameContract.populate('increase_qty_weapons', [10]);
+  const resp = await myAccount.fastExecute(
+    call2,
+    { tip: tipStats.recommendedTip },
+    { retries: 30, retryInterval: 500 }
+  );
+}
+```
+
+:::warning Warning
+
+- This method requires the provider to be initialized with `pre_confirmed` blockIdentifier option.
+- Rpc 0.9 minimum.
+- In a normal `myAccount.execute()` call, followed by `myProvider.waitForTransaction()`, you have an immediate access to the events and to the transaction report. Here, we are processing consecutive transactions faster ; then events & transaction reports are not available immediately.
+- As a consequence of the previous point, do not use contract/account deployment with this method. Use the normal way.
+
+:::
 
 ## Other existing methods
 
