@@ -307,6 +307,11 @@ export type waitForTransactionOptions = {
   errorStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
 };
 
+export type fastWaitForTransactionOptions = {
+  retries?: number;
+  retryInterval?: number;
+};
+
 export type getSimulateTransactionOptions = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;

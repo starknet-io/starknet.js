@@ -14,6 +14,7 @@ import {
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  type fastWaitForTransactionOptions,
   type GasPrices,
   GetBlockResponse,
   getContractVersionOptions,
@@ -321,6 +322,30 @@ export class RpcProvider implements ProviderInterface {
     )) as GetTxReceiptResponseWithoutHelper;
 
     return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
+  }
+
+  /**
+   *
+   * @param txHash
+   * @param options
+   * @returns
+   */
+  public async fastWaitForTransaction(
+    txHash: BigNumberish,
+    address: string,
+    initNonce: bigint,
+    options?: fastWaitForTransactionOptions
+  ): Promise<boolean> {
+    if (this.channel instanceof RPC09.RpcChannel) {
+      const isSuccess = await this.channel.fastWaitForTransaction(
+        txHash,
+        address,
+        initNonce,
+        options
+      );
+      return isSuccess;
+    }
+    throw new Error('Unsupported channel type');
   }
 
   public async getStorageAt(
