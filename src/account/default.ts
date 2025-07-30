@@ -8,7 +8,7 @@ import {
 } from '../global/constants';
 import { logger } from '../global/logger';
 import { LibraryError, Provider } from '../provider';
-import { ETransactionVersion, ETransactionVersion3 } from '../provider/types/spec.type';
+import { BlockTag, ETransactionVersion, ETransactionVersion3 } from '../provider/types/spec.type';
 import { Signer, type SignerInterface } from '../signer';
 import {
   // Runtime values
@@ -58,6 +58,8 @@ import type {
   UniversalDetails,
   UserTransaction,
   waitForTransactionOptions,
+  fastWaitForTransactionOptions,
+  fastExecuteResponse,
 } from '../types';
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
@@ -329,6 +331,39 @@ export class Account extends Provider implements AccountInterface {
         version: invocation.version,
       }
     );
+  }
+
+  /**
+   * Execute one or multiple calls through the account contract,
+   *  responding as soon a new transaction is possible with the same account.
+   * Useful for gaming usage.
+   * @param transactions
+   * @param transactionsDetail
+   * @param waitDetail
+   * @returns
+   */
+  public async fastExecute(
+    transactions: AllowArray<Call>,
+    transactionsDetail: UniversalDetails = {},
+    waitDetail: fastWaitForTransactionOptions = {}
+  ): Promise<fastExecuteResponse> {
+    assert(
+      this.channel.blockIdentifier === BlockTag.PRE_CONFIRMED,
+      'Provider needs to be initialized with `pre_confirmed` blockIdentifier option.'
+    );
+    const initNonce = BigInt(
+      transactionsDetail.nonce ??
+        (await this.getNonceForAddress(this.address, BlockTag.PRE_CONFIRMED))
+    );
+    const details = { ...transactionsDetail, nonce: initNonce };
+    const resultTx: InvokeFunctionResponse = await this.execute(transactions, details);
+    const resultWait = await this.fastWaitForTransaction(
+      resultTx.transaction_hash,
+      this.address,
+      initNonce,
+      waitDetail
+    );
+    return { txResult: resultTx, isReady: resultWait } as fastExecuteResponse;
   }
 
   /**
