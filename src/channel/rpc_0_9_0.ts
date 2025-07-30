@@ -21,7 +21,6 @@ import {
   RPC_ERROR,
   RpcProviderOptions,
   waitForTransactionOptions,
-  type fastWaitForTransactionOptions,
 } from '../types';
 import assert from '../utils/assert';
 import { ETransactionType, JRPC, RPCSPEC09 as RPC } from '../types/api';
@@ -476,72 +475,6 @@ export class RpcChannel {
       await wait(retryInterval);
     }
     return txReceipt as RPC.TXN_RECEIPT;
-  }
-
-  public async fastWaitForTransaction(
-    txHash: BigNumberish,
-    address: string,
-    initNonce: bigint,
-    options?: fastWaitForTransactionOptions
-  ): Promise<boolean> {
-    let retries = options?.retries ?? this.retries;
-    const retryInterval = options?.retryInterval ?? 500; // 0.5s
-    let isErrorState = false;
-    const errorStates: string[] = [RPC.ETransactionExecutionStatus.REVERTED];
-    const successStates: string[] = [
-      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
-      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
-      RPC.ETransactionFinalityStatus.PRE_CONFIRMED,
-    ];
-    let txStatus: RPC.TransactionStatus;
-    const start = new Date().getTime();
-    while (retries > 0) {
-      // eslint-disable-next-line no-await-in-loop
-      await wait(retryInterval);
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        txStatus = await this.getTransactionStatus(txHash);
-        console.log(
-          retries,
-          txStatus,
-          // eslint-disable-next-line no-await-in-loop
-          BigInt(await this.getNonceForAddress(address, BlockTag.PRE_CONFIRMED)),
-          (new Date().getTime() - start) / 1000
-        );
-        const executionStatus = txStatus.execution_status ?? '';
-        const finalityStatus = txStatus.finality_status;
-        if (errorStates.includes(executionStatus)) {
-          const message = `${executionStatus}: ${finalityStatus}`;
-          const error = new Error(message) as Error & { response: RPC.TransactionStatus };
-          error.response = txStatus;
-          isErrorState = true;
-          throw error;
-        } else if (successStates.includes(finalityStatus)) {
-          let currentNonce = initNonce;
-          while (currentNonce === initNonce && retries > 0) {
-            // eslint-disable-next-line no-await-in-loop
-            currentNonce = BigInt(await this.getNonceForAddress(address, BlockTag.PRE_CONFIRMED));
-            console.log(
-              retries,
-              'waiting new nonce',
-              initNonce,
-              (new Date().getTime() - start) / 1000
-            );
-            if (currentNonce !== initNonce) return true;
-            // eslint-disable-next-line no-await-in-loop
-            await wait(retryInterval);
-            retries -= 1;
-          }
-          return false;
-        }
-      } catch (error) {
-        if (error instanceof Error && isErrorState) {
-          throw error;
-        }
-      }
-      retries -= 1;
-    }
-    return false;
   }
 
   public getStorageAt(
