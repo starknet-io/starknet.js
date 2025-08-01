@@ -481,12 +481,12 @@ export class RpcChannel {
   public async fastWaitForTransaction(
     txHash: BigNumberish,
     address: string,
-    initNonce: bigint,
+    initNonceBN: BigNumberish,
     options?: fastWaitForTransactionOptions
   ): Promise<boolean> {
+    const initNonce = BigInt(initNonceBN);
     let retries = options?.retries ?? 50;
     const retryInterval = options?.retryInterval ?? 500; // 0.5s
-    let isErrorState = false;
     const errorStates: string[] = [RPC.ETransactionExecutionStatus.REVERTED];
     const successStates: string[] = [
       RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
@@ -498,47 +498,35 @@ export class RpcChannel {
     while (retries > 0) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        txStatus = await this.getTransactionStatus(txHash);
-        console.log(
-          retries,
-          txStatus,
+
+      // eslint-disable-next-line no-await-in-loop
+      txStatus = await this.getTransactionStatus(txHash);
+      logger.info(
+        `${retries} ${JSON.stringify(txStatus)} ${(new Date().getTime() - start) / 1000}s.`
+      );
+      const executionStatus = txStatus.execution_status ?? '';
+      const finalityStatus = txStatus.finality_status;
+      if (errorStates.includes(executionStatus)) {
+        const message = `${executionStatus}: ${finalityStatus}`;
+        const error = new Error(message) as Error & { response: RPC.TransactionStatus };
+        error.response = txStatus;
+        throw error;
+      } else if (successStates.includes(finalityStatus)) {
+        let currentNonce = initNonce;
+        while (currentNonce === initNonce && retries > 0) {
           // eslint-disable-next-line no-await-in-loop
-          BigInt(await this.getNonceForAddress(address, BlockTag.PRE_CONFIRMED)),
-          (new Date().getTime() - start) / 1000
-        );
-        const executionStatus = txStatus.execution_status ?? '';
-        const finalityStatus = txStatus.finality_status;
-        if (errorStates.includes(executionStatus)) {
-          const message = `${executionStatus}: ${finalityStatus}`;
-          const error = new Error(message) as Error & { response: RPC.TransactionStatus };
-          error.response = txStatus;
-          isErrorState = true;
-          throw error;
-        } else if (successStates.includes(finalityStatus)) {
-          let currentNonce = initNonce;
-          while (currentNonce === initNonce && retries > 0) {
-            // eslint-disable-next-line no-await-in-loop
-            currentNonce = BigInt(await this.getNonceForAddress(address, BlockTag.PRE_CONFIRMED));
-            console.log(
-              retries,
-              'waiting new nonce',
-              initNonce,
-              (new Date().getTime() - start) / 1000
-            );
-            if (currentNonce !== initNonce) return true;
-            // eslint-disable-next-line no-await-in-loop
-            await wait(retryInterval);
-            retries -= 1;
-          }
-          return false;
+          currentNonce = BigInt(await this.getNonceForAddress(address, BlockTag.PRE_CONFIRMED));
+          logger.info(
+            `${retries} Checking new nonce ${currentNonce} ${(new Date().getTime() - start) / 1000}s.`
+          );
+          if (currentNonce !== initNonce) return true;
+          // eslint-disable-next-line no-await-in-loop
+          await wait(retryInterval);
+          retries -= 1;
         }
-      } catch (error) {
-        if (error instanceof Error && isErrorState) {
-          throw error;
-        }
+        return false;
       }
+
       retries -= 1;
     }
     return false;

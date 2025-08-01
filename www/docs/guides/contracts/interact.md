@@ -139,7 +139,7 @@ const myAccount = new Account({
   address: accountAddress0,
   signer: privateKey0,
 });
-const call1 = gameContract.populate('decrease_qty_weapons', [5]);
+const call1 = gameContract.populate('decrease_qty_weapons', { qty: 5 });
 const tipStats = await myProvider.getEstimateTip();
 const resp = await myAccount.fastExecute(
   call1,
@@ -147,7 +147,7 @@ const resp = await myAccount.fastExecute(
   { retries: 30, retryInterval: 500 }
 );
 if (resp.isReady) {
-  const call2 = gameContract.populate('increase_qty_weapons', [10]);
+  const call2 = gameContract.populate('increase_qty_weapons', { qty: 10 });
   const resp = await myAccount.fastExecute(
     call2,
     { tip: tipStats.recommendedTip },
@@ -162,6 +162,7 @@ if (resp.isReady) {
 - Rpc 0.9 minimum.
 - In a normal `myAccount.execute()` call, followed by `myProvider.waitForTransaction()`, you have an immediate access to the events and to the transaction report. Here, we are processing consecutive transactions faster ; then events & transaction reports are not available immediately.
 - As a consequence of the previous point, do not use contract/account deployment with this method. Use the normal way.
+- `fastExecute()` is generating a significant amount of communication with the node. To use sparingly, especially with a public node.
 
 :::
 

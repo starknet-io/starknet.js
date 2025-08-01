@@ -331,14 +331,16 @@ export class RpcProvider implements ProviderInterface {
    * - only rpc 0.9 and onwards.
    * @param {BigNumberish} txHash - transaction hash
    * @param {string} address - address of the account
-   * @param {bigint} initNonce - initial nonce of the account (before the transaction).
+   * @param {BigNumberish} initNonce - initial nonce of the account (before the transaction).
    * @param {fastWaitForTransactionOptions} [options={retries: 50, retryInterval: 500}] - options to scan the network for the next possible transaction. `retries` is the number of times to retry.
-   * @returns {Promise<boolean>} Returns true if the next transaction is possible, false if the timeout has been reached.
+   * @returns {Promise<boolean>} Returns true if the next transaction is possible,
+   * false if the timeout has been reached,
+   * throw an error in case of provider communication.
    */
   public async fastWaitForTransaction(
     txHash: BigNumberish,
     address: string,
-    initNonce: bigint,
+    initNonce: BigNumberish,
     options?: fastWaitForTransactionOptions
   ): Promise<boolean> {
     if (this.channel instanceof RPC09.RpcChannel) {
