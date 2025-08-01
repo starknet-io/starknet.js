@@ -39,6 +39,8 @@ export type ReconnectOptions = {
   delay?: number;
 };
 
+export type WebSocketModule = { new (nodeUrl: WebSocketOptions['nodeUrl']): WebSocket };
+
 /**
  * Options for configuring the WebSocketChannel.
  */
@@ -57,7 +59,7 @@ export type WebSocketOptions = {
    * const channel = new WebSocketChannel({ nodeUrl: '...', websocket: WebSocket });
    * ```
    */
-  websocket?: typeof WebSocket;
+  websocket?: WebSocketModule;
   /**
    * The maximum number of events to buffer per subscription when no handler is attached.
    * @default 1000
@@ -119,7 +121,7 @@ export class WebSocketChannel {
   public websocket: WebSocket;
 
   // Store the WebSocket implementation class to allow for custom implementations.
-  private WsImplementation: typeof WebSocket;
+  private WsImplementation: WebSocketModule;
 
   // Map of active subscriptions, keyed by their ID.
   private activeSubscriptions: Map<SUBSCRIPTION_ID, Subscription<any>> = new Map();
@@ -322,7 +324,7 @@ export class WebSocketChannel {
    * console.log('Connected!');
    * ```
    */
-  public async waitForConnection(): Promise<typeof this.websocket.readyState> {
+  public async waitForConnection(): Promise<WebSocket['readyState']> {
     // Wait for the websocket to connect
     if (this.websocket.readyState !== WebSocket.OPEN) {
       return new Promise((resolve, reject) => {
@@ -356,7 +358,7 @@ export class WebSocketChannel {
    * Returns a Promise that resolves when the WebSocket connection is closed.
    * @returns {Promise<number | Event>} A Promise that resolves with the WebSocket's `readyState` or a `CloseEvent` when disconnected.
    */
-  public async waitForDisconnection(): Promise<typeof this.websocket.readyState | Event> {
+  public async waitForDisconnection(): Promise<WebSocket['readyState'] | Event> {
     // Wait for the websocket to disconnect
     if (this.websocket.readyState !== WebSocket.CLOSED) {
       return new Promise((resolve, reject) => {

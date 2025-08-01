@@ -64,7 +64,7 @@ describe('Default RPC Nodes', () => {
             );
           })
         );
-
+        // eslint-disable-next-line no-console
         console.table(result.flat());
         return result
           .flat()
