@@ -43,7 +43,7 @@ const channel = new WebSocketChannel({
 await channel.waitForConnection();
 ```
 
-If you are in an environment without a native `WebSocket` object (like Node.js), you can provide a custom implementation (e.g., from the `ws` library).
+If you are in an environment without a native `WebSocket` object (like old node.js), you can provide a custom implementation (e.g., from the `ws` library).
 
 ```typescript
 import WebSocket from 'ws';

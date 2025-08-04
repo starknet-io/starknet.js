@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Provider, Subscription, WebSocketChannel } from '../src';
+import { Provider, Subscription, SubscriptionNewHeadsEvent, WebSocketChannel } from '../src';
 import { logger } from '../src/global/logger';
 import { StarknetChainId } from '../src/global/constants';
 import { getTestProvider, TEST_WS_URL } from './config/fixtures';
@@ -65,7 +65,8 @@ describeIfWs('E2E WebSocket Tests', () => {
     });
 
     test('Test subscribeNewHeads', async () => {
-      const sub = await webSocketChannel.subscribeNewHeads();
+      // type not required, here I just test type availability
+      const sub: SubscriptionNewHeadsEvent = await webSocketChannel.subscribeNewHeads();
       expect(sub).toBeInstanceOf(Subscription);
 
       let i = 0;

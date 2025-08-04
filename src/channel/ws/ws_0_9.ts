@@ -52,6 +52,15 @@ export interface SubscribeNewTransactionsParams {
   senderAddress?: BigNumberish[];
 }
 
+// Subscription Result types
+export type SubscriptionNewHeadsEvent = Subscription<NewHeadsEvent['result']>;
+export type SubscriptionStarknetEventsEvent = Subscription<StarknetEventsEvent['result']>;
+export type SubscriptionTransactionStatusEvent = Subscription<TransactionsStatusEvent['result']>;
+export type SubscriptionNewTransactionReceiptsEvent = Subscription<
+  NewTransactionReceiptsEvent['result']
+>;
+export type SubscriptionNewTransactionEvent = Subscription<NewTransactionEvent['result']>;
+
 /**
  * Options for configuring the automatic reconnection behavior of the WebSocketChannel.
  */
@@ -580,7 +589,7 @@ export class WebSocketChannel {
    */
   public async subscribeNewHeads(
     params: SubscribeNewHeadsParams = {}
-  ): Promise<Subscription<NewHeadsEvent['result']>> {
+  ): Promise<SubscriptionNewHeadsEvent> {
     const method = 'starknet_subscribeNewHeads';
     const rpcParams = {
       block_id: params.blockIdentifier ? new Block(params.blockIdentifier).identifier : undefined,
@@ -604,7 +613,7 @@ export class WebSocketChannel {
    */
   public async subscribeEvents(
     params: SubscribeEventsParams = {}
-  ): Promise<Subscription<StarknetEventsEvent['result']>> {
+  ): Promise<SubscriptionStarknetEventsEvent> {
     const method = 'starknet_subscribeEvents';
     const rpcParams = {
       from_address: params.fromAddress !== undefined ? toHex(params.fromAddress) : undefined,
@@ -631,7 +640,7 @@ export class WebSocketChannel {
    */
   public async subscribeTransactionStatus(
     params: SubscribeTransactionStatusParams
-  ): Promise<Subscription<TransactionsStatusEvent['result']>> {
+  ): Promise<SubscriptionTransactionStatusEvent> {
     const method = 'starknet_subscribeTransactionStatus';
     const rpcParams = {
       transaction_hash: toHex(params.transactionHash),
@@ -656,7 +665,7 @@ export class WebSocketChannel {
    */
   public async subscribeNewTransactionReceipts(
     params: SubscribeNewTransactionReceiptsParams = {}
-  ): Promise<Subscription<NewTransactionReceiptsEvent['result']>> {
+  ): Promise<SubscriptionNewTransactionReceiptsEvent> {
     const method = 'starknet_subscribeNewTransactionReceipts';
     const rpcParams = {
       finality_status: params.finalityStatus,
@@ -682,7 +691,7 @@ export class WebSocketChannel {
    */
   public async subscribeNewTransactions(
     params: SubscribeNewTransactionsParams = {}
-  ): Promise<Subscription<NewTransactionEvent['result']>> {
+  ): Promise<SubscriptionNewTransactionEvent> {
     const method = 'starknet_subscribeNewTransactions';
     const rpcParams = {
       finality_status: params.finalityStatus,
