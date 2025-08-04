@@ -288,7 +288,7 @@ const txReceipt = await account.waitForTransaction(deployTx.transaction_hash);
 const deployedContract = defaultDeployer.parseDeployerEvent(txReceipt);
 ```
 
-### Response Parser Changes
+### Response Parser Fee Estimate Changes
 
 The response parser now automatically adds overhead calculations to fee estimations, providing `resourceBounds` and `overall_fee` with configurable overhead margins.
 
@@ -389,9 +389,13 @@ The new overhead types provide enhanced structure with `resourceBounds` (Resourc
 These new methods provide better handling of the enhanced resource bounds structure introduced in v8.
 
 :::tip Important: Default Overhead Configuration
-By default, all fee estimation methods now include a **50% overhead** on all resource bounds (l1_gas, l2_gas, l1_data_gas) for both `max_amount` and `max_price_per_unit`. This global configuration ensures safer transaction execution by preventing out-of-gas errors due to network fluctuations. You can customize this overhead using `resourceBoundsOverhead` in provider options, ;with custom parser or global config.
+By default, all fee estimation methods now include a **50% overhead** on all resource bounds (l1_gas, l2_gas, l1_data_gas) for both `max_amount` and `max_price_per_unit`. This global configuration ensures safer transaction execution by preventing out-of-gas errors due to network fluctuations. You can customize this overhead using `resourceBoundsOverhead` in provider options, with custom parser or global config.
 `toOverheadOverallFee()` and `toOverheadResourceBounds()` use default global overhead
-if overhead not specify. This could be disabled by providing false to overhead argument.
+if overhead not specified. This could be disabled by providing false to overhead argument.
+:::
+
+:::warning Fee Estimation Implementation Notice
+The current fee estimation calculation, particularly regarding tip handling, is still under discussion. The implementation may change based on the final solution determined by the Starknet protocol team. Future updates may modify how fees are calculated and structured.
 :::
 
 ## New Features
