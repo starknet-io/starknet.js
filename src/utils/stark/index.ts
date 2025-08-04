@@ -1,7 +1,7 @@
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 import { config } from '../../global/config';
-import { EstimateFeeResponse, FeeEstimate } from '../../provider/types/index.type';
+import { EstimateFeeResponseOverhead, FeeEstimate } from '../../provider/types/index.type';
 import {
   EDAMode,
   EDataAvailabilityMode,
@@ -175,37 +175,81 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
 }
 
 /**
+ * Returns a resource bounds with zero values and no overhead.
+ * @returns {ResourceBoundsBN} A resource bounds with zero values and no overhead.
+ */
+export function zeroResourceBounds(): ResourceBoundsBN {
+  return toOverheadResourceBounds(ZeroFeeEstimate(), false);
+}
+
+/**
  * Calculates the maximum resource bounds for fee estimation.
  *
- * @param {FeeEstimate | 0n} estimate The estimate for the fee. If a BigInt is provided, the returned bounds will be set to 0n.
- * @param {ResourceBoundsOverhead} [overhead] - The percentage overhead added to the max units and max price per unit.
+ * @param {FeeEstimate} estimate The estimate for the fee. If a BigInt is provided, the returned bounds will be set to 0n.
+ * @param {ResourceBoundsOverhead | false} [overhead] - The percentage overhead added to the max units and max price per unit. Pass `false` to disable overhead.
  * @returns {ResourceBoundsBN} The resource bounds with overhead represented as BigInt.
  * @throws {Error} If the estimate object is undefined or does not have the required properties.
  */
 export function toOverheadResourceBounds(
   estimate: FeeEstimate,
-  overhead: ResourceBoundsOverhead = config.get('resourceBoundsOverhead')
+  overhead: ResourceBoundsOverhead | false = config.get('resourceBoundsOverhead')
 ): ResourceBoundsBN {
   return {
     l2_gas: {
-      max_amount: addPercent(estimate.l2_gas_consumed, overhead.l2_gas.max_amount),
-      max_price_per_unit: addPercent(estimate.l2_gas_price, overhead.l2_gas.max_price_per_unit),
+      max_amount: addPercent(
+        estimate.l2_gas_consumed,
+        overhead !== false ? overhead.l2_gas.max_amount : 0
+      ),
+      max_price_per_unit: addPercent(
+        estimate.l2_gas_price,
+        overhead !== false ? overhead.l2_gas.max_price_per_unit : 0
+      ),
     },
     l1_gas: {
-      max_amount: addPercent(estimate.l1_gas_consumed, overhead.l1_gas.max_amount),
-      max_price_per_unit: addPercent(estimate.l1_gas_price, overhead.l1_gas.max_price_per_unit),
+      max_amount: addPercent(
+        estimate.l1_gas_consumed,
+        overhead !== false ? overhead.l1_gas.max_amount : 0
+      ),
+      max_price_per_unit: addPercent(
+        estimate.l1_gas_price,
+        overhead !== false ? overhead.l1_gas.max_price_per_unit : 0
+      ),
     },
     l1_data_gas: {
-      max_amount: addPercent(estimate.l1_data_gas_consumed, overhead.l1_data_gas.max_amount),
+      max_amount: addPercent(
+        estimate.l1_data_gas_consumed,
+        overhead !== false ? overhead.l1_data_gas.max_amount : 0
+      ),
       max_price_per_unit: addPercent(
         estimate.l1_data_gas_price,
-        overhead.l1_data_gas.max_price_per_unit
+        overhead !== false ? overhead.l1_data_gas.max_price_per_unit : 0
       ),
     },
   };
 }
 
-export function resourceBoundsToEstimateFee(resourceBounds: ResourceBoundsBN): EstimateFeeResponse {
+/**
+ * Converts a resource bounds to an estimate fee response. No overhead is applied.
+ * @param {ResourceBoundsBN} resourceBounds - The resource bounds to convert.
+ * @returns {EstimateFeeResponseOverhead} The estimate fee response.
+ * @example
+ * ```typescript
+ * const resourceBounds = {
+ *   l1_gas: { max_amount: 1000n, max_price_per_unit: 100n },
+ *   l2_gas: { max_amount: 2000n, max_price_per_unit: 200n },
+ *   l1_data_gas: { max_amount: 500n, max_price_per_unit: 50n }
+ * };
+ * const result = stark.resourceBoundsToEstimateFeeResponse(resourceBounds);
+ * // result = {
+ * //   resourceBounds: resourceBounds,
+ * //   overall_fee: 129000n,
+ * //   unit: 'FRI'
+ * // }
+ * ```
+ */
+export function resourceBoundsToEstimateFeeResponse(
+  resourceBounds: ResourceBoundsBN
+): EstimateFeeResponseOverhead {
   return {
     resourceBounds,
     /**
@@ -226,7 +270,7 @@ export function resourceBoundsToEstimateFee(resourceBounds: ResourceBoundsBN): E
  * l1_gas_consumed*l1_gas_price + l1_data_gas_consumed*l1_data_gas_price + l2_gas_consumed*l2_gas_price
  *
  * @param {FeeEstimate} estimate - The fee estimate containing gas consumption and price data
- * @param {ResourceBoundsOverhead} overhead - The overhead percentage (currently unused in calculation)
+ * @param {ResourceBoundsOverhead | false} overhead - The overhead percentage. Pass `false` to disable overhead.
  * @returns {bigint} The calculated overall fee in wei or fri
  * @example
  * ```typescript
@@ -244,19 +288,26 @@ export function resourceBoundsToEstimateFee(resourceBounds: ResourceBoundsBN): E
  */
 export function toOverheadOverallFee(
   estimate: FeeEstimate,
-  overhead: ResourceBoundsOverhead = config.get('resourceBoundsOverhead')
+  overhead: ResourceBoundsOverhead | false = config.get('resourceBoundsOverhead')
 ): bigint {
   return (
-    addPercent(estimate.l1_gas_consumed, overhead.l1_gas.max_amount) *
-      addPercent(estimate.l1_gas_price, overhead.l1_gas.max_price_per_unit) +
-    addPercent(estimate.l1_data_gas_consumed, overhead.l1_data_gas.max_amount) *
-      addPercent(estimate.l1_data_gas_price, overhead.l1_data_gas.max_price_per_unit) +
-    addPercent(estimate.l2_gas_consumed, overhead.l2_gas.max_amount) *
-      addPercent(estimate.l2_gas_price, overhead.l2_gas.max_price_per_unit)
+    addPercent(estimate.l1_gas_consumed, overhead !== false ? overhead.l1_gas.max_amount : 0) *
+      addPercent(
+        estimate.l1_gas_price,
+        overhead !== false ? overhead.l1_gas.max_price_per_unit : 0
+      ) +
+    addPercent(
+      estimate.l1_data_gas_consumed,
+      overhead !== false ? overhead.l1_data_gas.max_amount : 0
+    ) *
+      addPercent(
+        estimate.l1_data_gas_price,
+        overhead !== false ? overhead.l1_data_gas.max_price_per_unit : 0
+      ) +
+    addPercent(estimate.l2_gas_consumed, overhead !== false ? overhead.l2_gas.max_amount : 0) *
+      addPercent(estimate.l2_gas_price, overhead !== false ? overhead.l2_gas.max_price_per_unit : 0)
   );
 }
-
-// export type feeOverhead = ResourceBounds;
 
 /**
  * Mock zero fee response
@@ -370,8 +421,7 @@ export function v3Details(details: UniversalDetails): V3Details {
     accountDeploymentData: details.accountDeploymentData || [],
     nonceDataAvailabilityMode: details.nonceDataAvailabilityMode || EDataAvailabilityMode.L1,
     feeDataAvailabilityMode: details.feeDataAvailabilityMode || EDataAvailabilityMode.L1,
-    resourceBounds:
-      details.resourceBounds ?? toOverheadResourceBounds(ZeroFeeEstimate(), undefined),
+    resourceBounds: details.resourceBounds ?? zeroResourceBounds(),
   };
 }
 
