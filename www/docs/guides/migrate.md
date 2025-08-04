@@ -246,7 +246,7 @@ import { Contract } from 'starknet';
 const contract = await Contract.factory({
   contract: sierraContract, // Compiled Sierra contract
   casm: casmContract, // Compiled CASM contract
-  account: account,
+  account: account, // optional
   constructorCalldata: {
     name: 'Token',
     symbol: 'ERC20',
@@ -259,6 +259,9 @@ const contract = await Contract.factory({
   unique: true, // optional
   deployer: account.deployer, // optional
 });
+
+// if `account` property has not been defined above, it can be added later with:
+contract.providerOrAccount = myAccount;
 ```
 
 ### Removed Helper Functions
