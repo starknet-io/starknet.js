@@ -185,7 +185,7 @@ export function zeroResourceBounds(): ResourceBoundsBN {
 /**
  * Calculates the maximum resource bounds for fee estimation.
  *
- * @param {FeeEstimate} estimate The estimate for the fee. If a BigInt is provided, the returned bounds will be set to 0n.
+ * @param {FeeEstimate} estimate The estimate for the fee.
  * @param {ResourceBoundsOverhead | false} [overhead] - The percentage overhead added to the max units and max price per unit. Pass `false` to disable overhead.
  * @returns {ResourceBoundsBN} The resource bounds with overhead represented as BigInt.
  * @throws {Error} If the estimate object is undefined or does not have the required properties.
@@ -310,7 +310,7 @@ export function toOverheadOverallFee(
 }
 
 /**
- * Mock zero fee response
+ * Mock zero fee API response
  */
 export function ZeroFeeEstimate(): FeeEstimate {
   return {
