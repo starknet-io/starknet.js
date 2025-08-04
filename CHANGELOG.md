@@ -1,3 +1,15 @@
+## [8.1.2](https://github.com/starknet-io/starknet.js/compare/v8.1.1...v8.1.2) (2025-08-04)
+
+### Bug Fixes
+
+- migration docs update and fix overhead method to allow false overhead for no overhead ([3b74e62](https://github.com/starknet-io/starknet.js/commit/3b74e621b69447790a6bd1c4112b60e2b428c946))
+
+## [8.1.1](https://github.com/starknet-io/starknet.js/compare/v8.1.0...v8.1.1) (2025-08-04)
+
+### Bug Fixes
+
+- repair published types ([#1465](https://github.com/starknet-io/starknet.js/issues/1465)) ([6ab9db0](https://github.com/starknet-io/starknet.js/commit/6ab9db0fd41155735f8536d9add046e2c89abb14))
+
 # [8.1.0](https://github.com/starknet-io/starknet.js/compare/v8.0.0...v8.1.0) (2025-07-28)
 
 ### Bug Fixes

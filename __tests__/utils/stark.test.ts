@@ -1,8 +1,17 @@
-import { CallData, RawArgs, UniversalDetails, stark, FeeEstimate } from '../../src';
-import { EDataAvailabilityMode, ETransactionVersion } from '../../src/types/api';
-import { toBigInt, toHex } from '../../src/utils/num';
-import { ArraySignatureType } from '../../src/types/lib';
+import {
+  CallData,
+  RawArgs,
+  UniversalDetails,
+  stark,
+  FeeEstimate,
+  num,
+  EDataAvailabilityMode,
+  ETransactionVersion,
+  ArraySignatureType,
+} from '../../src';
 import sampleContract from '../../__mocks__/cairo/helloCairo2/compiled.sierra.json';
+
+const { toBigInt, toHex } = num;
 
 describe('stark', () => {
   describe('CallData.compile() ', () => {
@@ -240,6 +249,55 @@ describe('stark', () => {
       expect(result.l2_gas.max_amount).toBe(400n); // 200 + 100%
       expect(result.l2_gas.max_price_per_unit).toBe(40n); // 20 + 100%
     });
+
+    test('calculates resource bounds with default overhead', () => {
+      const estimate: FeeEstimate = {
+        l1_gas_consumed: '1000',
+        l1_gas_price: '100',
+        l1_data_gas_consumed: '500',
+        l1_data_gas_price: '50',
+        l2_gas_consumed: '200',
+        l2_gas_price: '20',
+        overall_fee: '0',
+        unit: 'FRI',
+      };
+      const result = stark.toOverheadResourceBounds(estimate);
+
+      expect(result).toHaveProperty('l1_gas');
+      expect(result).toHaveProperty('l2_gas');
+      expect(result).toHaveProperty('l1_data_gas');
+      expect(typeof result.l1_gas.max_amount).toBe('bigint');
+      expect(typeof result.l1_gas.max_price_per_unit).toBe('bigint');
+      expect(result.l1_gas.max_amount).toBe(1500n);
+      expect(result.l1_gas.max_price_per_unit).toBe(150n);
+      expect(result.l2_gas.max_amount).toBe(300n);
+      expect(result.l2_gas.max_price_per_unit).toBe(30n);
+      expect(result.l1_data_gas.max_amount).toBe(750n);
+      expect(result.l1_data_gas.max_price_per_unit).toBe(75n);
+    });
+
+    test('calculates resource bounds with false overhead', () => {
+      const estimate: FeeEstimate = {
+        l1_gas_consumed: '1000',
+        l1_gas_price: '100',
+        l1_data_gas_consumed: '500',
+        l1_data_gas_price: '50',
+        l2_gas_consumed: '200',
+        l2_gas_price: '20',
+        overall_fee: '0',
+        unit: 'FRI',
+      };
+
+      const result = stark.toOverheadResourceBounds(estimate, false);
+
+      // With false overhead, should return exact values without any overhead
+      expect(result.l1_gas.max_amount).toBe(1000n);
+      expect(result.l1_gas.max_price_per_unit).toBe(100n);
+      expect(result.l2_gas.max_amount).toBe(200n);
+      expect(result.l2_gas.max_price_per_unit).toBe(20n);
+      expect(result.l1_data_gas.max_amount).toBe(500n);
+      expect(result.l1_data_gas.max_price_per_unit).toBe(50n);
+    });
   });
 
   describe('toOverheadOverallFee', () => {
@@ -286,6 +344,25 @@ describe('stark', () => {
       // With 50% overhead: (1000*1.5)*(100*1.5) + (500*1.5)*(50*1.5) + (200*1.5)*(20*1.5)
       // = 1500*150 + 750*75 + 300*30 = 225000 + 56250 + 9000 = 290250
       expect(result).toBe(290250n);
+    });
+
+    test('calculates overall fee with false overhead', () => {
+      const estimate: FeeEstimate = {
+        l1_gas_consumed: '1000',
+        l1_gas_price: '100',
+        l1_data_gas_consumed: '500',
+        l1_data_gas_price: '50',
+        l2_gas_consumed: '200',
+        l2_gas_price: '20',
+        overall_fee: '0',
+        unit: 'FRI',
+      };
+
+      const result = stark.toOverheadOverallFee(estimate, false);
+
+      // With false overhead, should return exact calculation without any overhead
+      // 1000*100 + 500*50 + 200*20 = 100000 + 25000 + 4000 = 129000
+      expect(result).toBe(129000n);
     });
   });
 
@@ -396,6 +473,65 @@ describe('stark', () => {
 
     expect(stark.v3Details(details)).toMatchObject(details);
     expect(stark.v3Details(detailsUndefined)).toEqual(expect.objectContaining(detailsAnything));
+  });
+
+  describe('zeroResourceBounds', () => {
+    test('returns zero resource bounds', () => {
+      const result = stark.zeroResourceBounds();
+
+      expect(result).toEqual({
+        l1_gas: {
+          max_amount: 0n,
+          max_price_per_unit: 0n,
+        },
+        l2_gas: {
+          max_amount: 0n,
+          max_price_per_unit: 0n,
+        },
+        l1_data_gas: {
+          max_amount: 0n,
+          max_price_per_unit: 0n,
+        },
+      });
+    });
+  });
+
+  describe('resourceBoundsToEstimateFeeResponse', () => {
+    test('converts resource bounds to estimate fee response', () => {
+      const resourceBounds = {
+        l1_gas: {
+          max_amount: 1000n,
+          max_price_per_unit: 100n,
+        },
+        l2_gas: {
+          max_amount: 2000n,
+          max_price_per_unit: 200n,
+        },
+        l1_data_gas: {
+          max_amount: 500n,
+          max_price_per_unit: 50n,
+        },
+      };
+
+      const result = stark.resourceBoundsToEstimateFeeResponse(resourceBounds);
+
+      expect(result).toEqual({
+        resourceBounds,
+        overall_fee: 525000n, // 1000*100 + 500*50 + 2000*200 = 100000 + 25000 + 400000 = 525000
+        unit: 'FRI',
+      });
+    });
+
+    test('handles zero resource bounds', () => {
+      const resourceBounds = stark.zeroResourceBounds();
+      const result = stark.resourceBoundsToEstimateFeeResponse(resourceBounds);
+
+      expect(result).toEqual({
+        resourceBounds,
+        overall_fee: 0n,
+        unit: 'FRI',
+      });
+    });
   });
 });
 

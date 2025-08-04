@@ -75,7 +75,7 @@ import { parseContract } from '../utils/provider';
 import { supportsInterface } from '../utils/src5';
 import {
   randomAddress,
-  resourceBoundsToEstimateFee,
+  resourceBoundsToEstimateFeeResponse,
   signatureToHexArray,
   toFeeVersion,
   toTransactionVersion,
@@ -240,7 +240,8 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<EstimateFeeBulk> {
     if (!invocations.length) throw TypeError('Invocations should be non-empty array');
     // skip estimating bounds if user provide bounds
-    if (details.resourceBounds) return [resourceBoundsToEstimateFee(details.resourceBounds)];
+    if (details.resourceBounds)
+      return [resourceBoundsToEstimateFeeResponse(details.resourceBounds)];
 
     const { nonce, blockIdentifier, version, skipValidate } = details;
     const detailsWithTip = await this.resolveDetailsWithTip(details);
