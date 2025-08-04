@@ -15,6 +15,6 @@ export type RpcProviderOptions = {
   default?: boolean;
   waitMode?: boolean;
   baseFetch?: WindowOrWorkerGlobalScope['fetch'];
-  resourceBoundsOverhead?: ResourceBoundsOverhead;
+  resourceBoundsOverhead?: ResourceBoundsOverhead | false;
   batch?: false | number;
 };
