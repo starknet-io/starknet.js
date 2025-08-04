@@ -57,6 +57,7 @@ import type {
   UniversalDeployerContractPayload,
   UniversalDetails,
   UserTransaction,
+  waitForTransactionOptions,
 } from '../types';
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
@@ -72,7 +73,7 @@ import { parseContract } from '../utils/provider';
 import { supportsInterface } from '../utils/src5';
 import {
   randomAddress,
-  resourceBoundsToEstimateFee,
+  resourceBoundsToEstimateFeeResponse,
   signatureToHexArray,
   toFeeVersion,
   toTransactionVersion,
@@ -236,7 +237,8 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<EstimateFeeBulk> {
     if (!invocations.length) throw TypeError('Invocations should be non-empty array');
     // skip estimating bounds if user provide bounds
-    if (details.resourceBounds) return [resourceBoundsToEstimateFee(details.resourceBounds)];
+    if (details.resourceBounds)
+      return [resourceBoundsToEstimateFeeResponse(details.resourceBounds)];
 
     const { nonce, blockIdentifier, version, skipValidate } = details;
     const detailsWithTip = await this.resolveDetailsWithTip(details);
@@ -413,10 +415,10 @@ export class Account extends Provider implements AccountInterface {
 
   public async deployContract(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-    details: UniversalDetails = {}
+    details: UniversalDetails & waitForTransactionOptions = {}
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
-    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
+    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, details);
     return this.deployer.parseDeployerEvent(
       txReceipt as unknown as DeployTransactionReceiptResponse
     );
@@ -424,11 +426,11 @@ export class Account extends Provider implements AccountInterface {
 
   public async declareAndDeploy(
     payload: DeclareAndDeployContractPayload,
-    details: UniversalDetails = {}
+    details: UniversalDetails & waitForTransactionOptions = {}
   ): Promise<DeclareDeployUDCResponse> {
     let declare = await this.declareIfNot(payload, details);
     if (declare.transaction_hash !== '') {
-      const tx = await this.waitForTransaction(declare.transaction_hash);
+      const tx = await this.waitForTransaction(declare.transaction_hash, details);
       declare = { ...declare, ...tx };
     }
     const deploy = await this.deployContract(

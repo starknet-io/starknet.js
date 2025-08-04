@@ -25,7 +25,9 @@ import {
   WithOptions,
   FactoryParams,
   UniversalDetails,
+  DeclareAndDeployContractPayload,
 } from '../types';
+import type { AccountInterface } from '../account/interface';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
 import { createAbiParser } from '../utils/calldata/parser';
@@ -94,7 +96,10 @@ function buildPopulate(contract: Contract, functionAbi: FunctionAbi): ContractFu
  */
 function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFunction {
   return function (...args: Array<any>): any {
-    return contract.estimate(functionAbi.name, args);
+    const options = { ...contract.withOptionsProps };
+    // eslint-disable-next-line no-param-reassign
+    contract.withOptionsProps = undefined;
+    return contract.estimate(functionAbi.name, args, options);
   };
 }
 export class Contract implements ContractInterface {
@@ -210,59 +215,6 @@ export class Contract implements ContractInterface {
     }
   }
 
-  /**
-   * Factory method to declare and deploy a contract creating a new Contract instance
-   *
-   * It handles the entire lifecycle: compiles constructor calldata, declares the contract class,
-   * deploys an instance, and returns a ready-to-use Contract object.
-   *
-   * @param params - Factory parameters containing Contract Class details and deployment options
-   * @returns Promise that resolves to a deployed Contract instance with address and transaction hash
-   * @throws Error if deployment fails or contract_address is not returned
-   * @example
-   * ```typescript
-   * // Deploy an ERC20 contract
-   * const contract = await Contract.factory({
-   *   compiledContract: erc20CompiledContract,
-   *   account: myAccount,
-   *   casm: erc20Casm,
-   *   constructorArguments: {
-   *     name: 'MyToken',
-   *     symbol: 'MTK',
-   *     decimals: 18,
-   *     initial_supply: { low: 1000000, high: 0 },
-   *     recipient: myAccount.address
-   *   }
-   * });
-   *
-   * console.log('Contract deployed at:', contract.address);
-   * ```\
-   */
-  static async factory(params: FactoryParams, details: UniversalDetails = {}): Promise<Contract> {
-    const contract = parseContract(params.contract);
-    const { account, parseRequest = true } = params;
-    const abi = params.abi ? params.abi : extractAbi(contract);
-
-    const {
-      declare: { class_hash },
-      deploy: { contract_address },
-    } = await account.declareAndDeploy(
-      {
-        ...params,
-        abi: parseRequest ? abi : undefined,
-      },
-      details
-    );
-    assert(Boolean(contract_address), 'Deployment of the contract failed');
-
-    return new Contract({
-      abi,
-      address: contract_address,
-      providerOrAccount: account,
-      classHash: class_hash.toString(),
-    });
-  }
-
   public async isDeployed(): Promise<Contract> {
     try {
       await this.providerOrAccount.getClassHashAt(this.address);
@@ -360,7 +312,8 @@ export class Contract implements ContractInterface {
 
   public async estimate(
     method: string,
-    args: ArgsOrCalldata = []
+    args: ArgsOrCalldata = [],
+    estimateDetails: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
     assert(this.address !== null, 'contract is not connected to an address');
 
@@ -370,7 +323,7 @@ export class Contract implements ContractInterface {
 
     const invocation = this.populate(method, args);
     if (isAccount(this.providerOrAccount)) {
-      return this.providerOrAccount.estimateInvokeFee(invocation);
+      return this.providerOrAccount.estimateInvokeFee(invocation, estimateDetails);
     }
     throw Error('Contract must be connected to the account contract to estimate');
   }
@@ -427,5 +380,129 @@ export class Contract implements ContractInterface {
 
   public typedv2<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV2<TAbi> {
     return this as unknown as TypedContractV2<typeof tAbi>;
+  }
+
+  /**
+   * Factory method to declare and/or deploy a contract creating a new Contract instance
+   *
+   * It handles the entire lifecycle: compiles constructor calldata, optionally declares the contract class,
+   * deploys an instance, and returns a ready-to-use Contract object.
+   *
+   * When classHash is provided, it will only deploy the contract without declaring.
+   * When contract is provided without classHash, it will declare and deploy.
+   *
+   * @param params - Factory parameters containing Contract Class details and deployment options
+   * @returns Promise that resolves to a deployed Contract instance with address and transaction hash
+   * @throws Error if deployment fails or contract_address is not returned
+   * @example
+   * ```typescript
+   * // Declare and deploy an ERC20 contract
+   * const contract = await Contract.factory({
+   *   contract: erc20CompiledContract,
+   *   account: myAccount,
+   *   casm: erc20Casm,
+   *   constructorCalldata: {
+   *     name: 'MyToken',
+   *     symbol: 'MTK',
+   *     decimals: 18,
+   *     initial_supply: { low: 1000000, high: 0 },
+   *     recipient: myAccount.address
+   *   }
+   * });
+   *
+   * // Deploy-only mode with existing classHash (ABI will be fetched from network)
+   * const contract2 = await Contract.factory({
+   *   classHash: '0x1234...',
+   *   account: myAccount,
+   *   constructorCalldata: {
+   *     name: 'AnotherToken',
+   *     symbol: 'ATK',
+   *     decimals: 18,
+   *     initial_supply: { low: 2000000, high: 0 },
+   *     recipient: myAccount.address
+   *   }
+   * });
+   *
+   * // Deploy-only mode with provided ABI (faster, no network call)
+   * const contract3 = await Contract.factory({
+   *   classHash: '0x1234...',
+   *   abi: erc20Abi,
+   *   account: myAccount,
+   *   constructorCalldata: {
+   *     name: 'ThirdToken',
+   *     symbol: 'TTK',
+   *     decimals: 18,
+   *     initial_supply: { low: 3000000, high: 0 },
+   *     recipient: myAccount.address
+   *   }
+   * });
+   *
+   * console.log('Contract deployed at:', contract.address);
+   * ```\
+   */
+  static async factory(params: FactoryParams, details: UniversalDetails = {}): Promise<Contract> {
+    const { account, parseRequest = true } = params;
+    let abi: Abi;
+    let classHash: string;
+    let contract_address: string;
+
+    // Check if only deploying (classHash provided and no contract)
+    if ('classHash' in params && params.classHash && !('contract' in params)) {
+      // Deploy-only mode: use provided classHash
+      const deployParams = params as FactoryParams & { classHash: string; abi?: Abi };
+      classHash = deployParams.classHash.toString();
+
+      // If ABI is not provided, fetch it from the network using the classHash
+      if (!deployParams.abi) {
+        const contractClass = await account.getClass(classHash);
+        abi = contractClass.abi;
+      } else {
+        abi = deployParams.abi;
+      }
+
+      // Deploy the contract using the provided classHash
+      const deployResult = await account.deployContract(
+        {
+          classHash,
+          constructorCalldata: deployParams.constructorCalldata,
+          salt: deployParams.salt,
+          unique: deployParams.unique,
+          abi: parseRequest ? abi : undefined,
+        },
+        details
+      );
+      contract_address = deployResult.contract_address;
+    } else {
+      // Declare and deploy mode: original behavior
+      const declareParams = params as DeclareAndDeployContractPayload & {
+        account: AccountInterface;
+        parseRequest?: boolean;
+      };
+      const contract = parseContract(declareParams.contract);
+      abi = declareParams.abi ? declareParams.abi : extractAbi(contract);
+
+      const {
+        declare: { class_hash },
+        deploy: { contract_address: deployed_address },
+      } = await account.declareAndDeploy(
+        {
+          ...declareParams,
+          abi: parseRequest ? abi : undefined,
+        },
+        details
+      );
+      classHash = class_hash.toString();
+      contract_address = deployed_address;
+    }
+
+    // Common contract creation logic
+    assert(Boolean(contract_address), 'Deployment of the contract failed');
+
+    return new Contract({
+      abi,
+      address: contract_address,
+      providerOrAccount: account,
+      classHash,
+    });
   }
 }

@@ -15,8 +15,15 @@ import {
   type Calldata,
   type InvokeTransactionReceiptResponse,
   Deployer,
+  RPC,
 } from '../src';
-import { C1v2ClassHash, contracts, describeIfDevnet, erc20ClassHash } from './config/fixtures';
+import {
+  C1v2ClassHash,
+  contracts,
+  describeIfDevnet,
+  describeIfNotDevnet,
+  erc20ClassHash,
+} from './config/fixtures';
 import {
   createTestProvider,
   getTestAccount,
@@ -469,8 +476,7 @@ describe('deploy and test Account', () => {
       expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
       expect(hexToDecimalString(declareTx.class_hash)).toEqual(hexToDecimalString(erc20ClassHash));
     });
-
-    test('UDC DeployContract', async () => {
+    test('UDC DeployContract - on default ACCEPTED_ON_L2', async () => {
       const deployResponse = await account.deployContract({
         classHash: erc20ClassHash,
         constructorCalldata: erc20Constructor,
@@ -748,23 +754,47 @@ describe('deploy and test Account', () => {
     // Order is important, declare c1 must be last else estimate and simulate will error
     // with contract already declared
     test('estimateInvokeFee Cairo 1', async () => {
-      // TODO @dhruvkelawala check expectation for feeTransactionVersion
       // Cairo 1 contract
       const ddc1: DeclareDeployUDCResponse = await account.declareAndDeploy({
         contract: contracts.C260.sierra,
         casm: contracts.C260.casm,
       });
 
-      // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-      const result = await account.estimateInvokeFee({
-        contractAddress: ddc1.deploy.address,
-        entrypoint: 'set_name',
-        calldata: ['Hello'],
-      });
+      const latestBlock = await provider.getBlock('latest');
 
-      expect(result).toMatchSchemaRef('EstimateFeeResponseOverhead');
-      // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-      // innerInvokeEstFeeSpy.mockClear();
+      // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const result = account.estimateInvokeFee(
+        {
+          contractAddress: ddc1.deploy.address, // 0x630f529021f2686e9869b83121ca36f4cbb2b1d617d29d5b079c765f4ef409e
+          entrypoint: 'set_name',
+          calldata: ['Hello'],
+        },
+        {
+          tip: 0,
+          blockIdentifier: latestBlock.block_number,
+        }
+      );
+
+      const result1 = account.estimateInvokeFee(
+        {
+          contractAddress: ddc1.deploy.address,
+          entrypoint: 'set_name',
+          calldata: ['Hello'],
+        },
+        {
+          tip: 1000000000000000000,
+          blockIdentifier: latestBlock.block_number,
+        }
+      );
+
+      const [resolvedResult, resolvedResult1] = await Promise.all([result, result1]);
+      expect(resolvedResult).toMatchSchemaRef('EstimateFeeResponseOverhead');
+
+      // TODO: Different tips should produce different fees on estimate Fee.
+      expect(resolvedResult.resourceBounds.l2_gas.max_price_per_unit).toBe(
+        resolvedResult1.resourceBounds.l2_gas.max_price_per_unit
+      );
+      expect(resolvedResult.overall_fee).toBe(resolvedResult1.overall_fee);
     });
   });
   describe('Custom Cairo 1 Deployer', () => {
@@ -791,6 +821,27 @@ describe('deploy and test Account', () => {
         constructorCalldata: erc20Constructor,
       });
       expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
+    });
+  });
+
+  describeIfNotDevnet('Not Devnet', () => {
+    test('UDC DeployContract - on PRE_CONFIRMED', async () => {
+      const deployResponse = await account.deployContract(
+        {
+          classHash: erc20ClassHash,
+          constructorCalldata: erc20Constructor,
+        },
+        {
+          successStates: [
+            RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
+            RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
+            RPC.ETransactionFinalityStatus.PRE_CONFIRMED,
+          ],
+        }
+      );
+      // TODO: expect based on Sepolia test where UDC events are not Filled with data on pre-confirmed, change if behavior changes
+      expect(deployResponse.address).toBeUndefined();
+      // expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
     });
   });
 });

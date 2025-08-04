@@ -27,116 +27,150 @@ This two-phase deployment model is unique to Starknet and offers several advanta
 
 :::
 
+## Deployment Methods Overview
+
+Starknet.js provides two main approaches for contract deployment:
+
+| Method                 | Use Case                       | Declare + Deploy | Deploy Only | ABI Handling         |
+| ---------------------- | ------------------------------ | :--------------: | :---------: | -------------------- |
+| **Contract.factory()** | Quick, streamlined deployments |        ✅        |     ✅      | Auto-fetch or manual |
+| **Account methods**    | Fine-grained control           |        ✅        |     ✅      | Manual               |
+
+Choose the method that best fits your use case:
+
+- **Contract.factory()**: Best for most use cases, especially when deploying from existing class hashes
+- **Account methods**: Use when you need maximum control over the deployment process
+
 ## Using Contract.factory() Static Method
 
-Starknet.js v8 provides a static `Contract.factory()` method for deploying contracts. This method handles the entire deployment lifecycle: compiling constructor calldata, declaring the contract class, deploying an instance, and returning a ready-to-use Contract object.
+The `Contract.factory()` static method provides a streamlined approach for both declaring and deploying contracts, or deploying from existing class hashes. It handles the entire deployment lifecycle: compiling constructor calldata, declaring the contract class, deploying an instance, and returning a ready-to-use Contract object.
 
 This approach is useful when you need to:
 
 - Deploy contracts with automatic declaration and deployment
+- Deploy from existing class hashes with automatic ABI fetching
 - Ensure constructor argument validation against the contract ABI
 - Get a ready-to-use Contract instance immediately after deployment
 
-### Deploying Contracts with Contract.factory()
+### Declare and Deploy Mode
+
+Use this mode when you need to declare a new contract class and deploy an instance:
 
 ```typescript
 import { Contract } from 'starknet';
 
-// Deploy with constructor arguments
+// Declare and deploy in one step
 const myContract = await Contract.factory({
-  compiledContract: compiledSierra, // Your compiled Sierra contract
-  account: myAccount, // Account that will deploy the contract
-  casm: compiledCasm, // CASM file for the contract
-  constructorArguments: {
+  contract: compiledSierra, // Compiled Sierra contract
+  casm: compiledCasm, // Compiled CASM file
+  account: myAccount, // Deploying account
+  constructorCalldata: {
     name: 'MyToken',
     symbol: 'MTK',
     decimals: 18,
     initialSupply: 1000n * 10n ** 18n,
+    recipient: myAccount.address,
   },
-  parseRequest: true, // Enable ABI validation (default: true)
 });
 
 console.log('Contract deployed at:', myContract.address);
+console.log('Class hash:', myContract.classHash);
+
+// Contract is immediately ready to use
+const balance = await myContract.balanceOf(myAccount.address);
 ```
 
-### Factory Method Features
+### Deploy-Only Mode
+
+When you have an existing class hash (e.g., standard contracts like ERC20), you can deploy directly without declaring:
+
+#### Deploy with ABI Fetched from Network
 
 ```typescript
-// The factory method handles both declare and deploy automatically
-const contract = await Contract.factory({
-  compiledContract: contractCode,
+// ABI will be automatically fetched from the network
+const myContract = await Contract.factory({
+  classHash: '0x1234...', // Existing class hash
   account: myAccount,
-  casm: compiledCasm,
-  constructorArguments: { owner: myAccount.address },
-});
-
-// Start using the contract immediately - no need to wait for deployment
-const balance = await contract.balanceOf(myAccount.address);
-```
-
-### Advanced Usage
-
-1. **Constructor Argument Validation**
-
-```typescript
-// With parseRequest: true (default), arguments are validated against ABI
-const contract = await Contract.factory({
-  compiledContract: erc20Contract,
-  account: myAccount,
-  casm: erc20Casm,
-  constructorArguments: {
+  constructorCalldata: {
     name: 'MyToken',
     symbol: 'MTK',
     decimals: 18,
-    initial_supply: cairo.uint256(1000000),
+    initialSupply: 1000n * 10n ** 18n,
     recipient: myAccount.address,
   },
-  parseRequest: true, // Validates arguments against contract ABI
+});
+
+// Contract is ready with automatically fetched ABI
+const totalSupply = await myContract.totalSupply();
+```
+
+#### Deploy with Provided ABI (Faster)
+
+```typescript
+// Provide ABI to skip network fetch
+const myContract = await Contract.factory({
+  classHash: '0x1234...', // Existing class hash
+  abi: contractAbi, // Your contract ABI
+  account: myAccount,
+  constructorCalldata: {
+    name: 'MyToken',
+    symbol: 'MTK',
+    decimals: 18,
+    initialSupply: 1000n * 10n ** 18n,
+    recipient: myAccount.address,
+  },
 });
 ```
 
-2. **Deploy Multiple Instances**
+### Advanced Options
+
+The factory method supports all deployment parameters:
 
 ```typescript
-// Deploy multiple instances of the same contract
-const deployMultipleTokens = async () => {
-  const tokens = [];
-
-  const tokenConfigs = [
-    { name: 'Token1', symbol: 'TK1', decimals: 18 },
-    { name: 'Token2', symbol: 'TK2', decimals: 18 },
-  ];
-
-  for (const tokenConfig of tokenConfigs) {
-    const token = await Contract.factory({
-      compiledContract: erc20Contract,
-      account: myAccount,
-      casm: erc20Casm,
-      constructorArguments: tokenConfig,
-    });
-    tokens.push(token);
-  }
-
-  return tokens;
-};
+const myContract = await Contract.factory({
+  classHash: '0x1234...',
+  abi: contractAbi, // Optional: will fetch from network if not provided
+  account: myAccount,
+  constructorCalldata: {
+    // Your constructor parameters
+  },
+  salt: '0xabcd...', // Optional: custom salt for address generation
+  unique: false, // Optional: set to false for predictable addresses
+  parseRequest: true, // Optional: enable/disable request parsing (default: true)
+});
 ```
 
-### Best Practices with Contract.factory()
+The factory method supports all deployment parameters:
 
-1. **Handle Deployment Errors**
+```typescript
+const myContract = await Contract.factory({
+  classHash: '0x1234...',
+  abi: contractAbi, // Optional: will fetch from network if not provided
+  account: myAccount,
+  constructorCalldata: {
+    // Your constructor parameters
+  },
+  salt: '0xabcd...', // Optional: custom salt for address generation
+  unique: false, // Optional: set to false for predictable addresses
+  parseRequest: true, // Optional: enable/disable request parsing (default: true)
+});
+```
+
+### Error Handling
 
 ```typescript
 try {
   const myContract = await Contract.factory({
-    compiledContract: contractCode,
+    classHash: '0x1234...',
     account: myAccount,
-    casm: compiledCasm,
-    constructorArguments: constructorParams,
+    constructorCalldata: constructorParams,
   });
   console.log('Deployed at:', myContract.address);
 } catch (error) {
   if (error.message.includes('Class hash not declared')) {
-    console.error('Contract class needs to be declared first');
+    console.error('Class hash does not exist on the network');
+  } else if (error.message.includes('ABI not found')) {
+    console.error('Could not fetch ABI from network, provide it manually');
   } else if (error.message.includes('Insufficient funds')) {
     console.error('Account has insufficient funds for deployment');
   } else {
@@ -145,31 +179,10 @@ try {
 }
 ```
 
-2. **Reuse Compiled Contracts**
+:::tip Recommended Approach
 
-```typescript
-// Load contracts once, deploy multiple times
-const erc20Contract = json.parse(fs.readFileSync('./ERC20.sierra.json').toString());
-const erc20Casm = json.parse(fs.readFileSync('./ERC20.casm.json').toString());
+`Contract.factory()` is the recommended way to deploy and create contract instances in Starknet.js. It provides a streamlined API that handles both declaration and deployment, with automatic ABI fetching when deploying from existing class hashes.
 
-// Deploy multiple tokens efficiently
-const token1 = await Contract.factory({
-  compiledContract: erc20Contract,
-  account: myAccount,
-  casm: erc20Casm,
-  constructorArguments: { name: 'Token1', symbol: 'TK1' },
-});
-
-const token2 = await Contract.factory({
-  compiledContract: erc20Contract,
-  account: myAccount,
-  casm: erc20Casm,
-  constructorArguments: { name: 'Token2', symbol: 'TK2' },
-});
-```
-
-:::tip
-The `Contract.factory()` method is the simplest way to deploy a new contract and get contract instance.
 :::
 
 ## Using Account Methods Directly
@@ -245,6 +258,19 @@ const myContract = new Contract({
   providerOrAccount: myProvider,
 });
 ```
+
+:::tip Simplified Alternative
+For a more streamlined approach, consider using `Contract.factory()` which handles ABI fetching automatically:
+
+```typescript
+const myContract = await Contract.factory({
+  classHash: existingClassHash,
+  account: myAccount,
+  // ABI will be fetched automatically from the network
+});
+```
+
+:::
 
 ### Working with Constructors
 

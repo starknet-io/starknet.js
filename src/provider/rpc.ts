@@ -14,6 +14,7 @@ import {
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  type GasPrices,
   GetBlockResponse,
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
@@ -54,6 +55,7 @@ import type {
   TransactionWithHash,
 } from './types/spec.type';
 import { verifyMessageInStarknet } from './modules/verifyMessageInStarknet';
+import { getGasPrices } from './modules';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -210,6 +212,24 @@ export class RpcProvider implements ProviderInterface {
     return this.channel
       .getBlockWithTxHashes(blockIdentifier)
       .then(this.responseParser.parseL1GasPriceResponse);
+  }
+
+  /**
+   * Get the gas prices related to a block.
+   * @param {BlockIdentifier} [blockIdentifier = this.identifier] - Optional. Can be 'pending', 'latest' or a block number (an integer type).
+   * @returns {Promise<GasPrices>} an object with l1DataGasPrice, l1GasPrice, l2GasPrice properties (all bigint type).
+   * @example
+   * ```ts
+   * const result = await myProvider.getGasPrices();
+   * // result = { l1DataGasPrice: 3039n, l1GasPrice: 55590341542890n, l2GasPrice: 8441845008n }
+   * ```
+   */
+  public async getGasPrices(
+    blockIdentifier: BlockIdentifier = this.channel.blockIdentifier
+  ): Promise<GasPrices> {
+    if (this.channel instanceof RPC09.RpcChannel)
+      return getGasPrices(this.channel, blockIdentifier);
+    throw new LibraryError('Unsupported method for RPC version');
   }
 
   public async getL1MessageHash(l2TxHash: BigNumberish): Promise<string> {
@@ -375,17 +395,12 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ) {
-    const estimates = await this.getEstimateFeeBulk(
-      [
-        {
-          type: ETransactionType.INVOKE,
-          ...invocation,
-          ...details,
-        },
-      ],
-      { blockIdentifier, skipValidate }
-    );
-    return estimates[0]; // Return the first (and only) estimate
+    return (
+      await this.getEstimateFeeBulk(
+        [{ type: ETransactionType.INVOKE, ...invocation, ...details }],
+        { blockIdentifier, skipValidate }
+      )
+    )[0]; // Return the first (and only) estimate
   }
 
   public async getDeclareEstimateFee(
@@ -394,17 +409,12 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ) {
-    const estimates = await this.getEstimateFeeBulk(
-      [
-        {
-          type: ETransactionType.DECLARE,
-          ...invocation,
-          ...details,
-        },
-      ],
-      { blockIdentifier, skipValidate }
-    );
-    return estimates[0]; // Return the first (and only) estimate
+    return (
+      await this.getEstimateFeeBulk(
+        [{ type: ETransactionType.DECLARE, ...invocation, ...details }],
+        { blockIdentifier, skipValidate }
+      )
+    )[0]; // Return the first (and only) estimate
   }
 
   public async getDeployAccountEstimateFee(
@@ -413,22 +423,17 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ) {
-    const estimates = await this.getEstimateFeeBulk(
-      [
-        {
-          type: ETransactionType.DEPLOY_ACCOUNT,
-          ...invocation,
-          ...details,
-        },
-      ],
-      { blockIdentifier, skipValidate }
-    );
-    return estimates[0]; // Return the first (and only) estimate
+    return (
+      await this.getEstimateFeeBulk(
+        [{ type: ETransactionType.DEPLOY_ACCOUNT, ...invocation, ...details }],
+        { blockIdentifier, skipValidate }
+      )
+    )[0]; // Return the first (and only) estimate
   }
 
   public async getEstimateFeeBulk(
     invocations: AccountInvocations,
-    options: getEstimateFeeBulkOptions
+    options?: getEstimateFeeBulkOptions
   ) {
     return this.channel
       .getEstimateFee(invocations, options)
