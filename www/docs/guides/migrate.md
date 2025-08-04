@@ -291,6 +291,116 @@ const txReceipt = await account.waitForTransaction(deployTx.transaction_hash);
 const deployedContract = defaultDeployer.parseDeployerEvent(txReceipt);
 ```
 
+### Response Parser Fee Estimate Changes
+
+The response parser now automatically adds overhead calculations to fee estimations, providing `resourceBounds` and `overall_fee` with configurable overhead margins.
+
+**All estimate methods now use `parseFeeEstimateBulkResponse`** internally, which:
+
+- Adds overhead to resource bounds for safety margin
+- Formats responses to include both `resourceBounds` and `overall_fee`
+- Returns `EstimateFeeResponseBulkOverhead` type with standardized structure
+
+**v7 Response Structure:**
+
+```typescript
+// Raw fee estimate from RPC
+{
+  l1_gas_consumed: "0x1000",
+  l1_gas_price: "0x20",
+  l1_data_gas_consumed: "0x500",
+  l1_data_gas_price: "0x10",
+  l2_gas_consumed: "0x200",
+  l2_gas_price: "0x5",
+  unit: "FRI"
+}
+```
+
+**v8 Response Structure:**
+
+```typescript
+// Enhanced response with overhead and resource bounds
+{
+  resourceBounds: {
+    l1_gas: { amount: "0x1200", price: "0x20" },    // With overhead
+    l2_gas: { amount: "0x240", price: "0x5" },      // With overhead
+    l1_data_gas: { amount: "0x600", price: "0x10" } // With overhead
+  },
+  overall_fee: 12345n, // Total fee calculation with overhead
+  unit: "FRI"
+}
+```
+
+**Configuring Resource Bounds Overhead:**
+
+```typescript
+import { RpcProvider } from 'starknet';
+
+// Configure custom overhead percentages (default: 50% for all)
+const provider = new RpcProvider({
+  nodeUrl: 'https://your-node-url',
+  resourceBoundsOverhead: {
+    l1_gas: {
+      max_amount: 10, // 10% overhead for L1 gas amount
+      max_price_per_unit: 10, // 10% overhead for L1 gas price
+    },
+    l2_gas: {
+      max_amount: 5, // 5% overhead for L2 gas amount
+      max_price_per_unit: 5, // 5% overhead for L2 gas price
+    },
+    l1_data_gas: {
+      max_amount: 15, // 15% overhead for L1 data gas amount
+      max_price_per_unit: 15, // 15% overhead for L1 data gas price
+    },
+  },
+});
+
+// All estimate methods benefit from this overhead
+const invokeEstimate = await account.estimateInvokeFee(calls);
+const declareEstimate = await account.estimateDeclareFee(contract);
+const deployEstimate = await account.estimateDeployFee(payload);
+const bulkEstimate = await account.estimateFeeBulk(invocations);
+```
+
+This change ensures safer transaction execution by automatically adding a margin to prevent out-of-gas errors due to network fluctuations.
+
+### Removed Fee Utility Methods
+
+The following utility methods have been removed and replaced with new resource bounds methods:
+
+**Removed Methods:**
+
+- `RPCResponseParser.ZEROFee()` → replaced with `stark.ZeroFeeEstimate()`
+- `stark.estimatedFeeToMaxFee()` → replaced with `stark.toOverheadOverallFee()`
+- `stark.estimateFeeToBounds()` → replaced with `stark.toOverheadResourceBounds()`
+
+**Replaced Types:**
+
+- `EstimateFeeResponse` → replaced with `EstimateFeeResponseOverhead`
+- `EstimateFeeResponseBulk` → replaced with `EstimateFeeResponseBulkOverhead`
+
+The new overhead types provide enhanced structure with `resourceBounds` (ResourceBoundsBN) and `overall_fee` (bigint) instead of the previous flat structure with individual gas consumption fields.
+
+**New Resource Bounds Methods:**
+
+- `stark.zeroResourceBounds()` - Returns zero resource bounds
+- `stark.toOverheadResourceBounds()` - Converts fee estimates to resource bounds with overhead
+- `stark.resourceBoundsToEstimateFeeResponse()` - Converts resource bounds back to fee response format
+- `stark.toOverheadOverallFee()` - Calculates total fee with overhead
+- `stark.ZeroFeeEstimate()` - Returns zero fee estimate structure
+
+These new methods provide better handling of the enhanced resource bounds structure introduced in v8.
+
+:::tip Important: Default Overhead Configuration
+By default, all fee estimation methods now include a **50% overhead** on all resource bounds (l1_gas, l2_gas, l1_data_gas) for both `max_amount` and `max_price_per_unit`. This global configuration ensures safer transaction execution by preventing out-of-gas errors due to network fluctuations. You can customize this overhead using `resourceBoundsOverhead` in provider options, with custom parser or global config.
+`toOverheadOverallFee()` and `toOverheadResourceBounds()` use default global overhead
+if overhead not specified. This could be disabled by providing false to overhead argument.
+:::
+
+:::warning Fee Estimation Implementation Notice
+The current fee estimation calculation, particularly regarding tip handling, is still under discussion. The implementation may change based on the final solution determined by the Starknet protocol team. Future updates may modify how fees are calculated and structured.
+:::
+
 ## New Features
 
 ### Custom Deployer Support

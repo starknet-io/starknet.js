@@ -147,6 +147,8 @@ export function isRPC08Plus_ResourceBoundsBN(entry: ResourceBoundsBN): entry is 
 
 export type ResourceBounds = Merge<RPCSPEC08.ResourceBounds, RPCSPEC09.ResourceBounds>; // same sa rpc0.8
 
+export type EventFilter = RPCSPEC09.EventFilter;
+
 /**
  * Represents percentage overhead for each resource bound
  * numerical 50 means 50% overhead
