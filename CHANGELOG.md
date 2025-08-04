@@ -1,3 +1,9 @@
+## [8.1.1](https://github.com/starknet-io/starknet.js/compare/v8.1.0...v8.1.1) (2025-08-04)
+
+### Bug Fixes
+
+- repair published types ([#1465](https://github.com/starknet-io/starknet.js/issues/1465)) ([6ab9db0](https://github.com/starknet-io/starknet.js/commit/6ab9db0fd41155735f8536d9add046e2c89abb14))
+
 # [8.1.0](https://github.com/starknet-io/starknet.js/compare/v8.0.0...v8.1.0) (2025-07-28)
 
 ### Bug Fixes
