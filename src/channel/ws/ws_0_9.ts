@@ -1,5 +1,16 @@
 /* eslint-disable no-underscore-dangle */
-import { RPCSPEC08, JRPC } from '../../types/api';
+import {
+  JRPC,
+  StarknetEventsEvent,
+  NewHeadsEvent,
+  TransactionsStatusEvent,
+  NewTransactionReceiptsEvent,
+  TXN_STATUS_WITHOUT_L1,
+  NewTransactionEvent,
+  SUBSCRIPTION_ID,
+  TXN_FINALITY_STATUS,
+  STATUS_ACCEPTED_ON_L1,
+} from '../../types/api'; // Default exported RPC 0.9 Types
 
 import { BigNumberish, SubscriptionBlockIdentifier } from '../../types';
 import { WebSocketEvent } from '../../types/api/jsonrpc';
@@ -14,13 +25,41 @@ import { config } from '../../global/config';
 import { logger } from '../../global/logger';
 import { Subscription } from './subscription';
 
-// Create type aliases to avoid repeating RPCSPEC08 prefix
-type BLOCK_HEADER = RPCSPEC08.BLOCK_HEADER;
-type EMITTED_EVENT = RPCSPEC08.EMITTED_EVENT;
-type NEW_TXN_STATUS = RPCSPEC08.NEW_TXN_STATUS;
-type SUBSCRIPTION_ID = RPCSPEC08.SUBSCRIPTION_ID;
-type TXN_HASH = RPCSPEC08.TXN_HASH;
-type TXN_WITH_HASH = RPCSPEC08.TXN_WITH_HASH;
+// Subscription parameter interfaces for object-based API
+export interface SubscribeNewHeadsParams {
+  blockIdentifier?: SubscriptionBlockIdentifier;
+}
+
+export interface SubscribeEventsParams {
+  fromAddress?: BigNumberish;
+  keys?: string[][];
+  blockIdentifier?: SubscriptionBlockIdentifier;
+  finalityStatus?: Exclude<TXN_FINALITY_STATUS, STATUS_ACCEPTED_ON_L1>;
+}
+
+export interface SubscribeTransactionStatusParams {
+  transactionHash: BigNumberish;
+  blockIdentifier?: SubscriptionBlockIdentifier;
+}
+
+export interface SubscribeNewTransactionReceiptsParams {
+  finalityStatus?: Exclude<TXN_FINALITY_STATUS, STATUS_ACCEPTED_ON_L1>[];
+  senderAddress?: BigNumberish[];
+}
+
+export interface SubscribeNewTransactionsParams {
+  finalityStatus?: TXN_STATUS_WITHOUT_L1[];
+  senderAddress?: BigNumberish[];
+}
+
+// Subscription Result types
+export type SubscriptionNewHeadsEvent = Subscription<NewHeadsEvent['result']>;
+export type SubscriptionStarknetEventsEvent = Subscription<StarknetEventsEvent['result']>;
+export type SubscriptionTransactionStatusEvent = Subscription<TransactionsStatusEvent['result']>;
+export type SubscriptionNewTransactionReceiptsEvent = Subscription<
+  NewTransactionReceiptsEvent['result']
+>;
+export type SubscriptionNewTransactionEvent = Subscription<NewTransactionEvent['result']>;
 
 /**
  * Options for configuring the automatic reconnection behavior of the WebSocketChannel.
@@ -39,6 +78,9 @@ export type ReconnectOptions = {
   delay?: number;
 };
 
+/**
+ * The type of the WebSocket implementation.
+ */
 export type WebSocketModule = { new (nodeUrl: WebSocketOptions['nodeUrl']): WebSocket };
 
 /**
@@ -542,21 +584,21 @@ export class WebSocketChannel {
 
   /**
    * Subscribes to new block headers.
-   * @param {SubscriptionBlockIdentifier} [blockIdentifier] - The block to start receiving notifications from. Defaults to 'latest'.
+   * @param {SubscribeNewHeadsParams} params - The parameters for the subscription.
    * @returns {Promise<Subscription<BLOCK_HEADER>>} A Promise that resolves with a `Subscription` object for new block headers.
    */
   public async subscribeNewHeads(
-    blockIdentifier?: SubscriptionBlockIdentifier
-  ): Promise<Subscription<BLOCK_HEADER>> {
+    params: SubscribeNewHeadsParams = {}
+  ): Promise<SubscriptionNewHeadsEvent> {
     const method = 'starknet_subscribeNewHeads';
-    const params = {
-      block_id: blockIdentifier ? new Block(blockIdentifier).identifier : undefined,
+    const rpcParams = {
+      block_id: params.blockIdentifier ? new Block(params.blockIdentifier).identifier : undefined,
     };
-    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
+    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
     const subscription = new Subscription({
       channel: this,
       method,
-      params,
+      params: rpcParams,
       id: subId,
       maxBufferSize: this.maxBufferSize,
     });
@@ -566,27 +608,24 @@ export class WebSocketChannel {
 
   /**
    * Subscribes to events matching a given filter.
-   * @param {BigNumberish} [fromAddress] - The contract address to filter by.
-   * @param {string[][]} [keys] - The event keys to filter by.
-   * @param {SubscriptionBlockIdentifier} [blockIdentifier] - The block to start receiving notifications from. Defaults to 'latest'.
+   * @param {SubscribeEventsParams} params - The parameters for the subscription.
    * @returns {Promise<Subscription<EMITTED_EVENT>>} A Promise that resolves with a `Subscription` object for the specified events.
    */
   public async subscribeEvents(
-    fromAddress?: BigNumberish,
-    keys?: string[][],
-    blockIdentifier?: SubscriptionBlockIdentifier
-  ): Promise<Subscription<EMITTED_EVENT>> {
+    params: SubscribeEventsParams = {}
+  ): Promise<SubscriptionStarknetEventsEvent> {
     const method = 'starknet_subscribeEvents';
-    const params = {
-      from_address: fromAddress !== undefined ? toHex(fromAddress) : undefined,
-      keys,
-      block_id: blockIdentifier ? new Block(blockIdentifier).identifier : undefined,
+    const rpcParams = {
+      from_address: params.fromAddress !== undefined ? toHex(params.fromAddress) : undefined,
+      keys: params.keys,
+      block_id: params.blockIdentifier ? new Block(params.blockIdentifier).identifier : undefined,
+      finality_status: params.finalityStatus,
     };
-    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
+    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
     const subscription = new Subscription({
       channel: this,
       method,
-      params,
+      params: rpcParams,
       id: subId,
       maxBufferSize: this.maxBufferSize,
     });
@@ -596,24 +635,22 @@ export class WebSocketChannel {
 
   /**
    * Subscribes to status updates for a specific transaction.
-   * @param {BigNumberish} transactionHash - The hash of the transaction to monitor.
-   * @param {SubscriptionBlockIdentifier} [blockIdentifier] - The block context. Not typically required.
+   * @param {SubscribeTransactionStatusParams} params - The parameters for the subscription.
    * @returns {Promise<Subscription<NEW_TXN_STATUS>>} A Promise that resolves with a `Subscription` object for the transaction's status.
    */
   public async subscribeTransactionStatus(
-    transactionHash: BigNumberish,
-    blockIdentifier?: SubscriptionBlockIdentifier
-  ): Promise<Subscription<NEW_TXN_STATUS>> {
+    params: SubscribeTransactionStatusParams
+  ): Promise<SubscriptionTransactionStatusEvent> {
     const method = 'starknet_subscribeTransactionStatus';
-    const params = {
-      transaction_hash: toHex(transactionHash),
-      block_id: blockIdentifier ? new Block(blockIdentifier).identifier : undefined,
+    const rpcParams = {
+      transaction_hash: toHex(params.transactionHash),
+      block_id: params.blockIdentifier ? new Block(params.blockIdentifier).identifier : undefined,
     };
-    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
+    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
     const subscription = new Subscription({
       channel: this,
       method,
-      params,
+      params: rpcParams,
       id: subId,
       maxBufferSize: this.maxBufferSize,
     });
@@ -622,25 +659,50 @@ export class WebSocketChannel {
   }
 
   /**
-   * Subscribes to pending transactions.
-   * @param {boolean} [transactionDetails] - If `true`, the full transaction details are included. Defaults to `false` (hash only).
-   * @param {BigNumberish[]} [senderAddress] - An array of sender addresses to filter by.
-   * @returns {Promise<Subscription<TXN_HASH | TXN_WITH_HASH>>} A Promise that resolves with a `Subscription` object for pending transactions.
+   * Subscribes to new transaction receipts.
+   * @param {SubscribeNewTransactionReceiptsParams} params - The parameters for the subscription.
+   * @returns {Promise<Subscription<NewTransactionReceiptsEvent['result']>>} A Promise that resolves with a `Subscription` object for new transaction receipts.
    */
-  public async subscribePendingTransaction(
-    transactionDetails?: boolean,
-    senderAddress?: BigNumberish[]
-  ): Promise<Subscription<TXN_HASH | TXN_WITH_HASH>> {
-    const method = 'starknet_subscribePendingTransactions';
-    const params = {
-      transaction_details: transactionDetails,
-      sender_address: senderAddress && bigNumberishArrayToHexadecimalStringArray(senderAddress),
+  public async subscribeNewTransactionReceipts(
+    params: SubscribeNewTransactionReceiptsParams = {}
+  ): Promise<SubscriptionNewTransactionReceiptsEvent> {
+    const method = 'starknet_subscribeNewTransactionReceipts';
+    const rpcParams = {
+      finality_status: params.finalityStatus,
+      sender_address:
+        params.senderAddress && bigNumberishArrayToHexadecimalStringArray(params.senderAddress),
     };
-    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, params);
+    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
     const subscription = new Subscription({
       channel: this,
       method,
-      params,
+      params: rpcParams,
+      id: subId,
+      maxBufferSize: this.maxBufferSize,
+    });
+    this.activeSubscriptions.set(subId, subscription);
+    return subscription;
+  }
+
+  /**
+   * Subscribes to new transactions.
+   * @param {SubscribeNewTransactionsParams} params - The parameters for the subscription.
+   * @returns {Promise<Subscription<NewTransactionEvent['result']>>} A Promise that resolves with a `Subscription` object for new transactions.
+   */
+  public async subscribeNewTransactions(
+    params: SubscribeNewTransactionsParams = {}
+  ): Promise<SubscriptionNewTransactionEvent> {
+    const method = 'starknet_subscribeNewTransactions';
+    const rpcParams = {
+      finality_status: params.finalityStatus,
+      sender_address:
+        params.senderAddress && bigNumberishArrayToHexadecimalStringArray(params.senderAddress),
+    };
+    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
+    const subscription = new Subscription({
+      channel: this,
+      method,
+      params: rpcParams,
       id: subId,
       maxBufferSize: this.maxBufferSize,
     });
