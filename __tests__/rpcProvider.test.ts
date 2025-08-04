@@ -324,6 +324,77 @@ describeIfRpc('RPCProvider', () => {
     });
   });
 
+  describe('fastWaitForTransaction()', () => {
+    test('timeout due to low tip', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'RECEIVED' };
+        });
+      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 10, {
+        retries: 2,
+        retryInterval: 100,
+      });
+      spyProvider.mockRestore();
+      expect(resp).toBe(false);
+    });
+
+    test('timeout due to missing new nonce', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'PRE_CONFIRMED', execution_status: 'SUCCEEDED' };
+        });
+      const spyChannel = jest
+        .spyOn(rpcProvider.channel, 'getNonceForAddress')
+        .mockImplementation(async () => {
+          return '0x8';
+        });
+      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 8, {
+        retries: 2,
+        retryInterval: 100,
+      });
+      spyProvider.mockRestore();
+      spyChannel.mockRestore();
+      expect(resp).toBe(false);
+    });
+
+    test('transaction reverted', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'PRE_CONFIRMED', execution_status: 'REVERTED' };
+        });
+      await expect(
+        rpcProvider.fastWaitForTransaction('0x123', '0x456', 10, {
+          retries: 2,
+          retryInterval: 100,
+        })
+      ).rejects.toThrow('REVERTED: PRE_CONFIRMED');
+      spyProvider.mockRestore();
+    });
+
+    test('Normal behavior', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'ACCEPTED_ON_L2', execution_status: 'SUCCEEDED' };
+        });
+      const spyChannel = jest
+        .spyOn(rpcProvider.channel, 'getNonceForAddress')
+        .mockImplementation(async () => {
+          return '0x9';
+        });
+      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 8, {
+        retries: 2,
+        retryInterval: 100,
+      });
+      spyProvider.mockRestore();
+      spyChannel.mockRestore();
+      expect(resp).toBe(true);
+    });
+  });
+
   describe('RPC methods', () => {
     let latestBlock: Block;
 
