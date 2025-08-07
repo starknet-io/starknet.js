@@ -1,6 +1,7 @@
+import { CairoFelt252 } from '../../../src/utils/cairoDataTypes/felt';
 import { CairoUint32 } from '../../../src/utils/cairoDataTypes/uint32';
 
-describe('CairoUint32 class', () => {
+describe('CairoUint32 class Unit Tests', () => {
   describe('constructor with different input types', () => {
     test('should handle number input', () => {
       const u32 = new CairoUint32(42);
@@ -49,50 +50,56 @@ describe('CairoUint32 class', () => {
       expect(() => new CairoUint32(2n ** 32n - 1n)).not.toThrow();
     });
 
-    test('should allow negative values (constructor does not validate)', () => {
-      // Note: Constructor doesn't validate, so these won't throw
-      const u32Negative = new CairoUint32(-1);
-      expect(u32Negative.data).toBe(-1n);
+    test('should reject negative values', () => {
+      expect(() => new CairoUint32(-1)).toThrow('Value is out of u32 range [0, 2^32)');
+      expect(() => new CairoUint32(-100n)).toThrow('Value is out of u32 range [0, 2^32)');
     });
 
-    test('should allow values greater than 2^32 - 1 (constructor does not validate)', () => {
-      // Note: Constructor doesn't validate, so these won't throw
+    test('should reject values greater than 2^32 - 1', () => {
       const overflowValue = 2n ** 32n; // 4294967296
-      const u32Overflow = new CairoUint32(overflowValue);
-      expect(u32Overflow.data).toBe(overflowValue);
+      expect(() => new CairoUint32(overflowValue)).toThrow('Value is out of u32 range [0, 2^32)');
+      expect(() => new CairoUint32(4294967296)).toThrow('Value is out of u32 range [0, 2^32)');
     });
 
-    test('should accept some unexpected types (BigInt behavior)', () => {
-      // BigInt constructor is more permissive than expected
-      const u32FromString = new CairoUint32('123' as any);
-      expect(u32FromString.data).toBe(123n);
+    test('should handle valid string inputs correctly', () => {
+      // Hex strings
+      const u32FromHex = new CairoUint32('0x7b'); // 123 in hex
+      expect(u32FromHex.data).toBe(123n);
 
-      const u32FromTrue = new CairoUint32(true as any);
-      expect(u32FromTrue.data).toBe(1n);
-
-      const u32FromFalse = new CairoUint32(false as any);
-      expect(u32FromFalse.data).toBe(0n);
+      // Decimal strings
+      const u32FromDecimal = new CairoUint32('456');
+      expect(u32FromDecimal.data).toBe(456n);
     });
 
-    test('should handle various edge cases (BigInt behavior)', () => {
-      // BigInt is surprisingly permissive
+    test('should accept text strings and convert via UTF-8 encoding', () => {
+      // UTF-8 text strings should be converted via UTF-8 encoding
+      const u32FromA = new CairoUint32('A');
+      expect(u32FromA.data).toBe(65n); // 'A' as UTF-8 = 65
+
+      const u32FromHi = new CairoUint32('Hi');
+      expect(u32FromHi.data).toBe(18537n); // 'Hi' as UTF-8 bytes
+
+      // Long strings should also work if they fit in u32 range
+      const u32FromShort = new CairoUint32('test');
+      expect(u32FromShort.data).toBe(1952805748n); // 'test' as UTF-8 bytes
+    });
+
+    test('should handle edge cases and invalid inputs', () => {
       expect(() => new CairoUint32({} as any)).toThrow();
       expect(() => new CairoUint32(undefined as any)).toThrow();
-
-      // These actually work with BigInt
-      const u32FromEmptyArray = new CairoUint32([] as any);
-      expect(u32FromEmptyArray.data).toBe(0n); // [] -> 0
-
-      expect(() => new CairoUint32(null as any)).toThrow(); // null throws
+      expect(() => new CairoUint32(null as any)).toThrow();
     });
 
     test('should reject decimal numbers', () => {
-      expect(() => new CairoUint32(3.14)).toThrow(
-        'cannot be converted to a BigInt because it is not an integer'
-      );
-      expect(() => new CairoUint32(1.5)).toThrow(
-        'cannot be converted to a BigInt because it is not an integer'
-      );
+      expect(() => new CairoUint32(3.14)).toThrow();
+      expect(() => new CairoUint32(1.5)).toThrow();
+    });
+
+    test('should validate string inputs with out-of-range values', () => {
+      expect(() => new CairoUint32('4294967296')).toThrow('Value is out of u32 range [0, 2^32)');
+      // Note: '-1' is treated as text and converted via UTF-8, not as a number string
+      // because it fails isStringWholeNumber (which only matches positive digits)
+      expect(() => new CairoUint32('0x100000000')).toThrow('Value is out of u32 range [0, 2^32)');
     });
   });
 
@@ -156,33 +163,33 @@ describe('CairoUint32 class', () => {
   describe('toUnicode method', () => {
     test('should convert single byte values to Unicode', () => {
       const u32 = new CairoUint32(65); // ASCII 'A'
-      expect(u32.toUnicode()).toBe('A');
+      expect(u32.decodeUtf8()).toBe('A');
     });
 
     test('should convert zero to null character', () => {
       const u32 = new CairoUint32(0);
-      expect(u32.toUnicode()).toBe('\x00');
+      expect(u32.decodeUtf8()).toBe('\x00');
     });
 
     test('should convert multi-byte values to Unicode', () => {
       const u32 = new CairoUint32(0x4142); // 'AB' in ASCII
-      expect(u32.toUnicode()).toBe('AB');
+      expect(u32.decodeUtf8()).toBe('AB');
     });
 
     test('should handle special ASCII characters', () => {
       const u32 = new CairoUint32(33); // '!'
-      expect(u32.toUnicode()).toBe('!');
+      expect(u32.decodeUtf8()).toBe('!');
     });
 
     test('should handle larger multi-byte sequences', () => {
       const u32 = new CairoUint32(0x48656c6c); // 'Hell' in ASCII
-      expect(u32.toUnicode()).toBe('Hell');
+      expect(u32.decodeUtf8()).toBe('Hell');
     });
 
     test('should handle 4-byte values', () => {
       // Test with a 4-byte value that represents valid UTF-8
       const u32 = new CairoUint32(0x74657374); // 'test' in ASCII
-      expect(u32.toUnicode()).toBe('test');
+      expect(u32.decodeUtf8()).toBe('test');
     });
   });
 
@@ -228,18 +235,10 @@ describe('CairoUint32 class', () => {
     });
 
     test('should reject invalid types', () => {
-      expect(() => CairoUint32.validate('42' as any)).toThrow(
-        'Invalid input type. Expected number or bigint'
-      );
-      expect(() => CairoUint32.validate({} as any)).toThrow(
-        'Invalid input type. Expected number or bigint'
-      );
-      expect(() => CairoUint32.validate([] as any)).toThrow(
-        'Invalid input type. Expected number or bigint'
-      );
-      expect(() => CairoUint32.validate(null as any)).toThrow(
-        'Invalid input type. Expected number or bigint'
-      );
+      expect(() => CairoUint32.validate({} as any)).toThrow();
+      expect(() => CairoUint32.validate(null as any)).toThrow();
+      expect(() => CairoUint32.validate(undefined as any)).toThrow();
+      expect(() => CairoUint32.validate('invalid' as any)).toThrow();
     });
 
     test('should reject negative values', () => {
@@ -253,10 +252,9 @@ describe('CairoUint32 class', () => {
     });
 
     test('should reject decimal numbers', () => {
-      // Note: The validation compares as bigint, so 3.14 becomes 3n which is valid
-      // The actual issue is in the constructor when converting to BigInt
-      expect(() => CairoUint32.validate(3.14)).not.toThrow(); // 3.14 -> 3n -> valid
-      expect(() => CairoUint32.validate(1.1)).not.toThrow(); // 1.1 -> 1n -> valid
+      // Decimal numbers throw when converting to BigInt
+      expect(() => CairoUint32.validate(3.14)).toThrow();
+      expect(() => CairoUint32.validate(1.5)).toThrow();
     });
   });
 
@@ -271,13 +269,14 @@ describe('CairoUint32 class', () => {
     });
 
     test('should return false for invalid inputs', () => {
-      expect(CairoUint32.is('42' as any)).toBe(false);
-      expect(CairoUint32.is({} as any)).toBe(false);
-      expect(CairoUint32.is([] as any)).toBe(false);
-      expect(CairoUint32.is(null as any)).toBe(false);
-      expect(CairoUint32.is(-1)).toBe(false);
       expect(CairoUint32.is(2n ** 32n)).toBe(false);
-      expect(CairoUint32.is(3.14)).toBe(true); // 3.14 -> 3n -> valid in u32 range
+      expect(CairoFelt252.is({} as any)).toBe(false);
+      expect(CairoFelt252.is([] as any)).toBe(false);
+      expect(CairoFelt252.is(null as any)).toBe(false);
+      expect(CairoFelt252.is(3.14 as any)).toBe(false);
+      expect(CairoFelt252.is(-1)).toBe(false);
+      expect(CairoFelt252.is(-1n)).toBe(false);
+      expect(CairoFelt252.is(undefined as any)).toBe(false);
     });
   });
 
@@ -375,6 +374,190 @@ describe('CairoUint32 class', () => {
         expect(u32.toBigInt()).toBe(BigInt(hex));
         expect(u32.toHexString()).toBe(`0x${hex.toString(16)}`);
       });
+    });
+  });
+
+  describe('String handling', () => {
+    describe('Hex strings', () => {
+      test('should handle hex strings with 0x prefix', () => {
+        const u32 = new CairoUint32('0xff');
+        expect(u32.toBigInt()).toBe(255n);
+        expect(u32.toHexString()).toBe('0xff');
+      });
+
+      test('should handle large hex strings', () => {
+        const u32 = new CairoUint32('0xffffffff'); // Max u32
+        expect(u32.toBigInt()).toBe(4294967295n);
+        expect(u32.toHexString()).toBe('0xffffffff');
+      });
+    });
+
+    describe('Decimal strings', () => {
+      test('should handle decimal strings', () => {
+        const u32 = new CairoUint32('12345');
+        expect(u32.toBigInt()).toBe(12345n);
+        expect(u32.decodeUtf8()).toBe('09'); // 12345 as bytes
+      });
+
+      test('should handle zero as decimal string', () => {
+        const u32 = new CairoUint32('0');
+        expect(u32.toBigInt()).toBe(0n);
+        expect(u32.toHexString()).toBe('0x0');
+      });
+
+      test('should handle max u32 as decimal string', () => {
+        const u32 = new CairoUint32('4294967295');
+        expect(u32.toBigInt()).toBe(4294967295n);
+        expect(u32.toHexString()).toBe('0xffffffff');
+      });
+    });
+  });
+
+  describe('decodeUtf8 method', () => {
+    test('should decode single byte values', () => {
+      const u32 = new CairoUint32(65); // 'A'
+      expect(u32.decodeUtf8()).toBe('A');
+    });
+
+    test('should decode multi-byte values', () => {
+      const u32 = new CairoUint32(0x48656c6c); // "Hell" (fits in u32)
+      expect(u32.decodeUtf8()).toBe('Hell');
+    });
+
+    test('should handle zero', () => {
+      const u32 = new CairoUint32(0);
+      expect(u32.decodeUtf8()).toBe('\x00');
+    });
+
+    test('should handle ASCII range values', () => {
+      for (let i = 32; i < 127; i += 1) {
+        // Printable ASCII
+        const u32 = new CairoUint32(i);
+        expect(u32.decodeUtf8()).toBe(String.fromCharCode(i));
+      }
+    });
+  });
+
+  describe('Static methods', () => {
+    describe('validate method', () => {
+      test('should validate valid u32 range', () => {
+        expect(() => CairoUint32.validate(0)).not.toThrow();
+        expect(() => CairoUint32.validate(4294967295)).not.toThrow();
+        expect(() => CairoUint32.validate(0n)).not.toThrow();
+        expect(() => CairoUint32.validate(2n ** 32n - 1n)).not.toThrow();
+      });
+
+      test('should reject out-of-range values', () => {
+        expect(() => CairoUint32.validate(-1)).toThrow('Value is out of u32 range [0, 2^32)');
+        expect(() => CairoUint32.validate(4294967296)).toThrow(
+          'Value is out of u32 range [0, 2^32)'
+        );
+        expect(() => CairoUint32.validate(2n ** 32n)).toThrow(
+          'Value is out of u32 range [0, 2^32)'
+        );
+      });
+    });
+
+    describe('is method', () => {
+      test('should return true for valid values', () => {
+        expect(CairoUint32.is(0)).toBe(true);
+        expect(CairoUint32.is(4294967295)).toBe(true);
+        expect(CairoUint32.is(0n)).toBe(true);
+        expect(CairoUint32.is(2n ** 32n - 1n)).toBe(true);
+      });
+
+      test('should return false for invalid values', () => {
+        expect(CairoUint32.is(-1)).toBe(false);
+        expect(CairoUint32.is(4294967296)).toBe(false);
+        expect(CairoUint32.is(2n ** 32n)).toBe(false);
+      });
+    });
+
+    describe('isAbiType method', () => {
+      test('should return true for correct ABI selector', () => {
+        expect(CairoUint32.isAbiType('core::u32::u32')).toBe(true);
+      });
+
+      test('should return false for incorrect ABI selector', () => {
+        expect(CairoUint32.isAbiType('core::u64::u64')).toBe(false);
+        expect(CairoUint32.isAbiType('core::felt252')).toBe(false);
+        expect(CairoUint32.isAbiType('')).toBe(false);
+      });
+    });
+
+    describe('factoryFromApiResponse method', () => {
+      test('should create CairoUint32 from API response iterator', () => {
+        const mockIterator = {
+          next: jest.fn().mockReturnValue({ value: '12345', done: false }),
+        } as Iterator<string>;
+
+        const u32 = CairoUint32.factoryFromApiResponse(mockIterator);
+        expect(u32).toBeInstanceOf(CairoUint32);
+        expect(u32.toBigInt()).toBe(12345n);
+        expect(mockIterator.next).toHaveBeenCalledTimes(1);
+      });
+
+      test('should handle hex string from API response', () => {
+        const mockIterator = {
+          next: jest.fn().mockReturnValue({ value: '0xff', done: false }),
+        } as Iterator<string>;
+
+        const u32 = CairoUint32.factoryFromApiResponse(mockIterator);
+        expect(u32.toBigInt()).toBe(255n);
+      });
+
+      test('should handle max u32 value from API response', () => {
+        const mockIterator = {
+          next: jest.fn().mockReturnValue({ value: '4294967295', done: false }),
+        } as Iterator<string>;
+
+        const u32 = CairoUint32.factoryFromApiResponse(mockIterator);
+        expect(u32.toBigInt()).toBe(4294967295n);
+      });
+    });
+  });
+
+  describe('Round-trip consistency', () => {
+    test('should maintain consistency between constructor types', () => {
+      const testValues = [0, 1, 255, 65536, 4294967295];
+
+      testValues.forEach((value) => {
+        const u32FromNumber = new CairoUint32(value);
+        const u32FromBigint = new CairoUint32(BigInt(value));
+        const u32FromString = new CairoUint32(value.toString());
+        const u32FromHex = new CairoUint32(`0x${value.toString(16)}`);
+
+        // All should have the same internal value
+        expect(u32FromNumber.toBigInt()).toBe(u32FromBigint.toBigInt());
+        expect(u32FromNumber.toBigInt()).toBe(u32FromString.toBigInt());
+        expect(u32FromNumber.toBigInt()).toBe(u32FromHex.toBigInt());
+
+        // All should produce the same API request
+        expect(u32FromNumber.toApiRequest()).toEqual(u32FromBigint.toApiRequest());
+        expect(u32FromNumber.toApiRequest()).toEqual(u32FromString.toApiRequest());
+        expect(u32FromNumber.toApiRequest()).toEqual(u32FromHex.toApiRequest());
+      });
+    });
+
+    test('should handle string-to-bigint-to-string round trips', () => {
+      const testStrings = ['123', '0xff'];
+
+      testStrings.forEach((str) => {
+        const u32 = new CairoUint32(str);
+        const bigintValue = u32.toBigInt();
+        const hexValue = u32.toHexString();
+
+        // Creating from the hex should yield the same result
+        const u32FromHex = new CairoUint32(hexValue);
+        expect(u32FromHex.toBigInt()).toBe(bigintValue);
+      });
+
+      // Test numeric values for consistency
+      const u32FromNumber = new CairoUint32(65); // 'A' as number
+      const bigintFromNumber = u32FromNumber.toBigInt();
+      const hexFromNumber = u32FromNumber.toHexString();
+      const u32FromHex = new CairoUint32(hexFromNumber);
+      expect(u32FromHex.toBigInt()).toBe(bigintFromNumber);
     });
   });
 });

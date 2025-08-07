@@ -222,6 +222,7 @@ function parseResponseValue(
     }, {} as any);
   }
 
+  // TODO: duplicated, investigate why and what was an issue then de-duplicate
   // type c1 array
   if (isTypeArray(element.type)) {
     // eslint-disable-next-line no-case-declarations

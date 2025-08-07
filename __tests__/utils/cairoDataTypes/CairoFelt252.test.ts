@@ -1,7 +1,7 @@
 import { CairoFelt252 } from '../../../src/utils/cairoDataTypes/felt';
 import { uint8ArrayToBigInt } from '../../../src/utils/encode';
 
-describe('CairoFelt252 class', () => {
+describe('CairoFelt252 class Unit Tests', () => {
   describe('constructor with different input types', () => {
     test('should handle bigint values', () => {
       const felt = new CairoFelt252(123n);
@@ -189,75 +189,75 @@ describe('CairoFelt252 class', () => {
     test('should convert ASCII text back to original string', () => {
       const text = 'hello';
       const felt = new CairoFelt252(text);
-      expect(felt.toUnicode()).toBe(text);
+      expect(felt.decodeUtf8()).toBe(text);
     });
 
     test('should convert Unicode emoji back to original', () => {
       const emoji = '☥';
       const felt = new CairoFelt252(emoji);
-      expect(felt.toUnicode()).toBe(emoji);
+      expect(felt.decodeUtf8()).toBe(emoji);
     });
 
     test('should convert Chinese characters back to original', () => {
       const chinese = '世界';
       const felt = new CairoFelt252(chinese);
-      expect(felt.toUnicode()).toBe(chinese);
+      expect(felt.decodeUtf8()).toBe(chinese);
     });
 
     test('should convert mixed Unicode text back to original', () => {
       const mixed = 'Hello ☥ 世界!';
       const felt = new CairoFelt252(mixed);
-      expect(felt.toUnicode()).toBe(mixed);
+      expect(felt.decodeUtf8()).toBe(mixed);
     });
 
     test('should handle special characters correctly', () => {
       const special = '!@#$%^&*()_+-=[]{}|;:,.<>?';
       const felt = new CairoFelt252(special);
-      expect(felt.toUnicode()).toBe(special);
+      expect(felt.decodeUtf8()).toBe(special);
     });
 
     test('should handle newlines, tabs, and spaces', () => {
       const whitespace = 'line1\nline2\ttab\r\nwindows';
       const felt = new CairoFelt252(whitespace);
-      expect(felt.toUnicode()).toBe(whitespace);
+      expect(felt.decodeUtf8()).toBe(whitespace);
     });
 
     test('should return empty string for zero value', () => {
       const felt = new CairoFelt252(0n);
       // 0n becomes single byte [0], which decodes to null character
-      expect(felt.toUnicode()).toBe('\x00');
+      expect(felt.decodeUtf8()).toBe('\x00');
     });
 
     test('should return empty string for empty string input', () => {
       const felt = new CairoFelt252('');
-      expect(felt.toUnicode()).toBe('');
+      expect(felt.decodeUtf8()).toBe('');
     });
 
     test('should decode hex string inputs as raw bytes, not as text', () => {
       // When we pass a hex string, it's converted to bytes representing the number
       const felt = new CairoFelt252('0x48656c6c6f'); // This is "Hello" in hex
       // The bytes stored are [72, 101, 108, 108, 111] which decode to "Hello"
-      expect(felt.toUnicode()).toBe('Hello');
+      expect(felt.decodeUtf8()).toBe('Hello');
     });
 
     test('should decode decimal string inputs as raw bytes', () => {
       // Decimal string '65' becomes bigint 65n, which is byte [65], which is 'A' in ASCII
       const felt = new CairoFelt252('65');
-      expect(felt.toUnicode()).toBe('A');
+      expect(felt.decodeUtf8()).toBe('A');
     });
 
     test('should handle all printable ASCII characters', () => {
       // Test a subset of printable ASCII characters that fit in felt252
       const printableAscii = 'Hello World!@#$%^&*()';
       const felt = new CairoFelt252(printableAscii);
-      expect(felt.toUnicode()).toBe(printableAscii);
+      expect(felt.decodeUtf8()).toBe(printableAscii);
     });
 
     test('should handle multi-byte UTF-8 sequences', () => {
       // Test various multi-byte UTF-8 characters that fit in felt252
       const multiByteChars = '€£¥§©';
       const felt = new CairoFelt252(multiByteChars);
-      expect(felt.toUnicode()).toBe(multiByteChars);
+      expect(felt.decodeUtf8()).toBe(multiByteChars);
     });
 
     test('should preserve text through round-trip conversion', () => {
@@ -273,26 +273,26 @@ describe('CairoFelt252 class', () => {
 
       testStrings.forEach((text) => {
         const felt = new CairoFelt252(text);
-        expect(felt.toUnicode()).toBe(text);
+        expect(felt.decodeUtf8()).toBe(text);
       });
     });
 
     test('should decode bigint inputs as their byte representation', () => {
       // BigInt 0x41 = 65 = byte [65] = 'A'
       const felt1 = new CairoFelt252(65n);
-      expect(felt1.toUnicode()).toBe('A');
+      expect(felt1.decodeUtf8()).toBe('A');
 
       // BigInt 0x4142 = 16706 = bytes [65, 66] = 'AB'
       const felt2 = new CairoFelt252(0x4142n);
-      expect(felt2.toUnicode()).toBe('AB');
+      expect(felt2.decodeUtf8()).toBe('AB');
     });
 
     test('should decode boolean inputs correctly', () => {
       const trueFelt = new CairoFelt252(true);
-      expect(trueFelt.toUnicode()).toBe('\x01'); // byte value 1
+      expect(trueFelt.decodeUtf8()).toBe('\x01'); // byte value 1
 
       const falseFelt = new CairoFelt252(false);
-      expect(falseFelt.toUnicode()).toBe('\x00'); // byte value 0
+      expect(falseFelt.decodeUtf8()).toBe('\x00'); // byte value 0
     });
   });
 
@@ -342,7 +342,9 @@ describe('CairoFelt252 class', () => {
       expect(() => CairoFelt252.validate(PRIME + 1n)).toThrow(/out of felt252 range/);
 
       // Negative values should be rejected
-      expect(() => CairoFelt252.validate(-1n)).toThrow(/out of felt252 range/);
+      expect(() => CairoFelt252.validate(-1n)).toThrow(
+        /Cannot convert negative bigint -1 to Uint8Array/
+      );
 
       // each flag is 8 byte, so this should be 32 bytes what is out of felt range
       expect(() => CairoFelt252.validate('🇦🇺🇦🇺🇦🇺🇦🇺')).toThrow(/out of felt252 range/);
@@ -363,6 +365,9 @@ describe('CairoFelt252 class', () => {
       expect(CairoFelt252.is([] as any)).toBe(false);
       expect(CairoFelt252.is(null as any)).toBe(false);
       expect(CairoFelt252.is(3.14 as any)).toBe(false);
+      expect(CairoFelt252.is(-1)).toBe(false);
+      expect(CairoFelt252.is(-1n)).toBe(false);
+      expect(CairoFelt252.is(undefined as any)).toBe(false);
 
       const PRIME = 2n ** 251n + 17n * 2n ** 192n + 1n;
       expect(CairoFelt252.is(PRIME)).toBe(false);

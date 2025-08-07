@@ -1,6 +1,7 @@
 import { CairoBytes31 } from '../../../src/utils/cairoDataTypes/bytes31';
+import { CairoFelt252 } from '../../../src/utils/cairoDataTypes/felt';
 
-describe('CairoBytes31 class', () => {
+describe('CairoBytes31 class Unit Tests', () => {
   describe('constructor with different input types', () => {
     test('should handle string input', () => {
       const bytes31 = new CairoBytes31('hello');
@@ -130,43 +131,43 @@ describe('CairoBytes31 class', () => {
     test('should convert ASCII text back to original string', () => {
       const text = 'hello world';
       const bytes31 = new CairoBytes31(text);
-      expect(bytes31.toUnicode()).toBe(text);
+      expect(bytes31.decodeUtf8()).toBe(text);
     });
 
     test('should convert Unicode text back to original string', () => {
       const text = '☥ 世界';
       const bytes31 = new CairoBytes31(text);
-      expect(bytes31.toUnicode()).toBe(text);
+      expect(bytes31.decodeUtf8()).toBe(text);
     });
 
     test('should handle empty string', () => {
       const bytes31 = new CairoBytes31('');
-      expect(bytes31.toUnicode()).toBe('');
+      expect(bytes31.decodeUtf8()).toBe('');
     });
 
     test('should handle special characters', () => {
       const text = '!@#$%^&*()_+-=[]{}|;:,.<>?';
       const bytes31 = new CairoBytes31(text);
-      expect(bytes31.toUnicode()).toBe(text);
+      expect(bytes31.decodeUtf8()).toBe(text);
     });
 
     test('should handle whitespace characters', () => {
       const text = 'line1\\nline2\\ttab\\r\\nwindows';
       const bytes31 = new CairoBytes31(text);
-      expect(bytes31.toUnicode()).toBe(text);
+      expect(bytes31.decodeUtf8()).toBe(text);
     });
 
     test('should decode Buffer input as text', () => {
       const buffer = Buffer.from('Hello Buffer', 'utf8');
       const bytes31 = new CairoBytes31(buffer);
-      expect(bytes31.toUnicode()).toBe('Hello Buffer');
+      expect(bytes31.decodeUtf8()).toBe('Hello Buffer');
     });
 
     test('should decode Uint8Array input as text', () => {
       // UTF-8 bytes for "Test"
       const array = new Uint8Array([84, 101, 115, 116]);
       const bytes31 = new CairoBytes31(array);
-      expect(bytes31.toUnicode()).toBe('Test');
+      expect(bytes31.decodeUtf8()).toBe('Test');
     });
   });
 
@@ -315,6 +316,11 @@ describe('CairoBytes31 class', () => {
       expect(CairoBytes31.is('a'.repeat(32))).toBe(false);
       expect(CairoBytes31.is(Buffer.alloc(32))).toBe(false);
       expect(CairoBytes31.is(new Uint8Array(32))).toBe(false);
+      expect(CairoFelt252.is([] as any)).toBe(false);
+      expect(CairoFelt252.is(3.14 as any)).toBe(false);
+      expect(CairoFelt252.is(-1)).toBe(false);
+      expect(CairoFelt252.is(-1n)).toBe(false);
+      expect(CairoFelt252.is(undefined as any)).toBe(false);
     });
   });
 
@@ -353,7 +359,7 @@ describe('CairoBytes31 class', () => {
     test('should handle round-trip conversions correctly', () => {
       const originalText = 'Test 123 ☥!';
       const bytes31 = new CairoBytes31(originalText);
-      expect(bytes31.toUnicode()).toBe(originalText);
+      expect(bytes31.decodeUtf8()).toBe(originalText);
 
       const bigintValue = bytes31.toBigInt();
       const hexValue = bytes31.toHexString();

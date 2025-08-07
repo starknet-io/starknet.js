@@ -1,4 +1,6 @@
+/* eslint-disable no-underscore-dangle */
 import { addHexPrefix, stringToUint8Array, uint8ArrayToBigInt } from '../encode';
+import { getNext } from '../num';
 
 export class CairoBytes31 {
   static MAX_BYTE_SIZE = 31 as const;
@@ -7,33 +9,22 @@ export class CairoBytes31 {
 
   static abiSelector = 'core::bytes_31::bytes31';
 
-  /**
-   *  from String
-   */
-  constructor(data: string);
-  /**
-   *  from Buffer
-   */
-  constructor(data: Buffer);
-  /**
-   *  from Uint8Array
-   */
-  constructor(data: Uint8Array);
-  constructor(...arr: any[]) {
-    const input = arr[0];
+  constructor(data: string | Uint8Array | Buffer) {
+    CairoBytes31.validate(data);
+    this.data = CairoBytes31.__processData(data);
+  }
 
-    // Validate input using static validate method
-    CairoBytes31.validate(input);
-
-    if (typeof input === 'string') {
-      this.data = stringToUint8Array(input);
-    } else if (input instanceof Buffer) {
-      this.data = new Uint8Array(input);
-    } else if (input instanceof Uint8Array) {
-      this.data = new Uint8Array(input);
-    } else {
-      throw new Error('Invalid input type. Expected string, Buffer, or Uint8Array');
+  static __processData(data: Uint8Array | string | Buffer): Uint8Array {
+    if (typeof data === 'string') {
+      return stringToUint8Array(data);
     }
+    if (data instanceof Buffer) {
+      return new Uint8Array(data);
+    }
+    if (data instanceof Uint8Array) {
+      return new Uint8Array(data);
+    }
+    throw new Error('Invalid input type. Expected string, Buffer, or Uint8Array');
   }
 
   toApiRequest(): string[] {
@@ -44,7 +35,7 @@ export class CairoBytes31 {
     return uint8ArrayToBigInt(this.data);
   }
 
-  toUnicode() {
+  decodeUtf8() {
     return new TextDecoder().decode(this.data);
   }
 
@@ -53,18 +44,7 @@ export class CairoBytes31 {
   }
 
   static validate(data: Uint8Array | string | Buffer): void {
-    let byteLength: number;
-
-    if (typeof data === 'string') {
-      const encoder = new TextEncoder();
-      byteLength = encoder.encode(data).length;
-    } else if (data instanceof Buffer) {
-      byteLength = data.length;
-    } else if (data instanceof Uint8Array) {
-      byteLength = data.length;
-    } else {
-      throw new Error('Invalid input type. Expected string, Buffer, or Uint8Array');
-    }
+    const byteLength = CairoBytes31.__processData(data).length;
 
     if (byteLength > this.MAX_BYTE_SIZE) {
       throw new Error(`Data is too long: ${byteLength} bytes (max ${this.MAX_BYTE_SIZE} bytes)`);
@@ -85,5 +65,9 @@ export class CairoBytes31 {
    */
   static isAbiType(abiType: string): boolean {
     return abiType === CairoBytes31.abiSelector;
+  }
+
+  static factoryFromApiResponse(responseIterator: Iterator<string>): CairoBytes31 {
+    return new CairoBytes31(getNext(responseIterator));
   }
 }

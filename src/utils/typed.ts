@@ -88,6 +88,19 @@ export function isString(value: unknown): value is string {
 }
 
 /**
+ * Check if a value is a Buffer.
+ *
+ * @param {unknown} value - The value to check.
+ * @returns {boolean} Returns true if the value is a Buffer, otherwise returns false.
+ * @example
+ * ```typescript
+ * const result = isBuffer(new Buffer([1, 2, 3]));
+ */
+export function isBuffer(obj: unknown): obj is Buffer {
+  return typeof Buffer !== 'undefined' && obj instanceof Buffer;
+}
+
+/**
  * Checks if a given value is an object (Object or Array)
  * @param {unknown} item the tested item
  * @returns {boolean}

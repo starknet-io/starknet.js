@@ -55,6 +55,16 @@ export function utf8ToUint8Array(str: string): Uint8Array {
 export const utf8ToArray = utf8ToUint8Array;
 
 /**
+ * Convert utf8-string to bigint
+ *
+ * @param str The UTF-8 string to convert.
+ * @returns The converted bigint.
+ */
+export function utf8ToBigInt(str: string): bigint {
+  return uint8ArrayToBigInt(utf8ToUint8Array(str));
+}
+
+/**
  * Convert string to array buffer (browser and node compatible)
  *
  * @param {string} a The Base64 encoded string to convert.
@@ -408,7 +418,7 @@ export function stringToUint8Array(str: string): Uint8Array {
   }
 
   // Otherwise treat as UTF-8 text
-  return utf8ToArray(str);
+  return utf8ToUint8Array(str);
 }
 
 /**

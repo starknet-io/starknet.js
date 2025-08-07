@@ -62,7 +62,7 @@ export function isDecimalString(str: string): boolean {
  * // result = false
  * ```
  */
-export function isText(val: any): boolean {
+export function isText(val: any): val is string {
   return isString(val) && !isHex(val) && !isStringWholeNumber(val);
 }
 

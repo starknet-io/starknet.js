@@ -1,8 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 // TODO Convert to CairoFelt base on CairoUint256 and implement it in the codebase in the backward compatible manner
 
 import { BigNumberish } from '../../types';
 import { PRIME } from '../../global/constants';
-import { isHex, isStringWholeNumber } from '../num';
+import { getNext, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { isBoolean, isString, isBigInt } from '../typed';
 import {
@@ -67,36 +68,31 @@ export class CairoFelt252 {
   static abiSelector = 'core::felt252';
 
   constructor(data: BigNumberish | boolean) {
-    // Validate input
     CairoFelt252.validate(data);
+    this.data = CairoFelt252.__processData(data);
+  }
 
-    // Handle strings - stringToUint8Array will automatically handle all string types
+  static __processData(data: BigNumberish | boolean): Uint8Array {
     if (isString(data)) {
-      // Use stringToUint8Array which will:
-      // - Detect hex strings (0x prefix) and convert from hex
-      // - Detect decimal strings and convert as numbers
-      // - Treat everything else as UTF-8 text (including Unicode)
-      this.data = stringToUint8Array(data);
+      return stringToUint8Array(data);
     }
-    // Handle bigints and numbers
-    else if (isBigInt(data)) {
-      this.data = bigIntToUint8Array(data);
-    } else if (Number.isInteger(data)) {
-      this.data = bigIntToUint8Array(BigInt(data));
+    if (isBigInt(data)) {
+      return bigIntToUint8Array(data);
     }
-    // Handle booleans
-    else if (isBoolean(data)) {
-      this.data = bigIntToUint8Array(BigInt(data ? 1 : 0));
-    } else {
-      throw new Error(`${data} can't be computed by felt()`);
+    if (Number.isInteger(data)) {
+      return bigIntToUint8Array(BigInt(data));
     }
+    if (isBoolean(data)) {
+      return bigIntToUint8Array(BigInt(data ? 1 : 0));
+    }
+    throw new Error(`${data} can't be computed by felt()`);
   }
 
   toBigInt() {
     return uint8ArrayToBigInt(this.data);
   }
 
-  toUnicode() {
+  decodeUtf8() {
     return new TextDecoder().decode(this.data);
   }
 
@@ -112,38 +108,11 @@ export class CairoFelt252 {
   }
 
   static validate(data: BigNumberish | boolean): void {
-    let value: bigint;
-
-    // Convert to bigint based on type
-    if (isBoolean(data)) {
-      value = BigInt(+data);
-    } else if (isBigInt(data)) {
-      value = data;
-    } else if (Number.isInteger(data)) {
-      value = BigInt(data);
-    } else if (isString(data)) {
-      // Try to convert string to bigint
-      try {
-        if (isHex(data)) {
-          value = BigInt(data);
-        } else if (isStringWholeNumber(data)) {
-          value = BigInt(data);
-        } else if (isText(data)) {
-          // For text unicode strings, convert to UTF-8 bytes then to bigint
-          const bytes = stringToUint8Array(data);
-          value = uint8ArrayToBigInt(bytes);
-        } else {
-          throw new Error(`Invalid felt252 value`);
-        }
-      } catch {
-        throw new Error(`${data} cannot be converted to felt252`);
-      }
-    } else {
-      throw new Error(`${data} is not a valid felt252 type`);
-    }
+    const value = CairoFelt252.__processData(data);
+    const bn = uint8ArrayToBigInt(value);
 
     // Check if value is within the felt252 range (0 ≤ x < PRIME)
-    if (value < 0n || value >= PRIME) {
+    if (bn < 0n || bn >= PRIME) {
       throw new Error(`Value ${value} is out of felt252 range [0, ${PRIME})`);
     }
   }
@@ -159,5 +128,12 @@ export class CairoFelt252 {
 
   static isAbiType(abiType: string): boolean {
     return abiType === CairoFelt252.abiSelector;
+  }
+
+  static factoryFromApiResponse(responseIterator: Iterator<string>): CairoFelt252 {
+    /**
+     * The API response is HexString
+     */
+    return new CairoFelt252(getNext(responseIterator));
   }
 }
