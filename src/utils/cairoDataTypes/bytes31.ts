@@ -28,7 +28,14 @@ export class CairoBytes31 {
   }
 
   toApiRequest(): string[] {
-    return [uint8ArrayToBigInt(this.data).toString()];
+    const compiled = [uint8ArrayToBigInt(this.data).toString()];
+    Object.defineProperty(compiled, '__compiled__', {
+      enumerable: false,
+      writable: false,
+      value: true,
+    });
+
+    return compiled;
   }
 
   toBigInt() {

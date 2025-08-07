@@ -26,7 +26,14 @@ export class CairoUint32 {
   }
 
   toApiRequest(): string[] {
-    return [this.data.toString()];
+    const compiled = [this.data.toString()];
+    Object.defineProperty(compiled, '__compiled__', {
+      enumerable: false,
+      writable: false,
+      value: true,
+    });
+
+    return compiled;
   }
 
   toBigInt() {

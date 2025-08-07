@@ -558,4 +558,127 @@ describe('CairoByteArray Unit Tests', () => {
       });
     });
   });
+
+  describe('toApiRequest and factoryFromApiResponse', () => {
+    test('should serialize and deserialize short message', () => {
+      const testMessage = 'Hello, Starknet!';
+      const byteArray = new CairoByteArray(testMessage);
+
+      // Serialize to API request format
+      const apiRequest = byteArray.toApiRequest();
+
+      // Verify API request structure
+      expect(apiRequest).toBeInstanceOf(Array);
+      expect(apiRequest[0]).toBe('0'); // data length (no complete chunks)
+      expect(typeof apiRequest[1]).toBe('string'); // pending_word as decimal string
+      expect(apiRequest[2]).toBe('16'); // pending_word_len
+
+      // Deserialize from API response
+      const iterator = apiRequest[Symbol.iterator]();
+      const reconstructedByteArray = CairoByteArray.factoryFromApiResponse(iterator);
+
+      // Verify the message is correctly reconstructed
+      expect(reconstructedByteArray.decodeUtf8()).toBe(testMessage);
+      expect(reconstructedByteArray.toBigInt()).toBe(byteArray.toBigInt());
+      expect(reconstructedByteArray.toHexString()).toBe(byteArray.toHexString());
+    });
+
+    test('should serialize and deserialize long message (> 31 bytes)', () => {
+      const testMessage =
+        'This is a very long message that exceeds 31 bytes and will be split into multiple chunks!';
+      const byteArray = new CairoByteArray(testMessage);
+
+      // Serialize to API request format
+      const apiRequest = byteArray.toApiRequest();
+
+      // Verify API request structure
+      expect(apiRequest).toBeInstanceOf(Array);
+      expect(Number(apiRequest[0])).toBeGreaterThan(0); // Should have complete chunks
+
+      // Deserialize from API response
+      const iterator = apiRequest[Symbol.iterator]();
+      const reconstructedByteArray = CairoByteArray.factoryFromApiResponse(iterator);
+
+      // Verify the message is correctly reconstructed
+      expect(reconstructedByteArray.decodeUtf8()).toBe(testMessage);
+      expect(reconstructedByteArray.toBigInt()).toBe(byteArray.toBigInt());
+      expect(reconstructedByteArray.toHexString()).toBe(byteArray.toHexString());
+    });
+
+    test('should serialize and deserialize empty message', () => {
+      const testMessage = '';
+      const byteArray = new CairoByteArray(testMessage);
+
+      // Serialize to API request format
+      const apiRequest = byteArray.toApiRequest();
+
+      // Verify API request structure
+      expect(apiRequest).toBeInstanceOf(Array);
+      expect(apiRequest[0]).toBe('0'); // data length
+      expect(apiRequest[1]).toBe('0'); // pending_word
+      expect(apiRequest[2]).toBe('0'); // pending_word_len
+
+      // Deserialize from API response
+      const iterator = apiRequest[Symbol.iterator]();
+      const reconstructedByteArray = CairoByteArray.factoryFromApiResponse(iterator);
+
+      // Verify the message is correctly reconstructed
+      expect(reconstructedByteArray.decodeUtf8()).toBe(testMessage);
+      expect(reconstructedByteArray.toBigInt()).toBe(0n);
+      expect(reconstructedByteArray.toHexString()).toBe('0x0');
+    });
+
+    test('should serialize and deserialize with disabled parsers simulation', () => {
+      const testMessage = 'Testing disabled parsers';
+      const byteArray = new CairoByteArray(testMessage);
+
+      // Simulate contract call with parseRequest: false
+      // This is what happens when you call contract.withOptions({parseRequest: false})
+      const rawCalldata = byteArray.toApiRequest();
+
+      // Simulate contract response with parseResponse: false
+      // This is what you get back when contract.withOptions({parseResponse: false})
+      const rawResponse = rawCalldata; // Contract echoes the data back
+
+      // Parse the raw response back to CairoByteArray
+      const iterator = rawResponse[Symbol.iterator]();
+      const reconstructedByteArray = CairoByteArray.factoryFromApiResponse(iterator);
+
+      // Verify the round trip
+      expect(reconstructedByteArray.decodeUtf8()).toBe(testMessage);
+      expect(reconstructedByteArray.toBigInt()).toBe(byteArray.toBigInt());
+      expect(reconstructedByteArray.toHexString()).toBe(byteArray.toHexString());
+    });
+
+    test('should handle multiple serialization/deserialization cycles', () => {
+      const testMessages = [
+        'First message',
+        'Second message with numbers 12345',
+        'Third message with symbols !@#$%',
+        '',
+        'Final message after empty',
+      ];
+
+      testMessages.forEach((message) => {
+        const byteArray = new CairoByteArray(message);
+
+        // First cycle
+        const apiRequest1 = byteArray.toApiRequest();
+        const iterator1 = apiRequest1[Symbol.iterator]();
+        const reconstructed1 = CairoByteArray.factoryFromApiResponse(iterator1);
+
+        // Second cycle from reconstructed
+        const apiRequest2 = reconstructed1.toApiRequest();
+        const iterator2 = apiRequest2[Symbol.iterator]();
+        const reconstructed2 = CairoByteArray.factoryFromApiResponse(iterator2);
+
+        // Verify consistency across cycles
+        expect(reconstructed1.decodeUtf8()).toBe(message);
+        expect(reconstructed2.decodeUtf8()).toBe(message);
+        expect(reconstructed1.toBigInt()).toBe(byteArray.toBigInt());
+        expect(reconstructed2.toBigInt()).toBe(byteArray.toBigInt());
+        expect(apiRequest1).toEqual(apiRequest2);
+      });
+    });
+  });
 });

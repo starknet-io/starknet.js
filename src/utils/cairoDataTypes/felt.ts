@@ -104,7 +104,14 @@ export class CairoFelt252 {
     /**
      * DecimalString representation of the felt252
      */
-    return [uint8ArrayToBigInt(this.data).toString()];
+    const compiled = [uint8ArrayToBigInt(this.data).toString()];
+    Object.defineProperty(compiled, '__compiled__', {
+      enumerable: false,
+      writable: false,
+      value: true,
+    });
+
+    return compiled;
   }
 
   static validate(data: BigNumberish | boolean): void {

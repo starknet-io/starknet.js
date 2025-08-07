@@ -125,12 +125,20 @@ export class CairoByteArray {
       throw new Error('CairoByteArray is not properly initialized');
     }
 
-    return [
+    const compiled = [
       this.data.length.toString(),
       ...this.data.flatMap((bytes31) => bytes31.toApiRequest()),
       ...this.pending_word.toApiRequest(),
       ...this.pending_word_len.toApiRequest(),
     ];
+
+    Object.defineProperty(compiled, '__compiled__', {
+      enumerable: false,
+      writable: false,
+      value: true,
+    });
+
+    return compiled;
   }
 
   decodeUtf8() {
@@ -150,9 +158,22 @@ export class CairoByteArray {
 
       // Convert hex to bytes
       const bytes = new Uint8Array(pendingLen);
+      // Ensure hex string has even length by padding with leading zero if necessary
+      const paddedHex =
+        hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
+
       for (let i = 0; i < pendingLen; i += 1) {
-        const byteHex = hexWithoutPrefix.slice(i * 2, i * 2 + 2);
-        bytes[i] = parseInt(byteHex, 16);
+        const byteHex = paddedHex.slice(i * 2, i * 2 + 2);
+        if (byteHex.length < 2) {
+          // If we don't have enough hex digits, treat as zero
+          bytes[i] = 0;
+        } else {
+          const byteValue = parseInt(byteHex, 16);
+          if (Number.isNaN(byteValue)) {
+            throw new Error(`Invalid hex byte: ${byteHex}`);
+          }
+          bytes[i] = byteValue;
+        }
       }
 
       // Decode bytes to UTF-8 string
@@ -186,9 +207,22 @@ export class CairoByteArray {
       const hexWithoutPrefix = hex.startsWith('0x') ? hex.slice(2) : hex;
 
       // Convert hex to bytes
+      // Ensure hex string has even length by padding with leading zero if necessary
+      const paddedHex =
+        hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
+
       for (let i = 0; i < pendingLen; i += 1) {
-        const byteHex = hexWithoutPrefix.slice(i * 2, i * 2 + 2);
-        allBytes.push(parseInt(byteHex, 16));
+        const byteHex = paddedHex.slice(i * 2, i * 2 + 2);
+        if (byteHex.length < 2) {
+          // If we don't have enough hex digits, treat as zero
+          allBytes.push(0);
+        } else {
+          const byteValue = parseInt(byteHex, 16);
+          if (Number.isNaN(byteValue)) {
+            throw new Error(`Invalid hex byte: ${byteHex}`);
+          }
+          allBytes.push(byteValue);
+        }
       }
     }
 
