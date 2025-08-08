@@ -10,6 +10,7 @@ import {
   legacyDeployer,
 } from '../../src';
 import { getFunctionAbi, getInterfaceAbi, getAbiEntry } from '../factories/abi';
+import { createAbiParser } from '../../src/utils/calldata/parser';
 
 const { isAbiEvent, getAbiEvents, parseEvents } = events;
 
@@ -208,7 +209,9 @@ describe('parseEvents', () => {
       transaction_hash: '0x789',
     };
 
-    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums);
+    const abi = [getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum];
+    const parser = createAbiParser(abi);
+    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums, parser);
 
     const result = [
       {
@@ -293,7 +296,9 @@ describe('parseEvents', () => {
       transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
     };
 
-    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums);
+    const abi = [getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum];
+    const parser = createAbiParser(abi);
+    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums, parser);
 
     const result = [
       {
@@ -379,7 +384,9 @@ describe('parseEvents', () => {
     };
 
     abiEvents['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'].name = '';
-    expect(() => parseEvents([event], abiEvents, abiStructs, abiEnums)).toBeTruthy();
+    const abi = [getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum];
+    const parser = createAbiParser(abi);
+    expect(() => parseEvents([event], abiEvents, abiStructs, abiEnums, parser)).toBeTruthy();
   });
 });
 

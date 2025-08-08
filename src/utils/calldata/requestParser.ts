@@ -4,26 +4,24 @@ import {
   AbiStructs,
   AllowArray,
   BigNumberish,
-  ByteArray,
   CairoEnum,
   ParsedStruct,
   Tupled,
 } from '../../types';
 import assert from '../assert';
+import { CairoByteArray } from '../cairoDataTypes/byteArray';
+import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { addHexPrefix, removeHexPrefix } from '../encode';
 import { toHex } from '../num';
-import { encodeShortString, isText, splitLongString } from '../shortString';
+import { isText, splitLongString } from '../shortString';
 import { isUndefined, isString } from '../typed';
-import { byteArrayFromString } from './byteArray';
 import {
   felt,
   getArrayType,
   isTypeArray,
-  isTypeByteArray,
-  isTypeBytes31,
   isTypeEnum,
   isTypeEthAddress,
   isTypeNonZero,
@@ -43,22 +41,24 @@ import {
 } from './enum';
 import extractTupleMemberTypes from './tuple';
 
+// TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
+
 /**
  * parse base types
  * @param type type from abi
  * @param val value provided
  * @returns string | string[]
  */
-function parseBaseTypes(type: string, val: BigNumberish): AllowArray<string> {
+function parseBaseTypes(type: string, val: unknown): AllowArray<string> {
   switch (true) {
     case CairoUint256.isAbiType(type):
-      return new CairoUint256(val).toApiRequest();
+      return new CairoUint256(val as BigNumberish).toApiRequest();
     case CairoUint512.isAbiType(type):
-      return new CairoUint512(val).toApiRequest();
-    case isTypeBytes31(type):
-      return encodeShortString(val.toString());
+      return new CairoUint512(val as BigNumberish).toApiRequest();
+    case CairoBytes31.isAbiType(type):
+      return new CairoBytes31(val).toApiRequest();
     case isTypeSecp256k1Point(type): {
-      const pubKeyETH = removeHexPrefix(toHex(val)).padStart(128, '0');
+      const pubKeyETH = removeHexPrefix(toHex(val as BigNumberish)).padStart(128, '0');
       const pubKeyETHy = uint256(addHexPrefix(pubKeyETH.slice(-64)));
       const pubKeyETHx = uint256(addHexPrefix(pubKeyETH.slice(0, -64)));
       return [
@@ -69,7 +69,7 @@ function parseBaseTypes(type: string, val: BigNumberish): AllowArray<string> {
       ];
     }
     default:
-      return felt(val);
+      return felt(val as BigNumberish);
   }
 }
 
@@ -99,16 +99,6 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
   });
 }
 
-function parseByteArray(element: string): string[] {
-  const myByteArray: ByteArray = byteArrayFromString(element);
-  return [
-    myByteArray.data.length.toString(),
-    ...myByteArray.data.map((bn) => bn.toString()),
-    myByteArray.pending_word.toString(),
-    myByteArray.pending_word_len.toString(),
-  ];
-}
-
 /**
  * Deep parse of the object that has been passed to the method
  *
@@ -119,13 +109,7 @@ function parseByteArray(element: string): string[] {
  * @return {string | string[]} - parsed arguments in format that contract is expecting
  */
 function parseCalldataValue(
-  element:
-    | ParsedStruct
-    | BigNumberish
-    | BigNumberish[]
-    | CairoOption<any>
-    | CairoResult<any, any>
-    | CairoEnum,
+  element: unknown,
   type: string,
   structs: AbiStructs,
   enums: AbiEnums
@@ -142,7 +126,7 @@ function parseCalldataValue(
       const array = new CairoFixedArray(element, type);
       values = array.content;
     } else if (typeof element === 'object') {
-      values = Object.values(element);
+      values = Object.values(element as object);
       assert(
         values.length === CairoFixedArray.getFixedArraySize(type),
         `ABI type ${type}: object provided do not includes  ${CairoFixedArray.getFixedArraySize(type)} items. ${values.length} items provided.`
@@ -169,14 +153,16 @@ function parseCalldataValue(
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
     if (CairoUint256.isAbiType(type)) {
-      return new CairoUint256(element as any).toApiRequest();
+      return new CairoUint256(element as BigNumberish).toApiRequest();
     }
     if (CairoUint512.isAbiType(type)) {
-      return new CairoUint512(element as any).toApiRequest();
+      return new CairoUint512(element as BigNumberish).toApiRequest();
     }
     if (isTypeEthAddress(type)) return parseBaseTypes(type, element as BigNumberish);
 
-    if (isTypeByteArray(type)) return parseByteArray(element as string);
+    if (CairoByteArray.isAbiType(type)) {
+      return new CairoByteArray(element).toApiRequest();
+    }
 
     const { members } = structs[type];
     const subElement = element as any;
@@ -289,7 +275,7 @@ function parseCalldataValue(
   }
 
   if (isTypeNonZero(type)) {
-    return parseBaseTypes(getArrayType(type), element as BigNumberish);
+    return parseBaseTypes(getArrayType(type), element);
   }
 
   if (typeof element === 'object') {

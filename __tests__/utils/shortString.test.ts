@@ -115,6 +115,15 @@ describe('isShortString', () => {
     expect(isShortString(shortStr)).toBe(true);
   });
 
+  test('should return true for short strings', () => {
+    // TODO: IMPORTANT: This pass even though it's 31 chars long, but each char is 2 bytes, so it's 62 bytes long
+    // TODO: felt can store 31 bytes + 4 bits.
+    // TODO: This is a bug, we need to fix it.
+    // TODO: We need to check if the string is 31 bytes long or less, not by character number.
+    const shortStr = '☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥☥';
+    expect(isShortString(shortStr)).toBe(true);
+  });
+
   test('should return false for long strings', () => {
     const longStr = '12345678901234567890123456789012';
     expect(isShortString(longStr)).toBe(false);

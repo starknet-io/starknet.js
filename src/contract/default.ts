@@ -360,7 +360,8 @@ export class Contract implements ContractInterface {
           emittedEvents as any, // TODO: any temp hotfix, fix this
           this.events,
           this.structs,
-          CallData.getAbiEnum(this.abi)
+          CallData.getAbiEnum(this.abi),
+          this.callData.parser
         );
       },
       _: () => {

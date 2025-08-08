@@ -469,7 +469,7 @@ export function resourceBoundsToHexString(resourceBoundsBN: ResourceBoundsBN): R
     if (isObject(obj)) {
       const result: any = {};
       Object.keys(obj).forEach((key) => {
-        result[key] = convertBigIntToHex(obj[key]);
+        result[key] = convertBigIntToHex(obj[key as keyof typeof obj]);
       });
       return result;
     }
@@ -507,7 +507,7 @@ export function resourceBoundsToBigInt(resourceBounds: ResourceBounds): Resource
     if (isObject(obj)) {
       const result: any = {};
       Object.keys(obj).forEach((key) => {
-        result[key] = convertStringToBigInt(obj[key]);
+        result[key] = convertStringToBigInt(obj[key as keyof typeof obj]);
       });
       return result;
     }

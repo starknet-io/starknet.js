@@ -27,6 +27,8 @@ export function isHex(hex: string): boolean {
   return /^0[xX][0-9a-fA-F]*$/.test(hex);
 }
 
+export const isHexString = isHex;
+
 /**
  * Convert BigNumberish to bigint
  *
@@ -377,7 +379,7 @@ export function stringToSha256ToArrayBuff4(str: string): Uint8Array {
 
 /**
  * Checks if a given value is of BigNumberish type.
- * 234, 234n, "234", "0xea" are valid
+ * 234, 234n, "234", "0xea" are valid, exclude boolean and string
  * @param {unknown} input a value
  * @returns {boolean} true if type of input is `BigNumberish`
  * @example
@@ -392,4 +394,17 @@ export function isBigNumberish(input: unknown): input is BigNumberish {
     isBigInt(input) ||
     (isString(input) && (isHex(input) || isStringWholeNumber(input)))
   );
+}
+
+/**
+ * Expect the next value from an iterator
+ *
+ * @param iterator The iterator to get the next value from.
+ * @returns The next value from the iterator.
+ * @throws Error if the iterator is done.
+ */
+export function getNext(iterator: Iterator<string>): string {
+  const it = iterator.next();
+  if (it.done) throw new Error('Unexpected end of response');
+  return it.value;
 }

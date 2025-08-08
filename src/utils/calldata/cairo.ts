@@ -127,20 +127,6 @@ export const isTypeContractAddress = (type: string) => type === Literal.Contract
  * @returns - Returns true if the given type is 'core::starknet::eth_address::EthAddress', otherwise false.
  */
 export const isTypeEthAddress = (type: string) => type === ETH_ADDRESS;
-/**
- * Checks if the given type is 'core::bytes_31::bytes31'.
- *
- * @param {string} type - The type to check.
- * @returns - True if the type is 'core::bytes_31::bytes31', false otherwise.
- */
-export const isTypeBytes31 = (type: string) => type === 'core::bytes_31::bytes31';
-/**
- * Checks if the given type is equal to the 'core::byte_array::ByteArray'.
- *
- * @param {string} type - The type to check.
- * @returns - True if the given type is equal to 'core::byte_array::ByteArray', false otherwise.
- */
-export const isTypeByteArray = (type: string) => type === 'core::byte_array::ByteArray';
 
 /**
  * Checks if the given type is equal to the u96 type
