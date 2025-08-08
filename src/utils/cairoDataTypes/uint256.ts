@@ -39,7 +39,10 @@ export class CairoUint256 {
 
   public constructor(...arr: any[]) {
     if (isObject(arr[0]) && arr.length === 1 && 'low' in arr[0] && 'high' in arr[0]) {
-      const props = CairoUint256.validateProps(arr[0].low, arr[0].high);
+      const props = CairoUint256.validateProps(
+        arr[0].low as BigNumberish,
+        arr[0].high as BigNumberish
+      );
       this.low = props.low;
       this.high = props.high;
     } else if (arr.length === 1) {

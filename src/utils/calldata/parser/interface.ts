@@ -1,4 +1,4 @@
-import { Abi, FunctionAbi } from '../../../types';
+import { Abi, AbiEntryType, FunctionAbi } from '../../../types';
 
 export abstract class AbiParserInterface {
   /**
@@ -20,4 +20,6 @@ export abstract class AbiParserInterface {
    * @return Abi
    */
   public abstract getLegacyFormat(): Abi;
+
+  public abstract getParser(abiType: AbiEntryType): (responseIterator: Iterator<string>) => any;
 }

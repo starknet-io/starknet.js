@@ -3,7 +3,7 @@ import { BigNumberish } from '../../types';
 import assert from '../assert';
 import { addHexPrefix, bigIntToUint8Array, stringToUint8Array } from '../encode';
 import { getNext } from '../num';
-import { isBigInt, isBuffer, isString } from '../typed';
+import { isBigInt, isBuffer, isInteger, isString } from '../typed';
 import { CairoBytes31 } from './bytes31';
 import { CairoFelt252 } from './felt';
 import { CairoUint32 } from './uint32';
@@ -24,13 +24,13 @@ export class CairoByteArray {
    */
   pending_word_len!: CairoUint32; // u32
 
-  static abiSelector = 'core::byte_array::ByteArray';
+  static abiSelector = 'core::byte_array::ByteArray' as const;
 
   /**
    * byteArray from typed components
    */
   public constructor(data: CairoBytes31[], pendingWord: CairoFelt252, pendingWordLen: CairoUint32);
-  public constructor(data: BigNumberish | Buffer | Uint8Array);
+  public constructor(data: BigNumberish | Buffer | Uint8Array | unknown);
   public constructor(...arr: any[]) {
     // Handle constructor from typed components
     if (arr.length === 3) {
@@ -55,7 +55,7 @@ export class CairoByteArray {
     }
 
     // Handle custom constructor
-    const inData = arr[0];
+    const inData = arr[0] as unknown;
     CairoByteArray.validate(inData);
     const { data, pending_word, pending_word_len } = CairoByteArray.__processData(inData);
     this.data = data;
@@ -63,7 +63,7 @@ export class CairoByteArray {
     this.pending_word_len = pending_word_len;
   }
 
-  static __processData(inData: BigNumberish | Buffer | Uint8Array) {
+  static __processData(inData: BigNumberish | Buffer | Uint8Array | unknown) {
     let fullData: Uint8Array;
     // Handle different input types
     if (inData instanceof Uint8Array) {
@@ -78,7 +78,7 @@ export class CairoByteArray {
     } else if (isBigInt(inData)) {
       // byteArrayFromBigInt
       fullData = bigIntToUint8Array(inData);
-    } else if (Number.isInteger(inData)) {
+    } else if (isInteger(inData)) {
       // byteArrayFromNumber
       fullData = bigIntToUint8Array(BigInt(inData));
     } else {
@@ -243,7 +243,7 @@ export class CairoByteArray {
     return addHexPrefix(this.toBigInt().toString(16));
   }
 
-  static validate(data: Uint8Array | Buffer | BigNumberish) {
+  static validate(data: Uint8Array | Buffer | BigNumberish | unknown) {
     // Check for invalid types
     if (data === null || data === undefined) {
       throw new Error('Invalid input: null or undefined');
@@ -256,22 +256,24 @@ export class CairoByteArray {
 
     // Check for objects that are not Buffer or Uint8Array
     if (typeof data === 'object' && !isBuffer(data) && !(data instanceof Uint8Array)) {
-      throw new Error('Invalid input: objects are not supported');
+      throw new Error('Invalid input for CairoByteArray: objects are not supported');
     }
 
     // Check for decimal numbers - only integers are allowed
     if (typeof data === 'number' && !Number.isInteger(data)) {
-      throw new Error('Invalid input: decimal numbers are not supported, only integers');
+      throw new Error(
+        'Invalid input for CairoByteArray: decimal numbers are not supported, only integers'
+      );
     }
 
     // Check for negative numbers
     if (typeof data === 'number' && data < 0) {
-      throw new Error('Invalid input: negative numbers are not supported');
+      throw new Error('Invalid input for CairoByteArray: negative numbers are not supported');
     }
 
     // Check for negative bigints
     if (typeof data === 'bigint' && data < 0n) {
-      throw new Error('Invalid input: negative bigints are not supported');
+      throw new Error('Invalid input for CairoByteArray: negative bigints are not supported');
     }
 
     // There is no particular validation from input parameters when they are composed of existing types
@@ -285,6 +287,12 @@ export class CairoByteArray {
     );
   }
 
+  /**
+   * Check if the provided data is a valid CairoByteArray
+   *
+   * @param data - The data to check
+   * @returns True if the data is a valid CairoByteArray, false otherwise
+   */
   static is(data: any): boolean {
     try {
       CairoByteArray.validate(data);

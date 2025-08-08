@@ -252,7 +252,14 @@ export class CallData {
 
     const parsed = outputs.flat().reduce((acc, output, idx) => {
       const propName = output.name ?? idx;
-      acc[propName] = responseParser(responseIterator, output, this.structs, this.enums, acc);
+      acc[propName] = responseParser({
+        responseIterator,
+        output,
+        structs: this.structs,
+        enums: this.enums,
+        parsedResult: acc,
+        parser: this.parser,
+      });
       if (acc[propName] && acc[`${propName}_len`]) {
         delete acc[`${propName}_len`];
       }
@@ -348,12 +355,13 @@ export class CallData {
     const responseIterator = response.flat()[Symbol.iterator]();
     const decodedArray = typeCairoArray.map(
       (typeParam) =>
-        responseParser(
+        responseParser({
           responseIterator,
-          { name: '', type: typeParam },
-          this.structs,
-          this.enums
-        ) as CallResult
+          output: { name: '', type: typeParam },
+          parser: this.parser,
+          structs: this.structs,
+          enums: this.enums,
+        }) as CallResult
     );
     return decodedArray.length === 1 ? decodedArray[0] : decodedArray;
   }

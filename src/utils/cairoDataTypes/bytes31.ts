@@ -7,14 +7,14 @@ export class CairoBytes31 {
 
   data: Uint8Array;
 
-  static abiSelector = 'core::bytes_31::bytes31';
+  static abiSelector = 'core::bytes_31::bytes31' as const;
 
-  constructor(data: string | Uint8Array | Buffer) {
+  constructor(data: string | Uint8Array | Buffer | unknown) {
     CairoBytes31.validate(data);
     this.data = CairoBytes31.__processData(data);
   }
 
-  static __processData(data: Uint8Array | string | Buffer): Uint8Array {
+  static __processData(data: Uint8Array | string | Buffer | unknown): Uint8Array {
     if (typeof data === 'string') {
       return stringToUint8Array(data);
     }
@@ -24,7 +24,7 @@ export class CairoBytes31 {
     if (data instanceof Uint8Array) {
       return new Uint8Array(data);
     }
-    throw new Error('Invalid input type. Expected string, Buffer, or Uint8Array');
+    throw new Error('Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array');
   }
 
   toApiRequest(): string[] {
@@ -50,7 +50,7 @@ export class CairoBytes31 {
     return addHexPrefix(this.toBigInt().toString(16));
   }
 
-  static validate(data: Uint8Array | string | Buffer): void {
+  static validate(data: Uint8Array | string | Buffer | unknown): void {
     const byteLength = CairoBytes31.__processData(data).length;
 
     if (byteLength > this.MAX_BYTE_SIZE) {

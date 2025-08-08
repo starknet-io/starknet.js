@@ -53,10 +53,10 @@ export class CairoUint512 {
       'limb3' in arr[0]
     ) {
       const props = CairoUint512.validateProps(
-        arr[0].limb0,
-        arr[0].limb1,
-        arr[0].limb2,
-        arr[0].limb3
+        arr[0].limb0 as BigNumberish,
+        arr[0].limb1 as BigNumberish,
+        arr[0].limb2 as BigNumberish,
+        arr[0].limb3 as BigNumberish
       );
       this.limb0 = props.limb0;
       this.limb1 = props.limb1;

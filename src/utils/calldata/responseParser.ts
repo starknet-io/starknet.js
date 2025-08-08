@@ -5,26 +5,22 @@ import {
   AbiStructs,
   Args,
   BigNumberish,
-  ByteArray,
   CairoEnum,
   EventEntry,
   ParsedStruct,
 } from '../../types';
+import { CairoByteArray } from '../cairoDataTypes/byteArray';
+import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { addHexPrefix, removeHexPrefix } from '../encode';
-import { toHex } from '../num';
-import { decodeShortString } from '../shortString';
-import { stringFromByteArray } from './byteArray';
 import {
   getArrayType,
   isCairo1Type,
   isLen,
   isTypeArray,
   isTypeBool,
-  isTypeByteArray,
-  isTypeBytes31,
   isTypeEnum,
   isTypeEthAddress,
   isTypeNonZero,
@@ -39,6 +35,7 @@ import {
   CairoResult,
   CairoResultVariant,
 } from './enum';
+import { AbiParserInterface } from './parser/interface';
 import extractTupleMemberTypes from './tuple';
 
 /**
@@ -47,7 +44,7 @@ import extractTupleMemberTypes from './tuple';
  * @param it iterator
  * @returns bigint | boolean
  */
-function parseBaseTypes(type: string, it: Iterator<string>) {
+function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInterface) {
   let temp;
   switch (true) {
     case isTypeBool(type):
@@ -66,9 +63,9 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
     case isTypeEthAddress(type):
       temp = it.next().value;
       return BigInt(temp);
-    case isTypeBytes31(type):
-      temp = it.next().value;
-      return decodeShortString(temp);
+    case CairoBytes31.isAbiType(type):
+      return parser.getParser(type)(it);
+    // return CairoBytes31.factoryFromApiResponse(it).decodeUtf8();
     case isTypeSecp256k1Point(type):
       const xLow = removeHexPrefix(it.next().value).padStart(32, '0');
       const xHigh = removeHexPrefix(it.next().value).padStart(32, '0');
@@ -94,6 +91,7 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
 function parseResponseValue(
   responseIterator: Iterator<string>,
   element: { name: string; type: string },
+  parser: AbiParserInterface,
   structs?: AbiStructs,
   enums?: AbiEnums
 ): BigNumberish | ParsedStruct | boolean | any[] | CairoEnum {
@@ -114,21 +112,10 @@ function parseResponseValue(
     const limb3 = responseIterator.next().value;
     return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
   }
-  // type C1 ByteArray struct, representing a LongString
-  if (isTypeByteArray(element.type)) {
-    const parsedBytes31Arr: BigNumberish[] = [];
-    const bytes31ArrLen = BigInt(responseIterator.next().value);
-    while (parsedBytes31Arr.length < bytes31ArrLen) {
-      parsedBytes31Arr.push(toHex(responseIterator.next().value));
-    }
-    const pending_word = toHex(responseIterator.next().value);
-    const pending_word_len = BigInt(responseIterator.next().value);
-    const myByteArray: ByteArray = {
-      data: parsedBytes31Arr,
-      pending_word,
-      pending_word_len,
-    };
-    return stringFromByteArray(myByteArray);
+  // type ByteArray struct
+  if (CairoByteArray.isAbiType(element.type)) {
+    return parser.getParser(element.type)(responseIterator);
+    // return CairoByteArray.factoryFromApiResponse(responseIterator).decodeUtf8();
   }
 
   // type fixed-array
@@ -137,7 +124,7 @@ function parseResponseValue(
     const el: AbiEntry = { name: '', type: CairoFixedArray.getFixedArrayType(element.type) };
     const arraySize = CairoFixedArray.getFixedArraySize(element.type);
     while (parsedDataArr.length < arraySize) {
-      parsedDataArr.push(parseResponseValue(responseIterator, el, structs, enums));
+      parsedDataArr.push(parseResponseValue(responseIterator, el, parser, structs, enums));
     }
     return parsedDataArr;
   }
@@ -149,7 +136,7 @@ function parseResponseValue(
     const el: AbiEntry = { name: '', type: getArrayType(element.type) };
     const len = BigInt(responseIterator.next().value); // get length
     while (parsedDataArr.length < len) {
-      parsedDataArr.push(parseResponseValue(responseIterator, el, structs, enums));
+      parsedDataArr.push(parseResponseValue(responseIterator, el, parser, structs, enums));
     }
     return parsedDataArr;
   }
@@ -160,16 +147,16 @@ function parseResponseValue(
     // const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
     const el: AbiEntry = { name: '', type: getArrayType(element.type) };
     // parsedDataArr.push();
-    return parseResponseValue(responseIterator, el, structs, enums);
+    return parseResponseValue(responseIterator, el, parser, structs, enums);
   }
 
   // type struct
   if (structs && element.type in structs && structs[element.type]) {
     if (isTypeEthAddress(element.type)) {
-      return parseBaseTypes(element.type, responseIterator);
+      return parseBaseTypes(element.type, responseIterator, parser);
     }
     return structs[element.type].members.reduce((acc, el) => {
-      acc[el.name] = parseResponseValue(responseIterator, el, structs, enums);
+      acc[el.name] = parseResponseValue(responseIterator, el, parser, structs, enums);
       return acc;
     }, {} as any);
   }
@@ -182,6 +169,7 @@ function parseResponseValue(
         acc[variant.name] = parseResponseValue(
           responseIterator,
           { name: '', type: variant.type },
+          parser,
           structs,
           enums
         );
@@ -217,7 +205,7 @@ function parseResponseValue(
       const name = it?.name ? it.name : idx;
       const type = it?.type ? it.type : it;
       const el = { name, type };
-      acc[name] = parseResponseValue(responseIterator, el, structs, enums);
+      acc[name] = parseResponseValue(responseIterator, el, parser, structs, enums);
       return acc;
     }, {} as any);
   }
@@ -230,13 +218,13 @@ function parseResponseValue(
     const el = { name: '', type: getArrayType(element.type) };
     const len = BigInt(responseIterator.next().value); // get length
     while (parsedDataArr.length < len) {
-      parsedDataArr.push(parseResponseValue(responseIterator, el, structs, enums));
+      parsedDataArr.push(parseResponseValue(responseIterator, el, parser, structs, enums));
     }
     return parsedDataArr;
   }
 
   // base type
-  return parseBaseTypes(element.type, responseIterator);
+  return parseBaseTypes(element.type, responseIterator, parser);
 }
 
 /**
@@ -248,13 +236,21 @@ function parseResponseValue(
  * @param parsedResult
  * @return - parsed response corresponding to the abi structure of the field
  */
-export default function responseParser(
-  responseIterator: Iterator<string>,
-  output: AbiEntry | EventEntry,
-  structs?: AbiStructs,
-  enums?: AbiEnums,
-  parsedResult?: Args | ParsedStruct
-): any {
+export default function responseParser({
+  responseIterator,
+  output,
+  structs,
+  enums,
+  parsedResult,
+  parser,
+}: {
+  responseIterator: Iterator<string>;
+  output: AbiEntry | EventEntry;
+  structs: AbiStructs;
+  enums: AbiEnums;
+  parsedResult?: Args | ParsedStruct;
+  parser: AbiParserInterface;
+}): any {
   const { name, type } = output;
   let temp;
 
@@ -264,18 +260,18 @@ export default function responseParser(
       return BigInt(temp);
 
     case (structs && type in structs) || isTypeTuple(type):
-      return parseResponseValue(responseIterator, output, structs, enums);
+      return parseResponseValue(responseIterator, output, parser, structs, enums);
 
     case enums && isTypeEnum(type, enums):
-      return parseResponseValue(responseIterator, output, structs, enums);
+      return parseResponseValue(responseIterator, output, parser, structs, enums);
 
     case CairoFixedArray.isTypeFixedArray(type):
-      return parseResponseValue(responseIterator, output, structs, enums);
+      return parseResponseValue(responseIterator, output, parser, structs, enums);
 
     case isTypeArray(type):
       // C1 Array
       if (isCairo1Type(type)) {
-        return parseResponseValue(responseIterator, output, structs, enums);
+        return parseResponseValue(responseIterator, output, parser, structs, enums);
       }
       // C0 Array
       // eslint-disable-next-line no-case-declarations
@@ -287,6 +283,7 @@ export default function responseParser(
             parseResponseValue(
               responseIterator,
               { name, type: output.type.replace('*', '') },
+              parser,
               structs,
               enums
             )
@@ -296,9 +293,9 @@ export default function responseParser(
       return parsedDataArr;
 
     case isTypeNonZero(type):
-      return parseResponseValue(responseIterator, output, structs, enums);
+      return parseResponseValue(responseIterator, output, parser, structs, enums);
 
     default:
-      return parseBaseTypes(type, responseIterator);
+      return parseBaseTypes(type, responseIterator, parser);
   }
 }

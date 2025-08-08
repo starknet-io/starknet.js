@@ -110,6 +110,15 @@ export function isBuffer(obj: unknown): obj is Buffer {
  * // result = true
  * ```
  */
-export function isObject(item: unknown | undefined): boolean {
+export function isObject(item: unknown | undefined): item is object {
   return !!item && typeof item === 'object' && !Array.isArray(item);
+}
+
+/**
+ * Checks if a given value is an integer.
+ * @param {unknown} value the value to be checked.
+ * @returns {boolean} returns true if the value is an integer, false otherwise.
+ */
+export function isInteger(value: unknown): value is number {
+  return Number.isInteger(value) && typeof value === 'number';
 }

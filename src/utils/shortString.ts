@@ -106,6 +106,7 @@ export function splitLongString(longStr: string): string[] {
 }
 
 /**
+ * @deprecated use Utf8 instead
  * Convert an ASCII short string to a hexadecimal string.
  * @param {string} str short string (ASCII string, 31 characters max)
  * @returns {string} hex-string with 248 bits max
@@ -122,6 +123,7 @@ export function encodeShortString(str: string): string {
 }
 
 /**
+ * @deprecated use Utf8 instead
  * Convert a hexadecimal or decimal string to an ASCII string.
  * @param {string} str representing a 248 bit max number (ex. "0x1A4F64EA56" or "236942575435676423")
  * @returns {string} short string; 31 characters max
