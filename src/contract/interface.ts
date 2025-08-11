@@ -8,6 +8,7 @@ import type {
   ContractVersion,
   Invocation,
   InvokeFunctionResponse,
+  PaymasterFeeEstimate,
   RawArgs,
   Uint256,
 } from '../types';
@@ -193,7 +194,7 @@ export abstract class ContractInterface {
     options?: {
       blockIdentifier?: BlockIdentifier;
     }
-  ): Promise<EstimateFeeResponseOverhead>;
+  ): Promise<EstimateFeeResponseOverhead | PaymasterFeeEstimate>;
 
   /**
    * Populate transaction data for a contract method call

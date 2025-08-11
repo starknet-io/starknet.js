@@ -46,7 +46,8 @@ console.log('User balance:', userBalance);
 
 - Cairo 1 contracts return values directly as `bigint`
 - Cairo 0 contracts return objects with named properties (e.g., `result.res`)
-  :::
+
+:::
 
 ## ✍️ Writing to Contract State
 
@@ -169,7 +170,7 @@ txR.match({
     console.log('Reverted =', txR);
   },
   error: (err: Error) => {
-    console.log('An error occured =', err);
+    console.log('An error occurred =', err);
   },
 });
 ```
