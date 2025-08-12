@@ -14,7 +14,7 @@ import type {
 import type { UniversalDetails } from '../../account/types/index.type';
 import type { ProviderInterface } from '../../provider';
 import type { AccountInterface } from '../../account/interface';
-import type { AbiParserInterface } from '../../utils/calldata/parser/interface';
+import type { ParsingStrategy } from '../../utils/calldata/parser';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
@@ -74,9 +74,9 @@ export type CommonContractOptions = {
   parseResponse?: boolean;
 
   /**
-   * Custom Abi parser class constructor (must extend AbiParserInterface)
+   * Custom parsing strategy for request/response processing
    */
-  ParserClass?: new (abi: Abi) => AbiParserInterface;
+  parsingStrategy?: ParsingStrategy;
 };
 
 export type ContractOptions = {

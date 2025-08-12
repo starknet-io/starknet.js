@@ -31,7 +31,7 @@ import {
 import type { AccountInterface } from '../account/interface';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
-import { createAbiParser } from '../utils/calldata/parser';
+import { createAbiParser, ParsingStrategy } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
@@ -39,7 +39,6 @@ import { logger } from '../global/logger';
 import { defaultProvider } from '../provider';
 import { getCompiledCalldata } from '../utils/transaction';
 import { extractAbi, parseContract } from '../utils/provider';
-import { AbiParserInterface } from '../utils/calldata/parser/interface';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -135,7 +134,7 @@ export class Contract implements ContractInterface {
 
   public withOptionsProps?: WithOptions;
 
-  private ParserClass?: new (abi: Abi) => AbiParserInterface;
+  private parsingStrategy?: ParsingStrategy;
 
   /**
    * @param options
@@ -149,10 +148,8 @@ export class Contract implements ContractInterface {
   constructor(options: ContractOptions) {
     // TODO: REFACTOR: move from legacy format and add support for legacy format
     // Must have params
-    this.ParserClass = options.ParserClass;
-    const parser = options.ParserClass
-      ? new options.ParserClass(options.abi)
-      : createAbiParser(options.abi);
+    this.parsingStrategy = options.parsingStrategy;
+    const parser = createAbiParser(options.abi, options.parsingStrategy);
     this.abi = parser.getLegacyFormat();
     this.address = options.address && options.address.toLowerCase();
     this.providerOrAccount = options.providerOrAccount ?? defaultProvider;
@@ -163,7 +160,7 @@ export class Contract implements ContractInterface {
     this.classHash = options.classHash;
 
     // Init
-    this.callData = new CallData(options.abi, options.ParserClass);
+    this.callData = new CallData(options.abi, options.parsingStrategy);
     this.structs = CallData.getAbiStruct(options.abi);
     this.events = getAbiEvents(options.abi);
 
@@ -222,9 +219,9 @@ export class Contract implements ContractInterface {
     // TODO: if changing address, probably changing abi also !? Also nonsense method as if you change abi and address, you need to create a new contract instance.
     this.address = address;
     if (abi) {
-      const parser = this.ParserClass ? new this.ParserClass(abi) : createAbiParser(abi);
+      const parser = createAbiParser(abi, this.parsingStrategy);
       this.abi = parser.getLegacyFormat();
-      this.callData = new CallData(abi, this.ParserClass);
+      this.callData = new CallData(abi, this.parsingStrategy);
       this.structs = CallData.getAbiStruct(abi);
       this.events = getAbiEvents(abi);
     }
@@ -397,7 +394,7 @@ export class Contract implements ContractInterface {
             })
             .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || [];
         parsed = parseRawEvents(
-          emittedEvents as any, // TODO: any temp hotfix, fix this
+          emittedEvents,
           this.events,
           this.structs,
           CallData.getAbiEnum(this.abi),
@@ -546,7 +543,7 @@ export class Contract implements ContractInterface {
       classHash,
       parseRequest: params.parseRequest,
       parseResponse: params.parseResponse,
-      ParserClass: params.ParserClass,
+      parsingStrategy: params.parsingStrategy,
     });
   }
 }

@@ -1,4 +1,13 @@
-import { Account, Contract, ProviderInterface, AbiParser2HD, CairoByteArray } from '../src';
+import * as fs from 'fs';
+import * as path from 'path';
+import {
+  Account,
+  Contract,
+  ProviderInterface,
+  CairoByteArray,
+  hdParsingStrategy,
+  ParsingStrategy,
+} from '../src';
 import { contracts } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
 
@@ -434,7 +443,7 @@ describe('CairoByteArray Contract Integration Tests', () => {
       casm: contracts.CairoByteArray.casm,
       account,
       constructorCalldata: [],
-      ParserClass: AbiParser2HD,
+      parsingStrategy: hdParsingStrategy,
     });
   }, 60000);
 
@@ -442,18 +451,81 @@ describe('CairoByteArray Contract Integration Tests', () => {
     const testMessage = 'Hello, Starknet!';
 
     // Send CairoByteArray to contract with parseRequest disabled
-    const storeResult = await byteArrayContract.store_message('Hello, Starknet!');
-
-    await provider.waitForTransaction(storeResult.transaction_hash);
+    await byteArrayContract.withOptions({ waitForTransaction: true }).store_message(testMessage);
 
     // Read CairoByteArray from contract with parseResponse disabled
     const readResult = await byteArrayContract.read_message();
 
-    // Reconstruct CairoByteArray from raw response
-    const iterator = readResult[Symbol.iterator]();
-    const reconstructedByteArray = CairoByteArray.factoryFromApiResponse(iterator);
+    // Verify the message is correctly stored and retrieved
+    expect(readResult).toBe(testMessage);
+  });
+
+  test('should store and read long CairoByteArray (> 31 bytes)', async () => {
+    const testMessage = 'Unicode test: émojis 🚀 and 中文字符 {}[]. 🇦🇺🇦🇺🇦🇺';
+
+    // Send CairoByteArray to contract with parseRequest disabled
+    await byteArrayContract.withOptions({ waitForTransaction: true }).store_message(testMessage);
+
+    // Read CairoByteArray from contract with parseResponse disabled
+    const readResult = await byteArrayContract.read_message();
 
     // Verify the message is correctly stored and retrieved
-    expect(reconstructedByteArray.decodeUtf8()).toBe(testMessage);
+    expect(readResult).toBe(testMessage);
+  });
+
+  test('should store large Buffer file, custom response parser', async () => {
+    // Create custom parsing strategy that extends hdParsingStrategy
+    const customParsingStrategy: ParsingStrategy = {
+      request: hdParsingStrategy.request,
+      response: {
+        ...hdParsingStrategy.response,
+        [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
+          return CairoByteArray.factoryFromApiResponse(responseIterator).toBuffer();
+        },
+      },
+    };
+
+    const customByteArrayContract = new Contract({
+      abi: contracts.CairoByteArray.sierra.abi,
+      address: byteArrayContract.address,
+      providerOrAccount: account,
+      parsingStrategy: customParsingStrategy,
+    });
+    // Read a smaller binary file from __mocks__ as Buffer (under 300 byte limit)
+    const mockFilePath = path.join(
+      __dirname,
+      '..',
+      '__mocks__',
+      'cairo',
+      'byteArray',
+      'src',
+      'lib.cairo'
+    );
+
+    // "error":"Exceeded the maximum data length, data length: 2773, max data length: 300."
+    // TODO: check what is imposing this limit ?
+    /*     const mockFilePath = path.join(
+      __dirname,
+      '..',
+      '__mocks__',
+      'cairo',
+      'byteArray',
+      'target',
+      'dev',
+      'test_ByteArrayStorage.sierra.json'
+    ); */
+
+    const originalBuffer = fs.readFileSync(mockFilePath);
+
+    // Pass Buffer directly to store_message
+    await customByteArrayContract
+      .withOptions({ waitForTransaction: true })
+      .store_message(originalBuffer);
+
+    // Read it back
+    const retrievedData = await customByteArrayContract.read_message();
+
+    // Verify the round-trip worked correctly
+    expect(retrievedData).toEqual(originalBuffer);
   });
 });

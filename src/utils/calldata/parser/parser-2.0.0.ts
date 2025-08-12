@@ -7,31 +7,29 @@ import {
   type LegacyEvent,
   AbiEntryType,
 } from '../../../types';
-import { CairoByteArray } from '../../cairoDataTypes/byteArray';
-import { CairoBytes31 } from '../../cairoDataTypes/bytes31';
 import { AbiParserInterface } from './interface';
+import { fastParsingStrategy, ParsingStrategy } from './parsingStrategy';
 
 export class AbiParser2 implements AbiParserInterface {
   abi: Abi;
 
-  parsingMap: Record<AbiEntryType, (responseIterator: Iterator<string>) => any> = {};
+  parsingStrategy: ParsingStrategy;
 
-  constructor(abi: Abi) {
+  constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
     this.abi = abi;
-    // TODO: set to old type conversion implementation
-    this.parsingMap = {
-      [CairoBytes31.abiSelector]: (responseIterator: Iterator<string>) => {
-        return CairoBytes31.factoryFromApiResponse(responseIterator).decodeUtf8();
-      },
-      [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
-        return CairoByteArray.factoryFromApiResponse(responseIterator).decodeUtf8();
-      },
-    };
+    this.parsingStrategy = parsingStrategy || fastParsingStrategy;
   }
 
-  public getParser(abiType: AbiEntryType): (responseIterator: Iterator<string>) => any {
-    if (this.parsingMap[abiType]) {
-      return this.parsingMap[abiType];
+  public getRequestParser(abiType: AbiEntryType): () => any {
+    if (this.parsingStrategy.request[abiType]) {
+      return this.parsingStrategy.request[abiType];
+    }
+    throw new Error(`Parser for ${abiType} not found`);
+  }
+
+  public getResponseParser(abiType: AbiEntryType): (responseIterator: Iterator<string>) => any {
+    if (this.parsingStrategy.response[abiType]) {
+      return this.parsingStrategy.response[abiType];
     }
     throw new Error(`Parser for ${abiType} not found`);
   }

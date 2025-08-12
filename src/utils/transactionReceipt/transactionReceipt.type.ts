@@ -7,6 +7,7 @@ import {
 export type TransactionStatusReceiptSets = {
   SUCCEEDED: SuccessfulTransactionReceiptResponse;
   REVERTED: RevertedTransactionReceiptResponse;
+  // TODO: there should be no ERROR case in library flow as fetch would throw on error before it could be read by Helper
   ERROR: Error;
 };
 export type TransactionReceiptStatus = keyof TransactionStatusReceiptSets;

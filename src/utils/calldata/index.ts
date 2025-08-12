@@ -29,7 +29,7 @@ import {
   CairoResultVariant,
 } from './enum';
 import formatter from './formatter';
-import { createAbiParser, isNoConstructorValid } from './parser';
+import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
@@ -50,10 +50,10 @@ export class CallData {
 
   protected readonly enums: AbiEnums;
 
-  constructor(abi: Abi, ParserClass?: new (_abi: Abi) => AbiParserInterface) {
+  constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
     this.structs = CallData.getAbiStruct(abi);
     this.enums = CallData.getAbiEnum(abi);
-    this.parser = ParserClass ? new ParserClass(abi) : createAbiParser(abi);
+    this.parser = createAbiParser(abi, parsingStrategy);
     this.abi = this.parser.getLegacyFormat();
   }
 

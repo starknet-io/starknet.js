@@ -243,6 +243,48 @@ export class CairoByteArray {
     return addHexPrefix(this.toBigInt().toString(16));
   }
 
+  toBuffer() {
+    if (!this.data || this.pending_word === undefined || this.pending_word_len === undefined) {
+      throw new Error('CairoByteArray is not properly initialized');
+    }
+
+    // Reconstruct the full byte sequence
+    const allBytes: number[] = [];
+
+    // Add bytes from all complete chunks (each chunk contains exactly 31 bytes when full)
+    this.data.forEach((chunk) => {
+      // Each chunk stores its data as a Uint8Array
+      const chunkBytes = chunk.data;
+      for (let i = 0; i < chunkBytes.length; i += 1) {
+        allBytes.push(chunkBytes[i]);
+      }
+    });
+
+    // Add bytes from pending word
+    const pendingLen = Number(this.pending_word_len.toBigInt());
+    if (pendingLen > 0) {
+      const hex = this.pending_word.toHexString();
+      const hexWithoutPrefix = hex.startsWith('0x') ? hex.slice(2) : hex;
+
+      // Convert hex to bytes
+      // Ensure hex string has even length by padding with leading zero if necessary
+      const paddedHex =
+        hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
+
+      for (let i = 0; i < pendingLen; i += 1) {
+        const byteHex = paddedHex.slice(i * 2, i * 2 + 2);
+        if (byteHex.length >= 2) {
+          const byteValue = parseInt(byteHex, 16);
+          if (!Number.isNaN(byteValue)) {
+            allBytes.push(byteValue);
+          }
+        }
+      }
+    }
+
+    return Buffer.from(allBytes);
+  }
+
   static validate(data: Uint8Array | Buffer | BigNumberish | unknown) {
     // Check for invalid types
     if (data === null || data === undefined) {

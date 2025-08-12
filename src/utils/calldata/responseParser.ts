@@ -64,7 +64,7 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
       temp = it.next().value;
       return BigInt(temp);
     case CairoBytes31.isAbiType(type):
-      return parser.getParser(type)(it);
+      return parser.getResponseParser(type)(it);
     // return CairoBytes31.factoryFromApiResponse(it).decodeUtf8();
     case isTypeSecp256k1Point(type):
       const xLow = removeHexPrefix(it.next().value).padStart(32, '0');
@@ -114,7 +114,7 @@ function parseResponseValue(
   }
   // type ByteArray struct
   if (CairoByteArray.isAbiType(element.type)) {
-    return parser.getParser(element.type)(responseIterator);
+    return parser.getResponseParser(element.type)(responseIterator);
     // return CairoByteArray.factoryFromApiResponse(responseIterator).decodeUtf8();
   }
 
