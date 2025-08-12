@@ -39,6 +39,7 @@ import validateFields from './validate';
 export * as cairo from './cairo';
 export * as byteArray from './byteArray';
 export { parseCalldataField } from './requestParser';
+export * from './parser';
 
 export class CallData {
   abi: Abi;
@@ -49,10 +50,10 @@ export class CallData {
 
   protected readonly enums: AbiEnums;
 
-  constructor(abi: Abi) {
+  constructor(abi: Abi, ParserClass?: new (_abi: Abi) => AbiParserInterface) {
     this.structs = CallData.getAbiStruct(abi);
     this.enums = CallData.getAbiEnum(abi);
-    this.parser = createAbiParser(abi);
+    this.parser = ParserClass ? new ParserClass(abi) : createAbiParser(abi);
     this.abi = this.parser.getLegacyFormat();
   }
 

@@ -1,9 +1,9 @@
 import { Account, Contract, ProviderInterface } from '../src';
 import { CairoByteArray } from '../src/utils/cairoDataTypes/byteArray';
-import { contracts, describeIfDevnet } from './config/fixtures';
+import { contracts } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
 
-describeIfDevnet('CairoByteArray Contract Integration Tests', () => {
+describe('CairoByteArray Manual Integration Tests', () => {
   let provider: ProviderInterface;
   let account: Account;
   let byteArrayContract: Contract;
@@ -416,5 +416,45 @@ describeIfDevnet('CairoByteArray Contract Integration Tests', () => {
       // The result should be automatically parsed to a string
       expect(readResult).toBe(testMessage);
     });
+  });
+});
+
+describe('CairoByteArray Contract Integration Tests', () => {
+  let provider: ProviderInterface;
+  let account: Account;
+  let byteArrayContract: Contract;
+
+  beforeAll(async () => {
+    // Setup provider and account
+    provider = await createTestProvider();
+    account = await getTestAccount(provider);
+
+    // Deploy ByteArrayStorage contract using Contract.factory
+    byteArrayContract = await Contract.factory({
+      contract: contracts.CairoByteArray.sierra,
+      casm: contracts.CairoByteArray.casm,
+      account,
+      constructorCalldata: [],
+    });
+  }, 60000);
+
+  test('should store and read short CairoByteArray', async () => {
+    const testMessage = 'Hello, Starknet!';
+    const byteArray = new CairoByteArray(testMessage);
+
+    // Send CairoByteArray to contract with parseRequest disabled
+    const storeResult = await byteArrayContract.store_message(byteArray.toApiRequest());
+
+    await provider.waitForTransaction(storeResult.transaction_hash);
+
+    // Read CairoByteArray from contract with parseResponse disabled
+    const readResult = await byteArrayContract.read_message();
+
+    // Reconstruct CairoByteArray from raw response
+    const iterator = readResult[Symbol.iterator]();
+    const reconstructedByteArray = CairoByteArray.factoryFromApiResponse(iterator);
+
+    // Verify the message is correctly stored and retrieved
+    expect(reconstructedByteArray.decodeUtf8()).toBe(testMessage);
   });
 });

@@ -14,6 +14,7 @@ import type {
 import type { UniversalDetails } from '../../account/types/index.type';
 import type { ProviderInterface } from '../../provider';
 import type { AccountInterface } from '../../account/interface';
+import type { AbiParserInterface } from '../../utils/calldata/parser/interface';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
@@ -65,11 +66,17 @@ export type CommonContractOptions = {
    * @default true
    */
   parseRequest?: boolean;
+
   /**
    * Parse elements of the response array and structuring them into response object
    * @default true
    */
   parseResponse?: boolean;
+
+  /**
+   * Custom Abi parser class constructor (must extend AbiParserInterface)
+   */
+  ParserClass?: new (abi: Abi) => AbiParserInterface;
 };
 
 export type ContractOptions = {
@@ -163,4 +170,4 @@ type DeployOnlyParams = FactoryParamsBase & {
   abi?: Abi;
 };
 
-export type FactoryParams = DeclareAndDeployParams | DeployOnlyParams;
+export type FactoryParams = (DeclareAndDeployParams | DeployOnlyParams) & CommonContractOptions;

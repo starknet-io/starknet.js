@@ -38,6 +38,7 @@ import { logger } from '../global/logger';
 import { defaultProvider } from '../provider';
 import { getCompiledCalldata } from '../utils/transaction';
 import { extractAbi, parseContract } from '../utils/provider';
+import { AbiParserInterface } from '../utils/calldata/parser/interface';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -50,8 +51,8 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
     // eslint-disable-next-line no-param-reassign
     contract.withOptionsProps = undefined;
     return contract.call(functionAbi.name, args, {
-      parseRequest: true,
-      parseResponse: true,
+      parseRequest: contract.parseRequest,
+      parseResponse: contract.parseResponse,
       ...options,
     });
   };
@@ -66,7 +67,7 @@ function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContrac
     // eslint-disable-next-line no-param-reassign
     contract.withOptionsProps = undefined;
     return contract.invoke(functionAbi.name, args, {
-      parseRequest: true,
+      parseRequest: contract.parseRequest,
       ...options,
     });
   };
@@ -111,6 +112,10 @@ export class Contract implements ContractInterface {
 
   classHash?: string;
 
+  parseRequest: boolean;
+
+  parseResponse: boolean;
+
   private structs: { [name: string]: AbiStruct };
 
   private events: AbiEvents;
@@ -129,6 +134,8 @@ export class Contract implements ContractInterface {
 
   public withOptionsProps?: WithOptions;
 
+  private ParserClass?: new (abi: Abi) => AbiParserInterface;
+
   /**
    * @param options
    *  - abi: Abi of the contract object (required)
@@ -136,20 +143,27 @@ export class Contract implements ContractInterface {
    *  - providerOrAccount?: Provider or Account to attach to (fallback to defaultProvider)
    *  - parseRequest?: compile and validate arguments (optional, default true)
    *  - parseResponse?: Parse elements of the response array and structuring them into response object (optional, default true)
+   *  - parser?: Abi parser (optional, default createAbiParser(options.abi))
    */
   constructor(options: ContractOptions) {
-    // TODO: HUGE_REFACTOR: move from legacy format and add support for legacy format
-    const parser = createAbiParser(options.abi);
+    // TODO: REFACTOR: move from legacy format and add support for legacy format
+    this.ParserClass = options.ParserClass;
+    const parser = options.ParserClass
+      ? new options.ParserClass(options.abi)
+      : createAbiParser(options.abi);
+    this.abi = parser.getLegacyFormat();
+
+    this.parseRequest = options.parseRequest ?? true;
+    this.parseResponse = options.parseResponse ?? true;
     // Must have params
     this.address = options.address && options.address.toLowerCase();
-    this.abi = parser.getLegacyFormat();
     this.providerOrAccount = options.providerOrAccount ?? defaultProvider;
 
     // Optional params
     this.classHash = options.classHash;
 
     // Init
-    this.callData = new CallData(options.abi);
+    this.callData = new CallData(options.abi, options.ParserClass);
     this.structs = CallData.getAbiStruct(options.abi);
     this.events = getAbiEvents(options.abi);
 
@@ -208,8 +222,9 @@ export class Contract implements ContractInterface {
     // TODO: if changing address, probably changing abi also !? Also nonsense method as if you change abi and address, you need to create a new contract instance.
     this.address = address;
     if (abi) {
-      this.abi = createAbiParser(abi).getLegacyFormat();
-      this.callData = new CallData(abi);
+      const parser = this.ParserClass ? new this.ParserClass(abi) : createAbiParser(abi);
+      this.abi = parser.getLegacyFormat();
+      this.callData = new CallData(abi, this.ParserClass);
       this.structs = CallData.getAbiStruct(abi);
       this.events = getAbiEvents(abi);
     }
@@ -504,6 +519,9 @@ export class Contract implements ContractInterface {
       address: contract_address,
       providerOrAccount: account,
       classHash,
+      parseRequest: params.parseRequest,
+      parseResponse: params.parseResponse,
+      ParserClass: params.ParserClass,
     });
   }
 }

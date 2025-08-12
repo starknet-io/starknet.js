@@ -3,6 +3,12 @@ import { isCairo1Abi } from '../cairo';
 import { AbiParserInterface } from './interface';
 import { AbiParser1 } from './parser-0-1.1.0';
 import { AbiParser2 } from './parser-2.0.0';
+import { AbiParser2HD } from './parser-2.0.0HD';
+
+export { AbiParser2HD };
+export { AbiParser2 };
+export { AbiParser1 };
+export { AbiParserInterface };
 
 /**
  * Creates ABI parser

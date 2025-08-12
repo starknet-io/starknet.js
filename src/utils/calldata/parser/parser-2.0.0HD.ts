@@ -11,14 +11,13 @@ import { CairoByteArray } from '../../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../../cairoDataTypes/bytes31';
 import { AbiParserInterface } from './interface';
 
-export class AbiParser2 implements AbiParserInterface {
+export class AbiParser2HD implements AbiParserInterface {
   abi: Abi;
 
   parsingMap: Record<AbiEntryType, (responseIterator: Iterator<string>) => any> = {};
 
   constructor(abi: Abi) {
     this.abi = abi;
-    // TODO: set to old type conversion implementation
     this.parsingMap = {
       [CairoBytes31.abiSelector]: (responseIterator: Iterator<string>) => {
         return CairoBytes31.factoryFromApiResponse(responseIterator).decodeUtf8();
