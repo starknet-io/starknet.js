@@ -104,6 +104,11 @@ export type ExecuteOptions = Pick<CommonContractOptions, 'parseRequest'> & {
    * Deployer contract salt
    */
   salt?: string;
+  /**
+   * Wait for transaction to be included in a block
+   * @default false
+   */
+  waitForTransaction?: boolean;
 } & Partial<UniversalDetails>;
 
 export type CallOptions = CommonContractOptions & {

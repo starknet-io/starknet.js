@@ -1,5 +1,4 @@
-import { Account, Contract, ProviderInterface } from '../src';
-import { CairoByteArray } from '../src/utils/cairoDataTypes/byteArray';
+import { Account, Contract, ProviderInterface, AbiParser2HD, CairoByteArray } from '../src';
 import { contracts } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
 
@@ -435,15 +434,15 @@ describe('CairoByteArray Contract Integration Tests', () => {
       casm: contracts.CairoByteArray.casm,
       account,
       constructorCalldata: [],
+      ParserClass: AbiParser2HD,
     });
   }, 60000);
 
   test('should store and read short CairoByteArray', async () => {
     const testMessage = 'Hello, Starknet!';
-    const byteArray = new CairoByteArray(testMessage);
 
     // Send CairoByteArray to contract with parseRequest disabled
-    const storeResult = await byteArrayContract.store_message(byteArray.toApiRequest());
+    const storeResult = await byteArrayContract.store_message('Hello, Starknet!');
 
     await provider.waitForTransaction(storeResult.transaction_hash);
 

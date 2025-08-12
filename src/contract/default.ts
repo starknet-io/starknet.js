@@ -147,19 +147,18 @@ export class Contract implements ContractInterface {
    */
   constructor(options: ContractOptions) {
     // TODO: REFACTOR: move from legacy format and add support for legacy format
+    // Must have params
     this.ParserClass = options.ParserClass;
     const parser = options.ParserClass
       ? new options.ParserClass(options.abi)
       : createAbiParser(options.abi);
     this.abi = parser.getLegacyFormat();
-
-    this.parseRequest = options.parseRequest ?? true;
-    this.parseResponse = options.parseResponse ?? true;
-    // Must have params
     this.address = options.address && options.address.toLowerCase();
     this.providerOrAccount = options.providerOrAccount ?? defaultProvider;
 
     // Optional params
+    this.parseRequest = options.parseRequest ?? true;
+    this.parseResponse = options.parseResponse ?? true;
     this.classHash = options.classHash;
 
     // Init
@@ -213,7 +212,7 @@ export class Contract implements ContractInterface {
     });
   }
 
-  public withOptions(options: WithOptions) {
+  public withOptions(options: WithOptions): this {
     this.withOptionsProps = options;
     return this;
   }
@@ -230,7 +229,7 @@ export class Contract implements ContractInterface {
     }
   }
 
-  public async isDeployed(): Promise<Contract> {
+  public async isDeployed(): Promise<this> {
     try {
       await this.providerOrAccount.getClassHashAt(this.address);
     } catch (error) {
@@ -282,11 +281,27 @@ export class Contract implements ContractInterface {
       });
   }
 
-  public invoke(
+  public async invoke(
+    method: string,
+    args: ArgsOrCalldata,
+    options: ExecuteOptions & { waitForTransaction: true }
+  ): Promise<GetTransactionReceiptResponse<'success'>>;
+  public async invoke(
+    method: string,
+    args: ArgsOrCalldata,
+    options: ExecuteOptions & { waitForTransaction: false }
+  ): Promise<InvokeFunctionResponse>;
+  public async invoke(
+    method: string,
+    args?: ArgsOrCalldata,
+    options?: ExecuteOptions
+  ): Promise<InvokeFunctionResponse>;
+  public async invoke(
     method: string,
     args: ArgsOrCalldata = [],
-    { parseRequest = true, signature, ...RestInvokeOptions }: ExecuteOptions = {}
-  ): Promise<InvokeFunctionResponse> {
+    options: ExecuteOptions = {}
+  ): Promise<GetTransactionReceiptResponse<'success'> | InvokeFunctionResponse> {
+    const { parseRequest = true, signature, waitForTransaction, ...RestInvokeOptions } = options;
     assert(this.address !== null, 'contract is not connected to an address');
 
     const calldata = getCompiledCalldata(args, () => {
@@ -304,9 +319,18 @@ export class Contract implements ContractInterface {
       entrypoint: method,
     };
     if (isAccount(this.providerOrAccount)) {
-      return this.providerOrAccount.execute(invocation, {
+      const result: InvokeFunctionResponse = await this.providerOrAccount.execute(invocation, {
         ...RestInvokeOptions,
       });
+      if (waitForTransaction) {
+        const result2: GetTransactionReceiptResponse =
+          await this.providerOrAccount.waitForTransaction(result.transaction_hash);
+        if (result2.isSuccess()) {
+          return result2;
+        }
+        throw new Error('Transaction failed', { cause: result2 });
+      }
+      return result;
     }
 
     if (!RestInvokeOptions.nonce)
