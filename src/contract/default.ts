@@ -26,6 +26,7 @@ import {
   FactoryParams,
   UniversalDetails,
   DeclareAndDeployContractPayload,
+  SuccessfulTransactionReceiptResponseHelper,
 } from '../types';
 import type { AccountInterface } from '../account/interface';
 import assert from '../utils/assert';
@@ -285,7 +286,7 @@ export class Contract implements ContractInterface {
     method: string,
     args: ArgsOrCalldata,
     options: ExecuteOptions & { waitForTransaction: true }
-  ): Promise<GetTransactionReceiptResponse<'success'>>;
+  ): Promise<SuccessfulTransactionReceiptResponseHelper>;
   public async invoke(
     method: string,
     args: ArgsOrCalldata,
@@ -300,7 +301,7 @@ export class Contract implements ContractInterface {
     method: string,
     args: ArgsOrCalldata = [],
     options: ExecuteOptions = {}
-  ): Promise<GetTransactionReceiptResponse<'success'> | InvokeFunctionResponse> {
+  ): Promise<SuccessfulTransactionReceiptResponseHelper | InvokeFunctionResponse> {
     const { parseRequest = true, signature, waitForTransaction, ...RestInvokeOptions } = options;
     assert(this.address !== null, 'contract is not connected to an address');
 
@@ -381,7 +382,7 @@ export class Contract implements ContractInterface {
   public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
     let parsed: ParsedEvents;
     receipt.match({
-      success: (txR: SuccessfulTransactionReceiptResponse) => {
+      SUCCEEDED: (txR: SuccessfulTransactionReceiptResponse) => {
         const emittedEvents =
           txR.events
             ?.map((event) => {
