@@ -146,10 +146,19 @@ export class CairoByteArray {
       throw new Error('CairoByteArray is not properly initialized');
     }
 
-    // Concatenate all complete chunks
-    let result = this.data.map((chunk) => chunk.decodeUtf8()).join('');
+    // Reconstruct the full byte sequence first to avoid splitting UTF-8 characters
+    const allBytes: number[] = [];
 
-    // Add the pending word if it has content
+    // Add bytes from all complete chunks (each chunk contains exactly 31 bytes when full)
+    this.data.forEach((chunk) => {
+      // Each chunk stores its data as a Uint8Array
+      const chunkBytes = chunk.data;
+      for (let i = 0; i < chunkBytes.length; i += 1) {
+        allBytes.push(chunkBytes[i]);
+      }
+    });
+
+    // Add bytes from pending word
     const pendingLen = Number(this.pending_word_len.toBigInt());
     if (pendingLen > 0) {
       // Get the hex string from pending_word and convert to bytes
@@ -157,7 +166,6 @@ export class CairoByteArray {
       const hexWithoutPrefix = hex.startsWith('0x') ? hex.slice(2) : hex;
 
       // Convert hex to bytes
-      const bytes = new Uint8Array(pendingLen);
       // Ensure hex string has even length by padding with leading zero if necessary
       const paddedHex =
         hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
@@ -166,21 +174,21 @@ export class CairoByteArray {
         const byteHex = paddedHex.slice(i * 2, i * 2 + 2);
         if (byteHex.length < 2) {
           // If we don't have enough hex digits, treat as zero
-          bytes[i] = 0;
+          allBytes.push(0);
         } else {
           const byteValue = parseInt(byteHex, 16);
           if (Number.isNaN(byteValue)) {
             throw new Error(`Invalid hex byte: ${byteHex}`);
           }
-          bytes[i] = byteValue;
+          allBytes.push(byteValue);
         }
       }
-
-      // Decode bytes to UTF-8 string
-      result += new TextDecoder().decode(bytes);
     }
 
-    return result;
+    // Convert all bytes to Uint8Array and decode as UTF-8 string
+    // This ensures multi-byte UTF-8 characters are not split across chunk boundaries
+    const fullBytes = new Uint8Array(allBytes);
+    return new TextDecoder().decode(fullBytes);
   }
 
   toBigInt() {

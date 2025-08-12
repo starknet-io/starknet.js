@@ -123,7 +123,9 @@ export type ParsedEvent = { [name: string]: ParsedStruct } & {
   transaction_hash?: TransactionHash;
 };
 
-export type ParsedEvents = Array<ParsedEvent>;
+export type ParsedEvents = Array<ParsedEvent> & {
+  getByPath?(path: string): ParsedStruct | null;
+};
 
 // TODO: This should be in formatResponse type
 /**

@@ -351,6 +351,14 @@ describe('CairoByteArray Unit Tests', () => {
       expect(decoded).toBe(originalString);
     });
 
+    test('should decode string with unicode characters and emojis', () => {
+      const originalString = '🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀';
+      const byteArray = new CairoByteArray(originalString);
+      const decoded = byteArray.decodeUtf8();
+
+      expect(decoded).toBe(originalString);
+    });
+
     test('should decode from Uint8Array input', () => {
       const originalString = 'Test from Uint8Array';
       const encoder = new TextEncoder();

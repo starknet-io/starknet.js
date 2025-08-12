@@ -377,7 +377,7 @@ export class Contract implements ContractInterface {
   // TODO: Demistify what is going on here ???
   // TODO: receipt status filtering test and fix this do not look right
   public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
-    let parsed: ParsedEvents;
+    let parsed: ParsedEvents = [] as unknown as ParsedEvents;
     receipt.match({
       SUCCEEDED: (txR: SuccessfulTransactionReceiptResponse) => {
         const emittedEvents =
@@ -392,20 +392,33 @@ export class Contract implements ContractInterface {
                 ...event,
               };
             })
-            .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || [];
+            .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || []; // TODO: what data is in this that is cleaned out ?
         parsed = parseRawEvents(
           emittedEvents,
           this.events,
           this.structs,
           CallData.getAbiEnum(this.abi),
           this.callData.parser
-        );
+        ) as ParsedEvents;
       },
       _: () => {
         throw Error('This transaction was not successful.');
       },
     });
-    return parsed!;
+
+    // Add getByPath method to the specific instance (non-enumerable)
+    Object.defineProperty(parsed, 'getByPath', {
+      value: (path: string) => {
+        const event = parsed.find((ev) => Object.keys(ev).some((key) => key.includes(path)));
+        const eventKey = Object.keys(event || {}).find((key) => key.includes(path));
+        return eventKey && event ? event[eventKey] : null;
+      },
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    });
+
+    return parsed;
   }
 
   public isCairo1(): boolean {

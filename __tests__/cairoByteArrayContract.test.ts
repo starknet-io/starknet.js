@@ -7,9 +7,11 @@ import {
   CairoByteArray,
   hdParsingStrategy,
   ParsingStrategy,
+  BigNumberish,
 } from '../src';
 import { contracts } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
+import { toHex } from '../src/utils/num';
 
 describe('CairoByteArray Manual Integration Tests', () => {
   let provider: ProviderInterface;
@@ -473,7 +475,7 @@ describe('CairoByteArray Contract Integration Tests', () => {
     expect(readResult).toBe(testMessage);
   });
 
-  test('should store large Buffer file, custom response parser', async () => {
+  test('should store and read Buffer file, custom response parsing strategy', async () => {
     // Create custom parsing strategy that extends hdParsingStrategy
     const customParsingStrategy: ParsingStrategy = {
       request: hdParsingStrategy.request,
@@ -527,5 +529,26 @@ describe('CairoByteArray Contract Integration Tests', () => {
 
     // Verify the round-trip worked correctly
     expect(retrievedData).toEqual(originalBuffer);
+  });
+
+  test('should parse invoke event with ByteArray message', async () => {
+    const testMessage = '🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀';
+
+    // Send CairoByteArray to contract with parseRequest disabled
+    const txReceipt = await byteArrayContract
+      .withOptions({ waitForTransaction: true })
+      .store_message(testMessage);
+
+    // Parse events from transaction receipt
+    const events = byteArrayContract.parseEvents(txReceipt);
+
+    // Use the new getByPath helper method (most convenient)
+    const messageStored = events.getByPath?.('MessageStored');
+    if (!messageStored) throw new Error('MessageStored event not found');
+
+    // Verify all event return proper data
+    expect(toHex(messageStored.caller as BigNumberish)).toEqual(account.address);
+    expect(messageStored).toBeDefined();
+    expect(messageStored.message).toEqual(testMessage);
   });
 });
