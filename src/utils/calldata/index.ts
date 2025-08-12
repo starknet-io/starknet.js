@@ -145,7 +145,15 @@ export class CallData {
       (acc, input) =>
         isLen(input.name) && !isCairo1Type(input.type)
           ? acc
-          : acc.concat(parseCalldataField(argsIterator, input, this.structs, this.enums)),
+          : acc.concat(
+              parseCalldataField({
+                argsIterator,
+                input,
+                structs: this.structs,
+                enums: this.enums,
+                parser: this.parser,
+              })
+            ),
       [] as Calldata
     );
 

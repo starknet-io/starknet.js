@@ -20,7 +20,7 @@ export class AbiParser2 implements AbiParserInterface {
     this.parsingStrategy = parsingStrategy || fastParsingStrategy;
   }
 
-  public getRequestParser(abiType: AbiEntryType): () => any {
+  public getRequestParser(abiType: AbiEntryType): (val: unknown) => any {
     if (this.parsingStrategy.request[abiType]) {
       return this.parsingStrategy.request[abiType];
     }

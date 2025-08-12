@@ -29,7 +29,7 @@ export abstract class AbiParserInterface {
    * @param abiType AbiEntryType
    * @returns Parser function
    */
-  public abstract getRequestParser(abiType: AbiEntryType): () => any;
+  public abstract getRequestParser(abiType: AbiEntryType): (val: unknown) => any;
 
   /**
    * Get response parser for the given abi type

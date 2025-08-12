@@ -17,26 +17,20 @@ export const UINT_256_LOW_MIN = 0n;
 export const UINT_256_HIGH_MIN = 0n;
 
 export class CairoUint256 {
-  public low: bigint;
+  public low: bigint; // TODO should be u128
 
-  public high: bigint;
+  public high: bigint; // TODO should be u128
 
-  static abiSelector = 'core::integer::u256';
+  static abiSelector = 'core::integer::u256' as const;
 
   /**
    * Default constructor (Lib usage)
-   * @param bigNumberish BigNumberish value representing uin256
    */
-  public constructor(bigNumberish: BigNumberish);
+  public constructor(data: BigNumberish | Uint256 | unknown);
   /**
    * Direct props initialization (Api response)
    */
   public constructor(low: BigNumberish, high: BigNumberish);
-  /**
-   * Initialization from Uint256 object
-   */
-  public constructor(uint256: Uint256);
-
   public constructor(...arr: any[]) {
     if (isObject(arr[0]) && arr.length === 1 && 'low' in arr[0] && 'high' in arr[0]) {
       const props = CairoUint256.validateProps(
@@ -61,8 +55,22 @@ export class CairoUint256 {
   /**
    * Validate if BigNumberish can be represented as Unit256
    */
-  static validate(bigNumberish: BigNumberish) {
-    const bigInt = BigInt(bigNumberish);
+  static validate(bigNumberish: BigNumberish | unknown) {
+    if (bigNumberish === null) {
+      throw new Error('null value is not allowed for u256');
+    }
+    if (bigNumberish === undefined) {
+      throw new Error('undefined value is not allowed for u256');
+    }
+
+    const dataType = typeof bigNumberish;
+    if (!['string', 'number', 'bigint', 'object'].includes(dataType)) {
+      throw new Error(
+        `Unsupported data type '${dataType}' for u256. Expected string, number, bigint, or Uint256 object`
+      );
+    }
+
+    const bigInt = BigInt(bigNumberish as BigNumberish);
     if (bigInt < UINT_256_MIN) throw Error('bigNumberish is smaller than UINT_256_MIN');
     if (bigInt > UINT_256_MAX) throw new Error('bigNumberish is bigger than UINT_256_MAX');
     return bigInt;
@@ -86,7 +94,7 @@ export class CairoUint256 {
   /**
    * Check if BigNumberish can be represented as Unit256
    */
-  static is(bigNumberish: BigNumberish) {
+  static is(bigNumberish: BigNumberish | unknown) {
     try {
       CairoUint256.validate(bigNumberish);
     } catch (error) {

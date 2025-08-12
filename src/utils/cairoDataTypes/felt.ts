@@ -14,7 +14,7 @@ import {
 } from '../encode';
 
 /**
- * @deprecated use CairoFelt252 Class instead
+ * @deprecated use CairoFelt252 Class instead, this one limit string to ASCII
  * Create felt Cairo type (cairo type helper)
  * @returns format: felt-string
  */
@@ -65,11 +65,11 @@ export class CairoFelt252 {
    */
   data: Uint8Array;
 
-  static abiSelector = 'core::felt252';
+  static abiSelector = 'core::felt252' as const;
 
-  constructor(data: BigNumberish | boolean) {
+  constructor(data: BigNumberish | boolean | unknown) {
     CairoFelt252.validate(data);
-    this.data = CairoFelt252.__processData(data);
+    this.data = CairoFelt252.__processData(data as BigNumberish | boolean);
   }
 
   static __processData(data: BigNumberish | boolean): Uint8Array {
@@ -114,8 +114,24 @@ export class CairoFelt252 {
     return compiled;
   }
 
-  static validate(data: BigNumberish | boolean): void {
-    const value = CairoFelt252.__processData(data);
+  static validate(data: BigNumberish | boolean | unknown): void {
+    // Check for unknown data types
+    if (data === null) {
+      throw new Error('null value is not allowed for felt252');
+    }
+    if (data === undefined) {
+      throw new Error('undefined value is not allowed for felt252');
+    }
+
+    // Check for valid types that can be processed
+    const dataType = typeof data;
+    if (!['string', 'number', 'bigint', 'boolean'].includes(dataType)) {
+      throw new Error(
+        `Unsupported data type '${dataType}' for felt252. Expected string, number, bigint, or boolean`
+      );
+    }
+
+    const value = CairoFelt252.__processData(data as BigNumberish | boolean);
     const bn = uint8ArrayToBigInt(value);
 
     // Check if value is within the felt252 range (0 ≤ x < PRIME)
@@ -124,7 +140,7 @@ export class CairoFelt252 {
     }
   }
 
-  static is(data: BigNumberish | boolean): boolean {
+  static is(data: BigNumberish | boolean | unknown): boolean {
     try {
       CairoFelt252.validate(data);
       return true;

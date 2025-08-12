@@ -1,15 +1,22 @@
 import { CairoBytes31 } from '../../cairoDataTypes/bytes31';
 import { CairoByteArray } from '../../cairoDataTypes/byteArray';
-import { AbiEntryType } from '../../../types';
+import { AbiEntryType, BigNumberish } from '../../../types';
+import { CairoFelt252 } from '../../cairoDataTypes/felt';
+import { felt } from '../cairo';
+import { CairoUint256 } from '../../cairoDataTypes/uint256';
+import { CairoUint512 } from '../../cairoDataTypes/uint512';
+import { getNext } from '../../num';
 
 /**
  * Parsing map for parser, request and response parsers are separated
  * Configure parsing strategy for each abi type
  */
 export type ParsingStrategy = {
-  request: Record<AbiEntryType, () => any>;
+  request: Record<AbiEntryType, (val: unknown) => any>;
   response: Record<AbiEntryType, (responseIterator: Iterator<string>) => any>;
 };
+
+// TODO: extend for complex types like structs, tuples, enums, arrays, etc.
 
 /**
  * More robust parsing strategy
@@ -17,7 +24,24 @@ export type ParsingStrategy = {
  * Configure parsing strategy for each abi type
  */
 export const hdParsingStrategy = {
-  request: {},
+  // TODO: provjeri svi request parseri stvaraju array, dali je to ok sa requstParserom
+  request: {
+    [CairoBytes31.abiSelector]: (val: unknown) => {
+      return new CairoBytes31(val).toApiRequest();
+    },
+    [CairoByteArray.abiSelector]: (val: unknown) => {
+      return new CairoByteArray(val).toApiRequest();
+    },
+    [CairoFelt252.abiSelector]: (val: unknown) => {
+      return new CairoFelt252(val).toApiRequest();
+    },
+    [CairoUint256.abiSelector]: (val: unknown) => {
+      return new CairoUint256(val).toApiRequest();
+    },
+    [CairoUint512.abiSelector]: (val: unknown) => {
+      return new CairoUint512(val).toApiRequest();
+    },
+  },
   response: {
     [CairoBytes31.abiSelector]: (responseIterator: Iterator<string>) => {
       return CairoBytes31.factoryFromApiResponse(responseIterator).decodeUtf8();
@@ -25,15 +49,72 @@ export const hdParsingStrategy = {
     [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
       return CairoByteArray.factoryFromApiResponse(responseIterator).decodeUtf8();
     },
+    [CairoFelt252.abiSelector]: (responseIterator: Iterator<string>) => {
+      return CairoFelt252.factoryFromApiResponse(responseIterator).toBigInt();
+    },
+    [CairoUint256.abiSelector]: (responseIterator: Iterator<string>) => {
+      // TODO add factory from response iterator
+      const low = getNext(responseIterator);
+      const high = getNext(responseIterator);
+      return new CairoUint256(low, high).toBigInt();
+    },
+    [CairoUint512.abiSelector]: (responseIterator: Iterator<string>) => {
+      // TODO add factory
+      const limb0 = getNext(responseIterator);
+      const limb1 = getNext(responseIterator);
+      const limb2 = getNext(responseIterator);
+      const limb3 = getNext(responseIterator);
+      return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
+    },
   },
 } as const;
 
 /**
- * Fastest parsing strategy
+ * Faster parsing strategy
  * Configuration mapping - data-driven approach
  * Configure parsing strategy for each abi type
  */
 export const fastParsingStrategy: ParsingStrategy = {
-  request: {},
-  response: {},
+  request: {
+    [CairoBytes31.abiSelector]: (val: unknown) => {
+      return new CairoBytes31(val).toApiRequest();
+    },
+    [CairoByteArray.abiSelector]: (val: unknown) => {
+      return new CairoByteArray(val).toApiRequest();
+    },
+    [CairoFelt252.abiSelector]: (val: unknown) => {
+      return felt(val as BigNumberish);
+    },
+    [CairoUint256.abiSelector]: (val: unknown) => {
+      return new CairoUint256(val).toApiRequest();
+    },
+    [CairoUint512.abiSelector]: (val: unknown) => {
+      return new CairoUint512(val).toApiRequest();
+    },
+  },
+  response: {
+    [CairoBytes31.abiSelector]: (responseIterator: Iterator<string>) => {
+      return CairoBytes31.factoryFromApiResponse(responseIterator).decodeUtf8();
+    },
+    [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
+      return CairoByteArray.factoryFromApiResponse(responseIterator).decodeUtf8();
+    },
+    [CairoFelt252.abiSelector]: (responseIterator: Iterator<string>) => {
+      return BigInt(getNext(responseIterator));
+    },
+    [CairoUint256.abiSelector]: (responseIterator: Iterator<string>) => {
+      // TODO add factory from response iterator
+      const low = getNext(responseIterator);
+      const high = getNext(responseIterator);
+      return new CairoUint256(low, high).toBigInt();
+    },
+    [CairoUint512.abiSelector]: (responseIterator: Iterator<string>) => {
+      // TODO add factory
+      const limb0 = getNext(responseIterator);
+      const limb1 = getNext(responseIterator);
+      const limb2 = getNext(responseIterator);
+      const limb3 = getNext(responseIterator);
+      return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
+    },
+  },
 } as const;

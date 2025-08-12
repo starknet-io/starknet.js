@@ -326,6 +326,33 @@ describe('CairoFelt252 class Unit Tests', () => {
       expect(() => CairoFelt252.validate(3.14 as any)).toThrow();
     });
 
+    test('should reject null with specific error message', () => {
+      expect(() => CairoFelt252.validate(null as any)).toThrow(
+        'null value is not allowed for felt252'
+      );
+    });
+
+    test('should reject undefined with specific error message', () => {
+      expect(() => CairoFelt252.validate(undefined as any)).toThrow(
+        'undefined value is not allowed for felt252'
+      );
+    });
+
+    test('should reject unsupported data types with specific error messages', () => {
+      expect(() => CairoFelt252.validate(Symbol('test') as any)).toThrow(
+        "Unsupported data type 'symbol' for felt252. Expected string, number, bigint, or boolean"
+      );
+      expect(() => CairoFelt252.validate((() => {}) as any)).toThrow(
+        "Unsupported data type 'function' for felt252. Expected string, number, bigint, or boolean"
+      );
+      expect(() => CairoFelt252.validate({} as any)).toThrow(
+        "Unsupported data type 'object' for felt252. Expected string, number, bigint, or boolean"
+      );
+      expect(() => CairoFelt252.validate([] as any)).toThrow(
+        "Unsupported data type 'object' for felt252. Expected string, number, bigint, or boolean"
+      );
+    });
+
     test('should reject values outside felt252 range', () => {
       const PRIME = 2n ** 251n + 17n * 2n ** 192n + 1n;
 
@@ -371,6 +398,14 @@ describe('CairoFelt252 class Unit Tests', () => {
 
       const PRIME = 2n ** 251n + 17n * 2n ** 192n + 1n;
       expect(CairoFelt252.is(PRIME)).toBe(false);
+    });
+
+    test('should return false for unknown invalid data types', () => {
+      expect(CairoFelt252.is(Symbol('test') as any)).toBe(false);
+      expect(CairoFelt252.is((() => {}) as any)).toBe(false);
+      expect(CairoFelt252.is(new Date() as any)).toBe(false);
+      expect(CairoFelt252.is(new Map() as any)).toBe(false);
+      expect(CairoFelt252.is(new Set() as any)).toBe(false);
     });
   });
 

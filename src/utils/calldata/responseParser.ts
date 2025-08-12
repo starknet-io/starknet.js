@@ -11,6 +11,7 @@ import {
 } from '../../types';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
+import { CairoFelt252 } from '../cairoDataTypes/felt';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
@@ -51,21 +52,14 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
       temp = it.next().value;
       return Boolean(BigInt(temp));
     case CairoUint256.isAbiType(type):
-      const low = it.next().value;
-      const high = it.next().value;
-      return new CairoUint256(low, high).toBigInt();
+      return parser.getResponseParser(type)(it);
     case CairoUint512.isAbiType(type):
-      const limb0 = it.next().value;
-      const limb1 = it.next().value;
-      const limb2 = it.next().value;
-      const limb3 = it.next().value;
-      return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
+      return parser.getResponseParser(type)(it);
     case isTypeEthAddress(type):
       temp = it.next().value;
       return BigInt(temp);
     case CairoBytes31.isAbiType(type):
       return parser.getResponseParser(type)(it);
-    // return CairoBytes31.factoryFromApiResponse(it).decodeUtf8();
     case isTypeSecp256k1Point(type):
       const xLow = removeHexPrefix(it.next().value).padStart(32, '0');
       const xHigh = removeHexPrefix(it.next().value).padStart(32, '0');
@@ -74,8 +68,8 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
       const pubK = BigInt(addHexPrefix(xHigh + xLow + yHigh + yLow));
       return pubK;
     default:
-      temp = it.next().value;
-      return BigInt(temp);
+      // TODO: this is for all simple types felt and rest to BN, at the moment handle as felt
+      return parser.getResponseParser(CairoFelt252.abiSelector)(it);
   }
 }
 
@@ -100,22 +94,15 @@ function parseResponseValue(
   }
   // type uint256 struct (c1v2)
   if (CairoUint256.isAbiType(element.type)) {
-    const low = responseIterator.next().value;
-    const high = responseIterator.next().value;
-    return new CairoUint256(low, high).toBigInt();
+    return parser.getResponseParser(element.type)(responseIterator);
   }
   // type uint512 struct
   if (CairoUint512.isAbiType(element.type)) {
-    const limb0 = responseIterator.next().value;
-    const limb1 = responseIterator.next().value;
-    const limb2 = responseIterator.next().value;
-    const limb3 = responseIterator.next().value;
-    return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
+    return parser.getResponseParser(element.type)(responseIterator);
   }
   // type ByteArray struct
   if (CairoByteArray.isAbiType(element.type)) {
     return parser.getResponseParser(element.type)(responseIterator);
-    // return CairoByteArray.factoryFromApiResponse(responseIterator).decodeUtf8();
   }
 
   // type fixed-array

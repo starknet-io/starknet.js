@@ -141,6 +141,7 @@ export class CairoFixedArray {
 
   /**
    * Checks if the given Cairo type is a fixed-array type.
+   * structure: [string; number]
    *
    * @param {string} type - The type to check.
    * @returns - `true` if the type is a fixed array type, `false` otherwise.

@@ -14,21 +14,20 @@ export const UINT_512_MIN = 0n;
 export const UINT_128_MIN = 0n;
 
 export class CairoUint512 {
-  public limb0: bigint;
+  public limb0: bigint; // TODO should be u128
 
-  public limb1: bigint;
+  public limb1: bigint; // TODO should be u128
 
-  public limb2: bigint;
+  public limb2: bigint; // TODO should be u128
 
-  public limb3: bigint;
+  public limb3: bigint; // TODO should be u128
 
   static abiSelector = 'core::integer::u512';
 
   /**
    * Default constructor (Lib usage)
-   * @param bigNumberish BigNumberish value representing u512
    */
-  public constructor(bigNumberish: BigNumberish);
+  public constructor(bigNumberish: BigNumberish | Uint512 | unknown);
   /**
    * Direct props initialization (Api response)
    */
@@ -38,11 +37,6 @@ export class CairoUint512 {
     limb2: BigNumberish,
     limb3: BigNumberish
   );
-  /**
-   * Initialization from Uint512 object
-   */
-  public constructor(uint512: Uint512);
-
   public constructor(...arr: any[]) {
     if (
       isObject(arr[0]) &&
@@ -82,8 +76,22 @@ export class CairoUint512 {
   /**
    * Validate if BigNumberish can be represented as Uint512
    */
-  static validate(bigNumberish: BigNumberish): bigint {
-    const bigInt = BigInt(bigNumberish);
+  static validate(bigNumberish: BigNumberish | unknown): bigint {
+    if (bigNumberish === null) {
+      throw new Error('null value is not allowed for u512');
+    }
+    if (bigNumberish === undefined) {
+      throw new Error('undefined value is not allowed for u512');
+    }
+
+    const dataType = typeof bigNumberish;
+    if (!['string', 'number', 'bigint', 'object'].includes(dataType)) {
+      throw new Error(
+        `Unsupported data type '${dataType}' for u512. Expected string, number, bigint, or Uint512 object`
+      );
+    }
+
+    const bigInt = BigInt(bigNumberish as BigNumberish);
     if (bigInt < UINT_512_MIN) throw Error('bigNumberish is smaller than UINT_512_MIN.');
     if (bigInt > UINT_512_MAX) throw Error('bigNumberish is bigger than UINT_512_MAX.');
     return bigInt;
@@ -113,7 +121,7 @@ export class CairoUint512 {
   /**
    * Check if BigNumberish can be represented as Uint512
    */
-  static is(bigNumberish: BigNumberish): boolean {
+  static is(bigNumberish: BigNumberish | unknown): boolean {
     try {
       CairoUint512.validate(bigNumberish);
     } catch (error) {
