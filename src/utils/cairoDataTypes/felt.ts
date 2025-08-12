@@ -102,9 +102,9 @@ export class CairoFelt252 {
 
   toApiRequest(): string[] {
     /**
-     * DecimalString representation of the felt252
+     * HexString representation of the felt252
      */
-    const compiled = [uint8ArrayToBigInt(this.data).toString()];
+    const compiled = [this.toHexString()];
     Object.defineProperty(compiled, '__compiled__', {
       enumerable: false,
       writable: false,

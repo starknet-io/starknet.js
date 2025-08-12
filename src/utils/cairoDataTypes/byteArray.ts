@@ -126,7 +126,7 @@ export class CairoByteArray {
     }
 
     const compiled = [
-      this.data.length.toString(),
+      addHexPrefix(this.data.length.toString(16)),
       ...this.data.flatMap((bytes31) => bytes31.toApiRequest()),
       ...this.pending_word.toApiRequest(),
       ...this.pending_word_len.toApiRequest(),

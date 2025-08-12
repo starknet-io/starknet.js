@@ -26,7 +26,7 @@ export class CairoUint32 {
   }
 
   toApiRequest(): string[] {
-    const compiled = [this.data.toString()];
+    const compiled = [this.toHexString()];
     Object.defineProperty(compiled, '__compiled__', {
       enumerable: false,
       writable: false,

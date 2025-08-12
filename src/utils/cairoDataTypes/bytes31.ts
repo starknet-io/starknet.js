@@ -28,7 +28,7 @@ export class CairoBytes31 {
   }
 
   toApiRequest(): string[] {
-    const compiled = [uint8ArrayToBigInt(this.data).toString()];
+    const compiled = [this.toHexString()];
     Object.defineProperty(compiled, '__compiled__', {
       enumerable: false,
       writable: false,

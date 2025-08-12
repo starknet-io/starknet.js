@@ -53,13 +53,13 @@ describe('CairoBytes31 class Unit Tests', () => {
 
     test('should reject invalid input types', () => {
       expect(() => new CairoBytes31(123 as any)).toThrow(
-        'Invalid input type. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
       );
       expect(() => new CairoBytes31({} as any)).toThrow(
-        'Invalid input type. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
       );
       expect(() => new CairoBytes31(null as any)).toThrow(
-        'Invalid input type. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
       );
     });
 
@@ -213,31 +213,31 @@ describe('CairoBytes31 class Unit Tests', () => {
   });
 
   describe('toApiRequest method', () => {
-    test('should return decimal string array for empty data', () => {
+    test('should return hex string array for empty data', () => {
       const bytes31 = new CairoBytes31('');
-      expect(bytes31.toApiRequest()).toEqual(['0']);
+      expect(bytes31.toApiRequest()).toEqual(['0x0']);
     });
 
-    test('should return decimal string array for text data', () => {
+    test('should return hex string array for text data', () => {
       const bytes31 = new CairoBytes31('A'); // ASCII 65
-      expect(bytes31.toApiRequest()).toEqual(['65']);
+      expect(bytes31.toApiRequest()).toEqual(['0x41']);
     });
 
-    test('should return decimal string array for multi-byte data', () => {
+    test('should return hex string array for multi-byte data', () => {
       const bytes31 = new CairoBytes31('AB'); // 0x4142 = 16706
-      expect(bytes31.toApiRequest()).toEqual(['16706']);
+      expect(bytes31.toApiRequest()).toEqual(['0x4142']);
     });
 
-    test('should return decimal string array for Buffer input', () => {
+    test('should return hex string array for Buffer input', () => {
       const buffer = Buffer.from([1, 0]); // 0x0100 = 256
       const bytes31 = new CairoBytes31(buffer);
-      expect(bytes31.toApiRequest()).toEqual(['256']);
+      expect(bytes31.toApiRequest()).toEqual(['0x100']);
     });
 
-    test('should return decimal string array for large values', () => {
+    test('should return hex string array for large values', () => {
       const array = new Uint8Array([222, 173, 190, 239]); // 0xdeadbeef
       const bytes31 = new CairoBytes31(array);
-      expect(bytes31.toApiRequest()).toEqual(['3735928559']); // decimal value of 0xdeadbeef
+      expect(bytes31.toApiRequest()).toEqual(['0xdeadbeef']);
     });
   });
 
@@ -263,16 +263,16 @@ describe('CairoBytes31 class Unit Tests', () => {
 
     test('should reject invalid input types', () => {
       expect(() => CairoBytes31.validate(123 as any)).toThrow(
-        'Invalid input type. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
       );
       expect(() => CairoBytes31.validate({} as any)).toThrow(
-        'Invalid input type. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
       );
       expect(() => CairoBytes31.validate(null as any)).toThrow(
-        'Invalid input type. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
       );
       expect(() => CairoBytes31.validate(undefined as any)).toThrow(
-        'Invalid input type. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
       );
     });
 

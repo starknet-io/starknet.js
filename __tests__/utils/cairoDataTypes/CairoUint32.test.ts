@@ -194,30 +194,30 @@ describe('CairoUint32 class Unit Tests', () => {
   });
 
   describe('toApiRequest method', () => {
-    test('should return decimal string array for zero', () => {
+    test('should return hex string array for zero', () => {
       const u32 = new CairoUint32(0);
-      expect(u32.toApiRequest()).toEqual(['0']);
+      expect(u32.toApiRequest()).toEqual(['0x0']);
     });
 
-    test('should return decimal string array for small numbers', () => {
+    test('should return hex string array for small numbers', () => {
       const u32 = new CairoUint32(42);
-      expect(u32.toApiRequest()).toEqual(['42']);
+      expect(u32.toApiRequest()).toEqual(['0x2a']);
     });
 
-    test('should return decimal string array for large numbers', () => {
+    test('should return hex string array for large numbers', () => {
       const u32 = new CairoUint32(1000000);
-      expect(u32.toApiRequest()).toEqual(['1000000']);
+      expect(u32.toApiRequest()).toEqual(['0xf4240']);
     });
 
-    test('should return decimal string array for maximum u32', () => {
+    test('should return hex string array for maximum u32', () => {
       const maxU32 = 2n ** 32n - 1n;
       const u32 = new CairoUint32(maxU32);
-      expect(u32.toApiRequest()).toEqual(['4294967295']);
+      expect(u32.toApiRequest()).toEqual(['0xffffffff']);
     });
 
     test('should handle bigint input', () => {
       const u32 = new CairoUint32(12345n);
-      expect(u32.toApiRequest()).toEqual(['12345']);
+      expect(u32.toApiRequest()).toEqual(['0x3039']);
     });
   });
 
