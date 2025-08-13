@@ -8,6 +8,7 @@ import {
   hdParsingStrategy,
   ParsingStrategy,
   BigNumberish,
+  logger,
 } from '../src';
 import { contracts } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
@@ -493,30 +494,9 @@ describe('CairoByteArray Contract Integration Tests', () => {
       providerOrAccount: account,
       parsingStrategy: customParsingStrategy,
     });
-    // Read a smaller binary file from __mocks__ as Buffer (under 300 byte limit)
-    const mockFilePath = path.join(
-      __dirname,
-      '..',
-      '__mocks__',
-      'cairo',
-      'byteArray',
-      'src',
-      'lib.cairo'
-    );
 
-    // "error":"Exceeded the maximum data length, data length: 2773, max data length: 300."
-    // TODO: check what is imposing this limit ?
-    /*     const mockFilePath = path.join(
-      __dirname,
-      '..',
-      '__mocks__',
-      'cairo',
-      'byteArray',
-      'target',
-      'dev',
-      'test_ByteArrayStorage.sierra.json'
-    ); */
-
+    // (under 300 byte limit) for tx Emitted Event (https://github.com/starkware-libs/cairo-lang/blob/66355d7d99f1962ff9ccba8d0dbacbce3bd79bf8/src/starkware/starknet/definitions/versioned_constants.json#L491C10-L491C25)
+    const mockFilePath = path.resolve(__dirname, '../__mocks__/cairo/byteArray/src/lib.cairo');
     const originalBuffer = fs.readFileSync(mockFilePath);
 
     // Pass Buffer directly to store_message
@@ -531,7 +511,51 @@ describe('CairoByteArray Contract Integration Tests', () => {
     expect(retrievedData).toEqual(originalBuffer);
   });
 
-  test('should parse invoke event with ByteArray message', async () => {
+  xtest('should store and read large Buffer file without event, custom response parsing strategy', async () => {
+    // Create custom parsing strategy that extends hdParsingStrategy
+    const customParsingStrategy: ParsingStrategy = {
+      request: hdParsingStrategy.request,
+      response: {
+        ...hdParsingStrategy.response,
+        [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
+          return CairoByteArray.factoryFromApiResponse(responseIterator).toBuffer();
+        },
+      },
+    };
+
+    // increase tip to avoid transaction evicted from mempool
+    account.defaultTipType = 'p95Tip';
+
+    // info logger to see failed tx life status
+    logger.setLogLevel('INFO');
+
+    const customByteArrayContract = new Contract({
+      abi: contracts.CairoByteArray.sierra.abi,
+      address: byteArrayContract.address,
+      providerOrAccount: account,
+      parsingStrategy: customParsingStrategy,
+    });
+
+    // "execution error" :"Transaction size exceeds the maximum block capacity"
+    const mockFilePath = path.resolve(
+      __dirname,
+      '../__mocks__/cairo/byteArray/target/dev/test_ByteArrayStorage.sierra.json'
+    );
+    const originalBuffer = fs.readFileSync(mockFilePath);
+
+    // Pass Buffer directly to store_message
+    await customByteArrayContract
+      .withOptions({ waitForTransaction: true })
+      .store_message_noevent(originalBuffer);
+
+    // Read it back
+    const retrievedData = await customByteArrayContract.read_message();
+
+    // Verify the round-trip worked correctly
+    expect(retrievedData).toEqual(originalBuffer);
+  });
+
+  test('should receive and parse MessageStored event with ByteArray message', async () => {
     const testMessage = '🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀';
 
     // Send CairoByteArray to contract with parseRequest disabled
