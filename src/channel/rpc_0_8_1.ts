@@ -21,7 +21,7 @@ import {
   RpcProviderOptions,
   waitForTransactionOptions,
 } from '../types';
-import { JRPC, RPCSPEC08 as RPC, RPCSPEC08 } from '../types/api';
+import { JRPC, RPCSPEC08 as RPC, RPCSPEC08, RPCSPEC09 } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -412,6 +412,7 @@ export class RpcChannel {
       RPC.ETransactionStatus.ACCEPTED_ON_L1,
     ];
 
+    const txLife: string[] = [];
     let txStatus: RPC.TransactionStatus;
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
@@ -419,6 +420,7 @@ export class RpcChannel {
       try {
         // eslint-disable-next-line no-await-in-loop
         txStatus = await this.getTransactionStatus(transactionHash);
+        txLife.push(txStatus.finality_status);
 
         const executionStatus = txStatus.execution_status;
         const finalityStatus = txStatus.finality_status;
@@ -445,6 +447,20 @@ export class RpcChannel {
       } catch (error) {
         if (error instanceof Error && isErrorState) {
           throw error;
+        }
+
+        if (error instanceof RpcError && error.baseError.code === 29) {
+          logger.info('txLife: ', txLife);
+          const errorMessages: Record<string, string> = {
+            [RPCSPEC09.ETransactionStatus.RECEIVED]: SYSTEM_MESSAGES.txEvictedFromMempool,
+            [RPCSPEC09.ETransactionStatus.PRE_CONFIRMED]: SYSTEM_MESSAGES.consensusFailed,
+            [RPCSPEC09.ETransactionStatus.CANDIDATE]:
+              SYSTEM_MESSAGES.txFailsBlockBuildingValidation,
+          };
+          const errorMessage = errorMessages[txLife.at(-1) as string];
+          if (errorMessage) {
+            throw new Error(errorMessage);
+          }
         }
 
         if (retries <= 0) {

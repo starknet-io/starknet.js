@@ -37,20 +37,16 @@ export class CairoByteArray {
       const [dataArg, pendingWord, pendingWordLen] = arr;
 
       // Check if we're dealing with typed classes
-      if (
+      assert(
         Array.isArray(dataArg) &&
-        pendingWord instanceof CairoFelt252 &&
-        pendingWordLen instanceof CairoUint32
-      ) {
-        // Typed classes - use directly
-        this.data = dataArg;
-        this.pending_word = pendingWord;
-        this.pending_word_len = pendingWordLen;
-      } else {
-        throw new Error(
-          'Invalid constructor parameters. Expected (CairoBytes31[], CairoFelt252, CairoUint32)'
-        );
-      }
+          pendingWord instanceof CairoFelt252 &&
+          pendingWordLen instanceof CairoUint32,
+        'Invalid constructor parameters. Expected (CairoBytes31[], CairoFelt252, CairoUint32)'
+      );
+      // Typed classes - use directly
+      this.data = dataArg;
+      this.pending_word = pendingWord;
+      this.pending_word_len = pendingWordLen;
       return;
     }
 
@@ -121,9 +117,10 @@ export class CairoByteArray {
   }
 
   toApiRequest() {
-    if (!this.data || this.pending_word === undefined || this.pending_word_len === undefined) {
-      throw new Error('CairoByteArray is not properly initialized');
-    }
+    assert(
+      this.data && this.pending_word !== undefined && this.pending_word_len !== undefined,
+      'CairoByteArray is not properly initialized'
+    );
 
     const compiled = [
       addHexPrefix(this.data.length.toString(16)),
@@ -142,9 +139,10 @@ export class CairoByteArray {
   }
 
   decodeUtf8() {
-    if (!this.data || this.pending_word === undefined || this.pending_word_len === undefined) {
-      throw new Error('CairoByteArray is not properly initialized');
-    }
+    assert(
+      this.data && this.pending_word !== undefined && this.pending_word_len !== undefined,
+      'CairoByteArray is not properly initialized'
+    );
 
     // Reconstruct the full byte sequence first to avoid splitting UTF-8 characters
     const allBytes: number[] = [];
@@ -192,9 +190,10 @@ export class CairoByteArray {
   }
 
   toBigInt() {
-    if (!this.data || this.pending_word === undefined || this.pending_word_len === undefined) {
-      throw new Error('CairoByteArray is not properly initialized');
-    }
+    assert(
+      this.data && this.pending_word !== undefined && this.pending_word_len !== undefined,
+      'CairoByteArray is not properly initialized'
+    );
 
     // Reconstruct the full byte sequence
     const allBytes: number[] = [];
@@ -252,9 +251,10 @@ export class CairoByteArray {
   }
 
   toBuffer() {
-    if (!this.data || this.pending_word === undefined || this.pending_word_len === undefined) {
-      throw new Error('CairoByteArray is not properly initialized');
-    }
+    assert(
+      this.data && this.pending_word !== undefined && this.pending_word_len !== undefined,
+      'CairoByteArray is not properly initialized'
+    );
 
     // Reconstruct the full byte sequence
     const allBytes: number[] = [];
@@ -294,37 +294,27 @@ export class CairoByteArray {
   }
 
   static validate(data: Uint8Array | Buffer | BigNumberish | unknown) {
-    // Check for invalid types
-    if (data === null || data === undefined) {
-      throw new Error('Invalid input: null or undefined');
-    }
-
-    // Check for arrays that are not Uint8Array
-    if (Array.isArray(data) && !(data instanceof Uint8Array)) {
-      throw new Error('Invalid input: arrays are not supported, use Uint8Array');
-    }
-
-    // Check for objects that are not Buffer or Uint8Array
-    if (typeof data === 'object' && !isBuffer(data) && !(data instanceof Uint8Array)) {
-      throw new Error('Invalid input for CairoByteArray: objects are not supported');
-    }
-
-    // Check for decimal numbers - only integers are allowed
-    if (typeof data === 'number' && !Number.isInteger(data)) {
-      throw new Error(
-        'Invalid input for CairoByteArray: decimal numbers are not supported, only integers'
-      );
-    }
-
-    // Check for negative numbers
-    if (typeof data === 'number' && data < 0) {
-      throw new Error('Invalid input for CairoByteArray: negative numbers are not supported');
-    }
-
-    // Check for negative bigints
-    if (typeof data === 'bigint' && data < 0n) {
-      throw new Error('Invalid input for CairoByteArray: negative bigints are not supported');
-    }
+    assert(data != null, 'Invalid input: null or undefined');
+    assert(
+      !Array.isArray(data) || data instanceof Uint8Array,
+      'Invalid input: arrays are not supported, use Uint8Array'
+    );
+    assert(
+      typeof data !== 'object' || isBuffer(data) || data instanceof Uint8Array,
+      'Invalid input for CairoByteArray: objects are not supported'
+    );
+    assert(
+      typeof data !== 'number' || Number.isInteger(data),
+      'Invalid input for CairoByteArray: decimal numbers are not supported, only integers'
+    );
+    assert(
+      typeof data !== 'number' || data >= 0,
+      'Invalid input for CairoByteArray: negative numbers are not supported'
+    );
+    assert(
+      typeof data !== 'bigint' || data >= 0n,
+      'Invalid input for CairoByteArray: negative bigints are not supported'
+    );
 
     // There is no particular validation from input parameters when they are composed of existing types
     assert(

@@ -5,6 +5,7 @@ import {
   BigNumberish,
   ContractVersion,
   ETH_ADDRESS,
+  Int,
   Literal,
   NON_ZERO_PREFIX,
   Uint,
@@ -92,6 +93,13 @@ export const isTypeResult = (type: string) => type.startsWith('core::result::Res
  * @returns - Returns true if the value is a valid Uint type, otherwise false.
  */
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
+/**
+ * Checks if the given value is a valid Int type.
+ *
+ * @param {string} type - The value to check.
+ * @returns - Returns true if the value is a valid Int type, otherwise false.
+ */
+export const isTypeInt = (type: string) => Object.values(Int).includes(type as Int);
 // Legacy Export
 /**
  * Checks if the given type is `uint256`.

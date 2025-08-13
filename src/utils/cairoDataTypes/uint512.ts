@@ -8,6 +8,8 @@ import { addHexPrefix } from '../encode';
 import { CairoFelt } from './felt';
 import { UINT_128_MAX } from './uint256';
 import { isObject } from '../typed';
+import { getNext } from '../num';
+import assert from '../assert';
 
 export const UINT_512_MAX = (1n << 512n) - 1n;
 export const UINT_512_MIN = 0n;
@@ -77,23 +79,15 @@ export class CairoUint512 {
    * Validate if BigNumberish can be represented as Uint512
    */
   static validate(bigNumberish: BigNumberish | unknown): bigint {
-    if (bigNumberish === null) {
-      throw new Error('null value is not allowed for u512');
-    }
-    if (bigNumberish === undefined) {
-      throw new Error('undefined value is not allowed for u512');
-    }
-
-    const dataType = typeof bigNumberish;
-    if (!['string', 'number', 'bigint', 'object'].includes(dataType)) {
-      throw new Error(
-        `Unsupported data type '${dataType}' for u512. Expected string, number, bigint, or Uint512 object`
-      );
-    }
+    assert(bigNumberish != null, `${String(bigNumberish)} value is not allowed for u512`);
+    assert(
+      ['string', 'number', 'bigint', 'object'].includes(typeof bigNumberish),
+      `Unsupported data type '${typeof bigNumberish}' for u512. Expected string, number, bigint, or Uint512 object`
+    );
 
     const bigInt = BigInt(bigNumberish as BigNumberish);
-    if (bigInt < UINT_512_MIN) throw Error('bigNumberish is smaller than UINT_512_MIN.');
-    if (bigInt > UINT_512_MAX) throw Error('bigNumberish is bigger than UINT_512_MAX.');
+    assert(bigInt >= UINT_512_MIN, 'bigNumberish is smaller than UINT_512_MIN.');
+    assert(bigInt <= UINT_512_MAX, 'bigNumberish is bigger than UINT_512_MAX.');
     return bigInt;
   }
 
@@ -111,9 +105,10 @@ export class CairoUint512 {
     const l2 = BigInt(limb2);
     const l3 = BigInt(limb3);
     [l0, l1, l2, l3].forEach((value: bigint, index) => {
-      if (value < UINT_128_MIN || value > UINT_128_MAX) {
-        throw Error(`limb${index} is not in the range of a u128 number`);
-      }
+      assert(
+        value >= UINT_128_MIN && value <= UINT_128_MAX,
+        `limb${index} is not in the range of a u128 number`
+      );
     });
     return { limb0: l0, limb1: l1, limb2: l2, limb3: l3 };
   }
@@ -135,6 +130,14 @@ export class CairoUint512 {
    */
   static isAbiType(abiType: string): boolean {
     return abiType === CairoUint512.abiSelector;
+  }
+
+  static factoryFromApiResponse(responseIterator: Iterator<string>) {
+    const limb0 = getNext(responseIterator);
+    const limb1 = getNext(responseIterator);
+    const limb2 = getNext(responseIterator);
+    const limb3 = getNext(responseIterator);
+    return new CairoUint512(limb0, limb1, limb2, limb3);
   }
 
   /**

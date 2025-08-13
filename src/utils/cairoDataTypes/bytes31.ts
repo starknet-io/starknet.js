@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { addHexPrefix, stringToUint8Array, uint8ArrayToBigInt } from '../encode';
 import { getNext } from '../num';
+import assert from '../assert';
 
 export class CairoBytes31 {
   static MAX_BYTE_SIZE = 31 as const;
@@ -52,10 +53,10 @@ export class CairoBytes31 {
 
   static validate(data: Uint8Array | string | Buffer | unknown): void {
     const byteLength = CairoBytes31.__processData(data).length;
-
-    if (byteLength > this.MAX_BYTE_SIZE) {
-      throw new Error(`Data is too long: ${byteLength} bytes (max ${this.MAX_BYTE_SIZE} bytes)`);
-    }
+    assert(
+      byteLength <= this.MAX_BYTE_SIZE,
+      `Data is too long: ${byteLength} bytes (max ${this.MAX_BYTE_SIZE} bytes)`
+    );
   }
 
   static is(data: Uint8Array | string | Buffer): boolean {

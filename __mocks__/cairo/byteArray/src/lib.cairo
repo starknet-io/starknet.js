@@ -2,6 +2,7 @@
 #[starknet::interface]
 pub trait IByteArrayStorage<TContractState> {
     fn store_message(ref self: TContractState, message: ByteArray);
+    fn store_message_noevent(ref self: TContractState, message: ByteArray);
     fn read_message(self: @TContractState) -> ByteArray;
 }
 
@@ -47,6 +48,11 @@ pub mod ByteArrayStorage {
                 caller, 
                 message 
             }));
+        }
+
+        fn store_message_noevent(ref self: ContractState, message: ByteArray) {
+            // Store the message in storage
+            self.stored_message.write(message.clone());
         }
 
         fn read_message(self: @ContractState) -> ByteArray {

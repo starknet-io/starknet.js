@@ -12,6 +12,7 @@ import {
   uint8ArrayToBigInt,
   addHexPrefix,
 } from '../encode';
+import assert from '../assert';
 
 /**
  * @deprecated use CairoFelt252 Class instead, this one limit string to ASCII
@@ -115,29 +116,15 @@ export class CairoFelt252 {
   }
 
   static validate(data: BigNumberish | boolean | unknown): void {
-    // Check for unknown data types
-    if (data === null) {
-      throw new Error('null value is not allowed for felt252');
-    }
-    if (data === undefined) {
-      throw new Error('undefined value is not allowed for felt252');
-    }
-
-    // Check for valid types that can be processed
-    const dataType = typeof data;
-    if (!['string', 'number', 'bigint', 'boolean'].includes(dataType)) {
-      throw new Error(
-        `Unsupported data type '${dataType}' for felt252. Expected string, number, bigint, or boolean`
-      );
-    }
+    assert(data != null, `${String(data)} value is not allowed for felt252`);
+    assert(
+      ['string', 'number', 'bigint', 'boolean'].includes(typeof data),
+      `Unsupported data type '${typeof data}' for felt252. Expected string, number, bigint, or boolean`
+    );
 
     const value = CairoFelt252.__processData(data as BigNumberish | boolean);
     const bn = uint8ArrayToBigInt(value);
-
-    // Check if value is within the felt252 range (0 ≤ x < PRIME)
-    if (bn < 0n || bn >= PRIME) {
-      throw new Error(`Value ${value} is out of felt252 range [0, ${PRIME})`);
-    }
+    assert(bn >= 0n && bn < PRIME, `Value ${value} is out of felt252 range [0, ${PRIME})`);
   }
 
   static is(data: BigNumberish | boolean | unknown): boolean {
