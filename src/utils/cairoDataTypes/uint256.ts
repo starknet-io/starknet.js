@@ -7,6 +7,7 @@ import { BigNumberish, Uint256 } from '../../types';
 import { addHexPrefix } from '../encode';
 import { CairoFelt } from './felt';
 import { isObject } from '../typed';
+import { getNext } from '../num';
 
 export const UINT_128_MAX = (1n << 128n) - 1n;
 export const UINT_256_MAX = (1n << 256n) - 1n;
@@ -108,6 +109,12 @@ export class CairoUint256 {
    */
   static isAbiType(abiType: string) {
     return abiType === CairoUint256.abiSelector;
+  }
+
+  static factoryFromApiResponse(responseIterator: Iterator<string>) {
+    const low = getNext(responseIterator);
+    const high = getNext(responseIterator);
+    return new CairoUint256(low, high);
   }
 
   /**

@@ -8,6 +8,7 @@ import { addHexPrefix } from '../encode';
 import { CairoFelt } from './felt';
 import { UINT_128_MAX } from './uint256';
 import { isObject } from '../typed';
+import { getNext } from '../num';
 
 export const UINT_512_MAX = (1n << 512n) - 1n;
 export const UINT_512_MIN = 0n;
@@ -135,6 +136,14 @@ export class CairoUint512 {
    */
   static isAbiType(abiType: string): boolean {
     return abiType === CairoUint512.abiSelector;
+  }
+
+  static factoryFromApiResponse(responseIterator: Iterator<string>) {
+    const limb0 = getNext(responseIterator);
+    const limb1 = getNext(responseIterator);
+    const limb2 = getNext(responseIterator);
+    const limb3 = getNext(responseIterator);
+    return new CairoUint512(limb0, limb1, limb2, limb3);
   }
 
   /**

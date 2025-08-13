@@ -53,18 +53,10 @@ export const hdParsingStrategy = {
       return CairoFelt252.factoryFromApiResponse(responseIterator).toBigInt();
     },
     [CairoUint256.abiSelector]: (responseIterator: Iterator<string>) => {
-      // TODO add factory from response iterator
-      const low = getNext(responseIterator);
-      const high = getNext(responseIterator);
-      return new CairoUint256(low, high).toBigInt();
+      return CairoUint256.factoryFromApiResponse(responseIterator).toBigInt();
     },
     [CairoUint512.abiSelector]: (responseIterator: Iterator<string>) => {
-      // TODO add factory
-      const limb0 = getNext(responseIterator);
-      const limb1 = getNext(responseIterator);
-      const limb2 = getNext(responseIterator);
-      const limb3 = getNext(responseIterator);
-      return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
+      return CairoUint512.factoryFromApiResponse(responseIterator).toBigInt();
     },
   },
 } as const;
@@ -103,18 +95,10 @@ export const fastParsingStrategy: ParsingStrategy = {
       return BigInt(getNext(responseIterator));
     },
     [CairoUint256.abiSelector]: (responseIterator: Iterator<string>) => {
-      // TODO add factory from response iterator
-      const low = getNext(responseIterator);
-      const high = getNext(responseIterator);
-      return new CairoUint256(low, high).toBigInt();
+      return CairoUint256.factoryFromApiResponse(responseIterator).toBigInt();
     },
     [CairoUint512.abiSelector]: (responseIterator: Iterator<string>) => {
-      // TODO add factory
-      const limb0 = getNext(responseIterator);
-      const limb1 = getNext(responseIterator);
-      const limb2 = getNext(responseIterator);
-      const limb3 = getNext(responseIterator);
-      return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
+      return CairoUint512.factoryFromApiResponse(responseIterator).toBigInt();
     },
   },
 } as const;
