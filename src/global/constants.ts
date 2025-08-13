@@ -153,4 +153,7 @@ export const SYSTEM_MESSAGES = {
   maxFeeInV3: 'maxFee is not supported in V3 transactions, use resourceBounds instead',
   declareNonSierra: 'Declaring non Sierra (Cairo0)contract using RPC 0.8+',
   unsupportedMethodForRpcVersion: 'Unsupported method for RPC version',
+  txEvictedFromMempool: 'Transaction TTL, evicted from the mempool, try to increase the tip',
+  consensusFailed: 'Consensus failed to finalize the block proposal',
+  txFailsBlockBuildingValidation: 'Transaction fails block building validation',
 };
