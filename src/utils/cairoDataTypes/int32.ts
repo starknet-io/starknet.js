@@ -5,7 +5,7 @@ import { getNext } from '../num';
 import { isText } from '../shortString';
 import { isString } from '../typed';
 import assert from '../assert';
-import { RANGE_I32 } from '../../global/constants';
+import { RANGE_I32, PRIME } from '../../global/constants';
 
 export class CairoInt32 {
   data: bigint;
@@ -28,7 +28,17 @@ export class CairoInt32 {
   }
 
   toApiRequest(): string[] {
-    const compiled = [this.toHexString()];
+    // For negative values, convert to field element representation
+    const value = this.toBigInt();
+    let apiValue: string;
+    if (value < 0n) {
+      // In Cairo's field, negative values are represented as PRIME + value
+      apiValue = (PRIME + value).toString();
+    } else {
+      apiValue = value.toString();
+    }
+
+    const compiled = [apiValue];
     Object.defineProperty(compiled, '__compiled__', {
       enumerable: false,
       writable: false,
@@ -93,9 +103,7 @@ export class CairoInt32 {
     const response = getNext(responseIterator);
     const value = BigInt(response);
     // Convert from field element representation to signed value
-    const FIELD_PRIME =
-      3618502788666131213697322783095070105623107215331596699973092056135872020481n;
-    const signedValue = value > FIELD_PRIME / 2n ? value - FIELD_PRIME : value;
+    const signedValue = value > PRIME / 2n ? value - PRIME : value;
     return new CairoInt32(signedValue);
   }
 }

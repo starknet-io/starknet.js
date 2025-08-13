@@ -17,9 +17,6 @@ import { CairoInt64 } from '../../cairoDataTypes/int64';
 import { CairoInt128 } from '../../cairoDataTypes/int128';
 import { getNext } from '../../num';
 
-// Cairo field prime for signed integer representation
-const FIELD_PRIME = 3618502788666131213697322783095070105623107215331596699973092056135872020481n;
-
 /**
  * Parsing map for parser, request and response parsers are separated
  * Configure parsing strategy for each abi type
@@ -70,54 +67,19 @@ export const hdParsingStrategy = {
       return new CairoUint128(val).toApiRequest();
     },
     [CairoInt8.abiSelector]: (val: unknown) => {
-      const signedInt = new CairoInt8(val);
-      const value = signedInt.toBigInt();
-      // For negative values, convert to field element representation
-      if (value < 0n) {
-        // In Cairo's field, negative values are represented as FIELD_PRIME + value
-        return (FIELD_PRIME + value).toString();
-      }
-      return value.toString();
+      return new CairoInt8(val).toApiRequest();
     },
     [CairoInt16.abiSelector]: (val: unknown) => {
-      const signedInt = new CairoInt16(val);
-      const value = signedInt.toBigInt();
-      // For negative values, convert to field element representation
-      if (value < 0n) {
-        // In Cairo's field, negative values are represented as FIELD_PRIME + value
-        return (FIELD_PRIME + value).toString();
-      }
-      return value.toString();
+      return new CairoInt16(val).toApiRequest();
     },
     [CairoInt32.abiSelector]: (val: unknown) => {
-      const signedInt = new CairoInt32(val);
-      const value = signedInt.toBigInt();
-      // For negative values, convert to field element representation
-      if (value < 0n) {
-        // In Cairo's field, negative values are represented as FIELD_PRIME + value
-        return (FIELD_PRIME + value).toString();
-      }
-      return value.toString();
+      return new CairoInt32(val).toApiRequest();
     },
     [CairoInt64.abiSelector]: (val: unknown) => {
-      const signedInt = new CairoInt64(val);
-      const value = signedInt.toBigInt();
-      // For negative values, convert to field element representation
-      if (value < 0n) {
-        // In Cairo's field, negative values are represented as FIELD_PRIME + value
-        return (FIELD_PRIME + value).toString();
-      }
-      return value.toString();
+      return new CairoInt64(val).toApiRequest();
     },
     [CairoInt128.abiSelector]: (val: unknown) => {
-      const signedInt = new CairoInt128(val);
-      const value = signedInt.toBigInt();
-      // For negative values, convert to field element representation
-      if (value < 0n) {
-        // In Cairo's field, negative values are represented as FIELD_PRIME + value
-        return (FIELD_PRIME + value).toString();
-      }
-      return value.toString();
+      return new CairoInt128(val).toApiRequest();
     },
   },
   response: {
@@ -207,54 +169,19 @@ export const fastParsingStrategy: ParsingStrategy = {
       return felt(val as BigNumberish);
     },
     [CairoInt8.abiSelector]: (val: unknown) => {
-      const signedInt = new CairoInt8(val);
-      const value = signedInt.toBigInt();
-      // For negative values, convert to field element representation
-      if (value < 0n) {
-        // In Cairo's field, negative values are represented as FIELD_PRIME + value
-        return (FIELD_PRIME + value).toString();
-      }
-      return value.toString();
+      return new CairoInt8(val).toApiRequest();
     },
     [CairoInt16.abiSelector]: (val: unknown) => {
-      const signedInt = new CairoInt16(val);
-      const value = signedInt.toBigInt();
-      // For negative values, convert to field element representation
-      if (value < 0n) {
-        // In Cairo's field, negative values are represented as FIELD_PRIME + value
-        return (FIELD_PRIME + value).toString();
-      }
-      return value.toString();
+      return new CairoInt16(val).toApiRequest();
     },
     [CairoInt32.abiSelector]: (val: unknown) => {
-      const signedInt = new CairoInt32(val);
-      const value = signedInt.toBigInt();
-      // For negative values, convert to field element representation
-      if (value < 0n) {
-        // In Cairo's field, negative values are represented as FIELD_PRIME + value
-        return (FIELD_PRIME + value).toString();
-      }
-      return value.toString();
+      return new CairoInt32(val).toApiRequest();
     },
     [CairoInt64.abiSelector]: (val: unknown) => {
-      const signedInt = new CairoInt64(val);
-      const value = signedInt.toBigInt();
-      // For negative values, convert to field element representation
-      if (value < 0n) {
-        // In Cairo's field, negative values are represented as FIELD_PRIME + value
-        return (FIELD_PRIME + value).toString();
-      }
-      return value.toString();
+      return new CairoInt64(val).toApiRequest();
     },
     [CairoInt128.abiSelector]: (val: unknown) => {
-      const signedInt = new CairoInt128(val);
-      const value = signedInt.toBigInt();
-      // For negative values, convert to field element representation
-      if (value < 0n) {
-        // In Cairo's field, negative values are represented as FIELD_PRIME + value
-        return (FIELD_PRIME + value).toString();
-      }
-      return value.toString();
+      return new CairoInt128(val).toApiRequest();
     },
   },
   response: {
