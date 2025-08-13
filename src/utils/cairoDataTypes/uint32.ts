@@ -4,6 +4,7 @@ import { addHexPrefix, bigIntToUint8Array, utf8ToBigInt } from '../encode';
 import { getNext } from '../num';
 import { isText } from '../shortString';
 import { isString } from '../typed';
+import assert from '../assert';
 
 export class CairoUint32 {
   data: bigint;
@@ -49,24 +50,15 @@ export class CairoUint32 {
   }
 
   static validate(data: BigNumberish): void {
-    // Check for invalid types
-    if (data === null || data === undefined) {
-      throw new Error('Invalid input: null or undefined');
-    }
-
-    if (typeof data === 'object' && data !== null) {
-      throw new Error('Invalid input: objects are not supported');
-    }
-
-    // Check for decimal numbers - only integers are allowed
-    if (typeof data === 'number' && !Number.isInteger(data)) {
-      throw new Error('Invalid input: decimal numbers are not supported, only integers');
-    }
+    assert(data != null, 'Invalid input: null or undefined');
+    assert(typeof data !== 'object' || data === null, 'Invalid input: objects are not supported');
+    assert(
+      typeof data !== 'number' || Number.isInteger(data),
+      'Invalid input: decimal numbers are not supported, only integers'
+    );
 
     const value = CairoUint32.__processData(data);
-    if (value < 0n || value > 2n ** 32n - 1n) {
-      throw new Error('Value is out of u32 range [0, 2^32)');
-    }
+    assert(value >= 0n && value <= 2n ** 32n - 1n, 'Value is out of u32 range [0, 2^32)');
   }
 
   static is(data: BigNumberish): boolean {

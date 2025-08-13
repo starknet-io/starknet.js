@@ -33,6 +33,10 @@ import {
   isTypeUint,
 } from './cairo';
 
+// TODO: separate validate is redundant as CairoTypes are validated during construction.
+// TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
+// TODO: Something like: store_message(a -> *INVALID JS TYPE*, b, c -> *MISSING REQUIRED ARG*)
+
 const validateFelt = (parameter: any, input: AbiEntry) => {
   assert(
     isString(parameter) || isNumber(parameter) || isBigInt(parameter),
@@ -411,7 +415,6 @@ export default function validateFields(
         validateFelt(parameter, input);
         break;
       case CairoBytes31.isAbiType(input.type):
-        // TODO: think about adding inout to validate as optional validation
         CairoBytes31.validate(parameter);
         break;
       case isTypeUint(input.type) || isTypeLiteral(input.type):

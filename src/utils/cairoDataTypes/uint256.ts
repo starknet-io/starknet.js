@@ -8,6 +8,7 @@ import { addHexPrefix } from '../encode';
 import { CairoFelt } from './felt';
 import { isObject } from '../typed';
 import { getNext } from '../num';
+import assert from '../assert';
 
 export const UINT_128_MAX = (1n << 128n) - 1n;
 export const UINT_256_MAX = (1n << 256n) - 1n;
@@ -57,23 +58,15 @@ export class CairoUint256 {
    * Validate if BigNumberish can be represented as Unit256
    */
   static validate(bigNumberish: BigNumberish | unknown) {
-    if (bigNumberish === null) {
-      throw new Error('null value is not allowed for u256');
-    }
-    if (bigNumberish === undefined) {
-      throw new Error('undefined value is not allowed for u256');
-    }
-
-    const dataType = typeof bigNumberish;
-    if (!['string', 'number', 'bigint', 'object'].includes(dataType)) {
-      throw new Error(
-        `Unsupported data type '${dataType}' for u256. Expected string, number, bigint, or Uint256 object`
-      );
-    }
+    assert(bigNumberish != null, `${String(bigNumberish)} value is not allowed for u256`);
+    assert(
+      ['string', 'number', 'bigint', 'object'].includes(typeof bigNumberish),
+      `Unsupported data type '${typeof bigNumberish}' for u256. Expected string, number, bigint, or Uint256 object`
+    );
 
     const bigInt = BigInt(bigNumberish as BigNumberish);
-    if (bigInt < UINT_256_MIN) throw Error('bigNumberish is smaller than UINT_256_MIN');
-    if (bigInt > UINT_256_MAX) throw new Error('bigNumberish is bigger than UINT_256_MAX');
+    assert(bigInt >= UINT_256_MIN, 'bigNumberish is smaller than UINT_256_MIN');
+    assert(bigInt <= UINT_256_MAX, 'bigNumberish is bigger than UINT_256_MAX');
     return bigInt;
   }
 
@@ -83,12 +76,14 @@ export class CairoUint256 {
   static validateProps(low: BigNumberish, high: BigNumberish) {
     const bigIntLow = BigInt(low);
     const bigIntHigh = BigInt(high);
-    if (bigIntLow < UINT_256_LOW_MIN || bigIntLow > UINT_256_LOW_MAX) {
-      throw new Error('low is out of range UINT_256_LOW_MIN - UINT_256_LOW_MAX');
-    }
-    if (bigIntHigh < UINT_256_HIGH_MIN || bigIntHigh > UINT_256_HIGH_MAX) {
-      throw new Error('high is out of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
-    }
+    assert(
+      bigIntLow >= UINT_256_LOW_MIN && bigIntLow <= UINT_256_LOW_MAX,
+      'low is out of range UINT_256_LOW_MIN - UINT_256_LOW_MAX'
+    );
+    assert(
+      bigIntHigh >= UINT_256_HIGH_MIN && bigIntHigh <= UINT_256_HIGH_MAX,
+      'high is out of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX'
+    );
     return { low: bigIntLow, high: bigIntHigh };
   }
 
