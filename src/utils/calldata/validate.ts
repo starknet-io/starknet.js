@@ -11,6 +11,11 @@ import assert from '../assert';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoInt8 } from '../cairoDataTypes/int8';
+import { CairoInt16 } from '../cairoDataTypes/int16';
+import { CairoInt32 } from '../cairoDataTypes/int32';
+import { CairoInt64 } from '../cairoDataTypes/int64';
+import { CairoInt128 } from '../cairoDataTypes/int128';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { isHex, toBigInt } from '../num';
@@ -425,6 +430,21 @@ export default function validateFields(
         break;
       case CairoByteArray.isAbiType(input.type):
         CairoByteArray.validate(parameter);
+        break;
+      case CairoInt8.isAbiType(input.type):
+        CairoInt8.validate(parameter);
+        break;
+      case CairoInt16.isAbiType(input.type):
+        CairoInt16.validate(parameter);
+        break;
+      case CairoInt32.isAbiType(input.type):
+        CairoInt32.validate(parameter);
+        break;
+      case CairoInt64.isAbiType(input.type):
+        CairoInt64.validate(parameter);
+        break;
+      case CairoInt128.isAbiType(input.type):
+        CairoInt128.validate(parameter);
         break;
       case isTypeArray(input.type) || CairoFixedArray.isTypeFixedArray(input.type):
         validateArray(parameter, input, structs, enums);

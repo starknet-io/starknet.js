@@ -73,6 +73,7 @@ const compiledContracts = {
   echo: 'cairo2114/echo',
   deployer: 'cairo2100/deployer',
   CairoByteArray: 'byteArray/target/dev/test_ByteArrayStorage',
+  IntegerTypes: 'integerTypes/target/dev/test_IntegerTypesStorage',
 };
 export const contracts = mapContractSets(compiledContracts);
 

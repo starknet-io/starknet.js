@@ -15,6 +15,16 @@ import { CairoFelt252 } from '../cairoDataTypes/felt';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
+import { CairoUint8 } from '../cairoDataTypes/uint8';
+import { CairoUint16 } from '../cairoDataTypes/uint16';
+import { CairoUint64 } from '../cairoDataTypes/uint64';
+import { CairoUint96 } from '../cairoDataTypes/uint96';
+import { CairoUint128 } from '../cairoDataTypes/uint128';
+import { CairoInt8 } from '../cairoDataTypes/int8';
+import { CairoInt16 } from '../cairoDataTypes/int16';
+import { CairoInt32 } from '../cairoDataTypes/int32';
+import { CairoInt64 } from '../cairoDataTypes/int64';
+import { CairoInt128 } from '../cairoDataTypes/int128';
 import { addHexPrefix, removeHexPrefix } from '../encode';
 import {
   getArrayType,
@@ -54,6 +64,26 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
     case CairoUint256.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case CairoUint512.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoUint8.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoUint16.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoUint64.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoUint96.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoUint128.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoInt8.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoInt16.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoInt32.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoInt64.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoInt128.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case isTypeEthAddress(type):
       temp = it.next().value;
