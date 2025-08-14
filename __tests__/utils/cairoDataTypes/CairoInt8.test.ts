@@ -1,4 +1,5 @@
 import { CairoInt8 } from '../../../src/utils/cairoDataTypes/int8';
+import { PRIME } from '../../../src/global/constants';
 
 describe('CairoInt8 class Unit Tests', () => {
   describe('constructor with different input types', () => {
@@ -157,15 +158,18 @@ describe('CairoInt8 class Unit Tests', () => {
       expect(i8.toHexString()).toBe('0xf');
     });
 
-    test('should convert negative numbers to hex', () => {
+    test('should convert negative numbers to hex using field element representation', () => {
       const i8 = new CairoInt8(-1);
-      expect(i8.toHexString()).toBe('0x-1');
+      // -1 becomes PRIME + (-1) = PRIME - 1
+      const fieldElement = PRIME - 1n;
+      expect(i8.toHexString()).toBe(`0x${fieldElement.toString(16)}`);
     });
 
     test('should convert boundary values to hex', () => {
       const minI8 = new CairoInt8(-128);
       const maxI8 = new CairoInt8(127);
-      expect(minI8.toHexString()).toBe('0x-80');
+      const minFieldElement = PRIME - 128n;
+      expect(minI8.toHexString()).toBe(`0x${minFieldElement.toString(16)}`);
       expect(maxI8.toHexString()).toBe('0x7f');
     });
   });
@@ -273,6 +277,92 @@ describe('CairoInt8 class Unit Tests', () => {
     });
   });
 
+  describe('decodeUtf8 method', () => {
+    test('should decode UTF-8 bytes correctly for positive values', () => {
+      const i8 = new CairoInt8(65); // ASCII 'A'
+      expect(i8.decodeUtf8()).toBe('A');
+    });
+
+    test('should decode UTF-8 bytes for character values', () => {
+      const testCases = [
+        { input: 72, expected: 'H' }, // ASCII 'H'
+        { input: 48, expected: '0' }, // ASCII '0'
+        { input: 33, expected: '!' }, // ASCII '!'
+      ];
+
+      testCases.forEach(({ input, expected }) => {
+        const i8 = new CairoInt8(input);
+        expect(i8.decodeUtf8()).toBe(expected);
+      });
+    });
+
+    test('should handle zero value', () => {
+      const i8 = new CairoInt8(0);
+      expect(i8.decodeUtf8()).toBe('\x00'); // null character
+    });
+  });
+
+  describe('toApiRequest method', () => {
+    test('should return hex string array for zero', () => {
+      const i8 = new CairoInt8(0);
+      const result = i8.toApiRequest();
+      expect(result).toEqual(['0x0']);
+      expect(result).toHaveProperty('__compiled__', true);
+    });
+
+    test('should return hex string array for positive numbers', () => {
+      const i8 = new CairoInt8(100);
+      const result = i8.toApiRequest();
+      expect(result).toEqual(['0x64']);
+      expect(result).toHaveProperty('__compiled__', true);
+    });
+
+    test('should return field element hex representation for negative numbers', () => {
+      const i8 = new CairoInt8(-100);
+      const result = i8.toApiRequest();
+      // Negative value -100 becomes PRIME + (-100) = PRIME - 100
+      const fieldElement = PRIME - 100n;
+      const expectedValue = `0x${fieldElement.toString(16)}`;
+      expect(result).toEqual([expectedValue]);
+      expect(result).toHaveProperty('__compiled__', true);
+    });
+
+    test('should handle boundary values', () => {
+      const minI8 = new CairoInt8(-128);
+      const maxI8 = new CairoInt8(127);
+      const minFieldElement = PRIME - 128n;
+      const expectedMinValue = `0x${minFieldElement.toString(16)}`;
+      expect(minI8.toApiRequest()).toEqual([expectedMinValue]);
+      expect(maxI8.toApiRequest()).toEqual(['0x7f']);
+    });
+  });
+
+  describe('factoryFromApiResponse method', () => {
+    test('should create CairoInt8 from API response iterator', () => {
+      const mockIterator = {
+        next: jest.fn().mockReturnValue({ value: '100', done: false }),
+      };
+      const i8 = CairoInt8.factoryFromApiResponse(mockIterator as any);
+      expect(i8.data).toBe(100n);
+    });
+
+    test('should handle positive values from API response', () => {
+      const mockIterator = {
+        next: jest.fn().mockReturnValue({ value: '127', done: false }),
+      };
+      const i8 = CairoInt8.factoryFromApiResponse(mockIterator as any);
+      expect(i8.data).toBe(127n);
+    });
+
+    test('should handle boundary values from API response', () => {
+      const mockIterator = {
+        next: jest.fn().mockReturnValue({ value: '127', done: false }),
+      };
+      const i8 = CairoInt8.factoryFromApiResponse(mockIterator as any);
+      expect(i8.data).toBe(127n);
+    });
+  });
+
   describe('round-trip consistency', () => {
     test('should maintain consistency between constructor types', () => {
       const testValues = [-128, -50, 0, 50, 127];
@@ -283,6 +373,73 @@ describe('CairoInt8 class Unit Tests', () => {
 
         expect(i8FromNumber.toBigInt()).toBe(i8FromBigint.toBigInt());
       });
+    });
+
+    test('should handle round-trip conversions', () => {
+      const originalValue = -100;
+      const i8 = new CairoInt8(originalValue);
+      const bigintValue = i8.toBigInt();
+      const newI8 = new CairoInt8(bigintValue);
+
+      expect(newI8.toBigInt()).toBe(BigInt(originalValue));
+      expect(newI8.data).toBe(i8.data);
+    });
+  });
+
+  describe('edge cases and consistency checks', () => {
+    test('should handle boundary values correctly', () => {
+      const minI8 = new CairoInt8(-128);
+      const maxI8 = new CairoInt8(127);
+
+      expect(minI8.data).toBe(-128n);
+      expect(maxI8.data).toBe(127n);
+      expect(minI8.toBigInt()).toBe(-128n);
+      expect(maxI8.toBigInt()).toBe(127n);
+    });
+
+    test('should maintain consistency across methods', () => {
+      const values = [-128, -100, 0, 100, 127];
+      values.forEach((val) => {
+        const i8 = new CairoInt8(val);
+        const bigintVal = i8.toBigInt();
+        const hexVal = i8.toHexString();
+        const apiRequest = i8.toApiRequest();
+
+        expect(bigintVal).toBe(BigInt(val));
+        // For negative values, hex uses field element representation
+        if (val < 0) {
+          const fieldElement = PRIME + BigInt(val);
+          expect(hexVal).toBe(`0x${fieldElement.toString(16)}`);
+        } else {
+          expect(hexVal).toBe(`0x${val.toString(16)}`);
+        }
+        // apiRequest should equal hexVal
+        expect(apiRequest[0]).toBe(hexVal);
+      });
+    });
+
+    test('should preserve exact values without precision loss', () => {
+      const testValues = [-128, -100, 0, 100, 127];
+      testValues.forEach((val) => {
+        const i8 = new CairoInt8(val);
+        expect(i8.toBigInt()).toBe(BigInt(val));
+        expect(Number(i8.toBigInt())).toBe(val);
+      });
+    });
+
+    test('should handle min and max edge cases', () => {
+      const minValue = -128;
+      const maxValue = 127;
+
+      const minI8 = new CairoInt8(minValue);
+      const maxI8 = new CairoInt8(maxValue);
+
+      expect(minI8.toBigInt()).toBe(BigInt(minValue));
+      expect(maxI8.toBigInt()).toBe(BigInt(maxValue));
+
+      const minFieldElement = PRIME - 128n;
+      expect(minI8.toHexString()).toBe(`0x${minFieldElement.toString(16)}`);
+      expect(maxI8.toHexString()).toBe('0x7f');
     });
   });
 });

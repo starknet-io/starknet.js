@@ -5,6 +5,7 @@ import { getNext } from '../num';
 import { isText } from '../shortString';
 import { isString } from '../typed';
 import assert from '../assert';
+import { addCompiledFlag } from '../helpers';
 
 export class CairoUint32 {
   data: bigint;
@@ -27,14 +28,7 @@ export class CairoUint32 {
   }
 
   toApiRequest(): string[] {
-    const compiled = [this.toHexString()];
-    Object.defineProperty(compiled, '__compiled__', {
-      enumerable: false,
-      writable: false,
-      value: true,
-    });
-
-    return compiled;
+    return addCompiledFlag([this.toHexString()]);
   }
 
   toBigInt() {

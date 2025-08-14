@@ -1,4 +1,5 @@
 import { CairoInt128 } from '../../../src/utils/cairoDataTypes/int128';
+import { PRIME } from '../../../src/global/constants';
 
 describe('CairoInt128 class Unit Tests', () => {
   describe('constructor with different input types', () => {
@@ -137,15 +138,18 @@ describe('CairoInt128 class Unit Tests', () => {
       expect(i128.toHexString()).toBe('0xffffffffffffffff');
     });
 
-    test('should convert negative numbers to hex', () => {
+    test('should convert negative numbers to hex using field element representation', () => {
       const i128 = new CairoInt128(-1);
-      expect(i128.toHexString()).toBe('0x-1');
+      // -1 becomes PRIME + (-1) = PRIME - 1
+      const fieldElement = PRIME - 1n;
+      expect(i128.toHexString()).toBe(`0x${fieldElement.toString(16)}`);
     });
 
     test('should convert boundary values to hex', () => {
       const minI128 = new CairoInt128(-(2n ** 127n));
       const maxI128 = new CairoInt128(2n ** 127n - 1n);
-      expect(minI128.toHexString()).toBe('0x-80000000000000000000000000000000');
+      const minFieldElement = PRIME - 2n ** 127n;
+      expect(minI128.toHexString()).toBe(`0x${minFieldElement.toString(16)}`);
       expect(maxI128.toHexString()).toBe('0x7fffffffffffffffffffffffffffffff');
     });
   });
@@ -230,18 +234,24 @@ describe('CairoInt128 class Unit Tests', () => {
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return hex string array for negative numbers', () => {
+    test('should return field element hex representation for negative numbers', () => {
       const i128 = new CairoInt128(-10000000000000000000n);
       const result = i128.toApiRequest();
-      expect(result).toEqual(['0x-8ac7230489e80000']);
+      // Negative value -10000000000000000000 becomes PRIME + (-10000000000000000000) = PRIME - 10000000000000000000
+      const fieldElement = PRIME - 10000000000000000000n;
+      const expectedValue = `0x${fieldElement.toString(16)}`;
+      expect(result).toEqual([expectedValue]);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
     test('should handle boundary values', () => {
       const minI128 = new CairoInt128(-(2n ** 127n));
       const maxI128 = new CairoInt128(2n ** 127n - 1n);
-      expect(minI128.toApiRequest()).toEqual(['0x-80000000000000000000000000000000']);
-      expect(maxI128.toApiRequest()).toEqual(['0x7fffffffffffffffffffffffffffffff']);
+      const minFieldElement = PRIME - 2n ** 127n;
+      const expectedMinValue = `0x${minFieldElement.toString(16)}`;
+      const expectedMaxValue = `0x${(2n ** 127n - 1n).toString(16)}`;
+      expect(minI128.toApiRequest()).toEqual([expectedMinValue]);
+      expect(maxI128.toApiRequest()).toEqual([expectedMaxValue]);
     });
   });
 

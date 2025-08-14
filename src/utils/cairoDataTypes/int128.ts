@@ -6,6 +6,7 @@ import { isText } from '../shortString';
 import { isString } from '../typed';
 import assert from '../assert';
 import { RANGE_I128, PRIME } from '../../global/constants';
+import { addCompiledFlag } from '../helpers';
 
 export class CairoInt128 {
   data: bigint;
@@ -28,24 +29,7 @@ export class CairoInt128 {
   }
 
   toApiRequest(): string[] {
-    // For negative values, convert to field element representation
-    const value = this.toBigInt();
-    let apiValue: string;
-    if (value < 0n) {
-      // In Cairo's field, negative values are represented as PRIME + value
-      apiValue = (PRIME + value).toString();
-    } else {
-      apiValue = value.toString();
-    }
-
-    const compiled = [apiValue];
-    Object.defineProperty(compiled, '__compiled__', {
-      enumerable: false,
-      writable: false,
-      value: true,
-    });
-
-    return compiled;
+    return addCompiledFlag([this.toHexString()]);
   }
 
   toBigInt() {
@@ -58,12 +42,16 @@ export class CairoInt128 {
     );
   }
 
+  /**
+   * For negative values field element representation as positive hex string.
+   * @returns cairo field arithmetic hex string
+   */
   toHexString() {
-    // For signed integers, convert to unsigned representation using two's complement
-    let value = this.toBigInt();
-    if (value < 0) {
-      // Convert negative value to two's complement 128-bit representation
-      value = 340282366920938463463374607431768211456n + value; // 2^128
+    const value = this.toBigInt();
+    // For negative values, convert to field element representation
+    if (value < 0n) {
+      const fieldElement = PRIME + value;
+      return addHexPrefix(fieldElement.toString(16));
     }
     return addHexPrefix(value.toString(16));
   }

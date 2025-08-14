@@ -1,4 +1,5 @@
 import { CairoInt64 } from '../../../src/utils/cairoDataTypes/int64';
+import { PRIME } from '../../../src/global/constants';
 
 describe('CairoInt64 class Unit Tests', () => {
   describe('constructor with different input types', () => {
@@ -137,15 +138,18 @@ describe('CairoInt64 class Unit Tests', () => {
       expect(i64.toHexString()).toBe('0xffffffff');
     });
 
-    test('should convert negative numbers to hex', () => {
+    test('should convert negative numbers to hex using field element representation', () => {
       const i64 = new CairoInt64(-1);
-      expect(i64.toHexString()).toBe('0x-1');
+      // -1 becomes PRIME + (-1) = PRIME - 1
+      const fieldElement = PRIME - 1n;
+      expect(i64.toHexString()).toBe(`0x${fieldElement.toString(16)}`);
     });
 
     test('should convert boundary values to hex', () => {
       const minI64 = new CairoInt64(-(2n ** 63n));
       const maxI64 = new CairoInt64(2n ** 63n - 1n);
-      expect(minI64.toHexString()).toBe('0x-8000000000000000');
+      const minFieldElement = PRIME - 2n ** 63n;
+      expect(minI64.toHexString()).toBe(`0x${minFieldElement.toString(16)}`);
       expect(maxI64.toHexString()).toBe('0x7fffffffffffffff');
     });
   });
@@ -230,18 +234,24 @@ describe('CairoInt64 class Unit Tests', () => {
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return hex string array for negative numbers', () => {
+    test('should return field element hex representation for negative numbers', () => {
       const i64 = new CairoInt64(-1000000000n);
       const result = i64.toApiRequest();
-      expect(result).toEqual(['0x-3b9aca00']);
+      // Negative value -1000000000 becomes PRIME + (-1000000000) = PRIME - 1000000000
+      const fieldElement = PRIME - 1000000000n;
+      const expectedValue = `0x${fieldElement.toString(16)}`;
+      expect(result).toEqual([expectedValue]);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
     test('should handle boundary values', () => {
       const minI64 = new CairoInt64(-(2n ** 63n));
       const maxI64 = new CairoInt64(2n ** 63n - 1n);
-      expect(minI64.toApiRequest()).toEqual(['0x-8000000000000000']);
-      expect(maxI64.toApiRequest()).toEqual(['0x7fffffffffffffff']);
+      const minFieldElement = PRIME - 2n ** 63n;
+      const expectedMinValue = `0x${minFieldElement.toString(16)}`;
+      const expectedMaxValue = `0x${(2n ** 63n - 1n).toString(16)}`;
+      expect(minI64.toApiRequest()).toEqual([expectedMinValue]);
+      expect(maxI64.toApiRequest()).toEqual([expectedMaxValue]);
     });
   });
 
