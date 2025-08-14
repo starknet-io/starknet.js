@@ -1,3 +1,5 @@
+import type { ParsingStrategy } from '../calldata/parser/parsingStrategy';
+
 /* eslint-disable max-classes-per-file */
 export abstract class CairoType {
   // Static methods cannot be abstract, but can provide base implementation
@@ -8,7 +10,7 @@ export abstract class CairoType {
    * @param _data - The data to check
    * @returns True if the data is a valid CairoType, false otherwise
    */
-  static is(_data: any): boolean {
+  static is(_data: any, _type?: string): boolean {
     throw new Error('Static method must be implemented by derived class');
   }
 
@@ -17,7 +19,11 @@ export abstract class CairoType {
    * @param _responseIterator - The iterator of the API response
    * @returns The created CairoType
    */
-  static factoryFromApiResponse(_responseIterator: Iterator<string>): CairoType {
+  static factoryFromApiResponse(
+    _responseIterator: Iterator<string>,
+    _arrayType?: string,
+    _strategy?: ParsingStrategy
+  ): CairoType {
     throw new Error('Static method must be implemented by derived class');
   }
 

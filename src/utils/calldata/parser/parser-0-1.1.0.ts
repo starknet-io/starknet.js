@@ -13,14 +13,16 @@ export class AbiParser1 implements AbiParserInterface {
     this.parsingStrategy = parsingStrategy || fastParsingStrategy;
   }
 
-  public getRequestParser(abiType: AbiEntryType): (val: unknown) => any {
+  public getRequestParser(abiType: AbiEntryType): (val: unknown, type?: string) => any {
     if (this.parsingStrategy.request[abiType]) {
       return this.parsingStrategy.request[abiType];
     }
     throw new Error(`Parser for ${abiType} not found`);
   }
 
-  public getResponseParser(abiType: AbiEntryType): (responseIterator: Iterator<string>) => any {
+  public getResponseParser(
+    abiType: AbiEntryType
+  ): (responseIterator: Iterator<string>, type?: string) => any {
     if (this.parsingStrategy.response[abiType]) {
       return this.parsingStrategy.response[abiType];
     }

@@ -10,21 +10,21 @@ import { addCompiledFlag } from '../helpers';
 export class CairoUint32 {
   data: bigint;
 
-  static abiSelector = 'core::u32::u32';
+  static abiSelector = 'core::integer::u32' as const;
 
-  constructor(data: BigNumberish) {
+  constructor(data: BigNumberish | boolean | unknown) {
     CairoUint32.validate(data);
     this.data = CairoUint32.__processData(data);
   }
 
-  static __processData(data: BigNumberish): bigint {
+  static __processData(data: BigNumberish | boolean | unknown): bigint {
     if (isString(data) && isText(data)) {
       // Only allow text strings that represent valid UTF-8 byte sequences for specific use cases
       // For general numeric input validation, reject pure text strings
       // This maintains compatibility while being more restrictive for validation
       return utf8ToBigInt(data);
     }
-    return BigInt(data);
+    return BigInt(data as BigNumberish);
   }
 
   toApiRequest(): string[] {
@@ -43,7 +43,7 @@ export class CairoUint32 {
     return addHexPrefix(this.toBigInt().toString(16));
   }
 
-  static validate(data: BigNumberish): void {
+  static validate(data: BigNumberish | boolean | unknown): void {
     assert(data !== null && data !== undefined, 'Invalid input: null or undefined');
     assert(!isObject(data) && !Array.isArray(data), 'Invalid input: objects are not supported');
     assert(
@@ -55,7 +55,7 @@ export class CairoUint32 {
     assert(value >= 0n && value <= 2n ** 32n - 1n, 'Value is out of u32 range [0, 2^32)');
   }
 
-  static is(data: BigNumberish): boolean {
+  static is(data: BigNumberish | boolean | unknown): boolean {
     try {
       CairoUint32.validate(data);
       return true;

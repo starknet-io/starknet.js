@@ -16,25 +16,32 @@ import { CairoInt32 } from '../../cairoDataTypes/int32';
 import { CairoInt64 } from '../../cairoDataTypes/int64';
 import { CairoInt128 } from '../../cairoDataTypes/int128';
 import { getNext } from '../../num';
+import { CairoUint32 } from '../../cairoDataTypes/uint32';
+import { CairoFixedArray } from '../../cairoDataTypes/fixedArray';
+import assert from '../../assert';
 
 /**
  * Parsing map for parser, request and response parsers are separated
  * Configure parsing strategy for each abi type
  */
 export type ParsingStrategy = {
-  request: Record<AbiEntryType, (val: unknown) => any>;
-  response: Record<AbiEntryType, (responseIterator: Iterator<string>) => any>;
+  request: Record<AbiEntryType, (val: unknown, type?: string) => any>;
+  response: Record<AbiEntryType, (responseIterator: Iterator<string>, type?: string) => any>;
+  dynamicSelectors: Record<string, (type: string) => boolean>;
 };
-
-// TODO: extend for complex types like structs, tuples, enums, arrays, etc.
 
 /**
  * More robust parsing strategy
  * Configuration mapping - data-driven approach
  * Configure parsing strategy for each abi type
  */
-export const hdParsingStrategy = {
-  // TODO: provjeri svi request parseri stvaraju array, dali je to ok sa requstParserom
+export const hdParsingStrategy: ParsingStrategy = {
+  dynamicSelectors: {
+    CairoFixedArray: (type: string) => {
+      return CairoFixedArray.isAbiType(type);
+    },
+    // TODO: add more dynamic selectors here
+  },
   request: {
     [CairoBytes31.abiSelector]: (val: unknown) => {
       return new CairoBytes31(val).toApiRequest();
@@ -56,6 +63,9 @@ export const hdParsingStrategy = {
     },
     [CairoUint16.abiSelector]: (val: unknown) => {
       return new CairoUint16(val).toApiRequest();
+    },
+    [CairoUint32.abiSelector]: (val: unknown) => {
+      return new CairoUint32(val).toApiRequest();
     },
     [CairoUint64.abiSelector]: (val: unknown) => {
       return new CairoUint64(val).toApiRequest();
@@ -81,6 +91,10 @@ export const hdParsingStrategy = {
     [CairoInt128.abiSelector]: (val: unknown) => {
       return new CairoInt128(val).toApiRequest();
     },
+    CairoFixedArray: (val: unknown, type?: string) => {
+      assert(!!type, 'CairoFixedArray parser requires type parameter');
+      return new CairoFixedArray(val, type, hdParsingStrategy).toApiRequest();
+    },
   },
   response: {
     [CairoBytes31.abiSelector]: (responseIterator: Iterator<string>) => {
@@ -103,6 +117,9 @@ export const hdParsingStrategy = {
     },
     [CairoUint16.abiSelector]: (responseIterator: Iterator<string>) => {
       return CairoUint16.factoryFromApiResponse(responseIterator).toBigInt();
+    },
+    [CairoUint32.abiSelector]: (responseIterator: Iterator<string>) => {
+      return CairoUint32.factoryFromApiResponse(responseIterator).toBigInt();
     },
     [CairoUint64.abiSelector]: (responseIterator: Iterator<string>) => {
       return CairoUint64.factoryFromApiResponse(responseIterator).toBigInt();
@@ -128,35 +145,38 @@ export const hdParsingStrategy = {
     [CairoInt128.abiSelector]: (responseIterator: Iterator<string>) => {
       return CairoInt128.factoryFromApiResponse(responseIterator).toBigInt();
     },
+    CairoFixedArray: (responseIterator: Iterator<string>, type?: string) => {
+      assert(!!type, 'CairoFixedArray parser requires type parameter');
+      return CairoFixedArray.factoryFromApiResponse(
+        responseIterator,
+        type,
+        hdParsingStrategy
+      ).decompose();
+    },
   },
 } as const;
 
 /**
  * Faster parsing strategy
- * Configuration mapping - data-driven approach
- * Configure parsing strategy for each abi type
+ * Inherits from hdParsingStrategy but overrides specific parsers for performance
+ * Uses direct felt() and BigInt() conversions instead of creating Cairo type instances
  */
 export const fastParsingStrategy: ParsingStrategy = {
+  dynamicSelectors: hdParsingStrategy.dynamicSelectors,
   request: {
-    [CairoBytes31.abiSelector]: (val: unknown) => {
-      return new CairoBytes31(val).toApiRequest();
-    },
-    [CairoByteArray.abiSelector]: (val: unknown) => {
-      return new CairoByteArray(val).toApiRequest();
-    },
+    // Inherit most parsers from hdParsingStrategy
+    ...hdParsingStrategy.request,
+    // Override for performance: use felt() directly instead of creating Cairo types
     [CairoFelt252.abiSelector]: (val: unknown) => {
       return felt(val as BigNumberish);
-    },
-    [CairoUint256.abiSelector]: (val: unknown) => {
-      return new CairoUint256(val).toApiRequest();
-    },
-    [CairoUint512.abiSelector]: (val: unknown) => {
-      return new CairoUint512(val).toApiRequest();
     },
     [CairoUint8.abiSelector]: (val: unknown) => {
       return felt(val as BigNumberish);
     },
     [CairoUint16.abiSelector]: (val: unknown) => {
+      return felt(val as BigNumberish);
+    },
+    [CairoUint32.abiSelector]: (val: unknown) => {
       return felt(val as BigNumberish);
     },
     [CairoUint64.abiSelector]: (val: unknown) => {
@@ -168,42 +188,21 @@ export const fastParsingStrategy: ParsingStrategy = {
     [CairoUint128.abiSelector]: (val: unknown) => {
       return felt(val as BigNumberish);
     },
-    [CairoInt8.abiSelector]: (val: unknown) => {
-      return new CairoInt8(val).toApiRequest();
-    },
-    [CairoInt16.abiSelector]: (val: unknown) => {
-      return new CairoInt16(val).toApiRequest();
-    },
-    [CairoInt32.abiSelector]: (val: unknown) => {
-      return new CairoInt32(val).toApiRequest();
-    },
-    [CairoInt64.abiSelector]: (val: unknown) => {
-      return new CairoInt64(val).toApiRequest();
-    },
-    [CairoInt128.abiSelector]: (val: unknown) => {
-      return new CairoInt128(val).toApiRequest();
-    },
   },
   response: {
-    [CairoBytes31.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoBytes31.factoryFromApiResponse(responseIterator).decodeUtf8();
-    },
-    [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoByteArray.factoryFromApiResponse(responseIterator).decodeUtf8();
-    },
+    // Inherit all parsers from hdParsingStrategy first
+    ...hdParsingStrategy.response,
+    // Override simple types for performance: use BigInt() directly instead of factory methods
     [CairoFelt252.abiSelector]: (responseIterator: Iterator<string>) => {
       return BigInt(getNext(responseIterator));
-    },
-    [CairoUint256.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint256.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoUint512.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint512.factoryFromApiResponse(responseIterator).toBigInt();
     },
     [CairoUint8.abiSelector]: (responseIterator: Iterator<string>) => {
       return BigInt(getNext(responseIterator));
     },
     [CairoUint16.abiSelector]: (responseIterator: Iterator<string>) => {
+      return BigInt(getNext(responseIterator));
+    },
+    [CairoUint32.abiSelector]: (responseIterator: Iterator<string>) => {
       return BigInt(getNext(responseIterator));
     },
     [CairoUint64.abiSelector]: (responseIterator: Iterator<string>) => {

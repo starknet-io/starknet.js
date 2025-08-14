@@ -47,7 +47,7 @@ export default function orderPropsByAbi(
   enums: AbiEnums
 ): object {
   const orderInput = (unorderedItem: any, abiType: string): any => {
-    if (CairoFixedArray.isTypeFixedArray(abiType)) {
+    if (CairoFixedArray.isAbiType(abiType)) {
       return orderFixedArray(unorderedItem, abiType);
     }
     if (isTypeArray(abiType)) {

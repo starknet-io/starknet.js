@@ -14,6 +14,7 @@ import {
   ProviderInterface,
   byteArray,
   cairo,
+  hdParsingStrategy,
   num,
   type Uint512,
 } from '../src';
@@ -438,7 +439,7 @@ describe('Cairo v2.4 onwards', () => {
   describe('Cairo v2.9.2 fixed-array', () => {
     const myArray: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
     const myWrongArray = [...myArray, 9];
-    const expectedCalldata = myArray.map((val) => val.toString());
+    const expectedCalldata = myArray.map((val) => `0x${val.toString(16)}`);
     let fixedArrayContract: Contract;
 
     beforeAll(async () => {
@@ -476,7 +477,11 @@ describe('Cairo v2.4 onwards', () => {
       const myCalldata3 = myCallData.compile('fixed_array', [CairoFixedArray.compile(myArray)]);
       const res3 = await fixedArrayContract.call('fixed_array', myCalldata3);
       expect(res3).toEqual(expectedRes);
-      const myFixedArray = new CairoFixedArray(myArray, '[core::integer::u32; 8]');
+      const myFixedArray = new CairoFixedArray(
+        myArray,
+        '[core::integer::u32; 8]',
+        hdParsingStrategy
+      );
       const myCalldata4 = myCallData.compile('fixed_array', { x: myFixedArray.compile() });
       const res4 = await fixedArrayContract.call('fixed_array', myCalldata4);
       expect(res4).toEqual(expectedRes);

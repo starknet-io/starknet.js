@@ -8,7 +8,6 @@ import {
   ParsedStruct,
   Tupled,
 } from '../../types';
-import assert from '../assert';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFelt252 } from '../cairoDataTypes/felt';
@@ -168,25 +167,7 @@ function parseCalldataValue({
 
   // value is fixed array
   if (CairoFixedArray.isAbiType(type)) {
-    const arrayType = CairoFixedArray.getFixedArrayType(type);
-    let values: any[] = [];
-    if (Array.isArray(element)) {
-      const array = new CairoFixedArray(element, type);
-      values = array.content;
-    } else if (typeof element === 'object') {
-      values = Object.values(element as object);
-      assert(
-        values.length === CairoFixedArray.getFixedArraySize(type),
-        `ABI type ${type}: object provided do not includes  ${CairoFixedArray.getFixedArraySize(type)} items. ${values.length} items provided.`
-      );
-    } else {
-      throw new Error(`ABI type ${type}: not an Array representing a cairo.fixedArray() provided.`);
-    }
-    return values.reduce((acc, it) => {
-      return acc.concat(
-        parseCalldataValue({ element: it, type: arrayType, structs, enums, parser })
-      );
-    }, [] as string[]);
+    return parser.getRequestParser(CairoFixedArray.dynamicSelector)(element, type);
   }
 
   // value is Array
@@ -432,9 +413,6 @@ export function parseCalldataField({
   switch (true) {
     // Fixed array
     case CairoFixedArray.isAbiType(type):
-      if (!Array.isArray(value) && !(typeof value === 'object')) {
-        throw Error(`ABI expected parameter ${name} to be an array or an object, got ${value}`);
-      }
       return parseCalldataValue({ element: value, type: input.type, structs, enums, parser });
     // Normal Array
     case isTypeArray(type):

@@ -446,7 +446,7 @@ export default function validateFields(
       case CairoInt128.isAbiType(input.type):
         CairoInt128.validate(parameter);
         break;
-      case isTypeArray(input.type) || CairoFixedArray.isTypeFixedArray(input.type):
+      case isTypeArray(input.type) || CairoFixedArray.isAbiType(input.type):
         validateArray(parameter, input, structs, enums);
         break;
       case isTypeStruct(input.type, structs):

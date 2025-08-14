@@ -137,13 +137,10 @@ function parseResponseValue(
 
   // type fixed-array
   if (CairoFixedArray.isAbiType(element.type)) {
-    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
-    const el: AbiEntry = { name: '', type: CairoFixedArray.getFixedArrayType(element.type) };
-    const arraySize = CairoFixedArray.getFixedArraySize(element.type);
-    while (parsedDataArr.length < arraySize) {
-      parsedDataArr.push(parseResponseValue(responseIterator, el, parser, structs, enums));
-    }
-    return parsedDataArr;
+    return parser.getResponseParser(CairoFixedArray.dynamicSelector)(
+      responseIterator,
+      element.type
+    );
   }
 
   // type c1 array
