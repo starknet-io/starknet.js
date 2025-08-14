@@ -2,6 +2,7 @@
 import { addHexPrefix, stringToUint8Array, uint8ArrayToBigInt } from '../encode';
 import { getNext } from '../num';
 import assert from '../assert';
+import { addCompiledFlag } from '../helpers';
 
 export class CairoBytes31 {
   static MAX_BYTE_SIZE = 31 as const;
@@ -29,14 +30,7 @@ export class CairoBytes31 {
   }
 
   toApiRequest(): string[] {
-    const compiled = [this.toHexString()];
-    Object.defineProperty(compiled, '__compiled__', {
-      enumerable: false,
-      writable: false,
-      value: true,
-    });
-
-    return compiled;
+    return addCompiledFlag([this.toHexString()]);
   }
 
   toBigInt() {

@@ -1,4 +1,5 @@
 import { CairoInt16 } from '../../../src/utils/cairoDataTypes/int16';
+import { PRIME } from '../../../src/global/constants';
 
 describe('CairoInt16 class Unit Tests', () => {
   describe('constructor with different input types', () => {
@@ -131,15 +132,18 @@ describe('CairoInt16 class Unit Tests', () => {
       expect(i16.toHexString()).toBe('0xff');
     });
 
-    test('should convert negative numbers to hex', () => {
+    test('should convert negative numbers to hex using field element representation', () => {
       const i16 = new CairoInt16(-1);
-      expect(i16.toHexString()).toBe('0x-1');
+      // -1 becomes PRIME + (-1) = PRIME - 1
+      const fieldElement = PRIME - 1n;
+      expect(i16.toHexString()).toBe(`0x${fieldElement.toString(16)}`);
     });
 
     test('should convert boundary values to hex', () => {
       const minI16 = new CairoInt16(-32768);
       const maxI16 = new CairoInt16(32767);
-      expect(minI16.toHexString()).toBe('0x-8000');
+      const minFieldElement = PRIME - 32768n;
+      expect(minI16.toHexString()).toBe(`0x${minFieldElement.toString(16)}`);
       expect(maxI16.toHexString()).toBe('0x7fff');
     });
   });
@@ -288,17 +292,22 @@ describe('CairoInt16 class Unit Tests', () => {
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return hex string array for negative numbers', () => {
+    test('should return field element hex representation for negative numbers', () => {
       const i16 = new CairoInt16(-1000);
       const result = i16.toApiRequest();
-      expect(result).toEqual(['0x-3e8']);
+      // Negative value -1000 becomes PRIME + (-1000) = PRIME - 1000
+      const fieldElement = PRIME - 1000n;
+      const expectedValue = `0x${fieldElement.toString(16)}`;
+      expect(result).toEqual([expectedValue]);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
     test('should handle boundary values', () => {
       const minI16 = new CairoInt16(-32768);
       const maxI16 = new CairoInt16(32767);
-      expect(minI16.toApiRequest()).toEqual(['0x-8000']);
+      const minFieldElement = PRIME - 32768n;
+      const expectedMinValue = `0x${minFieldElement.toString(16)}`;
+      expect(minI16.toApiRequest()).toEqual([expectedMinValue]);
       expect(maxI16.toApiRequest()).toEqual(['0x7fff']);
     });
   });
@@ -372,7 +381,14 @@ describe('CairoInt16 class Unit Tests', () => {
         const apiRequest = i16.toApiRequest();
 
         expect(bigintVal).toBe(BigInt(val));
-        expect(hexVal).toBe(`0x${val < 0 ? '-' : ''}${Math.abs(val).toString(16)}`);
+        // For negative values, hex uses field element representation
+        if (val < 0) {
+          const fieldElement = PRIME + BigInt(val);
+          expect(hexVal).toBe(`0x${fieldElement.toString(16)}`);
+        } else {
+          expect(hexVal).toBe(`0x${val.toString(16)}`);
+        }
+        // apiRequest should equal hexVal
         expect(apiRequest[0]).toBe(hexVal);
       });
     });

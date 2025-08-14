@@ -4,6 +4,7 @@ import assert from '../assert';
 import { addHexPrefix, bigIntToUint8Array, stringToUint8Array } from '../encode';
 import { getNext } from '../num';
 import { isBigInt, isBuffer, isInteger, isString } from '../typed';
+import { addCompiledFlag } from '../helpers';
 import { CairoBytes31 } from './bytes31';
 import { CairoFelt252 } from './felt';
 import { CairoUint32 } from './uint32';
@@ -122,20 +123,12 @@ export class CairoByteArray {
       'CairoByteArray is not properly initialized'
     );
 
-    const compiled = [
+    return addCompiledFlag([
       addHexPrefix(this.data.length.toString(16)),
       ...this.data.flatMap((bytes31) => bytes31.toApiRequest()),
       ...this.pending_word.toApiRequest(),
       ...this.pending_word_len.toApiRequest(),
-    ];
-
-    Object.defineProperty(compiled, '__compiled__', {
-      enumerable: false,
-      writable: false,
-      value: true,
-    });
-
-    return compiled;
+    ]);
   }
 
   decodeUtf8() {

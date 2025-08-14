@@ -1,4 +1,5 @@
 import { CairoInt32 } from '../../../src/utils/cairoDataTypes/int32';
+import { PRIME } from '../../../src/global/constants';
 
 describe('CairoInt32 class Unit Tests', () => {
   describe('constructor with different input types', () => {
@@ -140,15 +141,18 @@ describe('CairoInt32 class Unit Tests', () => {
       expect(i32.toHexString()).toBe('0xffff');
     });
 
-    test('should convert negative numbers to hex', () => {
+    test('should convert negative numbers to hex using field element representation', () => {
       const i32 = new CairoInt32(-1);
-      expect(i32.toHexString()).toBe('0x-1');
+      // -1 becomes PRIME + (-1) = PRIME - 1
+      const fieldElement = PRIME - 1n;
+      expect(i32.toHexString()).toBe(`0x${fieldElement.toString(16)}`);
     });
 
     test('should convert boundary values to hex', () => {
       const minI32 = new CairoInt32(-2147483648);
       const maxI32 = new CairoInt32(2147483647);
-      expect(minI32.toHexString()).toBe('0x-80000000');
+      const minFieldElement = PRIME - 2147483648n;
+      expect(minI32.toHexString()).toBe(`0x${minFieldElement.toString(16)}`);
       expect(maxI32.toHexString()).toBe('0x7fffffff');
     });
   });
@@ -299,18 +303,24 @@ describe('CairoInt32 class Unit Tests', () => {
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return hex string array for negative numbers', () => {
+    test('should return field element hex representation for negative numbers', () => {
       const i32 = new CairoInt32(-1000000);
       const result = i32.toApiRequest();
-      expect(result).toEqual(['0x-f4240']);
+      // Negative value -1000000 becomes PRIME + (-1000000) = PRIME - 1000000
+      const fieldElement = PRIME - 1000000n;
+      const expectedValue = `0x${fieldElement.toString(16)}`;
+      expect(result).toEqual([expectedValue]);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
     test('should handle boundary values', () => {
       const minI32 = new CairoInt32(-2147483648);
       const maxI32 = new CairoInt32(2147483647);
-      expect(minI32.toApiRequest()).toEqual(['0x-80000000']);
-      expect(maxI32.toApiRequest()).toEqual(['0x7fffffff']);
+      const minFieldElement = PRIME - 2147483648n;
+      const expectedMinValue = `0x${minFieldElement.toString(16)}`;
+      const expectedMaxValue = '0x7fffffff';
+      expect(minI32.toApiRequest()).toEqual([expectedMinValue]);
+      expect(maxI32.toApiRequest()).toEqual([expectedMaxValue]);
     });
   });
 
@@ -383,7 +393,14 @@ describe('CairoInt32 class Unit Tests', () => {
         const apiRequest = i32.toApiRequest();
 
         expect(bigintVal).toBe(BigInt(val));
-        expect(hexVal).toBe(`0x${val < 0 ? '-' : ''}${Math.abs(val).toString(16)}`);
+        // For negative values, hex uses field element representation
+        if (val < 0) {
+          const fieldElement = PRIME + BigInt(val);
+          expect(hexVal).toBe(`0x${fieldElement.toString(16)}`);
+        } else {
+          expect(hexVal).toBe(`0x${val.toString(16)}`);
+        }
+        // apiRequest should equal hexVal
         expect(apiRequest[0]).toBe(hexVal);
       });
     });

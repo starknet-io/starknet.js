@@ -13,6 +13,7 @@ import {
   addHexPrefix,
 } from '../encode';
 import assert from '../assert';
+import { addCompiledFlag } from '../helpers';
 
 /**
  * @deprecated use CairoFelt252 Class instead, this one limit string to ASCII
@@ -105,14 +106,7 @@ export class CairoFelt252 {
     /**
      * HexString representation of the felt252
      */
-    const compiled = [this.toHexString()];
-    Object.defineProperty(compiled, '__compiled__', {
-      enumerable: false,
-      writable: false,
-      value: true,
-    });
-
-    return compiled;
+    return addCompiledFlag([this.toHexString()]);
   }
 
   static validate(data: BigNumberish | boolean | unknown): void {
