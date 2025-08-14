@@ -5,6 +5,7 @@ import { addHexPrefix, bigIntToUint8Array, stringToUint8Array } from '../encode'
 import { getNext } from '../num';
 import { isBigInt, isBuffer, isInteger, isString } from '../typed';
 import { addCompiledFlag } from '../helpers';
+import Buffer from '../connect/buffer';
 import { CairoBytes31 } from './bytes31';
 import { CairoFelt252 } from './felt';
 import { CairoUint32 } from './uint32';
@@ -68,7 +69,7 @@ export class CairoByteArray {
       fullData = inData;
     } else if (isBuffer(inData)) {
       // byteArrayFromBuffer
-      fullData = new Uint8Array(inData);
+      fullData = new Uint8Array(inData as Buffer);
     } else if (isString(inData)) {
       // byteArrayFromString - stringToUint8Array handles hex, decimal, and UTF-8
       fullData = stringToUint8Array(inData);

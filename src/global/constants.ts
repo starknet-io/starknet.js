@@ -119,6 +119,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   defaultTipType: TipType;
   fetch: any;
   websocket: any;
+  buffer: any;
 } = {
   rpcVersion: '0.9.0',
   transactionVersion: ETransactionVersion.V3, // Starknet 0.14.0 only V3 transactions
@@ -140,6 +141,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   defaultTipType: 'recommendedTip',
   fetch: undefined,
   websocket: undefined,
+  buffer: undefined,
 };
 
 export const RPC_DEFAULT_NODES = {
