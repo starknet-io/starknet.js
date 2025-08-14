@@ -16,7 +16,7 @@ import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 
 /**
- * @deprecated use CairoFelt252 Class instead, this one limit string to ASCII
+ * @deprecated use the CairoFelt252 class instead, this one is limited to ASCII strings
  * Create felt Cairo type (cairo type helper)
  * @returns format: felt-string
  */
