@@ -120,5 +120,5 @@ export function isObject(item: unknown | undefined): item is object {
  * @returns {boolean} returns true if the value is an integer, false otherwise.
  */
 export function isInteger(value: unknown): value is number {
-  return Number.isInteger(value) && typeof value === 'number';
+  return Number.isInteger(value);
 }

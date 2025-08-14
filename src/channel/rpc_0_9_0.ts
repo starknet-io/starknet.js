@@ -450,7 +450,7 @@ export class RpcChannel {
           throw error;
         }
 
-        if (error instanceof RpcError && error.baseError.code === 29) {
+        if (error instanceof RpcError && error.isType('TXN_HASH_NOT_FOUND')) {
           logger.info('txLife: ', txLife);
           const errorMessages: Record<string, string> = {
             [RPC.ETransactionStatus.RECEIVED]: SYSTEM_MESSAGES.txEvictedFromMempool,

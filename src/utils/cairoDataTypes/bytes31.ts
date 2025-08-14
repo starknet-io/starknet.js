@@ -3,7 +3,7 @@ import { addHexPrefix, stringToUint8Array, uint8ArrayToBigInt } from '../encode'
 import { getNext } from '../num';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
-import { isBuffer } from '../typed';
+import { isBuffer, isString } from '../typed';
 
 export class CairoBytes31 {
   static MAX_BYTE_SIZE = 31 as const;
@@ -18,7 +18,7 @@ export class CairoBytes31 {
   }
 
   static __processData(data: Uint8Array | string | Buffer | unknown): Uint8Array {
-    if (typeof data === 'string') {
+    if (isString(data)) {
       return stringToUint8Array(data);
     }
     if (isBuffer(data)) {

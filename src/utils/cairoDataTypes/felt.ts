@@ -5,7 +5,7 @@ import { BigNumberish } from '../../types';
 import { PRIME } from '../../global/constants';
 import { getNext, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
-import { isBoolean, isString, isBigInt } from '../typed';
+import { isBoolean, isString, isBigInt, isNumber } from '../typed';
 import {
   stringToUint8Array,
   bigIntToUint8Array,
@@ -110,9 +110,10 @@ export class CairoFelt252 {
   }
 
   static validate(data: BigNumberish | boolean | unknown): void {
-    assert(data != null, `${String(data)} value is not allowed for felt252`);
+    assert(data !== null, 'null value is not allowed for felt252');
+    assert(data !== undefined, 'undefined value is not allowed for felt252');
     assert(
-      ['string', 'number', 'bigint', 'boolean'].includes(typeof data),
+      isString(data) || isNumber(data) || isBigInt(data) || isBoolean(data),
       `Unsupported data type '${typeof data}' for felt252. Expected string, number, bigint, or boolean`
     );
 

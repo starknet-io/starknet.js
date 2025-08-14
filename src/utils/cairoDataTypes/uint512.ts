@@ -8,7 +8,7 @@ import { addHexPrefix } from '../encode';
 import { CairoFelt } from './felt';
 import { UINT_128_MAX } from './uint256';
 import { isObject } from '../typed';
-import { getNext } from '../num';
+import { getNext, isBigNumberish } from '../num';
 import assert from '../assert';
 
 export const UINT_512_MAX = (1n << 512n) - 1n;
@@ -79,9 +79,10 @@ export class CairoUint512 {
    * Validate if BigNumberish can be represented as Uint512
    */
   static validate(bigNumberish: BigNumberish | unknown): bigint {
-    assert(bigNumberish != null, `${String(bigNumberish)} value is not allowed for u512`);
+    assert(bigNumberish !== null, 'null value is not allowed for u512');
+    assert(bigNumberish !== undefined, 'undefined value is not allowed for u512');
     assert(
-      ['string', 'number', 'bigint', 'object'].includes(typeof bigNumberish),
+      isBigNumberish(bigNumberish) || isObject(bigNumberish),
       `Unsupported data type '${typeof bigNumberish}' for u512. Expected string, number, bigint, or Uint512 object`
     );
 

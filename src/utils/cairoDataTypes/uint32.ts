@@ -3,7 +3,7 @@ import { BigNumberish } from '../../types';
 import { addHexPrefix, bigIntToUint8Array, utf8ToBigInt } from '../encode';
 import { getNext } from '../num';
 import { isText } from '../shortString';
-import { isString } from '../typed';
+import { isString, isObject, isNumber } from '../typed';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 
@@ -44,10 +44,10 @@ export class CairoUint32 {
   }
 
   static validate(data: BigNumberish): void {
-    assert(data != null, 'Invalid input: null or undefined');
-    assert(typeof data !== 'object' || data === null, 'Invalid input: objects are not supported');
+    assert(data !== null && data !== undefined, 'Invalid input: null or undefined');
+    assert(!isObject(data) && !Array.isArray(data), 'Invalid input: objects are not supported');
     assert(
-      typeof data !== 'number' || Number.isInteger(data),
+      !isNumber(data) || Number.isInteger(data),
       'Invalid input: decimal numbers are not supported, only integers'
     );
 
