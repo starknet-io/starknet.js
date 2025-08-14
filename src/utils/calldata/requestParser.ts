@@ -167,7 +167,7 @@ function parseCalldataValue({
   }
 
   // value is fixed array
-  if (CairoFixedArray.isTypeFixedArray(type)) {
+  if (CairoFixedArray.isAbiType(type)) {
     const arrayType = CairoFixedArray.getFixedArrayType(type);
     let values: any[] = [];
     if (Array.isArray(element)) {
@@ -431,7 +431,7 @@ export function parseCalldataField({
 
   switch (true) {
     // Fixed array
-    case CairoFixedArray.isTypeFixedArray(type):
+    case CairoFixedArray.isAbiType(type):
       if (!Array.isArray(value) && !(typeof value === 'object')) {
         throw Error(`ABI expected parameter ${name} to be an array or an object, got ${value}`);
       }

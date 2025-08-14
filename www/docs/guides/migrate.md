@@ -35,6 +35,14 @@ const provider = new RpcProvider({
 const provider = await RpcProvider.create({ nodeUrl: `${myNodeUrl}` });
 ```
 
+### Provider receipt helper
+
+**Update all transaction receipt callbacks** to use the new constants:
+
+- `success` → `SUCCEEDED`
+- `reverted` → `REVERTED`
+- `error` → `ERROR`
+
 ### Transaction Version Changes
 
 **Only V3 transactions are supported** - Starknet 0.14 has removed support for legacy transaction versions:

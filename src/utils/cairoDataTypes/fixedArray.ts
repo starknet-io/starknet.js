@@ -155,7 +155,7 @@ export class CairoFixedArray {
    * const result = CairoFixedArray.isTypeFixedArray("[core::integer::u32; 8]");
    * // result = true
    */
-  static isTypeFixedArray(type: string) {
+  static isAbiType(type: string) {
     return (
       /^\[.*;\s.*\]$/.test(type) && /(?<=\[).+(?=;)/.test(type) && /(?<=; )\d+(?=\])/.test(type)
     );

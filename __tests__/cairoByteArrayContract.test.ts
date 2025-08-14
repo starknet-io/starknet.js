@@ -13,6 +13,7 @@ import {
 import { contracts } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
 import { toHex } from '../src/utils/num';
+import { CairoType } from '../src/utils/cairoDataTypes/cairoType.interface';
 
 describe('CairoByteArray Manual Integration Tests', () => {
   let provider: ProviderInterface;
@@ -64,6 +65,10 @@ describe('CairoByteArray Manual Integration Tests', () => {
     test('should store and read short CairoByteArray', async () => {
       const testMessage = 'Hello, Starknet!';
       const byteArray = new CairoByteArray(testMessage);
+
+      console.log(byteArray instanceof CairoByteArray);
+      console.log(byteArray instanceof CairoType);
+      console.log(byteArray instanceof Object);
 
       // Send CairoByteArray to contract with parseRequest disabled
       const storeResult = await byteArrayContract

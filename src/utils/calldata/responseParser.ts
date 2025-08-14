@@ -136,7 +136,7 @@ function parseResponseValue(
   }
 
   // type fixed-array
-  if (CairoFixedArray.isTypeFixedArray(element.type)) {
+  if (CairoFixedArray.isAbiType(element.type)) {
     const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
     const el: AbiEntry = { name: '', type: CairoFixedArray.getFixedArrayType(element.type) };
     const arraySize = CairoFixedArray.getFixedArraySize(element.type);
@@ -282,7 +282,7 @@ export default function responseParser({
     case enums && isTypeEnum(type, enums):
       return parseResponseValue(responseIterator, output, parser, structs, enums);
 
-    case CairoFixedArray.isTypeFixedArray(type):
+    case CairoFixedArray.isAbiType(type):
       return parseResponseValue(responseIterator, output, parser, structs, enums);
 
     case isTypeArray(type):
