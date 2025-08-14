@@ -239,7 +239,11 @@ describe('requestParser', () => {
           enums: getAbiEnums(),
           parser: new AbiParser1([getAbiEntry('core::integer::u256')]),
         })
-      ).toThrow(new Error('Cannot convert test to a BigInt'));
+      ).toThrow(
+        new Error(
+          "Unsupported data type 'string' for u256. Expected string, number, bigint, or Uint256 object"
+        )
+      );
     });
 
     test('should throw an error if provided tuple size do not match', () => {
