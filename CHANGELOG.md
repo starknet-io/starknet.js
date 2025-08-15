@@ -1,3 +1,9 @@
+# [8.2.0](https://github.com/starknet-io/starknet.js/compare/v8.1.2...v8.2.0) (2025-08-15)
+
+### Features
+
+- a CairoByteArray, CairoTypes, updates ([#1469](https://github.com/starknet-io/starknet.js/issues/1469)) ([430fb70](https://github.com/starknet-io/starknet.js/commit/430fb70e5c54d59f9fde9acadd701632170aca25)), closes [#1472](https://github.com/starknet-io/starknet.js/issues/1472)
+
 ## [8.1.2](https://github.com/starknet-io/starknet.js/compare/v8.1.1...v8.1.2) (2025-08-04)
 
 ### Bug Fixes
