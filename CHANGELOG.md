@@ -1,3 +1,9 @@
+## [8.3.1](https://github.com/starknet-io/starknet.js/compare/v8.3.0...v8.3.1) (2025-08-15)
+
+### Bug Fixes
+
+- ensure a Buffer type is available for all environments ([6e67834](https://github.com/starknet-io/starknet.js/commit/6e678343876504082d3c232a115b1c48a8f6ce96))
+
 # [8.3.0](https://github.com/starknet-io/starknet.js/compare/v8.2.0...v8.3.0) (2025-08-15)
 
 ### Features
