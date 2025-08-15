@@ -12,7 +12,6 @@ import {
 import { contracts } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
 
-// TODO: add RPC 0.7 V3, RPC 0.8 V3
 describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
   let provider: ProviderInterface;
   let account: Account;
@@ -45,13 +44,13 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
     }); // maxFee needed to not throw error in getEstimateFee
     const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.SUCCEEDED);
-    expect(txR.statusReceipt).toBe('success');
+    expect(txR.statusReceipt).toBe('SUCCEEDED');
     expect(txR.isSuccess()).toBe(true);
     expect(txR.isReverted()).toBe(false);
     expect(txR.isError()).toBe(false);
     let isSuccess: boolean = false;
     txR.match({
-      success: () => {
+      SUCCEEDED: () => {
         isSuccess = true;
       },
       _: () => {
@@ -69,13 +68,13 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
     const res = await account.execute(myCall, { ...estim }); // maxFee needed to not throw error in getEstimateFee
     const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.REVERTED);
-    expect(txR.statusReceipt).toBe('reverted');
+    expect(txR.statusReceipt).toBe('REVERTED');
     expect(txR.isSuccess()).toBe(false);
     expect(txR.isReverted()).toBe(true);
     expect(txR.isError()).toBe(false);
     let isReverted: boolean = false;
     txR.match({
-      reverted: (_resp: RevertedTransactionReceiptResponse) => {
+      REVERTED: (_resp: RevertedTransactionReceiptResponse) => {
         isReverted = true;
       },
       _: () => {
@@ -95,13 +94,13 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
     ); // maxFee needed to not throw error in getEstimateFee
     const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.SUCCEEDED);
-    expect(txR.statusReceipt).toBe('success');
+    expect(txR.statusReceipt).toBe('SUCCEEDED');
     expect(txR.isSuccess()).toBe(true);
     expect(txR.isReverted()).toBe(false);
     expect(txR.isError()).toBe(false);
     let isSuccess: boolean = false;
     txR.match({
-      success: (_resp: SuccessfulTransactionReceiptResponse) => {
+      SUCCEEDED: (_resp: SuccessfulTransactionReceiptResponse) => {
         isSuccess = true;
       },
       _: () => {
@@ -111,7 +110,12 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
     expect(isSuccess).toBe(true);
   });
 
-  // NOTE:
-  // no rejected test, impossible to trigger 'rejected' from a node/devnet.
-  // no declare test due to slow process (result is very similar to Invoke)
+  xtest('test error case', async () => {
+    // TODO: this should not be possible as fetch would throw on error before it could be read by Helper
+    const txR = await provider.getTransactionReceipt('0x123');
+    expect(txR.statusReceipt).toBe('ERROR');
+    expect(txR.isSuccess()).toBe(false);
+    expect(txR.isReverted()).toBe(false);
+    expect(txR.isError()).toBe(true);
+  });
 });

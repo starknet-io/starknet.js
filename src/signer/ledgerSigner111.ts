@@ -13,6 +13,7 @@ import type {
 } from '../types';
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
+import Buffer from '../utils/connect/buffer';
 import type { SignerInterface } from './interface';
 import { MASK_31 } from '../global/constants';
 import { getMessageHash } from '../utils/typedData';

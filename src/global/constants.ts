@@ -24,8 +24,21 @@ export const ADDR_BOUND = 2n ** 251n - MAX_STORAGE_ITEM_SIZE;
 const range = (min: bigint, max: bigint) => ({ min, max }) as const;
 
 export const RANGE_FELT = range(ZERO, PRIME - 1n);
-export const RANGE_I128 = range(-(2n ** 127n), 2n ** 127n - 1n);
+
+// Unsigned integer ranges
+export const RANGE_U8 = range(ZERO, 2n ** 8n - 1n);
+export const RANGE_U16 = range(ZERO, 2n ** 16n - 1n);
+export const RANGE_U32 = range(ZERO, 2n ** 32n - 1n);
+export const RANGE_U64 = range(ZERO, 2n ** 64n - 1n);
+export const RANGE_U96 = range(ZERO, 2n ** 96n - 1n);
 export const RANGE_U128 = range(ZERO, 2n ** 128n - 1n);
+
+// Signed integer ranges
+export const RANGE_I8 = range(-(2n ** 7n), 2n ** 7n - 1n);
+export const RANGE_I16 = range(-(2n ** 15n), 2n ** 15n - 1n);
+export const RANGE_I32 = range(-(2n ** 31n), 2n ** 31n - 1n);
+export const RANGE_I64 = range(-(2n ** 63n), 2n ** 63n - 1n);
+export const RANGE_I128 = range(-(2n ** 127n), 2n ** 127n - 1n);
 
 export const LegacyUDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
@@ -106,6 +119,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   defaultTipType: TipType;
   fetch: any;
   websocket: any;
+  buffer: any;
 } = {
   rpcVersion: '0.9.0',
   transactionVersion: ETransactionVersion.V3, // Starknet 0.14.0 only V3 transactions
@@ -127,6 +141,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   defaultTipType: 'recommendedTip',
   fetch: undefined,
   websocket: undefined,
+  buffer: undefined,
 };
 
 export const RPC_DEFAULT_NODES = {
@@ -153,4 +168,7 @@ export const SYSTEM_MESSAGES = {
   maxFeeInV3: 'maxFee is not supported in V3 transactions, use resourceBounds instead',
   declareNonSierra: 'Declaring non Sierra (Cairo0)contract using RPC 0.8+',
   unsupportedMethodForRpcVersion: 'Unsupported method for RPC version',
+  txEvictedFromMempool: 'Transaction TTL, evicted from the mempool, try to increase the tip',
+  consensusFailed: 'Consensus failed to finalize the block proposal',
+  txFailsBlockBuildingValidation: 'Transaction fails block building validation',
 };

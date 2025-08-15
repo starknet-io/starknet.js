@@ -14,6 +14,7 @@ import {
   num,
   byteArray,
   RpcError,
+  ReceiptTx,
 } from '../src';
 
 import { contracts, describeIfRpc081 } from './config/fixtures';
@@ -1049,6 +1050,15 @@ describe('Complex interaction', () => {
       const result3 = await echoContract.invoke('iecho', args);
       const transaction3R = await provider.waitForTransaction(result3.transaction_hash);
       expect(transaction3R.isSuccess()).toBe(true);
+
+      const result4 = await echoContract.invoke('iecho', args, { waitForTransaction: true });
+      expect(result4.block_number).toBeDefined();
+      expect(result4).toBeInstanceOf(ReceiptTx);
+      expect(result4.isSuccess()).toBe(true);
+
+      const result5 = await echoContract.withOptions({ waitForTransaction: true }).iecho(calldata);
+      const transactionR2 = await provider.waitForTransaction(result5.transaction_hash);
+      expect(transactionR2.isSuccess()).toBe(true);
     });
 
     describe('speedup live tests', () => {
