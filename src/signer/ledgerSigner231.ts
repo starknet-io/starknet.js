@@ -13,6 +13,7 @@ import {
   type V3InvocationsSignerDetails,
 } from '../types';
 import { CallData } from '../utils/calldata';
+import Buffer from '../utils/connect/buffer';
 import type { SignerInterface } from './interface';
 import { getSelector } from '../utils/hash';
 import { concatenateArrayBuffer } from '../utils/encode';

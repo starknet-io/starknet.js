@@ -26,11 +26,12 @@ import {
   FactoryParams,
   UniversalDetails,
   DeclareAndDeployContractPayload,
+  SuccessfulTransactionReceiptResponseHelper,
 } from '../types';
 import type { AccountInterface } from '../account/interface';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
-import { createAbiParser } from '../utils/calldata/parser';
+import { createAbiParser, ParsingStrategy } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
@@ -50,8 +51,8 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
     // eslint-disable-next-line no-param-reassign
     contract.withOptionsProps = undefined;
     return contract.call(functionAbi.name, args, {
-      parseRequest: true,
-      parseResponse: true,
+      parseRequest: contract.parseRequest,
+      parseResponse: contract.parseResponse,
       ...options,
     });
   };
@@ -66,7 +67,7 @@ function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContrac
     // eslint-disable-next-line no-param-reassign
     contract.withOptionsProps = undefined;
     return contract.invoke(functionAbi.name, args, {
-      parseRequest: true,
+      parseRequest: contract.parseRequest,
       ...options,
     });
   };
@@ -111,6 +112,10 @@ export class Contract implements ContractInterface {
 
   classHash?: string;
 
+  parseRequest: boolean;
+
+  parseResponse: boolean;
+
   private structs: { [name: string]: AbiStruct };
 
   private events: AbiEvents;
@@ -129,6 +134,8 @@ export class Contract implements ContractInterface {
 
   public withOptionsProps?: WithOptions;
 
+  private parsingStrategy?: ParsingStrategy;
+
   /**
    * @param options
    *  - abi: Abi of the contract object (required)
@@ -136,20 +143,24 @@ export class Contract implements ContractInterface {
    *  - providerOrAccount?: Provider or Account to attach to (fallback to defaultProvider)
    *  - parseRequest?: compile and validate arguments (optional, default true)
    *  - parseResponse?: Parse elements of the response array and structuring them into response object (optional, default true)
+   *  - parser?: Abi parser (optional, default createAbiParser(options.abi))
    */
   constructor(options: ContractOptions) {
-    // TODO: HUGE_REFACTOR: move from legacy format and add support for legacy format
-    const parser = createAbiParser(options.abi);
+    // TODO: REFACTOR: move from legacy format and add support for legacy format
     // Must have params
-    this.address = options.address && options.address.toLowerCase();
+    this.parsingStrategy = options.parsingStrategy;
+    const parser = createAbiParser(options.abi, options.parsingStrategy);
     this.abi = parser.getLegacyFormat();
+    this.address = options.address && options.address.toLowerCase();
     this.providerOrAccount = options.providerOrAccount ?? defaultProvider;
 
     // Optional params
+    this.parseRequest = options.parseRequest ?? true;
+    this.parseResponse = options.parseResponse ?? true;
     this.classHash = options.classHash;
 
     // Init
-    this.callData = new CallData(options.abi);
+    this.callData = new CallData(options.abi, options.parsingStrategy);
     this.structs = CallData.getAbiStruct(options.abi);
     this.events = getAbiEvents(options.abi);
 
@@ -199,7 +210,7 @@ export class Contract implements ContractInterface {
     });
   }
 
-  public withOptions(options: WithOptions) {
+  public withOptions(options: WithOptions): this {
     this.withOptionsProps = options;
     return this;
   }
@@ -208,14 +219,15 @@ export class Contract implements ContractInterface {
     // TODO: if changing address, probably changing abi also !? Also nonsense method as if you change abi and address, you need to create a new contract instance.
     this.address = address;
     if (abi) {
-      this.abi = createAbiParser(abi).getLegacyFormat();
-      this.callData = new CallData(abi);
+      const parser = createAbiParser(abi, this.parsingStrategy);
+      this.abi = parser.getLegacyFormat();
+      this.callData = new CallData(abi, this.parsingStrategy);
       this.structs = CallData.getAbiStruct(abi);
       this.events = getAbiEvents(abi);
     }
   }
 
-  public async isDeployed(): Promise<Contract> {
+  public async isDeployed(): Promise<this> {
     try {
       await this.providerOrAccount.getClassHashAt(this.address);
     } catch (error) {
@@ -267,11 +279,27 @@ export class Contract implements ContractInterface {
       });
   }
 
-  public invoke(
+  public async invoke(
+    method: string,
+    args: ArgsOrCalldata,
+    options: ExecuteOptions & { waitForTransaction: true }
+  ): Promise<SuccessfulTransactionReceiptResponseHelper>;
+  public async invoke(
+    method: string,
+    args: ArgsOrCalldata,
+    options: ExecuteOptions & { waitForTransaction: false }
+  ): Promise<InvokeFunctionResponse>;
+  public async invoke(
+    method: string,
+    args?: ArgsOrCalldata,
+    options?: ExecuteOptions
+  ): Promise<InvokeFunctionResponse>;
+  public async invoke(
     method: string,
     args: ArgsOrCalldata = [],
-    { parseRequest = true, signature, ...RestInvokeOptions }: ExecuteOptions = {}
-  ): Promise<InvokeFunctionResponse> {
+    options: ExecuteOptions = {}
+  ): Promise<SuccessfulTransactionReceiptResponseHelper | InvokeFunctionResponse> {
+    const { parseRequest = true, signature, waitForTransaction, ...RestInvokeOptions } = options;
     assert(this.address !== null, 'contract is not connected to an address');
 
     const calldata = getCompiledCalldata(args, () => {
@@ -289,9 +317,18 @@ export class Contract implements ContractInterface {
       entrypoint: method,
     };
     if (isAccount(this.providerOrAccount)) {
-      return this.providerOrAccount.execute(invocation, {
+      const result: InvokeFunctionResponse = await this.providerOrAccount.execute(invocation, {
         ...RestInvokeOptions,
       });
+      if (waitForTransaction) {
+        const result2: GetTransactionReceiptResponse =
+          await this.providerOrAccount.waitForTransaction(result.transaction_hash);
+        if (result2.isSuccess()) {
+          return result2;
+        }
+        throw new Error('Transaction failed', { cause: result2 });
+      }
+      return result;
     }
 
     if (!RestInvokeOptions.nonce)
@@ -340,9 +377,9 @@ export class Contract implements ContractInterface {
   // TODO: Demistify what is going on here ???
   // TODO: receipt status filtering test and fix this do not look right
   public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
-    let parsed: ParsedEvents;
+    let parsed: ParsedEvents = [] as unknown as ParsedEvents;
     receipt.match({
-      success: (txR: SuccessfulTransactionReceiptResponse) => {
+      SUCCEEDED: (txR: SuccessfulTransactionReceiptResponse) => {
         const emittedEvents =
           txR.events
             ?.map((event) => {
@@ -355,19 +392,33 @@ export class Contract implements ContractInterface {
                 ...event,
               };
             })
-            .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || [];
+            .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || []; // TODO: what data is in this that is cleaned out ?
         parsed = parseRawEvents(
-          emittedEvents as any, // TODO: any temp hotfix, fix this
+          emittedEvents,
           this.events,
           this.structs,
-          CallData.getAbiEnum(this.abi)
-        );
+          CallData.getAbiEnum(this.abi),
+          this.callData.parser
+        ) as ParsedEvents;
       },
       _: () => {
         throw Error('This transaction was not successful.');
       },
     });
-    return parsed!;
+
+    // Add getByPath method to the specific instance (non-enumerable)
+    Object.defineProperty(parsed, 'getByPath', {
+      value: (path: string) => {
+        const event = parsed.find((ev) => Object.keys(ev).some((key) => key.includes(path)));
+        const eventKey = Object.keys(event || {}).find((key) => key.includes(path));
+        return eventKey && event ? event[eventKey] : null;
+      },
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    });
+
+    return parsed;
   }
 
   public isCairo1(): boolean {
@@ -503,6 +554,9 @@ export class Contract implements ContractInterface {
       address: contract_address,
       providerOrAccount: account,
       classHash,
+      parseRequest: params.parseRequest,
+      parseResponse: params.parseResponse,
+      parsingStrategy: params.parsingStrategy,
     });
   }
 }

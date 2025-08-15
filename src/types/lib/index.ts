@@ -2,7 +2,7 @@ import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ETransactionType, SUBSCRIPTION_BLOCK_ID } from '../api';
 import { CairoEnum } from '../cairoEnum';
-import { Abi, CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
+import { Abi, AbiEntry, CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 import {
   BlockTag,
   ResourceBoundsBN,
@@ -28,6 +28,17 @@ export type ByteArray = {
  * decimal-string array
  */
 export type Calldata = string[] & { readonly __compiled__?: true };
+
+/**
+ * "Abi Entry type"
+ * @example
+ * 'core::bytes_31::bytes31'
+ * 'core::bool'
+ * 'core::felt'
+ * 'core::uint256'
+ * 'core::uint512'
+ */
+export type AbiEntryType = AbiEntry['type'];
 
 /**
  * Represents an integer in the range [0, 2^256)

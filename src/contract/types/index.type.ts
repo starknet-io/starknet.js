@@ -14,6 +14,7 @@ import type {
 import type { UniversalDetails } from '../../account/types/index.type';
 import type { ProviderInterface } from '../../provider';
 import type { AccountInterface } from '../../account/interface';
+import type { ParsingStrategy } from '../../utils/calldata/parser';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
@@ -65,11 +66,17 @@ export type CommonContractOptions = {
    * @default true
    */
   parseRequest?: boolean;
+
   /**
    * Parse elements of the response array and structuring them into response object
    * @default true
    */
   parseResponse?: boolean;
+
+  /**
+   * Custom parsing strategy for request/response processing
+   */
+  parsingStrategy?: ParsingStrategy;
 };
 
 export type ContractOptions = {
@@ -97,6 +104,11 @@ export type ExecuteOptions = Pick<CommonContractOptions, 'parseRequest'> & {
    * Deployer contract salt
    */
   salt?: string;
+  /**
+   * Wait for transaction to be included in a block
+   * @default false
+   */
+  waitForTransaction?: boolean;
 } & Partial<UniversalDetails>;
 
 export type CallOptions = CommonContractOptions & {
@@ -111,7 +123,9 @@ export type ParsedEvent = { [name: string]: ParsedStruct } & {
   transaction_hash?: TransactionHash;
 };
 
-export type ParsedEvents = Array<ParsedEvent>;
+export type ParsedEvents = Array<ParsedEvent> & {
+  getByPath?(path: string): ParsedStruct | null;
+};
 
 // TODO: This should be in formatResponse type
 /**
@@ -163,4 +177,4 @@ type DeployOnlyParams = FactoryParamsBase & {
   abi?: Abi;
 };
 
-export type FactoryParams = DeclareAndDeployParams | DeployOnlyParams;
+export type FactoryParams = (DeclareAndDeployParams | DeployOnlyParams) & CommonContractOptions;

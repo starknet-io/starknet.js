@@ -6,7 +6,6 @@ import {
   isCairo1Type,
   isLen,
   isTypeArray,
-  isTypeByteArray,
   isTypeEnum,
   isTypeEthAddress,
   isTypeNonZero,
@@ -27,6 +26,7 @@ import {
 import extractTupleMemberTypes from './tuple';
 import { isUndefined, isString } from '../typed';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoByteArray } from '../cairoDataTypes/byteArray';
 
 function errorU256(key: string) {
   return Error(
@@ -67,7 +67,7 @@ export default function orderPropsByAbi(
     if (isTypeNonZero(abiType)) {
       return unorderedItem;
     }
-    if (isTypeByteArray(abiType)) {
+    if (CairoByteArray.isAbiType(abiType)) {
       return unorderedItem;
     }
     if (isTypeU96(abiType)) {

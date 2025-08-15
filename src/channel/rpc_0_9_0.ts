@@ -413,6 +413,7 @@ export class RpcChannel {
       RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
     ];
 
+    const txLife: string[] = [];
     let txStatus: RPC.TransactionStatus;
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
@@ -420,6 +421,7 @@ export class RpcChannel {
       try {
         // eslint-disable-next-line no-await-in-loop
         txStatus = await this.getTransactionStatus(transactionHash);
+        txLife.push(txStatus.finality_status);
 
         const executionStatus = txStatus.execution_status;
         const finalityStatus = txStatus.finality_status;
@@ -446,6 +448,19 @@ export class RpcChannel {
       } catch (error) {
         if (error instanceof Error && isErrorState) {
           throw error;
+        }
+
+        if (error instanceof RpcError && error.isType('TXN_HASH_NOT_FOUND')) {
+          logger.info('txLife: ', txLife);
+          const errorMessages: Record<string, string> = {
+            [RPC.ETransactionStatus.RECEIVED]: SYSTEM_MESSAGES.txEvictedFromMempool,
+            [RPC.ETransactionStatus.PRE_CONFIRMED]: SYSTEM_MESSAGES.consensusFailed,
+            [RPC.ETransactionStatus.CANDIDATE]: SYSTEM_MESSAGES.txFailsBlockBuildingValidation,
+          };
+          const errorMessage = errorMessages[txLife.at(-1) as string];
+          if (errorMessage) {
+            throw new Error(errorMessage);
+          }
         }
 
         if (retries <= 0) {

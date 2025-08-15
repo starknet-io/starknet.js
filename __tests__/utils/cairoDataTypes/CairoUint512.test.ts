@@ -20,6 +20,28 @@ describe('CairoUint512 class test', () => {
     }).toThrow('bigNumberish is bigger than UINT_512_MAX');
   });
 
+  test('constructor 1 should throw on null', () => {
+    expect(() => {
+      new CairoUint512(null as any);
+    }).toThrow('null value is not allowed for u512');
+  });
+
+  test('constructor 1 should throw on undefined', () => {
+    expect(() => {
+      new CairoUint512(undefined as any);
+    }).toThrow('undefined value is not allowed for u512');
+  });
+
+  test('constructor 1 should throw on invalid types', () => {
+    expect(() => {
+      new CairoUint512(Symbol('test') as any);
+    }).toThrow("Unsupported data type 'symbol' for u512");
+
+    expect(() => {
+      new CairoUint512((() => {}) as any);
+    }).toThrow("Unsupported data type 'function' for u512");
+  });
+
   test('constructor 1 should support BigNumberish', () => {
     const case1 = new CairoUint512(10n);
     const case2 = new CairoUint512(10);
@@ -140,6 +162,38 @@ describe('CairoUint512 class test', () => {
     expect(typeof validate).toBe('bigint');
   });
 
+  test('validate should reject null with specific error message', () => {
+    expect(() => {
+      CairoUint512.validate(null as any);
+    }).toThrow('null value is not allowed for u512');
+  });
+
+  test('validate should reject undefined with specific error message', () => {
+    expect(() => {
+      CairoUint512.validate(undefined as any);
+    }).toThrow('undefined value is not allowed for u512');
+  });
+
+  test('validate should reject unsupported data types with specific error messages', () => {
+    expect(() => {
+      CairoUint512.validate(Symbol('test') as any);
+    }).toThrow(
+      "Unsupported data type 'symbol' for u512. Expected string, number, bigint, or Uint512 object"
+    );
+
+    expect(() => {
+      CairoUint512.validate((() => {}) as any);
+    }).toThrow(
+      "Unsupported data type 'function' for u512. Expected string, number, bigint, or Uint512 object"
+    );
+
+    expect(() => {
+      CairoUint512.validate(true as any);
+    }).toThrow(
+      "Unsupported data type 'boolean' for u512. Expected string, number, bigint, or Uint512 object"
+    );
+  });
+
   test('validateProps should pass', () => {
     expect(CairoUint512.validateProps(1000, 1001, 1002, 1003)).toEqual({
       limb0: 1000n,
@@ -188,6 +242,17 @@ describe('CairoUint512 class test', () => {
   test('is should return false', () => {
     const is = CairoUint512.is(UINT_512_MAX + 1n);
     expect(is).toBe(false);
+  });
+
+  test('is should return false for unknown invalid data types', () => {
+    expect(CairoUint512.is(null as any)).toBe(false);
+    expect(CairoUint512.is(undefined as any)).toBe(false);
+    expect(CairoUint512.is(Symbol('test') as any)).toBe(false);
+    expect(CairoUint512.is((() => {}) as any)).toBe(false);
+    expect(CairoUint512.is(true as any)).toBe(false);
+    expect(CairoUint512.is(false as any)).toBe(false);
+    // Note: Date, Map, Set can be converted to numbers/BigInt so they may pass validation
+    // depending on BigInt conversion behavior
   });
 
   test('should convert UINT_512_MAX to Uint512 bigint', () => {
