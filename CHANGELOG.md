@@ -1,3 +1,9 @@
+# [8.4.0](https://github.com/starknet-io/starknet.js/compare/v8.3.1...v8.4.0) (2025-08-15)
+
+### Features
+
+- fast execute ([#1463](https://github.com/starknet-io/starknet.js/issues/1463)) ([d76fb63](https://github.com/starknet-io/starknet.js/commit/d76fb6321782b87a9bfc18c9ac859d21acb4f47e))
+
 ## [8.3.1](https://github.com/starknet-io/starknet.js/compare/v8.3.0...v8.3.1) (2025-08-15)
 
 ### Bug Fixes
