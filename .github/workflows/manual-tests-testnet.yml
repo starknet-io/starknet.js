@@ -5,7 +5,7 @@ on:
       ignore-scripts:
         description: 'Ignore scripts'
         type: boolean
-        default: false
+        default: true
       fail-fast:
         description: 'Fail fast'
         type: boolean
