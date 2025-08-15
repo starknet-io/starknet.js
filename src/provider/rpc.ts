@@ -46,7 +46,7 @@ import { wait } from '../utils/provider';
 import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { getTipStatsFromBlocks, TipAnalysisOptions, TipEstimate } from './modules/tip';
-import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
+import { createTransactionReceipt } from '../utils/transactionReceipt/transactionReceipt';
 import { ProviderInterface } from './interface';
 import type {
   DeclaredTransaction,
@@ -289,7 +289,7 @@ export class RpcProvider implements ProviderInterface {
     const txReceiptWoHelper = await this.channel.getTransactionReceipt(txHash);
     const txReceiptWoHelperModified =
       this.responseParser.parseTransactionReceipt(txReceiptWoHelper);
-    return new ReceiptTx(txReceiptWoHelperModified);
+    return createTransactionReceipt(txReceiptWoHelperModified);
   }
 
   public async getTransactionTrace(
@@ -321,7 +321,7 @@ export class RpcProvider implements ProviderInterface {
       options
     )) as GetTxReceiptResponseWithoutHelper;
 
-    return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
+    return createTransactionReceipt(receiptWoHelper);
   }
 
   /**

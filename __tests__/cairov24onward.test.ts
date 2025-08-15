@@ -55,9 +55,11 @@ describe('Cairo v2.4 onwards', () => {
       expect(callD1).toEqual([hexToDecimalString(encodeShortString(str))]);
       const callD2 = CallData.compile({ str });
       expect(callD2).toEqual([hexToDecimalString(encodeShortString(str))]);
+
       const myCallData = new CallData(contracts.C240.sierra.abi);
       const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
       expect(myCalldata1).toEqual([encodeShortString(str)]);
+
       const myCalldata2 = myCallData.compile('proceed_bytes31', { str });
       expect(myCalldata2).toEqual([encodeShortString(str)]);
       const myCall1 = stringContract.populate('proceed_bytes31', [str]);

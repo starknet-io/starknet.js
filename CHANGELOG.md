@@ -1,3 +1,21 @@
+## [8.3.1](https://github.com/starknet-io/starknet.js/compare/v8.3.0...v8.3.1) (2025-08-15)
+
+### Bug Fixes
+
+- ensure a Buffer type is available for all environments ([6e67834](https://github.com/starknet-io/starknet.js/commit/6e678343876504082d3c232a115b1c48a8f6ce96))
+
+# [8.3.0](https://github.com/starknet-io/starknet.js/compare/v8.2.0...v8.3.0) (2025-08-15)
+
+### Features
+
+- implement websocket 0.9 ([#1467](https://github.com/starknet-io/starknet.js/issues/1467)) ([7e988c4](https://github.com/starknet-io/starknet.js/commit/7e988c417ac2b4c862dc438b56a149ba7c20439d))
+
+# [8.2.0](https://github.com/starknet-io/starknet.js/compare/v8.1.2...v8.2.0) (2025-08-15)
+
+### Features
+
+- a CairoByteArray, CairoTypes, updates ([#1469](https://github.com/starknet-io/starknet.js/issues/1469)) ([430fb70](https://github.com/starknet-io/starknet.js/commit/430fb70e5c54d59f9fde9acadd701632170aca25)), closes [#1472](https://github.com/starknet-io/starknet.js/issues/1472)
+
 ## [8.1.2](https://github.com/starknet-io/starknet.js/compare/v8.1.1...v8.1.2) (2025-08-04)
 
 ### Bug Fixes

@@ -14,6 +14,7 @@ import type {
 } from '../types';
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
+import Buffer from '../utils/connect/buffer';
 import type { SignerInterface } from './interface';
 import { HARDENING_4BYTES, HARDENING_BYTE } from '../global/constants';
 import { getExecuteCalldata } from '../utils/transaction';

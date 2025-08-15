@@ -16,8 +16,6 @@ import {
   isTypeBool,
   isTypeContractAddress,
   isTypeEthAddress,
-  isTypeBytes31,
-  isTypeByteArray,
   isTypeSecp256k1Point,
   isCairo1Type,
   getArrayType,
@@ -28,7 +26,14 @@ import {
   felt,
   isTypeU96,
 } from '../../../src/utils/calldata/cairo';
-import { ETH_ADDRESS, Literal, Uint, type ContractVersion, NON_ZERO_PREFIX } from '../../../src';
+import {
+  ETH_ADDRESS,
+  Literal,
+  Uint,
+  type ContractVersion,
+  NON_ZERO_PREFIX,
+  CairoByteArray,
+} from '../../../src';
 import {
   getFunctionAbi,
   getAbiEnums,
@@ -36,6 +41,7 @@ import {
   getInterfaceAbi,
   getConstructorAbi,
 } from '../../factories/abi';
+import { CairoBytes31 } from '../../../src/utils/cairoDataTypes/bytes31';
 
 describe('isLen', () => {
   test('should return true if name ends with "_len"', () => {
@@ -197,21 +203,21 @@ describe('isTypeEthAddress', () => {
 
 describe('isTypeBytes31', () => {
   test('should return true if given type is Bytes31', () => {
-    expect(isTypeBytes31('core::bytes_31::bytes31')).toEqual(true);
+    expect(CairoBytes31.isAbiType('core::bytes_31::bytes31')).toEqual(true);
   });
 
   test('should return false if given type is not Bytes31', () => {
-    expect(isTypeBytes31('core::bool')).toEqual(false);
+    expect(CairoBytes31.isAbiType('core::bool')).toEqual(false);
   });
 });
 
 describe('isTypeByteArray', () => {
   test('should return true if given type is ByteArray', () => {
-    expect(isTypeByteArray('core::byte_array::ByteArray')).toEqual(true);
+    expect(CairoByteArray.isAbiType('core::byte_array::ByteArray')).toEqual(true);
   });
 
   test('should return false if given type is not ByteArray', () => {
-    expect(isTypeByteArray('core::bool')).toEqual(false);
+    expect(CairoByteArray.isAbiType('core::bool')).toEqual(false);
   });
 });
 
