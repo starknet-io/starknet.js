@@ -1,4 +1,4 @@
-import { CairoFixedArray, hdParsingStrategy, fastParsingStrategy } from '../../../src';
+import { CairoFixedArray, CallData, hdParsingStrategy } from '../../../src';
 
 describe('CairoFixedArray class Unit test', () => {
   test('inputs for a CairoFixedArray instance', () => {
@@ -17,14 +17,14 @@ describe('CairoFixedArray class Unit test', () => {
     expect(() => new CairoFixedArray([2, 4, 6], '[; 3]', hdParsingStrategy)).toThrow();
   });
 
-  test('use dynamic class methods', () => {
+  test('use static class methods', () => {
     const myFixedArray = new CairoFixedArray(
       [1, 2, 3],
       '[core::integer::u32; 3]',
       hdParsingStrategy
     );
-    expect(myFixedArray.getFixedArraySize()).toBe(3);
-    expect(myFixedArray.getFixedArrayType()).toBe('core::integer::u32');
+    expect(CairoFixedArray.getFixedArraySize(myFixedArray.arrayType)).toBe(3);
+    expect(CairoFixedArray.getFixedArrayType(myFixedArray.arrayType)).toBe('core::integer::u32');
   });
 
   test('use static methods for CallData.compile()', () => {
@@ -37,65 +37,89 @@ describe('CairoFixedArray class Unit test', () => {
     expect(CairoFixedArray.isAbiType('[core::integer::u32; zorg]')).toBe(false);
   });
 
-  test('prepare fixed array for CallData.compile()', () => {
+  test('CairoFixedArray works with CallData.compile()', () => {
     const myFixedArray = new CairoFixedArray(
       [10, 20, 30],
       '[core::integer::u32; 3]',
       hdParsingStrategy
     );
-    expect(myFixedArray.compile()).toStrictEqual({ '0': 10, '1': 20, '2': 30 });
-    expect(CairoFixedArray.compile([10, 20, 30])).toStrictEqual({ '0': 10, '1': 20, '2': 30 });
+    const compiled = CallData.compile([myFixedArray]);
+    expect(compiled).toEqual(['10', '20', '30']);
   });
 
-  test('factoryFromApiResponse with different parsing strategies', () => {
+  test('constructor with API response data', () => {
     // Test simple u8 array
     const u8Response = ['0x1', '0x2', '0x3'];
     const u8Iterator = u8Response[Symbol.iterator]();
-    const u8Result = CairoFixedArray.factoryFromApiResponse(
-      u8Iterator,
+    const u8Result = new CairoFixedArray(u8Iterator, '[core::integer::u8; 3]', hdParsingStrategy);
+    expect(u8Result.decompose(hdParsingStrategy)).toEqual([1n, 2n, 3n]);
+
+    // Test with same parsing strategy (hdParsingStrategy)
+    const u8ResponseSecond = ['0x10', '0x20', '0x30'];
+    const u8IteratorSecond = u8ResponseSecond[Symbol.iterator]();
+    const u8ResultSecond = new CairoFixedArray(
+      u8IteratorSecond,
       '[core::integer::u8; 3]',
       hdParsingStrategy
     );
-    expect(u8Result.decompose()).toEqual([1n, 2n, 3n]);
-
-    // Test with fastParsingStrategy
-    const u8ResponseFast = ['0x10', '0x20', '0x30'];
-    const u8IteratorFast = u8ResponseFast[Symbol.iterator]();
-    const u8ResultFast = CairoFixedArray.factoryFromApiResponse(
-      u8IteratorFast,
-      '[core::integer::u8; 3]',
-      fastParsingStrategy
-    );
-    expect(u8ResultFast.decompose()).toEqual([16n, 32n, 48n]);
+    expect(u8ResultSecond.decompose(hdParsingStrategy)).toEqual([16n, 32n, 48n]);
   });
 
-  test('factoryFromApiResponse with nested fixed arrays', () => {
+  test('constructor with nested fixed arrays API response', () => {
     // Test nested arrays: [[u8; 2]; 2] = [[1, 2], [3, 4]]
     const nestedResponse = ['0x1', '0x2', '0x3', '0x4'];
     const nestedIterator = nestedResponse[Symbol.iterator]();
-    const nestedResult = CairoFixedArray.factoryFromApiResponse(
+    const nestedResult = new CairoFixedArray(
       nestedIterator,
       '[[core::integer::u8; 2]; 2]',
       hdParsingStrategy
     );
-    expect(nestedResult.decompose()).toEqual([
+    expect(nestedResult.decompose(hdParsingStrategy)).toEqual([
       [1n, 2n],
       [3n, 4n],
     ]);
+
+    // Test deeply nested arrays: [[[u8; 3]; 2]; 2]
+    const deeplyNestedResponse = [
+      '0x1',
+      '0x2',
+      '0x3',
+      '0x4',
+      '0x5',
+      '0x6',
+      '0x7',
+      '0x8',
+      '0x9',
+      '0xa',
+      '0xb',
+      '0xc',
+    ];
+    const deeplyNestedIterator = deeplyNestedResponse[Symbol.iterator]();
+    const deeplyNestedResult = new CairoFixedArray(
+      deeplyNestedIterator,
+      '[[[core::integer::u8; 3]; 2]; 2]',
+      hdParsingStrategy
+    );
+    expect(deeplyNestedResult.decompose(hdParsingStrategy)).toEqual([
+      [
+        [1n, 2n, 3n],
+        [4n, 5n, 6n],
+      ],
+      [
+        [7n, 8n, 9n],
+        [10n, 11n, 12n],
+      ],
+    ]);
   });
 
-  test('factoryFromApiResponse error handling', () => {
+  test('constructor error handling with unsupported types', () => {
     const response = ['0x1', '0x2'];
     const iterator = response[Symbol.iterator]();
 
     // Test with unsupported element type - error should occur during decompose()
-    const fixedArray = CairoFixedArray.factoryFromApiResponse(
-      iterator,
-      '[unsupported::type; 2]',
-      hdParsingStrategy
-    );
+    const fixedArray = new CairoFixedArray(iterator, '[unsupported::type; 2]', hdParsingStrategy);
     expect(() => {
-      fixedArray.decompose();
+      fixedArray.decompose(hdParsingStrategy);
     }).toThrow('No parser found for element type: unsupported::type in parsing strategy');
   });
 
@@ -245,16 +269,16 @@ describe('CairoFixedArray class Unit test', () => {
       expect(result).toEqual(['0x1', '0x2', '0x3']);
     });
 
-    test('should work with different parsing strategies', () => {
-      const hdArray = new CairoFixedArray([1, 2], '[core::integer::u8; 2]', hdParsingStrategy);
-      const fastArray = new CairoFixedArray([1, 2], '[core::integer::u8; 2]', fastParsingStrategy);
+    test('should work with parsing strategy', () => {
+      const array1 = new CairoFixedArray([1, 2], '[core::integer::u8; 2]', hdParsingStrategy);
+      const array2 = new CairoFixedArray([1, 2], '[core::integer::u8; 2]', hdParsingStrategy);
 
-      const hdResult = hdArray.toApiRequest();
-      const fastResult = fastArray.toApiRequest();
+      const result1 = array1.toApiRequest();
+      const result2 = array2.toApiRequest();
 
-      // HD strategy returns hex format, fast strategy returns decimal
-      expect(hdResult).toEqual(['0x1', '0x2']);
-      expect(fastResult).toEqual(['1', '2']);
+      // Unified parsing strategy approach for API serialization
+      expect(result1).toEqual(['0x1', '0x2']);
+      expect(result2).toEqual(['0x1', '0x2']);
     });
 
     test('should throw for invalid inputs', () => {
@@ -306,19 +330,15 @@ describe('CairoFixedArray class Unit test', () => {
       expect(result).toEqual(['0x1', '0x2', '0x3']);
     });
 
-    test('should work with different strategies', () => {
-      const hdArray = new CairoFixedArray([100, 200], '[core::integer::u8; 2]', hdParsingStrategy);
-      const fastArray = new CairoFixedArray(
-        [100, 200],
-        '[core::integer::u8; 2]',
-        fastParsingStrategy
-      );
+    test('should work with hdParsingStrategy', () => {
+      const array1 = new CairoFixedArray([100, 200], '[core::integer::u8; 2]', hdParsingStrategy);
+      const array2 = new CairoFixedArray([100, 200], '[core::integer::u8; 2]', hdParsingStrategy);
 
-      const hdResult = hdArray.toApiRequest();
-      const fastResult = fastArray.toApiRequest();
+      const result1 = array1.toApiRequest();
+      const result2 = array2.toApiRequest();
 
-      expect(hdResult).toEqual(['0x64', '0xc8']);
-      expect(fastResult).toEqual(['100', '200']);
+      expect(result1).toEqual(['0x64', '0xc8']);
+      expect(result2).toEqual(['0x64', '0xc8']);
     });
 
     test('should handle nested arrays', () => {
@@ -343,10 +363,6 @@ describe('CairoFixedArray class Unit test', () => {
   });
 
   describe('static properties', () => {
-    test('should have correct abiSelector', () => {
-      expect(CairoFixedArray.abiSelector).toBe('CairoFixedArray');
-    });
-
     test('should have correct dynamicSelector', () => {
       expect(CairoFixedArray.dynamicSelector).toBe('CairoFixedArray');
     });
@@ -356,7 +372,7 @@ describe('CairoFixedArray class Unit test', () => {
     test('should handle zero-length arrays', () => {
       const emptyArray = new CairoFixedArray([], '[core::integer::u8; 0]', hdParsingStrategy);
       expect(emptyArray.content).toEqual([]);
-      expect(emptyArray.getFixedArraySize()).toBe(0);
+      expect(CairoFixedArray.getFixedArraySize(emptyArray.arrayType)).toBe(0);
       expect(emptyArray.toApiRequest()).toEqual([]);
     });
 
@@ -368,7 +384,7 @@ describe('CairoFixedArray class Unit test', () => {
         hdParsingStrategy
       );
       expect(largeArray.content.length).toBe(1000);
-      expect(largeArray.getFixedArraySize()).toBe(1000);
+      expect(CairoFixedArray.getFixedArraySize(largeArray.arrayType)).toBe(1000);
     });
 
     test('should handle complex nested structures', () => {

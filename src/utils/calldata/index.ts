@@ -28,6 +28,7 @@ import {
   CairoResult,
   CairoResultVariant,
 } from './enum';
+import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import formatter from './formatter';
 import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
 import { AbiParserInterface } from './parser/interface';
@@ -215,6 +216,14 @@ export class CallData {
                 return [[`${prefix}${kk}`, felt(activeVariantNb)]];
               }
               return getEntries({ 0: activeVariantNb, 1: myEnum.unwrap() }, `${prefix}${kk}.`);
+            }
+            if (value instanceof CairoFixedArray) {
+              // CairoFixedArray - use toApiRequest() to get flat array, then convert to tree structure
+              const apiRequest = value.toApiRequest();
+              const compiledObj = Object.fromEntries(
+                apiRequest.map((item, idx) => [idx.toString(), item])
+              );
+              return getEntries(compiledObj, `${prefix}${kk}.`);
             }
             // normal object
             return getEntries(value, `${prefix}${kk}.`);

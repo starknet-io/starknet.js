@@ -485,11 +485,11 @@ describe('CairoByteArray Contract Integration Tests', () => {
     // Create custom parsing strategy that extends hdParsingStrategy
     const customParsingStrategy: ParsingStrategy = {
       dynamicSelectors: hdParsingStrategy.dynamicSelectors,
-      request: hdParsingStrategy.request,
+      constructors: hdParsingStrategy.constructors,
       response: {
         ...hdParsingStrategy.response,
-        [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
-          return CairoByteArray.factoryFromApiResponse(responseIterator).toBuffer();
+        [CairoByteArray.abiSelector]: (instance: CairoType) => {
+          return (instance as CairoByteArray).toBuffer();
         },
       },
     };
@@ -521,11 +521,11 @@ describe('CairoByteArray Contract Integration Tests', () => {
     // Create custom parsing strategy that extends hdParsingStrategy
     const customParsingStrategy: ParsingStrategy = {
       dynamicSelectors: hdParsingStrategy.dynamicSelectors,
-      request: hdParsingStrategy.request,
+      constructors: hdParsingStrategy.constructors,
       response: {
         ...hdParsingStrategy.response,
-        [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
-          return CairoByteArray.factoryFromApiResponse(responseIterator).toBuffer();
+        [CairoByteArray.abiSelector]: (instance: CairoType) => {
+          return (instance as CairoByteArray).toBuffer();
         },
       },
     };

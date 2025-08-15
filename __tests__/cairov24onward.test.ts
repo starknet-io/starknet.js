@@ -471,10 +471,14 @@ describe('Cairo v2.4 onwards', () => {
       expect(res0).toEqual(expectedRes);
       const res1 = await fixedArrayContract.fixed_array(myArray);
       expect(res1).toEqual(expectedRes);
-      const myCalldata = CallData.compile([CairoFixedArray.compile(myArray)]);
+      const myCalldata = CallData.compile([
+        Object.fromEntries(myArray.map((item, idx) => [idx.toString(), item])),
+      ]);
       const res2 = await fixedArrayContract.call('fixed_array', myCalldata);
       expect(res2).toEqual(expectedRes);
-      const myCalldata3 = myCallData.compile('fixed_array', [CairoFixedArray.compile(myArray)]);
+      const myCalldata3 = myCallData.compile('fixed_array', [
+        Object.fromEntries(myArray.map((item, idx) => [idx.toString(), item])),
+      ]);
       const res3 = await fixedArrayContract.call('fixed_array', myCalldata3);
       expect(res3).toEqual(expectedRes);
       const myFixedArray = new CairoFixedArray(
@@ -482,7 +486,7 @@ describe('Cairo v2.4 onwards', () => {
         '[core::integer::u32; 8]',
         hdParsingStrategy
       );
-      const myCalldata4 = myCallData.compile('fixed_array', { x: myFixedArray.compile() });
+      const myCalldata4 = myCallData.compile('fixed_array', { x: myFixedArray });
       const res4 = await fixedArrayContract.call('fixed_array', myCalldata4);
       expect(res4).toEqual(expectedRes);
     });

@@ -237,11 +237,16 @@ const validateTuple = (parameter: any, input: AbiEntry) => {
 };
 
 const validateArray = (
-  parameterArray: Array<any> | Record<string, any>,
+  parameterArray: Array<any> | Record<string, any> | CairoFixedArray,
   input: AbiEntry,
   structs: AbiStructs,
   enums: AbiEnums
 ) => {
+  // If parameterArray is a CairoFixedArray instance, skip validation (it's already validated)
+  if (parameterArray instanceof CairoFixedArray) {
+    return;
+  }
+
   const isNormalArray = isTypeArray(input.type);
   const baseType = isNormalArray
     ? getArrayType(input.type)
