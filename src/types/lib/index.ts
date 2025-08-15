@@ -1,6 +1,6 @@
 import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
-import { EDataAvailabilityMode, ETransactionType, SUBSCRIPTION_BLOCK_TAG } from '../api';
+import { EDataAvailabilityMode, ETransactionType, SUBSCRIPTION_BLOCK_ID } from '../api';
 import { CairoEnum } from '../cairoEnum';
 import { Abi, AbiEntry, CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 import {
@@ -271,8 +271,8 @@ export type BlockNumber = BlockTag | null | number;
  * null return 'pending' block tag
  */
 export type BlockIdentifier = BlockNumber | BigNumberish;
-
-export type SubscriptionBlockIdentifier = SUBSCRIPTION_BLOCK_TAG | (string & {}) | number | bigint;
+type SubscriptionBlockTag = Extract<SUBSCRIPTION_BLOCK_ID, string>;
+export type SubscriptionBlockIdentifier = SubscriptionBlockTag | (string & {}) | number | bigint;
 
 /**
  * items used by AccountInvocations

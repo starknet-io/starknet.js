@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Provider, Subscription, WebSocketChannel } from '../src';
+import { Provider, Subscription, SubscriptionNewHeadsEvent, WebSocketChannel } from '../src';
 import { logger } from '../src/global/logger';
 import { StarknetChainId } from '../src/global/constants';
 import { getTestProvider, TEST_WS_URL } from './config/fixtures';
@@ -10,6 +10,8 @@ const NODE_URL = TEST_WS_URL!;
 
 describeIfWs('E2E WebSocket Tests', () => {
   describe('websocket specific endpoints', () => {
+    // Updated for RPC 0.9: removed subscribePendingTransaction (not available in 0.9)
+    // Added subscribeNewTransactionReceipts and subscribeNewTransactions (new in 0.9)
     // account provider
     const provider = new Provider(getTestProvider());
     const account = getTestAccount(provider);
@@ -63,7 +65,8 @@ describeIfWs('E2E WebSocket Tests', () => {
     });
 
     test('Test subscribeNewHeads', async () => {
-      const sub = await webSocketChannel.subscribeNewHeads();
+      // type not required, here I just test type availability
+      const sub: SubscriptionNewHeadsEvent = await webSocketChannel.subscribeNewHeads();
       expect(sub).toBeInstanceOf(Subscription);
 
       let i = 0;
@@ -87,6 +90,7 @@ describeIfWs('E2E WebSocket Tests', () => {
       sub.on(async (result) => {
         i += 1;
         expect(result).toBeDefined();
+        expect(result).toHaveProperty('event');
         if (i === 5) {
           const status = await sub.unsubscribe();
           expect(status).toBe(true);
@@ -96,19 +100,99 @@ describeIfWs('E2E WebSocket Tests', () => {
       await webSocketChannel.waitForUnsubscription(sub.id);
     });
 
-    test('Test subscribePendingTransaction', async () => {
-      const sub = await webSocketChannel.subscribePendingTransaction(true);
+    test('Test subscribeEvents with finality status filter', async () => {
+      const sub = await webSocketChannel.subscribeEvents({
+        finalityStatus: 'ACCEPTED_ON_L2',
+      });
       expect(sub).toBeInstanceOf(Subscription);
 
       let i = 0;
       sub.on(async (result) => {
         i += 1;
         expect(result).toBeDefined();
-        if (i === 5) {
+        expect(result).toHaveProperty('event');
+        if (i === 2) {
           const status = await sub.unsubscribe();
           expect(status).toBe(true);
         }
       });
+
+      await webSocketChannel.waitForUnsubscription(sub.id);
+    });
+
+    test('Test subscribeNewTransactionReceipts', async () => {
+      const sub = await webSocketChannel.subscribeNewTransactionReceipts();
+      expect(sub).toBeInstanceOf(Subscription);
+
+      let i = 0;
+      sub.on(async (result) => {
+        i += 1;
+        expect(result).toBeDefined();
+        expect(result).toHaveProperty('transaction_receipt');
+        if (i === 2) {
+          const status = await sub.unsubscribe();
+          expect(status).toBe(true);
+        }
+      });
+
+      await webSocketChannel.waitForUnsubscription(sub.id);
+    });
+
+    test('Test subscribeNewTransactionReceipts with finality status filter', async () => {
+      const sub = await webSocketChannel.subscribeNewTransactionReceipts({
+        finalityStatus: ['ACCEPTED_ON_L2'],
+      });
+      expect(sub).toBeInstanceOf(Subscription);
+
+      let i = 0;
+      sub.on(async (result) => {
+        i += 1;
+        expect(result).toBeDefined();
+        expect(result).toHaveProperty('transaction_receipt');
+        if (i === 1) {
+          const status = await sub.unsubscribe();
+          expect(status).toBe(true);
+        }
+      });
+
+      await webSocketChannel.waitForUnsubscription(sub.id);
+    });
+
+    test('Test subscribeNewTransactions', async () => {
+      const sub = await webSocketChannel.subscribeNewTransactions();
+      expect(sub).toBeInstanceOf(Subscription);
+
+      let i = 0;
+      sub.on(async (result) => {
+        i += 1;
+        expect(result).toBeDefined();
+        expect(result).toHaveProperty('transaction');
+        if (i === 2) {
+          const status = await sub.unsubscribe();
+          expect(status).toBe(true);
+        }
+      });
+
+      await webSocketChannel.waitForUnsubscription(sub.id);
+    });
+
+    test('Test subscribeNewTransactions with finality status filter', async () => {
+      const sub = await webSocketChannel.subscribeNewTransactions({
+        finalityStatus: ['ACCEPTED_ON_L2'],
+      });
+      expect(sub).toBeInstanceOf(Subscription);
+
+      let i = 0;
+      sub.on(async (result) => {
+        i += 1;
+        expect(result).toBeDefined();
+        expect(result).toHaveProperty('transaction');
+        if (i === 1) {
+          const status = await sub.unsubscribe();
+          expect(status).toBe(true);
+        }
+      });
+
       await webSocketChannel.waitForUnsubscription(sub.id);
     });
 
@@ -119,7 +203,9 @@ describeIfWs('E2E WebSocket Tests', () => {
         calldata: [account.address, '10', '0'],
       });
 
-      const sub = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
+      const sub = await webSocketChannel.subscribeTransactionStatus({
+        transactionHash: transaction_hash,
+      });
       expect(sub).toBeInstanceOf(Subscription);
 
       let i = 0;
