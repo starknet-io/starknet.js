@@ -14,6 +14,7 @@ import {
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  type fastWaitForTransactionOptions,
   type GasPrices,
   GetBlockResponse,
   getContractVersionOptions,
@@ -321,6 +322,37 @@ export class RpcProvider implements ProviderInterface {
     )) as GetTxReceiptResponseWithoutHelper;
 
     return createTransactionReceipt(receiptWoHelper);
+  }
+
+  /**
+   * Wait up until a new transaction is possible with same the account.
+   * This method is fast, but Events and transaction report are not yet
+   * available. Useful for gaming activity.
+   * - only rpc 0.9 and onwards.
+   * @param {BigNumberish} txHash - transaction hash
+   * @param {string} address - address of the account
+   * @param {BigNumberish} initNonce - initial nonce of the account (before the transaction).
+   * @param {fastWaitForTransactionOptions} [options={retries: 50, retryInterval: 500}] - options to scan the network for the next possible transaction. `retries` is the number of times to retry.
+   * @returns {Promise<boolean>} Returns true if the next transaction is possible,
+   * false if the timeout has been reached,
+   * throw an error in case of provider communication.
+   */
+  public async fastWaitForTransaction(
+    txHash: BigNumberish,
+    address: string,
+    initNonce: BigNumberish,
+    options?: fastWaitForTransactionOptions
+  ): Promise<boolean> {
+    if (this.channel instanceof RPC09.RpcChannel) {
+      const isSuccess = await this.channel.fastWaitForTransaction(
+        txHash,
+        address,
+        initNonce,
+        options
+      );
+      return isSuccess;
+    }
+    throw new Error('Unsupported channel type');
   }
 
   public async getStorageAt(
