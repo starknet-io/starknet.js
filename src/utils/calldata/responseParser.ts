@@ -13,6 +13,7 @@ import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFelt252 } from '../cairoDataTypes/felt';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoTuple } from '../cairoDataTypes/tuple';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { CairoUint8 } from '../cairoDataTypes/uint8';
@@ -47,7 +48,6 @@ import {
   CairoResultVariant,
 } from './enum';
 import { AbiParserInterface } from './parser/interface';
-import extractTupleMemberTypes from './tuple';
 
 /**
  * Parse base types
@@ -214,14 +214,8 @@ function parseResponseValue(
 
   // type tuple
   if (isTypeTuple(element.type)) {
-    const memberTypes = extractTupleMemberTypes(element.type);
-    return memberTypes.reduce((acc, it: any, idx) => {
-      const name = it?.name ? it.name : idx;
-      const type = it?.type ? it.type : it;
-      const el = { name, type };
-      acc[name] = parseResponseValue(responseIterator, el, parser, structs, enums);
-      return acc;
-    }, {} as any);
+    const tuple = new CairoTuple(responseIterator, element.type, parser.parsingStrategy);
+    return tuple.decompose(parser.parsingStrategy);
   }
 
   // TODO: duplicated, investigate why and what was an issue then de-duplicate

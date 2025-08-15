@@ -17,9 +17,10 @@ import { CairoInt128 } from '../../cairoDataTypes/int128';
 import { CairoUint32 } from '../../cairoDataTypes/uint32';
 import { CairoFixedArray } from '../../cairoDataTypes/fixedArray';
 import { CairoArray } from '../../cairoDataTypes/array';
+import { CairoTuple } from '../../cairoDataTypes/tuple';
 import { CairoType } from '../../cairoDataTypes/cairoType.interface';
 import assert from '../../assert';
-import { isTypeArray } from '../cairo';
+import { isTypeArray, isTypeTuple } from '../cairo';
 
 /**
  * Parsing map for constructors and response parsers
@@ -148,6 +149,11 @@ export const hdParsingStrategy: ParsingStrategy = {
       // Always use constructor - it handles both iterator and user input internally
       return new CairoArray(input, type, hdParsingStrategy);
     },
+    CairoTuple: (input: Iterator<string> | unknown, type?: string) => {
+      assert(!!type, 'CairoTuple constructor requires type parameter');
+      // Always use constructor - it handles both iterator and user input internally
+      return new CairoTuple(input, type, hdParsingStrategy);
+    },
   },
   dynamicSelectors: {
     CairoFixedArray: (type: string) => {
@@ -155,6 +161,9 @@ export const hdParsingStrategy: ParsingStrategy = {
     },
     CairoArray: (type: string) => {
       return isTypeArray(type);
+    },
+    CairoTuple: (type: string) => {
+      return isTypeTuple(type);
     },
     // TODO: add more dynamic selectors here
   },
@@ -179,5 +188,6 @@ export const hdParsingStrategy: ParsingStrategy = {
     CairoFixedArray: (instance: CairoType) =>
       (instance as CairoFixedArray).decompose(hdParsingStrategy),
     CairoArray: (instance: CairoType) => (instance as CairoArray).decompose(hdParsingStrategy),
+    CairoTuple: (instance: CairoType) => (instance as CairoTuple).decompose(hdParsingStrategy),
   },
 } as const;

@@ -1,6 +1,7 @@
 /**
  * Main Classes
  */
+
 export * from './wallet';
 export * from './account';
 export * from './deployer';
@@ -53,7 +54,9 @@ export * from './utils/cairoDataTypes/int64';
 export * from './utils/cairoDataTypes/int128';
 export * from './utils/cairoDataTypes/fixedArray';
 export * from './utils/cairoDataTypes/array';
+export * from './utils/cairoDataTypes/tuple';
 export * from './utils/cairoDataTypes/byteArray';
+
 export * from './utils/address';
 export * from './utils/calldata';
 export * from './utils/calldata/enum';

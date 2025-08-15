@@ -1,8 +1,8 @@
-import { stringFromByteArray, byteArrayFromString } from '../../../src/utils/calldata/byteArray';
+import { CairoByteArray } from '../../../src/utils/cairoDataTypes/byteArray';
 
-describe('stringFromByteArray', () => {
+describe('CairoByteArray.stringFromByteArray', () => {
   test('should return string from Cairo byte array', () => {
-    const str = stringFromByteArray({
+    const str = CairoByteArray.stringFromByteArray({
       data: [],
       pending_word: '0x414243444546474849',
       pending_word_len: 9,
@@ -11,9 +11,9 @@ describe('stringFromByteArray', () => {
   });
 });
 
-describe('byteArrayFromString', () => {
+describe('CairoByteArray.byteArrayFromString', () => {
   test('should return Cairo byte array from string', () => {
-    const byteArray = byteArrayFromString('ABCDEFGHI');
+    const byteArray = CairoByteArray.byteArrayFromString('ABCDEFGHI');
     expect(byteArray).toEqual({
       data: [],
       pending_word: '0x414243444546474849',

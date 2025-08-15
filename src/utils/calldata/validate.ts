@@ -12,6 +12,7 @@ import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoArray } from '../cairoDataTypes/array';
+import { CairoTuple } from '../cairoDataTypes/tuple';
 import { CairoInt8 } from '../cairoDataTypes/int8';
 import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
@@ -233,18 +234,27 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
 };
 
 const validateTuple = (parameter: any, input: AbiEntry) => {
+  // If parameter is a CairoTuple instance, skip validation (it's already validated)
+  if (parameter instanceof CairoTuple) {
+    return;
+  }
+
   assert(isObject(parameter), `Validate: arg ${input.name} should be a tuple (defined as object)`);
   // todo: skip tuple structural validation for now
 };
 
 const validateArray = (
-  parameterArray: Array<any> | Record<string, any> | CairoFixedArray | CairoArray,
+  parameterArray: Array<any> | Record<string, any> | CairoFixedArray | CairoArray | CairoTuple,
   input: AbiEntry,
   structs: AbiStructs,
   enums: AbiEnums
 ) => {
-  // If parameterArray is a CairoFixedArray or CairoArray instance, skip validation (it's already validated)
-  if (parameterArray instanceof CairoFixedArray || parameterArray instanceof CairoArray) {
+  // If parameterArray is a CairoFixedArray, CairoArray, or CairoTuple instance, skip validation (it's already validated)
+  if (
+    parameterArray instanceof CairoFixedArray ||
+    parameterArray instanceof CairoArray ||
+    parameterArray instanceof CairoTuple
+  ) {
     return;
   }
 

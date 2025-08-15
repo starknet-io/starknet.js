@@ -6,12 +6,13 @@ import {
   BigNumberish,
   CairoEnum,
   ParsedStruct,
-  Tupled,
 } from '../../types';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFelt252 } from '../cairoDataTypes/felt';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoArray } from '../cairoDataTypes/array';
+import { CairoTuple } from '../cairoDataTypes/tuple';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { CairoUint8 } from '../cairoDataTypes/uint8';
@@ -50,7 +51,6 @@ import {
   CairoResultVariant,
 } from './enum';
 import { AbiParserInterface } from './parser';
-import extractTupleMemberTypes from './tuple';
 
 // TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
 
@@ -114,32 +114,6 @@ function parseBaseTypes({
 }
 
 /**
- * Parse tuple type string to array of known objects
- * @param element request element
- * @param typeStr tuple type string
- * @returns Tupled[]
- */
-function parseTuple(element: object, typeStr: string): Tupled[] {
-  const memberTypes = extractTupleMemberTypes(typeStr);
-  const elements = Object.values(element);
-
-  if (elements.length !== memberTypes.length) {
-    throw Error(
-      `ParseTuple: provided and expected abi tuple size do not match.
-      provided: ${elements}
-      expected: ${memberTypes}`
-    );
-  }
-
-  return memberTypes.map((it: any, dx: number) => {
-    return {
-      element: elements[dx],
-      type: it.type ?? it,
-    };
-  });
-}
-
-/**
  * Deep parse of the object that has been passed to the method
  *
  * @param element - element that needs to be parsed
@@ -168,6 +142,16 @@ function parseCalldataValue({
   // value is fixed array
   if (CairoFixedArray.isAbiType(type)) {
     return parser.getRequestParser(CairoFixedArray.dynamicSelector)(element, type);
+  }
+
+  // value is CairoArray instance
+  if (element instanceof CairoArray) {
+    return element.toApiRequest();
+  }
+
+  // value is CairoTuple instance
+  if (element instanceof CairoTuple) {
+    return element.toApiRequest();
   }
 
   // value is Array
@@ -219,18 +203,9 @@ function parseCalldataValue({
   }
   // check if abi element is tuple
   if (isTypeTuple(type)) {
-    const tupled = parseTuple(element as object, type);
-
-    return tupled.reduce((acc, it: Tupled) => {
-      const parsedData = parseCalldataValue({
-        element: it.element,
-        type: it.type,
-        structs,
-        enums,
-        parser,
-      });
-      return acc.concat(parsedData);
-    }, [] as string[]);
+    // Create CairoTuple instance and use its toApiRequest method
+    const tuple = new CairoTuple(element, type, parser.parsingStrategy);
+    return tuple.toApiRequest();
   }
 
   // check if Enum
@@ -416,6 +391,9 @@ export function parseCalldataField({
       return parseCalldataValue({ element: value, type: input.type, structs, enums, parser });
     // Normal Array
     case isTypeArray(type):
+      if (value instanceof CairoArray) {
+        return value.toApiRequest();
+      }
       if (!Array.isArray(value) && !isText(value)) {
         throw Error(`ABI expected parameter ${name} to be array or long string, got ${value}`);
       }
@@ -428,8 +406,16 @@ export function parseCalldataField({
       return parseBaseTypes({ type: getArrayType(type), val: value, parser });
     case isTypeEthAddress(type):
       return parseBaseTypes({ type, val: value, parser });
-    // Struct or Tuple
-    case isTypeStruct(type, structs) || isTypeTuple(type) || CairoUint256.isAbiType(type):
+    // CairoTuple instance
+    case value instanceof CairoTuple:
+      return value.toApiRequest();
+    // Tuple type - create CairoTuple from raw input
+    case isTypeTuple(type): {
+      const tuple = new CairoTuple(value, type, parser.parsingStrategy);
+      return tuple.toApiRequest();
+    }
+    // Struct
+    case isTypeStruct(type, structs) || CairoUint256.isAbiType(type):
       return parseCalldataValue({
         element: value as ParsedStruct | BigNumberish[],
         type,
