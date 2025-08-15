@@ -26,6 +26,7 @@ import {
 import extractTupleMemberTypes from './tuple';
 import { isUndefined, isString } from '../typed';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoArray } from '../cairoDataTypes/array';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
 
 function errorU256(key: string) {
@@ -126,7 +127,15 @@ export default function orderPropsByAbi(
     return orderedObject2;
   };
 
-  function orderArray(myArray: Array<any> | string, abiParam: string): Array<any> | string {
+  function orderArray(
+    myArray: Array<any> | string | CairoArray,
+    abiParam: string
+  ): Array<any> | string | CairoArray {
+    // If myArray is already a CairoArray instance, return it as-is
+    if (myArray instanceof CairoArray) {
+      return myArray;
+    }
+
     const typeInArray = getArrayType(abiParam);
     if (isString(myArray)) {
       return myArray; // longstring

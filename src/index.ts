@@ -52,6 +52,7 @@ export * from './utils/cairoDataTypes/int32';
 export * from './utils/cairoDataTypes/int64';
 export * from './utils/cairoDataTypes/int128';
 export * from './utils/cairoDataTypes/fixedArray';
+export * from './utils/cairoDataTypes/array';
 export * from './utils/cairoDataTypes/byteArray';
 export * from './utils/address';
 export * from './utils/calldata';

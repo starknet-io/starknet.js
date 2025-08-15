@@ -11,6 +11,7 @@ import assert from '../assert';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoArray } from '../cairoDataTypes/array';
 import { CairoInt8 } from '../cairoDataTypes/int8';
 import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
@@ -237,13 +238,13 @@ const validateTuple = (parameter: any, input: AbiEntry) => {
 };
 
 const validateArray = (
-  parameterArray: Array<any> | Record<string, any> | CairoFixedArray,
+  parameterArray: Array<any> | Record<string, any> | CairoFixedArray | CairoArray,
   input: AbiEntry,
   structs: AbiStructs,
   enums: AbiEnums
 ) => {
-  // If parameterArray is a CairoFixedArray instance, skip validation (it's already validated)
-  if (parameterArray instanceof CairoFixedArray) {
+  // If parameterArray is a CairoFixedArray or CairoArray instance, skip validation (it's already validated)
+  if (parameterArray instanceof CairoFixedArray || parameterArray instanceof CairoArray) {
     return;
   }
 

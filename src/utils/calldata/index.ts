@@ -29,6 +29,7 @@ import {
   CairoResultVariant,
 } from './enum';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoArray } from '../cairoDataTypes/array';
 import formatter from './formatter';
 import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
 import { AbiParserInterface } from './parser/interface';
@@ -219,6 +220,14 @@ export class CallData {
             }
             if (value instanceof CairoFixedArray) {
               // CairoFixedArray - use toApiRequest() to get flat array, then convert to tree structure
+              const apiRequest = value.toApiRequest();
+              const compiledObj = Object.fromEntries(
+                apiRequest.map((item, idx) => [idx.toString(), item])
+              );
+              return getEntries(compiledObj, `${prefix}${kk}.`);
+            }
+            if (value instanceof CairoArray) {
+              // CairoArray - use toApiRequest() to get length-prefixed array, then convert to tree structure
               const apiRequest = value.toApiRequest();
               const compiledObj = Object.fromEntries(
                 apiRequest.map((item, idx) => [idx.toString(), item])

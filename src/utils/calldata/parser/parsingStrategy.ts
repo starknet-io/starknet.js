@@ -16,8 +16,10 @@ import { CairoInt64 } from '../../cairoDataTypes/int64';
 import { CairoInt128 } from '../../cairoDataTypes/int128';
 import { CairoUint32 } from '../../cairoDataTypes/uint32';
 import { CairoFixedArray } from '../../cairoDataTypes/fixedArray';
+import { CairoArray } from '../../cairoDataTypes/array';
 import { CairoType } from '../../cairoDataTypes/cairoType.interface';
 import assert from '../../assert';
+import { isTypeArray } from '../cairo';
 
 /**
  * Parsing map for constructors and response parsers
@@ -141,10 +143,18 @@ export const hdParsingStrategy: ParsingStrategy = {
       // Always use constructor - it handles both iterator and user input internally
       return new CairoFixedArray(input, type, hdParsingStrategy);
     },
+    CairoArray: (input: Iterator<string> | unknown, type?: string) => {
+      assert(!!type, 'CairoArray constructor requires type parameter');
+      // Always use constructor - it handles both iterator and user input internally
+      return new CairoArray(input, type, hdParsingStrategy);
+    },
   },
   dynamicSelectors: {
     CairoFixedArray: (type: string) => {
       return CairoFixedArray.isAbiType(type);
+    },
+    CairoArray: (type: string) => {
+      return isTypeArray(type);
     },
     // TODO: add more dynamic selectors here
   },
@@ -168,5 +178,6 @@ export const hdParsingStrategy: ParsingStrategy = {
     [CairoInt128.abiSelector]: (instance: CairoType) => (instance as CairoInt128).toBigInt(),
     CairoFixedArray: (instance: CairoType) =>
       (instance as CairoFixedArray).decompose(hdParsingStrategy),
+    CairoArray: (instance: CairoType) => (instance as CairoArray).decompose(hdParsingStrategy),
   },
 } as const;
