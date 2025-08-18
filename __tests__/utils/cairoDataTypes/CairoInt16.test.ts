@@ -1,5 +1,6 @@
-import { CairoInt16 } from '../../../src/utils/cairoDataTypes/int16';
-import { PRIME } from '../../../src/global/constants';
+import { CairoInt16, constants } from '../../../src';
+
+const { PRIME } = constants;
 
 describe('CairoInt16 class Unit Tests', () => {
   describe('constructor with different input types', () => {

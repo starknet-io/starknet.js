@@ -1,7 +1,4 @@
-import { CairoByteArray } from '../../../src';
-import { CairoBytes31 } from '../../../src/utils/cairoDataTypes/bytes31';
-import { CairoFelt252 } from '../../../src/utils/cairoDataTypes/felt';
-import { CairoUint32 } from '../../../src/utils/cairoDataTypes/uint32';
+import { CairoByteArray, CairoBytes31, CairoFelt252, CairoUint32 } from '../../../src';
 
 describe('CairoByteArray Unit Tests', () => {
   describe('String constructor', () => {

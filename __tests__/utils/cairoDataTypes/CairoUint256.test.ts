@@ -1,6 +1,6 @@
 /* eslint-disable no-new */
-import { Uint256 } from '../../../src';
 import {
+  Uint256,
   CairoUint256,
   UINT_256_HIGH_MAX,
   UINT_256_HIGH_MIN,
@@ -8,7 +8,7 @@ import {
   UINT_256_LOW_MIN,
   UINT_256_MAX,
   UINT_256_MIN,
-} from '../../../src/utils/cairoDataTypes/uint256';
+} from '../../../src';
 
 describe('CairoUint256 class test', () => {
   test('constructor 1 should throw on < UINT_256_MIN', () => {

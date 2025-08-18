@@ -1,11 +1,13 @@
 /* eslint-disable no-new */
-import { UINT_128_MAX, Uint512, num } from '../../../src';
 import {
+  UINT_128_MAX,
+  Uint512,
+  num,
   CairoUint512,
   UINT_128_MIN,
   UINT_512_MAX,
   UINT_512_MIN,
-} from '../../../src/utils/cairoDataTypes/uint512';
+} from '../../../src';
 
 describe('CairoUint512 class test', () => {
   test('constructor 1 should throw on < UINT_512_MIN', () => {
