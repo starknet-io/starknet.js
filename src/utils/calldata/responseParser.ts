@@ -26,7 +26,6 @@ import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
 import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
-import { addHexPrefix, removeHexPrefix } from '../encode';
 import {
   getArrayType,
   isCairo1Type,
@@ -91,12 +90,7 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
     case CairoBytes31.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case isTypeSecp256k1Point(type):
-      const xLow = removeHexPrefix(it.next().value).padStart(32, '0');
-      const xHigh = removeHexPrefix(it.next().value).padStart(32, '0');
-      const yLow = removeHexPrefix(it.next().value).padStart(32, '0');
-      const yHigh = removeHexPrefix(it.next().value).padStart(32, '0');
-      const pubK = BigInt(addHexPrefix(xHigh + xLow + yHigh + yLow));
-      return pubK;
+      return parser.getResponseParser(type)(it);
     default:
       // TODO: this is for all simple types felt and rest to BN, at the moment handle as felt
       return parser.getResponseParser(CairoFelt252.abiSelector)(it);

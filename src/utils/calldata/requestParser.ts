@@ -25,8 +25,6 @@ import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
 import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
-import { addHexPrefix, removeHexPrefix } from '../encode';
-import { toHex } from '../num';
 import { isText, splitLongString } from '../shortString';
 import { isUndefined, isString } from '../typed';
 import {
@@ -41,7 +39,6 @@ import {
   isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
-  uint256,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -96,17 +93,8 @@ function parseBaseTypes({
       return parser.getRequestParser(type)(val);
     case CairoBytes31.isAbiType(type):
       return parser.getRequestParser(type)(val);
-    case isTypeSecp256k1Point(type): {
-      const pubKeyETH = removeHexPrefix(toHex(val as BigNumberish)).padStart(128, '0');
-      const pubKeyETHy = uint256(addHexPrefix(pubKeyETH.slice(-64)));
-      const pubKeyETHx = uint256(addHexPrefix(pubKeyETH.slice(0, -64)));
-      return [
-        felt(pubKeyETHx.low),
-        felt(pubKeyETHx.high),
-        felt(pubKeyETHy.low),
-        felt(pubKeyETHy.high),
-      ];
-    }
+    case isTypeSecp256k1Point(type):
+      return parser.getRequestParser(type)(val);
     default:
       // TODO: check but u32 should land here with rest of the simple types, at the moment handle as felt
       return parser.getRequestParser(CairoFelt252.abiSelector)(val);

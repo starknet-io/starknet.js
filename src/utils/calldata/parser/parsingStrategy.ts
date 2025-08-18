@@ -18,6 +18,7 @@ import { CairoUint32 } from '../../cairoDataTypes/uint32';
 import { CairoFixedArray } from '../../cairoDataTypes/fixedArray';
 import { CairoArray } from '../../cairoDataTypes/array';
 import { CairoTuple } from '../../cairoDataTypes/tuple';
+import { CairoSecp256k1Point } from '../../cairoDataTypes/secp256k1Point';
 import { CairoType } from '../../cairoDataTypes/cairoType.interface';
 import assert from '../../assert';
 import { isTypeArray, isTypeTuple } from '../cairo';
@@ -139,6 +140,12 @@ export const hdParsingStrategy: ParsingStrategy = {
       }
       return new CairoInt128(input);
     },
+    [CairoSecp256k1Point.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoSecp256k1Point.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoSecp256k1Point(input);
+    },
     CairoFixedArray: (input: Iterator<string> | unknown, type?: string) => {
       assert(!!type, 'CairoFixedArray constructor requires type parameter');
       // Always use constructor - it handles both iterator and user input internally
@@ -185,6 +192,8 @@ export const hdParsingStrategy: ParsingStrategy = {
     [CairoInt32.abiSelector]: (instance: CairoType) => (instance as CairoInt32).toBigInt(),
     [CairoInt64.abiSelector]: (instance: CairoType) => (instance as CairoInt64).toBigInt(),
     [CairoInt128.abiSelector]: (instance: CairoType) => (instance as CairoInt128).toBigInt(),
+    [CairoSecp256k1Point.abiSelector]: (instance: CairoType) =>
+      (instance as CairoSecp256k1Point).toBigInt(),
     CairoFixedArray: (instance: CairoType) =>
       (instance as CairoFixedArray).decompose(hdParsingStrategy),
     CairoArray: (instance: CairoType) => (instance as CairoArray).decompose(hdParsingStrategy),

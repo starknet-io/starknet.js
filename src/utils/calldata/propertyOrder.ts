@@ -11,7 +11,6 @@ import {
   isTypeNonZero,
   isTypeOption,
   isTypeResult,
-  isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
   isTypeU96,
@@ -28,6 +27,7 @@ import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoArray } from '../cairoDataTypes/array';
 import { CairoTuple } from '../cairoDataTypes/tuple';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
+import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
 
 function errorU256(key: string) {
   return Error(
@@ -77,7 +77,7 @@ export default function orderPropsByAbi(
     if (isTypeU96(abiType)) {
       return unorderedItem;
     }
-    if (isTypeSecp256k1Point(abiType)) {
+    if (CairoSecp256k1Point.isAbiType(abiType)) {
       return unorderedItem;
     }
     if (CairoUint256.isAbiType(abiType)) {

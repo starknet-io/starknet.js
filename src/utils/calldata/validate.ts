@@ -20,6 +20,7 @@ import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
+import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
 import { isHex, toBigInt } from '../num';
 import { isLongText } from '../shortString';
 import { isBoolean, isNumber, isString, isBigInt, isObject } from '../typed';
@@ -154,8 +155,8 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       break;
     case Literal.Secp256k1Point: {
       assert(
-        param >= 0n && param <= 2n ** 512n - 1n,
-        `Validate: arg ${input.name} must be ${input.type} : a 512 bits number.`
+        CairoSecp256k1Point.is(param),
+        `Validate: arg ${input.name} must be ${input.type} : a valid 512 bits secp256k1 point.`
       );
       break;
     }
