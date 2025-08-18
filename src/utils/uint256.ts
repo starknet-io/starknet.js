@@ -1,11 +1,6 @@
 /* eslint-disable no-bitwise */
 import { BigNumberish, Uint256 } from '../types';
-import { CairoUint256, UINT_128_MAX, UINT_256_MAX } from './cairoDataTypes/uint256';
-
-/**
- * @deprecated Legacy support Export
- */
-export { UINT_128_MAX, UINT_256_MAX };
+import { CairoUint256 } from './cairoDataTypes/uint256';
 
 /**
  * Convert Uint256 to bigint

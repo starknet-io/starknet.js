@@ -3,6 +3,7 @@ import * as starkCurve from '@scure/starknet';
 import typedDataExample from '../../__mocks__/typedData/baseExample.json';
 import exampleBaseTypes from '../../__mocks__/typedData/example_baseTypes.json';
 import exampleEnum from '../../__mocks__/typedData/example_enum.json';
+import exampleEnumNested from '../../__mocks__/typedData/example_enumNested.json';
 import examplePresetTypes from '../../__mocks__/typedData/example_presetTypes.json';
 import typedDataStructArrayExample from '../../__mocks__/typedData/mail_StructArray.json';
 import typedDataSessionExample from '../../__mocks__/typedData/session_MerkleTree.json';
@@ -11,6 +12,7 @@ import {
   Account,
   BigNumberish,
   StarknetDomain,
+  TypedDataRevision,
   num,
   stark,
   typedData,
@@ -21,7 +23,6 @@ import { PRIME } from '../../src/global/constants';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
 import {
-  TypedDataRevision,
   encodeType,
   encodeValue,
   getMessageHash,
@@ -32,6 +33,8 @@ import {
 } from '../../src/utils/typedData';
 
 const exampleAddress = '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826';
+
+const copyMock = <T>(o: T) => JSON.parse(JSON.stringify(o)) as T;
 
 describe('typedData', () => {
   test('should get right type encoding', () => {
@@ -65,6 +68,10 @@ describe('typedData', () => {
     encoded = encodeType(exampleEnum.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
       `"\\"Example\\"(\\"someEnum1\\":\\"EnumA\\",\\"someEnum2\\":\\"EnumB\\")\\"EnumA\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\",\\"u128*\\"),\\"Variant 3\\":(\\"u128\\"))\\"EnumB\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\"))"`
+    );
+    encoded = encodeType(exampleEnumNested.types, 'Example', TypedDataRevision.ACTIVE);
+    expect(encoded).toMatchInlineSnapshot(
+      `"\\"Example\\"(\\"someEnum\\":\\"EnumA\\")\\"EnumA\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\",\\"StructA\\"))\\"EnumB\\"(\\"Variant A\\":(),\\"Variant B\\":(\\"StructB*\\"))\\"StructA\\"(\\"nestedEnum\\":\\"EnumB\\")\\"StructB\\"(\\"flag\\":\\"bool\\")"`
     );
   });
 
@@ -105,6 +112,10 @@ describe('typedData', () => {
     typeHash = getTypeHash(exampleEnum.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
       `"0x8eb4aeac64b707f3e843284c4258df6df1f0f7fd38dcffdd8a153a495cd351"`
+    );
+    typeHash = getTypeHash(exampleEnumNested.types, 'Example', TypedDataRevision.ACTIVE);
+    expect(typeHash).toMatchInlineSnapshot(
+      `"0x2143bb787fabace39d62e9acf8b6e97d9a369000516c3e6ffd963dc1370fc1a"`
     );
   });
 
@@ -319,6 +330,13 @@ describe('typedData', () => {
       `"0xdb7829db8909c0c5496f5952bcfc4fc894341ce01842537fc4f448743480b6"`
     );
 
+    // support for numeric revision value
+    const previousMessageHash = messageHash;
+    const exampleBaseTypesCopy = copyMock(exampleBaseTypes);
+    exampleBaseTypesCopy.domain.revision = 1 as any;
+    messageHash = getMessageHash(exampleBaseTypesCopy, exampleAddress);
+    expect(messageHash).toMatch(previousMessageHash);
+
     messageHash = getMessageHash(examplePresetTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
       `"0x185b339d5c566a883561a88fb36da301051e2c0225deb325c91bb7aa2f3473a"`
@@ -329,6 +347,11 @@ describe('typedData', () => {
       `"0x6e61abaf480b1370bbf231f54e298c5f4872f40a6d2dd409ff30accee5bbd1e"`
     );
 
+    messageHash = getMessageHash(exampleEnumNested, exampleAddress);
+    expect(messageHash).toMatchInlineSnapshot(
+      `"0x691fc54567306a8ea5431130f1b98299e74a748ac391540a86736f20ef5f2b7"`
+    );
+
     expect(spyPedersen).not.toHaveBeenCalled();
     expect(spyPoseidon).toHaveBeenCalled();
     spyPedersen.mockRestore();
@@ -337,7 +360,7 @@ describe('typedData', () => {
 
   describe('should fail validation', () => {
     const baseTypes = (type: string, value: any = PRIME) => {
-      const copy = JSON.parse(JSON.stringify(exampleBaseTypes)) as typeof exampleBaseTypes;
+      const copy = copyMock(exampleBaseTypes);
       const property = copy.types.Example.find((e) => e.type === type)!.name;
       (copy.message as any)[property] = value;
       return copy;
@@ -361,7 +384,11 @@ describe('typedData', () => {
     const addr = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
     const privK = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
     const fullPubK = stark.getFullPublicKey(privK);
-    const myAccount = new Account({ nodeUrl: 'fake' }, addr, privK);
+    const myAccount = new Account({
+      provider: { nodeUrl: 'fake' },
+      address: addr,
+      signer: privK,
+    });
     let signedMessage: Signature;
     let hashedMessage: string;
     let arraySign: ArraySignatureType;

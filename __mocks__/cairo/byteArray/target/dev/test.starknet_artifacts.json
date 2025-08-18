@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "contracts": [
+    {
+      "id": "e4evnsfe9oipm",
+      "package_name": "test",
+      "contract_name": "ByteArrayStorage",
+      "module_path": "test::ByteArrayStorage",
+      "artifacts": {
+        "sierra": "test_ByteArrayStorage.contract_class.json",
+        "casm": "test_ByteArrayStorage.compiled_contract_class.json"
+      }
+    }
+  ]
+}

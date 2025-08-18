@@ -1,21 +1,21 @@
 import {
-  type WatchAssetParameters,
-  type AccountChangeEventHandler,
-  type AddDeclareTransactionParameters,
-  type AddInvokeTransactionParameters,
-  type AddStarknetChainParameters,
-  type NetworkChangeEventHandler,
-  type ChainId,
-  type StarknetWindowObject,
-  type TypedData,
-  type Permission,
-  type Address,
-  AddInvokeTransactionResult,
-  AddDeclareTransactionResult,
+  Address,
+  AddStarknetChainParameters,
+  ChainId,
   AccountDeploymentData,
+  AddInvokeTransactionParameters,
+  AddInvokeTransactionResult,
+  AddDeclareTransactionParameters,
+  AddDeclareTransactionResult,
+  Permission,
+  StarknetWindowObject,
+  WatchAssetParameters,
+  TypedData,
   Signature,
   SpecVersion,
-} from 'starknet-types-07';
+  AccountChangeEventHandler,
+  NetworkChangeEventHandler,
+} from '../types/api';
 
 /**
  * Request Permission for wallet account, return addresses that are allowed by user
@@ -90,7 +90,7 @@ export function requestChainId(swo: StarknetWindowObject): Promise<ChainId> {
  * @returns The deployment data result.
  */
 export function deploymentData(swo: StarknetWindowObject): Promise<AccountDeploymentData> {
-  return swo.request({ type: 'wallet_deploymentData' }); // TODO: test
+  return swo.request({ type: 'wallet_deploymentData' });
 }
 
 /**

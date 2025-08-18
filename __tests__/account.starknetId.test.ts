@@ -1,17 +1,20 @@
-import { Provider, num, shortString } from '../src';
-import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { Account, Provider, num, shortString } from '../src';
+import { contracts } from './config/fixtures';
+import { createTestProvider, getTestAccount, STRKtokenAddress } from './config/fixturesInit';
 
 const { hexToDecimalString } = num;
 
 describe('deploy and test Wallet', () => {
-  const provider = new Provider(getTestProvider());
-  const account = getTestAccount(provider);
+  let provider: Provider;
+  let account: Account;
   let identityAddress: string;
   let namingAddress: string;
   let multicallAddress: string;
-  const devnetERC20Address = '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
 
   beforeAll(async () => {
+    provider = new Provider(await createTestProvider());
+    account = getTestAccount(provider);
+
     // Deploy Starknet id contract
     const idResponse = await account.declareAndDeploy({
       contract: contracts.starknetId.StarknetId.sierra,
@@ -24,7 +27,7 @@ describe('deploy and test Wallet', () => {
     const pricingResponse = await account.declareAndDeploy({
       contract: contracts.starknetId.Pricing.sierra,
       casm: contracts.starknetId.Pricing.casm,
-      constructorCalldata: [devnetERC20Address],
+      constructorCalldata: [STRKtokenAddress],
     });
     const pricingAddress = pricingResponse.deploy.contract_address;
 
@@ -43,39 +46,36 @@ describe('deploy and test Wallet', () => {
     });
     multicallAddress = multicallResponse.deploy.contract_address;
 
-    const { transaction_hash } = await account.execute(
-      [
-        {
-          contractAddress: devnetERC20Address,
-          entrypoint: 'approve',
-          calldata: [namingAddress, 0, 1], // Price of domain
-        },
-        {
-          contractAddress: identityAddress,
-          entrypoint: 'mint',
-          calldata: ['1'], // TokenId
-        },
-        {
-          contractAddress: namingAddress,
-          entrypoint: 'buy',
-          calldata: [
-            '1', // Starknet id linked
-            '1499554868251', // Domain encoded "fricoben"
-            '62', // days
-            '0', // resolver
-            0, // sponsor
-            0,
-            0,
-          ],
-        },
-        {
-          contractAddress: identityAddress,
-          entrypoint: 'set_main_id',
-          calldata: ['1'],
-        },
-      ],
-      undefined
-    );
+    const { transaction_hash } = await account.execute([
+      {
+        contractAddress: STRKtokenAddress,
+        entrypoint: 'approve',
+        calldata: [namingAddress, 0, 1], // Price of domain
+      },
+      {
+        contractAddress: identityAddress,
+        entrypoint: 'mint',
+        calldata: ['1'], // TokenId
+      },
+      {
+        contractAddress: namingAddress,
+        entrypoint: 'buy',
+        calldata: [
+          '1', // Starknet id linked
+          '1499554868251', // Domain encoded "fricoben"
+          '62', // days
+          '0', // resolver
+          0, // sponsor
+          0,
+          0,
+        ],
+      },
+      {
+        contractAddress: identityAddress,
+        entrypoint: 'set_main_id',
+        calldata: ['1'],
+      },
+    ]);
 
     await provider.waitForTransaction(transaction_hash);
   });
@@ -99,21 +99,18 @@ describe('deploy and test Wallet', () => {
   describe('Test getStarkProfile', () => {
     beforeAll(async () => {
       // Add verifier data
-      const { transaction_hash: transaction_hash_verifier } = await account.execute(
-        [
-          {
-            contractAddress: identityAddress,
-            entrypoint: 'set_verifier_data',
-            calldata: [
-              '1', // token_id
-              shortString.encodeShortString('discord'), // field
-              123, // value
-              0,
-            ],
-          },
-        ],
-        undefined
-      );
+      const { transaction_hash: transaction_hash_verifier } = await account.execute([
+        {
+          contractAddress: identityAddress,
+          entrypoint: 'set_verifier_data',
+          calldata: [
+            '1', // token_id
+            shortString.encodeShortString('discord'), // field
+            123, // value
+            0,
+          ],
+        },
+      ]);
       await provider.waitForTransaction(transaction_hash_verifier);
     });
 

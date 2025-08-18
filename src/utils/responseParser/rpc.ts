@@ -3,23 +3,25 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 import type {
-  BlockWithTxHashes,
   ContractClassPayload,
   ContractClassResponse,
-  EstimateFeeResponse,
-  EstimateFeeResponseBulk,
-  FeeEstimate,
   GetBlockResponse,
   GetTxReceiptResponseWithoutHelper,
   RpcProviderOptions,
   SimulateTransactionResponse,
-  SimulatedTransaction,
-  TransactionReceipt,
-} from '../../types/provider';
-import { toBigInt } from '../num';
+  BlockWithTxHashes,
+  SimulateTransactionOverheadResponse,
+  EstimateFeeResponseBulkOverhead,
+} from '../../provider/types/index.type';
 import { isString } from '../typed';
-import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
+import { toOverheadOverallFee, toOverheadResourceBounds } from '../stark';
 import { ResponseParser } from './interface';
+import {
+  ApiEstimateFeeResponse,
+  SimulateTransaction,
+  TransactionReceipt,
+} from '../../provider/types/spec.type';
+// import { TransactionReceipt } from '../../types/api/merge';
 
 export class RPCResponseParser
   implements
@@ -33,84 +35,39 @@ export class RPCResponseParser
       | 'parseCallContractResponse'
     >
 {
-  private margin: RpcProviderOptions['feeMarginPercentage'];
+  private resourceBoundsOverhead: RpcProviderOptions['resourceBoundsOverhead'];
 
-  constructor(margin?: RpcProviderOptions['feeMarginPercentage']) {
-    this.margin = margin;
-  }
-
-  private estimatedFeeToMaxFee(estimatedFee: Parameters<typeof estimatedFeeToMaxFee>[0]) {
-    return estimatedFeeToMaxFee(estimatedFee, this.margin?.maxFee);
-  }
-
-  private estimateFeeToBounds(estimate: Parameters<typeof estimateFeeToBounds>[0]) {
-    return estimateFeeToBounds(
-      estimate,
-      this.margin?.l1BoundMaxAmount,
-      this.margin?.l1BoundMaxPricePerUnit
-    );
+  constructor(resourceBoundsOverhead?: RpcProviderOptions['resourceBoundsOverhead']) {
+    this.resourceBoundsOverhead = resourceBoundsOverhead;
   }
 
   public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
-    return { status: 'PENDING', ...res } as GetBlockResponse;
+    return res as GetBlockResponse;
   }
 
   public parseTransactionReceipt(res: TransactionReceipt): GetTxReceiptResponseWithoutHelper {
-    // HOTFIX RPC 0.5 to align with RPC 0.6
-    // This case is RPC 0.5. It can be only v2 thx with FRI units
-    if ('actual_fee' in res && isString(res.actual_fee)) {
-      return {
-        ...(res as GetTxReceiptResponseWithoutHelper),
-        actual_fee: {
-          amount: res.actual_fee,
-          unit: 'FRI',
-        },
-      } as GetTxReceiptResponseWithoutHelper;
-    }
-
     return res as GetTxReceiptResponseWithoutHelper;
   }
 
-  public parseFeeEstimateResponse(res: FeeEstimate[]): EstimateFeeResponse {
-    const val = res[0];
-    return {
-      overall_fee: toBigInt(val.overall_fee),
-      gas_consumed: toBigInt(val.gas_consumed),
-      gas_price: toBigInt(val.gas_price),
-      unit: val.unit,
-      suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
-      resourceBounds: this.estimateFeeToBounds(val),
-      data_gas_consumed: val.data_gas_consumed ? toBigInt(val.data_gas_consumed) : 0n,
-      data_gas_price: val.data_gas_price ? toBigInt(val.data_gas_price) : 0n,
-    };
-  }
-
-  public parseFeeEstimateBulkResponse(res: FeeEstimate[]): EstimateFeeResponseBulk {
+  public parseFeeEstimateBulkResponse(
+    res: ApiEstimateFeeResponse
+  ): EstimateFeeResponseBulkOverhead {
     return res.map((val) => ({
-      overall_fee: toBigInt(val.overall_fee),
-      gas_consumed: toBigInt(val.gas_consumed),
-      gas_price: toBigInt(val.gas_price),
+      resourceBounds: toOverheadResourceBounds(val, this.resourceBoundsOverhead),
+      overall_fee: toOverheadOverallFee(val, this.resourceBoundsOverhead),
       unit: val.unit,
-      suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
-      resourceBounds: this.estimateFeeToBounds(val),
-      data_gas_consumed: val.data_gas_consumed ? toBigInt(val.data_gas_consumed) : 0n,
-      data_gas_price: val.data_gas_price ? toBigInt(val.data_gas_price) : 0n,
     }));
   }
 
   public parseSimulateTransactionResponse(
-    // TODO: revisit
-    // set as 'any' to avoid a mapped type circular recursion error stemming from
-    // merging src/types/api/rpcspec*/components/FUNCTION_INVOCATION.calls
-    //
-    // res: SimulateTransactionResponse
-    res: any
-  ): SimulateTransactionResponse {
-    return res.map((it: SimulatedTransaction) => {
+    res: SimulateTransactionResponse
+  ): SimulateTransactionOverheadResponse {
+    return res.map((it: SimulateTransaction) => {
       return {
-        ...it,
-        suggestedMaxFee: this.estimatedFeeToMaxFee(it.fee_estimation.overall_fee),
-        resourceBounds: this.estimateFeeToBounds(it.fee_estimation),
+        transaction_trace: it.transaction_trace,
+        resourceBounds: toOverheadResourceBounds(it.fee_estimation, this.resourceBoundsOverhead),
+        overall_fee: toOverheadOverallFee(it.fee_estimation, this.resourceBoundsOverhead),
+        unit: it.fee_estimation.unit,
       };
     });
   }

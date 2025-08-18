@@ -3,6 +3,7 @@ import accountResolver from './accountResolver';
 import { GS_DEFAULT_TEST_PROVIDER_URL, LOCAL_DEVNET_NOT_RUNNING_MESSAGE } from '../constants';
 import { setIfNullish } from './env';
 import { RpcProvider } from '../../../src';
+import { DEFAULT_GLOBAL_CONFIG } from '../../../src/global/constants';
 
 class StrategyResolver {
   private isDevnet = false;
@@ -27,7 +28,7 @@ class StrategyResolver {
     return !!(TEST_ACCOUNT_PRIVATE_KEY && TEST_ACCOUNT_ADDRESS);
   }
 
-  private async isRsDevnet(): Promise<boolean> {
+  private async isStarknetDevnet(): Promise<boolean> {
     const response = await fetch(GS_DEFAULT_TEST_PROVIDER_URL, {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
@@ -38,10 +39,10 @@ class StrategyResolver {
   }
 
   async detectDevnet(): Promise<void> {
-    // if on base url RPC endpoint work it is devnet-rs else it devnet-py
+    // if on base url RPC endpoint work it is Starknet-devnet else it devnet-py
     try {
-      this.isDevnet = await this.isRsDevnet();
-      if (this.isDevnet) console.log('Detected Devnet-RS');
+      this.isDevnet = await this.isStarknetDevnet();
+      if (this.isDevnet) console.log('Detected Starknet-devnet');
     } catch (error) {
       console.log('\x1b[36m%s\x1b[0m', LOCAL_DEVNET_NOT_RUNNING_MESSAGE);
       throw new Error(
@@ -67,19 +68,35 @@ class StrategyResolver {
     console.log('Detected RPC');
   }
 
-  private logConfigInfo(): void {
+  private defineTestTransactionVersion() {
+    process.env.TX_VERSION = process.env.TX_VERSION ?? DEFAULT_GLOBAL_CONFIG.transactionVersion;
+  }
+
+  async getNodeSpecVersion() {
+    const tempProv = new RpcProvider({
+      nodeUrl: process.env.TEST_RPC_URL,
+    });
+
+    process.env.RPC_SPEC_VERSION = await tempProv.getSpecVersion();
+    console.log('Detected Spec Version:', process.env.RPC_SPEC_VERSION);
+  }
+
+  async logConfigInfo() {
     console.table({
       TEST_ACCOUNT_ADDRESS: process.env.TEST_ACCOUNT_ADDRESS,
       TEST_ACCOUNT_PRIVATE_KEY: '****',
       INITIAL_BALANCE: process.env.INITIAL_BALANCE,
       TEST_RPC_URL: process.env.TEST_RPC_URL,
-      TX_VERSION: process.env.TX_VERSION === 'v3' ? 'v3' : 'v2',
+      TEST_WS_URL: process.env.TEST_WS_URL,
+      TX_VERSION: process.env.TX_VERSION,
+      SPEC_VERSION: process.env.SPEC_VERSION,
     });
 
     console.table({
       IS_DEVNET: process.env.IS_DEVNET,
       IS_RPC: process.env.IS_RPC,
       IS_TESTNET: process.env.IS_TESTNET,
+      'Detected Spec Version': process.env.RPC_SPEC_VERSION,
     });
 
     console.log('Global Test Environment is Ready');
@@ -102,6 +119,9 @@ class StrategyResolver {
   private async useProvidedSetup(): Promise<void> {
     setIfNullish('IS_DEVNET', false);
     setIfNullish('IS_RPC', !!process.env.TEST_RPC_URL);
+    if (!process.env.RPC_SPEC_VERSION) {
+      await this.getNodeSpecVersion();
+    }
     setIfNullish('IS_TESTNET', await this.isTestnet);
 
     this.logConfigInfo();
@@ -128,6 +148,9 @@ class StrategyResolver {
 
     this.verifyAccountData(true);
     if (!this.hasAllAccountEnvs) console.error('Test Setup Environment is NOT Ready');
+
+    this.defineTestTransactionVersion();
+    await this.getNodeSpecVersion();
 
     this.logConfigInfo();
   }

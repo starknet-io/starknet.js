@@ -6,9 +6,9 @@ import { poseidonHashMany } from '@scure/starknet';
 
 import { StarknetChainId, TransactionHashPrefix } from '../../../global/constants';
 import { BigNumberish, Calldata } from '../../../types';
-import { EDAMode, ResourceBounds } from '../../../types/api';
 import { toHex } from '../../num';
 import { encodeShortString } from '../../shortString';
+import { EDAMode, type ResourceBoundsBN } from '../../../provider/types/spec.type';
 
 const AToBI = (array: BigNumberish[]) => array.map((it: BigNumberish) => BigInt(it));
 
@@ -19,6 +19,7 @@ const MAX_PRICE_PER_UNIT_BITS = 128n;
 const RESOURCE_VALUE_OFFSET = MAX_AMOUNT_BITS + MAX_PRICE_PER_UNIT_BITS;
 const L1_GAS_NAME = BigInt(encodeShortString('L1_GAS'));
 const L2_GAS_NAME = BigInt(encodeShortString('L2_GAS'));
+const L1_DATA_GAS_NAME = BigInt(encodeShortString('L1_DATA'));
 
 export function hashDAMode(nonceDAMode: BigNumberish, feeDAMode: BigNumberish) {
   return (BigInt(nonceDAMode) << DATA_AVAILABILITY_MODE_BITS) + BigInt(feeDAMode);
@@ -29,11 +30,11 @@ export function hashDAMode(nonceDAMode: BigNumberish, feeDAMode: BigNumberish) {
  * @param {ResourceBounds} bounds object including the limits for L1 & L2 gas
  * @returns {bigint} encoded data
  */
-export function encodeResourceBoundsL1(bounds: ResourceBounds): bigint {
+export function encodeResourceBoundsL1(bounds: ResourceBoundsBN): bigint {
   return (
     (L1_GAS_NAME << RESOURCE_VALUE_OFFSET) +
-    (BigInt(bounds.l1_gas.max_amount) << MAX_PRICE_PER_UNIT_BITS) +
-    BigInt(bounds.l1_gas.max_price_per_unit)
+    (bounds.l1_gas.max_amount << MAX_PRICE_PER_UNIT_BITS) +
+    bounds.l1_gas.max_price_per_unit
   );
 }
 
@@ -45,18 +46,30 @@ export function encodeResourceBoundsL1(bounds: ResourceBounds): bigint {
 }
  * @returns {bigint} encoded data
  */
-export function encodeResourceBoundsL2(bounds: ResourceBounds): bigint {
+export function encodeResourceBoundsL2(bounds: ResourceBoundsBN): bigint {
   return (
     (L2_GAS_NAME << RESOURCE_VALUE_OFFSET) +
-    (BigInt(bounds.l2_gas.max_amount) << MAX_PRICE_PER_UNIT_BITS) +
-    BigInt(bounds.l2_gas.max_price_per_unit)
+    (bounds.l2_gas.max_amount << MAX_PRICE_PER_UNIT_BITS) +
+    bounds.l2_gas.max_price_per_unit
   );
 }
 
-export function hashFeeField(tip: BigNumberish, bounds: ResourceBounds) {
+export function encodeDataResourceBoundsL1(bounds: ResourceBoundsBN): bigint {
+  return (
+    (L1_DATA_GAS_NAME << RESOURCE_VALUE_OFFSET) +
+    (bounds.l1_data_gas.max_amount << MAX_PRICE_PER_UNIT_BITS) +
+    bounds.l1_data_gas.max_price_per_unit
+  );
+}
+
+/**
+ * hash tip and resource bounds (3 bounds params) V3 RPC 0.8
+ */
+export function hashFeeFieldV3B3(tip: BigNumberish, bounds: ResourceBoundsBN) {
   const L1Bound = encodeResourceBoundsL1(bounds);
   const L2Bound = encodeResourceBoundsL2(bounds);
-  return poseidonHashMany([BigInt(tip), L1Bound, L2Bound]);
+  const L1Data = encodeDataResourceBoundsL1(bounds);
+  return poseidonHashMany([BigInt(tip), L1Bound, L2Bound, L1Data]);
 }
 
 export function calculateTransactionHashCommon(
@@ -69,10 +82,10 @@ export function calculateTransactionHashCommon(
   paymasterData: BigNumberish[],
   nonceDataAvailabilityMode: EDAMode,
   feeDataAvailabilityMode: EDAMode,
-  resourceBounds: ResourceBounds,
+  resourceBounds: ResourceBoundsBN,
   additionalData: BigNumberish[] = []
 ): string {
-  const feeFieldHash = hashFeeField(tip, resourceBounds);
+  const feeFieldHash = hashFeeFieldV3B3(tip, resourceBounds);
   const dAModeHash = hashDAMode(nonceDataAvailabilityMode, feeDataAvailabilityMode);
   const dataToHash = AToBI([
     txHashPrefix,
@@ -102,7 +115,7 @@ export function calculateDeployAccountTransactionHash(
   nonce: BigNumberish,
   nonceDataAvailabilityMode: EDAMode,
   feeDataAvailabilityMode: EDAMode,
-  resourceBounds: ResourceBounds,
+  resourceBounds: ResourceBoundsBN,
   tip: BigNumberish,
   paymasterData: BigNumberish[]
 ) {
@@ -135,7 +148,7 @@ export function calculateDeclareTransactionHash(
   accountDeploymentData: BigNumberish[],
   nonceDataAvailabilityMode: EDAMode,
   feeDataAvailabilityMode: EDAMode,
-  resourceBounds: ResourceBounds,
+  resourceBounds: ResourceBoundsBN,
   tip: BigNumberish,
   paymasterData: BigNumberish[]
 ): string {
@@ -167,7 +180,7 @@ export function calculateInvokeTransactionHash(
   accountDeploymentData: BigNumberish[],
   nonceDataAvailabilityMode: EDAMode,
   feeDataAvailabilityMode: EDAMode,
-  resourceBounds: ResourceBounds,
+  resourceBounds: ResourceBoundsBN,
   tip: BigNumberish,
   paymasterData: BigNumberish[]
 ): string {

@@ -11,7 +11,9 @@ const generateSourceLinkTemplate = (gitRevision) =>
     gitRevision || '{gitRevision}'
   }/{path}#L{line}`;
 
-const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/guides/migrate`;
+// TODO: restore after v7 full release
+// const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/guides/migrate`;
+const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/next/guides/migrate`;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -24,7 +26,6 @@ const config = {
   favicon: 'img/favicon.ico',
   organizationName: 'starknet-io', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
-
   presets: [
     [
       'classic',
@@ -39,7 +40,12 @@ const config = {
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    {
+    ({
+      colorMode: {
+        defaultMode: 'dark',
+        disableSwitch: false,
+        respectPrefersColorScheme: false,
+      },
       algolia: {
         // The application ID provided by Algolia
         appId: '86VVNRI64B',
@@ -69,7 +75,7 @@ const config = {
         //... other Algolia param
       },
       announcementBar: {
-        content: `<a href="${migrationGuideLink}">Migrate from v5</a>`,
+        content: `<a href="${migrationGuideLink}">Migrate to v7</a>`,
         backgroundColor: 'rgb(230 231 232)',
       },
       navbar: {
@@ -119,7 +125,7 @@ const config = {
                 to: '/docs/guides/intro',
               },
               {
-                label: 'Migrate from v5',
+                label: 'Migrate to v7',
                 to: migrationGuideLink,
               },
             ],
@@ -153,7 +159,7 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
       },
-    },
+    }),
 
   plugins: [
     [

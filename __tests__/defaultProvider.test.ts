@@ -1,43 +1,53 @@
 import {
+  Account,
+  Block,
   BlockNumber,
   CallData,
-  GetBlockResponse,
+  isPendingStateUpdate,
   LibraryError,
   Provider,
-  provider,
+  ProviderInterface,
   stark,
+  num,
+  type Calldata,
+  type RawArgs,
 } from '../src';
-import { toBigInt } from '../src/utils/num';
-import { encodeShortString } from '../src/utils/shortString';
-import {
-  contracts,
-  erc20ClassHash,
-  getTestAccount,
-  getTestProvider,
-  wrongClassHash,
-} from './config/fixtures';
+import { contracts, erc20ClassHash, wrongClassHash } from './config/fixtures';
+import { createTestProvider, getTestAccount } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
-const { isPendingStateUpdate } = provider;
-
-const testProvider = new Provider(getTestProvider());
-
 describe('defaultProvider', () => {
+  let testProvider: ProviderInterface;
+  let account: Account;
   let exampleTransactionHash: string;
   let erc20ContractAddress: string;
-  let exampleBlock: GetBlockResponse;
+  let exampleBlock: Block;
   let exampleBlockNumber: BlockNumber;
   let exampleBlockHash: string;
+  let erc20Constructor: Calldata;
+  let erc20ConstructorParams: RawArgs;
+  const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
   const wallet = stark.randomAddress();
-  const account = getTestAccount(testProvider);
   initializeMatcher(expect);
 
   beforeAll(async () => {
+    testProvider = new Provider(await createTestProvider());
+    account = getTestAccount(testProvider);
     expect(testProvider).toBeInstanceOf(Provider);
 
+    erc20ConstructorParams = {
+      name: 'Token',
+      symbol: 'ERC20',
+      amount: 1000n,
+      recipient: account.address,
+      owner: account.address,
+    };
+    erc20Constructor = erc20CallData.compile('constructor', erc20ConstructorParams);
+
     const { deploy } = await account.declareAndDeploy({
-      contract: contracts.Erc20,
-      constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
+      contract: contracts.Erc20OZ.sierra,
+      casm: contracts.Erc20OZ.casm,
+      constructorCalldata: erc20Constructor,
     });
 
     exampleTransactionHash = deploy.transaction_hash;
@@ -55,7 +65,7 @@ describe('defaultProvider', () => {
     });
 
     test('getContractVersion', async () => {
-      const expected = { cairo: '0', compiler: '0' };
+      const expected = { cairo: '1', compiler: '2' };
       expect(await testProvider.getContractVersion(erc20ContractAddress)).toEqual(expected);
       expect(await testProvider.getContractVersion(undefined, erc20ClassHash)).toEqual(expected);
     });
@@ -102,17 +112,17 @@ describe('defaultProvider', () => {
 
     test('getNonceForAddress()', async () => {
       const nonce = await testProvider.getNonceForAddress(erc20ContractAddress);
-      return expect(toBigInt(nonce)).toEqual(toBigInt('0x0'));
+      return expect(num.toBigInt(nonce)).toEqual(num.toBigInt('0x0'));
     });
 
     test('getClassAt(contractAddress, blockNumber="latest")', async () => {
       const classResponse = await testProvider.getClassAt(erc20ContractAddress);
-      expect(classResponse).toMatchSchemaRef('LegacyContractClass');
+      expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
 
     test('getClassByHash', async () => {
       const classResponse = await testProvider.getClassByHash(erc20ClassHash);
-      expect(classResponse).toMatchSchemaRef('LegacyContractClass');
+      expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
 
     describe('getStorageAt', () => {
@@ -128,7 +138,7 @@ describe('defaultProvider', () => {
 
       test('with "key" type of BN', () => {
         return expect(
-          testProvider.getStorageAt(erc20ContractAddress, toBigInt('0x0'))
+          testProvider.getStorageAt(erc20ContractAddress, num.toBigInt('0x0'))
         ).resolves.not.toThrow();
       });
     });

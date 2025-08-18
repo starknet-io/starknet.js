@@ -1,15 +1,7 @@
-import type {
-  AccountChangeEventHandler,
-  AddStarknetChainParameters,
-  NetworkChangeEventHandler,
-  Signature,
-  WatchAssetParameters,
-} from 'starknet-types-07';
-
 import { Account, AccountInterface } from '../account';
 import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
-import {
+import type {
   AllowArray,
   CairoVersion,
   Call,
@@ -22,7 +14,6 @@ import {
 } from '../types';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
-import { buildUDCCall } from '../utils/transaction';
 import {
   addDeclareTransaction,
   addInvokeTransaction,
@@ -35,36 +26,24 @@ import {
   switchStarknetChain,
   watchAsset,
 } from './connect';
-import { StarknetWalletProvider } from './types';
-import { logger } from '../global/logger';
+import type { StarknetWalletProvider, WalletAccountOptions } from './types/index.type';
+import type { PaymasterOptions } from '../paymaster/types/index.type';
+import type { PaymasterInterface } from '../paymaster';
+import {
+  AccountChangeEventHandler,
+  NetworkChangeEventHandler,
+  WatchAssetParameters,
+  AddStarknetChainParameters,
+  Signature,
+} from '../types/api';
 
-// TODO: Remove non address constructor in next major version
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
   public walletProvider: StarknetWalletProvider;
 
-  /**
-   * @deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.
-   */
-  constructor(
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
-  );
-  constructor(
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion,
-    address?: string
-  );
-  constructor(
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion,
-    address: string = ''
-  ) {
-    super(providerOrOptions, address, '', cairoVersion); // At this point unknown address
-    this.walletProvider = walletProvider;
+  constructor(options: WalletAccountOptions) {
+    super({ ...options, signer: '' }); // At this point unknown address
+    this.walletProvider = options.walletProvider;
 
     // Update Address on change
     this.walletProvider.on('accountsChanged', (res) => {
@@ -79,15 +58,6 @@ export class WalletAccount extends Account implements AccountInterface {
       // At the moment channel is stateless but it could change
       this.channel.setChainId(res as StarknetChainId);
     });
-
-    if (!address.length) {
-      logger.warn(
-        '@deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.'
-      );
-      requestAccounts(this.walletProvider).then(([accountAddress]) => {
-        this.address = accountAddress.toLowerCase();
-      });
-    }
   }
 
   /**
@@ -170,7 +140,7 @@ export class WalletAccount extends Account implements AccountInterface {
   override async deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Promise<MultiDeployContractResponse> {
-    const { calls, addresses } = buildUDCCall(payload, this.address);
+    const { calls, addresses } = this.deployer.buildDeployerCall(payload, this.address);
     const invokeResponse = await this.execute(calls);
 
     return {
@@ -184,21 +154,29 @@ export class WalletAccount extends Account implements AccountInterface {
   }
 
   static async connect(
-    provider: ProviderInterface,
+    provider: ProviderOptions | ProviderInterface,
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
-    return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
+    return new WalletAccount({
+      provider,
+      walletProvider,
+      address: accountAddress,
+      cairoVersion,
+      paymaster,
+    });
   }
 
   static async connectSilent(
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface
   ) {
-    return WalletAccount.connect(provider, walletProvider, cairoVersion, true);
+    return WalletAccount.connect(provider, walletProvider, cairoVersion, paymaster, true);
   }
 
   // TODO: MISSING ESTIMATES

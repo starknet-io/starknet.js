@@ -11,7 +11,7 @@ import {
   HexCalldata,
   RawArgs,
   RawArgsArray,
-  Result,
+  CallResult,
   ValidateType,
 } from '../../types';
 import assert from '../assert';
@@ -29,7 +29,7 @@ import {
   CairoResultVariant,
 } from './enum';
 import formatter from './formatter';
-import { createAbiParser, isNoConstructorValid } from './parser';
+import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
@@ -39,6 +39,7 @@ import validateFields from './validate';
 export * as cairo from './cairo';
 export * as byteArray from './byteArray';
 export { parseCalldataField } from './requestParser';
+export * from './parser';
 
 export class CallData {
   abi: Abi;
@@ -49,10 +50,10 @@ export class CallData {
 
   protected readonly enums: AbiEnums;
 
-  constructor(abi: Abi) {
+  constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
     this.structs = CallData.getAbiStruct(abi);
     this.enums = CallData.getAbiEnum(abi);
-    this.parser = createAbiParser(abi);
+    this.parser = createAbiParser(abi, parsingStrategy);
     this.abi = this.parser.getLegacyFormat();
   }
 
@@ -144,7 +145,15 @@ export class CallData {
       (acc, input) =>
         isLen(input.name) && !isCairo1Type(input.type)
           ? acc
-          : acc.concat(parseCalldataField(argsIterator, input, this.structs, this.enums)),
+          : acc.concat(
+              parseCalldataField({
+                argsIterator,
+                input,
+                structs: this.structs,
+                enums: this.enums,
+                parser: this.parser,
+              })
+            ),
       [] as Calldata
     );
 
@@ -246,13 +255,20 @@ export class CallData {
    * @param response string[] - response from the method
    * @return Result - parsed response corresponding to the abi
    */
-  public parse(method: string, response: string[]): Result {
+  public parse(method: string, response: string[]): CallResult {
     const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const responseIterator = response.flat()[Symbol.iterator]();
 
     const parsed = outputs.flat().reduce((acc, output, idx) => {
       const propName = output.name ?? idx;
-      acc[propName] = responseParser(responseIterator, output, this.structs, this.enums, acc);
+      acc[propName] = responseParser({
+        responseIterator,
+        output,
+        structs: this.structs,
+        enums: this.enums,
+        parsedResult: acc,
+        parser: this.parser,
+      });
       if (acc[propName] && acc[`${propName}_len`]) {
         delete acc[`${propName}_len`];
       }
@@ -260,7 +276,7 @@ export class CallData {
     }, {} as Args);
 
     // Cairo1 avoid object.0 structure
-    return Object.keys(parsed).length === 1 && 0 in parsed ? (parsed[0] as Result) : parsed;
+    return Object.keys(parsed).length === 1 && 0 in parsed ? (parsed[0] as CallResult) : parsed;
   }
 
   /**
@@ -270,7 +286,7 @@ export class CallData {
    * @param format object - formatter object schema
    * @returns Result - parsed and formatted response object
    */
-  public format(method: string, response: string[], format: object): Result {
+  public format(method: string, response: string[], format: object): CallResult {
     const parsed = this.parse(method, response);
     return formatter(parsed as Record<string, any>, format);
   }
@@ -340,17 +356,21 @@ export class CallData {
    * const res2=helloCallData.decodeParameters("hello::hello::UserData",["0x123456","0x1"]);
    * result = { address: 1193046n, is_claimed: true }
    */
-  public decodeParameters(typeCairo: AllowArray<string>, response: string[]): AllowArray<Result> {
+  public decodeParameters(
+    typeCairo: AllowArray<string>,
+    response: string[]
+  ): AllowArray<CallResult> {
     const typeCairoArray = Array.isArray(typeCairo) ? typeCairo : [typeCairo];
     const responseIterator = response.flat()[Symbol.iterator]();
     const decodedArray = typeCairoArray.map(
       (typeParam) =>
-        responseParser(
+        responseParser({
           responseIterator,
-          { name: '', type: typeParam },
-          this.structs,
-          this.enums
-        ) as Result
+          output: { name: '', type: typeParam },
+          parser: this.parser,
+          structs: this.structs,
+          enums: this.enums,
+        }) as CallResult
     );
     return decodedArray.length === 1 ? decodedArray[0] : decodedArray;
   }

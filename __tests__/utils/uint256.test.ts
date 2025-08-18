@@ -1,6 +1,6 @@
-import { cairo, uint256 as u256 } from '../../src';
+import { cairo, uint256 as u256, UINT_128_MAX, UINT_256_MAX } from '../../src';
 
-const { bnToUint256, UINT_128_MAX, UINT_256_MAX, uint256ToBN } = u256;
+const { bnToUint256, uint256ToBN } = u256;
 
 describe('cairo uint256', () => {
   test('bnToUint256 should not convert -1 from BN to uint256 hex-string struct', () => {

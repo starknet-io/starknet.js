@@ -27,39 +27,62 @@ import {
 } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { getDecimalString } from '../src/utils/num';
-import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { contracts } from './config/fixtures';
+import {
+  adaptAccountIfDevnet,
+  createTestProvider,
+  getTestAccount,
+  STRKtokenAddress,
+} from './config/fixturesInit';
+import { initializeMatcher } from './config/schema';
 
 describe('Account and OutsideExecution', () => {
-  const ethAddress = '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
-  const provider = new Provider(getTestProvider());
-  const executorAccount = getTestAccount(provider);
+  let provider: Provider;
+  let executorAccount: Account;
   let signerAccount: Account;
+
   const targetPK = stark.randomAddress();
   const targetPubK = ec.starkCurve.getStarkKey(targetPK);
+
   // For ERC20 transfer outside call
-  const recipientAccount = executorAccount;
-  const ethContract = new Contract(contracts.Erc20OZ.sierra.abi, ethAddress, provider);
-  const call1: Call = {
-    contractAddress: ethAddress,
-    entrypoint: 'transfer',
-    calldata: {
-      recipient: recipientAccount.address,
-      amount: cairo.uint256(100),
-    },
-  };
-  const call2: Call = {
-    contractAddress: ethAddress,
-    entrypoint: 'transfer',
-    calldata: {
-      recipient: recipientAccount.address,
-      amount: cairo.uint256(200),
-    },
-  };
+  let recipientAccount: Account;
+  let strkContract: Contract;
+
+  let call1: Call;
+  let call2: Call;
+
   const now_seconds = Math.floor(Date.now() / 1000);
   const hour_ago = (now_seconds - 3600).toString();
   const hour_later = (now_seconds + 3600).toString();
 
+  initializeMatcher(expect);
+
   beforeAll(async () => {
+    provider = new Provider(await createTestProvider());
+    executorAccount = getTestAccount(provider);
+    recipientAccount = executorAccount;
+    strkContract = new Contract({
+      abi: contracts.Erc20OZ.sierra.abi,
+      address: STRKtokenAddress,
+      providerOrAccount: provider,
+    });
+    call1 = {
+      contractAddress: STRKtokenAddress,
+      entrypoint: 'transfer',
+      calldata: {
+        recipient: recipientAccount.address,
+        amount: cairo.uint256(100),
+      },
+    };
+    call2 = {
+      contractAddress: STRKtokenAddress,
+      entrypoint: 'transfer',
+      calldata: {
+        recipient: recipientAccount.address,
+        amount: cairo.uint256(200),
+      },
+    };
+
     // Deploy the SNIP-9 signer account (ArgentX v 0.4.0, using SNIP-9 v2):
     const calldataAX = new CallData(contracts.ArgentX4Account.sierra.abi);
     const axSigner = new CairoCustomEnum({ Starknet: { pubkey: targetPubK } });
@@ -75,15 +98,21 @@ describe('Account and OutsideExecution', () => {
       constructorCalldata: constructorAXCallData,
     });
     const targetAddress = response.deploy.contract_address;
-    signerAccount = new Account(provider, targetAddress, targetPK);
+    signerAccount = adaptAccountIfDevnet(
+      new Account({
+        provider,
+        address: targetAddress,
+        signer: targetPK,
+      })
+    );
 
-    // Transfer dust of ETH token to the signer account
+    // Transfer dust of STRK token to the signer account
     const transferCall = {
-      contractAddress: ethAddress,
+      contractAddress: STRKtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: signerAccount.address,
-        amount: cairo.uint256(1300),
+        amount: cairo.uint256(2n * 10n ** 17n), // 0.2 STRK
       },
     };
     const { transaction_hash } = await executorAccount.execute(transferCall);
@@ -92,7 +121,7 @@ describe('Account and OutsideExecution', () => {
 
   test('getOutsideCall', async () => {
     expect(outsideExecution.getOutsideCall(call1)).toEqual({
-      to: ethAddress,
+      to: STRKtokenAddress,
       selector: getSelectorFromName(call1.entrypoint),
       calldata: [num.hexToDecimalString(recipientAccount.address), '100', '0'],
     });
@@ -124,7 +153,7 @@ describe('Account and OutsideExecution', () => {
           {
             Calldata: [num.hexToDecimalString(recipientAccount.address), '100', '0'],
             Selector: getSelectorFromName(call1.entrypoint),
-            To: ethAddress,
+            To: STRKtokenAddress,
           },
         ],
         'Execute After': 100,
@@ -243,13 +272,13 @@ describe('Account and OutsideExecution', () => {
           outsideTransaction1.outsideExecution.execute_after.toString(),
           outsideTransaction1.outsideExecution.execute_before.toString(),
           '2',
-          '2087021424722619777119509474943472645767659996348769578120564519014510906823',
+          '2009894490435840142178314390393166646092438090257831307886760648929397478285',
           '232670485425082704932579856502088130646006032362877466777181098476241604910',
           '3',
           num.hexToDecimalString(recipientAccount.address),
           '100',
           '0',
-          '2087021424722619777119509474943472645767659996348769578120564519014510906823',
+          '2009894490435840142178314390393166646092438090257831307886760648929397478285',
           '232670485425082704932579856502088130646006032362877466777181098476241604910',
           '3',
           num.hexToDecimalString(recipientAccount.address),
@@ -286,7 +315,7 @@ describe('Account and OutsideExecution', () => {
       caller: 'ANY_CALLER',
     };
     const call3: Call = {
-      contractAddress: ethAddress,
+      contractAddress: STRKtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: recipientAccount.address,
@@ -294,7 +323,7 @@ describe('Account and OutsideExecution', () => {
       },
     };
     const call4: Call = {
-      contractAddress: ethAddress,
+      contractAddress: STRKtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: recipientAccount.address,
@@ -318,7 +347,7 @@ describe('Account and OutsideExecution', () => {
     expect(outsideTransaction1.outsideExecution.execute_before).toBe(hour_later);
     expect(outsideTransaction1.outsideExecution.calls).toEqual([
       {
-        to: ethAddress,
+        to: STRKtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
         calldata: [getDecimalString(recipientAccount.address), '300', '0'],
       },
@@ -330,20 +359,20 @@ describe('Account and OutsideExecution', () => {
     );
     expect(outsideTransaction2.outsideExecution.calls).toEqual([
       {
-        to: ethAddress,
+        to: STRKtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
         calldata: [getDecimalString(recipientAccount.address), '100', '0'],
       },
       {
-        to: ethAddress,
+        to: STRKtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
         calldata: [getDecimalString(recipientAccount.address), '200', '0'],
       },
     ]);
-    const bal0 = (await ethContract.balanceOf(signerAccount.address)) as bigint;
+    const bal0 = (await strkContract.balanceOf(signerAccount.address)) as bigint;
     const res0 = await executorAccount.executeFromOutside(outsideTransaction2);
     await provider.waitForTransaction(res0.transaction_hash);
-    const bal1 = (await ethContract.balanceOf(signerAccount.address)) as bigint;
+    const bal1 = (await strkContract.balanceOf(signerAccount.address)) as bigint;
     expect(bal0 - bal1).toBe(300n);
     // execute multi outside transactions
     const res1 = await executorAccount.executeFromOutside([
@@ -351,7 +380,7 @@ describe('Account and OutsideExecution', () => {
       outsideTransaction3,
     ]);
     await provider.waitForTransaction(res1.transaction_hash);
-    const bal2 = (await ethContract.balanceOf(signerAccount.address)) as bigint;
+    const bal2 = (await strkContract.balanceOf(signerAccount.address)) as bigint;
     expect(bal1 - bal2).toBe(700n);
     expect(await signerAccount.isValidSnip9Nonce(outsideTransaction3.outsideExecution.nonce)).toBe(
       false
@@ -370,19 +399,8 @@ describe('Account and OutsideExecution', () => {
     );
     const outsideExecutionCall: Call[] =
       outsideExecution.buildExecuteFromOutsideCall(outsideTransaction);
-    const estimateFee = await executorAccount.estimateFee(outsideExecutionCall);
-    expect(Object.keys(estimateFee)).toEqual(
-      Object.keys({
-        overall_fee: 0,
-        gas_consumed: 0,
-        gas_price: 0,
-        unit: 0,
-        suggestedMaxFee: 0,
-        resourceBounds: 0,
-        data_gas_consumed: 0,
-        data_gas_price: 0,
-      })
-    );
+    const estimateFee = await executorAccount.estimateInvokeFee(outsideExecutionCall);
+    expect(estimateFee).toMatchSchemaRef('EstimateFeeResponseOverhead');
 
     const invocations: Invocations = [
       {
@@ -391,14 +409,7 @@ describe('Account and OutsideExecution', () => {
       },
     ];
     const responseSimulate = await executorAccount.simulateTransaction(invocations);
-    expect(Object.keys(responseSimulate[0])).toEqual(
-      Object.keys({
-        transaction_trace: 0,
-        fee_estimation: 0,
-        suggestedMaxFee: 0,
-        resourceBounds: 0,
-      })
-    );
+    expect(responseSimulate).toMatchSchemaRef('SimulateTransactionOverheadResponse');
   });
 
   test('ERC165 introspection', async () => {

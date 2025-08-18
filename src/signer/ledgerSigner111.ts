@@ -1,13 +1,10 @@
 /* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
 import type {
   InvocationsSignerDetails,
-  V2InvocationsSignerDetails,
   V3InvocationsSignerDetails,
   DeployAccountSignerDetails,
-  V2DeployAccountSignerDetails,
   V3DeployAccountSignerDetails,
   DeclareSignerDetails,
-  V2DeclareSignerDetails,
   V3DeclareSignerDetails,
   TypedData,
   Call,
@@ -16,9 +13,9 @@ import type {
 } from '../types';
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
+import Buffer from '../utils/connect/buffer';
 import type { SignerInterface } from './interface';
 import { MASK_31 } from '../global/constants';
-import { ETransactionVersion2 } from '../types/api/rpcspec_0_6';
 import { getMessageHash } from '../utils/typedData';
 import { getExecuteCalldata } from '../utils/transaction';
 import {
@@ -202,16 +199,7 @@ export class LedgerSigner111<Transport extends Record<any, any> = any> implement
     const compiledCalldata = getExecuteCalldata(transactions, transactionsDetail.cairoVersion);
     let msgHash;
 
-    // TODO: How to do generic union discriminator for all like this
-    if (Object.values(ETransactionVersion2).includes(transactionsDetail.version as any)) {
-      const det = transactionsDetail as V2InvocationsSignerDetails;
-      msgHash = calculateInvokeTransactionHash({
-        ...det,
-        senderAddress: det.walletAddress,
-        compiledCalldata,
-        version: det.version,
-      });
-    } else if (Object.values(ETransactionVersion3).includes(transactionsDetail.version as any)) {
+    if (Object.values(ETransactionVersion3).includes(transactionsDetail.version as any)) {
       const det = transactionsDetail as V3InvocationsSignerDetails;
       msgHash = calculateInvokeTransactionHash({
         ...det,
@@ -247,15 +235,7 @@ export class LedgerSigner111<Transport extends Record<any, any> = any> implement
     /*     const version = BigInt(details.version).toString(); */
     let msgHash;
 
-    if (Object.values(ETransactionVersion2).includes(details.version as any)) {
-      const det = details as V2DeployAccountSignerDetails;
-      msgHash = calculateDeployAccountTransactionHash({
-        ...det,
-        salt: det.addressSalt,
-        constructorCalldata: compiledConstructorCalldata,
-        version: det.version,
-      });
-    } else if (Object.values(ETransactionVersion3).includes(details.version as any)) {
+    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
       const det = details as V3DeployAccountSignerDetails;
       msgHash = calculateDeployAccountTransactionHash({
         ...det,
@@ -289,13 +269,7 @@ export class LedgerSigner111<Transport extends Record<any, any> = any> implement
     details: DeclareSignerDetails
   ): Promise<Signature> {
     let msgHash;
-    if (Object.values(ETransactionVersion2).includes(details.version as any)) {
-      const det = details as V2DeclareSignerDetails;
-      msgHash = calculateDeclareTransactionHash({
-        ...det,
-        version: det.version,
-      });
-    } else if (Object.values(ETransactionVersion3).includes(details.version as any)) {
+    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
       const det = details as V3DeclareSignerDetails;
       msgHash = calculateDeclareTransactionHash({
         ...det,

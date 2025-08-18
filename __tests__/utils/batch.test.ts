@@ -1,39 +1,66 @@
-import fetch from '../../src/utils/fetchPonyfill';
+import fetch from '../../src/utils/connect/fetch';
 import { BatchClient } from '../../src/utils/batch';
-import { createBlockForDevnet, getTestProvider } from '../config/fixtures';
+import { createBlockForDevnet, describeIfRpc081, getTestProvider } from '../config/fixtures';
 import { initializeMatcher } from '../config/schema';
+import { RPC } from '../../src/types';
+import { createTestProvider } from '../config/fixturesInit';
 
-describe('Batch Client', () => {
-  const provider = getTestProvider(false);
-
-  const batchClient = new BatchClient({
-    nodeUrl: provider.channel.nodeUrl,
-    headers: provider.channel.headers,
-    interval: 0,
-    baseFetch: fetch,
-  });
-
+describe('BatchClient', () => {
   initializeMatcher(expect);
+  const provider = getTestProvider();
 
-  test('should batch two requests', async () => {
-    await createBlockForDevnet();
+  let batchClient: BatchClient<RPC.Methods>;
 
-    const fetchSpy = jest.spyOn(batchClient as any, 'sendBatch');
-
-    const [blockNumber, blockWithReceipts] = await Promise.all([
-      batchClient.fetch('starknet_blockNumber'),
-      batchClient.fetch('starknet_getBlockWithReceipts', { block_id: 'latest' }),
-    ]);
-
-    expect(typeof blockNumber.result).toBe('number');
-    expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts');
-
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-    fetchSpy.mockRestore();
+  beforeEach(() => {
+    batchClient = new BatchClient<RPC.Methods>({
+      nodeUrl: provider.channel.nodeUrl,
+      headers: provider.channel.headers,
+      interval: 0,
+      baseFetch: fetch,
+      rpcMethods: {} as RPC.Methods, // Type information only, not used at runtime
+    });
   });
+
+  describeIfRpc081('should batch two requests RPC0.8.1', () => {
+    test('should batch two requests', async () => {
+      await createBlockForDevnet();
+
+      const fetchSpy = jest.spyOn(batchClient as any, 'sendBatch');
+
+      const [blockNumber, blockWithReceipts] = await Promise.all([
+        batchClient.fetch('starknet_blockNumber'),
+        batchClient.fetch('starknet_getBlockWithReceipts', { block_id: 'latest' }),
+      ]);
+
+      expect(typeof blockNumber.result).toBe('number');
+      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts');
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      fetchSpy.mockRestore();
+    });
+  });
+
+  /*   describeIfRpc071('should batch two requests RPC0.7.1', () => {
+    test('should batch two requests', async () => {
+      await createBlockForDevnet();
+
+      const fetchSpy = jest.spyOn(batchClient as any, 'sendBatch');
+
+      const [blockNumber, blockWithReceipts] = await Promise.all([
+        batchClient.fetch('starknet_blockNumber'),
+        batchClient.fetch('starknet_getBlockWithReceipts', { block_id: 'latest' }),
+      ]);
+
+      expect(typeof blockNumber.result).toBe('number');
+      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts071');
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      fetchSpy.mockRestore();
+    });
+  }); */
 
   test('batch request using Provider', async () => {
-    const myBatchProvider = getTestProvider(false, { batch: 0 });
+    const myBatchProvider = await createTestProvider(false, { batch: 0 });
 
     const sendBatchSpy = jest.spyOn((myBatchProvider.channel as any).batchClient, 'sendBatch');
 

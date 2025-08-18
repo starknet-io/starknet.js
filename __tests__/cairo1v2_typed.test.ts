@@ -12,7 +12,8 @@ import {
   Calldata,
   CompiledSierra,
   Contract,
-  DeclareDeployUDCResponse,
+  ParsedEvents,
+  ProviderInterface,
   RawArgsArray,
   RawArgsObject,
   TypedContractV2,
@@ -24,12 +25,19 @@ import {
   selector,
   shortString,
   stark,
-  types,
+  type DeclareDeployUDCResponse,
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { isString } from '../src/utils/typed';
-import { TEST_TX_VERSION, contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { contracts } from './config/fixtures';
+import {
+  createTestProvider,
+  getTestAccount,
+  STRKtokenAddress,
+  adaptAccountIfDevnet,
+  TEST_TX_VERSION,
+} from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -37,8 +45,14 @@ const { toHex } = num;
 const { starknetKeccak } = selector;
 
 describe('Cairo 1', () => {
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let provider: ProviderInterface;
+  let account: Account;
+
+  beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+  });
+
   describe('API &  Contract interactions', () => {
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: TypedContractV2<typeof tAbi>;
@@ -51,21 +65,21 @@ describe('Cairo 1', () => {
         contract: contracts.C1v2.sierra,
         casm: contracts.C1v2.casm,
       });
-      cairo1Contract = new Contract(
-        contracts.C1v2.sierra.abi,
-        dd.deploy.contract_address,
-        account
-      ).typedv2(tAbi);
+      cairo1Contract = new Contract({
+        abi: contracts.C1v2.sierra.abi,
+        address: dd.deploy.contract_address,
+        providerOrAccount: account,
+      }).typedv2(tAbi);
 
       dd2 = await account.declareAndDeploy({
         contract: contracts.C210.sierra,
         casm: contracts.C210.casm,
       });
-      cairo210Contract = new Contract(
-        contracts.C210.sierra.abi,
-        dd2.deploy.contract_address,
-        account
-      ).typedv2(tAbi);
+      cairo210Contract = new Contract({
+        abi: contracts.C210.sierra.abi,
+        address: dd2.deploy.contract_address,
+        providerOrAccount: account,
+      }).typedv2(tAbi);
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
@@ -130,9 +144,11 @@ describe('Cairo 1', () => {
       );
       await account.waitForTransaction(tx.transaction_hash);
 
-      const balance = await cairo1Contract.get_balance({
-        parseResponse: false,
-      });
+      const balance = await cairo1Contract
+        .withOptions({
+          parseResponse: false,
+        })
+        .get_balance();
 
       // TODO: handle parseResponse correctly, get_balance should return a list here !?
       expect(num.toBigInt(balance)).toBe(100n);
@@ -146,10 +162,10 @@ describe('Cairo 1', () => {
     });
 
     test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128, litterals', async () => {
-      const tx = await cairo1Contract.increase_balance_u8(255n);
+      const tx = await cairo1Contract.increase_balance_u8(20n);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();
-      expect(balance).toBe(255n);
+      expect(balance).toBe(20n);
 
       let result = await cairo1Contract.test_u16(255n);
       expect(result).toBe(256n);
@@ -335,9 +351,11 @@ describe('Cairo 1', () => {
     test('Cairo 1 more complex structs', async () => {
       const tx = await cairo1Contract.set_bet();
       await account.waitForTransaction(tx.transaction_hash);
-      const status = await cairo1Contract.get_bet(1, {
-        formatResponse: { name: 'string', description: 'string' },
-      });
+      const status = await cairo1Contract
+        .withOptions({
+          formatResponse: { name: 'string', description: 'string' },
+        })
+        .get_bet(1);
 
       const expected = {
         name: 'test',
@@ -714,20 +732,26 @@ describe('Cairo 1', () => {
         calldata,
         0
       );
-      const devnetERC20Address =
-        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetERC20Address,
+        contractAddress: STRKtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
-          amount: uint256(5 * 10 ** 15),
+          amount: uint256(5n * 10n ** 16n),
         },
       });
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1', TEST_TX_VERSION);
+      accountC1 = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: toBeAccountAddress,
+          signer: priKey,
+          transactionVersion: TEST_TX_VERSION,
+        })
+      );
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
@@ -737,7 +761,7 @@ describe('Cairo 1', () => {
       expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
     });
 
-    test('deploy Cairo1 Account from Cairo0 Account', () => {
+    test('deploy Cairo1 Account', () => {
       expect(accountC1).toBeInstanceOf(Account);
     });
   });
@@ -776,11 +800,11 @@ describe('Cairo 1', () => {
         casm: contracts.C1v2.casm,
       });
 
-      eventContract = new Contract(
-        contracts.C1v2.sierra.abi,
-        deploy.contract_address!,
-        account
-      ).typedv2(tAbi);
+      eventContract = new Contract({
+        abi: contracts.C1v2.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      }).typedv2(tAbi);
     });
 
     test('parse event returning a regular struct', async () => {
@@ -792,7 +816,7 @@ describe('Cairo 1', () => {
         simpleDataStruct,
         simpleDataArray
       );
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
@@ -814,7 +838,7 @@ describe('Cairo 1', () => {
         nestedKeyStruct,
         nestedDataStruct
       );
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventNested': {
             nestedKeyStruct,
@@ -829,7 +853,7 @@ describe('Cairo 1', () => {
 
     test('parse tx returning multiple similar events', async () => {
       const anotherKeyVariable = 100n;
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
@@ -874,7 +898,7 @@ describe('Cairo 1', () => {
       expect(events[1]).toMatchEventStructure(shouldBe[1]);
     });
     test('parse tx returning multiple different events', async () => {
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
@@ -921,11 +945,11 @@ describe('Cairo 1', () => {
         casm: contracts.C240.casm,
       });
 
-      stringContract = new Contract(
-        contracts.C240.sierra.abi,
-        deploy.contract_address,
-        account
-      ).typedv2(StringABI);
+      stringContract = new Contract({
+        abi: contracts.C240.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      }).typedv2(StringABI);
     });
 
     test('bytes31', async () => {

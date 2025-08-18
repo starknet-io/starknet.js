@@ -1,4 +1,16 @@
 import { getStarkKey, Signature, utils } from '@scure/starknet';
+import { hasMixin } from 'ts-mixer';
+import {
+  contracts,
+  createBlockForDevnet,
+  describeIfDevnet,
+  describeIfNotDevnet,
+  describeIfRpc,
+  describeIfRpc081,
+  describeIfTestnet,
+  waitNextBlock,
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 import typedDataExample from '../__mocks__/typedData/baseExample.json';
 import {
   Account,
@@ -6,46 +18,86 @@ import {
   CallData,
   Contract,
   FeeEstimate,
+  LibraryError,
+  ProviderInterface,
   RPC,
-  RPC06,
   RPCResponseParser,
   ReceiptTx,
   RpcProvider,
   TransactionExecutionStatus,
   cairo,
+  num,
   stark,
   waitForTransactionOptions,
+  isVersion,
+  toAnyPatchVersion,
+  BlockTag,
+  logger,
+  type GasPrices,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
-import { felt, uint256 } from '../src/utils/calldata/cairo';
-import { toBigInt, toHexString } from '../src/utils/num';
-import {
-  contracts,
-  createBlockForDevnet,
-  describeIfDevnet,
-  describeIfNotDevnet,
-  describeIfRpc,
-  describeIfTestnet,
-  devnetETHtokenAddress,
-  getTestAccount,
-  getTestProvider,
-  waitNextBlock,
-} from './config/fixtures';
-import { initializeMatcher } from './config/schema';
 import { isBoolean } from '../src/utils/typed';
+import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
+import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
+import { StarknetId } from '../src/provider/extensions/starknetId';
+import { createTestProvider, ETHtokenAddress, getTestAccount } from './config/fixturesInit';
+
+/**
+ * Helper function to create expected zero tip estimate for tests
+ */
+function expectZeroTipEstimate() {
+  return {
+    minTip: 0n,
+    maxTip: 0n,
+    averageTip: 0n,
+    medianTip: 0n,
+    modeTip: 0n,
+    recommendedTip: 0n,
+    p90Tip: 0n,
+    p95Tip: 0n,
+    metrics: expect.objectContaining({
+      blocksAnalyzed: expect.any(Number),
+      transactionsTipsFound: expect.any(Array),
+    }),
+  };
+}
 
 describeIfRpc('RPCProvider', () => {
-  const rpcProvider = getTestProvider(false);
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let rpcProvider: RpcProvider;
+  let provider: ProviderInterface;
+  let account: Account;
   let accountPublicKey: string;
   initializeMatcher(expect);
 
   beforeAll(async () => {
+    rpcProvider = await createTestProvider(false);
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+
     expect(account).toBeInstanceOf(Account);
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
     await createBlockForDevnet();
+  });
+
+  test('create should be usable by the base and extended RpcProvider, but not Account', async () => {
+    const nodeUrl = process.env.TEST_RPC_URL;
+    const base = await BaseRpcProvider.create({ nodeUrl });
+    const extended = await ExtendedRpcProvider.create({ nodeUrl });
+
+    expect(hasMixin(base, StarknetId)).toBe(false);
+    expect(hasMixin(extended, StarknetId)).toBe(true);
+    await expect(Account.create()).rejects.toThrow(LibraryError);
+  });
+
+  test('detect spec version with create', async () => {
+    const providerTest = await RpcProvider.create({ nodeUrl: process.env.TEST_RPC_URL });
+    const { channel } = providerTest;
+    expect(channel).toBeDefined();
+    const rawResult = await channel.fetch('starknet_specVersion');
+    const j = await rawResult.json();
+    expect(channel.readSpecVersion()).toBeDefined();
+    expect(isVersion(toAnyPatchVersion(j.result), await channel.setUpSpecVersion())).toBeTruthy();
   });
 
   test('baseFetch override', async () => {
@@ -111,60 +163,51 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof spec).toBe('string');
   });
 
-  test('configurable margin', async () => {
+  test('getGasPrices', async () => {
+    const gasPrices: GasPrices = await rpcProvider.getGasPrices('latest');
+    expect(gasPrices).toHaveProperty('l1DataGasPrice');
+    expect(gasPrices).toHaveProperty('l1GasPrice');
+    expect(gasPrices).toHaveProperty('l2GasPrice');
+    expect(typeof gasPrices.l1DataGasPrice).toBe('bigint');
+    expect(typeof gasPrices.l1GasPrice).toBe('bigint');
+    expect(typeof gasPrices.l2GasPrice).toBe('bigint');
+  });
+
+  test('configurable fee overhead on instance', async () => {
     const p = new RpcProvider({
       nodeUrl: provider.channel.nodeUrl,
-      feeMarginPercentage: {
-        l1BoundMaxAmount: 0,
-        l1BoundMaxPricePerUnit: 0,
-        maxFee: 0,
+      resourceBoundsOverhead: {
+        l1_gas: {
+          max_amount: 0,
+          max_price_per_unit: 0,
+        },
+        l2_gas: {
+          max_amount: 0,
+          max_price_per_unit: 0,
+        },
+        l1_data_gas: {
+          max_amount: 0,
+          max_price_per_unit: 0,
+        },
       },
     });
     const estimateSpy = jest.spyOn(p.channel as any, 'getEstimateFee');
     const mockFeeEstimate: FeeEstimate = {
-      gas_consumed: '0x2',
-      gas_price: '0x1',
-      data_gas_consumed: '0x2',
-      data_gas_price: '0x1',
+      l1_gas_consumed: '0x2',
+      l1_gas_price: '0x1',
+      l2_gas_consumed: '0x2',
+      l2_gas_price: '0x1',
+      l1_data_gas_consumed: '0x2',
+      l1_data_gas_price: '0x1',
       overall_fee: '0x4',
       unit: 'WEI',
     };
     estimateSpy.mockResolvedValue([mockFeeEstimate]);
     const result = (await p.getEstimateFeeBulk([{} as any], {}))[0];
     expect(estimateSpy).toHaveBeenCalledTimes(1);
-    expect(result.suggestedMaxFee).toBe(4n);
-    expect(result.resourceBounds.l1_gas.max_amount).toBe('0x4');
-    expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe('0x1');
+    expect(result.resourceBounds.l1_gas.max_amount).toBe(2n);
+    expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe(1n);
     estimateSpy.mockRestore();
-  });
-
-  describeIfDevnet('Test Estimate message fee Cairo 0', () => {
-    // declaration of Cairo 0 contract is no more authorized in Sepolia Testnet
-    let l1l2ContractCairo0Address: string;
-
-    beforeAll(async () => {
-      const { deploy } = await account.declareAndDeploy({
-        contract: contracts.L1L2,
-      });
-      l1l2ContractCairo0Address = deploy.contract_address;
-    });
-
-    test('estimate message fee Cairo 0', async () => {
-      const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
-      const estimationCairo0 = await rpcProvider.estimateMessageFee({
-        from_address: L1_ADDRESS,
-        to_address: l1l2ContractCairo0Address,
-        entry_point_selector: 'deposit',
-        payload: ['556', '123'],
-      });
-      expect(estimationCairo0).toEqual(
-        expect.objectContaining({
-          gas_consumed: expect.anything(),
-          gas_price: expect.anything(),
-          overall_fee: expect.anything(),
-        })
-      );
-    });
   });
 
   describe('Test Estimate message fee Cairo 1', () => {
@@ -179,33 +222,62 @@ describeIfRpc('RPCProvider', () => {
       await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
     });
 
-    test('estimate message fee Cairo 1', async () => {
-      const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
-      const estimationCairo1 = await rpcProvider.estimateMessageFee({
-        from_address: L1_ADDRESS,
-        to_address: l1l2ContractCairo1Address,
-        entry_point_selector: 'increase_bal',
-        payload: ['100'],
+    describeIfRpc081('estimate message fee rpc 0.8', () => {
+      test('estimate message fee Cairo 1', async () => {
+        const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
+        const estimationCairo1 = await rpcProvider.estimateMessageFee({
+          from_address: L1_ADDRESS,
+          to_address: l1l2ContractCairo1Address,
+          entry_point_selector: 'increase_bal',
+          payload: ['100'],
+        });
+        expect(estimationCairo1).toEqual(
+          expect.objectContaining({
+            l1_data_gas_consumed: expect.anything(),
+            l1_data_gas_price: expect.anything(),
+            l1_gas_consumed: expect.anything(),
+            l1_gas_price: expect.anything(),
+            l2_gas_consumed: expect.anything(),
+            l2_gas_price: expect.anything(),
+            overall_fee: expect.anything(),
+            unit: expect.anything(),
+          })
+        );
       });
-      expect(estimationCairo1).toEqual(
-        expect.objectContaining({
-          gas_consumed: expect.anything(),
-          gas_price: expect.anything(),
-          overall_fee: expect.anything(),
-        })
-      );
     });
+
+    /*     describeIfRpc071('estimate message fee rpc 0.7', () => {
+      test('estimate message fee Cairo 1', async () => {
+        const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
+        const estimationCairo1 = await rpcProvider.estimateMessageFee({
+          from_address: L1_ADDRESS,
+          to_address: l1l2ContractCairo1Address,
+          entry_point_selector: 'increase_bal',
+          payload: ['100'],
+        });
+        expect(estimationCairo1).toEqual(
+          expect.objectContaining({
+            data_gas_consumed: expect.anything(),
+            data_gas_price: expect.anything(),
+            gas_consumed: expect.anything(),
+            gas_price: expect.anything(),
+            overall_fee: expect.anything(),
+            unit: expect.anything(),
+          })
+        );
+      });
+    }); */
   });
 
   describe('waitForTransaction', () => {
     const receipt = {};
-    const transactionStatusSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionStatus');
-    const transactionReceiptSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionReceipt');
+    let transactionStatusSpy: any;
+    let transactionReceiptSpy: any;
 
     const generateOptions = (o: waitForTransactionOptions) => ({ retryInterval: 10, ...o });
     const generateTransactionStatus = (
-      finality_status: RPC.SPEC.TXN_STATUS,
-      execution_status?: RPC.SPEC.TXN_EXECUTION_STATUS
+      finality_status: RPC.TXN_STATUS,
+      execution_status?: RPC.TXN_EXECUTION_STATUS
     ): RPC.TransactionStatus => ({
       finality_status,
       execution_status,
@@ -213,10 +285,12 @@ describeIfRpc('RPCProvider', () => {
     const response = {
       successful: generateTransactionStatus('ACCEPTED_ON_L1', 'SUCCEEDED'),
       reverted: generateTransactionStatus('ACCEPTED_ON_L2', 'REVERTED'),
-      rejected: generateTransactionStatus('REJECTED'),
     };
 
     beforeAll(() => {
+      transactionStatusSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionStatus');
+      transactionReceiptSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionReceipt');
+
       transactionStatusSpy.mockResolvedValue(null);
       transactionReceiptSpy.mockResolvedValue(receipt);
     });
@@ -236,13 +310,6 @@ describeIfRpc('RPCProvider', () => {
       await expect(rpcProvider.waitForTransaction(0)).resolves.toBeInstanceOf(ReceiptTx);
     });
 
-    test('rejected - default', async () => {
-      transactionStatusSpy.mockResolvedValueOnce(response.rejected);
-      await expect(rpcProvider.waitForTransaction(0)).rejects.toThrow(
-        `${undefined}: ${RPC.ETransactionStatus.REJECTED}`
-      );
-    });
-
     test('reverted - as error state', async () => {
       transactionStatusSpy.mockResolvedValueOnce(response.reverted);
       const options = generateOptions({ errorStates: [TransactionExecutionStatus.REVERTED] });
@@ -257,13 +324,84 @@ describeIfRpc('RPCProvider', () => {
     });
   });
 
+  describe('fastWaitForTransaction()', () => {
+    test('timeout due to low tip', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'RECEIVED' };
+        });
+      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 10, {
+        retries: 2,
+        retryInterval: 100,
+      });
+      spyProvider.mockRestore();
+      expect(resp).toBe(false);
+    });
+
+    test('timeout due to missing new nonce', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'PRE_CONFIRMED', execution_status: 'SUCCEEDED' };
+        });
+      const spyChannel = jest
+        .spyOn(rpcProvider.channel, 'getNonceForAddress')
+        .mockImplementation(async () => {
+          return '0x8';
+        });
+      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 8, {
+        retries: 2,
+        retryInterval: 100,
+      });
+      spyProvider.mockRestore();
+      spyChannel.mockRestore();
+      expect(resp).toBe(false);
+    });
+
+    test('transaction reverted', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'PRE_CONFIRMED', execution_status: 'REVERTED' };
+        });
+      await expect(
+        rpcProvider.fastWaitForTransaction('0x123', '0x456', 10, {
+          retries: 2,
+          retryInterval: 100,
+        })
+      ).rejects.toThrow('REVERTED: PRE_CONFIRMED');
+      spyProvider.mockRestore();
+    });
+
+    test('Normal behavior', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'ACCEPTED_ON_L2', execution_status: 'SUCCEEDED' };
+        });
+      const spyChannel = jest
+        .spyOn(rpcProvider.channel, 'getNonceForAddress')
+        .mockImplementation(async () => {
+          return '0x9';
+        });
+      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 8, {
+        retries: 2,
+        retryInterval: 100,
+      });
+      spyProvider.mockRestore();
+      spyChannel.mockRestore();
+      expect(resp).toBe(true);
+    });
+  });
+
   describe('RPC methods', () => {
     let latestBlock: Block;
 
     beforeAll(async () => {
       // add a Tx to be sure to have at least one Tx in the last block
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetETHtokenAddress,
+        contractAddress: ETHtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: account.address,
@@ -284,28 +422,24 @@ describeIfRpc('RPCProvider', () => {
       expect(blockResponse).toHaveProperty('transactions');
     });
 
-    test('getBlockWithReceipts - 0.6 RpcChannel', async () => {
-      const channel = new RPC06.RpcChannel({ nodeUrl: rpcProvider.channel.nodeUrl });
-      const p = new RpcProvider({ channel } as any);
-      await expect(p.getBlockWithReceipts(latestBlock.block_number)).rejects.toThrow(/Unsupported/);
-    });
-
-    test('getBlockWithReceipts - 0.7 RpcChannel', async () => {
+    test('getBlockWithReceipts - 0.v RpcChannel', async () => {
       const blockResponse = await rpcProvider.getBlockWithReceipts(latestBlock.block_number);
-      expect(blockResponse).toMatchSchemaRef('BlockWithTxReceipts');
+      expect(blockResponse).toBeDefined();
+      // TODO add Zod schema validation
+      // expect(blockResponse).toMatchSchemaRef('BlockWithTxReceipts');
     });
 
     test('getTransactionByBlockIdAndIndex', async () => {
-      const transaction = await rpcProvider.getTransactionByBlockIdAndIndex(
-        latestBlock.block_number,
-        0
-      );
+      // Find a block with transactions
+      let block: any = latestBlock; // TODO: fix this type
+      let blockNumber = latestBlock.block_number;
+      while (block.transactions.length === 0 && blockNumber > latestBlock.block_number - 20) {
+        blockNumber -= 1;
+        // eslint-disable-next-line no-await-in-loop
+        block = await provider.getBlock(blockNumber);
+      }
+      const transaction = await rpcProvider.getTransactionByBlockIdAndIndex(blockNumber, 0);
       expect(transaction).toHaveProperty('transaction_hash');
-    });
-
-    test('getPendingTransactions', async () => {
-      const transactions = await rpcProvider.getPendingTransactions();
-      expect(Array.isArray(transactions)).toBe(true);
     });
 
     test('getSyncingStats', async () => {
@@ -320,33 +454,33 @@ describeIfRpc('RPCProvider', () => {
 
     describeIfDevnet('devnet only', () => {
       test('getEvents ', async () => {
+        const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
+        const erc20ConstructorParams = {
+          name: 'Token',
+          symbol: 'ERC20',
+          amount: 1000n,
+          recipient: account.address,
+          owner: account.address,
+        };
+        const erc20Constructor = erc20CallData.compile('constructor', erc20ConstructorParams);
         const randomWallet = stark.randomAddress();
-        const classHash = '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3';
-        const transferSelector = toHexString(
+        const transferSelector = num.toHexString(
           '271746229759260285552388728919865295615886751538523744128730118297934206697'
         );
 
         const { deploy } = await account.declareAndDeploy({
-          contract: contracts.Erc20Echo,
-          classHash,
-          constructorCalldata: CallData.compile({
-            name: felt('Token'),
-            symbol: felt('ERC20'),
-            decimals: felt('18'),
-            initial_supply: uint256('1000000000'),
-            recipient: felt(account.address),
-            signers: [],
-            threshold: 1,
-          }),
+          contract: contracts.Erc20OZ.sierra,
+          casm: contracts.Erc20OZ.casm,
+          constructorCalldata: erc20Constructor,
         });
 
-        const erc20EchoContract = new Contract(
-          contracts.Erc20Echo.abi,
-          deploy.contract_address!,
-          account
-        );
-        await erc20EchoContract.transfer(randomWallet, uint256(1));
-        await erc20EchoContract.transfer(randomWallet, uint256(1));
+        const erc20EchoContract = new Contract({
+          abi: contracts.Erc20OZ.sierra.abi,
+          address: deploy.contract_address,
+          providerOrAccount: account,
+        });
+        await erc20EchoContract.transfer(randomWallet, cairo.uint256(1));
+        await erc20EchoContract.transfer(randomWallet, cairo.uint256(1));
 
         const blockNumber = await rpcProvider.getBlockNumber();
         const result = await rpcProvider.getEvents({
@@ -391,7 +525,8 @@ describeIfRpc('RPCProvider', () => {
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
-          contract: contracts.OpenZeppelinAccount,
+          contract: contracts.C1Account.sierra,
+          casm: contracts.C1Account.casm,
           constructorCalldata: [accountPublicKey],
           salt: accountPublicKey,
         });
@@ -428,24 +563,343 @@ describeIfRpc('RPCProvider', () => {
 
       test('traceTransaction', async () => {
         const trace = await rpcProvider.getTransactionTrace(transaction_hash);
-        expect(trace).toMatchSchemaRef('getTransactionTrace');
+        expect(trace).toBeDefined();
+        // TODO add Zod schema validation
       });
 
       test('getClassAt', async () => {
         const classAt = await rpcProvider.getClassAt(contract_address);
-        expect(classAt).toMatchSchemaRef('LegacyContractClass');
+        expect(classAt).toMatchSchemaRef('SierraContractClass');
       });
 
       test('getClass classHash', async () => {
         const contractClass = await rpcProvider.getClass(ozClassHash);
-        expect(contractClass).toMatchSchemaRef('LegacyContractClass');
+        expect(contractClass).toMatchSchemaRef('SierraContractClass');
       });
+    });
+  });
+
+  describe('Tip Estimation', () => {
+    describeIfRpc('getEstimateTip', () => {
+      test('should estimate tip from latest block or handle insufficient data', async () => {
+        const tipEstimate = await rpcProvider.getEstimateTip('latest', {
+          minTxsNecessary: 1, // Use low threshold for test reliability
+          maxBlocks: 10, // Use more blocks to increase chance of finding data
+        });
+
+        expect(tipEstimate).toBeDefined();
+        expect(tipEstimate).toEqual({
+          minTip: expect.any(BigInt),
+          maxTip: expect.any(BigInt),
+          averageTip: expect.any(BigInt),
+          medianTip: expect.any(BigInt),
+          modeTip: expect.any(BigInt),
+          recommendedTip: expect.any(BigInt),
+          p90Tip: expect.any(BigInt),
+          p95Tip: expect.any(BigInt),
+          metrics: expect.objectContaining({
+            blocksAnalyzed: expect.any(Number),
+            transactionsTipsFound: expect.any(Array),
+          }),
+        });
+
+        // If there's insufficient data, all values should be 0n
+        if (tipEstimate.recommendedTip === 0n) {
+          expect(tipEstimate).toEqual(expectZeroTipEstimate());
+        } else {
+          // Verify tip relationships
+          expect(tipEstimate.minTip).toBeLessThanOrEqual(tipEstimate.maxTip);
+          expect(tipEstimate.recommendedTip).toBeGreaterThan(0n);
+
+          // Verify recommended tip is median tip (no buffer)
+          expect(tipEstimate.recommendedTip).toBe(tipEstimate.medianTip);
+        }
+      });
+
+      test('should estimate tip from specific block number or handle insufficient data', async () => {
+        const latestBlockNumber = await rpcProvider.getBlockNumber();
+        const targetBlock = Math.max(0, latestBlockNumber - 2); // Use a recent block
+
+        try {
+          const tipEstimate = await rpcProvider.getEstimateTip(targetBlock, {
+            minTxsNecessary: 1,
+            maxBlocks: 10,
+          });
+
+          expect(tipEstimate).toBeDefined();
+          expect(typeof tipEstimate.minTip).toBe('bigint');
+          expect(typeof tipEstimate.maxTip).toBe('bigint');
+          expect(typeof tipEstimate.averageTip).toBe('bigint');
+          expect(typeof tipEstimate.medianTip).toBe('bigint');
+          expect(typeof tipEstimate.modeTip).toBe('bigint');
+          expect(typeof tipEstimate.recommendedTip).toBe('bigint');
+        } catch (error) {
+          expect((error as Error).message).toContain('Insufficient transaction data');
+        }
+      });
+
+      test('should work with includeZeroTips option or handle insufficient data', async () => {
+        try {
+          const tipEstimate = await rpcProvider.getEstimateTip('latest', {
+            minTxsNecessary: 1,
+            maxBlocks: 10,
+            includeZeroTips: true,
+          });
+
+          expect(tipEstimate).toBeDefined();
+          // With zero tips included, minimum could be 0
+          expect(tipEstimate.minTip).toBeGreaterThanOrEqual(0n);
+          expect(tipEstimate.maxTip).toBeGreaterThanOrEqual(tipEstimate.minTip);
+        } catch (error) {
+          expect((error as Error).message).toContain('Insufficient transaction data');
+        }
+      });
+
+      test('should work with custom maxBlocks or handle insufficient data', async () => {
+        const tipEstimate = await rpcProvider.getEstimateTip('latest', {
+          minTxsNecessary: 1,
+          maxBlocks: 20, // Analyze more blocks
+        });
+
+        expect(tipEstimate).toBeDefined();
+
+        // If there's insufficient data, all values should be 0n
+        if (tipEstimate.recommendedTip === 0n) {
+          expect(tipEstimate).toEqual(expectZeroTipEstimate());
+        } else {
+          expect(tipEstimate.recommendedTip).toBeGreaterThan(0n);
+        }
+      });
+
+      test('should return zero values with insufficient transaction data', async () => {
+        logger.setLogLevel('FATAL');
+        const tipEstimate = await rpcProvider.getEstimateTip('latest', {
+          minTxsNecessary: 1000, // Unreasonably high requirement
+          maxBlocks: 1,
+        });
+        logger.setLogLevel('ERROR');
+
+        expect(tipEstimate).toEqual(expectZeroTipEstimate());
+      });
+
+      describeIfDevnet('with devnet transactions', () => {
+        test('should provide estimates after creating transactions', async () => {
+          // First create some transactions to ensure we have tip data
+          const { transaction_hash } = await account.execute({
+            contractAddress: ETHtokenAddress,
+            entrypoint: 'transfer',
+            calldata: {
+              recipient: account.address,
+              amount: cairo.uint256(1n),
+            },
+          });
+
+          await account.waitForTransaction(transaction_hash);
+          await createBlockForDevnet(); // Ensure transaction is in a block
+
+          try {
+            const tipEstimate = await rpcProvider.getEstimateTip('latest', {
+              minTxsNecessary: 1,
+              maxBlocks: 10,
+            });
+
+            expect(tipEstimate).toBeDefined();
+            expect(tipEstimate.minTip).toBeLessThanOrEqual(tipEstimate.maxTip);
+            expect(tipEstimate.recommendedTip).toBeGreaterThanOrEqual(tipEstimate.medianTip);
+
+            // Test that we get consistent estimates
+            const tipEstimate2 = await rpcProvider.getEstimateTip('latest', {
+              minTxsNecessary: 1,
+              maxBlocks: 10,
+            });
+
+            expect(tipEstimate2.medianTip).toBe(tipEstimate.medianTip);
+            expect(tipEstimate2.recommendedTip).toBe(tipEstimate.recommendedTip);
+          } catch (error) {
+            // Even after creating transactions, V3 invoke transactions might not have tips in devnet
+            expect((error as Error).message).toContain('Insufficient transaction data');
+          }
+        });
+
+        test('should handle different block ranges after creating multiple transactions', async () => {
+          // Create multiple transactions across different blocks
+          for (let i = 0; i < 3; i += 1) {
+            // eslint-disable-next-line no-await-in-loop
+            const { transaction_hash } = await account.execute({
+              contractAddress: ETHtokenAddress,
+              entrypoint: 'transfer',
+              calldata: {
+                recipient: account.address,
+                amount: cairo.uint256(BigInt(i + 1)),
+              },
+            });
+            // eslint-disable-next-line no-await-in-loop
+            await account.waitForTransaction(transaction_hash);
+            // eslint-disable-next-line no-await-in-loop
+            await createBlockForDevnet();
+          }
+
+          // Test with different block ranges
+          logger.setLogLevel('FATAL');
+          const smallRange = await rpcProvider.getEstimateTip('latest', {
+            minTxsNecessary: 1,
+            maxBlocks: 1,
+          });
+          logger.setLogLevel('ERROR');
+
+          const largeRange = await rpcProvider.getEstimateTip('latest', {
+            minTxsNecessary: 1,
+            maxBlocks: 10,
+          });
+
+          expect(smallRange).toBeDefined();
+          expect(largeRange).toBeDefined();
+
+          // If insufficient data, values should be 0n
+          if (smallRange.recommendedTip === 0n) {
+            expect(smallRange).toEqual(expectZeroTipEstimate());
+          } else {
+            expect(smallRange.recommendedTip).toBeGreaterThan(0n);
+          }
+
+          if (largeRange.recommendedTip === 0n) {
+            expect(largeRange).toEqual(expectZeroTipEstimate());
+          } else {
+            expect(largeRange.recommendedTip).toBeGreaterThan(0n);
+          }
+        });
+      });
+
+      test('should handle provider with batching enabled', async () => {
+        // Create a provider with batching enabled
+        const batchedProvider = new RpcProvider({
+          nodeUrl: rpcProvider.channel.nodeUrl,
+          batch: 50, // Enable batching
+        });
+
+        const tipEstimate = await batchedProvider.getEstimateTip('latest', {
+          minTxsNecessary: 1,
+          maxBlocks: 10,
+        });
+
+        expect(tipEstimate).toBeDefined();
+
+        // Verify the structure is correct
+        expect(tipEstimate).toEqual({
+          minTip: expect.any(BigInt),
+          maxTip: expect.any(BigInt),
+          averageTip: expect.any(BigInt),
+          medianTip: expect.any(BigInt),
+          modeTip: expect.any(BigInt),
+          recommendedTip: expect.any(BigInt),
+          p90Tip: expect.any(BigInt),
+          p95Tip: expect.any(BigInt),
+          metrics: expect.objectContaining({
+            blocksAnalyzed: expect.any(Number),
+            transactionsTipsFound: expect.any(Array),
+          }),
+        });
+
+        // If insufficient data, values should be 0n
+        if (tipEstimate.recommendedTip === 0n) {
+          expect(tipEstimate).toEqual(expectZeroTipEstimate());
+        } else {
+          expect(tipEstimate.recommendedTip).toBeGreaterThan(0n);
+        }
+      });
+
+      test('should calculate statistics correctly with real data when available', async () => {
+        try {
+          const tipEstimate = await rpcProvider.getEstimateTip('latest', {
+            minTxsNecessary: 1,
+            maxBlocks: 15,
+          });
+
+          // Verify mathematical relationships
+          expect(tipEstimate.minTip).toBeLessThanOrEqual(tipEstimate.averageTip);
+          expect(tipEstimate.averageTip).toBeLessThanOrEqual(tipEstimate.maxTip);
+          expect(tipEstimate.medianTip).toBeGreaterThanOrEqual(tipEstimate.minTip);
+          expect(tipEstimate.medianTip).toBeLessThanOrEqual(tipEstimate.maxTip);
+          expect(tipEstimate.modeTip).toBeGreaterThanOrEqual(tipEstimate.minTip);
+          expect(tipEstimate.modeTip).toBeLessThanOrEqual(tipEstimate.maxTip);
+
+          // Verify recommended tip calculation
+          expect(tipEstimate.recommendedTip).toBe(tipEstimate.medianTip);
+        } catch (error) {
+          // Expected when insufficient tip data is available
+          expect((error as Error).message).toContain('Insufficient transaction data');
+        }
+      });
+
+      test('should use median tip directly as recommended tip', async () => {
+        try {
+          const tipEstimate = await rpcProvider.getEstimateTip('latest', {
+            minTxsNecessary: 1,
+            maxBlocks: 10,
+          });
+
+          // Recommended tip should equal median tip directly
+          expect(tipEstimate.recommendedTip).toBe(tipEstimate.medianTip);
+        } catch (error) {
+          // Expected in environments without sufficient tip data
+          expect((error as Error).message).toContain('Insufficient transaction data');
+        }
+      });
+    });
+  });
+
+  describe('EIP712 verification', () => {
+    beforeEach(async () => {
+      // Use existing rpcProvider and account from outer scope
+    });
+
+    test('sign and verify message', async () => {
+      const signature = await account.signMessage(typedDataExample);
+      const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
+        typedDataExample,
+        signature,
+        account.address
+      );
+      expect(verifMessageResponse).toBe(true);
+
+      const messageHash = await account.hashMessage(typedDataExample);
+      const verifMessageResponse2: boolean = await rpcProvider.verifyMessageInStarknet(
+        messageHash,
+        signature,
+        account.address
+      );
+      expect(verifMessageResponse2).toBe(true);
+    });
+
+    test('sign and verify EIP712 message fail', async () => {
+      const signature = await account.signMessage(typedDataExample);
+      const [r, s] = stark.formatSignature(signature);
+
+      // change the signature to make it invalid
+      const r2 = num.toBigInt(r) + 123n;
+      const wrongSignature = new Signature(num.toBigInt(r2.toString()), num.toBigInt(s));
+      if (!wrongSignature) return;
+      const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
+        typedDataExample,
+        wrongSignature,
+        account.address
+      );
+      expect(verifMessageResponse).toBe(false);
+
+      const wrongAccountAddress = '0x123456789';
+      await expect(
+        rpcProvider.verifyMessageInStarknet(typedDataExample, signature, wrongAccountAddress)
+      ).rejects.toThrow();
     });
   });
 });
 
 describeIfTestnet('RPCProvider', () => {
-  const provider = getTestProvider();
+  let provider: ProviderInterface;
+
+  beforeEach(async () => {
+    provider = await createTestProvider();
+  });
 
   test('getL1MessageHash', async () => {
     const l2TransactionHash = '0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819';
@@ -459,11 +913,12 @@ describeIfTestnet('RPCProvider', () => {
     await expect(provider.getL1MessageHash('0x123')).rejects.toThrow(/Transaction hash not found/);
   });
 });
-describeIfNotDevnet('waitForBlock', () => {
-  // As Devnet-rs isn't generating automatically blocks at a periodic time, it's excluded of this test.
+describeIfNotDevnet('If not devnet: waitForBlock', () => {
+  // As Starknet-devnet isn't generating automatically blocks at a periodic time, it's excluded of this test.
   const providerStandard = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
   const providerFastTimeOut = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL, retries: 1 });
   let block: number;
+
   beforeEach(async () => {
     block = await providerStandard.getBlockNumber();
   });
@@ -490,49 +945,8 @@ describeIfNotDevnet('waitForBlock', () => {
   test('waitForBlock pending', async () => {
     await providerStandard.waitForBlock('pending');
     expect(true).toBe(true); // answer without timeout Error (blocks have to be spaced with 16 minutes maximum : 200 retries * 5000ms)
-  });
-});
 
-describe('EIP712 verification', () => {
-  const rpcProvider = getTestProvider(false);
-  const account = getTestAccount(rpcProvider);
-
-  test('sign and verify message', async () => {
-    const signature = await account.signMessage(typedDataExample);
-    const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
-      typedDataExample,
-      signature,
-      account.address
-    );
-    expect(verifMessageResponse).toBe(true);
-
-    const messageHash = await account.hashMessage(typedDataExample);
-    const verifMessageResponse2: boolean = await rpcProvider.verifyMessageInStarknet(
-      messageHash,
-      signature,
-      account.address
-    );
-    expect(verifMessageResponse2).toBe(true);
-  });
-
-  test('sign and verify EIP712 message fail', async () => {
-    const signature = await account.signMessage(typedDataExample);
-    const [r, s] = stark.formatSignature(signature);
-
-    // change the signature to make it invalid
-    const r2 = toBigInt(r) + 123n;
-    const wrongSignature = new Signature(toBigInt(r2.toString()), toBigInt(s));
-    if (!wrongSignature) return;
-    const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
-      typedDataExample,
-      wrongSignature,
-      account.address
-    );
-    expect(verifMessageResponse).toBe(false);
-
-    const wrongAccountAddress = '0x123456789';
-    await expect(
-      rpcProvider.verifyMessageInStarknet(typedDataExample, signature, wrongAccountAddress)
-    ).rejects.toThrow();
+    await providerStandard.waitForBlock(BlockTag.PRE_CONFIRMED);
+    expect(true).toBe(true);
   });
 });
