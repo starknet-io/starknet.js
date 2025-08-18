@@ -1,4 +1,4 @@
-import { CairoUint128 } from '../../../src/utils/cairoDataTypes/uint128';
+import { CairoUint128 } from '../../../src';
 
 describe('CairoUint128 class Unit Tests', () => {
   describe('constructor with different input types', () => {

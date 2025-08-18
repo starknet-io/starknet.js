@@ -1,5 +1,4 @@
-import { CairoBytes31 } from '../../../src/utils/cairoDataTypes/bytes31';
-import { CairoFelt252 } from '../../../src/utils/cairoDataTypes/felt';
+import { CairoBytes31, CairoFelt252 } from '../../../src';
 
 describe('CairoBytes31 class Unit Tests', () => {
   describe('constructor with different input types', () => {
