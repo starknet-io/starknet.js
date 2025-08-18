@@ -1,3 +1,9 @@
+# [8.5.0](https://github.com/starknet-io/starknet.js/compare/v8.4.0...v8.5.0) (2025-08-18)
+
+### Features
+
+- **provider:** Add Brother ID domain resolution support ([#1313](https://github.com/starknet-io/starknet.js/issues/1313)) ([0bea966](https://github.com/starknet-io/starknet.js/commit/0bea966d29b51b026c6ed5d9916d9039d5fd6a17))
+
 # [8.4.0](https://github.com/starknet-io/starknet.js/compare/v8.3.1...v8.4.0) (2025-08-15)
 
 ### Features
