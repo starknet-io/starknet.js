@@ -131,7 +131,7 @@ describe('CairoByteArray Unit Tests', () => {
       expect(byteArray.pending_word_len?.toBigInt()).toBe(1n); // 0 is represented as 1 byte
       expect(byteArray.decodeUtf8()).toBe('\x00'); // NULL character
       expect(byteArray.toBigInt()).toBe(0n);
-      expect(byteArray.toHexString()).toBe('0x0');
+      expect(byteArray.toHexString()).toBe('0x00');
     });
 
     test('should handle zero number', () => {
@@ -142,7 +142,7 @@ describe('CairoByteArray Unit Tests', () => {
       expect(byteArray.pending_word_len?.toBigInt()).toBe(1n); // 0 is represented as 1 byte
       expect(byteArray.decodeUtf8()).toBe('\x00'); // NULL character
       expect(byteArray.toBigInt()).toBe(0n);
-      expect(byteArray.toHexString()).toBe('0x0');
+      expect(byteArray.toHexString()).toBe('0x00');
     });
 
     test('should handle large bigint that spans multiple chunks', () => {
@@ -243,6 +243,22 @@ describe('CairoByteArray Unit Tests', () => {
       expect(byteArray.data?.length).toBe(1); // 1 CairoBytes31 chunk
       expect(byteArray.pending_word?.toHexString()).toBe('0x3536373839'); // "56789"
       expect(byteArray.pending_word_len?.toBigInt()).toBe(5n);
+    });
+
+    test('should preserve pending word leading zeros for toBuffer()', () => {
+      const content = '0x000000010000001900000002';
+      const buffer = Buffer.from(content.slice(2), 'hex');
+      const byteArray = new CairoByteArray(buffer);
+
+      expect(byteArray.toBuffer().toString('hex')).toEqual(buffer.toString('hex'));
+    });
+
+    test('should preserve pending word leading zeros for toHexString()', () => {
+      const content = '0x000000010000001900000002';
+      const buffer = Buffer.from(content.slice(2), 'hex');
+      const byteArray = new CairoByteArray(buffer);
+
+      expect(byteArray.toHexString()).toEqual(content);
     });
   });
 

@@ -1,7 +1,13 @@
 /* eslint-disable no-underscore-dangle */
 import { BigNumberish } from '../../types';
 import assert from '../assert';
-import { addHexPrefix, bigIntToUint8Array, stringToUint8Array } from '../encode';
+import {
+  addHexPrefix,
+  bigIntToUint8Array,
+  buf2hex,
+  concatenateArrayBuffer,
+  stringToUint8Array,
+} from '../encode';
 import { getNext } from '../num';
 import { isBigInt, isBuffer, isInteger, isNumber, isString } from '../typed';
 import { addCompiledFlag } from '../helpers';
@@ -133,8 +139,7 @@ export class CairoByteArray {
     // Convert all bytes to Uint8Array and decode as UTF-8 string
     // This ensures multi-byte UTF-8 characters are not split across chunk boundaries
     const allBytes = this.reconstructBytes();
-    const fullBytes = new Uint8Array(allBytes);
-    return new TextDecoder().decode(fullBytes);
+    return new TextDecoder().decode(allBytes);
   }
 
   toBigInt() {
@@ -155,42 +160,14 @@ export class CairoByteArray {
   }
 
   toHexString() {
-    return addHexPrefix(this.toBigInt().toString(16));
+    const allBytes = this.reconstructBytes();
+    const hexValue = allBytes.length === 0 ? '0' : buf2hex(allBytes);
+    return addHexPrefix(hexValue);
   }
 
   toBuffer() {
-    // Note: toBuffer uses a slightly different byte reconstruction that filters out invalid bytes
     this.assertInitialized();
-
-    const allBytes: number[] = [];
-
-    // Add bytes from all complete chunks
-    this.data.forEach((chunk) => {
-      const chunkBytes = chunk.data;
-      for (let i = 0; i < chunkBytes.length; i += 1) {
-        allBytes.push(chunkBytes[i]);
-      }
-    });
-
-    // Add bytes from pending word with different validation logic than other methods
-    const pendingLen = Number(this.pending_word_len.toBigInt());
-    if (pendingLen > 0) {
-      const hex = this.pending_word.toHexString();
-      const hexWithoutPrefix = hex.startsWith('0x') ? hex.slice(2) : hex;
-      const paddedHex =
-        hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
-
-      for (let i = 0; i < pendingLen; i += 1) {
-        const byteHex = paddedHex.slice(i * 2, i * 2 + 2);
-        if (byteHex.length >= 2) {
-          const byteValue = parseInt(byteHex, 16);
-          if (!Number.isNaN(byteValue)) {
-            allBytes.push(byteValue);
-          }
-        }
-      }
-    }
-
+    const allBytes = this.reconstructBytes();
     return Buffer.from(allBytes);
   }
 
@@ -263,48 +240,22 @@ export class CairoByteArray {
   /**
    * Private helper to reconstruct the full byte sequence from chunks and pending word
    */
-  private reconstructBytes(): number[] {
+  private reconstructBytes(): Uint8Array {
     this.assertInitialized();
 
-    const allBytes: number[] = [];
-
     // Add bytes from all complete chunks (each chunk contains exactly 31 bytes when full)
-    this.data.forEach((chunk) => {
-      // Each chunk stores its data as a Uint8Array
-      const chunkBytes = chunk.data;
-      for (let i = 0; i < chunkBytes.length; i += 1) {
-        allBytes.push(chunkBytes[i]);
-      }
-    });
+    const allChunks: Uint8Array[] = this.data.flatMap((chunk) => chunk.data);
 
-    // Add bytes from pending word
+    // // Add bytes from pending word
     const pendingLen = Number(this.pending_word_len.toBigInt());
-    if (pendingLen > 0) {
-      // Get the hex string from pending_word and convert to bytes
-      const hex = this.pending_word.toHexString();
-      const hexWithoutPrefix = hex.startsWith('0x') ? hex.slice(2) : hex;
-
-      // Convert hex to bytes
-      // Ensure hex string has even length by padding with leading zero if necessary
-      const paddedHex =
-        hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
-
-      for (let i = 0; i < pendingLen; i += 1) {
-        const byteHex = paddedHex.slice(i * 2, i * 2 + 2);
-        if (byteHex.length < 2) {
-          // If we don't have enough hex digits, treat as zero
-          allBytes.push(0);
-        } else {
-          const byteValue = parseInt(byteHex, 16);
-          if (Number.isNaN(byteValue)) {
-            throw new Error(`Invalid hex byte: ${byteHex}`);
-          }
-          allBytes.push(byteValue);
-        }
-      }
+    if (pendingLen) {
+      const pending = new Uint8Array(pendingLen);
+      const paddingDifference = pendingLen - this.pending_word.data.length;
+      pending.set(this.pending_word.data, paddingDifference);
+      allChunks.push(pending);
     }
 
-    return allBytes;
+    return concatenateArrayBuffer(allChunks);
   }
 
   static factoryFromApiResponse(responseIterator: Iterator<string>): CairoByteArray {
