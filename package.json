@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "8.5.1",
+  "version": "8.5.2",
   "description": "JavaScript library for Starknet",
   "license": "MIT",
   "repository": {

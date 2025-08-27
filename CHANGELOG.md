@@ -1,3 +1,9 @@
+## [8.5.2](https://github.com/starknet-io/starknet.js/compare/v8.5.1...v8.5.2) (2025-08-27)
+
+### Bug Fixes
+
+- preserve leading zeros for cairo bytes data ([5542a00](https://github.com/starknet-io/starknet.js/commit/5542a0015d0cc3cae186d63fe4258c9942ff07d2))
+
 ## [8.5.1](https://github.com/starknet-io/starknet.js/compare/v8.5.0...v8.5.1) (2025-08-27)
 
 ### Bug Fixes
