@@ -701,5 +701,19 @@ describe('CairoByteArray Unit Tests', () => {
         expect(apiRequest1).toEqual(apiRequest2);
       });
     });
+
+    test('should preserve data leading zeros for toApiRequest()', () => {
+      const content =
+        '0x' +
+        '000000019900000000000002222222374206275726e206d65737aaaa000001' +
+        '000000029900000000000002222222374206275726e206d65737aaaa000002' +
+        '000000039900000000000002222222374206275726e206d65737aaaa000003';
+      const buffer = Buffer.from(content.slice(2), 'hex');
+      const byteArray = new CairoByteArray(buffer);
+      const apiRequest = byteArray.toApiRequest();
+      const reconstructedByteArray = CairoByteArray.factoryFromApiResponse(apiRequest.values());
+
+      expect(reconstructedByteArray.toHexString()).toEqual(content);
+    });
   });
 });

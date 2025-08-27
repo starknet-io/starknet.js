@@ -126,7 +126,7 @@ describe('CairoBytes31 class Unit Tests', () => {
     });
   });
 
-  describe('toUnicode method', () => {
+  describe('decodeUtf8 method', () => {
     test('should convert ASCII text back to original string', () => {
       const text = 'hello world';
       const bytes31 = new CairoBytes31(text);
@@ -200,7 +200,7 @@ describe('CairoBytes31 class Unit Tests', () => {
     test('should convert Uint8Array to hex', () => {
       const array = new Uint8Array([1, 2, 3, 4]);
       const bytes31 = new CairoBytes31(array);
-      expect(bytes31.toHexString()).toBe('0x1020304');
+      expect(bytes31.toHexString()).toBe('0x01020304');
     });
 
     test('should handle maximum length data', () => {
@@ -208,6 +208,12 @@ describe('CairoBytes31 class Unit Tests', () => {
       const bytes31 = new CairoBytes31(maxArray);
       const expectedHex = `0x${'ff'.repeat(31)}`;
       expect(bytes31.toHexString()).toBe(expectedHex);
+    });
+
+    test('should preserve leading zero values', () => {
+      const buffer = Buffer.from([0, 0, 1]);
+      const bytes31 = new CairoBytes31(buffer);
+      expect(bytes31.toHexString()).toEqual(`0x${buffer.toString('hex')}`);
     });
   });
 
@@ -230,7 +236,7 @@ describe('CairoBytes31 class Unit Tests', () => {
     test('should return hex string array for Buffer input', () => {
       const buffer = Buffer.from([1, 0]); // 0x0100 = 256
       const bytes31 = new CairoBytes31(buffer);
-      expect(bytes31.toApiRequest()).toEqual(['0x100']);
+      expect(bytes31.toApiRequest()).toEqual(['0x0100']);
     });
 
     test('should return hex string array for large values', () => {

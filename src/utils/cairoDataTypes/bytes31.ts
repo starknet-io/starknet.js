@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { addHexPrefix, stringToUint8Array, uint8ArrayToBigInt } from '../encode';
+import { addHexPrefix, buf2hex, stringToUint8Array, uint8ArrayToBigInt } from '../encode';
 import { getNext } from '../num';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
@@ -22,7 +22,7 @@ export class CairoBytes31 {
       return stringToUint8Array(data);
     }
     if (isBuffer(data)) {
-      return new Uint8Array(data as Buffer);
+      return new Uint8Array(data);
     }
     if (data instanceof Uint8Array) {
       return new Uint8Array(data);
@@ -43,7 +43,11 @@ export class CairoBytes31 {
   }
 
   toHexString() {
-    return addHexPrefix(this.toBigInt().toString(16));
+    // TODO: revisit empty data handling for CairoBytes31 and CairoByteArray
+    // how to differentiate empty and zero input
+    const hexValue = this.data.length === 0 ? '0' : buf2hex(this.data);
+
+    return addHexPrefix(hexValue);
   }
 
   static validate(data: Uint8Array | string | Buffer | unknown): void {
