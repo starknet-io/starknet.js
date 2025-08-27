@@ -1,3 +1,9 @@
+## [8.5.1](https://github.com/starknet-io/starknet.js/compare/v8.5.0...v8.5.1) (2025-08-27)
+
+### Bug Fixes
+
+- preserve leading zeros for pending word within byte array ([5d7ab04](https://github.com/starknet-io/starknet.js/commit/5d7ab042ce1a81e4f31a5ec4488db758308e872a))
+
 # [8.5.0](https://github.com/starknet-io/starknet.js/compare/v8.4.0...v8.5.0) (2025-08-18)
 
 ### Features
