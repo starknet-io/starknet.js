@@ -4,7 +4,7 @@ We love pull requests. And following these guidelines will make your pull reques
 
 If you want to contribute but don’t know what to do, take a look at these two labels: [help wanted](https://github.com/starknet-io/starknet.js/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [good first issue](https://github.com/starknet-io/starknet.js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 
-_[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) for simple documentation changes, otherwise follow the steps below._
+_[Use GitHub interface](https://sapegin.me/blog/open-source-for-everyone/) for simple documentation changes, otherwise follow the steps below._
 
 > :warning: IMPORTANT NOTE :warning:
 >
@@ -13,7 +13,7 @@ _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) f
 
 ## Prerequisites
 
-- If it’s your first pull request, watch [this amazing course](http://makeapullrequest.com/) by [Kent C. Dodds](https://twitter.com/kentcdodds).
+- If it’s your first pull request, watch [this amazing course](http://makeapullrequest.com/) by [Kent C. Dodds](https://x.com/kentcdodds).
 - Fork the repository and clone your fork.
 - Checkout to the `develop` branch.
 - Install dependencies: `npm install`.
