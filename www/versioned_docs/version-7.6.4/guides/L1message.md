@@ -10,7 +10,7 @@ You can exchange messages between L1 & L2 networks:
 - L2 Starknet Testnet ↔️ L1 Sepolia ETH testnet.
 - L2 local Starknet Devnet ↔️ L1 local ETH testnet (anvil, ...).
 
-You can find an explanation of the global mechanism [here](https://docs.starknet.io/architecture-and-concepts/network-architecture/messaging-mechanism/).
+You can find an explanation of the global mechanism [here](https://docs.starknet.io/learn/protocol/messaging).
 
 Most of the code for this messaging process will be written in Cairo, but Starknet.js provides some functionalities for this subject.
 
