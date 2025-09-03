@@ -40,6 +40,8 @@ import {
   isTypeTuple,
   isTypeUint,
 } from './cairo';
+import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
+import { CairoOption } from './enum';
 
 // TODO: separate validate is redundant as CairoTypes are validated during construction.
 // TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
@@ -220,8 +222,11 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
 
   const methodsKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(parameter));
   const keys = [...Object.getOwnPropertyNames(parameter), ...methodsKeys];
-  if (isTypeOption(input.type) && keys.includes('isSome') && keys.includes('isNone')) {
-    return; // Option Enum
+  if (isTypeOption(input.type) && parameter instanceof CairoTypeOption) {
+    return; // CairoTypeOption Enum
+  }
+  if (isTypeOption(input.type) && parameter instanceof CairoOption) {
+    return; // CairoTypeOption Enum
   }
   if (isTypeResult(input.type) && keys.includes('isOk') && keys.includes('isErr')) {
     return; // Result Enum

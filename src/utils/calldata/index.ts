@@ -32,12 +32,18 @@ import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoArray } from '../cairoDataTypes/array';
 import { CairoTuple } from '../cairoDataTypes/tuple';
 import formatter from './formatter';
-import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
+import {
+  createAbiParser,
+  hdParsingStrategy,
+  isNoConstructorValid,
+  ParsingStrategy,
+} from './parser';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
 import responseParser from './responseParser';
 import validateFields from './validate';
+import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 
 export * as cairo from './cairo';
 export { parseCalldataField } from './requestParser';
@@ -107,9 +113,10 @@ export class CallData {
   /**
    * Compile contract callData with abi
    * Parse the calldata by using input fields from the abi for that method
-   * @param method string - method name
-   * @param argsCalldata RawArgs - arguments passed to the method. Can be an array of arguments (in the order of abi definition), or an object constructed in conformity with abi (in this case, the parameter can be in a wrong order).
-   * @return Calldata - parsed arguments in format that contract is expecting
+   * @param {string} method string - method name
+   * @param {RawArgs} argsCalldata RawArgs - arguments passed to the method. Can be an array of arguments (in the order of abi definition), or an object constructed in conformity with abi (in this case, the parameter can be in a wrong order).
+   * @param {ParsingStrategy} [parserStrategy = hdParsingStrategy] - optional parsing strategy to override the default one
+   * @return {Calldata} parsed arguments in format that contract is expecting
    * @example
    * ```typescript
    * const calldata = myCallData.compile("constructor", ["0x34a", [1, 3n]]);
@@ -118,7 +125,11 @@ export class CallData {
    * const calldata2 = myCallData.compile("constructor", {list:[1, 3n], balance:"0x34"}); // wrong order is valid
    * ```
    */
-  public compile(method: string, argsCalldata: RawArgs): Calldata {
+  public compile(
+    method: string,
+    argsCalldata: RawArgs,
+    parserStrategy: ParsingStrategy = hdParsingStrategy
+  ): Calldata {
     const abiMethod = this.abi.find((abiFunction) => abiFunction.name === method) as FunctionAbi;
 
     if (isNoConstructorValid(method, argsCalldata, abiMethod)) {
@@ -134,7 +145,8 @@ export class CallData {
         argsCalldata,
         abiMethod.inputs,
         this.structs,
-        this.enums
+        this.enums,
+        parserStrategy
       );
       args = Object.values(orderedObject);
       //   // validate array elements to abi
@@ -236,6 +248,13 @@ export class CallData {
             }
             if (value instanceof CairoTuple) {
               // CairoTuple - use toApiRequest() to get flat array (no length prefix), then convert to tree structure
+              const apiRequest = value.toApiRequest();
+              const compiledObj = Object.fromEntries(
+                apiRequest.map((item, idx) => [idx.toString(), item])
+              );
+              return getEntries(compiledObj, `${prefix}${kk}.`);
+            }
+            if (value instanceof CairoTypeOption) {
               const apiRequest = value.toApiRequest();
               const compiledObj = Object.fromEntries(
                 apiRequest.map((item, idx) => [idx.toString(), item])
