@@ -40,10 +40,12 @@ import { CairoType } from './cairoType.interface';
 export class CairoFixedArray extends CairoType {
   static dynamicSelector = 'CairoFixedArray' as const;
 
+  public readonly dynamicSelector = CairoFixedArray.dynamicSelector;
+
   /**
    * Array of CairoType instances representing a Cairo fixed array.
    */
-  public readonly content: CairoType[];
+  public readonly content: any[];
 
   /**
    * Cairo fixed array type.
@@ -400,20 +402,19 @@ export class CairoFixedArray extends CairoType {
   public decompose(strategy: ParsingStrategy): any[] {
     // Use response parsers to get final parsed values (for API response parsing)
     const elementType = CairoFixedArray.getFixedArrayType(this.arrayType);
-
     return this.content.map((element) => {
-      if (element instanceof CairoFixedArray) {
-        // For nested arrays, decompose recursively with strategy
-        return element.decompose(strategy);
-      }
       // For raw string values (unsupported types), throw error
       if (typeof element === 'string') {
         throw new Error(`No parser found for element type: ${elementType} in parsing strategy`);
       }
-
-      // For primitive types, use the response parser to get final values
-      const responseParser = strategy.response[elementType];
-
+      let parserName: string = elementType;
+      if (element instanceof CairoType) {
+        if (Object.hasOwn(element, 'dynamicSelector')) {
+          // dynamic recursive CairoType
+          parserName = (element as any).dynamicSelector;
+        }
+      }
+      const responseParser = strategy.response[parserName];
       if (responseParser) {
         return responseParser(element);
       }

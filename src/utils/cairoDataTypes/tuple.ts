@@ -42,10 +42,12 @@ import { CairoFelt252 } from './felt';
 export class CairoTuple extends CairoType {
   static dynamicSelector = 'CairoTuple' as const;
 
+  public readonly dynamicSelector = CairoTuple.dynamicSelector;
+
   /**
    * Array of CairoType instances representing the tuple elements.
    */
-  public readonly content: CairoType[];
+  public readonly content: any[];
 
   /**
    * Cairo tuple type string.
@@ -586,10 +588,10 @@ export class CairoTuple extends CairoType {
     const elementTypes = CairoTuple.getTupleElementTypes(this.tupleType);
 
     return this.content.map((element, index) => {
-      if (element instanceof CairoTuple) {
-        // For nested tuples, decompose recursively with strategy
-        return element.decompose(strategy);
-      }
+      // if (element instanceof CairoTuple) {
+      //   // For nested tuples, decompose recursively with strategy
+      //   return element.decompose(strategy);
+      // }
       // For raw string values (unsupported types), throw error
       if (typeof element === 'string') {
         const elementType =
@@ -599,32 +601,44 @@ export class CairoTuple extends CairoType {
         throw new Error(`No parser found for element type: ${elementType} in parsing strategy`);
       }
 
-      // For primitive types, use the response parser to get final values
-      const elementType =
-        typeof elementTypes[index] === 'string'
-          ? (elementTypes[index] as string)
-          : (elementTypes[index] as any).type;
-      const responseParser = strategy.response[elementType];
+      // // For primitive types, use the response parser to get final values
+      // const elementType =
+      //   typeof elementTypes[index] === 'string'
+      //     ? (elementTypes[index] as string)
+      //     : (elementTypes[index] as any).type;
+      // const responseParser = strategy.response[elementType];
 
+      // if (responseParser) {
+      //   return responseParser(element);
+      // }
+
+      // // Check dynamic selectors for response parsing
+      // const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+      // const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+
+      // if (matchingSelector) {
+      //   const [selectorName] = matchingSelector;
+      //   const dynamicResponseParser = strategy.response[selectorName];
+      //   if (dynamicResponseParser) {
+      //     return dynamicResponseParser(element);
+      //   }
+      // }
+      // TODO: "as string" to be removed once extractCairo1Tuple result is only string (no more object as result)
+      let parserName: string = elementTypes[index] as string;
+      if (element instanceof CairoType) {
+        if (Object.hasOwn(element, 'dynamicSelector')) {
+          // dynamic recursive CairoType
+          parserName = (element as any).dynamicSelector;
+        }
+      }
+      const responseParser = strategy.response[parserName];
       if (responseParser) {
         return responseParser(element);
       }
 
-      // Check dynamic selectors for response parsing
-      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-      const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-
-      if (matchingSelector) {
-        const [selectorName] = matchingSelector;
-        const dynamicResponseParser = strategy.response[selectorName];
-        if (dynamicResponseParser) {
-          return dynamicResponseParser(element);
-        }
-      }
-
       // No response parser found - throw error instead of fallback magic
       throw new Error(
-        `No response parser found for element type: ${elementType} in parsing strategy`
+        `No response parser found for element type: ${elementTypes[index]} in parsing strategy`
       );
     });
   }

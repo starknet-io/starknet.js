@@ -22,8 +22,10 @@ import { CairoOptionVariant, CairoOption } from '../calldata/enum';
 export class CairoTypeOption extends CairoType {
   static dynamicSelector = 'CairoTypeOption' as const;
 
+  public readonly dynamicSelector = CairoTypeOption.dynamicSelector;
+
   /* CairoType instance representing a Cairo option. */
-  public readonly content: CairoType | undefined;
+  public readonly content: any;
 
   /* Cairo type of the option. */
   public readonly optionCairoType: string;
@@ -122,52 +124,9 @@ export class CairoTypeOption extends CairoType {
         this.isVariantSome = variant === CairoOptionVariant.Some;
       } else if (content instanceof CairoOption) {
         // "content" is a CairoOption
-        switch (content.isSome()) {
-          case true: {
-            const elementType = CairoTypeOption.getVariantSomeType(optionCairoType);
-            const constructor = strategy.constructors[elementType];
-            if (constructor) {
-              this.content = constructor(
-                content.unwrap(),
-                elementType,
-                content.isSome() ? CairoOptionVariant.Some : CairoOptionVariant.None
-              );
-            } else {
-              const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-              const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
-                selectorFn(elementType)
-              );
-              if (matchingSelector) {
-                const [selectorName] = matchingSelector;
-                const dynamicConstructor = strategy.constructors[selectorName];
-                if (dynamicConstructor) {
-                  this.content = dynamicConstructor(
-                    content,
-                    elementType,
-                    content.isSome() ? CairoOptionVariant.Some : CairoOptionVariant.None
-                  );
-                }
-              } else {
-                throw new Error(`"${elementType}" is not a valid Cairo type`);
-              }
-            }
-            this.isVariantSome = true;
-            break;
-          }
-          case false: {
-            this.content = new CairoTypeOption(
-              undefined,
-              optionCairoType,
-              strategy,
-              CairoOptionVariant.None
-            );
-            this.isVariantSome = false;
-            break;
-          }
-          default: {
-            throw new Error('Invalid Option variant.');
-          }
-        }
+        const elementType = CairoTypeOption.getVariantSomeType(optionCairoType);
+        this.content = CairoTypeOption.fromCairoOption(content, elementType, strategy);
+        this.isVariantSome = variant === CairoOptionVariant.Some;
       } else {
         // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
         switch (variant) {
@@ -286,9 +245,9 @@ export class CairoTypeOption extends CairoType {
 
   /**
    * Check if input data is valid for CairoTypeOption creation.
-   * @param input - Input data to check
-   * @param type - The Cairo option type (e.g., "core::option::Option::<core::integer::u8>")
-   * @returns true if valid, false otherwise
+   * @param {unknown} input - Input data to check
+   * @param {string} type - The Cairo option type (e.g., "core::option::Option::<core::integer::u8>")
+   * @returns {boolean} true if valid, false otherwise
    * @example
    * ```typescript
    * const isValid1 = CairoTypeOption.is(200, "core::option::Option::<core::integer::u16>", CairoOptionVariant.Some"); // true
@@ -321,6 +280,35 @@ export class CairoTypeOption extends CairoType {
   }
 
   /**
+   * create a CairoTypeOption instance from a CairoOption instance.
+   * @param {CairoOption<any>} option - CairoOption instance to convert.
+   * @param {string} type - The Cairo option type string (e.g., "core::option::Option::<core::integer::u8>").
+   * @param {ParsingStrategy} strategy - Parsing strategy for element type handling (e.g. hdParsingStrategy).
+   * @returns {CairoTypeOption} new CairoTypeOption instance.
+   * @example
+   * ```typescript
+   * const myCairoTypeOption = CairoTypeOption.fromCairoOption(
+   *  myCairoOption,
+   *  "core::option::Option::<core::integer::u32>",
+   *  hdParsingStrategy
+   * );
+   * ```
+   */
+  static fromCairoOption(
+    option: CairoOption<any>,
+    type: string,
+    strategy: ParsingStrategy
+  ): CairoTypeOption {
+    const content = option.unwrap();
+    return new CairoTypeOption(
+      content,
+      type,
+      strategy,
+      option.isSome() ? CairoOptionVariant.Some : CairoOptionVariant.None
+    );
+  }
+
+  /**
    * Serialize the Cairo option into hex strings for Starknet API requests.
    *
    * Converts all CairoType elements in this Cairo option into their hex string representation
@@ -344,31 +332,55 @@ export class CairoTypeOption extends CairoType {
 
   private decomposeSome(strategyDecode?: ParsingStrategy): any {
     const strategy = strategyDecode ?? this.strategy;
-    const someType = CairoTypeOption.getVariantSomeType(this.optionCairoType);
-    const responseParser = strategy.response[someType];
-    if (responseParser) {
-      if (this.isVariantSome) {
-        const someContent = responseParser(this.content!);
-        return someContent;
-      }
-      return undefined;
-    }
-    const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-    const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
-      selectorFn(this.optionCairoType)
-    );
 
-    if (matchingSelector) {
-      if (this.isVariantSome) {
-        const [selectorName] = matchingSelector;
-        const dynamicResponseParser = strategy.response[selectorName];
-        if (dynamicResponseParser) {
-          return dynamicResponseParser(this.content!);
-        }
-      }
-      return undefined;
+    const { content } = this;
+    // const someType = CairoTypeOption.getVariantSomeType(this.optionCairoType);
+    // const responseParser = strategy.response[someType];
+    // if (responseParser) {
+    //   if (this.isVariantSome) {
+    //     const someContent = responseParser(this.content!);
+    //     return someContent;
+    //   }
+    //   return undefined;
+    // }
+    // const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+    // const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+    //   selectorFn(this.optionCairoType)
+    // );
+
+    // if (matchingSelector) {
+    //   if (this.isVariantSome) {
+    //     const [selectorName] = matchingSelector;
+    //     const dynamicResponseParser = strategy.response[selectorName];
+    //     if (dynamicResponseParser) {
+    //       return dynamicResponseParser(this.content!);
+    //     }
+    //   }
+    //   return undefined;
+    // }
+    // throw new Error(`No response parser found for element type: ${someType} in parsing strategy`);
+    const elementType = CairoTypeOption.getVariantSomeType(this.optionCairoType);
+    // return (
+    // For raw string values (unsupported types), throw error
+    if (typeof content === 'string') {
+      throw new Error(`No parser found for element type: ${elementType} in parsing strategy`);
     }
-    throw new Error(`No response parser found for element type: ${someType} in parsing strategy`);
+    let parserName: string = elementType;
+    if (content instanceof CairoType) {
+      if (Object.hasOwn(content, 'dynamicSelector')) {
+        // dynamic recursive CairoType
+        parserName = (content as any).dynamicSelector;
+      }
+    }
+    const responseParser = strategy.response[parserName];
+    if (responseParser) {
+      return responseParser(content);
+    }
+
+    // No response parser found - throw error instead of fallback magic
+    throw new Error(
+      `No response parser found for element type: ${elementType} in parsing strategy`
+    );
   }
 
   /**
@@ -387,8 +399,8 @@ export class CairoTypeOption extends CairoType {
    * ```
    */
   public decompose(strategy: ParsingStrategy): CairoOption<any> {
-    const someContent = this.decomposeSome(strategy);
     if (this.isVariantSome) {
+      const someContent = this.decomposeSome(strategy);
       return new CairoOption<any>(CairoOptionVariant.Some, someContent);
     }
     return new CairoOption<any>(CairoOptionVariant.None);

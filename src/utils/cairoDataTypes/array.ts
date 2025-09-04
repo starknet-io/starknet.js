@@ -4,6 +4,8 @@ import { getNext, toHex } from '../num';
 import { felt, getArrayType, isTypeArray } from '../calldata/cairo';
 import { type ParsingStrategy } from '../calldata/parser/parsingStrategy';
 import { CairoType } from './cairoType.interface';
+import { CairoTypeOption } from './cairoTypeOption';
+import { CairoOption } from '../calldata/enum';
 
 /**
  * Represents a Cairo dynamic array with runtime-determined length.
@@ -43,10 +45,12 @@ import { CairoType } from './cairoType.interface';
 export class CairoArray extends CairoType {
   static dynamicSelector = 'CairoArray' as const;
 
+  public readonly dynamicSelector = CairoArray.dynamicSelector;
+
   /**
    * Array of CairoType instances representing a Cairo dynamic array.
    */
-  public readonly content: CairoType[];
+  public readonly content: any[];
 
   /**
    * Cairo dynamic array type.
@@ -107,6 +111,9 @@ export class CairoArray extends CairoType {
 
       // Create CairoType instances for each element
       this.content = values.map((value) => {
+        if (value instanceof CairoOption) {
+          return CairoTypeOption.fromCairoOption(value, elementType, strategy);
+        }
         // First check direct constructors
         const constructor = strategy.constructors[elementType];
         if (constructor) {
@@ -336,20 +343,19 @@ export class CairoArray extends CairoType {
   public decompose(strategy: ParsingStrategy): any[] {
     // Use response parsers to get final parsed values (for API response parsing)
     const elementType = getArrayType(this.arrayType);
-
     return this.content.map((element) => {
-      if (element instanceof CairoArray) {
-        // For nested arrays, decompose recursively with strategy
-        return element.decompose(strategy);
-      }
       // For raw string values (unsupported types), throw error
       if (typeof element === 'string') {
         throw new Error(`No parser found for element type: ${elementType} in parsing strategy`);
       }
-
-      // For primitive types, use the response parser to get final values
-      const responseParser = strategy.response[elementType];
-
+      let parserName: string = elementType;
+      if (element instanceof CairoType) {
+        if (Object.hasOwn(element, 'dynamicSelector')) {
+          // dynamic recursive CairoType
+          parserName = (element as any).dynamicSelector;
+        }
+      }
+      const responseParser = strategy.response[parserName];
       if (responseParser) {
         return responseParser(element);
       }
