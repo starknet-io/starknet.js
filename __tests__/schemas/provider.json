@@ -233,22 +233,23 @@
       "$ref": "starknet_trace_api_openrpc#/components/schemas/TRANSACTION_TRACE"
     },
     "BlockWithTxReceipts": {
-      "oneOf": [
+      "comment": "oneOf changed to anyOf since results sometimes overlap and oneOf is exclusive",
+      "anyOf": [
         {
-          "$ref": "starknet_api_openrpc#/components/schemas/BLOCK_WITH_RECEIPTS"
+          "$ref": "starknet_api_openrpc#/components/schemas/BLOCK_WITH_TXS"
         },
         {
-          "$ref": "starknet_api_openrpc#/components/schemas/PENDING_BLOCK_WITH_RECEIPTS"
+          "$ref": "starknet_api_openrpc#/components/schemas/PRE_CONFIRMED_BLOCK_WITH_TXS"
         }
       ]
     },
-    "BlockWithTxReceipts071": {
+    "BlockWithTxReceipts08": {
       "oneOf": [
         {
-          "$ref": "starknet_api_openrpc071#/components/schemas/BLOCK_WITH_RECEIPTS"
+          "$ref": "starknet_api_openrpc08#/components/schemas/BLOCK_WITH_RECEIPTS"
         },
         {
-          "$ref": "starknet_api_openrpc071#/components/schemas/PENDING_BLOCK_WITH_RECEIPTS"
+          "$ref": "starknet_api_openrpc08#/components/schemas/PENDING_BLOCK_WITH_RECEIPTS"
         }
       ]
     }
