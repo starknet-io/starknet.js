@@ -19,7 +19,8 @@ import {
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
+import { contracts } from './config/fixtures';
+import { createTestProvider, getTestAccount } from './config/fixturesInit';
 
 describe('Cairo v2.4 onwards', () => {
   let provider: ProviderInterface;
@@ -39,7 +40,11 @@ describe('Cairo v2.4 onwards', () => {
         casm: contracts.C240.casm,
       });
 
-      stringContract = new Contract(contracts.C240.sierra.abi, deploy.contract_address, account);
+      stringContract = new Contract({
+        abi: contracts.C240.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('bytes31', async () => {
@@ -50,9 +55,11 @@ describe('Cairo v2.4 onwards', () => {
       expect(callD1).toEqual([hexToDecimalString(encodeShortString(str))]);
       const callD2 = CallData.compile({ str });
       expect(callD2).toEqual([hexToDecimalString(encodeShortString(str))]);
+
       const myCallData = new CallData(contracts.C240.sierra.abi);
       const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
       expect(myCalldata1).toEqual([encodeShortString(str)]);
+
       const myCalldata2 = myCallData.compile('proceed_bytes31', { str });
       expect(myCalldata2).toEqual([encodeShortString(str)]);
       const myCall1 = stringContract.populate('proceed_bytes31', [str]);
@@ -107,7 +114,11 @@ describe('Cairo v2.4 onwards', () => {
         casm: contracts.Tuple.casm,
       });
 
-      tupleContract = new Contract(contracts.Tuple.sierra.abi, deploy.contract_address, account);
+      tupleContract = new Contract({
+        abi: contracts.Tuple.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
       myCallData = new CallData(tupleContract.abi);
     });
 
@@ -246,7 +257,11 @@ describe('Cairo v2.4 onwards', () => {
         casm: contracts.U512.casm,
       });
 
-      u512Contract = new Contract(contracts.U512.sierra.abi, deploy.contract_address, account);
+      u512Contract = new Contract({
+        abi: contracts.U512.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('u512 compile', async () => {
@@ -321,11 +336,11 @@ describe('Cairo v2.4 onwards', () => {
         contract: contracts.NonZero.sierra,
         casm: contracts.NonZero.casm,
       });
-      nonZeroContract = new Contract(
-        contracts.NonZero.sierra.abi,
-        deploy.contract_address,
-        account
-      );
+      nonZeroContract = new Contract({
+        abi: contracts.NonZero.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('NonZero helpers', async () => {
@@ -392,7 +407,11 @@ describe('Cairo v2.4 onwards', () => {
         contract: contracts.U96.sierra,
         casm: contracts.U96.casm,
       });
-      u96Contract = new Contract(contracts.U96.sierra.abi, deploy.contract_address, account);
+      u96Contract = new Contract({
+        abi: contracts.U96.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('u96 compile', async () => {
@@ -427,11 +446,11 @@ describe('Cairo v2.4 onwards', () => {
         contract: contracts.fixedArray.sierra,
         casm: contracts.fixedArray.casm,
       });
-      fixedArrayContract = new Contract(
-        contracts.fixedArray.sierra.abi,
-        deploy.contract_address,
-        account
-      );
+      fixedArrayContract = new Contract({
+        abi: contracts.fixedArray.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      });
     });
 
     test('Fixed array compile [core::integer::u32; 8]', async () => {

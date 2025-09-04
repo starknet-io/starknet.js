@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2.1
+sidebar_position: 3
 ---
 
 # Configuration
@@ -17,13 +17,17 @@ Custom keys can also be used to store and use arbitrary values during runtime.
 import { config } from 'starknet';
 
 // Set existing or custom global property
-config.set('mode', 'DEFAULT');
+config.set('rpcVersion', '0.9.1');
+
+// Set WebSocket implementation for Node.js (if using older than Node.js 22)
+import WebSocket from 'ws';
+config.set('websocket', WebSocket);
 
 // Retrieve entire configuration
 config.getAll();
 
 // Retrieve single global property
-config.get('legacyMode');
+config.get('resourceBoundsOverhead');
 
 // Update (merge) existing configuration with modified or custom property
 config.update({ logLevel: 'DEBUG', newKey: 'value' });
@@ -36,19 +40,65 @@ config.delete('newKey');
 
 // Check existence of the global property
 config.hasKey('newKey');
+
+// Configure resource bounds overhead for fee estimation
+config.set('resourceBoundsOverhead', {
+  l1_gas: {
+    max_amount: 75,
+    max_price_per_unit: 60,
+  },
+  l2_gas: {
+    max_amount: 100,
+    max_price_per_unit: 60,
+  },
+  l1_data_gas: {
+    max_amount: 80,
+    max_price_per_unit: 70,
+  },
+});
 ```
 
 ### Global parameters and Default Global Configuration
 
 Default global configuration is the initial state that global configuration starts with.
-
-Details can be found in [global/constants.ts](https://github.com/starknet-io/starknet.js/blob/develop/src/global/constants.ts)
+Here are all the available configuration properties:
 
 ```ts
-  logLevel: 'INFO', // verbosity levels of the system logger, more details under logger
-  accountTxVersion: ETransactionVersion.V2, // by default use V2 transactions in Account class instances
-  legacyMode: false, // enable legacy transaction types (note: this could break the code depending on the Starknet version used by the network)
+{
+  // RPC version to use when communicating with nodes ('0.8.1' or '0.9.1')
+  rpcVersion: '0.9.1',
+
+  // Transaction version to use (only V3 is supported in v8)
+  transactionVersion: ETransactionVersion.V3,
+
+  // Verbosity levels of the system logger (more details under logger section)
+  logLevel: 'INFO',
+
+  // Resource bounds overhead configuration for transaction fee estimation (v8)
+  resourceBoundsOverhead: {
+    l1_gas: {
+      max_amount: 50,    // percentage increase for L1 gas amount
+      max_price_per_unit: 50,  // percentage increase for L1 gas price
+    },
+    l1_data_gas: {
+      max_amount: 50,    // percentage increase for L1 data gas amount
+      max_price_per_unit: 50,  // percentage increase for L1 data gas price
+    },
+    l2_gas: {
+      max_amount: 50,    // percentage increase for L2 gas amount
+      max_price_per_unit: 50,  // percentage increase for L2 gas price
+    },
+  },
+
+  // Custom fetch implementation (optional)
+  fetch: undefined,
+
+  // Custom websocket implementation (optional)
+  websocket: undefined
+}
 ```
+
+Details can be found in [global/constants.ts](https://github.com/starknet-io/starknet.js/blob/develop/src/global/constants.ts)
 
 ## Logger
 

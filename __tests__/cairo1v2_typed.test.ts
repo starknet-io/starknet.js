@@ -12,7 +12,7 @@ import {
   Calldata,
   CompiledSierra,
   Contract,
-  DeclareDeployUDCResponse,
+  ParsedEvents,
   ProviderInterface,
   RawArgsArray,
   RawArgsObject,
@@ -25,18 +25,19 @@ import {
   selector,
   shortString,
   stark,
-  types,
+  type DeclareDeployUDCResponse,
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { isString } from '../src/utils/typed';
+import { contracts } from './config/fixtures';
 import {
-  contracts,
   createTestProvider,
   getTestAccount,
   STRKtokenAddress,
+  adaptAccountIfDevnet,
   TEST_TX_VERSION,
-} from './config/fixtures';
+} from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -64,21 +65,21 @@ describe('Cairo 1', () => {
         contract: contracts.C1v2.sierra,
         casm: contracts.C1v2.casm,
       });
-      cairo1Contract = new Contract(
-        contracts.C1v2.sierra.abi,
-        dd.deploy.contract_address,
-        account
-      ).typedv2(tAbi);
+      cairo1Contract = new Contract({
+        abi: contracts.C1v2.sierra.abi,
+        address: dd.deploy.contract_address,
+        providerOrAccount: account,
+      }).typedv2(tAbi);
 
       dd2 = await account.declareAndDeploy({
         contract: contracts.C210.sierra,
         casm: contracts.C210.casm,
       });
-      cairo210Contract = new Contract(
-        contracts.C210.sierra.abi,
-        dd2.deploy.contract_address,
-        account
-      ).typedv2(tAbi);
+      cairo210Contract = new Contract({
+        abi: contracts.C210.sierra.abi,
+        address: dd2.deploy.contract_address,
+        providerOrAccount: account,
+      }).typedv2(tAbi);
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
@@ -743,7 +744,14 @@ describe('Cairo 1', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1', TEST_TX_VERSION);
+      accountC1 = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: toBeAccountAddress,
+          signer: priKey,
+          transactionVersion: TEST_TX_VERSION,
+        })
+      );
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
@@ -792,11 +800,11 @@ describe('Cairo 1', () => {
         casm: contracts.C1v2.casm,
       });
 
-      eventContract = new Contract(
-        contracts.C1v2.sierra.abi,
-        deploy.contract_address!,
-        account
-      ).typedv2(tAbi);
+      eventContract = new Contract({
+        abi: contracts.C1v2.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      }).typedv2(tAbi);
     });
 
     test('parse event returning a regular struct', async () => {
@@ -808,7 +816,7 @@ describe('Cairo 1', () => {
         simpleDataStruct,
         simpleDataArray
       );
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
@@ -830,7 +838,7 @@ describe('Cairo 1', () => {
         nestedKeyStruct,
         nestedDataStruct
       );
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventNested': {
             nestedKeyStruct,
@@ -845,7 +853,7 @@ describe('Cairo 1', () => {
 
     test('parse tx returning multiple similar events', async () => {
       const anotherKeyVariable = 100n;
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
@@ -890,7 +898,7 @@ describe('Cairo 1', () => {
       expect(events[1]).toMatchEventStructure(shouldBe[1]);
     });
     test('parse tx returning multiple different events', async () => {
-      const shouldBe: types.ParsedEvents = [
+      const shouldBe: ParsedEvents = [
         {
           'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
@@ -937,11 +945,11 @@ describe('Cairo 1', () => {
         casm: contracts.C240.casm,
       });
 
-      stringContract = new Contract(
-        contracts.C240.sierra.abi,
-        deploy.contract_address,
-        account
-      ).typedv2(StringABI);
+      stringContract = new Contract({
+        abi: contracts.C240.sierra.abi,
+        address: deploy.contract_address,
+        providerOrAccount: account,
+      }).typedv2(StringABI);
     });
 
     test('bytes31', async () => {

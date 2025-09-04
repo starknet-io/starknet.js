@@ -1,6 +1,6 @@
 /* eslint-disable no-new */
-import { Uint256 } from '../../../src';
 import {
+  Uint256,
   CairoUint256,
   UINT_256_HIGH_MAX,
   UINT_256_HIGH_MIN,
@@ -8,7 +8,7 @@ import {
   UINT_256_LOW_MIN,
   UINT_256_MAX,
   UINT_256_MIN,
-} from '../../../src/utils/cairoDataTypes/uint256';
+} from '../../../src';
 
 describe('CairoUint256 class test', () => {
   test('constructor 1 should throw on < UINT_256_MIN', () => {
@@ -26,6 +26,28 @@ describe('CairoUint256 class test', () => {
   test('constructor 2 (low, high)', () => {
     const u256 = new CairoUint256(1000, 1000);
     expect(u256.toApiRequest()).toEqual(['1000', '1000']);
+  });
+
+  test('constructor 1 should throw on null', () => {
+    expect(() => {
+      new CairoUint256(null as any);
+    }).toThrow('null value is not allowed for u256');
+  });
+
+  test('constructor 1 should throw on undefined', () => {
+    expect(() => {
+      new CairoUint256(undefined as any);
+    }).toThrow('undefined value is not allowed for u256');
+  });
+
+  test('constructor 1 should throw on invalid types', () => {
+    expect(() => {
+      new CairoUint256(Symbol('test') as any);
+    }).toThrow("Unsupported data type 'symbol' for u256");
+
+    expect(() => {
+      new CairoUint256((() => {}) as any);
+    }).toThrow("Unsupported data type 'function' for u256");
   });
 
   test('constructor 2 should throw out of bounds', () => {
@@ -80,6 +102,38 @@ describe('CairoUint256 class test', () => {
     expect(typeof validate).toBe('bigint');
   });
 
+  test('validate should reject null with specific error message', () => {
+    expect(() => {
+      CairoUint256.validate(null as any);
+    }).toThrow('null value is not allowed for u256');
+  });
+
+  test('validate should reject undefined with specific error message', () => {
+    expect(() => {
+      CairoUint256.validate(undefined as any);
+    }).toThrow('undefined value is not allowed for u256');
+  });
+
+  test('validate should reject unsupported data types with specific error messages', () => {
+    expect(() => {
+      CairoUint256.validate(Symbol('test') as any);
+    }).toThrow(
+      "Unsupported data type 'symbol' for u256. Expected string, number, bigint, or Uint256 object"
+    );
+
+    expect(() => {
+      CairoUint256.validate((() => {}) as any);
+    }).toThrow(
+      "Unsupported data type 'function' for u256. Expected string, number, bigint, or Uint256 object"
+    );
+
+    expect(() => {
+      CairoUint256.validate(true as any);
+    }).toThrow(
+      "Unsupported data type 'boolean' for u256. Expected string, number, bigint, or Uint256 object"
+    );
+  });
+
   test('is should return true', () => {
     const is = CairoUint256.is(UINT_256_MIN);
     expect(is).toBe(true);
@@ -88,6 +142,17 @@ describe('CairoUint256 class test', () => {
   test('is should return false', () => {
     const is = CairoUint256.is(UINT_256_MAX + 1n);
     expect(is).toBe(false);
+  });
+
+  test('is should return false for unknown invalid data types', () => {
+    expect(CairoUint256.is(null as any)).toBe(false);
+    expect(CairoUint256.is(undefined as any)).toBe(false);
+    expect(CairoUint256.is(Symbol('test') as any)).toBe(false);
+    expect(CairoUint256.is((() => {}) as any)).toBe(false);
+    expect(CairoUint256.is(true as any)).toBe(false);
+    expect(CairoUint256.is(false as any)).toBe(false);
+    // Note: Date, Map, Set can be converted to numbers/BigInt so they may pass validation
+    // depending on BigInt conversion behavior
   });
 
   test('constructor 1 should support BigNumberish', () => {
