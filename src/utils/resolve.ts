@@ -49,7 +49,7 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
  * @returns {boolean} True if the response matches the version, false otherwise.
  * @example
  * ``` typescript
- * const result = provider.isVersion("0.7","0.7.1");
+ * const result = provider.isVersion("0.9","0.9.0");
  * // result = true
  * ```
  */

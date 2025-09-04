@@ -31,8 +31,11 @@ export type SuccessfulTransactionReceiptResponseHelper = SuccessfulTransactionRe
   readonly statusReceipt: 'SUCCEEDED';
   readonly value: SuccessfulTransactionReceiptResponse;
   match(callbacks: TransactionReceiptCallbacks): void;
+  // @ts-ignore - docs
   isSuccess(): this is SuccessfulTransactionReceiptResponseHelper;
+  // @ts-ignore - docs
   isReverted(): this is RevertedTransactionReceiptResponseHelper;
+  // @ts-ignore - docs
   isError(): this is ErrorReceiptResponseHelper;
 };
 
@@ -40,8 +43,11 @@ export type RevertedTransactionReceiptResponseHelper = RevertedTransactionReceip
   readonly statusReceipt: 'REVERTED';
   readonly value: RevertedTransactionReceiptResponse;
   match(callbacks: TransactionReceiptCallbacks): void;
+  // @ts-ignore - docs
   isSuccess(): this is SuccessfulTransactionReceiptResponseHelper;
+  // @ts-ignore - docs
   isReverted(): this is RevertedTransactionReceiptResponseHelper;
+  // @ts-ignore - docs
   isError(): this is ErrorReceiptResponseHelper;
 };
 
@@ -49,8 +55,11 @@ export type ErrorReceiptResponseHelper = {
   readonly statusReceipt: 'ERROR';
   readonly value: Error;
   match(callbacks: TransactionReceiptCallbacks): void;
+  // @ts-ignore - docs
   isSuccess(): this is SuccessfulTransactionReceiptResponseHelper;
+  // @ts-ignore - docs
   isReverted(): this is RevertedTransactionReceiptResponseHelper;
+  // @ts-ignore - docs
   isError(): this is ErrorReceiptResponseHelper;
 };
 

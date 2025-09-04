@@ -82,6 +82,6 @@ This library would not be possible without these rockstars.
 
 ## 📜 License
 
-Copyright (c) 2024 StarkWare
+Copyright (c) 2025 StarkWare
 
 Licensed under the [MIT license](https://github.com/starknet-io/starknet.js/blob/main/LICENSE).

@@ -195,7 +195,7 @@ describe('defaultProvider', () => {
               user: '0xdeadbeef',
             }),
           })
-        ).rejects.toThrowError();
+        ).rejects.toThrow();
       });
     });
   });

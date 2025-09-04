@@ -207,7 +207,7 @@ export class RpcChannel {
 
   /**
    * fetch rpc node specVersion
-   * @example this.specVersion = "0.7.1"
+   * @example this.specVersion = "0.8.1"
    */
   public getSpecVersion() {
     return this.fetchEndpoint('starknet_specVersion');
