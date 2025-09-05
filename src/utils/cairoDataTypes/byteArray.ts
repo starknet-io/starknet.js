@@ -138,13 +138,13 @@ export class CairoByteArray {
   decodeUtf8() {
     // Convert all bytes to Uint8Array and decode as UTF-8 string
     // This ensures multi-byte UTF-8 characters are not split across chunk boundaries
-    const allBytes = this.reconstructBytes();
+    const allBytes = concatenateArrayBuffer(this.toElements());
     return new TextDecoder().decode(allBytes);
   }
 
   toBigInt() {
     // Reconstruct the full byte sequence
-    const allBytes = this.reconstructBytes();
+    const allBytes = concatenateArrayBuffer(this.toElements());
 
     // Convert bytes array to bigint
     if (allBytes.length === 0) {
@@ -160,15 +160,47 @@ export class CairoByteArray {
   }
 
   toHexString() {
-    const allBytes = this.reconstructBytes();
+    // TODO: revisit empty data handling, how to differentiate empty and zero input
+    const allBytes = concatenateArrayBuffer(this.toElements());
     const hexValue = allBytes.length === 0 ? '0' : buf2hex(allBytes);
     return addHexPrefix(hexValue);
   }
 
   toBuffer() {
-    this.assertInitialized();
-    const allBytes = this.reconstructBytes();
+    const allBytes = concatenateArrayBuffer(this.toElements());
     return Buffer.from(allBytes);
+  }
+
+  /**
+   * returns an array of all the data chunks and the pending word
+   * when concatenated, represents the original bytes sequence
+   */
+  toElements(): Uint8Array[] {
+    this.assertInitialized();
+
+    // Add bytes from all complete chunks (each chunk contains exactly 31 bytes when full)
+    const allChunks: Uint8Array[] = this.data.flatMap((chunk) => chunk.data);
+
+    // Add bytes from pending word
+    const pendingLen = Number(this.pending_word_len.toBigInt());
+    if (pendingLen) {
+      const pending = new Uint8Array(pendingLen);
+      const paddingDifference = pendingLen - this.pending_word.data.length;
+      pending.set(this.pending_word.data, paddingDifference);
+      allChunks.push(pending);
+    }
+
+    return allChunks;
+  }
+
+  /**
+   * Private helper to check if the CairoByteArray is properly initialized
+   */
+  private assertInitialized(): void {
+    assert(
+      this.data && this.pending_word !== undefined && this.pending_word_len !== undefined,
+      'CairoByteArray is not properly initialized'
+    );
   }
 
   static validate(data: Uint8Array | Buffer | BigNumberish | unknown) {
@@ -225,37 +257,6 @@ export class CairoByteArray {
    */
   static isAbiType(abiType: string): boolean {
     return abiType === CairoByteArray.abiSelector;
-  }
-
-  /**
-   * Private helper to check if the CairoByteArray is properly initialized
-   */
-  private assertInitialized(): void {
-    assert(
-      this.data && this.pending_word !== undefined && this.pending_word_len !== undefined,
-      'CairoByteArray is not properly initialized'
-    );
-  }
-
-  /**
-   * Private helper to reconstruct the full byte sequence from chunks and pending word
-   */
-  private reconstructBytes(): Uint8Array {
-    this.assertInitialized();
-
-    // Add bytes from all complete chunks (each chunk contains exactly 31 bytes when full)
-    const allChunks: Uint8Array[] = this.data.flatMap((chunk) => chunk.data);
-
-    // // Add bytes from pending word
-    const pendingLen = Number(this.pending_word_len.toBigInt());
-    if (pendingLen) {
-      const pending = new Uint8Array(pendingLen);
-      const paddingDifference = pendingLen - this.pending_word.data.length;
-      pending.set(this.pending_word.data, paddingDifference);
-      allChunks.push(pending);
-    }
-
-    return concatenateArrayBuffer(allChunks);
   }
 
   static factoryFromApiResponse(responseIterator: Iterator<string>): CairoByteArray {

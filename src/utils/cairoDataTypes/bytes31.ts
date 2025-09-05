@@ -14,7 +14,9 @@ export class CairoBytes31 {
 
   constructor(data: string | Uint8Array | Buffer | unknown) {
     CairoBytes31.validate(data);
-    this.data = CairoBytes31.__processData(data);
+    const processedData = CairoBytes31.__processData(data);
+    this.data = new Uint8Array(CairoBytes31.MAX_BYTE_SIZE); // ensure data has an exact size
+    this.data.set(processedData, CairoBytes31.MAX_BYTE_SIZE - processedData.length);
   }
 
   static __processData(data: Uint8Array | string | Buffer | unknown): Uint8Array {
@@ -39,15 +41,18 @@ export class CairoBytes31 {
   }
 
   decodeUtf8() {
-    return new TextDecoder().decode(this.data);
+    // strip leading zeros for decode to avoid leading null characters
+    const cutoff = this.data.findIndex((x) => x > 0);
+    const pruned = this.data.subarray(cutoff >= 0 ? cutoff : Infinity);
+    return new TextDecoder().decode(pruned);
   }
 
-  toHexString() {
-    // TODO: revisit empty data handling for CairoBytes31 and CairoByteArray
-    // how to differentiate empty and zero input
-    const hexValue = this.data.length === 0 ? '0' : buf2hex(this.data);
-
-    return addHexPrefix(hexValue);
+  /**
+   * @param padded flag for including leading zeros
+   */
+  toHexString(padded?: 'padded') {
+    const hex = padded === 'padded' ? buf2hex(this.data) : this.toBigInt().toString(16);
+    return addHexPrefix(hex);
   }
 
   static validate(data: Uint8Array | string | Buffer | unknown): void {
