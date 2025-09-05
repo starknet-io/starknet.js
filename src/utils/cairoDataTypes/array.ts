@@ -50,7 +50,7 @@ export class CairoArray extends CairoType {
   /**
    * Array of CairoType instances representing a Cairo dynamic array.
    */
-  public readonly content: any[];
+  public readonly content: CairoType[];
 
   /**
    * Cairo dynamic array type.
@@ -89,55 +89,53 @@ export class CairoArray extends CairoType {
    */
   constructor(content: unknown, arrayType: string, strategy: ParsingStrategy) {
     super();
-
-    // If content is already a CairoArray instance, just copy its properties
-    if (content instanceof CairoArray) {
-      this.content = content.content;
-      this.arrayType = content.arrayType;
+    this.arrayType = arrayType;
+    if (content && typeof content === 'object' && 'next' in content) {
+      // "content" is an iterator
+      const parsedContent: CairoType[] = CairoArray.parser(
+        content as Iterator<string>,
+        arrayType,
+        strategy
+      );
+      this.content = parsedContent;
       return;
     }
+    CairoArray.validate(content, arrayType);
+    const arrayContentType = CairoArray.getArrayElementType(arrayType);
+    const resultContent: any[] = CairoArray.extractValuesArray(content).map((contentItem: any) => {
+      if (
+        contentItem &&
+        typeof contentItem === 'object' &&
+        contentItem !== null &&
+        'toApiRequest' in contentItem
+      ) {
+        // "content" is a CairoType
+        return contentItem as CairoType;
+      }
+      if (contentItem instanceof CairoOption) {
+        // "content" is a CairoOption
+        return CairoTypeOption.fromCairoOption(contentItem, arrayContentType, strategy);
+      }
+      // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
 
-    // Check if input is an API response iterator
-    if (content && typeof content === 'object' && 'next' in content) {
-      // API response path - use parser
-      const parsedContent = CairoArray.parser(content as Iterator<string>, arrayType, strategy);
-      this.content = parsedContent;
-      this.arrayType = arrayType;
-    } else {
-      // User input path - process directly
-      CairoArray.validate(content, arrayType);
-      const values = CairoArray.extractValuesArray(content);
-      const elementType = getArrayType(arrayType);
-
-      // Create CairoType instances for each element
-      this.content = values.map((value) => {
-        if (value instanceof CairoOption) {
-          return CairoTypeOption.fromCairoOption(value, elementType, strategy);
+      const constructor = strategy.constructors[arrayContentType];
+      if (constructor) {
+        return constructor(contentItem, arrayContentType);
+      }
+      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+      const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+        selectorFn(arrayContentType)
+      );
+      if (matchingSelector) {
+        const [selectorName] = matchingSelector;
+        const dynamicConstructor = strategy.constructors[selectorName];
+        if (dynamicConstructor) {
+          return dynamicConstructor(contentItem, arrayContentType);
         }
-        // First check direct constructors
-        const constructor = strategy.constructors[elementType];
-        if (constructor) {
-          return constructor(value, elementType);
-        }
-
-        // Check dynamic selectors
-        const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-        const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-
-        if (matchingSelector) {
-          const [selectorName] = matchingSelector;
-          const dynamicConstructor = strategy.constructors[selectorName];
-          if (dynamicConstructor) {
-            return dynamicConstructor(value, elementType);
-          }
-        }
-
-        // Unknown type - store as string for later error handling
-        return String(value) as unknown as CairoType;
-      });
-
-      this.arrayType = arrayType;
-    }
+      }
+      throw new Error(`"${arrayContentType}" is not a valid Cairo type`);
+    });
+    this.content = resultContent;
   }
 
   /**

@@ -5,6 +5,8 @@ import { isTypeTuple, isCairo1Type, isTypeNamedTuple } from '../calldata/cairo';
 import { type ParsingStrategy } from '../calldata/parser/parsingStrategy';
 import { CairoType } from './cairoType.interface';
 import { CairoFelt252 } from './felt';
+import { CairoOption } from '../calldata/enum';
+import { CairoTypeOption } from './cairoTypeOption';
 
 /**
  * Represents a Cairo tuple with compile-time known structure.
@@ -23,7 +25,7 @@ import { CairoFelt252 } from './felt';
  *
  * @example
  * ```typescript
- * import { CairoTuple, hdParsingStrategy } from './path/to/module';
+ * import { CairoTuple, hdParsingStrategy } from 'starknet';
  *
  * // Simple tuple
  * const simple = new CairoTuple([1, 2], '(core::integer::u8, core::integer::u32)', hdParsingStrategy);
@@ -47,7 +49,7 @@ export class CairoTuple extends CairoType {
   /**
    * Array of CairoType instances representing the tuple elements.
    */
-  public readonly content: any[];
+  public readonly content: CairoType[];
 
   /**
    * Cairo tuple type string.
@@ -70,9 +72,6 @@ export class CairoTuple extends CairoType {
    * @param strategy - Parsing strategy for element type handling
    * @example
    * ```typescript
-   * // From user array
-   * const tuple1 = new CairoTuple([1, 2], '(core::integer::u8, core::integer::u32)', hdParsingStrategy);
-   *
    * // From user object with indices
    * const tuple2 = new CairoTuple({0: 1, 1: 2}, '(core::integer::u8, core::integer::u32)', hdParsingStrategy);
    *
@@ -89,70 +88,60 @@ export class CairoTuple extends CairoType {
    */
   constructor(content: unknown, tupleType: string, strategy: ParsingStrategy) {
     super();
-
-    // If content is already a CairoTuple instance, just copy its properties
-    if (content instanceof CairoTuple) {
-      this.content = content.content;
-      this.tupleType = content.tupleType;
+    this.tupleType = tupleType;
+    if (content && typeof content === 'object' && 'next' in content) {
+      // "content" is an iterator
+      const parsedContent: CairoType[] = CairoTuple.parser(
+        content as Iterator<string>,
+        tupleType,
+        strategy
+      );
+      this.content = parsedContent;
       return;
     }
-
-    // Check if input is an API response iterator
-    if (content && typeof content === 'object' && 'next' in content) {
-      // API response path - use parser
-      const parsedContent = CairoTuple.parser(content as Iterator<string>, tupleType, strategy);
-      this.content = parsedContent;
-      this.tupleType = tupleType;
-    } else {
-      // User input path - process directly
-      CairoTuple.validate(content, tupleType);
-      const values = CairoTuple.extractValuesArray(content, tupleType);
-      const elementTypes = CairoTuple.getTupleElementTypes(tupleType);
-
-      // Validate that the number of values matches the tuple structure
-      if (values.length !== elementTypes.length) {
-        throw new Error(
-          `Tuple size mismatch: expected ${elementTypes.length} elements, got ${values.length}`
-        );
-      }
-
-      // Create CairoType instances for each element
-      this.content = values.map((value, index) => {
-        const elementType =
-          typeof elementTypes[index] === 'string'
-            ? (elementTypes[index] as string)
-            : (elementTypes[index] as any).type;
-
-        // First check direct constructors
-        const constructor = strategy.constructors[elementType];
-        if (constructor) {
-          return constructor(value, elementType);
+    CairoTuple.validate(content, tupleType);
+    // TODO: handle Object[] and remove "as string[]"
+    const tupleContentType = CairoTuple.getTupleElementTypes(tupleType) as string[];
+    const resultContent: any[] = CairoTuple.extractValuesArray(content, tupleType).map(
+      (contentItem: any, index: number) => {
+        if (
+          contentItem &&
+          typeof contentItem === 'object' &&
+          contentItem !== null &&
+          'toApiRequest' in contentItem
+        ) {
+          // "content" is a CairoType
+          return contentItem as CairoType;
         }
+        if (contentItem instanceof CairoOption) {
+          // "content" is a CairoOption
+          return CairoTypeOption.fromCairoOption(contentItem, tupleContentType[index], strategy);
+        }
+        // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
 
-        // Check dynamic selectors
+        const constructor = strategy.constructors[tupleContentType[index]];
+        if (constructor) {
+          return constructor(contentItem, tupleContentType[index]);
+        }
         const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-        const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-
+        const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+          selectorFn(tupleContentType[index])
+        );
         if (matchingSelector) {
           const [selectorName] = matchingSelector;
           const dynamicConstructor = strategy.constructors[selectorName];
           if (dynamicConstructor) {
-            return dynamicConstructor(value, elementType);
+            return dynamicConstructor(contentItem, tupleContentType[index]);
           }
         }
-
-        // Unknown type - fallback to felt252 constructor
-        const feltConstructor = strategy.constructors[CairoFelt252.abiSelector];
-        if (feltConstructor) {
-          return feltConstructor(value, elementType);
-        }
-
-        // If even felt252 constructor is not available, store as string for error handling
-        return String(value) as unknown as CairoType;
-      });
-
-      this.tupleType = tupleType;
-    }
+        throw new Error(`"${tupleContentType}" is not a valid Cairo type`);
+      }
+    );
+    assert(
+      resultContent.length === tupleContentType.length,
+      `ABI type ${tupleType}: expected ${tupleContentType.length} items, got ${resultContent.length} items.`
+    );
+    this.content = resultContent;
   }
 
   /**
@@ -319,6 +308,10 @@ export class CairoTuple extends CairoType {
 
   /**
    * Extract tuple member types for Cairo 0 format.
+   * A cairo 0 tuple can be made in 2 formats:
+   * - (val1, val2)
+   * - named tuple (x:val1, y:val2)
+   * See https://github.com/starknet-io/starknet-docs/blob/f97d02377290df38a2192414f210f75f95684373/archive/cairozero/how-cairozero-works/types.rst#types
    * @private
    */
   private static extractCairo0Tuple(type: string) {
@@ -367,6 +360,9 @@ export class CairoTuple extends CairoType {
 
   /**
    * Extract tuple member types for Cairo 1 format.
+   * A cairo 1 tuple is made with  (val1, val2).
+   * No named tuples in Cairo 1.
+   * See https://www.starknet.io/cairo-book/ch02-02-data-types.html?highlight=tuple#the-tuple-type
    * @private
    */
   private static extractCairo1Tuple(type: string): (string | object)[] {
@@ -464,7 +460,7 @@ export class CairoTuple extends CairoType {
   /**
    * Get tuple element types from the tuple type string.
    * Uses the internal extractTupleMemberTypes method to parse tuple structure.
-   * @param tupleType - The tuple type string
+   * @param {string} tupleType - The tuple type string
    * @returns Array of element types (strings or objects with name/type for named tuples)
    * @example
    * ```typescript
@@ -481,8 +477,8 @@ export class CairoTuple extends CairoType {
 
   /**
    * Validate input data for CairoTuple creation.
-   * @param input - Input data to validate
-   * @param tupleType - The tuple type (e.g., "(core::integer::u8, core::integer::u32)")
+   * @param {unknown} input - Input data to validate
+   * @param {string} tupleType - The tuple type (e.g. "(core::integer::u8, core::integer::u32)")
    * @throws Error if input is invalid
    * @example
    * ```typescript
@@ -506,9 +502,9 @@ export class CairoTuple extends CairoType {
 
   /**
    * Check if input data is valid for CairoTuple creation.
-   * @param input - Input data to check
-   * @param tupleType - The tuple type (e.g., "(core::integer::u8, core::integer::u32)")
-   * @returns true if valid, false otherwise
+   * @param {unknown} input - Input data to check
+   * @param {string} tupleType - The tuple type (e.g., "(core::integer::u8, core::integer::u32)")
+   * @returns {boolean} true if valid, false otherwise
    * @example
    * ```typescript
    * const isValid1 = CairoTuple.is([1, 2], "(core::integer::u8, core::integer::u32)"); // true
@@ -528,10 +524,10 @@ export class CairoTuple extends CairoType {
    * Checks if the given string represents a valid Cairo tuple type format.
    *
    * A valid tuple type must follow the pattern: `(type1, type2, ...)` where each type
-   * is a valid Cairo type. Named tuples like `(x:type1, y:type2)` are also supported.
+   * is a valid Cairo type. Named tuples (from Cairo 0) like `(x:type1, y:type2)` are also supported.
    *
-   * @param type - The type string to validate
-   * @returns `true` if the type is a valid tuple format, `false` otherwise
+   * @param {string} type - The type string to validate
+   * @returns {boolean} `true` if the type is a valid tuple format, `false` otherwise
    * @example
    * ```typescript
    * CairoTuple.isAbiType("(core::integer::u8, core::integer::u32)");     // true
@@ -552,15 +548,11 @@ export class CairoTuple extends CairoType {
    * This follows the Cairo ABI standard for tuples which are serialized as
    * consecutive elements without length information.
    *
-   * @returns Array of hex strings ready for API requests (no length prefix)
+   * @returns {string[]} Array of hex strings ready for API requests (no length prefix)
    * @example
    * ```typescript
    * const tuple = new CairoTuple([1, 2], "(core::integer::u8, core::integer::u32)", strategy);
    * const result = tuple.toApiRequest(); // ['0x1', '0x2']
-   *
-   * // Nested tuples are flattened
-   * const nested = new CairoTuple([[1, 2], 3], "((core::integer::u8, core::integer::u8), core::integer::u32)", strategy);
-   * const flatResult = nested.toApiRequest(); // ['0x1', '0x2', '0x3']
    * ```
    */
   public toApiRequest(): string[] {
@@ -570,28 +562,24 @@ export class CairoTuple extends CairoType {
   }
 
   /**
-   * Decompose the tuple into final parsed values.
+   * Decompose the tuple into final parsed values, in an object {0:value0, ...}.
    *
    * Transforms CairoType instances into their final parsed values using the strategy's
    * response parsers (e.g., CairoUint8 → BigInt). This method is used primarily for
    * parsing API responses into user-friendly formats.
    *
-   * @param strategy - Parsing strategy for response parsing
-   * @returns Array of parsed values (BigInt, numbers, nested tuples, etc.)
+   * @param {ParsingStrategy} strategy - Parsing strategy for response parsing
+   * @returns {Object} an object of format {0:value0, 1:value2}
    * @example
    * ```typescript
-   * const tuple = new CairoTuple([1, 2], '(core::integer::u8, core::integer::u32)', hdParsingStrategy);
-   * const parsed = tuple.decompose(hdParsingStrategy); // [1n, 2n]
+   * const myTuple = new CairoTuple(cairo.tuple(1, 2), '(core::integer::u8, core::integer::u32)', hdParsingStrategy);
+   * const parsed = myTuple.decompose(hdParsingStrategy); // {"0": 1n, "1": 2n}
    * ```
    */
-  public decompose(strategy: ParsingStrategy): any[] {
+  public decompose(strategy: ParsingStrategy): Object {
     const elementTypes = CairoTuple.getTupleElementTypes(this.tupleType);
 
-    return this.content.map((element, index) => {
-      // if (element instanceof CairoTuple) {
-      //   // For nested tuples, decompose recursively with strategy
-      //   return element.decompose(strategy);
-      // }
+    const result = this.content.map((element, index) => {
       // For raw string values (unsupported types), throw error
       if (typeof element === 'string') {
         const elementType =
@@ -600,30 +588,6 @@ export class CairoTuple extends CairoType {
             : (elementTypes[index] as any).type;
         throw new Error(`No parser found for element type: ${elementType} in parsing strategy`);
       }
-
-      // // For primitive types, use the response parser to get final values
-      // const elementType =
-      //   typeof elementTypes[index] === 'string'
-      //     ? (elementTypes[index] as string)
-      //     : (elementTypes[index] as any).type;
-      // const responseParser = strategy.response[elementType];
-
-      // if (responseParser) {
-      //   return responseParser(element);
-      // }
-
-      // // Check dynamic selectors for response parsing
-      // const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-      // const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-
-      // if (matchingSelector) {
-      //   const [selectorName] = matchingSelector;
-      //   const dynamicResponseParser = strategy.response[selectorName];
-      //   if (dynamicResponseParser) {
-      //     return dynamicResponseParser(element);
-      //   }
-      // }
-      // TODO: "as string" to be removed once extractCairo1Tuple result is only string (no more object as result)
       let parserName: string = elementTypes[index] as string;
       if (element instanceof CairoType) {
         if (Object.hasOwn(element, 'dynamicSelector')) {
@@ -635,11 +599,11 @@ export class CairoTuple extends CairoType {
       if (responseParser) {
         return responseParser(element);
       }
-
       // No response parser found - throw error instead of fallback magic
       throw new Error(
         `No response parser found for element type: ${elementTypes[index]} in parsing strategy`
       );
     });
+    return { ...result };
   }
 }

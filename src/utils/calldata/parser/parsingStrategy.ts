@@ -24,6 +24,7 @@ import assert from '../../assert';
 import { isTypeArray, isTypeOption, isTypeTuple } from '../cairo';
 import { CairoTypeOption } from '../../cairoDataTypes/cairoTypeOption';
 import type { CairoOptionVariant, CairoResultVariant } from '../enum';
+import { isUndefined } from '../../typed';
 
 /**
  * Parsing map for constructors and response parsers
@@ -170,11 +171,7 @@ export const hdParsingStrategy: ParsingStrategy = {
       variant?: VariantType
     ) => {
       assert(!!type, 'CairoTypeOption constructor requires "type" parameter.');
-      assert(
-        typeof variant !== 'undefined',
-        'CairoTypeOption constructor requires "variant" parameter.'
-      );
-      const variantNumber = Number(variant);
+      const variantNumber = isUndefined(variant) ? undefined : Number(variant);
       return new CairoTypeOption(input, type, hdParsingStrategy, variantNumber);
     },
   },

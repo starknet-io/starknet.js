@@ -25,7 +25,7 @@ export class CairoTypeOption extends CairoType {
   public readonly dynamicSelector = CairoTypeOption.dynamicSelector;
 
   /* CairoType instance representing a Cairo option. */
-  public readonly content: any;
+  public readonly content: CairoType | undefined;
 
   /* Cairo type of the option. */
   public readonly optionCairoType: string;
@@ -112,56 +112,58 @@ export class CairoTypeOption extends CairoType {
         }
       }
       this.isVariantSome = variantFromIterator === 0;
-    } else {
-      assert(
-        !isUndefined(variant),
-        '"variant" parameter is mandatory when creating a new Cairo option from a "CairoType" or raw data.'
-      );
-      CairoTypeOption.validate(content, optionCairoType, variant);
-      if (content && typeof content === 'object' && content !== null && 'toApiRequest' in content) {
-        // "content" is a CairoType
-        this.content = content as CairoType;
-        this.isVariantSome = variant === CairoOptionVariant.Some;
-      } else if (content instanceof CairoOption) {
-        // "content" is a CairoOption
+      return;
+    }
+    CairoTypeOption.validate(content, optionCairoType, variant);
+    if (content && typeof content === 'object' && content !== null && 'toApiRequest' in content) {
+      // "content" is a CairoType
+      this.content = content as CairoType;
+      this.isVariantSome = variant === CairoOptionVariant.Some;
+      return;
+    }
+    if (content instanceof CairoOption) {
+      // "content" is a CairoOption
+      const elementType = CairoTypeOption.getVariantSomeType(optionCairoType);
+      this.content = CairoTypeOption.fromCairoOption(content, elementType, strategy);
+      this.isVariantSome = variant === CairoOptionVariant.Some;
+      return;
+    }
+    // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
+    assert(
+      !isUndefined(variant),
+      '"variant" parameter is mandatory when creating a new Cairo option from a "CairoType" or raw data.'
+    );
+    switch (variant) {
+      case CairoOptionVariant.Some: {
         const elementType = CairoTypeOption.getVariantSomeType(optionCairoType);
-        this.content = CairoTypeOption.fromCairoOption(content, elementType, strategy);
-        this.isVariantSome = variant === CairoOptionVariant.Some;
-      } else {
-        // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
-        switch (variant) {
-          case CairoOptionVariant.Some: {
-            const elementType = CairoTypeOption.getVariantSomeType(optionCairoType);
-            const constructor = strategy.constructors[elementType];
-            if (constructor) {
-              this.content = constructor(content, elementType);
-            } else {
-              const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-              const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
-                selectorFn(elementType)
-              );
-              if (matchingSelector) {
-                const [selectorName] = matchingSelector;
-                const dynamicConstructor = strategy.constructors[selectorName];
-                if (dynamicConstructor) {
-                  this.content = dynamicConstructor(content, elementType);
-                }
-              } else {
-                throw new Error(`"${elementType}" is not a valid Cairo type`);
-              }
+        const constructor = strategy.constructors[elementType];
+        if (constructor) {
+          this.content = constructor(content, elementType);
+        } else {
+          const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+          const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+            selectorFn(elementType)
+          );
+          if (matchingSelector) {
+            const [selectorName] = matchingSelector;
+            const dynamicConstructor = strategy.constructors[selectorName];
+            if (dynamicConstructor) {
+              this.content = dynamicConstructor(content, elementType);
             }
-            this.isVariantSome = true;
-            break;
-          }
-          case 1: {
-            this.isVariantSome = false;
-            this.content = undefined;
-            break;
-          }
-          default: {
-            throw new Error('Invalid Option variant.');
+          } else {
+            throw new Error(`"${elementType}" is not a valid Cairo type`);
           }
         }
+        this.isVariantSome = true;
+        break;
+      }
+      case 1: {
+        this.isVariantSome = false;
+        this.content = undefined;
+        break;
+      }
+      default: {
+        throw new Error('Invalid Option variant.');
       }
     }
   }
@@ -234,13 +236,18 @@ export class CairoTypeOption extends CairoType {
    * CairoTypeOption.validate(200, "wrong", 3); // throws
    * ```
    */
-  static validate(input: unknown, type: string, variant: VariantType): void {
+  static validate(input: unknown, type: string, variant: VariantType | undefined): void {
     assert(
       CairoTypeOption.isAbiType(type),
       `The type ${type} is not a Cairo option. Needs core::option::Option::<type>.`
     );
-    const numberVariant = Number(variant);
-    assert([0, 1].includes(numberVariant), 'In Cairo option, only 0 or 1 variants are authorized.');
+    if (!isUndefined(variant)) {
+      const numberVariant = Number(variant);
+      assert(
+        [0, 1].includes(numberVariant),
+        'In Cairo option, only 0 or 1 variants are authorized.'
+      );
+    }
   }
 
   /**
@@ -334,33 +341,7 @@ export class CairoTypeOption extends CairoType {
     const strategy = strategyDecode ?? this.strategy;
 
     const { content } = this;
-    // const someType = CairoTypeOption.getVariantSomeType(this.optionCairoType);
-    // const responseParser = strategy.response[someType];
-    // if (responseParser) {
-    //   if (this.isVariantSome) {
-    //     const someContent = responseParser(this.content!);
-    //     return someContent;
-    //   }
-    //   return undefined;
-    // }
-    // const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-    // const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
-    //   selectorFn(this.optionCairoType)
-    // );
-
-    // if (matchingSelector) {
-    //   if (this.isVariantSome) {
-    //     const [selectorName] = matchingSelector;
-    //     const dynamicResponseParser = strategy.response[selectorName];
-    //     if (dynamicResponseParser) {
-    //       return dynamicResponseParser(this.content!);
-    //     }
-    //   }
-    //   return undefined;
-    // }
-    // throw new Error(`No response parser found for element type: ${someType} in parsing strategy`);
     const elementType = CairoTypeOption.getVariantSomeType(this.optionCairoType);
-    // return (
     // For raw string values (unsupported types), throw error
     if (typeof content === 'string') {
       throw new Error(`No parser found for element type: ${elementType} in parsing strategy`);
@@ -374,7 +355,7 @@ export class CairoTypeOption extends CairoType {
     }
     const responseParser = strategy.response[parserName];
     if (responseParser) {
-      return responseParser(content);
+      return responseParser(content as CairoType);
     }
 
     // No response parser found - throw error instead of fallback magic

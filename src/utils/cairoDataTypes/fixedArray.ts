@@ -3,6 +3,8 @@ import { addCompiledFlag } from '../helpers';
 import { getNext } from '../num';
 import { type ParsingStrategy } from '../calldata/parser/parsingStrategy';
 import { CairoType } from './cairoType.interface';
+import { CairoOption } from '../calldata/enum';
+import { CairoTypeOption } from './cairoTypeOption';
 
 /**
  * Represents a Cairo fixed-size array with compile-time known length.
@@ -45,7 +47,7 @@ export class CairoFixedArray extends CairoType {
   /**
    * Array of CairoType instances representing a Cairo fixed array.
    */
-  public readonly content: any[];
+  public readonly content: CairoType[];
 
   /**
    * Cairo fixed array type.
@@ -85,19 +87,72 @@ export class CairoFixedArray extends CairoType {
   constructor(content: unknown, arrayType: string, strategy: ParsingStrategy) {
     super();
 
-    // If content is already a CairoFixedArray instance, just copy its properties
-    if (content instanceof CairoFixedArray) {
-      this.content = content.content;
-      this.arrayType = content.arrayType;
+    // // If content is already a CairoFixedArray instance, just copy its properties
+    // if (content instanceof CairoFixedArray) {
+    //   this.content = content.content;
+    //   this.arrayType = content.arrayType;
+    //   return;
+    // }
+
+    // // Always use parser for unified processing
+    // const iterator = CairoFixedArray.prepareIterator(content, arrayType);
+    // const parsedContent = CairoFixedArray.parser(iterator, arrayType, strategy);
+
+    // this.content = parsedContent;
+
+    this.arrayType = arrayType;
+    if (content && typeof content === 'object' && 'next' in content) {
+      // "content" is an iterator
+      const parsedContent: CairoType[] = CairoFixedArray.parser(
+        content as Iterator<string>,
+        arrayType,
+        strategy
+      );
+      this.content = parsedContent;
       return;
     }
+    CairoFixedArray.validate(content, arrayType);
+    const arrayContentType = CairoFixedArray.getFixedArrayType(arrayType);
+    const resultContent: any[] = CairoFixedArray.extractValuesArray(content).map(
+      (contentItem: any) => {
+        if (
+          contentItem &&
+          typeof contentItem === 'object' &&
+          contentItem !== null &&
+          'toApiRequest' in contentItem
+        ) {
+          // "content" is a CairoType
+          return contentItem as CairoType;
+        }
+        if (contentItem instanceof CairoOption) {
+          // "content" is a CairoOption
+          return CairoTypeOption.fromCairoOption(contentItem, arrayContentType, strategy);
+        }
+        // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
 
-    // Always use parser for unified processing
-    const iterator = CairoFixedArray.prepareIterator(content, arrayType);
-    const parsedContent = CairoFixedArray.parser(iterator, arrayType, strategy);
-
-    this.content = parsedContent;
-    this.arrayType = arrayType;
+        const constructor = strategy.constructors[arrayContentType];
+        if (constructor) {
+          return constructor(contentItem, arrayContentType);
+        }
+        const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+        const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+          selectorFn(arrayContentType)
+        );
+        if (matchingSelector) {
+          const [selectorName] = matchingSelector;
+          const dynamicConstructor = strategy.constructors[selectorName];
+          if (dynamicConstructor) {
+            return dynamicConstructor(contentItem, arrayContentType);
+          }
+        }
+        throw new Error(`"${arrayContentType}" is not a valid Cairo type`);
+      }
+    );
+    assert(
+      resultContent.length === CairoFixedArray.getFixedArraySize(arrayType),
+      `ABI type ${arrayType}: expected ${CairoFixedArray.getFixedArraySize(arrayType)} items, got ${resultContent.length} items.`
+    );
+    this.content = resultContent;
   }
 
   /**
@@ -150,47 +205,6 @@ export class CairoFixedArray extends CairoType {
   }
 
   /**
-   * Prepare a string iterator from any input type for unified processing.
-   *
-   * This method normalizes all possible input types into a consistent Iterator<string>
-   * that can be consumed by the parser. It handles three main scenarios:
-   * 1. Iterator<string> from API responses → pass through unchanged
-   * 2. CairoType instances → serialize to API strings and create iterator
-   * 3. User input (arrays/objects) → flatten to strings and create iterator
-   *
-   * @param content - Input data (Iterator, array, object, or CairoType instances)
-   * @param arrayType - Fixed array type for validation and processing
-   * @returns Iterator over string values ready for parsing
-   * @private
-   */
-  private static prepareIterator(content: unknown, arrayType: string): Iterator<string> {
-    // If already an iterator (API response), return as-is
-    if (content && typeof content === 'object' && 'next' in content) {
-      return content as Iterator<string>;
-    }
-
-    // For user input, validate and convert to string iterator
-    CairoFixedArray.validate(content, arrayType);
-    const values = CairoFixedArray.extractValuesArray(content);
-
-    // If values are already CairoType instances, serialize them to strings
-    if (
-      values.length > 0 &&
-      typeof values[0] === 'object' &&
-      values[0] !== null &&
-      'toApiRequest' in values[0]
-    ) {
-      // Convert CairoType instances to their API string representation
-      const stringValues = values.flatMap((cairoType) => (cairoType as any).toApiRequest());
-      return stringValues[Symbol.iterator]();
-    }
-
-    // Convert user input to flattened string array and return iterator
-    const flatStringValues = CairoFixedArray.flattenUserInput(values, arrayType);
-    return flatStringValues[Symbol.iterator]();
-  }
-
-  /**
    * Extract values array from either array or object input.
    *
    * Normalizes the two supported input formats (arrays and objects) into a consistent
@@ -209,44 +223,6 @@ export class CairoFixedArray extends CairoType {
       return input;
     }
     return Object.values(input as object);
-  }
-
-  /**
-   * Flatten user input into a sequence of strings for parser consumption.
-   *
-   * Recursively processes user input to create a flat sequence of strings that matches
-   * the format expected by API responses. For nested fixed arrays, it recursively
-   * flattens all nested structures into a single sequential stream of values.
-   *
-   * @param values - Array of user input values to flatten
-   * @param arrayType - Fixed array type to determine element processing
-   * @returns Flattened array of strings ready for parser consumption
-   * @private
-   * @example
-   * // Simple array: [1, 2, 3] → ['1', '2', '3']
-   * // Nested array: [[1, 2], [3, 4]] → ['1', '2', '3', '4']
-   */
-  private static flattenUserInput(values: any[], arrayType: string): string[] {
-    const elementType = CairoFixedArray.getFixedArrayType(arrayType);
-
-    // If element type is itself a fixed array, we need to flatten recursively
-    if (CairoFixedArray.isAbiType(elementType)) {
-      return values.flatMap((value) => {
-        if (
-          Array.isArray(value) ||
-          (typeof value === 'object' && value !== null && !('toApiRequest' in value))
-        ) {
-          // Recursively flatten nested arrays
-          const nestedValues = CairoFixedArray.extractValuesArray(value);
-          return CairoFixedArray.flattenUserInput(nestedValues, elementType);
-        }
-        // Single value, convert to string
-        return String(value);
-      });
-    }
-
-    // For primitive types, just convert all values to strings
-    return values.map((value) => String(value));
   }
 
   /**
