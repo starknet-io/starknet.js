@@ -48,6 +48,7 @@ import {
   CairoResultVariant,
 } from './enum';
 import { AbiParserInterface } from './parser';
+import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 
 // TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
 
@@ -201,27 +202,23 @@ function parseCalldataValue({
     const { variants } = enums[type];
     // Option Enum
     if (isTypeOption(type)) {
-      const myOption = element as CairoOption<any>;
-      if (myOption.isSome()) {
+      let myOption: CairoTypeOption;
+      if (element instanceof CairoOption) {
+        myOption = new CairoTypeOption(
+          element.unwrap(),
+          type,
+          parser.parsingStrategy,
+          element.isSome() ? CairoOptionVariant.Some : CairoOptionVariant.None
+        );
+      } else {
+        myOption = element as CairoTypeOption;
+      }
+      if (myOption.isVariantSome) {
         const listTypeVariant = variants.find((variant) => variant.name === 'Some');
         if (isUndefined(listTypeVariant)) {
           throw Error(`Error in abi : Option has no 'Some' variant.`);
         }
-        const typeVariantSome = listTypeVariant.type;
-        if (typeVariantSome === '()') {
-          return CairoOptionVariant.Some.toString();
-        }
-        const parsedParameter = parseCalldataValue({
-          element: myOption.unwrap(),
-          type: typeVariantSome,
-          structs,
-          enums,
-          parser,
-        });
-        if (Array.isArray(parsedParameter)) {
-          return [CairoOptionVariant.Some.toString(), ...parsedParameter];
-        }
-        return [CairoOptionVariant.Some.toString(), parsedParameter];
+        return myOption.toApiRequest();
       }
       return CairoOptionVariant.None.toString();
     }
@@ -415,7 +412,7 @@ export function parseCalldataField({
     // Enums
     case isTypeEnum(type, enums):
       return parseCalldataValue({
-        element: value as CairoOption<any> | CairoResult<any, any> | CairoEnum,
+        element: value as CairoTypeOption | CairoResult<any, any> | CairoEnum,
         type,
         structs,
         enums,
