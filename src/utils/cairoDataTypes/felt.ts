@@ -77,7 +77,9 @@ export class CairoFelt252 {
 
   constructor(data: BigNumberish | boolean | unknown) {
     CairoFelt252.validate(data);
-    this.data = CairoFelt252.__processData(data as BigNumberish | boolean);
+    const processedData = CairoFelt252.__processData(data as BigNumberish | boolean);
+    // remove leading zeros, ensure data is an exact value/number
+    this.data = processedData.subarray(processedData.findIndex((x) => x > 0));
   }
 
   static __processData(data: BigNumberish | boolean): Uint8Array {

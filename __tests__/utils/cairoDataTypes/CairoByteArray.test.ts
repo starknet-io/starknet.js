@@ -707,13 +707,43 @@ describe('CairoByteArray Unit Tests', () => {
         '0x' +
         '000000019900000000000002222222374206275726e206d65737aaaa000001' +
         '000000029900000000000002222222374206275726e206d65737aaaa000002' +
-        '000000039900000000000002222222374206275726e206d65737aaaa000003';
+        '000000039900000000000002222222374206275726e206d65737aaaa000003' +
+        '00d0f0';
       const buffer = Buffer.from(content.slice(2), 'hex');
       const byteArray = new CairoByteArray(buffer);
       const apiRequest = byteArray.toApiRequest();
       const reconstructedByteArray = CairoByteArray.factoryFromApiResponse(apiRequest.values());
 
       expect(reconstructedByteArray.toHexString()).toEqual(content);
+    });
+  });
+
+  describe('toElements method', () => {
+    test('should convert empty string to empty array', () => {
+      const byteArray = new CairoByteArray('');
+      expect(byteArray.toElements()).toEqual([]);
+    });
+
+    test('should convert short string into single element array corresponding to the pending word', () => {
+      const byteArray = new CairoByteArray('Test');
+      expect(byteArray.toElements()).toEqual([new Uint8Array([84, 101, 115, 116])]);
+    });
+
+    test('should convert large string into full size elements', () => {
+      const apiResponse = [
+        '0x3',
+        '0x19900000000000002222222374206275726e206d65737aaaa000001',
+        '0x29900000000000002222222374206275726e206d65737aaaa000002',
+        '0x39900000000000002222222374206275726e206d65737aaaa000003',
+        '0xd0f0',
+        '0xa',
+      ];
+      const byteArray = CairoByteArray.factoryFromApiResponse(apiResponse.values());
+      const elements = byteArray.toElements();
+
+      expect(elements).toHaveLength(Number(apiResponse[0]) + 1);
+      elements.slice(0, -1).forEach((e) => expect(e).toHaveLength(31));
+      expect(elements.at(-1)).toHaveLength(Number(apiResponse.at(-1)));
     });
   });
 });
