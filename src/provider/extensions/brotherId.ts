@@ -16,12 +16,13 @@ export function isBrotherDomain(domain: string): boolean {
 /**
  * Encodes a Brother domain name into a bigint value.
  * This uses the same encoding logic as Starknet ID.
- * @param domain - The domain name without .brother suffix
+ * @param domain - The domain name (with or without .brother suffix)
  * @returns encoded bigint value
  * @example
  * ```typescript
- * const encoded = encodeBrotherDomain("myname.brother");
- * // Returns a bigint value
+ * const encoded1 = encodeBrotherDomain("myname.brother");
+ * const encoded2 = encodeBrotherDomain("myname");
+ * // Both return the same bigint value
  * ```
  */
 export function encodeBrotherDomain(domain: string): bigint {
