@@ -1,3 +1,9 @@
+## [8.5.3](https://github.com/starknet-io/starknet.js/compare/v8.5.2...v8.5.3) (2025-09-05)
+
+### Bug Fixes
+
+- enforce fixed size for cairo bytes ([6a56166](https://github.com/starknet-io/starknet.js/commit/6a56166e65c79d68e012083cefff3fb532e150ac))
+
 ## [8.5.2](https://github.com/starknet-io/starknet.js/compare/v8.5.1...v8.5.2) (2025-08-27)
 
 ### Bug Fixes

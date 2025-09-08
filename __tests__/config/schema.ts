@@ -2,7 +2,7 @@ import ajvKeywords from 'ajv-keywords';
 import { matchersWithOptions } from 'jest-json-schema';
 
 import starknet_api_openrpc from 'starknet_specs/api/starknet_api_openrpc.json';
-import starknet_api_openrpc071 from 'starknet_specs_071/api/starknet_api_openrpc.json';
+import starknet_api_openrpc08 from 'starknet_specs_08/api/starknet_api_openrpc.json';
 import starknet_metadata from 'starknet_specs/api/starknet_metadata.json';
 import starknet_trace_api_openrpc from 'starknet_specs/api/starknet_trace_api_openrpc.json';
 import starknet_write_api from 'starknet_specs/api/starknet_write_api.json';
@@ -17,7 +17,7 @@ import { isBigInt } from '../../src/utils/typed';
 const matcherSchemas = [accountSchemas, libSchemas, providerSchemas, rpcSchemas];
 const starknetSchemas = [
   { $id: 'starknet_api_openrpc', ...starknet_api_openrpc },
-  { $id: 'starknet_api_openrpc071', ...starknet_api_openrpc071 },
+  { $id: 'starknet_api_openrpc08', ...starknet_api_openrpc08 },
   { $id: 'starknet_metadata', ...starknet_metadata },
   { $id: 'starknet_trace_api_openrpc', ...starknet_trace_api_openrpc },
   { $id: 'starknet_write_api', ...starknet_write_api },

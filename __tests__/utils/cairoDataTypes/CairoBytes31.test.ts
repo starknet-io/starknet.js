@@ -1,46 +1,57 @@
-import { CairoBytes31, CairoFelt252 } from '../../../src';
+import { BigNumberish, CairoBytes31, CairoFelt252 } from '../../../src';
+import { addHexPrefix } from '../../../src/utils/encode';
+
+function uint8ArrayToSize(input: Uint8Array | Array<number>, size: number = 31) {
+  const output = new Uint8Array(size);
+  output.set(input, size - input.length);
+  return output;
+}
+
+function toHex62(number: BigNumberish) {
+  return addHexPrefix(BigInt(number).toString(16).padStart(62, '0'));
+}
 
 describe('CairoBytes31 class Unit Tests', () => {
   describe('constructor with different input types', () => {
     test('should handle string input', () => {
       const bytes31 = new CairoBytes31('hello');
       expect(bytes31.data).toBeInstanceOf(Uint8Array);
-      expect(bytes31.data).toEqual(new Uint8Array([104, 101, 108, 108, 111]));
+      expect(bytes31.data).toEqual(uint8ArrayToSize([104, 101, 108, 108, 111]));
     });
 
     test('should handle empty string', () => {
       const bytes31 = new CairoBytes31('');
-      expect(bytes31.data).toEqual(new Uint8Array([]));
+      expect(bytes31.data).toEqual(uint8ArrayToSize([]));
     });
 
     test('should handle Unicode strings', () => {
       const bytes31 = new CairoBytes31('☥');
       // '☥' in UTF-8: [226, 152, 165]
-      expect(bytes31.data).toEqual(new Uint8Array([226, 152, 165]));
+      expect(bytes31.data).toEqual(uint8ArrayToSize([226, 152, 165]));
     });
 
     test('should handle Buffer input', () => {
       const buffer = Buffer.from([72, 101, 108, 108, 111]); // "Hello"
       const bytes31 = new CairoBytes31(buffer);
-      expect(bytes31.data).toEqual(new Uint8Array([72, 101, 108, 108, 111]));
+      expect(bytes31.data).toEqual(uint8ArrayToSize([72, 101, 108, 108, 111]));
     });
 
     test('should handle empty Buffer', () => {
       const buffer = Buffer.alloc(0);
       const bytes31 = new CairoBytes31(buffer);
-      expect(bytes31.data).toEqual(new Uint8Array([]));
+      expect(bytes31.data).toEqual(uint8ArrayToSize([]));
     });
 
     test('should handle Uint8Array input', () => {
       const uint8Array = new Uint8Array([87, 111, 114, 108, 100]); // "World"
       const bytes31 = new CairoBytes31(uint8Array);
-      expect(bytes31.data).toEqual(uint8Array);
+      expect(bytes31.data).toEqual(uint8ArrayToSize(uint8Array));
     });
 
     test('should handle empty Uint8Array', () => {
       const uint8Array = new Uint8Array([]);
       const bytes31 = new CairoBytes31(uint8Array);
-      expect(bytes31.data).toEqual(new Uint8Array([]));
+      expect(bytes31.data).toEqual(uint8ArrayToSize([]));
     });
 
     test('should handle maximum length input (31 bytes)', () => {
@@ -174,33 +185,39 @@ describe('CairoBytes31 class Unit Tests', () => {
     test('should convert empty data to 0x0', () => {
       const bytes31 = new CairoBytes31('');
       expect(bytes31.toHexString()).toBe('0x0');
+      expect(bytes31.toHexString('padded')).toBe(toHex62('0x0'));
     });
 
     test('should convert single character to hex', () => {
       const bytes31 = new CairoBytes31('A'); // ASCII 65 = 0x41
       expect(bytes31.toHexString()).toBe('0x41');
+      expect(bytes31.toHexString('padded')).toBe(toHex62('0x41'));
     });
 
     test('should convert multi-character string to hex', () => {
       const bytes31 = new CairoBytes31('AB'); // [65, 66] = 0x4142
       expect(bytes31.toHexString()).toBe('0x4142');
+      expect(bytes31.toHexString('padded')).toBe(toHex62('0x4142'));
     });
 
     test('should convert Unicode to hex', () => {
       const bytes31 = new CairoBytes31('☥'); // [226, 152, 165] = 0xe298a5
       expect(bytes31.toHexString()).toBe('0xe298a5');
+      expect(bytes31.toHexString('padded')).toBe(toHex62('0xe298a5'));
     });
 
     test('should convert Buffer to hex', () => {
       const buffer = Buffer.from([255, 254]);
       const bytes31 = new CairoBytes31(buffer);
       expect(bytes31.toHexString()).toBe('0xfffe');
+      expect(bytes31.toHexString('padded')).toBe(toHex62('0xfffe'));
     });
 
     test('should convert Uint8Array to hex', () => {
       const array = new Uint8Array([1, 2, 3, 4]);
       const bytes31 = new CairoBytes31(array);
-      expect(bytes31.toHexString()).toBe('0x01020304');
+      expect(bytes31.toHexString()).toBe('0x1020304');
+      expect(bytes31.toHexString('padded')).toBe(toHex62('0x1020304'));
     });
 
     test('should handle maximum length data', () => {
@@ -208,12 +225,7 @@ describe('CairoBytes31 class Unit Tests', () => {
       const bytes31 = new CairoBytes31(maxArray);
       const expectedHex = `0x${'ff'.repeat(31)}`;
       expect(bytes31.toHexString()).toBe(expectedHex);
-    });
-
-    test('should preserve leading zero values', () => {
-      const buffer = Buffer.from([0, 0, 1]);
-      const bytes31 = new CairoBytes31(buffer);
-      expect(bytes31.toHexString()).toEqual(`0x${buffer.toString('hex')}`);
+      expect(bytes31.toHexString('padded')).toBe(expectedHex);
     });
   });
 
@@ -236,7 +248,7 @@ describe('CairoBytes31 class Unit Tests', () => {
     test('should return hex string array for Buffer input', () => {
       const buffer = Buffer.from([1, 0]); // 0x0100 = 256
       const bytes31 = new CairoBytes31(buffer);
-      expect(bytes31.toApiRequest()).toEqual(['0x0100']);
+      expect(bytes31.toApiRequest()).toEqual(['0x100']);
     });
 
     test('should return hex string array for large values', () => {
@@ -342,7 +354,7 @@ describe('CairoBytes31 class Unit Tests', () => {
     test('should handle binary data correctly', () => {
       const binaryData = new Uint8Array([0, 1, 2, 254, 255]);
       const bytes31 = new CairoBytes31(binaryData);
-      expect(bytes31.data).toEqual(binaryData);
+      expect(bytes31.data).toEqual(uint8ArrayToSize(binaryData));
       expect(bytes31.toBigInt()).toBe(0x0102feffn);
     });
 
@@ -381,7 +393,7 @@ describe('CairoBytes31 class Unit Tests', () => {
 
       testCases.forEach((originalArray) => {
         const bytes31 = new CairoBytes31(originalArray);
-        expect(bytes31.data).toEqual(originalArray);
+        expect(bytes31.data).toEqual(uint8ArrayToSize(originalArray));
       });
     });
 

@@ -166,12 +166,15 @@ export function createTransactionReceipt(
           ? (callbacks as any)[statusReceipt]!(value)
           : (callbacks as TransactionReceiptCallbacksDefault)._();
       },
+      // @ts-ignore - docs
       isSuccess(): this is SuccessfulTransactionReceiptResponseHelper {
         return statusReceipt === 'SUCCEEDED';
       },
+      // @ts-ignore - docs
       isReverted(): this is RevertedTransactionReceiptResponseHelper {
         return statusReceipt === 'REVERTED';
       },
+      // @ts-ignore - docs
       isError(): this is ErrorReceiptResponseHelper {
         return false;
       },
@@ -187,12 +190,15 @@ export function createTransactionReceipt(
           ? callbacks.ERROR!(errorValue)
           : (callbacks as TransactionReceiptCallbacksDefault)._();
       },
+      // @ts-ignore - docs
       isSuccess(): this is SuccessfulTransactionReceiptResponseHelper {
         return false;
       },
+      // @ts-ignore - docs
       isReverted(): this is RevertedTransactionReceiptResponseHelper {
         return false;
       },
+      // @ts-ignore - docs
       isError(): this is ErrorReceiptResponseHelper {
         return true;
       },

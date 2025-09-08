@@ -1,6 +1,11 @@
 import fetch from '../../src/utils/connect/fetch';
 import { BatchClient } from '../../src/utils/batch';
-import { createBlockForDevnet, describeIfRpc081, getTestProvider } from '../config/fixtures';
+import {
+  createBlockForDevnet,
+  describeIfRpc081,
+  describeIfRpc09,
+  getTestProvider,
+} from '../config/fixtures';
 import { initializeMatcher } from '../config/schema';
 import { RPC } from '../../src/types';
 import { createTestProvider } from '../config/fixturesInit';
@@ -33,14 +38,14 @@ describe('BatchClient', () => {
       ]);
 
       expect(typeof blockNumber.result).toBe('number');
-      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts');
+      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts08');
 
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       fetchSpy.mockRestore();
     });
   });
 
-  /*   describeIfRpc071('should batch two requests RPC0.7.1', () => {
+  describeIfRpc09('should batch two requests RPC0.9.0', () => {
     test('should batch two requests', async () => {
       await createBlockForDevnet();
 
@@ -52,12 +57,12 @@ describe('BatchClient', () => {
       ]);
 
       expect(typeof blockNumber.result).toBe('number');
-      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts071');
+      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts');
 
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       fetchSpy.mockRestore();
     });
-  }); */
+  });
 
   test('batch request using Provider', async () => {
     const myBatchProvider = await createTestProvider(false, { batch: 0 });
