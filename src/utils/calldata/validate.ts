@@ -39,7 +39,7 @@ import {
 } from './cairo';
 
 // TODO: separate validate is redundant as CairoTypes are validated during construction.
-// TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
+// TODO: This validate should provide added valie method base validate poiniting to incorrect value for method, opt. using color coding
 // TODO: Something like: store_message(a -> *INVALID JS TYPE*, b, c -> *MISSING REQUIRED ARG*)
 
 const validateFelt = (parameter: any, input: AbiEntry) => {
@@ -402,7 +402,7 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
  * };
  *
  * validateFields(functionAbi, [1n], abiStructs, abiEnums); // Returns void since validation passes
- * validateFields(functionAbi, [{}], abiStructs, abiEnums); // Throw an error because paramters are not valid
+ * validateFields(functionAbi, [{}], abiStructs, abiEnums); // Throw an error because parameters are not valid
  */
 export default function validateFields(
   abiMethod: FunctionAbi,
