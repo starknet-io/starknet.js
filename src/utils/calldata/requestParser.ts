@@ -205,7 +205,7 @@ function parseCalldataValue({
       let myOption: CairoTypeOption;
       if (element instanceof CairoOption) {
         myOption = new CairoTypeOption(
-          element.unwrap(),
+          element,
           type,
           parser.parsingStrategy,
           element.isSome() ? CairoOptionVariant.Some : CairoOptionVariant.None

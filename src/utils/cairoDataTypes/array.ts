@@ -100,6 +100,10 @@ export class CairoArray extends CairoType {
       this.content = parsedContent;
       return;
     }
+    if (content instanceof CairoArray) {
+      this.content = content.content;
+      return;
+    }
     CairoArray.validate(content, arrayType);
     const arrayContentType = CairoArray.getArrayElementType(arrayType);
     const resultContent: any[] = CairoArray.extractValuesArray(content).map((contentItem: any) => {
@@ -114,7 +118,7 @@ export class CairoArray extends CairoType {
       }
       if (contentItem instanceof CairoOption) {
         // "content" is a CairoOption
-        return CairoTypeOption.fromCairoOption(contentItem, arrayContentType, strategy);
+        return new CairoTypeOption(contentItem, arrayContentType, strategy);
       }
       // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
 

@@ -99,9 +99,15 @@ export class CairoTuple extends CairoType {
       this.content = parsedContent;
       return;
     }
+    if (content instanceof CairoTuple) {
+      this.content = content.content;
+      return;
+    }
     CairoTuple.validate(content, tupleType);
-    // TODO: handle Object[] and remove "as string[]"
-    const tupleContentType = CairoTuple.getTupleElementTypes(tupleType) as string[];
+    const tupleContentTypeResponse = CairoTuple.getTupleElementTypes(tupleType);
+    const tupleContentType: string[] = tupleContentTypeResponse.map(
+      (el: string | { name: string; type: string }) => (typeof el === 'string' ? el : el.type)
+    );
     const resultContent: any[] = CairoTuple.extractValuesArray(content, tupleType).map(
       (contentItem: any, index: number) => {
         if (
@@ -115,7 +121,7 @@ export class CairoTuple extends CairoType {
         }
         if (contentItem instanceof CairoOption) {
           // "content" is a CairoOption
-          return CairoTypeOption.fromCairoOption(contentItem, tupleContentType[index], strategy);
+          return new CairoTypeOption(contentItem, tupleContentType[index], strategy);
         }
         // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
 
@@ -365,10 +371,10 @@ export class CairoTuple extends CairoType {
    * See https://www.starknet.io/cairo-book/ch02-02-data-types.html?highlight=tuple#the-tuple-type
    * @private
    */
-  private static extractCairo1Tuple(type: string): (string | object)[] {
+  private static extractCairo1Tuple(type: string): (string | { name: string; type: string })[] {
     // Support both named and un-named tuples
     const input = type.slice(1, -1); // remove first lvl ()
-    const result: (string | object)[] = [];
+    const result: (string | { name: string; type: string })[] = [];
 
     // Handle empty tuple
     if (input.trim() === '') {
@@ -451,10 +457,21 @@ export class CairoTuple extends CairoType {
    * ```
    * @private
    */
-  private static extractTupleMemberTypes(type: string): (string | object)[] {
+  private static extractTupleMemberTypes(
+    type: string
+  ): (string | { name: string; type: string })[] {
     return isCairo1Type(type)
       ? CairoTuple.extractCairo1Tuple(type)
       : CairoTuple.extractCairo0Tuple(type);
+  }
+
+  public static extractTupleMembersNames(type: string): string[] {
+    const elementTypes = CairoTuple.getTupleElementTypes(type);
+    if (typeof elementTypes[0] === 'string')
+      return elementTypes.map((_, index) => index.toString());
+    if ('name' in elementTypes[0] && 'type' in elementTypes[0])
+      return elementTypes.map((el) => (el as { name: string; type: string }).name);
+    return [];
   }
 
   /**
@@ -471,7 +488,9 @@ export class CairoTuple extends CairoType {
    * // result2 = [{name: "x", type: "core::integer::u8"}, {name: "y", type: "core::integer::u32"}]
    * ```
    */
-  static getTupleElementTypes = (tupleType: string): (string | object)[] => {
+  static getTupleElementTypes = (
+    tupleType: string
+  ): (string | { name: string; type: string })[] => {
     return CairoTuple.extractTupleMemberTypes(tupleType);
   };
 
@@ -574,11 +593,15 @@ export class CairoTuple extends CairoType {
    * ```typescript
    * const myTuple = new CairoTuple(cairo.tuple(1, 2), '(core::integer::u8, core::integer::u32)', hdParsingStrategy);
    * const parsed = myTuple.decompose(hdParsingStrategy); // {"0": 1n, "1": 2n}
+   * const myTuple1 = new CairoTuple([100, 200], "(x:felt, y:felt)", hdParsingStrategy); // Cairo 0 named tuple
+   * const parsed1 = myTuple.decompose(hdParsingStrategy); // { x: 100n, y: 200n }
    * ```
    */
   public decompose(strategy: ParsingStrategy): Object {
-    const elementTypes = CairoTuple.getTupleElementTypes(this.tupleType);
-
+    const tupleContentTypeResponse = CairoTuple.getTupleElementTypes(this.tupleType);
+    const elementTypes: string[] = tupleContentTypeResponse.map(
+      (el: string | { name: string; type: string }) => (typeof el === 'string' ? el : el.type)
+    );
     const result = this.content.map((element, index) => {
       // For raw string values (unsupported types), throw error
       if (typeof element === 'string') {
@@ -604,6 +627,19 @@ export class CairoTuple extends CairoType {
         `No response parser found for element type: ${elementTypes[index]} in parsing strategy`
       );
     });
-    return { ...result };
+    if (typeof tupleContentTypeResponse[0] === 'string') {
+      return { ...result };
+    }
+    const namedTuple: Record<string, any> = {};
+    tupleContentTypeResponse.forEach((el, index) => {
+      const a = (
+        tupleContentTypeResponse[index] as {
+          name: string;
+          type: string;
+        }
+      ).name;
+      namedTuple[a] = result[index];
+    });
+    return namedTuple;
   }
 }
