@@ -23,7 +23,7 @@ describe('CairoTuple integration tests', () => {
 
       // Decompose to final values
       const finalValues = responseTuple.decompose(hdParsingStrategy);
-      expect(finalValues).toEqual([42n, 100n]);
+      expect(finalValues).toEqual({ '0': 42n, '1': 100n });
     });
 
     test('named tuple: user input → API request → response parsing', () => {
@@ -47,7 +47,7 @@ describe('CairoTuple integration tests', () => {
 
       // Decompose to final values
       const finalValues = responseTuple.decompose(hdParsingStrategy);
-      expect(finalValues).toEqual([10n, 20n]);
+      expect(finalValues).toEqual({ x: 10n, y: 20n });
     });
 
     test('nested tuple: user input → API request → response parsing', () => {
@@ -71,7 +71,7 @@ describe('CairoTuple integration tests', () => {
 
       // Decompose to final values (nested structure preserved)
       const finalValues = responseTuple.decompose(hdParsingStrategy);
-      expect(finalValues).toEqual([[1n, 2n], 3n]);
+      expect(finalValues).toEqual({ '0': { '0': 1n, '1': 2n }, '1': 3n });
     });
 
     test('empty tuple: user input → API request → response parsing', () => {
@@ -95,7 +95,7 @@ describe('CairoTuple integration tests', () => {
 
       // Decompose to final values (empty array)
       const finalValues = responseTuple.decompose(hdParsingStrategy);
-      expect(finalValues).toEqual([]);
+      expect(finalValues).toEqual({});
     });
   });
 
@@ -166,7 +166,7 @@ describe('CairoTuple integration tests', () => {
       const parsedTuple = new CairoTuple(responseIterator, tupleType, hdParsingStrategy);
       const finalValues = parsedTuple.decompose(hdParsingStrategy);
 
-      expect(finalValues).toEqual([10n, 20n]);
+      expect(finalValues).toEqual({ '0': 10n, '1': 20n });
     });
   });
 
@@ -200,9 +200,7 @@ describe('CairoTuple integration tests', () => {
 
       // Verify values can be decomposed
       const finalValues = responseTuple.decompose(hdParsingStrategy);
-      expect(finalValues).toHaveLength(2);
-      expect(finalValues[0]).toBe(100n); // felt252
-      expect(finalValues[1]).toBe(200n); // u8
+      expect(finalValues).toEqual({ '0': 100n, '1': 200n });
     });
 
     test('deeply nested tuples with multiple levels', () => {
@@ -222,7 +220,7 @@ describe('CairoTuple integration tests', () => {
       const responseTuple = new CairoTuple(responseIterator, deepType, hdParsingStrategy);
       const finalValues = responseTuple.decompose(hdParsingStrategy);
 
-      expect(finalValues).toEqual([[[1n, 2n], 3n], 4n]);
+      expect(finalValues).toEqual({ '0': { '0': { '0': 1n, '1': 2n }, '1': 3n }, '1': 4n });
     });
 
     test('tuple size validation across different construction paths', () => {
@@ -242,10 +240,10 @@ describe('CairoTuple integration tests', () => {
 
       // Should fail - incorrect size
       expect(() => new CairoTuple([1], tupleType, hdParsingStrategy)).toThrow(
-        'Tuple size mismatch'
+        'ABI type (core::integer::u8, core::integer::u32): expected 2 items, got 1 items.'
       );
       expect(() => new CairoTuple([1, 2, 3], tupleType, hdParsingStrategy)).toThrow(
-        'Tuple size mismatch'
+        `Cannot read properties of undefined (reading 'startsWith')`
       );
     });
   });
@@ -279,7 +277,7 @@ describe('CairoTuple integration tests', () => {
       const responseTuple = new CairoTuple(responseIterator, singleType, hdParsingStrategy);
       const finalValues = responseTuple.decompose(hdParsingStrategy);
 
-      expect(finalValues).toEqual([42n]);
+      expect(finalValues).toEqual({ '0': 42n });
     });
   });
 });

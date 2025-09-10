@@ -102,6 +102,7 @@ export class CairoArray extends CairoType {
     }
     if (content instanceof CairoArray) {
       this.content = content.content;
+      this.arrayType = content.arrayType;
       return;
     }
     CairoArray.validate(content, arrayType);

@@ -272,7 +272,7 @@ describe('validateFields', () => {
         );
 
       const error = new Error(
-        `Validate: arg test must be ${Literal.Secp256k1Point} : a 512 bits number.`
+        `Validate: arg test must be ${Literal.Secp256k1Point} : a valid 512 bits secp256k1 point.`
       );
 
       expect(() => validateUint([2n ** 512n])).toThrow(error);

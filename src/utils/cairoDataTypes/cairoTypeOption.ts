@@ -78,7 +78,7 @@ export class CairoTypeOption extends CairoType {
       throw new Error('"content" parameter has to be defined when Some variant is selected');
     }
     if (variant === 1 && !isUndefined(content)) {
-      throw new Error('"content" parameter has to be defined when Some variant is selected');
+      throw new Error('"content" parameter has to be NOT defined when None variant is selected');
     }
     if (content && typeof content === 'object' && 'next' in content) {
       // "content" is an iterator
@@ -111,6 +111,7 @@ export class CairoTypeOption extends CairoType {
     if (content instanceof CairoTypeOption) {
       this.content = content.content;
       this.isVariantSome = content.isVariantSome;
+      this.optionCairoType = content.optionCairoType;
       return;
     }
     CairoTypeOption.validate(content, optionCairoType, variant);
@@ -162,7 +163,7 @@ export class CairoTypeOption extends CairoType {
         this.isVariantSome = true;
         break;
       }
-      case 1: {
+      case CairoOptionVariant.None: {
         this.isVariantSome = false;
         this.content = undefined;
         break;

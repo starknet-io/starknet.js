@@ -1,4 +1,4 @@
-import { CairoOption } from '../../../../src/utils/calldata/enum';
+import { CallData, type BigNumberish, CairoOptionVariant, CairoOption } from '../../../../src';
 
 describe('CairoOption', () => {
   describe('constructor', () => {
@@ -50,6 +50,22 @@ describe('CairoOption', () => {
     test('should return true if "None" value is set', () => {
       const cairoOption = new CairoOption<string>(1, 'option_content');
       expect(cairoOption.isNone()).toEqual(true);
+    });
+  });
+  describe('encoding without Abi', () => {
+    test('number', () => {
+      expect(CallData.compile([new CairoOption<BigNumberish>(CairoOptionVariant.Some, 7)])).toEqual(
+        ['0', '7']
+      );
+      expect(CallData.compile([new CairoOption<BigNumberish>(CairoOptionVariant.None)])).toEqual([
+        '1',
+      ]);
+      expect(
+        CallData.compile({ value: new CairoOption<BigNumberish>(CairoOptionVariant.Some, 7) })
+      ).toEqual(['0', '7']);
+      expect(
+        CallData.compile({ value: new CairoOption<BigNumberish>(CairoOptionVariant.None) })
+      ).toEqual(['1']);
     });
   });
 });

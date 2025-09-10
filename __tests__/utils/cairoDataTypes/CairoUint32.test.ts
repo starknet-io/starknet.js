@@ -282,7 +282,7 @@ describe('CairoUint32 class Unit Tests', () => {
 
   describe('isAbiType static method', () => {
     test('should identify correct ABI type', () => {
-      expect(CairoUint32.isAbiType('core::u32::u32')).toBe(true);
+      expect(CairoUint32.isAbiType('core::integer::u32')).toBe(true);
       expect(CairoUint32.isAbiType('u32')).toBe(false);
       expect(CairoUint32.isAbiType('core::u64::u64')).toBe(false);
       expect(CairoUint32.isAbiType('core::felt252')).toBe(false);
@@ -475,11 +475,11 @@ describe('CairoUint32 class Unit Tests', () => {
 
     describe('isAbiType method', () => {
       test('should return true for correct ABI selector', () => {
-        expect(CairoUint32.isAbiType('core::u32::u32')).toBe(true);
+        expect(CairoUint32.isAbiType('core::integer::u32')).toBe(true);
       });
 
       test('should return false for incorrect ABI selector', () => {
-        expect(CairoUint32.isAbiType('core::u64::u64')).toBe(false);
+        expect(CairoUint32.isAbiType('core::integer::u64')).toBe(false);
         expect(CairoUint32.isAbiType('core::felt252')).toBe(false);
         expect(CairoUint32.isAbiType('')).toBe(false);
       });

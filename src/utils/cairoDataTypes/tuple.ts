@@ -101,6 +101,7 @@ export class CairoTuple extends CairoType {
     }
     if (content instanceof CairoTuple) {
       this.content = content.content;
+      this.tupleType = content.tupleType;
       return;
     }
     CairoTuple.validate(content, tupleType);

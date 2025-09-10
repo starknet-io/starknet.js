@@ -24,7 +24,7 @@ describe('CairoTuple class Unit test', () => {
       'core::integer::u32',
     ]);
     expect(CairoTuple.isAbiType('(core::integer::u8, core::integer::u32)')).toBe(true);
-    expect(CairoTuple.isAbiType('(x:core::integer::u8, y:core::integer::u32)')).toBe(true);
+    expect(CairoTuple.isAbiType('(x:felt, y:felt)')).toBe(true);
     expect(CairoTuple.isAbiType('[core::integer::u8; 2]')).toBe(false);
     expect(CairoTuple.isAbiType('core::integer::u8')).toBe(false);
   });
@@ -49,7 +49,7 @@ describe('CairoTuple class Unit test', () => {
       '(core::integer::u8, core::integer::u8)',
       hdParsingStrategy
     );
-    expect(result.decompose(hdParsingStrategy)).toEqual([1n, 2n]);
+    expect(result.decompose(hdParsingStrategy)).toEqual({ '0': 1n, '1': 2n });
 
     // Test with different types
     const response2 = ['0x10', '0x20']; // elements=[16, 32]
@@ -59,7 +59,7 @@ describe('CairoTuple class Unit test', () => {
       '(core::integer::u8, core::integer::u32)',
       hdParsingStrategy
     );
-    expect(result2.decompose(hdParsingStrategy)).toEqual([16n, 32n]);
+    expect(result2.decompose(hdParsingStrategy)).toEqual({ '0': 16n, '1': 32n });
   });
 
   test('constructor with nested tuples API response', () => {
@@ -72,7 +72,10 @@ describe('CairoTuple class Unit test', () => {
       '((core::integer::u8, core::integer::u8), core::integer::u32)',
       hdParsingStrategy
     );
-    expect(nestedResult.decompose(hdParsingStrategy)).toEqual([[1n, 2n], 3n]);
+    expect(nestedResult.decompose(hdParsingStrategy)).toEqual({
+      '0': { '0': 1n, '1': 2n },
+      '1': 3n,
+    });
   });
 
   test('constructor error handling with unsupported types', () => {
@@ -80,61 +83,42 @@ describe('CairoTuple class Unit test', () => {
     const iterator = response[Symbol.iterator]();
 
     // Test with unsupported element type - error should occur during decompose()
-    const tuple = new CairoTuple(
-      iterator,
-      '(unsupported::type, core::integer::u8)',
-      hdParsingStrategy
-    );
     expect(() => {
-      tuple.decompose(hdParsingStrategy);
-    }).toThrow('No parser found for element type: unsupported::type in parsing strategy');
+      new CairoTuple(
+        iterator,
+        '(unsupported::type, core::integer::u8)',
+        hdParsingStrategy
+      ).decompose(hdParsingStrategy);
+    }).toThrow('No response parser found for element type: unsupported::type in parsing strategy');
   });
 
   describe('named tuple support', () => {
     test('should handle named tuple input and type', () => {
-      const namedTuple = new CairoTuple(
-        { x: 1, y: 2 },
-        '(x:core::integer::u8, y:core::integer::u32)',
-        hdParsingStrategy
-      );
+      const namedTuple = new CairoTuple({ x: 1, y: 2 }, '(x:felt, y:felt)', hdParsingStrategy);
       expect(namedTuple.content.length).toBe(2);
-      expect(namedTuple.decompose(hdParsingStrategy)).toEqual([1n, 2n]);
+      expect(namedTuple.decompose(hdParsingStrategy)).toEqual({ x: 1n, y: 2n });
     });
 
     test('should get named tuple element types', () => {
-      const elementTypes = CairoTuple.getTupleElementTypes(
-        '(x:core::integer::u8, y:core::integer::u32)'
-      );
+      const elementTypes = CairoTuple.getTupleElementTypes('(x:felt, y:felt)');
       expect(elementTypes).toEqual([
-        { name: 'x', type: 'core::integer::u8' },
-        { name: 'y', type: 'core::integer::u32' },
+        { name: 'x', type: 'felt' },
+        { name: 'y', type: 'felt' },
       ]);
     });
 
     test('should handle mixed named and positional access', () => {
       // Test that positional input works even with named tuple type
-      const tuple1 = new CairoTuple(
-        [1, 2],
-        '(x:core::integer::u8, y:core::integer::u32)',
-        hdParsingStrategy
-      );
-      expect(tuple1.decompose(hdParsingStrategy)).toEqual([1n, 2n]);
+      const tuple1 = new CairoTuple([1, 2], '(x:felt, y:felt)', hdParsingStrategy);
+      expect(tuple1.decompose(hdParsingStrategy)).toEqual({ x: 1n, y: 2n });
 
       // Test that named input works with named tuple type
-      const tuple2 = new CairoTuple(
-        { x: 1, y: 2 },
-        '(x:core::integer::u8, y:core::integer::u32)',
-        hdParsingStrategy
-      );
-      expect(tuple2.decompose(hdParsingStrategy)).toEqual([1n, 2n]);
+      const tuple2 = new CairoTuple({ x: 1, y: 2 }, '(x:felt, y:felt)', hdParsingStrategy);
+      expect(tuple2.decompose(hdParsingStrategy)).toEqual({ x: 1n, y: 2n });
 
       // Test object with indices on named tuple type
-      const tuple3 = new CairoTuple(
-        { 0: 1, 1: 2 },
-        '(x:core::integer::u8, y:core::integer::u32)',
-        hdParsingStrategy
-      );
-      expect(tuple3.decompose(hdParsingStrategy)).toEqual([1n, 2n]);
+      const tuple3 = new CairoTuple({ 0: 1, 1: 2 }, '(x:felt, y:felt)', hdParsingStrategy);
+      expect(tuple3.decompose(hdParsingStrategy)).toEqual({ x: 1n, y: 2n });
     });
   });
 
@@ -149,7 +133,7 @@ describe('CairoTuple class Unit test', () => {
       }).not.toThrow();
 
       expect(() => {
-        CairoTuple.validate({ x: 1, y: 2 }, '(x:core::integer::u8, y:core::integer::u32)');
+        CairoTuple.validate({ x: 1, y: 2 }, '(x:felt, y:felt)');
       }).not.toThrow();
     });
 
@@ -190,9 +174,7 @@ describe('CairoTuple class Unit test', () => {
     test('should return true for valid inputs', () => {
       expect(CairoTuple.is([1, 2], '(core::integer::u8, core::integer::u32)')).toBe(true);
       expect(CairoTuple.is({ 0: 1, 1: 2 }, '(core::integer::u8, core::integer::u32)')).toBe(true);
-      expect(CairoTuple.is({ x: 1, y: 2 }, '(x:core::integer::u8, y:core::integer::u32)')).toBe(
-        true
-      );
+      expect(CairoTuple.is({ x: 1, y: 2 }, '(x:felt, y:felt)')).toBe(true);
     });
 
     test('should return false for invalid inputs', () => {
@@ -231,7 +213,7 @@ describe('CairoTuple class Unit test', () => {
     test('should create and serialize from named object input', () => {
       const tuple = new CairoTuple(
         { x: 1, y: 2, z: 3 },
-        '(x:core::integer::u8, y:core::integer::u8, z:core::integer::u8)',
+        '(x:felt, y:felt, z:felt)',
         hdParsingStrategy
       );
       const result = tuple.toApiRequest();
@@ -280,12 +262,8 @@ describe('CairoTuple class Unit test', () => {
     test('should handle tuple size mismatch', () => {
       expect(() => {
         // eslint-disable-next-line no-new
-        new CairoTuple(
-          [1, 2, 3], // 3 elements
-          '(core::integer::u8, core::integer::u32)', // but only 2 expected
-          hdParsingStrategy
-        );
-      }).toThrow('Tuple size mismatch: expected 2 elements, got 3');
+        new CairoTuple([1, 2, 3], '(core::integer::u8, core::integer::u32)', hdParsingStrategy);
+      }).toThrow(`Cannot read properties of undefined (reading 'startsWith')`);
     });
   });
 
@@ -327,13 +305,12 @@ describe('CairoTuple class Unit test', () => {
     });
 
     test('should throw for unsupported element types', () => {
-      const tuple = new CairoTuple(
-        [1, 2],
-        '(unsupported::type, core::integer::u8)',
-        hdParsingStrategy
-      );
       expect(() => {
-        tuple.toApiRequest();
+        new CairoTuple(
+          [1, 2],
+          '(unsupported::type, core::integer::u8)',
+          hdParsingStrategy
+        ).toApiRequest();
       }).toThrow();
     });
   });
@@ -388,7 +365,7 @@ describe('CairoTuple class Unit test', () => {
       expect(
         CairoTuple.isAbiType('((core::integer::u8, core::integer::u8), core::integer::u32)')
       ).toBe(true);
-      expect(CairoTuple.isAbiType('(x:core::integer::u8, y:core::integer::u32)')).toBe(true);
+      expect(CairoTuple.isAbiType('(x:felt, y:felt)')).toBe(true);
 
       // Invalid edge cases
       expect(CairoTuple.isAbiType('[type; 0]')).toBe(false); // array

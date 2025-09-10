@@ -21,7 +21,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry('felt')]),
       });
-      expect(parsedField).toEqual('256');
+      expect(parsedField).toEqual(['0x100']);
     });
 
     test('should return parsed calldata field for Array type', () => {
@@ -34,7 +34,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry('core::array::Array::<felt>')]),
       });
-      expect(parsedField).toEqual(['2', '256', '128']);
+      expect(parsedField).toEqual(['0x2', '0x100', '0x80']);
     });
 
     test('should return parsed calldata field for Array type(string input)', () => {
@@ -47,7 +47,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry('core::array::Array::<felt>')]),
       });
-      expect(parsedField).toEqual(['1', '599374153440608178282648329058547045']);
+      expect(parsedField).toEqual(['0x1', '0x736f6d655f746573745f76616c7565']);
     });
 
     test('should return parsed calldata field for NonZero type', () => {
@@ -60,7 +60,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry(`${NON_ZERO_PREFIX}core::bool`)]),
       });
-      expect(parsedField).toEqual('1');
+      expect(parsedField).toEqual(['0x1']);
     });
 
     test('should return parsed calldata field for EthAddress type', () => {
@@ -73,7 +73,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry(`${ETH_ADDRESS}felt`)]),
       });
-      expect(parsedField).toEqual('1952805748');
+      expect(parsedField).toEqual(['0x74657374']);
     });
 
     test('should return parsed calldata field for Struct type', () => {
@@ -86,7 +86,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry('struct')]),
       });
-      expect(parsedField).toEqual(['1952805748']);
+      expect(parsedField).toEqual(['0x74657374']);
     });
 
     test('should return parsed calldata field for Tuple type', () => {
@@ -120,10 +120,10 @@ describe('requestParser', () => {
       const argsIterator = args[Symbol.iterator]();
       const parsedField = parseCalldataField({
         argsIterator,
-        input: getAbiEntry('core::option::Option::core::bool'),
+        input: getAbiEntry('core::option::Option::<core::bool>'),
         structs: getAbiStructs(),
-        enums: { 'core::option::Option::core::bool': getAbiEnums().enum },
-        parser: new AbiParser1([getAbiEntry('core::option::Option::core::bool')]),
+        enums: { 'core::option::Option::<core::bool>': getAbiEnums().enum },
+        parser: new AbiParser1([getAbiEntry('core::option::Option::<core::bool>')]),
       });
       expect(parsedField).toEqual('1');
     });
@@ -139,10 +139,10 @@ describe('requestParser', () => {
       });
       const parsedField = parseCalldataField({
         argsIterator,
-        input: getAbiEntry('core::option::Option::core::bool'),
+        input: getAbiEntry('core::option::Option::<core::bool>'),
         structs: getAbiStructs(),
-        enums: { 'core::option::Option::core::bool': abiEnum },
-        parser: new AbiParser1([getAbiEntry('core::option::Option::core::bool')]),
+        enums: { 'core::option::Option::<core::bool>': abiEnum },
+        parser: new AbiParser1([getAbiEntry('core::option::Option::<core::bool>')]),
       });
       expect(parsedField).toEqual(['0', '27988542884245108']);
     });
@@ -158,7 +158,9 @@ describe('requestParser', () => {
           enums: { 'core::option::Option::core::bool': getAbiEnums().enum },
           parser: new AbiParser1([getAbiEntry('core::option::Option::core::bool')]),
         })
-      ).toThrow(new Error(`Error in abi : Option has no 'Some' variant.`));
+      ).toThrow(
+        new Error(`ABI type core::option::Option::core::bool do not includes a valid type of data.`)
+      );
     });
 
     test('should return parsed calldata field for Enum Result type Ok', () => {
@@ -177,7 +179,7 @@ describe('requestParser', () => {
         enums: { 'core::result::Result::core::bool': abiEnum },
         parser: new AbiParser1([getAbiEntry('core::result::Result::core::bool')]),
       });
-      expect(parsedField).toEqual(['0', '20331']);
+      expect(parsedField).toEqual(['0x0', '0x4f6b']);
     });
 
     test('should throw an error for Enum Result has no "Ok" variant', () => {
@@ -211,10 +213,10 @@ describe('requestParser', () => {
         enums: { enum: abiEnum },
         parser: new AbiParser1([getAbiEntry('enum')]),
       });
-      expect(parsedField).toEqual(['1', '27988542884245108']);
+      expect(parsedField).toEqual(['0x1', '0x636f6e74656e74']);
     });
 
-    test('should throw an error for Custon Enum type when there is not active variant', () => {
+    test('should throw an error for Custom Enum type when there is not active variant', () => {
       const args = [new CairoCustomEnum({ test: 'content' })];
       const argsIterator = args[Symbol.iterator]();
       expect(() =>
@@ -257,13 +259,7 @@ describe('requestParser', () => {
           enums: getAbiEnums(),
           parser: new AbiParser1([getAbiEntry('(core::bool, core::bool)')]),
         })
-      ).toThrow(
-        new Error(
-          `ParseTuple: provided and expected abi tuple size do not match.
-      provided: true
-      expected: core::bool,core::bool`
-        )
-      );
+      ).toThrow(new Error('"core::bool,core::bool" is not a valid Cairo type'));
     });
 
     test('should throw an error if there is missing parameter for type Struct', () => {

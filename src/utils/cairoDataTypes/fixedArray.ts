@@ -113,6 +113,7 @@ export class CairoFixedArray extends CairoType {
     }
     if (content instanceof CairoFixedArray) {
       this.content = content.content;
+      this.arrayType = content.arrayType;
       return;
     }
     CairoFixedArray.validate(content, arrayType);

@@ -355,9 +355,8 @@ describe('CairoFixedArray class Unit test', () => {
     });
 
     test('should throw for unsupported element types', () => {
-      const fixedArray = new CairoFixedArray([1, 2], '[unsupported::type; 2]', hdParsingStrategy);
       expect(() => {
-        fixedArray.toApiRequest();
+        new CairoFixedArray([1, 2], '[unsupported::type; 2]', hdParsingStrategy).toApiRequest();
       }).toThrow();
     });
   });
