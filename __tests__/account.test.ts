@@ -899,9 +899,7 @@ describe('deploy and test Account', () => {
           ],
         }
       );
-      // TODO: expect based on Sepolia test where UDC events are not Filled with data on pre-confirmed, change if behavior changes
-      expect(deployResponse.address).toBeUndefined();
-      // expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
+      expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
     });
   });
 });
