@@ -41,7 +41,8 @@ import {
   isTypeUint,
 } from './cairo';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
-import { CairoOption } from './enum';
+import { CairoOption, CairoResult } from './enum';
+import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 
 // TODO: separate validate is redundant as CairoTypes are validated during construction.
 // TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
@@ -226,10 +227,13 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
     return; // CairoTypeOption Enum
   }
   if (isTypeOption(input.type) && parameter instanceof CairoOption) {
+    return; // CairoOption Enum
+  }
+  if (isTypeResult(input.type) && parameter instanceof CairoTypeResult) {
     return; // CairoTypeOption Enum
   }
-  if (isTypeResult(input.type) && keys.includes('isOk') && keys.includes('isErr')) {
-    return; // Result Enum
+  if (isTypeResult(input.type) && parameter instanceof CairoResult) {
+    return; // CairoResult Enum
   }
   if (keys.includes('variant') && keys.includes('activeVariant')) {
     return; // Custom Enum

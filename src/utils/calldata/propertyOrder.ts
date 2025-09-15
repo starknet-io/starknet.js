@@ -37,6 +37,7 @@ import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { type ParsingStrategy } from './parser';
+import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 
 function errorU256(key: string) {
   return Error(
@@ -207,24 +208,29 @@ export default function orderPropsByAbi(
     abiObject: AbiEntry
   ): CairoTypeEnum => {
     if (isTypeResult(abiObject.name)) {
-      const unorderedResult = unorderedObject2 as CairoResult<any, any>;
-      const resultOkType: string = abiObject.name.substring(
-        abiObject.name.indexOf('<') + 1,
-        abiObject.name.lastIndexOf(',')
-      );
-      const resultErrType: string = abiObject.name.substring(
-        abiObject.name.indexOf(',') + 1,
-        abiObject.name.lastIndexOf('>')
-      );
-      if (unorderedResult.isOk()) {
-        return new CairoResult<any, any>(
-          CairoResultVariant.Ok,
-          orderInput(unorderedResult.unwrap(), resultOkType)
+      if (unorderedObject2 instanceof CairoResult) {
+        const unorderedResult = unorderedObject2 as CairoResult<any, any>;
+        const resultType: string = CairoTypeResult.getVariantTypes(abiObject.name)[
+          unorderedResult.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err
+        ];
+        return new CairoTypeResult(
+          orderInput(unorderedResult.unwrap(), resultType),
+          abiObject.name,
+          parseStrategy,
+          unorderedResult.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err
         );
       }
-      return new CairoResult<any, any>(
-        CairoResultVariant.Err,
-        orderInput(unorderedResult.unwrap(), resultErrType)
+      const unorderedResult = unorderedObject2 as CairoTypeResult;
+      return new CairoTypeResult(
+        orderInput(
+          unorderedResult.content,
+          CairoTypeResult.getVariantTypes(abiObject.name)[
+            unorderedResult.isVariantOk ? CairoResultVariant.Ok : CairoResultVariant.Err
+          ]
+        ),
+        abiObject.name,
+        parseStrategy,
+        unorderedResult.isVariantOk ? CairoResultVariant.Ok : CairoResultVariant.Err
       );
     }
     if (isTypeOption(abiObject.name)) {

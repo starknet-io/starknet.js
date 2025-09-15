@@ -58,6 +58,7 @@ export * from './utils/cairoDataTypes/tuple';
 export * from './utils/cairoDataTypes/byteArray';
 export * from './utils/cairoDataTypes/secp256k1Point';
 export * from './utils/cairoDataTypes/cairoTypeOption';
+export * from './utils/cairoDataTypes/cairoTypeResult';
 
 export * from './utils/address';
 export * from './utils/calldata';

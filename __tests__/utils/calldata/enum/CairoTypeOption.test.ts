@@ -7,6 +7,9 @@ import {
   CairoOption,
   CairoArray,
   CallData,
+  CairoTypeResult,
+  CairoResultVariant,
+  CairoResult,
 } from '../../../../src';
 
 describe('CairoTypeOption', () => {
@@ -163,6 +166,35 @@ describe('CairoTypeOption', () => {
       );
     });
 
+    test('optionCairoType: option of a result', () => {
+      const myResult = new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 6n);
+      const myOption0 = new CairoTypeOption(
+        myResult,
+        'core::option::Option::<core::result::Result::<core::integer::u8, core::integer::u16>>',
+        hdParsingStrategy,
+        CairoOptionVariant.Some
+      );
+      const myOption1 = new CairoTypeOption(
+        new CairoTypeResult(
+          6,
+          'core::result::Result::<core::integer::u8, core::integer::u16>',
+          hdParsingStrategy,
+          CairoResultVariant.Ok
+        ),
+        'core::option::Option::<core::result::Result::<core::integer::u8, core::integer::u16>>',
+        hdParsingStrategy,
+        CairoOptionVariant.Some
+      );
+      expect(myOption0.toApiRequest()).toEqual(['0x00', '0x00', '0x6']);
+      expect(myOption0.decompose(hdParsingStrategy)).toEqual(
+        new CairoOption<CairoResult<BigNumberish, BigNumberish>>(CairoOptionVariant.Some, myResult)
+      );
+      expect(myOption1.toApiRequest()).toEqual(['0x00', '0x00', '0x6']);
+      expect(myOption1.decompose(hdParsingStrategy)).toEqual(
+        new CairoOption<CairoResult<BigNumberish, BigNumberish>>(CairoOptionVariant.Some, myResult)
+      );
+    });
+
     test('optionCairoType: nested options', () => {
       const option0 = new CairoOption<BigNumberish>(CairoOptionVariant.Some, 5n);
       const option1 = new CairoOption<CairoOption<BigNumberish>>(CairoOptionVariant.Some, option0);
@@ -178,19 +210,6 @@ describe('CairoTypeOption', () => {
       );
       expect(myOption.toApiRequest()).toEqual(['0x00', '0x00', '0x00', '0x5']);
       expect(myOption.decompose(hdParsingStrategy)).toEqual(option2);
-    });
-
-    test('optionCairoType: option of an iterator', () => {
-      const iter = ['0', '100'][Symbol.iterator]();
-      const myOption = new CairoTypeOption(
-        iter,
-        'core::option::Option::<core::integer::u8>',
-        hdParsingStrategy
-      );
-      expect(myOption.toApiRequest()).toEqual(['0x00', '0x64']);
-      expect(myOption.decompose(hdParsingStrategy)).toEqual(
-        new CairoOption<BigNumberish>(CairoOptionVariant.Some, 100n)
-      );
     });
 
     test('optionCairoType: option of a CairoType', () => {

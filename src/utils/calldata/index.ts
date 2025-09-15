@@ -44,6 +44,7 @@ import { parseCalldataField } from './requestParser';
 import responseParser from './responseParser';
 import validateFields from './validate';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
+import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 
 export * as cairo from './cairo';
 export { parseCalldataField } from './requestParser';
@@ -255,6 +256,13 @@ export class CallData {
               return getEntries(compiledObj, `${prefix}${kk}.`);
             }
             if (value instanceof CairoTypeOption) {
+              const apiRequest = value.toApiRequest();
+              const compiledObj = Object.fromEntries(
+                apiRequest.map((item, idx) => [idx.toString(), item])
+              );
+              return getEntries(compiledObj, `${prefix}${kk}.`);
+            }
+            if (value instanceof CairoTypeResult) {
               const apiRequest = value.toApiRequest();
               const compiledObj = Object.fromEntries(
                 apiRequest.map((item, idx) => [idx.toString(), item])

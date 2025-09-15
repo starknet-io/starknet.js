@@ -274,10 +274,12 @@ export class CairoTuple extends CairoType {
 
   /**
    * Parse sub-tuples by extracting nested parentheses.
-   * @private
    */
   // eslint-disable-next-line no-plusplus
-  private static parseSubTuple(s: string) {
+  static parseSubTuple(s: string): {
+    subTuple: string[];
+    result: string;
+  } {
     if (!s.includes('(')) return { subTuple: [], result: s };
     const subTuple: string[] = [];
     let result = '';
@@ -370,9 +372,8 @@ export class CairoTuple extends CairoType {
    * A cairo 1 tuple is made with  (val1, val2).
    * No named tuples in Cairo 1.
    * See https://www.starknet.io/cairo-book/ch02-02-data-types.html?highlight=tuple#the-tuple-type
-   * @private
    */
-  private static extractCairo1Tuple(type: string): (string | { name: string; type: string })[] {
+  static extractCairo1Tuple(type: string): (string | { name: string; type: string })[] {
     // Support both named and un-named tuples
     const input = type.slice(1, -1); // remove first lvl ()
     const result: (string | { name: string; type: string })[] = [];

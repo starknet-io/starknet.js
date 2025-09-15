@@ -24,7 +24,7 @@ export class CairoTypeOption extends CairoType {
 
   public readonly dynamicSelector = CairoTypeOption.dynamicSelector;
 
-  /* CairoType instance representing a Cairo option. */
+  /* CairoType instance representing the content of a Cairo option. */
   public readonly content: CairoType | undefined;
 
   /* Cairo type of the option. */
@@ -43,15 +43,15 @@ export class CairoTypeOption extends CairoType {
    * "content" parameter has to be defined when Some variant is selected
    * @param {string} optionCairoType - Cairo option type string (e.g., "core::option::Option::<core::integer::u8>").
    * @param {ParsingStrategy} strategy - Parsing strategy for element type handling (e.g. hdParsingStrategy).
-   * @param {CairoOptionVariant | number} [variant] - (optional) variant of the option: CairoOptionVariant.Some (0), or CairoOptionVariant.None (1). If "content" is an iterator, this parameter must be omitted. If "content" is not an iterator, this parameter is mandatory.
-   * @param {boolean} [subType=false] - optional. default=false. Use "true" if called in nested CairoOption instances.
+   * @param {CairoOptionVariant | number} [variant] - (optional) variant of the option: CairoOptionVariant.Some (0), or CairoOptionVariant.None (1). If "content" is an iterator, this parameter must be omitted.
+   * @param {boolean} [subType=false] - optional default=false. Use "true" if called in nested CairoOption instances.
    * @example
    * ```typescript
    * import { CairoTypeOption, hdParsingStrategy, CairoOptionVariant } from 'starknet';
    * // Simple Option with Some variant
-   * const myOption1 = new CairoTypeOption(123, "core::option::Option::<core::integer::u8>", hdParsingStrategy, CairoOptionVariant.Some);
-   * console.log(myOption1.toApiRequest()); // [ '0x01', [ '0x7b' ] ]
-   * console.log(myOption1.decompose(hdParsingStrategy)); // CairoOption instance with content 123n and Some variant.
+   * const myOption1 = new CairoTypeOption(7, "core::option::Option::<core::integer::u8>", hdParsingStrategy, CairoOptionVariant.Some);
+   * console.log(myOption1.toApiRequest()); // ['0x00', '0x7']
+   * console.log(myOption1.decompose(hdParsingStrategy)); // CairoOption instance with content 7n and Some variant.
    * // Simple Option with None variant
    * const myOption2 = new CairoTypeOption(undefined, "core::option::Option::<core::integer::u8>", hdParsingStrategy, CairoOptionVariant.None);
    *
@@ -74,10 +74,10 @@ export class CairoTypeOption extends CairoType {
   ) {
     super();
     this.optionCairoType = optionCairoType;
-    if (variant === 0 && isUndefined(content)) {
+    if (variant === CairoOptionVariant.Some && isUndefined(content)) {
       throw new Error('"content" parameter has to be defined when Some variant is selected');
     }
-    if (variant === 1 && !isUndefined(content)) {
+    if (variant === CairoOptionVariant.None && !isUndefined(content)) {
       throw new Error('"content" parameter has to be NOT defined when None variant is selected');
     }
     if (content && typeof content === 'object' && 'next' in content) {
@@ -105,7 +105,7 @@ export class CairoTypeOption extends CairoType {
           throw new Error('Invalid Option variant in iterator.');
         }
       }
-      this.isVariantSome = variantFromIterator === 0;
+      this.isVariantSome = variantFromIterator === CairoOptionVariant.Some;
       return;
     }
     if (content instanceof CairoTypeOption) {
@@ -134,7 +134,7 @@ export class CairoTypeOption extends CairoType {
       this.isVariantSome = option.isVariantSome;
       return;
     }
-    // not an iterator, not an CairoType, neither a CairoOption -> so is low level data (BigNumberish, array, object)
+    // not an iterator, not an CairoType, neither a CairoOption, CairoResult, CairoCustomEnum -> so is low level data (BigNumberish, array, object)
     assert(
       !isUndefined(variant),
       '"variant" parameter is mandatory when creating a new Cairo option from a "CairoType" or raw data.'
@@ -186,7 +186,7 @@ export class CairoTypeOption extends CairoType {
    * @param {Iterator<string>} responseIterator - Iterator over string data to parse
    * @param {string} someVariantCairoType - The Cairo option type (e.g., "core::option::Option::<core::integer::u8>")
    * @param {ParsingStrategy} strategy - The parsing strategy containing constructors and selectors
-   * @returns {CairoType} Array of parsed CairoType instances
+   * @returns {CairoType} CairoType instance
    * @private
    */
   private static parser(
@@ -224,12 +224,12 @@ export class CairoTypeOption extends CairoType {
    * // result = "core::integer::u8"
    * ```
    */
-  static getVariantSomeType = (type: string) => {
+  static getVariantSomeType(type: string): string {
     const matchArray = type.match(/(?<=<).+(?=>)/);
     if (matchArray === null)
       throw new Error(`ABI type ${type} do not includes a valid type of data.`);
     return matchArray[0];
-  };
+  }
 
   /**
    * Validate input data for CairoTypeOption creation.
@@ -350,7 +350,7 @@ export class CairoTypeOption extends CairoType {
    * @returns {CairoOption<any>} a CairoOptionInstance, with parsed variant (BigInt, numbers, nested arrays, etc.)
    * @example
    * ```typescript
-   * const myOption = new CairoTypedOption([0, 3], "core::option::Option::<core::integer::u8>", hdParsingStrategy, CairoOptionVariant.Some);
+   * const myOption = new CairoTypedOption(3, "core::option::Option::<core::integer::u8>", hdParsingStrategy, CairoOptionVariant.Some);
    * const parsed = myOption.decompose(hdParsingStrategy); // CairoOption{ Some: 3n }
    * ```
    */

@@ -40,15 +40,10 @@ import {
   isTypeStruct,
   isTypeTuple,
 } from './cairo';
-import {
-  CairoCustomEnum,
-  CairoOption,
-  CairoOptionVariant,
-  CairoResult,
-  CairoResultVariant,
-} from './enum';
+import { CairoCustomEnum, CairoOption, CairoOptionVariant, CairoResult } from './enum';
 import { AbiParserInterface } from './parser';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
+import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 
 // TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
 
@@ -224,49 +219,18 @@ function parseCalldataValue({
     }
     // Result Enum
     if (isTypeResult(type)) {
-      const myResult = element as CairoResult<any, any>;
-      if (myResult.isOk()) {
-        const listTypeVariant = variants.find((variant) => variant.name === 'Ok');
-        if (isUndefined(listTypeVariant)) {
-          throw Error(`Error in abi : Result has no 'Ok' variant.`);
-        }
-        const typeVariantOk = listTypeVariant.type;
-        if (typeVariantOk === '()') {
-          return CairoResultVariant.Ok.toString();
-        }
-        const parsedParameter = parseCalldataValue({
-          element: myResult.unwrap(),
-          type: typeVariantOk,
-          structs,
-          enums,
-          parser,
-        });
-        if (Array.isArray(parsedParameter)) {
-          return [CairoResultVariant.Ok.toString(), ...parsedParameter];
-        }
-        return [CairoResultVariant.Ok.toString(), parsedParameter];
+      let myResult: CairoTypeResult;
+      if (element instanceof CairoResult) {
+        myResult = new CairoTypeResult(element, type, parser.parsingStrategy);
+      } else {
+        myResult = element as CairoTypeResult;
       }
-
-      // is Result::Err
-      const listTypeVariant = variants.find((variant) => variant.name === 'Err');
+      const variantName = myResult.isVariantOk ? 'Ok' : 'Err';
+      const listTypeVariant = variants.find((variant) => variant.name === variantName);
       if (isUndefined(listTypeVariant)) {
-        throw Error(`Error in abi : Result has no 'Err' variant.`);
+        throw Error(`Error in abi : Result has no '${variantName}' variant.`);
       }
-      const typeVariantErr = listTypeVariant.type;
-      if (typeVariantErr === '()') {
-        return CairoResultVariant.Err.toString();
-      }
-      const parsedParameter = parseCalldataValue({
-        element: myResult.unwrap(),
-        type: typeVariantErr,
-        structs,
-        enums,
-        parser,
-      });
-      if (Array.isArray(parsedParameter)) {
-        return [CairoResultVariant.Err.toString(), ...parsedParameter];
-      }
-      return [CairoResultVariant.Err.toString(), parsedParameter];
+      return myResult.toApiRequest();
     }
     // Custom Enum
     const myEnum = element as CairoCustomEnum;
