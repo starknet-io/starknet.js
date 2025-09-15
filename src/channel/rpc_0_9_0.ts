@@ -403,7 +403,8 @@ export class RpcChannel {
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
     const transactionHash = toHex(txHash);
-    let { retries } = this;
+    let retries = options?.retries ?? this.retries;
+    let lifeCycleRetries = options?.lifeCycleRetries ?? 3;
     let onchain = false;
     let isErrorState = false;
     const retryInterval = options?.retryInterval ?? this.transactionRetryIntervalDefault;
@@ -413,6 +414,11 @@ export class RpcChannel {
       RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
       RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
     ];
+    const errorMessages: Record<string, string> = {
+      [RPC.ETransactionStatus.RECEIVED]: SYSTEM_MESSAGES.txEvictedFromMempool,
+      [RPC.ETransactionStatus.PRE_CONFIRMED]: SYSTEM_MESSAGES.consensusFailed,
+      [RPC.ETransactionStatus.CANDIDATE]: SYSTEM_MESSAGES.txFailsBlockBuildingValidation,
+    };
 
     const txLife: string[] = [];
     let txStatus: RPC.TransactionStatus;
@@ -453,15 +459,11 @@ export class RpcChannel {
 
         if (error instanceof RpcError && error.isType('TXN_HASH_NOT_FOUND')) {
           logger.info('txLife: ', txLife);
-          const errorMessages: Record<string, string> = {
-            [RPC.ETransactionStatus.RECEIVED]: SYSTEM_MESSAGES.txEvictedFromMempool,
-            [RPC.ETransactionStatus.PRE_CONFIRMED]: SYSTEM_MESSAGES.consensusFailed,
-            [RPC.ETransactionStatus.CANDIDATE]: SYSTEM_MESSAGES.txFailsBlockBuildingValidation,
-          };
           const errorMessage = errorMessages[txLife.at(-1) as string];
-          if (errorMessage) {
+          if (errorMessage && lifeCycleRetries <= 0) {
             throw new Error(errorMessage);
           }
+          lifeCycleRetries -= 1;
         }
 
         if (retries <= 0) {

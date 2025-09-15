@@ -396,21 +396,22 @@ export class RpcChannel {
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
     const transactionHash = toHex(txHash);
-    let { retries } = this;
+    let retries = options?.retries ?? this.retries;
+    let lifeCycleRetries = options?.lifeCycleRetries ?? 3;
     let onchain = false;
     let isErrorState = false;
     const retryInterval = options?.retryInterval ?? this.transactionRetryIntervalDefault;
-    const errorStates: any = options?.errorStates ?? [
-      RPC.ETransactionStatus.REJECTED,
-      // TODO: commented out to preserve the long-standing behavior of "reverted" not being treated as an error by default
-      // should decide which behavior to keep in the future
-      // RPC.ETransactionExecutionStatus.REVERTED,
-    ];
+    const errorStates: any = options?.errorStates ?? [RPC.ETransactionStatus.REJECTED];
     const successStates: any = options?.successStates ?? [
       // RPC.ETransactionExecutionStatus.SUCCEEDED, Starknet 0.14.0 this one can have incomplete events
       RPC.ETransactionStatus.ACCEPTED_ON_L2,
       RPC.ETransactionStatus.ACCEPTED_ON_L1,
     ];
+    const LifeCycleErrorMessages: Record<string, string> = {
+      [RPCSPEC09.ETransactionStatus.RECEIVED]: SYSTEM_MESSAGES.txEvictedFromMempool,
+      [RPCSPEC09.ETransactionStatus.PRE_CONFIRMED]: SYSTEM_MESSAGES.consensusFailed,
+      [RPCSPEC09.ETransactionStatus.CANDIDATE]: SYSTEM_MESSAGES.txFailsBlockBuildingValidation,
+    };
 
     const txLife: string[] = [];
     let txStatus: RPC.TransactionStatus;
@@ -451,16 +452,11 @@ export class RpcChannel {
 
         if (error instanceof RpcError && error.isType('TXN_HASH_NOT_FOUND')) {
           logger.info('txLife: ', txLife);
-          const errorMessages: Record<string, string> = {
-            [RPCSPEC09.ETransactionStatus.RECEIVED]: SYSTEM_MESSAGES.txEvictedFromMempool,
-            [RPCSPEC09.ETransactionStatus.PRE_CONFIRMED]: SYSTEM_MESSAGES.consensusFailed,
-            [RPCSPEC09.ETransactionStatus.CANDIDATE]:
-              SYSTEM_MESSAGES.txFailsBlockBuildingValidation,
-          };
-          const errorMessage = errorMessages[txLife.at(-1) as string];
-          if (errorMessage) {
+          const errorMessage = LifeCycleErrorMessages[txLife.at(-1) as string];
+          if (errorMessage && lifeCycleRetries <= 0) {
             throw new Error(errorMessage);
           }
+          lifeCycleRetries -= 1;
         }
 
         if (retries <= 0) {

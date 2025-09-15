@@ -313,8 +313,26 @@ export type ParsedStruct = {
 };
 
 export type waitForTransactionOptions = {
+  /**
+   * Define the number of retries before throwing an error for the transaction life cycle when the transaction is not found after it had a valid status.
+   * This is useful for nodes that are not fully synced yet when connecting to service that rotate nodes.
+   */
+  lifeCycleRetries?: number;
+  /**
+   * Define the number of retries before throwing an error
+   */
+  retries?: number;
+  /**
+   * Define the time interval between retries in milliseconds
+   */
   retryInterval?: number;
+  /**
+   * Define which states are considered as successful
+   */
   successStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
+  /**
+   * Define which states are considered as errors
+   */
   errorStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
 };
 
