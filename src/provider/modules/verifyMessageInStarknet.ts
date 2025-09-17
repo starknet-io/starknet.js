@@ -15,11 +15,11 @@ import { getMessageHash, validateTypedData } from '../../utils/typedData';
  * @param { okResponse: string[]; nokResponse: string[]; error: string[] } [signatureVerificationResponse] if account contract with non standard response of verification function.
  * @returns
  * ```typescript
- * const myTypedMessage: TypedMessage = .... ;
- * const messageHash = typedData.getMessageHash(myTypedMessage,accountAddress);
- * const sign: WeierstrassSignatureType = ec.starkCurve.sign(messageHash, privateKey);
+ * const myTypedData = {} as TypedData;
+ * const messageHash = typedData.getMessageHash(myTypedData, accountAddress);
+ * const sign: Signature = ec.starkCurve.sign(messageHash, privateKey) as WeierstrassSignatureType;
  * const accountAddress = "0x43b7240d227aa2fb8434350b3321c40ac1b88c7067982549e7609870621b535";
- * const result1 = await myRpcProvider.verifyMessageInStarknet(myTypedMessage, sign, accountAddress);
+ * const result1 = await myRpcProvider.verifyMessageInStarknet(myTypedData, sign, accountAddress);
  * const result2 = await myRpcProvider.verifyMessageInStarknet(messageHash, sign, accountAddress);
  * // result1 = result2 = true
  * ```
