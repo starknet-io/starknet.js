@@ -105,7 +105,7 @@ export abstract class ProviderInterface {
    * @example
    * In Sepolia Testnet :
    * ```typescript
-   * const result = provider.getL1MessageHash('0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819');
+   * const result = await provider.getL1MessageHash('0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819');
    * // result = '0x55b3f8b6e607fffd9b4d843dfe8f9b5c05822cd94fcad8797deb01d77805532a'
    * ```
    */
@@ -160,7 +160,7 @@ export abstract class ProviderInterface {
    * Gets the transaction information from a tx id.
    *
    * @param transactionHash
-   * @returns the transaction object \{ transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? \}
+   * @returns the transaction object \{ transaction_id, status, transaction, block_number?, transaction_index?, transaction_failure_reason? \}
    */
   public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
 
@@ -581,11 +581,11 @@ export abstract class ProviderInterface {
    * @param { okResponse: string[]; nokResponse: string[]; error: string[] } [signatureVerificationResponse] if account contract with non standard response of verification function.
    * @returns
    * ```typescript
-   * const myTypedMessage: TypedMessage = .... ;
-   * const messageHash = typedData.getMessageHash(myTypedMessage,accountAddress);
-   * const sign: WeierstrassSignatureType = ec.starkCurve.sign(messageHash, privateKey);
+   * const myTypedData = {} as TypedData;
+   * const messageHash = typedData.getMessageHash(myTypedData, accountAddress);
+   * const sign: Signature = ec.starkCurve.sign(messageHash, privateKey) as WeierstrassSignatureType;
    * const accountAddress = "0x43b7240d227aa2fb8434350b3321c40ac1b88c7067982549e7609870621b535";
-   * const result1 = await myRpcProvider.verifyMessageInStarknet(myTypedMessage, sign, accountAddress);
+   * const result1 = await myRpcProvider.verifyMessageInStarknet(myTypedData, sign, accountAddress);
    * const result2 = await myRpcProvider.verifyMessageInStarknet(messageHash, sign, accountAddress);
    * // result1 = result2 = true
    * ```
