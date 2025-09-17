@@ -25,9 +25,9 @@ export type FunctionAbi = {
 export type AbiStructs = { [name: string]: AbiStruct };
 
 export type AbiStruct = {
-  members: (AbiEntry & { offset: number })[];
+  members: (AbiEntry & { offset?: number })[]; // "offset" only in Cairo 0 Abi
   name: string;
-  size: number;
+  size?: number; // "size" only in Cairo 0 Abi
   type: 'struct';
 };
 

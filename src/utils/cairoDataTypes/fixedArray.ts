@@ -3,8 +3,9 @@ import { addCompiledFlag } from '../helpers';
 import { getNext } from '../num';
 import { type ParsingStrategy } from '../calldata/parser/parsingStrategy';
 import { CairoType } from './cairoType.interface';
-import { CairoOption } from '../calldata/enum';
+import { CairoOption, CairoResult } from '../calldata/enum';
 import { CairoTypeOption } from './cairoTypeOption';
+import { CairoTypeResult } from './cairoTypeResult';
 
 /**
  * Represents a Cairo fixed-size array with compile-time known length.
@@ -133,11 +134,14 @@ export class CairoFixedArray extends CairoType {
           // "content" is a CairoOption
           return new CairoTypeOption(contentItem, arrayContentType, strategy);
         }
+        if (contentItem instanceof CairoResult) {
+          // "content" is a CairoResult
+          return new CairoTypeResult(contentItem, arrayContentType, strategy);
+        }
         // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
-
         const constructor = strategy.constructors[arrayContentType];
         if (constructor) {
-          return constructor(contentItem, arrayContentType);
+          return constructor(contentItem, strategy, arrayContentType);
         }
         const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
         const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
@@ -147,7 +151,7 @@ export class CairoFixedArray extends CairoType {
           const [selectorName] = matchingSelector;
           const dynamicConstructor = strategy.constructors[selectorName];
           if (dynamicConstructor) {
-            return dynamicConstructor(contentItem, arrayContentType);
+            return dynamicConstructor(contentItem, strategy, arrayContentType);
           }
         }
         throw new Error(`"${arrayContentType}" is not a valid Cairo type`);
@@ -187,7 +191,9 @@ export class CairoFixedArray extends CairoType {
     const constructor = strategy.constructors[elementType];
 
     if (constructor) {
-      return Array.from({ length: outerSize }, () => constructor(responseIterator, elementType));
+      return Array.from({ length: outerSize }, () =>
+        constructor(responseIterator, strategy, elementType)
+      );
     }
 
     // Check dynamic selectors (includes CairoFixedArray, future: tuples, structs, etc.)
@@ -199,7 +205,7 @@ export class CairoFixedArray extends CairoType {
       const dynamicConstructor = strategy.constructors[selectorName];
       if (dynamicConstructor) {
         return Array.from({ length: outerSize }, () =>
-          dynamicConstructor(responseIterator, elementType)
+          dynamicConstructor(responseIterator, strategy, elementType)
         );
       }
     }
@@ -397,7 +403,7 @@ export class CairoFixedArray extends CairoType {
       }
       const responseParser = strategy.response[parserName];
       if (responseParser) {
-        return responseParser(element);
+        return responseParser(element, strategy);
       }
 
       // No response parser found - throw error instead of fallback magic

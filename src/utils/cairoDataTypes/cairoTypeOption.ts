@@ -5,7 +5,9 @@ import { type ParsingStrategy, type VariantType } from '../calldata/parser/parsi
 import { CairoType } from './cairoType.interface';
 import { isTypeOption } from '../calldata/cairo';
 import { isUndefined } from '../typed';
-import { CairoOptionVariant, CairoOption } from '../calldata/enum';
+import { CairoOptionVariant, CairoOption, CairoResult, CairoResultVariant } from '../calldata/enum';
+// eslint-disable-next-line import/no-cycle
+import { CairoTypeResult } from './cairoTypeResult';
 
 /**
  * Represents a Cairo Option.
@@ -134,6 +136,20 @@ export class CairoTypeOption extends CairoType {
       this.isVariantSome = option.isVariantSome;
       return;
     }
+    if (content instanceof CairoResult) {
+      // "content" is a CairoResult & CairoOptionVariant is "Some""
+      const result = new CairoTypeResult(
+        content.unwrap(),
+        CairoTypeOption.getVariantSomeType(optionCairoType),
+        strategy,
+        content.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err,
+        false
+      );
+      this.content = result;
+      this.isVariantSome = true;
+      return;
+    }
+
     // not an iterator, not an CairoType, neither a CairoOption, CairoResult, CairoCustomEnum -> so is low level data (BigNumberish, array, object)
     assert(
       !isUndefined(variant),
@@ -144,7 +160,7 @@ export class CairoTypeOption extends CairoType {
         const elementType = CairoTypeOption.getVariantSomeType(optionCairoType);
         const constructor = strategy.constructors[elementType];
         if (constructor) {
-          this.content = constructor(content, elementType);
+          this.content = constructor(content, strategy, elementType);
         } else {
           const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
           const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
@@ -154,7 +170,7 @@ export class CairoTypeOption extends CairoType {
             const [selectorName] = matchingSelector;
             const dynamicConstructor = strategy.constructors[selectorName];
             if (dynamicConstructor) {
-              this.content = dynamicConstructor(content, elementType);
+              this.content = dynamicConstructor(content, strategy, elementType);
             }
           } else {
             throw new Error(`"${elementType}" is not a valid Cairo type`);
@@ -197,7 +213,7 @@ export class CairoTypeOption extends CairoType {
     const elementType = CairoTypeOption.getVariantSomeType(someVariantCairoType);
     const constructor = strategy.constructors[elementType];
     if (constructor) {
-      return constructor(responseIterator, elementType);
+      return constructor(responseIterator, strategy, elementType);
     }
     const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
     const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
@@ -206,7 +222,7 @@ export class CairoTypeOption extends CairoType {
       const [selectorName] = matchingSelector;
       const dynamicConstructor = strategy.constructors[selectorName];
       if (dynamicConstructor) {
-        return dynamicConstructor(responseIterator, elementType);
+        return dynamicConstructor(responseIterator, strategy, elementType);
       }
     }
     // Unknown type - collect raw values, defer error
@@ -330,7 +346,7 @@ export class CairoTypeOption extends CairoType {
     }
     const responseParser = strategy.response[parserName];
     if (responseParser) {
-      return responseParser(content as CairoType);
+      return responseParser(content as CairoType, strategy);
     }
 
     // No response parser found - throw error instead of fallback magic

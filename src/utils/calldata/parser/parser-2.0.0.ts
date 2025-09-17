@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-cycle
+import { CallData, hdParsingStrategy } from '..';
 import {
   Abi,
   FunctionAbi,
@@ -7,24 +9,43 @@ import {
   type LegacyEvent,
   AbiEntryType,
 } from '../../../types';
+import { CairoStruct } from '../../cairoDataTypes/cairoStruct';
+import type { CairoType } from '../../cairoDataTypes/cairoType.interface';
+import { deepCopy } from '../../helpers';
 import { AbiParserInterface } from './interface';
-import { hdParsingStrategy, ParsingStrategy } from './parsingStrategy';
+import { ParsingStrategy } from './parsingStrategy';
 
 export class AbiParser2 implements AbiParserInterface {
   abi: Abi;
 
   parsingStrategy: ParsingStrategy;
 
-  constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
+  constructor(abi: Abi, parsingStrategy: ParsingStrategy = hdParsingStrategy) {
     this.abi = abi;
-    this.parsingStrategy = parsingStrategy || hdParsingStrategy;
+    // add structs & enums in strategy
+    this.parsingStrategy = deepCopy(parsingStrategy);
+    const structs: AbiStruct[] = Object.values(CallData.getAbiStruct(abi));
+    structs.forEach((struct: AbiStruct) => {
+      this.parsingStrategy.constructors[struct.name] = (input: Iterator<string> | unknown) => {
+        return new CairoStruct(input, struct, this.parsingStrategy);
+      };
+      this.parsingStrategy.response[struct.name] = (
+        instance: CairoType,
+        strategy: ParsingStrategy
+      ) => (instance as CairoStruct).decompose(strategy);
+      this.parsingStrategy.dynamicSelectors[struct.name] = (_type: string) => true;
+    });
   }
 
   public getRequestParser(abiType: AbiEntryType): (val: unknown, type?: string) => any {
     // Check direct constructors first
     if (this.parsingStrategy.constructors[abiType]) {
       return (val: unknown, type?: string) => {
-        const instance = this.parsingStrategy.constructors[abiType](val, type);
+        const instance = this.parsingStrategy.constructors[abiType](
+          val,
+          this.parsingStrategy,
+          type
+        );
         return instance.toApiRequest();
       };
     }
@@ -38,7 +59,7 @@ export class AbiParser2 implements AbiParserInterface {
       const dynamicConstructor = this.parsingStrategy.constructors[selectorName];
       if (dynamicConstructor) {
         return (val: unknown, type?: string) => {
-          const instance = dynamicConstructor(val, type || abiType);
+          const instance = dynamicConstructor(val, this.parsingStrategy, type || abiType);
           return instance.toApiRequest();
         };
       }
@@ -53,8 +74,12 @@ export class AbiParser2 implements AbiParserInterface {
     // Check direct constructors first
     if (this.parsingStrategy.constructors[abiType] && this.parsingStrategy.response[abiType]) {
       return (responseIterator: Iterator<string>, type?: string) => {
-        const instance = this.parsingStrategy.constructors[abiType](responseIterator, type);
-        return this.parsingStrategy.response[abiType](instance);
+        const instance = this.parsingStrategy.constructors[abiType](
+          responseIterator,
+          this.parsingStrategy,
+          type
+        );
+        return this.parsingStrategy.response[abiType](instance, this.parsingStrategy);
       };
     }
 
@@ -68,8 +93,12 @@ export class AbiParser2 implements AbiParserInterface {
       const responseParser = this.parsingStrategy.response[selectorName];
       if (dynamicConstructor && responseParser) {
         return (responseIterator: Iterator<string>, type?: string) => {
-          const instance = dynamicConstructor(responseIterator, type || abiType);
-          return responseParser(instance);
+          const instance = dynamicConstructor(
+            responseIterator,
+            this.parsingStrategy,
+            type || abiType
+          );
+          return responseParser(instance, this.parsingStrategy);
         };
       }
     }

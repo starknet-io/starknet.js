@@ -59,6 +59,8 @@ export * from './utils/cairoDataTypes/byteArray';
 export * from './utils/cairoDataTypes/secp256k1Point';
 export * from './utils/cairoDataTypes/cairoTypeOption';
 export * from './utils/cairoDataTypes/cairoTypeResult';
+export * from './utils/cairoDataTypes/cairoStruct';
+// export * from './utils/cairoDataTypes/cairoTypeEnum';
 
 export * from './utils/address';
 export * from './utils/calldata';
@@ -66,6 +68,7 @@ export * from './utils/calldata/enum';
 export * from './utils/contract';
 export * from './utils/transactionReceipt/transactionReceipt';
 export * from './utils/units';
+export * from './utils/helpers';
 export * as wallet from './wallet/connect';
 export * from './global/config';
 export * from './global/logger';

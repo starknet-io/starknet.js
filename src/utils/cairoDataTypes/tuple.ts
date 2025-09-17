@@ -5,8 +5,10 @@ import { isTypeTuple, isCairo1Type, isTypeNamedTuple } from '../calldata/cairo';
 import { type ParsingStrategy } from '../calldata/parser/parsingStrategy';
 import { CairoType } from './cairoType.interface';
 import { CairoFelt252 } from './felt';
-import { CairoOption } from '../calldata/enum';
+import { CairoOption, CairoResult } from '../calldata/enum';
+// eslint-disable-next-line import/no-cycle
 import { CairoTypeOption } from './cairoTypeOption';
+import { CairoTypeResult } from './cairoTypeResult';
 
 /**
  * Represents a Cairo tuple with compile-time known structure.
@@ -124,11 +126,15 @@ export class CairoTuple extends CairoType {
           // "content" is a CairoOption
           return new CairoTypeOption(contentItem, tupleContentType[index], strategy);
         }
+        if (contentItem instanceof CairoResult) {
+          // "content" is a CairoResult
+          return new CairoTypeResult(contentItem, tupleContentType[index], strategy);
+        }
         // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
 
         const constructor = strategy.constructors[tupleContentType[index]];
         if (constructor) {
-          return constructor(contentItem, tupleContentType[index]);
+          return constructor(contentItem, strategy, tupleContentType[index]);
         }
         const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
         const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
@@ -138,10 +144,10 @@ export class CairoTuple extends CairoType {
           const [selectorName] = matchingSelector;
           const dynamicConstructor = strategy.constructors[selectorName];
           if (dynamicConstructor) {
-            return dynamicConstructor(contentItem, tupleContentType[index]);
+            return dynamicConstructor(contentItem, strategy, tupleContentType[index]);
           }
         }
-        throw new Error(`"${tupleContentType}" is not a valid Cairo type`);
+        throw new Error(`"${tupleContentType[index]}" is not a valid Cairo type`);
       }
     );
     assert(
@@ -193,7 +199,7 @@ export class CairoTuple extends CairoType {
         const [selectorName] = matchingSelector;
         const dynamicConstructor = strategy.constructors[selectorName];
         if (dynamicConstructor) {
-          return dynamicConstructor(responseIterator, elementType);
+          return dynamicConstructor(responseIterator, strategy, elementType);
         }
       }
 
@@ -622,7 +628,7 @@ export class CairoTuple extends CairoType {
       }
       const responseParser = strategy.response[parserName];
       if (responseParser) {
-        return responseParser(element);
+        return responseParser(element, strategy);
       }
       // No response parser found - throw error instead of fallback magic
       throw new Error(

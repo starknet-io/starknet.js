@@ -130,7 +130,7 @@ export class Contract implements ContractInterface {
 
   readonly [key: string]: AsyncContractFunction | any;
 
-  private callData: CallData;
+  public callData: CallData;
 
   public withOptionsProps?: WithOptions;
 

@@ -17,7 +17,11 @@ export class AbiParser1 implements AbiParserInterface {
     // Check direct constructors first
     if (this.parsingStrategy.constructors[abiType]) {
       return (val: unknown, type?: string) => {
-        const instance = this.parsingStrategy.constructors[abiType](val, type);
+        const instance = this.parsingStrategy.constructors[abiType](
+          val,
+          this.parsingStrategy,
+          type
+        );
         return instance.toApiRequest();
       };
     }
@@ -31,7 +35,7 @@ export class AbiParser1 implements AbiParserInterface {
       const dynamicConstructor = this.parsingStrategy.constructors[selectorName];
       if (dynamicConstructor) {
         return (val: unknown, type?: string) => {
-          const instance = dynamicConstructor(val, type || abiType);
+          const instance = dynamicConstructor(val, this.parsingStrategy, type || abiType);
           return instance.toApiRequest();
         };
       }
@@ -46,8 +50,12 @@ export class AbiParser1 implements AbiParserInterface {
     // Check direct constructors first
     if (this.parsingStrategy.constructors[abiType] && this.parsingStrategy.response[abiType]) {
       return (responseIterator: Iterator<string>, type?: string) => {
-        const instance = this.parsingStrategy.constructors[abiType](responseIterator, type);
-        return this.parsingStrategy.response[abiType](instance);
+        const instance = this.parsingStrategy.constructors[abiType](
+          responseIterator,
+          this.parsingStrategy,
+          type
+        );
+        return this.parsingStrategy.response[abiType](instance, this.parsingStrategy);
       };
     }
 
@@ -61,8 +69,12 @@ export class AbiParser1 implements AbiParserInterface {
       const responseParser = this.parsingStrategy.response[selectorName];
       if (dynamicConstructor && responseParser) {
         return (responseIterator: Iterator<string>, type?: string) => {
-          const instance = dynamicConstructor(responseIterator, type || abiType);
-          return responseParser(instance);
+          const instance = dynamicConstructor(
+            responseIterator,
+            this.parsingStrategy,
+            type || abiType
+          );
+          return responseParser(instance, this.parsingStrategy);
         };
       }
     }

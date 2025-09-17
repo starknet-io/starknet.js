@@ -35,9 +35,14 @@ export type VariantType = CairoOptionVariant | CairoResultVariant | string | num
 export type ParsingStrategy = {
   constructors: Record<
     AbiEntryType,
-    (input: Iterator<string> | unknown, type?: string, variant?: VariantType) => CairoType
+    (
+      input: Iterator<string> | unknown,
+      strategy: ParsingStrategy,
+      type?: string,
+      variant?: VariantType
+    ) => CairoType
   >;
-  response: Record<AbiEntryType, (instance: CairoType) => any>;
+  response: Record<AbiEntryType, (instance: CairoType, strategy: ParsingStrategy) => any>;
   dynamicSelectors: Record<string, (type: string) => boolean>;
 };
 
@@ -157,38 +162,52 @@ export const hdParsingStrategy: ParsingStrategy = {
       }
       return new CairoSecp256k1Point(input);
     },
-    [CairoFixedArray.dynamicSelector]: (input: Iterator<string> | unknown, type?: string) => {
+    [CairoFixedArray.dynamicSelector]: (
+      input: Iterator<string> | unknown,
+      strategy: ParsingStrategy,
+      type?: string
+    ) => {
       assert(!!type, 'CairoFixedArray constructor requires type parameter');
       // Always use constructor - it handles both iterator and user input internally
-      return new CairoFixedArray(input, type, hdParsingStrategy);
+      return new CairoFixedArray(input, type, strategy);
     },
-    [CairoArray.dynamicSelector]: (input: Iterator<string> | unknown, type?: string) => {
+    [CairoArray.dynamicSelector]: (
+      input: Iterator<string> | unknown,
+      strategy: ParsingStrategy,
+      type?: string
+    ) => {
       assert(!!type, 'CairoArray constructor requires type parameter');
       // Always use constructor - it handles both iterator and user input internally
-      return new CairoArray(input, type, hdParsingStrategy);
+      return new CairoArray(input, type, strategy);
     },
-    [CairoTuple.dynamicSelector]: (input: Iterator<string> | unknown, type?: string) => {
+    [CairoTuple.dynamicSelector]: (
+      input: Iterator<string> | unknown,
+      strategy: ParsingStrategy,
+      type?: string
+    ) => {
       assert(!!type, 'CairoTuple constructor requires type parameter');
       // Always use constructor - it handles both iterator and user input internally
-      return new CairoTuple(input, type, hdParsingStrategy);
+      return new CairoTuple(input, type, strategy);
     },
     [CairoTypeOption.dynamicSelector]: (
       input: Iterator<string> | unknown,
+      strategy: ParsingStrategy,
       type?: string,
       variant?: VariantType
     ) => {
       assert(!!type, 'CairoTypeOption constructor requires "type" parameter.');
       const variantNumber = isUndefined(variant) ? undefined : Number(variant);
-      return new CairoTypeOption(input, type, hdParsingStrategy, variantNumber);
+      return new CairoTypeOption(input, type, strategy, variantNumber);
     },
     [CairoTypeResult.dynamicSelector]: (
       input: Iterator<string> | unknown,
+      strategy: ParsingStrategy,
       type?: string,
       variant?: VariantType
     ) => {
       assert(!!type, 'CairoTypeResult constructor requires "type" parameter.');
       const variantNumber = isUndefined(variant) ? undefined : Number(variant);
-      return new CairoTypeResult(input, type, hdParsingStrategy, variantNumber);
+      return new CairoTypeResult(input, type, strategy, variantNumber);
     },
   },
   dynamicSelectors: {
@@ -230,15 +249,15 @@ export const hdParsingStrategy: ParsingStrategy = {
     [CairoInt128.abiSelector]: (instance: CairoType) => (instance as CairoInt128).toBigInt(),
     [CairoSecp256k1Point.abiSelector]: (instance: CairoType) =>
       (instance as CairoSecp256k1Point).toBigInt(),
-    [CairoFixedArray.dynamicSelector]: (instance: CairoType) =>
-      (instance as CairoFixedArray).decompose(hdParsingStrategy),
-    [CairoArray.dynamicSelector]: (instance: CairoType) =>
-      (instance as CairoArray).decompose(hdParsingStrategy),
-    [CairoTuple.dynamicSelector]: (instance: CairoType) =>
-      (instance as CairoTuple).decompose(hdParsingStrategy),
-    [CairoTypeOption.dynamicSelector]: (instance: CairoType) =>
-      (instance as CairoTypeOption).decompose(hdParsingStrategy),
-    [CairoTypeResult.dynamicSelector]: (instance: CairoType) =>
-      (instance as CairoTypeResult).decompose(hdParsingStrategy),
+    [CairoFixedArray.dynamicSelector]: (instance: CairoType, strategy: ParsingStrategy) =>
+      (instance as CairoFixedArray).decompose(strategy),
+    [CairoArray.dynamicSelector]: (instance: CairoType, strategy: ParsingStrategy) =>
+      (instance as CairoArray).decompose(strategy),
+    [CairoTuple.dynamicSelector]: (instance: CairoType, strategy: ParsingStrategy) =>
+      (instance as CairoTuple).decompose(strategy),
+    [CairoTypeOption.dynamicSelector]: (instance: CairoType, strategy: ParsingStrategy) =>
+      (instance as CairoTypeOption).decompose(strategy),
+    [CairoTypeResult.dynamicSelector]: (instance: CairoType, strategy: ParsingStrategy) =>
+      (instance as CairoTypeResult).decompose(strategy),
   },
 } as const;

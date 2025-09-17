@@ -11,3 +11,29 @@ export function addCompiledFlag<T extends string[]>(compiled: T): T {
   });
   return compiled;
 }
+
+export function deepCopy<T>(obj: T): T {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+
+  // Handle Date objects
+  if (obj instanceof Date) {
+    return new Date(obj.getTime()) as any;
+  }
+
+  // Handle arrays
+  if (Array.isArray(obj)) {
+    const copyArr = [] as any[];
+    obj.forEach((value) => copyArr.push(deepCopy(value)));
+    return copyArr as any;
+  }
+
+  // Handle plain objects
+  const copyObj = { ...obj } as { [key: string]: any };
+  Object.keys(copyObj).forEach((key) => {
+    copyObj[key] = deepCopy(copyObj[key]);
+  });
+
+  return copyObj as T;
+}
