@@ -1,3 +1,9 @@
+## [8.5.4](https://github.com/starknet-io/starknet.js/compare/v8.5.3...v8.5.4) (2025-09-17)
+
+### Bug Fixes
+
+- fix waitfortransaction for rotating nodes services with lifeCycleRetries default 3 ([7296850](https://github.com/starknet-io/starknet.js/commit/72968500c9b0f4b889e9e388b3a98a0ea0de3b43))
+
 ## [8.5.3](https://github.com/starknet-io/starknet.js/compare/v8.5.2...v8.5.3) (2025-09-05)
 
 ### Bug Fixes
