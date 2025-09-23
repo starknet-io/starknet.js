@@ -12,28 +12,23 @@ export function addCompiledFlag<T extends string[]>(compiled: T): T {
   return compiled;
 }
 
-export function deepCopy<T>(obj: T): T {
-  if (typeof obj !== 'object' || obj === null) {
-    return obj;
+/**
+ * Copy by value of a complex object (including Date, Array, functions or classes)
+ * @param {any} obj - object to copy by value
+ * @returns {any} copied object.
+ */
+export function deepCopyWithMethods(obj: any): any {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj instanceof Date) return new Date(obj);
+  if (obj instanceof Array) return obj.map((item) => deepCopyWithMethods(item));
+  if (obj instanceof Function) return obj;
+  const cloned = Object.create(Object.getPrototypeOf(obj));
+  // eslint-disable-next-line no-restricted-syntax
+  for (const key in obj as Object) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (obj.hasOwnProperty(key)) {
+      cloned[key] = deepCopyWithMethods(obj[key]);
+    }
   }
-
-  // Handle Date objects
-  if (obj instanceof Date) {
-    return new Date(obj.getTime()) as any;
-  }
-
-  // Handle arrays
-  if (Array.isArray(obj)) {
-    const copyArr = [] as any[];
-    obj.forEach((value) => copyArr.push(deepCopy(value)));
-    return copyArr as any;
-  }
-
-  // Handle plain objects
-  const copyObj = { ...obj } as { [key: string]: any };
-  Object.keys(copyObj).forEach((key) => {
-    copyObj[key] = deepCopy(copyObj[key]);
-  });
-
-  return copyObj as T;
+  return cloned;
 }

@@ -1,25 +1,25 @@
 import { Abi, AbiEntryType, FunctionAbi } from '../../../types';
 import { isLen } from '../cairo';
 import { AbiParserInterface } from './interface';
-import { hdParsingStrategy, ParsingStrategy } from './parsingStrategy';
+import { ParsingStrategy } from './parsingStrategy.type';
 
 export class AbiParser1 implements AbiParserInterface {
   abi: Abi;
 
-  parsingStrategy: ParsingStrategy;
+  parsingStrategies: ParsingStrategy;
 
-  constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
+  constructor(abi: Abi, parsingStrategy: ParsingStrategy) {
     this.abi = abi;
-    this.parsingStrategy = parsingStrategy || hdParsingStrategy;
+    this.parsingStrategies = parsingStrategy;
   }
 
   public getRequestParser(abiType: AbiEntryType): (val: unknown, type?: string) => any {
     // Check direct constructors first
-    if (this.parsingStrategy.constructors[abiType]) {
+    if (this.parsingStrategies.constructors[abiType]) {
       return (val: unknown, type?: string) => {
-        const instance = this.parsingStrategy.constructors[abiType](
+        const instance = this.parsingStrategies.constructors[abiType](
           val,
-          this.parsingStrategy,
+          this.parsingStrategies,
           type
         );
         return instance.toApiRequest();
@@ -27,15 +27,15 @@ export class AbiParser1 implements AbiParserInterface {
     }
 
     // Check dynamic selectors
-    const dynamicSelectors = Object.entries(this.parsingStrategy.dynamicSelectors);
+    const dynamicSelectors = Object.entries(this.parsingStrategies.dynamicSelectors);
     const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(abiType));
 
     if (matchingSelector) {
       const [selectorName] = matchingSelector;
-      const dynamicConstructor = this.parsingStrategy.constructors[selectorName];
+      const dynamicConstructor = this.parsingStrategies.constructors[selectorName];
       if (dynamicConstructor) {
         return (val: unknown, type?: string) => {
-          const instance = dynamicConstructor(val, this.parsingStrategy, type || abiType);
+          const instance = dynamicConstructor(val, this.parsingStrategies, type || abiType);
           return instance.toApiRequest();
         };
       }
@@ -48,33 +48,33 @@ export class AbiParser1 implements AbiParserInterface {
     abiType: AbiEntryType
   ): (responseIterator: Iterator<string>, type?: string) => any {
     // Check direct constructors first
-    if (this.parsingStrategy.constructors[abiType] && this.parsingStrategy.response[abiType]) {
+    if (this.parsingStrategies.constructors[abiType] && this.parsingStrategies.response[abiType]) {
       return (responseIterator: Iterator<string>, type?: string) => {
-        const instance = this.parsingStrategy.constructors[abiType](
+        const instance = this.parsingStrategies.constructors[abiType](
           responseIterator,
-          this.parsingStrategy,
+          this.parsingStrategies,
           type
         );
-        return this.parsingStrategy.response[abiType](instance, this.parsingStrategy);
+        return this.parsingStrategies.response[abiType](instance, this.parsingStrategies);
       };
     }
 
     // Check dynamic selectors
-    const dynamicSelectors = Object.entries(this.parsingStrategy.dynamicSelectors);
+    const dynamicSelectors = Object.entries(this.parsingStrategies.dynamicSelectors);
     const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(abiType));
 
     if (matchingSelector) {
       const [selectorName] = matchingSelector;
-      const dynamicConstructor = this.parsingStrategy.constructors[selectorName];
-      const responseParser = this.parsingStrategy.response[selectorName];
+      const dynamicConstructor = this.parsingStrategies.constructors[selectorName];
+      const responseParser = this.parsingStrategies.response[selectorName];
       if (dynamicConstructor && responseParser) {
         return (responseIterator: Iterator<string>, type?: string) => {
           const instance = dynamicConstructor(
             responseIterator,
-            this.parsingStrategy,
+            this.parsingStrategies,
             type || abiType
           );
-          return responseParser(instance, this.parsingStrategy);
+          return responseParser(instance, this.parsingStrategies);
         };
       }
     }

@@ -38,6 +38,7 @@ import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { type ParsingStrategy } from './parser';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
+import { CairoStruct } from '../cairoDataTypes/cairoStruct';
 
 function errorU256(key: string) {
   return Error(
@@ -112,6 +113,9 @@ export default function orderPropsByAbi(
         throw errorU512(abiType);
       }
       return { limb0: u512.limb0, limb1: u512.limb1, limb2: u512.limb2, limb3: u512.limb3 };
+    }
+    if (CairoStruct.isAbiType(abiType)) {
+      return unorderedItem;
     }
     if (isTypeStruct(abiType, structs)) {
       const abiOfStruct = structs[abiType].members;

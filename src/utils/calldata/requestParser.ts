@@ -44,6 +44,7 @@ import { CairoCustomEnum, CairoOption, CairoOptionVariant, CairoResult } from '.
 import { AbiParserInterface } from './parser';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
+import { CairoStruct } from '../cairoDataTypes/cairoStruct';
 
 // TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
 
@@ -161,13 +162,18 @@ function parseCalldataValue({
   }
 
   // checking if the passed element is struct
-  if (structs[type] && structs[type].members.length) {
+  if (structs[type]) {
     if (isTypeEthAddress(type)) {
       return parseBaseTypes({ type, val: element as BigNumberish, parser });
     }
 
     if (CairoByteArray.isAbiType(type)) {
       return parser.getRequestParser(type)(element);
+    }
+
+    // value is CairoStruct instance
+    if (element instanceof CairoStruct) {
+      return element.toApiRequest();
     }
 
     const { members } = structs[type];
@@ -185,10 +191,11 @@ function parseCalldataValue({
       );
     }, [] as string[]);
   }
+
   // check if abi element is tuple
   if (isTypeTuple(type)) {
     // Create CairoTuple instance and use its toApiRequest method
-    const tuple = new CairoTuple(element, type, parser.parsingStrategy);
+    const tuple = new CairoTuple(element, type, parser.parsingStrategies);
     return tuple.toApiRequest();
   }
 
@@ -202,7 +209,7 @@ function parseCalldataValue({
         myOption = new CairoTypeOption(
           element,
           type,
-          parser.parsingStrategy,
+          parser.parsingStrategies,
           element.isSome() ? CairoOptionVariant.Some : CairoOptionVariant.None
         );
       } else {
@@ -221,7 +228,7 @@ function parseCalldataValue({
     if (isTypeResult(type)) {
       let myResult: CairoTypeResult;
       if (element instanceof CairoResult) {
-        myResult = new CairoTypeResult(element, type, parser.parsingStrategy);
+        myResult = new CairoTypeResult(element, type, parser.parsingStrategies);
       } else {
         myResult = element as CairoTypeResult;
       }
@@ -360,13 +367,13 @@ export function parseCalldataField({
       return value.toApiRequest();
     // Tuple type - create CairoTuple from raw input
     case isTypeTuple(type): {
-      const tuple = new CairoTuple(value, type, parser.parsingStrategy);
+      const tuple = new CairoTuple(value, type, parser.parsingStrategies);
       return tuple.toApiRequest();
     }
     // Struct
     case isTypeStruct(type, structs) || CairoUint256.isAbiType(type):
       return parseCalldataValue({
-        element: value as ParsedStruct | BigNumberish[],
+        element: value as ParsedStruct | BigNumberish[] | CairoStruct,
         type,
         structs,
         enums,

@@ -3,17 +3,20 @@ import { isCairo1Abi } from '../cairo';
 import { AbiParserInterface } from './interface';
 import { AbiParser1 } from './parser-0-1.1.0';
 import { AbiParser2 } from './parser-2.0.0';
-import { ParsingStrategy } from './parsingStrategy';
+import { hdParsingStrategy } from './parsingStrategy';
+import { ParsingStrategy } from './parsingStrategy.type';
 
 export { AbiParser2 };
 export { AbiParser1 };
 export { AbiParserInterface };
 export * from './parsingStrategy';
+export * from './parsingStrategy.type';
 
 /**
  * Creates ABI parser
  *
  * @param {Abi} abi
+ * @param {ParsingStrategy} parsingStrategy - optional - parsing strategy
  * @returns {AbiParserInterface} abi parser interface
  *
  * @example
@@ -23,7 +26,10 @@ export * from './parsingStrategy';
  * const abiParser1 = createAbiParser([getFunctionAbi('struct')]);
  * // abiParser1 instanceof AbiParser1 === true
  */
-export function createAbiParser(abi: Abi, parsingStrategy?: ParsingStrategy): AbiParserInterface {
+export function createAbiParser(
+  abi: Abi,
+  parsingStrategy: ParsingStrategy = hdParsingStrategy
+): AbiParserInterface {
   const version = getAbiVersion(abi);
   if (version === 0 || version === 1) {
     return new AbiParser1(abi, parsingStrategy);
@@ -64,7 +70,7 @@ export function getAbiVersion(abi: Abi): 1 | 2 | 0 {
  *
  * @param {string} method
  * @param {RawArgs} argsCalldata
- * @param {FunctionAbi} abiMethod
+ * @param {FunctionAbi} abiMethod - optional
  * @returns boolean
  *
  * @example

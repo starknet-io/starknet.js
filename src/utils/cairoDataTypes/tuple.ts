@@ -2,13 +2,14 @@ import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { getNext } from '../num';
 import { isTypeTuple, isCairo1Type, isTypeNamedTuple } from '../calldata/cairo';
-import { type ParsingStrategy } from '../calldata/parser/parsingStrategy';
+import { type ParsingStrategy } from '../calldata/parser/parsingStrategy.type';
 import { CairoType } from './cairoType.interface';
 import { CairoFelt252 } from './felt';
 import { CairoOption, CairoResult } from '../calldata/enum';
 // eslint-disable-next-line import/no-cycle
 import { CairoTypeOption } from './cairoTypeOption';
 import { CairoTypeResult } from './cairoTypeResult';
+import type { AllowArray } from '../../types';
 
 /**
  * Represents a Cairo tuple with compile-time known structure.
@@ -88,15 +89,16 @@ export class CairoTuple extends CairoType {
    * const nested = new CairoTuple([[1, 2], 3], '((core::integer::u8, core::integer::u8), core::integer::u32)', hdParsingStrategy);
    * ```
    */
-  constructor(content: unknown, tupleType: string, strategy: ParsingStrategy) {
+  constructor(content: unknown, tupleType: string, parsingStrategy: AllowArray<ParsingStrategy>) {
     super();
     this.tupleType = tupleType;
+    const strategies = Array.isArray(parsingStrategy) ? parsingStrategy : [parsingStrategy];
     if (content && typeof content === 'object' && 'next' in content) {
       // "content" is an iterator
       const parsedContent: CairoType[] = CairoTuple.parser(
         content as Iterator<string>,
         tupleType,
-        strategy
+        strategies
       );
       this.content = parsedContent;
       return;
@@ -124,27 +126,38 @@ export class CairoTuple extends CairoType {
         }
         if (contentItem instanceof CairoOption) {
           // "content" is a CairoOption
-          return new CairoTypeOption(contentItem, tupleContentType[index], strategy);
+          return new CairoTypeOption(contentItem, tupleContentType[index], strategies);
         }
         if (contentItem instanceof CairoResult) {
           // "content" is a CairoResult
-          return new CairoTypeResult(contentItem, tupleContentType[index], strategy);
+          return new CairoTypeResult(contentItem, tupleContentType[index], strategies);
         }
         // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
-
-        const constructor = strategy.constructors[tupleContentType[index]];
-        if (constructor) {
-          return constructor(contentItem, strategy, tupleContentType[index]);
-        }
-        const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-        const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
-          selectorFn(tupleContentType[index])
+        const strategyConstructorNum = strategies.findIndex(
+          (strategy: ParsingStrategy) => strategy.constructors[tupleContentType[index]]
         );
-        if (matchingSelector) {
-          const [selectorName] = matchingSelector;
-          const dynamicConstructor = strategy.constructors[selectorName];
+        if (strategyConstructorNum >= 0) {
+          const constructor =
+            strategies[strategyConstructorNum].constructors[tupleContentType[index]];
+          return constructor(contentItem, strategies, tupleContentType[index]);
+        }
+        const strategyDynamicNum = strategies.findIndex((strategy: ParsingStrategy) => {
+          const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+          return dynamicSelectors.find(([, selectorFn]) => selectorFn(tupleType));
+        });
+        if (strategyDynamicNum >= 0) {
+          const dynamicSelectors = Object.entries(strategies[strategyDynamicNum].dynamicSelectors);
+          const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+            selectorFn(tupleContentType[index])
+          );
+          const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+          const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
           if (dynamicConstructor) {
-            return dynamicConstructor(contentItem, strategy, tupleContentType[index]);
+            return dynamicConstructor(
+              contentItem,
+              strategies[strategyDynamicNum],
+              tupleContentType[index]
+            );
           }
         }
         throw new Error(`"${tupleContentType[index]}" is not a valid Cairo type`);
@@ -170,14 +183,14 @@ export class CairoTuple extends CairoType {
    *
    * @param responseIterator - Iterator over string data to parse
    * @param tupleType - The tuple type (e.g., "(core::integer::u8, core::integer::u32)")
-   * @param strategy - The parsing strategy containing constructors and selectors
+   * @param parsingStrategies - The parsing strategies containing constructors and selectors
    * @returns Array of parsed CairoType instances
    * @private
    */
   private static parser(
     responseIterator: Iterator<string>,
     tupleType: string,
-    strategy: ParsingStrategy
+    parsingStrategies: ParsingStrategy[]
   ): CairoType[] {
     const elementTypes = CairoTuple.getTupleElementTypes(tupleType);
 
@@ -186,25 +199,37 @@ export class CairoTuple extends CairoType {
         typeof elementTypeInfo === 'string' ? elementTypeInfo : (elementTypeInfo as any).type;
 
       // First check direct constructors
-      const constructor = strategy.constructors[elementType];
-      if (constructor) {
+      const strategyConstructorNum = parsingStrategies.findIndex(
+        (strategy: ParsingStrategy) => strategy.constructors[elementType]
+      );
+      if (strategyConstructorNum >= 0) {
+        const constructor = parsingStrategies[strategyConstructorNum].constructors[elementType];
         return constructor(responseIterator, elementType);
       }
 
       // Check dynamic selectors (includes CairoArray, CairoFixedArray, CairoTuple, etc.)
-      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-      const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-
-      if (matchingSelector) {
-        const [selectorName] = matchingSelector;
-        const dynamicConstructor = strategy.constructors[selectorName];
+      const strategyDynamicNum = parsingStrategies.findIndex((strategy: ParsingStrategy) => {
+        const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+        return dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+      });
+      if (strategyDynamicNum >= 0) {
+        const dynamicSelectors = Object.entries(
+          parsingStrategies[strategyDynamicNum].dynamicSelectors
+        );
+        const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+        const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+        const dynamicConstructor = parsingStrategies[strategyDynamicNum].constructors[selectorName];
         if (dynamicConstructor) {
-          return dynamicConstructor(responseIterator, strategy, elementType);
+          return dynamicConstructor(responseIterator, parsingStrategies, elementType);
         }
       }
 
       // Unknown type - fallback to felt252 constructor
-      const feltConstructor = strategy.constructors[CairoFelt252.abiSelector];
+      const felt252ConstructorNum = parsingStrategies.findIndex(
+        (strategy: ParsingStrategy) => strategy.constructors[CairoFelt252.abiSelector]
+      );
+      const feltConstructor =
+        parsingStrategies[felt252ConstructorNum].constructors[CairoFelt252.abiSelector];
       if (feltConstructor) {
         return feltConstructor(responseIterator, elementType);
       }
@@ -595,7 +620,7 @@ export class CairoTuple extends CairoType {
    * response parsers (e.g., CairoUint8 → BigInt). This method is used primarily for
    * parsing API responses into user-friendly formats.
    *
-   * @param {ParsingStrategy} strategy - Parsing strategy for response parsing
+   * @param {AllowArray<ParsingStrategy>} strategyDecompose - Parsing strategies for response parsing
    * @returns {Object} an object of format {0:value0, 1:value2}
    * @example
    * ```typescript
@@ -605,7 +630,8 @@ export class CairoTuple extends CairoType {
    * const parsed1 = myTuple.decompose(hdParsingStrategy); // { x: 100n, y: 200n }
    * ```
    */
-  public decompose(strategy: ParsingStrategy): Object {
+  public decompose(strategyDecompose: AllowArray<ParsingStrategy>): Object {
+    const strategies = Array.isArray(strategyDecompose) ? strategyDecompose : [strategyDecompose];
     const tupleContentTypeResponse = CairoTuple.getTupleElementTypes(this.tupleType);
     const elementTypes: string[] = tupleContentTypeResponse.map(
       (el: string | { name: string; type: string }) => (typeof el === 'string' ? el : el.type)
@@ -626,9 +652,12 @@ export class CairoTuple extends CairoType {
           parserName = (element as any).dynamicSelector;
         }
       }
-      const responseParser = strategy.response[parserName];
+      const strategyDecomposeNum = strategies.findIndex(
+        (strategy: ParsingStrategy) => strategy.response[parserName]
+      );
+      const responseParser = strategies[strategyDecomposeNum].response[parserName];
       if (responseParser) {
-        return responseParser(element, strategy);
+        return responseParser(element, strategies);
       }
       // No response parser found - throw error instead of fallback magic
       throw new Error(

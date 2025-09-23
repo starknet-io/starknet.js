@@ -1,13 +1,14 @@
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { getNext } from '../num';
-import { type ParsingStrategy, type VariantType } from '../calldata/parser/parsingStrategy';
+import { type ParsingStrategy, type VariantType } from '../calldata/parser/parsingStrategy.type';
 import { CairoType } from './cairoType.interface';
 import { isTypeOption } from '../calldata/cairo';
 import { isUndefined } from '../typed';
 import { CairoOptionVariant, CairoOption, CairoResult, CairoResultVariant } from '../calldata/enum';
 // eslint-disable-next-line import/no-cycle
 import { CairoTypeResult } from './cairoTypeResult';
+import type { AllowArray } from '../../types';
 
 /**
  * Represents a Cairo Option.
@@ -44,7 +45,7 @@ export class CairoTypeOption extends CairoType {
    * Iterator<string>, CairoOption, CairoResult, CairoCustomEnum, or CairoType instance).
    * "content" parameter has to be defined when Some variant is selected
    * @param {string} optionCairoType - Cairo option type string (e.g., "core::option::Option::<core::integer::u8>").
-   * @param {ParsingStrategy} strategy - Parsing strategy for element type handling (e.g. hdParsingStrategy).
+   * @param {AllowArray<ParsingStrategy>} parsingStrategy - Parsing strategy for element type handling (e.g. hdParsingStrategy).
    * @param {CairoOptionVariant | number} [variant] - (optional) variant of the option: CairoOptionVariant.Some (0), or CairoOptionVariant.None (1). If "content" is an iterator, this parameter must be omitted.
    * @param {boolean} [subType=false] - optional default=false. Use "true" if called in nested CairoOption instances.
    * @example
@@ -70,12 +71,13 @@ export class CairoTypeOption extends CairoType {
   constructor(
     content: unknown,
     optionCairoType: string,
-    strategy: ParsingStrategy,
+    parsingStrategy: AllowArray<ParsingStrategy>,
     variant?: CairoOptionVariant | number,
     subType: boolean = false
   ) {
     super();
     this.optionCairoType = optionCairoType;
+    const strategies = Array.isArray(parsingStrategy) ? parsingStrategy : [parsingStrategy];
     if (variant === CairoOptionVariant.Some && isUndefined(content)) {
       throw new Error('"content" parameter has to be defined when Some variant is selected');
     }
@@ -94,7 +96,7 @@ export class CairoTypeOption extends CairoType {
           const parsedContent: CairoType = CairoTypeOption.parser(
             content as Iterator<string>,
             optionCairoType,
-            strategy
+            strategies
           );
           this.content = parsedContent;
           break;
@@ -128,7 +130,7 @@ export class CairoTypeOption extends CairoType {
       const option = new CairoTypeOption(
         content.unwrap(),
         subType ? CairoTypeOption.getVariantSomeType(optionCairoType) : optionCairoType,
-        strategy,
+        strategies,
         content.isSome() ? CairoOptionVariant.Some : CairoOptionVariant.None,
         true // recursive sub-type
       );
@@ -141,7 +143,7 @@ export class CairoTypeOption extends CairoType {
       const result = new CairoTypeResult(
         content.unwrap(),
         CairoTypeOption.getVariantSomeType(optionCairoType),
-        strategy,
+        strategies,
         content.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err,
         false
       );
@@ -158,19 +160,28 @@ export class CairoTypeOption extends CairoType {
     switch (variant) {
       case CairoOptionVariant.Some: {
         const elementType = CairoTypeOption.getVariantSomeType(optionCairoType);
-        const constructor = strategy.constructors[elementType];
-        if (constructor) {
-          this.content = constructor(content, strategy, elementType);
+        const strategyConstructorNum = strategies.findIndex(
+          (strategy: ParsingStrategy) => strategy.constructors[elementType]
+        );
+        if (strategyConstructorNum >= 0) {
+          const constructor = strategies[strategyConstructorNum].constructors[elementType];
+          this.content = constructor(content, strategies, elementType);
         } else {
-          const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-          const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
-            selectorFn(elementType)
-          );
-          if (matchingSelector) {
-            const [selectorName] = matchingSelector;
-            const dynamicConstructor = strategy.constructors[selectorName];
+          const strategyDynamicNum = strategies.findIndex((strategy: ParsingStrategy) => {
+            const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+            return dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+          });
+          if (strategyDynamicNum >= 0) {
+            const dynamicSelectors = Object.entries(
+              strategies[strategyDynamicNum].dynamicSelectors
+            );
+            const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+              selectorFn(elementType)
+            );
+            const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+            const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
             if (dynamicConstructor) {
-              this.content = dynamicConstructor(content, strategy, elementType);
+              this.content = dynamicConstructor(content, strategies, elementType);
             }
           } else {
             throw new Error(`"${elementType}" is not a valid Cairo type`);
@@ -201,28 +212,36 @@ export class CairoTypeOption extends CairoType {
    *
    * @param {Iterator<string>} responseIterator - Iterator over string data to parse
    * @param {string} someVariantCairoType - The Cairo option type (e.g., "core::option::Option::<core::integer::u8>")
-   * @param {ParsingStrategy} strategy - The parsing strategy containing constructors and selectors
+   * @param {ParsingStrategy[]} parsingStrategies - The parsing strategy containing constructors and selectors
    * @returns {CairoType} CairoType instance
    * @private
    */
   private static parser(
     responseIterator: Iterator<string>,
     someVariantCairoType: string,
-    strategy: ParsingStrategy
+    parsingStrategies: ParsingStrategy[]
   ): CairoType {
     const elementType = CairoTypeOption.getVariantSomeType(someVariantCairoType);
-    const constructor = strategy.constructors[elementType];
-    if (constructor) {
-      return constructor(responseIterator, strategy, elementType);
+    const strategyConstructorNum = parsingStrategies.findIndex(
+      (strategy: ParsingStrategy) => strategy.constructors[elementType]
+    );
+    if (strategyConstructorNum >= 0) {
+      const constructor = parsingStrategies[strategyConstructorNum].constructors[elementType];
+      return constructor(responseIterator, parsingStrategies, elementType);
     }
-    const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-    const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-
-    if (matchingSelector) {
-      const [selectorName] = matchingSelector;
-      const dynamicConstructor = strategy.constructors[selectorName];
+    const strategyDynamicNum = parsingStrategies.findIndex((strategy: ParsingStrategy) => {
+      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+      return dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+    });
+    if (strategyDynamicNum >= 0) {
+      const dynamicSelectors = Object.entries(
+        parsingStrategies[strategyDynamicNum].dynamicSelectors
+      );
+      const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+      const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+      const dynamicConstructor = parsingStrategies[strategyDynamicNum].constructors[selectorName];
       if (dynamicConstructor) {
-        return dynamicConstructor(responseIterator, strategy, elementType);
+        return dynamicConstructor(responseIterator, parsingStrategies, elementType);
       }
     }
     // Unknown type - collect raw values, defer error
@@ -249,7 +268,7 @@ export class CairoTypeOption extends CairoType {
 
   /**
    * Validate input data for CairoTypeOption creation.
-   * @param {unknown} input - Input data to validate
+   * @param {unknown} _input - Input data to validate
    * @param {string} type - The Cairo option type string (e.g., "core::option::Option::<core::integer::u8>")
    * @throws Error if input is invalid
    * @example
@@ -258,7 +277,7 @@ export class CairoTypeOption extends CairoType {
    * CairoTypeOption.validate(200, "wrong", 3); // throws
    * ```
    */
-  static validate(input: unknown, type: string, variant: VariantType | undefined): void {
+  static validate(_input: unknown, type: string, variant: VariantType | undefined): void {
     assert(
       CairoTypeOption.isAbiType(type),
       `The type ${type} is not a Cairo option. Needs core::option::Option::<type>.`
@@ -276,6 +295,7 @@ export class CairoTypeOption extends CairoType {
    * Check if input data is valid for CairoTypeOption creation.
    * @param {unknown} input - Input data to check
    * @param {string} type - The Cairo option type (e.g., "core::option::Option::<core::integer::u8>")
+   * @param {VariantType} variant - The variant of the option (Some or None)
    * @returns {boolean} true if valid, false otherwise
    * @example
    * ```typescript
@@ -330,8 +350,9 @@ export class CairoTypeOption extends CairoType {
     return addCompiledFlag(result.flat());
   }
 
-  private decomposeSome(strategy: ParsingStrategy): any {
+  private decomposeSome(strategyDecompose: AllowArray<ParsingStrategy>): any {
     const { content } = this;
+    const strategies = Array.isArray(strategyDecompose) ? strategyDecompose : [strategyDecompose];
     const elementType = CairoTypeOption.getVariantSomeType(this.optionCairoType);
     // For raw string values (unsupported types), throw error
     if (typeof content === 'string') {
@@ -344,9 +365,12 @@ export class CairoTypeOption extends CairoType {
         parserName = (content as any).dynamicSelector;
       }
     }
-    const responseParser = strategy.response[parserName];
+    const strategyDecomposeNum = strategies.findIndex(
+      (strategy: ParsingStrategy) => strategy.response[parserName]
+    );
+    const responseParser = strategies[strategyDecomposeNum].response[parserName];
     if (responseParser) {
-      return responseParser(content as CairoType, strategy);
+      return responseParser(content as CairoType, strategies[strategyDecomposeNum]);
     }
 
     // No response parser found - throw error instead of fallback magic
@@ -362,7 +386,7 @@ export class CairoTypeOption extends CairoType {
    * response parsers (e.g., CairoUint8 → BigInt). This method is used primarily for
    * parsing API responses into user-friendly formats.
    *
-   * @param {ParsingStrategy} strategy - Parsing strategy for response parsing
+   * @param {AllowArray<ParsingStrategy>} strategyDecompose - Parsing strategy for response parsing
    * @returns {CairoOption<any>} a CairoOptionInstance, with parsed variant (BigInt, numbers, nested arrays, etc.)
    * @example
    * ```typescript
@@ -370,9 +394,9 @@ export class CairoTypeOption extends CairoType {
    * const parsed = myOption.decompose(hdParsingStrategy); // CairoOption{ Some: 3n }
    * ```
    */
-  public decompose(strategy: ParsingStrategy): CairoOption<any> {
+  public decompose(strategyDecompose: AllowArray<ParsingStrategy>): CairoOption<any> {
     if (this.isVariantSome) {
-      const someContent = this.decomposeSome(strategy);
+      const someContent = this.decomposeSome(strategyDecompose);
       return new CairoOption<any>(CairoOptionVariant.Some, someContent);
     }
     return new CairoOption<any>(CairoOptionVariant.None);

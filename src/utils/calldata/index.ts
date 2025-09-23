@@ -32,12 +32,8 @@ import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoArray } from '../cairoDataTypes/array';
 import { CairoTuple } from '../cairoDataTypes/tuple';
 import formatter from './formatter';
-import {
-  createAbiParser,
-  hdParsingStrategy,
-  isNoConstructorValid,
-  ParsingStrategy,
-} from './parser';
+import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
+import { hdParsingStrategy } from './parser/parsingStrategy';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
@@ -45,6 +41,8 @@ import responseParser from './responseParser';
 import validateFields from './validate';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
+import { getAbiStruct } from './getAbiStruct';
+import { CairoStruct } from '../cairoDataTypes/cairoStruct';
 
 export * as cairo from './cairo';
 export { parseCalldataField } from './requestParser';
@@ -59,7 +57,7 @@ export class CallData {
 
   protected readonly enums: AbiEnums;
 
-  constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
+  constructor(abi: Abi, parsingStrategy: ParsingStrategy = hdParsingStrategy) {
     this.structs = CallData.getAbiStruct(abi);
     this.enums = CallData.getAbiEnum(abi);
     this.parser = createAbiParser(abi, parsingStrategy);
@@ -269,6 +267,13 @@ export class CallData {
               );
               return getEntries(compiledObj, `${prefix}${kk}.`);
             }
+            if (value instanceof CairoStruct) {
+              const apiRequest = value.toApiRequest();
+              const compiledObj = Object.fromEntries(
+                apiRequest.map((item, idx) => [idx.toString(), item])
+              );
+              return getEntries(compiledObj, `${prefix}${kk}.`);
+            }
             // normal object
             return getEntries(value, `${prefix}${kk}.`);
           }
@@ -350,15 +355,7 @@ export class CallData {
    * @returns AbiStructs - structs from abi
    */
   static getAbiStruct(abi: Abi): AbiStructs {
-    return abi
-      .filter((abiEntry) => abiEntry.type === 'struct')
-      .reduce(
-        (acc, abiEntry) => ({
-          ...acc,
-          [abiEntry.name]: abiEntry,
-        }),
-        {}
-      );
+    return getAbiStruct(abi);
   }
 
   /**
