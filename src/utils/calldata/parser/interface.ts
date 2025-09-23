@@ -1,11 +1,11 @@
-import { Abi, AbiEntryType, FunctionAbi } from '../../../types';
-import { ParsingStrategy } from './parsingStrategy';
+import { Abi, AbiEntryType, FunctionAbi, type AllowArray } from '../../../types';
+import { ParsingStrategy } from './parsingStrategy.type';
 
 /**
  * Abi parser interface
  */
 export abstract class AbiParserInterface {
-  abstract parsingStrategy: ParsingStrategy;
+  abstract parsingStrategies: AllowArray<ParsingStrategy>;
 
   /**
    * Helper to calculate inputs length from abi

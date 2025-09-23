@@ -2,11 +2,12 @@ import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { getNext, toHex } from '../num';
 import { felt, getArrayType, isTypeArray } from '../calldata/cairo';
-import { type ParsingStrategy } from '../calldata/parser/parsingStrategy';
+import { type ParsingStrategy } from '../calldata/parser/parsingStrategy.type';
 import { CairoType } from './cairoType.interface';
 import { CairoTypeOption } from './cairoTypeOption';
 import { CairoOption, CairoResult } from '../calldata/enum';
 import { CairoTypeResult } from './cairoTypeResult';
+import type { AllowArray } from '../../types';
 
 /**
  * Represents a Cairo dynamic array with runtime-determined length.
@@ -69,9 +70,9 @@ export class CairoArray extends CairoType {
    * The constructor automatically detects input type and processes it appropriately,
    * converting all elements to proper CairoType instances based on the array type.
    *
-   * @param content - Input data (array, object, Iterator<string>, or CairoType instances)
-   * @param arrayType - Dynamic array type string (e.g., "core::array::Array::<core::integer::u8>")
-   * @param strategy - Parsing strategy for element type handling
+   * @param {unknown} content - Input data (array, object, Iterator<string>, or CairoType instances)
+   * @param {string} arrayType - Dynamic array type string (e.g., "core::array::Array::<core::integer::u8>")
+   * @param {AllowArray<ParsingStrategy>} parsingStrategy - Parsing strategy for element type handling
    * @example
    * ```typescript
    * // From user array
@@ -88,15 +89,16 @@ export class CairoArray extends CairoType {
    * const nested = new CairoArray([[1, 2], [3, 4]], 'core::array::Array::<core::array::Array::<core::integer::u8>>', hdParsingStrategy);
    * ```
    */
-  constructor(content: unknown, arrayType: string, strategy: ParsingStrategy) {
+  constructor(content: unknown, arrayType: string, parsingStrategy: AllowArray<ParsingStrategy>) {
     super();
     this.arrayType = arrayType;
+    const strategies = Array.isArray(parsingStrategy) ? parsingStrategy : [parsingStrategy];
     if (content && typeof content === 'object' && 'next' in content) {
       // "content" is an iterator
       const parsedContent: CairoType[] = CairoArray.parser(
         content as Iterator<string>,
         arrayType,
-        strategy
+        strategies
       );
       this.content = parsedContent;
       return;
@@ -120,27 +122,34 @@ export class CairoArray extends CairoType {
       }
       if (contentItem instanceof CairoOption) {
         // "content" is a CairoOption
-        return new CairoTypeOption(contentItem, arrayContentType, strategy);
+        return new CairoTypeOption(contentItem, arrayContentType, strategies);
       }
       if (contentItem instanceof CairoResult) {
         // "content" is a CairoResult
-        return new CairoTypeResult(contentItem, arrayContentType, strategy);
+        return new CairoTypeResult(contentItem, arrayContentType, strategies);
       }
       // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
 
-      const constructor = strategy.constructors[arrayContentType];
-      if (constructor) {
-        return constructor(contentItem, strategy, arrayContentType);
-      }
-      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-      const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
-        selectorFn(arrayContentType)
+      const strategyConstructorNum = strategies.findIndex(
+        (strategy: ParsingStrategy) => strategy.constructors[arrayContentType]
       );
-      if (matchingSelector) {
-        const [selectorName] = matchingSelector;
-        const dynamicConstructor = strategy.constructors[selectorName];
+      if (strategyConstructorNum >= 0) {
+        const constructor = strategies[strategyConstructorNum].constructors[arrayContentType];
+        return constructor(contentItem, strategies, arrayContentType);
+      }
+      const strategyDynamicNum = strategies.findIndex((strategy: ParsingStrategy) => {
+        const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+        return dynamicSelectors.find(([, selectorFn]) => selectorFn(arrayContentType));
+      });
+      if (strategyDynamicNum >= 0) {
+        const dynamicSelectors = Object.entries(strategies[strategyDynamicNum].dynamicSelectors);
+        const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+          selectorFn(arrayContentType)
+        );
+        const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+        const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
         if (dynamicConstructor) {
-          return dynamicConstructor(contentItem, strategy, arrayContentType);
+          return dynamicConstructor(contentItem, strategies, arrayContentType);
         }
       }
       throw new Error(`"${arrayContentType}" is not a valid Cairo type`);
@@ -158,46 +167,51 @@ export class CairoArray extends CairoType {
    * - Dynamic selectors (complex types like nested dynamic arrays)
    * - Unknown types (stored as raw strings for later error handling)
    *
-   * @param responseIterator - Iterator over string data to parse
-   * @param arrayType - The dynamic array type (e.g., "core::array::Array::<core::integer::u32>")
-   * @param strategy - The parsing strategy containing constructors and selectors
+   * @param {Iterator<string>} responseIterator - Iterator over string data to parse
+   * @param {string} arrayType - The dynamic array type (e.g., "core::array::Array::<core::integer::u32>")
+   * @param {ParsingStrategy[]} strategy - The parsing strategy containing constructors and selectors
    * @returns Array of parsed CairoType instances
    * @private
    */
   private static parser(
     responseIterator: Iterator<string>,
     arrayType: string,
-    strategy: ParsingStrategy
+    parsingStrategies: ParsingStrategy[]
   ): CairoType[] {
     const elementType = getArrayType(arrayType); // Extract T from core::array::Array::<T>
 
     // For API responses, first element is the array length
     const lengthStr = getNext(responseIterator);
     const arrayLength = parseInt(lengthStr, 16);
-
     // First check direct constructors
-    const constructor = strategy.constructors[elementType];
-
-    if (constructor) {
+    const strategyConstructorNum = parsingStrategies.findIndex(
+      (strategy: ParsingStrategy) => strategy.constructors[elementType]
+    );
+    if (strategyConstructorNum >= 0) {
+      const constructor = parsingStrategies[strategyConstructorNum].constructors[elementType];
       return Array.from({ length: arrayLength }, () =>
-        constructor(responseIterator, strategy, elementType)
+        constructor(responseIterator, parsingStrategies, elementType)
       );
     }
 
-    // Check dynamic selectors (includes CairoArray, CairoFixedArray, future: tuples, structs, etc.)
-    const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-    const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-
-    if (matchingSelector) {
-      const [selectorName] = matchingSelector;
-      const dynamicConstructor = strategy.constructors[selectorName];
+    // Check dynamic selectors (includes CairoFixedArray, future: tuples, structs, etc.)
+    const strategyDynamicNum = parsingStrategies.findIndex((strategy: ParsingStrategy) => {
+      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+      return dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+    });
+    if (strategyDynamicNum >= 0) {
+      const dynamicSelectors = Object.entries(
+        parsingStrategies[strategyDynamicNum].dynamicSelectors
+      );
+      const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+      const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+      const dynamicConstructor = parsingStrategies[strategyDynamicNum].constructors[selectorName];
       if (dynamicConstructor) {
         return Array.from({ length: arrayLength }, () =>
-          dynamicConstructor(responseIterator, strategy, elementType)
+          dynamicConstructor(responseIterator, parsingStrategies, elementType)
         );
       }
     }
-
     // Unknown type - collect raw values, defer error
     const rawValues = Array.from({ length: arrayLength }, () => getNext(responseIterator));
     return rawValues as unknown as CairoType[];
@@ -342,7 +356,7 @@ export class CairoArray extends CairoType {
    * response parsers (e.g., CairoUint8 → BigInt). This method is used primarily for
    * parsing API responses into user-friendly formats.
    *
-   * @param strategy - Parsing strategy for response parsing
+   * @param strategyDecompose - Parsing strategy for response parsing
    * @returns Array of parsed values (BigInt, numbers, nested arrays, etc.)
    * @example
    * ```typescript
@@ -350,8 +364,9 @@ export class CairoArray extends CairoType {
    * const parsed = dynArray.decompose(hdParsingStrategy); // [1n, 2n, 3n]
    * ```
    */
-  public decompose(strategy: ParsingStrategy): any[] {
+  public decompose(strategyDecompose: AllowArray<ParsingStrategy>): any[] {
     // Use response parsers to get final parsed values (for API response parsing)
+    const strategies = Array.isArray(strategyDecompose) ? strategyDecompose : [strategyDecompose];
     const elementType = getArrayType(this.arrayType);
     return this.content.map((element) => {
       // For raw string values (unsupported types), throw error
@@ -365,9 +380,12 @@ export class CairoArray extends CairoType {
           parserName = (element as any).dynamicSelector;
         }
       }
-      const responseParser = strategy.response[parserName];
+      const strategyDecomposeNum = strategies.findIndex(
+        (strategy: ParsingStrategy) => strategy.response[parserName]
+      );
+      const responseParser = strategies[strategyDecomposeNum].response[parserName];
       if (responseParser) {
-        return responseParser(element, strategy);
+        return responseParser(element, strategies);
       }
 
       // No response parser found - throw error instead of fallback magic

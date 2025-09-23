@@ -31,7 +31,7 @@ import {
 import type { AccountInterface } from '../account/interface';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
-import { createAbiParser, ParsingStrategy } from '../utils/calldata/parser';
+import { createAbiParser, hdParsingStrategy, ParsingStrategy } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
@@ -149,7 +149,7 @@ export class Contract implements ContractInterface {
     // TODO: REFACTOR: move from legacy format and add support for legacy format
     // Must have params
     this.parsingStrategy = options.parsingStrategy;
-    const parser = createAbiParser(options.abi, options.parsingStrategy);
+    const parser = createAbiParser(options.abi, options.parsingStrategy || hdParsingStrategy);
     this.abi = parser.getLegacyFormat();
     this.address = options.address && options.address.toLowerCase();
     this.providerOrAccount = options.providerOrAccount ?? defaultProvider;
@@ -160,7 +160,7 @@ export class Contract implements ContractInterface {
     this.classHash = options.classHash;
 
     // Init
-    this.callData = new CallData(options.abi, options.parsingStrategy);
+    this.callData = new CallData(options.abi, options.parsingStrategy || hdParsingStrategy);
     this.structs = CallData.getAbiStruct(options.abi);
     this.events = getAbiEvents(options.abi);
 
@@ -219,9 +219,9 @@ export class Contract implements ContractInterface {
     // TODO: if changing address, probably changing abi also !? Also nonsense method as if you change abi and address, you need to create a new contract instance.
     this.address = address;
     if (abi) {
-      const parser = createAbiParser(abi, this.parsingStrategy);
+      const parser = createAbiParser(abi, this.parsingStrategy || hdParsingStrategy);
       this.abi = parser.getLegacyFormat();
-      this.callData = new CallData(abi, this.parsingStrategy);
+      this.callData = new CallData(abi, this.parsingStrategy || hdParsingStrategy);
       this.structs = CallData.getAbiStruct(abi);
       this.events = getAbiEvents(abi);
     }

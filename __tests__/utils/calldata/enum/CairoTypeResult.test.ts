@@ -13,6 +13,7 @@ import {
   CairoResult,
   CairoTuple,
   CairoFixedArray,
+  type ParsingStrategy,
 } from '../../../../src';
 
 describe('CairoTypeResult', () => {
@@ -55,6 +56,26 @@ describe('CairoTypeResult', () => {
       expect(
         () => new CairoTypeResult(undefined, typeCairo, hdParsingStrategy, CairoResultVariant.Ok)
       ).toThrow(new Error('"content" parameter has to be defined.'));
+      expect(
+        () => new CairoTypeResult(null, typeCairo, hdParsingStrategy, CairoResultVariant.Ok)
+      ).toThrow(new Error('"content" parameter has to be defined.'));
+    });
+
+    test('accept array of parsing strategies', () => {
+      const customStrategy: ParsingStrategy = {
+        constructors: {},
+        dynamicSelectors: {},
+        response: {},
+      };
+      expect(
+        () =>
+          new CairoTypeResult(
+            val,
+            typeCairo,
+            [hdParsingStrategy, customStrategy],
+            CairoResultVariant.Ok
+          )
+      ).not.toThrow();
     });
 
     test('if content is an iterator, no variant is authorized', () => {
@@ -69,7 +90,6 @@ describe('CairoTypeResult', () => {
   describe('constructor content', () => {
     const val = 8n;
     const typeCairo = 'core::result::Result::<core::integer::u8, core::integer::u16>';
-    const iter = ['0', '100'][Symbol.iterator]();
 
     test('content is a CairoResult', () => {
       const myCairoResult = new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, val);
@@ -77,6 +97,14 @@ describe('CairoTypeResult', () => {
       expect(cairoTypeResult0.isVariantOk).toBe(true);
       expect(cairoTypeResult0.content).toEqual(new CairoUint8(8));
       expect(cairoTypeResult0.resultCairoType).toBe(typeCairo);
+      expect(
+        () =>
+          new CairoTypeResult(myCairoResult, typeCairo, hdParsingStrategy, CairoResultVariant.Ok)
+      ).toThrow(
+        new Error(
+          'when "content" parameter is a CairoResult and subType is false, do not define "variant" parameter.'
+        )
+      );
     });
 
     test('content is a CairoTypeResult', () => {
@@ -106,10 +134,15 @@ describe('CairoTypeResult', () => {
     });
 
     test('content is an iterator', () => {
-      const cairoTypeResult0 = new CairoTypeResult(iter, typeCairo, hdParsingStrategy);
+      const iter0 = ['0', '100'][Symbol.iterator]();
+      const cairoTypeResult0 = new CairoTypeResult(iter0, typeCairo, hdParsingStrategy);
       expect(cairoTypeResult0.isVariantOk).toBe(true);
       expect(cairoTypeResult0.content).toEqual(new CairoUint8(100));
       expect(cairoTypeResult0.resultCairoType).toBe(typeCairo);
+      const iter1 = ['1', '100', '2'][Symbol.iterator]();
+      const typeCairo1 = 'core::result::Result::<core::integer::u8, [core::integer::u16; 2]>';
+      const cairoTypeResult1 = new CairoTypeResult(iter1, typeCairo1, hdParsingStrategy);
+      expect(cairoTypeResult1.toApiRequest()).toEqual(['0x01', '0x64', '0x2']);
     });
   });
 

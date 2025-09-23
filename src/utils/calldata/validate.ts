@@ -43,6 +43,7 @@ import {
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { CairoOption, CairoResult } from './enum';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
+import { CairoStruct } from '../cairoDataTypes/cairoStruct';
 
 // TODO: separate validate is redundant as CairoTypes are validated during construction.
 // TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
@@ -199,6 +200,10 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
       `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^160-1]`
     );
     return;
+  }
+
+  if (isTypeStruct(input.type, structs) && parameter instanceof CairoStruct) {
+    return; // CairoStruct
   }
 
   assert(
@@ -428,7 +433,7 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
  * };
  *
  * validateFields(functionAbi, [1n], abiStructs, abiEnums); // Returns void since validation passes
- * validateFields(functionAbi, [{}], abiStructs, abiEnums); // Throw an error because paramters are not valid
+ * validateFields(functionAbi, [{}], abiStructs, abiEnums); // Throw an error because parameters are not valid
  */
 export default function validateFields(
   abiMethod: FunctionAbi,

@@ -47,6 +47,7 @@ import {
   CairoResultVariant,
 } from './enum';
 import { AbiParserInterface } from './parser/interface';
+import type { CairoStruct } from '../cairoDataTypes/cairoStruct';
 
 /**
  * Parse base types
@@ -112,7 +113,7 @@ function parseResponseValue(
   parser: AbiParserInterface,
   structs?: AbiStructs,
   enums?: AbiEnums
-): BigNumberish | ParsedStruct | boolean | any[] | CairoEnum {
+): BigNumberish | ParsedStruct | boolean | any[] | CairoEnum | CairoStruct {
   if (element.type === '()') {
     return {};
   }
@@ -140,7 +141,14 @@ function parseResponseValue(
   // type c1 array
   if (isTypeArray(element.type)) {
     // eslint-disable-next-line no-case-declarations
-    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
+    const parsedDataArr: (
+      | BigNumberish
+      | ParsedStruct
+      | boolean
+      | any[]
+      | CairoEnum
+      | CairoStruct
+    )[] = [];
     const el: AbiEntry = { name: '', type: getArrayType(element.type) };
     const len = BigInt(responseIterator.next().value); // get length
     while (parsedDataArr.length < len) {
@@ -208,15 +216,22 @@ function parseResponseValue(
 
   // type tuple
   if (isTypeTuple(element.type)) {
-    const tuple = new CairoTuple(responseIterator, element.type, parser.parsingStrategy);
-    return tuple.decompose(parser.parsingStrategy);
+    const tuple = new CairoTuple(responseIterator, element.type, parser.parsingStrategies);
+    return tuple.decompose(parser.parsingStrategies) as ParsedStruct;
   }
 
   // TODO: duplicated, investigate why and what was an issue then de-duplicate
   // type c1 array
   if (isTypeArray(element.type)) {
     // eslint-disable-next-line no-case-declarations
-    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
+    const parsedDataArr: (
+      | BigNumberish
+      | ParsedStruct
+      | boolean
+      | any[]
+      | CairoEnum
+      | CairoStruct
+    )[] = [];
     const el = { name: '', type: getArrayType(element.type) };
     const len = BigInt(responseIterator.next().value); // get length
     while (parsedDataArr.length < len) {
@@ -277,7 +292,14 @@ export default function responseParser({
       }
       // C0 Array
       // eslint-disable-next-line no-case-declarations
-      const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
+      const parsedDataArr: (
+        | BigNumberish
+        | ParsedStruct
+        | boolean
+        | any[]
+        | CairoEnum
+        | CairoStruct
+      )[] = [];
       if (parsedResult && parsedResult[`${name}_len`]) {
         const arrLen = parsedResult[`${name}_len`] as number;
         while (parsedDataArr.length < arrLen) {
