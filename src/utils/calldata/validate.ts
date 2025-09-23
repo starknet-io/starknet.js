@@ -39,7 +39,7 @@ import {
 } from './cairo';
 
 // TODO: separate validate is redundant as CairoTypes are validated during construction.
-// TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
+// TODO: This validate should provide added valie method base validate poiniting to incorrect value for method, opt. using color coding
 // TODO: Something like: store_message(a -> *INVALID JS TYPE*, b, c -> *MISSING REQUIRED ARG*)
 
 const validateFelt = (parameter: any, input: AbiEntry) => {
