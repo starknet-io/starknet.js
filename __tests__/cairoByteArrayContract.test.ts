@@ -66,10 +66,6 @@ describe('CairoByteArray Manual Integration Tests', () => {
       const testMessage = 'Hello, Starknet!';
       const byteArray = new CairoByteArray(testMessage);
 
-      console.log(byteArray instanceof CairoByteArray);
-      console.log(byteArray instanceof CairoType);
-      console.log(byteArray instanceof Object);
-
       // Send CairoByteArray to contract with parseRequest disabled
       const storeResult = await byteArrayContract
         .withOptions({ parseRequest: false })

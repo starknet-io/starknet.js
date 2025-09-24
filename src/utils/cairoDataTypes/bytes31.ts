@@ -4,6 +4,7 @@ import { getNext } from '../num';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { isBuffer, isString } from '../typed';
+import { CairoType } from './cairoType.interface';
 
 export class CairoBytes31 extends CairoType {
   static MAX_BYTE_SIZE = 31 as const;
