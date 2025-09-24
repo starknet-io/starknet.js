@@ -1,9 +1,14 @@
 /* eslint-disable no-underscore-dangle */
 import { BigNumberish } from '../../types';
 import assert from '../assert';
-import { addHexPrefix, bigIntToUint8Array, stringToUint8Array } from '../encode';
-import { getNext, toHex } from '../num';
-import { decodeShortString, encodeShortString, splitLongString } from '../shortString';
+import {
+  addHexPrefix,
+  bigIntToUint8Array,
+  buf2hex,
+  concatenateArrayBuffer,
+  stringToUint8Array,
+} from '../encode';
+import { getNext } from '../num';
 import { isBigInt, isBuffer, isInteger, isNumber, isString } from '../typed';
 import { addCompiledFlag } from '../helpers';
 import Buffer from '../connect/buffer';
@@ -135,14 +140,13 @@ export class CairoByteArray extends CairoType {
   decodeUtf8() {
     // Convert all bytes to Uint8Array and decode as UTF-8 string
     // This ensures multi-byte UTF-8 characters are not split across chunk boundaries
-    const allBytes = this.reconstructBytes();
-    const fullBytes = new Uint8Array(allBytes);
-    return new TextDecoder().decode(fullBytes);
+    const allBytes = concatenateArrayBuffer(this.toElements());
+    return new TextDecoder().decode(allBytes);
   }
 
   toBigInt() {
     // Reconstruct the full byte sequence
-    const allBytes = this.reconstructBytes();
+    const allBytes = concatenateArrayBuffer(this.toElements());
 
     // Convert bytes array to bigint
     if (allBytes.length === 0) {
@@ -158,43 +162,47 @@ export class CairoByteArray extends CairoType {
   }
 
   toHexString() {
-    return addHexPrefix(this.toBigInt().toString(16));
+    // TODO: revisit empty data handling, how to differentiate empty and zero input
+    const allBytes = concatenateArrayBuffer(this.toElements());
+    const hexValue = allBytes.length === 0 ? '0' : buf2hex(allBytes);
+    return addHexPrefix(hexValue);
   }
 
   toBuffer() {
-    // Note: toBuffer uses a slightly different byte reconstruction that filters out invalid bytes
+    const allBytes = concatenateArrayBuffer(this.toElements());
+    return Buffer.from(allBytes);
+  }
+
+  /**
+   * returns an array of all the data chunks and the pending word
+   * when concatenated, represents the original bytes sequence
+   */
+  toElements(): Uint8Array[] {
     this.assertInitialized();
 
-    const allBytes: number[] = [];
+    // Add bytes from all complete chunks (each chunk contains exactly 31 bytes when full)
+    const allChunks: Uint8Array[] = this.data.flatMap((chunk) => chunk.data);
 
-    // Add bytes from all complete chunks
-    this.data.forEach((chunk) => {
-      const chunkBytes = chunk.data;
-      for (let i = 0; i < chunkBytes.length; i += 1) {
-        allBytes.push(chunkBytes[i]);
-      }
-    });
-
-    // Add bytes from pending word with different validation logic than other methods
+    // Add bytes from pending word
     const pendingLen = Number(this.pending_word_len.toBigInt());
-    if (pendingLen > 0) {
-      const hex = this.pending_word.toHexString();
-      const hexWithoutPrefix = hex.startsWith('0x') ? hex.slice(2) : hex;
-      const paddedHex =
-        hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
-
-      for (let i = 0; i < pendingLen; i += 1) {
-        const byteHex = paddedHex.slice(i * 2, i * 2 + 2);
-        if (byteHex.length >= 2) {
-          const byteValue = parseInt(byteHex, 16);
-          if (!Number.isNaN(byteValue)) {
-            allBytes.push(byteValue);
-          }
-        }
-      }
+    if (pendingLen) {
+      const pending = new Uint8Array(pendingLen);
+      const paddingDifference = pendingLen - this.pending_word.data.length;
+      pending.set(this.pending_word.data, paddingDifference);
+      allChunks.push(pending);
     }
 
-    return Buffer.from(allBytes);
+    return allChunks;
+  }
+
+  /**
+   * Private helper to check if the CairoByteArray is properly initialized
+   */
+  private assertInitialized(): void {
+    assert(
+      this.data && this.pending_word !== undefined && this.pending_word_len !== undefined,
+      'CairoByteArray is not properly initialized'
+    );
   }
 
   static validate(data: Uint8Array | Buffer | BigNumberish | unknown) {
@@ -253,63 +261,6 @@ export class CairoByteArray extends CairoType {
     return abiType === CairoByteArray.abiSelector;
   }
 
-  /**
-   * Private helper to check if the CairoByteArray is properly initialized
-   */
-  private assertInitialized(): void {
-    assert(
-      this.data && this.pending_word !== undefined && this.pending_word_len !== undefined,
-      'CairoByteArray is not properly initialized'
-    );
-  }
-
-  /**
-   * Private helper to reconstruct the full byte sequence from chunks and pending word
-   */
-  private reconstructBytes(): number[] {
-    this.assertInitialized();
-
-    const allBytes: number[] = [];
-
-    // Add bytes from all complete chunks (each chunk contains exactly 31 bytes when full)
-    this.data.forEach((chunk) => {
-      // Each chunk stores its data as a Uint8Array
-      const chunkBytes = chunk.data;
-      for (let i = 0; i < chunkBytes.length; i += 1) {
-        allBytes.push(chunkBytes[i]);
-      }
-    });
-
-    // Add bytes from pending word
-    const pendingLen = Number(this.pending_word_len.toBigInt());
-    if (pendingLen > 0) {
-      // Get the hex string from pending_word and convert to bytes
-      const hex = this.pending_word.toHexString();
-      const hexWithoutPrefix = hex.startsWith('0x') ? hex.slice(2) : hex;
-
-      // Convert hex to bytes
-      // Ensure hex string has even length by padding with leading zero if necessary
-      const paddedHex =
-        hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
-
-      for (let i = 0; i < pendingLen; i += 1) {
-        const byteHex = paddedHex.slice(i * 2, i * 2 + 2);
-        if (byteHex.length < 2) {
-          // If we don't have enough hex digits, treat as zero
-          allBytes.push(0);
-        } else {
-          const byteValue = parseInt(byteHex, 16);
-          if (Number.isNaN(byteValue)) {
-            throw new Error(`Invalid hex byte: ${byteHex}`);
-          }
-          allBytes.push(byteValue);
-        }
-      }
-    }
-
-    return allBytes;
-  }
-
   static factoryFromApiResponse(responseIterator: Iterator<string>): CairoByteArray {
     const data = Array.from({ length: Number(getNext(responseIterator)) }, () =>
       CairoBytes31.factoryFromApiResponse(responseIterator)
@@ -317,73 +268,5 @@ export class CairoByteArray extends CairoType {
     const pending_word = CairoFelt252.factoryFromApiResponse(responseIterator);
     const pending_word_len = CairoUint32.factoryFromApiResponse(responseIterator);
     return new CairoByteArray(data, pending_word, pending_word_len);
-  }
-
-  /**
-   * Convert a Cairo ByteArray to a JS string
-   * @param myByteArray Cairo representation of a LongString
-   * @returns a JS string
-   * @example
-   * ```typescript
-   * const myByteArray = {
-   *    data: [],
-   *    pending_word: '0x414243444546474849',
-   *    pending_word_len: 9
-   * }
-   * const result: String = CairoByteArray.stringFromByteArray(myByteArray); // ABCDEFGHI
-   * ```
-   */
-  static stringFromByteArray(myByteArray: {
-    data: BigNumberish[];
-    pending_word: BigNumberish;
-    pending_word_len: number;
-  }): string {
-    const pending_word: string =
-      BigInt(myByteArray.pending_word) === 0n
-        ? ''
-        : decodeShortString(toHex(myByteArray.pending_word));
-    return (
-      myByteArray.data.reduce<string>((cumuledString, encodedString: BigNumberish) => {
-        const add: string =
-          BigInt(encodedString) === 0n ? '' : decodeShortString(toHex(encodedString));
-        return cumuledString + add;
-      }, '') + pending_word
-    );
-  }
-
-  /**
-   * Convert a JS string to a Cairo ByteArray
-   * @param targetString a JS string
-   * @returns Cairo representation of a LongString
-   * @example
-   * ```typescript
-   * const myByteArray = CairoByteArray.byteArrayFromString("ABCDEFGHI");
-   * ```
-   * Result is :
-   * {
-   *    data: [],
-   *    pending_word: '0x414243444546474849',
-   *    pending_word_len: 9
-   * }
-   */
-  static byteArrayFromString(targetString: string): {
-    data: BigNumberish[];
-    pending_word: BigNumberish;
-    pending_word_len: number;
-  } {
-    const shortStrings: string[] = splitLongString(targetString);
-    const remainder: string = shortStrings[shortStrings.length - 1];
-    const shortStringsEncoded: BigNumberish[] = shortStrings.map(encodeShortString);
-
-    const [pendingWord, pendingWordLength] =
-      remainder === undefined || remainder.length === 31
-        ? ['0x00', 0]
-        : [shortStringsEncoded.pop()!, remainder.length];
-
-    return {
-      data: shortStringsEncoded.length === 0 ? [] : shortStringsEncoded,
-      pending_word: pendingWord,
-      pending_word_len: pendingWordLength,
-    };
   }
 }

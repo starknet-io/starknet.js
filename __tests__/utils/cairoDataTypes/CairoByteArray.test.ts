@@ -1,7 +1,4 @@
-import { CairoByteArray } from '../../../src';
-import { CairoBytes31 } from '../../../src/utils/cairoDataTypes/bytes31';
-import { CairoFelt252 } from '../../../src/utils/cairoDataTypes/felt';
-import { CairoUint32 } from '../../../src/utils/cairoDataTypes/uint32';
+import { CairoByteArray, CairoBytes31, CairoFelt252, CairoUint32 } from '../../../src';
 
 describe('CairoByteArray Unit Tests', () => {
   describe('String constructor', () => {
@@ -134,7 +131,7 @@ describe('CairoByteArray Unit Tests', () => {
       expect(byteArray.pending_word_len?.toBigInt()).toBe(1n); // 0 is represented as 1 byte
       expect(byteArray.decodeUtf8()).toBe('\x00'); // NULL character
       expect(byteArray.toBigInt()).toBe(0n);
-      expect(byteArray.toHexString()).toBe('0x0');
+      expect(byteArray.toHexString()).toBe('0x00');
     });
 
     test('should handle zero number', () => {
@@ -145,7 +142,7 @@ describe('CairoByteArray Unit Tests', () => {
       expect(byteArray.pending_word_len?.toBigInt()).toBe(1n); // 0 is represented as 1 byte
       expect(byteArray.decodeUtf8()).toBe('\x00'); // NULL character
       expect(byteArray.toBigInt()).toBe(0n);
-      expect(byteArray.toHexString()).toBe('0x0');
+      expect(byteArray.toHexString()).toBe('0x00');
     });
 
     test('should handle large bigint that spans multiple chunks', () => {
@@ -246,6 +243,22 @@ describe('CairoByteArray Unit Tests', () => {
       expect(byteArray.data?.length).toBe(1); // 1 CairoBytes31 chunk
       expect(byteArray.pending_word?.toHexString()).toBe('0x3536373839'); // "56789"
       expect(byteArray.pending_word_len?.toBigInt()).toBe(5n);
+    });
+
+    test('should preserve pending word leading zeros for toBuffer()', () => {
+      const content = '0x000000010000001900000002';
+      const buffer = Buffer.from(content.slice(2), 'hex');
+      const byteArray = new CairoByteArray(buffer);
+
+      expect(byteArray.toBuffer().toString('hex')).toEqual(buffer.toString('hex'));
+    });
+
+    test('should preserve pending word leading zeros for toHexString()', () => {
+      const content = '0x000000010000001900000002';
+      const buffer = Buffer.from(content.slice(2), 'hex');
+      const byteArray = new CairoByteArray(buffer);
+
+      expect(byteArray.toHexString()).toEqual(content);
     });
   });
 
@@ -687,6 +700,50 @@ describe('CairoByteArray Unit Tests', () => {
         expect(reconstructed2.toBigInt()).toBe(byteArray.toBigInt());
         expect(apiRequest1).toEqual(apiRequest2);
       });
+    });
+
+    test('should preserve data leading zeros for toApiRequest()', () => {
+      const content =
+        '0x' +
+        '000000019900000000000002222222374206275726e206d65737aaaa000001' +
+        '000000029900000000000002222222374206275726e206d65737aaaa000002' +
+        '000000039900000000000002222222374206275726e206d65737aaaa000003' +
+        '00d0f0';
+      const buffer = Buffer.from(content.slice(2), 'hex');
+      const byteArray = new CairoByteArray(buffer);
+      const apiRequest = byteArray.toApiRequest();
+      const reconstructedByteArray = CairoByteArray.factoryFromApiResponse(apiRequest.values());
+
+      expect(reconstructedByteArray.toHexString()).toEqual(content);
+    });
+  });
+
+  describe('toElements method', () => {
+    test('should convert empty string to empty array', () => {
+      const byteArray = new CairoByteArray('');
+      expect(byteArray.toElements()).toEqual([]);
+    });
+
+    test('should convert short string into single element array corresponding to the pending word', () => {
+      const byteArray = new CairoByteArray('Test');
+      expect(byteArray.toElements()).toEqual([new Uint8Array([84, 101, 115, 116])]);
+    });
+
+    test('should convert large string into full size elements', () => {
+      const apiResponse = [
+        '0x3',
+        '0x19900000000000002222222374206275726e206d65737aaaa000001',
+        '0x29900000000000002222222374206275726e206d65737aaaa000002',
+        '0x39900000000000002222222374206275726e206d65737aaaa000003',
+        '0xd0f0',
+        '0xa',
+      ];
+      const byteArray = CairoByteArray.factoryFromApiResponse(apiResponse.values());
+      const elements = byteArray.toElements();
+
+      expect(elements).toHaveLength(Number(apiResponse[0]) + 1);
+      elements.slice(0, -1).forEach((e) => expect(e).toHaveLength(31));
+      expect(elements.at(-1)).toHaveLength(Number(apiResponse.at(-1)));
     });
   });
 });
