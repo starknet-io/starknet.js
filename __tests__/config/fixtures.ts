@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-
+import { DevnetProvider } from 'starknet-devnet';
 import { Provider, ProviderInterface, RpcProvider, config, hash, json } from '../../src';
 import {
   CompiledSierra,
@@ -107,16 +107,8 @@ export const { TEST_WS_URL } = process.env;
 
 export const createBlockForDevnet = async (): Promise<void> => {
   if (!(process.env.IS_DEVNET === 'true')) return;
-  const response = await fetch(new URL('/create_block', process.env.TEST_RPC_URL), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: '{}',
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`DEVNET status ${response.status}: ${errorText}`);
-  }
+  const devnet = new DevnetProvider({ url: process.env.TEST_RPC_URL });
+  await devnet.createBlock();
 };
 
 export async function waitNextBlock(provider: RpcProvider, delay: number) {

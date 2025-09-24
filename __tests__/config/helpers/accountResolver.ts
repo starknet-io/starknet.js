@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { DevnetProvider } from 'starknet-devnet';
 import { GS_DEFAULT_TEST_PROVIDER_URL } from '../constants';
 
 class AccountResolver {
@@ -15,9 +16,10 @@ class AccountResolver {
   }
 
   private async fetchAccount(url: string) {
-    const response = await fetch(`${url}predeployed_accounts`);
-    const [account] = await response.json();
-    const { address, private_key, initial_balance } = account;
+    const devnet = new DevnetProvider({ url });
+    console.log('devnetProvider ALIVE', await devnet.isAlive());
+    const response = await devnet.getPredeployedAccounts();
+    const { address, private_key, initial_balance } = response[0];
     process.env.TEST_ACCOUNT_ADDRESS = address;
     process.env.TEST_ACCOUNT_PRIVATE_KEY = private_key;
     process.env.INITIAL_BALANCE = initial_balance;
