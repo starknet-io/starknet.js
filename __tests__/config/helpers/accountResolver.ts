@@ -17,7 +17,6 @@ class AccountResolver {
 
   private async fetchAccount(url: string) {
     const devnet = new DevnetProvider({ url });
-    console.log('devnetProvider ALIVE', await devnet.isAlive());
     const response = await devnet.getPredeployedAccounts();
     const { address, private_key, initial_balance } = response[0];
     process.env.TEST_ACCOUNT_ADDRESS = address;
