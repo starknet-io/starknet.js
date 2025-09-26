@@ -5,11 +5,8 @@ import { type ParsingStrategy, type VariantType } from '../calldata/parser/parsi
 import { CairoType } from './cairoType.interface';
 import { isTypeResult } from '../calldata/cairo';
 import { isUndefined } from '../typed';
-import { CairoOptionVariant, CairoOption, CairoResultVariant, CairoResult } from '../calldata/enum';
-// eslint-disable-next-line import/no-cycle
+import { CairoResultVariant, CairoResult } from '../calldata/enum';
 import { CairoTuple } from './tuple';
-// eslint-disable-next-line import/no-cycle
-import { CairoTypeOption } from './cairoTypeOption';
 import type { AllowArray } from '../../types';
 
 /**
@@ -30,7 +27,7 @@ export class CairoTypeResult extends CairoType {
   public readonly dynamicSelector = CairoTypeResult.dynamicSelector;
 
   /* CairoType instance representing the content of a Cairo result. */
-  public readonly content: CairoType | undefined;
+  public readonly content: CairoType;
 
   /* Cairo type of the result enum. */
   public readonly resultCairoType: string;
@@ -120,50 +117,29 @@ export class CairoTypeResult extends CairoType {
       this.isVariantOk = variant === CairoResultVariant.Ok;
       return;
     }
-    if (content instanceof CairoOption) {
-      // "content" is a CairoOption
-      assert(
-        !isUndefined(variant),
-        '"variant" parameter is mandatory when creating a new Cairo Result from a Cairo Enum or raw data.'
-      );
-      const option = new CairoTypeOption(
-        content.unwrap(),
-        CairoTypeResult.getVariantTypes(resultCairoType)[variant],
-        strategies,
-        content.isSome() ? CairoOptionVariant.Some : CairoOptionVariant.None
-      );
-      this.content = option;
-      this.isVariantOk = variant === CairoResultVariant.Ok;
-      return;
-    }
     if (content instanceof CairoResult) {
       // "content" is a CairoResult
-      if (subType === false && !isUndefined(variant)) {
-        throw new Error(
-          'when "content" parameter is a CairoResult and subType is false, do not define "variant" parameter.'
+      if (!subType) {
+        const variantForResult = content.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err;
+        const result = new CairoTypeResult(
+          content.unwrap(),
+          resultCairoType,
+          strategies,
+          variantForResult,
+          true // recursive sub-type
         );
+        this.content = result.content;
+        this.isVariantOk = content.isOk();
+        return;
       }
-      const variantForResult = content.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err;
-      const typeForResult = subType
-        ? CairoTypeResult.getVariantTypes(resultCairoType)[variant as number]
-        : resultCairoType;
-      const result = new CairoTypeResult(
-        content.unwrap(),
-        typeForResult,
-        strategies,
-        variantForResult,
-        true // recursive sub-type
-      );
-      this.content = subType ? result : result.content;
-      const isVariantOk = variant === CairoResultVariant.Ok;
-      this.isVariantOk = subType ? isVariantOk : content.isOk();
-      return;
     }
-    // not an iterator, not an CairoType, neither a CairoOption, CairoResult, CairoCustomEnum -> so is low level data (BigNumberish, array, object)
+
+    // not an iterator, not an CairoType -> so is low level data (BigNumberish, array, object, Cairo Enum)
     assert(
       !isUndefined(variant),
       '"variant" parameter is mandatory when creating a new Cairo Result from a Cairo Enum or raw data.'
     );
+    this.isVariantOk = variant === CairoResultVariant.Ok;
     const elementType = CairoTypeResult.getVariantTypes(resultCairoType)[variant];
     const strategyConstructorNum = strategies.findIndex(
       (strategy: ParsingStrategy) => strategy.constructors[elementType]
@@ -171,24 +147,21 @@ export class CairoTypeResult extends CairoType {
     if (strategyConstructorNum >= 0) {
       const constructor = strategies[strategyConstructorNum].constructors[elementType];
       this.content = constructor(content, strategies, elementType);
-    } else {
-      const strategyDynamicNum = strategies.findIndex((strategy: ParsingStrategy) => {
-        const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-        return dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-      });
-      if (strategyDynamicNum >= 0) {
-        const dynamicSelectors = Object.entries(strategies[strategyDynamicNum].dynamicSelectors);
-        const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-        const [selectorName] = matchingSelector as [string, (type: string) => boolean];
-        const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
-        if (dynamicConstructor) {
-          this.content = dynamicConstructor(content, strategies, elementType);
-        }
-      } else {
-        throw new Error(`"${elementType}" is not a valid Cairo type`);
-      }
+      return;
     }
-    this.isVariantOk = variant === CairoResultVariant.Ok;
+    const strategyDynamicNum = strategies.findIndex((strategy: ParsingStrategy) => {
+      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+      return dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+    });
+    if (strategyDynamicNum >= 0) {
+      const dynamicSelectors = Object.entries(strategies[strategyDynamicNum].dynamicSelectors);
+      const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+      const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+      const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
+      this.content = dynamicConstructor(content, strategies, elementType);
+      return;
+    }
+    throw new Error(`"${elementType}" is not a valid Cairo type`);
   }
 
   /**
@@ -369,7 +342,7 @@ export class CairoTypeResult extends CairoType {
     }
     let parserName: string = elementType;
     if (content instanceof CairoType) {
-      if (Object.hasOwn(content, 'dynamicSelector')) {
+      if ('dynamicSelector' in content) {
         // dynamic recursive CairoType
         parserName = (content as any).dynamicSelector;
       }

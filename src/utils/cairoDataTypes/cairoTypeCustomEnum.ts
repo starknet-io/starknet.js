@@ -1,13 +1,21 @@
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
-import { getNext } from '../num';
-import { type ParsingStrategy, type VariantType } from '../calldata/parser/parsingStrategy';
+import { getNext, toHex } from '../num';
+import { type ParsingStrategy, type VariantType } from '../calldata/parser/parsingStrategy.type';
 import { CairoType } from './cairoType.interface';
-import { isTypeResult } from '../calldata/cairo';
+import { isCairo1Type } from '../calldata/cairo';
 import { isUndefined } from '../typed';
-import { CairoOptionVariant, CairoOption, CairoResultVariant, CairoResult } from '../calldata/enum';
-import { CairoTuple } from './tuple';
+import {
+  CairoOptionVariant,
+  CairoOption,
+  CairoResultVariant,
+  CairoResult,
+  CairoCustomEnum,
+  type CairoEnumRaw,
+} from '../calldata/enum';
 import { CairoTypeOption } from './cairoTypeOption';
+import type { AbiEnum, AllowArray } from '../../types';
+import { CairoTypeResult } from './cairoTypeResult';
 
 /**
  * Represents a Cairo custom enum.
@@ -21,19 +29,17 @@ import { CairoTypeOption } from './cairoTypeOption';
  * - Direct CallData.compile() integration
  * - Comprehensive type checking and validation
  */
-export class CairoTypeEnum extends CairoType {
-  static dynamicSelector = 'CairoTypeEnum' as const;
-
-  public readonly dynamicSelector = CairoTypeEnum.dynamicSelector;
+export class CairoTypeCustomEnum extends CairoType {
+  public readonly dynamicSelector: string;
 
   /* CairoType instance representing the content of a Cairo enum. */
-  public readonly content: CairoType | undefined;
+  public readonly content: CairoType;
 
-  /* Cairo type of the result enum. */
-  public readonly resultCairoType: string;
+  /** Cairo named custom enum type definition */
+  public readonly abiEnum: AbiEnum;
 
-  /* True if the current variant is 'Ok', false if 'Err'. */
-  public readonly isVariantOk: boolean;
+  /* Id of the selected enum */
+  public readonly enumVariant: number;
 
   /**
    * CairoTypeResult provides a complete implementation for handling Cairo's result,
@@ -66,118 +72,145 @@ export class CairoTypeEnum extends CairoType {
    * const fromApiResult = new CairoTypeResult(apiData, "core::result::Result::<core::integer::u8, core::integer::u8>", hdParsingStrategy); // CairoResult instance with content 32n and Ok variant.
    * ```
    */
+
   constructor(
     content: unknown,
-    resultCairoType: string,
-    strategy: ParsingStrategy,
-    variant?: CairoResultVariant | number,
+    abiEnum: AbiEnum,
+    parsingStrategy: AllowArray<ParsingStrategy>,
+    variant?: number,
     subType: boolean = false
   ) {
     super();
-    this.resultCairoType = resultCairoType;
+    this.dynamicSelector = abiEnum.name;
+    this.abiEnum = abiEnum;
+    const strategies = Array.isArray(parsingStrategy) ? parsingStrategy : [parsingStrategy];
     assert(!isUndefined(content), '"content" parameter has to be defined.');
     assert(content !== null, '"content" parameter has to be defined.');
-    if (typeof content === 'object' && 'next' in content) {
+    if (content && typeof content === 'object' && 'next' in content) {
       // "content" is an iterator
       assert(
         isUndefined(variant),
         'when "content" parameter is an iterator, do not define "variant" parameter.'
       );
       const variantFromIterator = Number(getNext(content as Iterator<string>));
-      const activeVariantType =
-        CairoTypeResult.getVariantTypes(resultCairoType)[variantFromIterator];
-      const parsedContent: CairoType = CairoTypeResult.parser(
+      this.enumVariant = variantFromIterator;
+      const elementTypes: string[] = CairoTypeCustomEnum.getVariantTypes(abiEnum);
+
+      const parsedContent: CairoType = CairoTypeCustomEnum.parser(
         content as Iterator<string>,
-        activeVariantType,
-        strategy
+        elementTypes[variantFromIterator],
+        strategies
       );
       this.content = parsedContent;
-      this.isVariantOk = variantFromIterator === CairoResultVariant.Ok;
       return;
     }
-    if (content instanceof CairoTypeResult) {
+    if (content instanceof CairoTypeCustomEnum) {
       assert(
         isUndefined(variant),
-        'when "content" parameter is a CairoTypeResult, do not define "variant" parameter.'
+        'when "content" parameter is a CairoTypeCustomEnum do not define "variant" parameter.'
       );
       this.content = content.content;
-      this.isVariantOk = content.isVariantOk;
-      this.resultCairoType = content.resultCairoType;
+      this.enumVariant = content.enumVariant;
+      this.dynamicSelector = content.dynamicSelector;
+      this.abiEnum = content.abiEnum;
       return;
     }
-    CairoTypeResult.validate(content, resultCairoType, variant);
+    CairoTypeCustomEnum.validate(content, abiEnum, variant);
+    // "content" is a CairoType
     if (content && typeof content === 'object' && content !== null && 'toApiRequest' in content) {
-      // "content" is a CairoType
       assert(
         !isUndefined(variant),
-        '"variant" parameter is mandatory when creating a new Cairo Result from a CairoType.'
+        '"variant" parameter is mandatory when creating a new Cairo enum from a CairoType.'
       );
       this.content = content as CairoType;
-      this.isVariantOk = variant === CairoResultVariant.Ok;
+      this.enumVariant = variant;
       return;
     }
+
     if (content instanceof CairoOption) {
       // "content" is a CairoOption
       assert(
         !isUndefined(variant),
-        '"variant" parameter is mandatory when creating a new Cairo Result from a Cairo Enum or raw data.'
+        '"variant" parameter is mandatory when creating a new Cairo custom enum from a CairoOption.'
       );
       const option = new CairoTypeOption(
         content.unwrap(),
-        CairoTypeResult.getVariantTypes(resultCairoType)[variant],
-        strategy,
+        CairoTypeCustomEnum.getVariantTypes(abiEnum)[variant],
+        strategies,
         content.isSome() ? CairoOptionVariant.Some : CairoOptionVariant.None
       );
       this.content = option;
-      this.isVariantOk = variant === CairoResultVariant.Ok;
+      this.enumVariant = variant;
       return;
     }
     if (content instanceof CairoResult) {
       // "content" is a CairoResult
-      if (subType === false && !isUndefined(variant)) {
-        throw new Error(
-          'when "content" parameter is a CairoResult and subType is false, do not define "variant" parameter.'
-        );
-      }
-      const variantForResult = content.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err;
-      const typeForResult = subType
-        ? CairoTypeResult.getVariantTypes(resultCairoType)[variant as number]
-        : resultCairoType;
-      const result = new CairoTypeResult(
-        content.unwrap(),
-        typeForResult,
-        strategy,
-        variantForResult,
-        true // recursive sub-type
+      assert(
+        !isUndefined(variant),
+        '"variant" parameter is mandatory when creating a new Cairo custom enum from a CairoResult.'
       );
-      this.content = subType ? result : result.content;
-      const isVariantOk = variant === CairoResultVariant.Ok;
-      this.isVariantOk = subType ? isVariantOk : content.isOk();
+      const option = new CairoTypeResult(
+        content.unwrap(),
+        CairoTypeCustomEnum.getVariantTypes(abiEnum)[variant],
+        strategies,
+        content.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err
+      );
+      this.content = option;
+      this.enumVariant = variant;
       return;
     }
-    // not an iterator, not an CairoType, neither a CairoOption, CairoResult, CairoCustomEnum -> so is low level data (BigNumberish, array, object)
+
+    // "content" is a CairoCustomEnum
+    if (content instanceof CairoCustomEnum) {
+      if (!subType) {
+        const subVariant: number = CairoTypeCustomEnum.extractEnumMembersNames(abiEnum).indexOf(
+          content.activeVariant()
+        );
+        assert(subVariant >= 0, `${content.activeVariant()} activeVariant is unknown in AbiEnum.`);
+        const customEnum = new CairoTypeCustomEnum(
+          content.unwrap(),
+          abiEnum,
+          strategies,
+          subVariant,
+          true // recursive sub-type
+        );
+        this.content = customEnum.content;
+        this.enumVariant = customEnum.enumVariant;
+        return;
+      }
+      assert(
+        !isUndefined(variant),
+        '"variant" parameter is mandatory when creating a new Cairo custom enum from a CairoCustomEnum.'
+      );
+    }
+    // not an iterator, not an CairoType -> so is low level data (BigNumberish, array, object)
     assert(
       !isUndefined(variant),
-      '"variant" parameter is mandatory when creating a new Cairo Result from a Cairo Enum or raw data.'
+      '"variant" parameter is mandatory when creating a new Cairo custom enum from a Cairo Enum or raw data.'
     );
-    const elementType = CairoTypeResult.getVariantTypes(resultCairoType)[variant];
-    const constructor = strategy.constructors[elementType];
-    if (constructor) {
-      this.content = constructor(content, elementType);
-    } else {
-      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-      const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-      if (matchingSelector) {
-        const [selectorName] = matchingSelector;
-        const dynamicConstructor = strategy.constructors[selectorName];
-        if (dynamicConstructor) {
-          this.content = dynamicConstructor(content, elementType);
-        }
-      } else {
-        throw new Error(`"${elementType}" is not a valid Cairo type`);
-      }
+    this.enumVariant = variant;
+    const elementType = CairoTypeCustomEnum.getVariantTypes(abiEnum)[variant];
+    const strategyConstructorNum = strategies.findIndex(
+      (strategy: ParsingStrategy) => strategy.constructors[elementType]
+    );
+    if (strategyConstructorNum >= 0) {
+      const constructor = strategies[strategyConstructorNum].constructors[elementType];
+      this.content = constructor(content, strategies, elementType, variant);
+      return;
     }
-    this.isVariantOk = variant === CairoResultVariant.Ok;
+    const strategyDynamicNum = strategies.findIndex((strategy: ParsingStrategy) => {
+      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+      return dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+    });
+    if (strategyDynamicNum >= 0) {
+      const dynamicSelectors = Object.entries(strategies[strategyDynamicNum].dynamicSelectors);
+      const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+      const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+      const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
+      this.content = dynamicConstructor(content, strategies, elementType, variant);
+      return;
+    }
+    throw new Error(`"${elementType}" is not a valid Cairo type`);
   }
 
   /**
@@ -197,21 +230,31 @@ export class CairoTypeEnum extends CairoType {
    */
   private static parser(
     responseIterator: Iterator<string>,
-    elementType: string,
-    strategy: ParsingStrategy
+    variantCairoType: string,
+    parsingStrategies: ParsingStrategy[]
   ): CairoType {
-    const constructor = strategy.constructors[elementType];
-    if (constructor) {
-      return constructor(responseIterator, elementType);
+    const strategyConstructorNum = parsingStrategies.findIndex(
+      (strategy: ParsingStrategy) => strategy.constructors[variantCairoType]
+    );
+    if (strategyConstructorNum >= 0) {
+      const constructor = parsingStrategies[strategyConstructorNum].constructors[variantCairoType];
+      return constructor(responseIterator, parsingStrategies, variantCairoType);
     }
-    const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-    const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-
-    if (matchingSelector) {
-      const [selectorName] = matchingSelector;
-      const dynamicConstructor = strategy.constructors[selectorName];
+    const strategyDynamicNum = parsingStrategies.findIndex((strategy: ParsingStrategy) => {
+      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+      return dynamicSelectors.find(([, selectorFn]) => selectorFn(variantCairoType));
+    });
+    if (strategyDynamicNum >= 0) {
+      const dynamicSelectors = Object.entries(
+        parsingStrategies[strategyDynamicNum].dynamicSelectors
+      );
+      const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+        selectorFn(variantCairoType)
+      );
+      const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+      const dynamicConstructor = parsingStrategies[strategyDynamicNum].constructors[selectorName];
       if (dynamicConstructor) {
-        return dynamicConstructor(responseIterator, elementType);
+        return dynamicConstructor(responseIterator, parsingStrategies, variantCairoType);
       }
     }
     // Unknown type - collect raw values, defer error
@@ -229,17 +272,17 @@ export class CairoTypeEnum extends CairoType {
    * // result = [" core::integer::u8", "core::integer::u16"]
    * ```
    */
-  static getVariantTypes(type: string): string[] {
-    const matchArray = type.match(/(?<=<).+(?=>)/);
-    if (matchArray === null)
-      throw new Error(`ABI type ${type} do not includes 2 types enclosed in <>.`);
-    const subTypes = CairoTuple.extractCairo1Tuple(`(${matchArray[0]})`) as string[];
-    assert(
-      subTypes.length === 2,
-      `ABI type ${type} is not including 2 sub types. Found ${subTypes.length}.`
-    );
-    return subTypes;
-  }
+  // static getVariantTypes(type: string): string[] {
+  //   const matchArray = type.match(/(?<=<).+(?=>)/);
+  //   if (matchArray === null)
+  //     throw new Error(`ABI type ${type} do not includes 2 types enclosed in <>.`);
+  //   const subTypes = CairoTuple.extractCairo1Tuple(`(${matchArray[0]})`) as string[];
+  //   assert(
+  //     subTypes.length === 2,
+  //     `ABI type ${type} is not including 2 sub types. Found ${subTypes.length}.`
+  //   );
+  //   return subTypes;
+  // }
 
   /**
    * Validate input data for CairoTypeResult creation.
@@ -252,16 +295,16 @@ export class CairoTypeEnum extends CairoType {
    * CairoTypeResult.validate(200, "wrong", 3); // throws
    * ```
    */
-  static validate(input: unknown, type: string, variant: VariantType | undefined): void {
+  static validate(_input: unknown, abiEnum: AbiEnum, variant: VariantType | undefined): void {
     assert(
-      CairoTypeResult.isAbiType(type),
-      `The type ${type} is not a Cairo Result. Needs core::result::Result::<type1, type2>.`
+      CairoTypeCustomEnum.isAbiType(abiEnum.name),
+      `The type ${abiEnum.name} is not a Cairo Enum. Needs impl::name.`
     );
     if (!isUndefined(variant)) {
       const numberVariant = Number(variant);
       assert(
-        [0, 1].includes(numberVariant),
-        'In Cairo Result, only 0 or 1 variants are authorized.'
+        numberVariant < abiEnum.variants.length && numberVariant >= 0,
+        `The custom enum ${abiEnum.name} variant must be in the range 0..${abiEnum.variants.length - 1}. You requested variant #${numberVariant}`
       );
     }
   }
@@ -300,7 +343,25 @@ export class CairoTypeEnum extends CairoType {
    * ```
    */
   static isAbiType(type: string): boolean {
-    return isTypeResult(type);
+    return isCairo1Type(type);
+  }
+
+  /**
+   * Extract the Cairo type of each property of a named Cairo Enum
+   * @param {AbiEnum} type - Abi definition of the enum
+   * @returns {string[]} an array of Cairo types
+   */
+  private static getVariantTypes(type: AbiEnum): string[] {
+    return type.variants.map((member) => member.type);
+  }
+
+  /**
+   *Extract the Cairo names of each property of a Cairo custom enum
+   * @param {AbiStruct} type - Abi definition of the enum
+   * @returns {string[]} an array of Cairo enum property names
+   */
+  public static extractEnumMembersNames(type: AbiEnum): string[] {
+    return type.variants.map((member) => member.name);
   }
 
   /**
@@ -318,7 +379,7 @@ export class CairoTypeEnum extends CairoType {
    * ```
    */
   public toApiRequest(): string[] {
-    const result = [this.isVariantOk ? '0x00' : '0x01'];
+    const result = [toHex(this.enumVariant)];
     result.push(this.content!.toApiRequest());
     return addCompiledFlag(result.flat());
   }
@@ -338,28 +399,38 @@ export class CairoTypeEnum extends CairoType {
    * const parsed = myResult.decompose(hdParsingStrategy); // CairoResult{ Some: 3n }
    * ```
    */
-  public decompose(strategy: ParsingStrategy): CairoResult<any, any> {
+  public decompose(strategyDecompose: AllowArray<ParsingStrategy>): CairoCustomEnum {
     const { content } = this;
+    const strategies = Array.isArray(strategyDecompose) ? strategyDecompose : [strategyDecompose];
     // For raw string values (unsupported types), throw error
-    const elementType = CairoTypeResult.getVariantTypes(this.resultCairoType)[
-      this.isVariantOk ? CairoResultVariant.Ok : CairoResultVariant.Err
-    ];
+    const enumTypes = CairoTypeCustomEnum.getVariantTypes(this.abiEnum);
+    const elementType = enumTypes[this.enumVariant];
+    const elementNames = CairoTypeCustomEnum.extractEnumMembersNames(this.abiEnum);
     if (typeof content === 'string') {
       throw new Error(`No parser found for element type: ${elementType} in parsing strategy`);
     }
     let parserName: string = elementType;
     if (content instanceof CairoType) {
-      if (Object.hasOwn(content, 'dynamicSelector')) {
+      if ('dynamicSelector' in content) {
         // dynamic recursive CairoType
         parserName = (content as any).dynamicSelector;
       }
     }
-    const responseParser = strategy.response[parserName];
+    const strategyDecomposeNum = strategies.findIndex(
+      (strategy: ParsingStrategy) => strategy.response[parserName]
+    );
+    const responseParser = strategies[strategyDecomposeNum].response[parserName];
     if (responseParser) {
-      return new CairoResult<any, any>(
-        this.isVariantOk ? CairoResultVariant.Ok : CairoResultVariant.Err,
-        responseParser(content as CairoType)
+      const resultObject: CairoEnumRaw = elementNames.reduce(
+        (current: CairoEnumRaw, name: string, index: number) => {
+          if (index === this.enumVariant) {
+            return { ...current, [name]: responseParser(content as CairoType, strategies) };
+          }
+          return { ...current, [name]: undefined };
+        },
+        {}
       );
+      return new CairoCustomEnum(resultObject);
     }
     // No response parser found - throw error instead of fallback magic
     throw new Error(

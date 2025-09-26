@@ -41,9 +41,10 @@ import {
   isTypeUint,
 } from './cairo';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
-import { CairoOption, CairoResult } from './enum';
+import { CairoCustomEnum, CairoOption, CairoResult } from './enum';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 import { CairoStruct } from '../cairoDataTypes/cairoStruct';
+import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
 
 // TODO: separate validate is redundant as CairoTypes are validated during construction.
 // TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
@@ -221,6 +222,10 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
 };
 
 const validateEnum = (parameter: any, input: AbiEntry) => {
+  // If parameter is a CairoTypeCustomEnum instance, skip validation (it's already validated)
+  if (parameter instanceof CairoTypeCustomEnum) {
+    return;
+  }
   assert(
     isObject(parameter),
     `Validate: arg ${input.name} is cairo type Enum (${input.type}), and should be defined as a js object (not array)`
@@ -239,6 +244,9 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
   }
   if (isTypeResult(input.type) && parameter instanceof CairoResult) {
     return; // CairoResult Enum
+  }
+  if (parameter instanceof CairoCustomEnum) {
+    return;
   }
   if (keys.includes('variant') && keys.includes('activeVariant')) {
     return; // Custom Enum

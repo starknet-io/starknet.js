@@ -10,7 +10,11 @@ import {
   CairoTypeResult,
   CairoResultVariant,
   CairoResult,
+  type AbiStruct,
+  type ParsingStrategy,
+  CairoStruct,
 } from '../../../../src';
+import { contracts } from '../../../config/fixtures';
 
 describe('CairoTypeOption', () => {
   describe('constructor variant', () => {
@@ -192,6 +196,37 @@ describe('CairoTypeOption', () => {
       expect(myOption1.toApiRequest()).toEqual(['0x00', '0x00', '0x6']);
       expect(myOption1.decompose(hdParsingStrategy)).toEqual(
         new CairoOption<CairoResult<BigNumberish, BigNumberish>>(CairoOptionVariant.Some, myResult)
+      );
+    });
+
+    test('optionCairoType: option of a struct', () => {
+      type Point = { x: BigNumberish; y: BigNumberish };
+      const struct0: Point = { x: 4, y: 5 };
+      const abiPoint: AbiStruct = contracts.TestCairoType.sierra.abi.find(
+        (item) => item.name === 'enums::Point'
+      );
+      const myCallData = new CallData(contracts.TestCairoType.sierra.abi);
+      const strategies = myCallData.parser.parsingStrategies as ParsingStrategy[];
+      const myTypeStruct0 = new CairoStruct(struct0, abiPoint, strategies);
+      const myOption0 = new CairoTypeOption(
+        struct0,
+        'core::option::Option::<enums::Point>',
+        strategies,
+        CairoOptionVariant.Some
+      );
+      const myOption1 = new CairoTypeOption(
+        myTypeStruct0,
+        'core::option::Option::<enums::Point>',
+        strategies,
+        CairoOptionVariant.Some
+      );
+      expect(myOption0.toApiRequest()).toEqual(['0x00', '0x4', '0x5']);
+      expect(myOption0.decompose(strategies)).toEqual(
+        new CairoOption<Point>(CairoOptionVariant.Some, { x: 4n, y: 5n })
+      );
+      expect(myOption1.toApiRequest()).toEqual(['0x00', '0x4', '0x5']);
+      expect(myOption1.decompose(strategies)).toEqual(
+        new CairoOption<Point>(CairoOptionVariant.Some, { x: 4n, y: 5n })
       );
     });
 

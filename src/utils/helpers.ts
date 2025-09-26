@@ -32,3 +32,13 @@ export function deepCopyWithMethods(obj: any): any {
   }
   return cloned;
 }
+
+/**
+ * Check if an instance is from an array of classes
+ * @param {any} toCheck - instance to check
+ * @param {any[]} classArray - array of class names to check against
+ * @returns  {boolean}
+ */
+export function isInstanceOf(toCheck: any, classArray: any[]): boolean {
+  return classArray.some((cls) => toCheck instanceof cls);
+}

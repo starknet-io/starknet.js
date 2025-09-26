@@ -32,7 +32,7 @@ import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoArray } from '../cairoDataTypes/array';
 import { CairoTuple } from '../cairoDataTypes/tuple';
 import formatter from './formatter';
-import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
+import { createAbiParser, isNoConstructorValid, type ParsingStrategy } from './parser';
 import { hdParsingStrategy } from './parser/parsingStrategy';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
@@ -41,8 +41,10 @@ import responseParser from './responseParser';
 import validateFields from './validate';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
-import { getAbiStruct } from './getAbiStruct';
 import { CairoStruct } from '../cairoDataTypes/cairoStruct';
+import { getAbiEnum, getAbiStruct } from './calldataUtils';
+import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
+import { isInstanceOf as isInstanceOfClasses } from '../helpers';
 
 export * as cairo from './cairo';
 export { parseCalldataField } from './requestParser';
@@ -127,7 +129,7 @@ export class CallData {
   public compile(
     method: string,
     argsCalldata: RawArgs,
-    parserStrategy: ParsingStrategy = hdParsingStrategy
+    parserStrategy: AllowArray<ParsingStrategy> = this.parser.parsingStrategies
   ): Calldata {
     const abiMethod = this.abi.find((abiFunction) => abiFunction.name === method) as FunctionAbi;
 
@@ -229,48 +231,20 @@ export class CallData {
               }
               return getEntries({ 0: activeVariantNb, 1: myEnum.unwrap() }, `${prefix}${kk}.`);
             }
-            if (value instanceof CairoFixedArray) {
-              // CairoFixedArray - use toApiRequest() to get flat array, then convert to tree structure
+            if (
+              isInstanceOfClasses(value, [
+                CairoTypeOption,
+                CairoTypeResult,
+                CairoStruct,
+                CairoTypeCustomEnum,
+                CairoTuple,
+                CairoArray,
+                CairoFixedArray,
+              ])
+            ) {
               const apiRequest = value.toApiRequest();
               const compiledObj = Object.fromEntries(
-                apiRequest.map((item, idx) => [idx.toString(), item])
-              );
-              return getEntries(compiledObj, `${prefix}${kk}.`);
-            }
-            if (value instanceof CairoArray) {
-              // CairoArray - use toApiRequest() to get length-prefixed array, then convert to tree structure
-              const apiRequest = value.toApiRequest();
-              const compiledObj = Object.fromEntries(
-                apiRequest.map((item, idx) => [idx.toString(), item])
-              );
-              return getEntries(compiledObj, `${prefix}${kk}.`);
-            }
-            if (value instanceof CairoTuple) {
-              // CairoTuple - use toApiRequest() to get flat array (no length prefix), then convert to tree structure
-              const apiRequest = value.toApiRequest();
-              const compiledObj = Object.fromEntries(
-                apiRequest.map((item, idx) => [idx.toString(), item])
-              );
-              return getEntries(compiledObj, `${prefix}${kk}.`);
-            }
-            if (value instanceof CairoTypeOption) {
-              const apiRequest = value.toApiRequest();
-              const compiledObj = Object.fromEntries(
-                apiRequest.map((item, idx) => [idx.toString(), item])
-              );
-              return getEntries(compiledObj, `${prefix}${kk}.`);
-            }
-            if (value instanceof CairoTypeResult) {
-              const apiRequest = value.toApiRequest();
-              const compiledObj = Object.fromEntries(
-                apiRequest.map((item, idx) => [idx.toString(), item])
-              );
-              return getEntries(compiledObj, `${prefix}${kk}.`);
-            }
-            if (value instanceof CairoStruct) {
-              const apiRequest = value.toApiRequest();
-              const compiledObj = Object.fromEntries(
-                apiRequest.map((item, idx) => [idx.toString(), item])
+                apiRequest.map((item: any, idx: number) => [idx.toString(), item])
               );
               return getEntries(compiledObj, `${prefix}${kk}.`);
             }
@@ -364,17 +338,7 @@ export class CallData {
    * @returns AbiEnums - enums from abi
    */
   static getAbiEnum(abi: Abi): AbiEnums {
-    const fullEnumList = abi
-      .filter((abiEntry) => abiEntry.type === 'enum')
-      .reduce(
-        (acc, abiEntry) => ({
-          ...acc,
-          [abiEntry.name]: abiEntry,
-        }),
-        {}
-      );
-    delete fullEnumList['core::bool'];
-    return fullEnumList;
+    return getAbiEnum(abi);
   }
 
   /**

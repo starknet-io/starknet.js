@@ -3,9 +3,6 @@ import { addCompiledFlag } from '../helpers';
 import { getNext } from '../num';
 import { type ParsingStrategy } from '../calldata/parser/parsingStrategy.type';
 import { CairoType } from './cairoType.interface';
-import { CairoOption, CairoResult } from '../calldata/enum';
-import { CairoTypeOption } from './cairoTypeOption';
-import { CairoTypeResult } from './cairoTypeResult';
 import type { AllowArray } from '../../types';
 
 /**
@@ -118,15 +115,7 @@ export class CairoFixedArray extends CairoType {
           // "content" is a CairoType
           return contentItem as CairoType;
         }
-        if (contentItem instanceof CairoOption) {
-          // "content" is a CairoOption
-          return new CairoTypeOption(contentItem, arrayContentType, strategies);
-        }
-        if (contentItem instanceof CairoResult) {
-          // "content" is a CairoResult
-          return new CairoTypeResult(contentItem, arrayContentType, strategies);
-        }
-        // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
+        // not an iterator, not an CairoType -> so is low level data (BigNumberish, array, object, Cairo Enums)
         const strategyConstructorNum = strategies.findIndex(
           (strategy: ParsingStrategy) => strategy.constructors[arrayContentType]
         );
@@ -419,7 +408,7 @@ export class CairoFixedArray extends CairoType {
       }
       let parserName: string = elementType;
       if (element instanceof CairoType) {
-        if (Object.hasOwn(element, 'dynamicSelector')) {
+        if ('dynamicSelector' in element) {
           // dynamic recursive CairoType
           parserName = (element as any).dynamicSelector;
         }

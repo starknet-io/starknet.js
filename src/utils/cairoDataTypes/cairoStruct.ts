@@ -79,7 +79,7 @@ export class CairoStruct extends CairoType {
           return contentItem as CairoType;
         }
 
-        // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
+        // not an iterator, not an CairoType -> so is low level data (BigNumberish, array, object)
         const strategyConstructorNum = strategies.findIndex(
           (strategy: ParsingStrategy) => strategy.constructors[structContentType[index]]
         );
@@ -100,9 +100,7 @@ export class CairoStruct extends CairoType {
           );
           const [selectorName] = matchingSelector as [string, (type: string) => boolean];
           const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
-          if (dynamicConstructor) {
-            return dynamicConstructor(contentItem, strategies, structContentType[index]);
-          }
+          return dynamicConstructor(contentItem, strategies, structContentType[index]);
         }
         throw new Error(`"${structContentType[index]}" is not a valid Cairo type`);
       }
@@ -283,7 +281,7 @@ export class CairoStruct extends CairoType {
       }
       let parserName: string = structContentType[index] as string;
       if (element instanceof CairoType) {
-        if (Object.hasOwn(element, 'dynamicSelector')) {
+        if ('dynamicSelector' in element) {
           // dynamic recursive CairoType
           parserName = (element as any).dynamicSelector;
         }
@@ -291,9 +289,11 @@ export class CairoStruct extends CairoType {
       const strategyDecomposeNum = strategies.findIndex(
         (strategy: ParsingStrategy) => strategy.response[parserName]
       );
-      const responseParser = strategies[strategyDecomposeNum].response[parserName];
-      if (responseParser) {
-        return responseParser(element, strategies);
+      if (strategyDecomposeNum >= 0) {
+        const responseParser = strategies[strategyDecomposeNum].response[parserName];
+        if (responseParser) {
+          return responseParser(element, strategies);
+        }
       }
       // No response parser found - throw error instead of fallback magic
       throw new Error(

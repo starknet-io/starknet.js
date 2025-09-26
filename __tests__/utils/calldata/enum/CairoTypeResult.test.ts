@@ -14,7 +14,10 @@ import {
   CairoTuple,
   CairoFixedArray,
   type ParsingStrategy,
+  CairoStruct,
+  type AbiStruct,
 } from '../../../../src';
+import { contracts } from '../../../config/fixtures';
 
 describe('CairoTypeResult', () => {
   describe('constructor variant', () => {
@@ -299,8 +302,39 @@ describe('CairoTypeResult', () => {
           )
       ).toThrow(
         new Error(
-          '"variant" parameter is mandatory when creating a new Cairo Result from a Cairo Enum or raw data.'
+          '"variant" parameter is mandatory when creating a new Cairo Result from a CairoOption.'
         )
+      );
+    });
+
+    test('resultCairoType: result of a struct', () => {
+      type Point = { x: BigNumberish; y: BigNumberish };
+      const struct0: Point = { x: 4, y: 5 };
+      const abiPoint: AbiStruct = contracts.TestCairoType.sierra.abi.find(
+        (item) => item.name === 'enums::Point'
+      );
+      const myCallData = new CallData(contracts.TestCairoType.sierra.abi);
+      const strategies = myCallData.parser.parsingStrategies as ParsingStrategy[];
+      const myTypeStruct0 = new CairoStruct(struct0, abiPoint, strategies);
+      const myResult0 = new CairoResult<BigNumberish, Point>(CairoResultVariant.Err, struct0);
+      const myResult1 = new CairoTypeResult(
+        myResult0,
+        'core::result::Result::<core::integer::u16, enums::Point>',
+        strategies
+      );
+      const myResult2 = new CairoTypeResult(
+        myTypeStruct0,
+        'core::result::Result::<core::integer::u16, enums::Point>',
+        strategies,
+        CairoResultVariant.Err
+      );
+      expect(myResult1.toApiRequest()).toEqual(['0x01', '0x4', '0x5']);
+      expect(myResult1.decompose(strategies)).toEqual(
+        new CairoResult<BigNumberish, Point>(CairoResultVariant.Err, { x: 4n, y: 5n })
+      );
+      expect(myResult2.toApiRequest()).toEqual(['0x01', '0x4', '0x5']);
+      expect(myResult2.decompose(strategies)).toEqual(
+        new CairoResult<BigNumberish, Point>(CairoResultVariant.Err, { x: 4n, y: 5n })
       );
     });
 

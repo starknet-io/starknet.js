@@ -60,7 +60,7 @@ export * from './utils/cairoDataTypes/secp256k1Point';
 export * from './utils/cairoDataTypes/cairoTypeOption';
 export * from './utils/cairoDataTypes/cairoTypeResult';
 export * from './utils/cairoDataTypes/cairoStruct';
-// export * from './utils/cairoDataTypes/cairoTypeEnum';
+export * from './utils/cairoDataTypes/cairoTypeCustomEnum';
 
 export * from './utils/address';
 export * from './utils/calldata';

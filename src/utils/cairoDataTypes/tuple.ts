@@ -5,10 +5,6 @@ import { isTypeTuple, isCairo1Type, isTypeNamedTuple } from '../calldata/cairo';
 import { type ParsingStrategy } from '../calldata/parser/parsingStrategy.type';
 import { CairoType } from './cairoType.interface';
 import { CairoFelt252 } from './felt';
-import { CairoOption, CairoResult } from '../calldata/enum';
-// eslint-disable-next-line import/no-cycle
-import { CairoTypeOption } from './cairoTypeOption';
-import { CairoTypeResult } from './cairoTypeResult';
 import type { AllowArray } from '../../types';
 
 /**
@@ -124,15 +120,8 @@ export class CairoTuple extends CairoType {
           // "content" is a CairoType
           return contentItem as CairoType;
         }
-        if (contentItem instanceof CairoOption) {
-          // "content" is a CairoOption
-          return new CairoTypeOption(contentItem, tupleContentType[index], strategies);
-        }
-        if (contentItem instanceof CairoResult) {
-          // "content" is a CairoResult
-          return new CairoTypeResult(contentItem, tupleContentType[index], strategies);
-        }
-        // not an iterator, not an CairoType, neither a CairoType -> so is low level data (BigNumberish, array, object)
+
+        // not an iterator, not an CairoType -> so is low level data (BigNumberish, array, object, Cairo Enums)
         const strategyConstructorNum = strategies.findIndex(
           (strategy: ParsingStrategy) => strategy.constructors[tupleContentType[index]]
         );
@@ -647,7 +636,7 @@ export class CairoTuple extends CairoType {
       }
       let parserName: string = elementTypes[index] as string;
       if (element instanceof CairoType) {
-        if (Object.hasOwn(element, 'dynamicSelector')) {
+        if ('dynamicSelector' in element) {
           // dynamic recursive CairoType
           parserName = (element as any).dynamicSelector;
         }

@@ -35,19 +35,17 @@ import {
   isTypeEnum,
   isTypeEthAddress,
   isTypeNonZero,
+  isTypeOption,
+  isTypeResult,
   isTypeSecp256k1Point,
   isTypeTuple,
 } from './cairo';
-import {
-  CairoCustomEnum,
-  CairoEnumRaw,
-  CairoOption,
-  CairoOptionVariant,
-  CairoResult,
-  CairoResultVariant,
-} from './enum';
+import { CairoCustomEnum, CairoOption, CairoResult } from './enum';
 import { AbiParserInterface } from './parser/interface';
 import type { CairoStruct } from '../cairoDataTypes/cairoStruct';
+import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
+import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
+import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 
 /**
  * Parse base types
@@ -179,39 +177,31 @@ function parseResponseValue(
 
   // type Enum (only CustomEnum)
   if (enums && element.type in enums && enums[element.type]) {
-    const variantNum: number = Number(responseIterator.next().value); // get variant number
-    const rawEnum = enums[element.type].variants.reduce((acc, variant, num) => {
-      if (num === variantNum) {
-        acc[variant.name] = parseResponseValue(
-          responseIterator,
-          { name: '', type: variant.type },
-          parser,
-          structs,
-          enums
-        );
-        return acc;
-      }
-      acc[variant.name] = undefined;
-      return acc;
-    }, {} as CairoEnumRaw);
     // Option
-    if (element.type.startsWith('core::option::Option')) {
-      const content = variantNum === CairoOptionVariant.Some ? rawEnum.Some : undefined;
-      return new CairoOption<Object>(variantNum, content);
+    if (isTypeOption(element.type)) {
+      const myOption = new CairoTypeOption(
+        responseIterator,
+        element.type,
+        parser.parsingStrategies
+      );
+      return myOption.decompose(parser.parsingStrategies) as CairoOption<object>;
     }
     // Result
-    if (element.type.startsWith('core::result::Result')) {
-      let content: Object;
-      if (variantNum === CairoResultVariant.Ok) {
-        content = rawEnum.Ok;
-      } else {
-        content = rawEnum.Err;
-      }
-      return new CairoResult<Object, Object>(variantNum, content);
+    if (isTypeResult(element.type)) {
+      const myResult = new CairoTypeResult(
+        responseIterator,
+        element.type,
+        parser.parsingStrategies
+      );
+      return myResult.decompose(parser.parsingStrategies) as CairoResult<Object, Object>;
     }
     // Cairo custom Enum
-    const customEnum = new CairoCustomEnum(rawEnum);
-    return customEnum;
+    const customEnum = new CairoTypeCustomEnum(
+      responseIterator,
+      enums[element.type],
+      parser.parsingStrategies
+    );
+    return customEnum.decompose(parser.parsingStrategies) as CairoCustomEnum;
   }
 
   // type tuple

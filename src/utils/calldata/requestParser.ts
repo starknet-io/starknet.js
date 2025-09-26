@@ -6,6 +6,7 @@ import {
   BigNumberish,
   CairoEnum,
   ParsedStruct,
+  type CairoTypeEnum,
 } from '../../types';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
@@ -45,6 +46,7 @@ import { AbiParserInterface } from './parser';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 import { CairoStruct } from '../cairoDataTypes/cairoStruct';
+import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
 
 // TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
 
@@ -240,28 +242,13 @@ function parseCalldataValue({
       return myResult.toApiRequest();
     }
     // Custom Enum
-    const myEnum = element as CairoCustomEnum;
-    const activeVariant: string = myEnum.activeVariant();
-    const listTypeVariant = variants.find((variant) => variant.name === activeVariant);
-    if (isUndefined(listTypeVariant)) {
-      throw Error(`Not find in abi : Enum has no '${activeVariant}' variant.`);
+    let myEnum: CairoTypeCustomEnum;
+    if (element instanceof CairoCustomEnum) {
+      myEnum = new CairoTypeCustomEnum(element, enums[type], parser.parsingStrategies);
+    } else {
+      myEnum = element as CairoTypeCustomEnum;
     }
-    const typeActiveVariant = listTypeVariant.type;
-    const numActiveVariant = variants.findIndex((variant) => variant.name === activeVariant); // can not fail due to check of listTypeVariant
-    if (typeActiveVariant === '()') {
-      return numActiveVariant.toString();
-    }
-    const parsedParameter = parseCalldataValue({
-      element: myEnum.unwrap(),
-      type: typeActiveVariant,
-      structs,
-      enums,
-      parser,
-    });
-    if (Array.isArray(parsedParameter)) {
-      return [numActiveVariant.toString(), ...parsedParameter];
-    }
-    return [numActiveVariant.toString(), parsedParameter];
+    return myEnum.toApiRequest();
   }
 
   if (isTypeNonZero(type)) {
@@ -383,7 +370,7 @@ export function parseCalldataField({
     // Enums
     case isTypeEnum(type, enums):
       return parseCalldataValue({
-        element: value as CairoTypeOption | CairoResult<any, any> | CairoEnum,
+        element: value as CairoTypeEnum | CairoEnum,
         type,
         structs,
         enums,
