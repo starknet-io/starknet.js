@@ -16,13 +16,13 @@ export const UINT_512_MIN = 0n;
 export const UINT_128_MIN = 0n;
 
 export class CairoUint512 {
-  public limb0: bigint; // TODO should be u128
+  public limb0: bigint;
 
-  public limb1: bigint; // TODO should be u128
+  public limb1: bigint;
 
-  public limb2: bigint; // TODO should be u128
+  public limb2: bigint;
 
-  public limb3: bigint; // TODO should be u128
+  public limb3: bigint;
 
   static abiSelector = 'core::integer::u512';
 
