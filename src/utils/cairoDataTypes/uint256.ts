@@ -19,9 +19,9 @@ export const UINT_256_LOW_MIN = 0n;
 export const UINT_256_HIGH_MIN = 0n;
 
 export class CairoUint256 {
-  public low: bigint; // TODO should be u128
+  public low: bigint;
 
-  public high: bigint; // TODO should be u128
+  public high: bigint;
 
   static abiSelector = 'core::integer::u256' as const;
 
