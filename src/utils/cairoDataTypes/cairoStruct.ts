@@ -1,6 +1,7 @@
-import type { AbiStruct, AllowArray } from '../../types';
+import type { AbiEntry, AbiStruct, AllowArray } from '../../types';
 import assert from '../assert';
 import type { ParsingStrategy, VariantType } from '../calldata';
+import { isCairo1Type, isLen } from '../calldata/cairo';
 import { addCompiledFlag } from '../helpers';
 import { getNext } from '../num';
 import { CairoType } from './cairoType.interface';
@@ -67,7 +68,7 @@ export class CairoStruct extends CairoType {
     }
     CairoStruct.validate(content, abiStruct);
     const structContentType: string[] = CairoStruct.getStructMembersTypes(abiStruct);
-    const resultContent: any[] = CairoStruct.extractValuesArray(content).map(
+    const resultContent: any[] = CairoStruct.extractValuesArray(content, abiStruct).map(
       (contentItem: any, index: number) => {
         // "content" is a CairoType
         if (
@@ -217,12 +218,30 @@ export class CairoStruct extends CairoType {
    * @param {unknown} input - Input data (array or object)
    * @returns {any[]} Array of values extracted from the input
    */
-  private static extractValuesArray(input: unknown): any[] {
+  private static extractValuesArray(input: unknown, abiStruct: AbiStruct): any[] {
     if (Array.isArray(input)) {
       return input;
     }
     const inputObj = input as Record<string | number, any>;
-    return Object.values(inputObj);
+    const orderedObject2 = abiStruct.members.reduce(
+      (orderedObject: Record<string | number, any>, abiParam: AbiEntry) => {
+        const setProperty = (value?: any) =>
+          Object.defineProperty(orderedObject, abiParam.name, {
+            enumerable: true,
+            value: value ?? inputObj[abiParam.name],
+          });
+
+        if (typeof inputObj[abiParam.name] === 'undefined') {
+          if (isCairo1Type(abiParam.type) || !isLen(abiParam.name)) {
+            throw Error(`Your object needs a property with key : ${abiParam.name} .`);
+          }
+        }
+        setProperty(inputObj[abiParam.name]);
+        return orderedObject;
+      },
+      {}
+    );
+    return Object.values(orderedObject2);
   }
 
   /**

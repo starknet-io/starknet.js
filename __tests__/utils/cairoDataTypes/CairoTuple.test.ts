@@ -23,6 +23,10 @@ describe('CairoTuple class Unit test', () => {
       'core::integer::u8',
       'core::integer::u32',
     ]);
+    // missing space
+    expect(() => {
+      CairoTuple.getTupleElementTypes('(core::integer::u8,core::integer::u32)');
+    }).toThrow(new Error('abc'));
     expect(CairoTuple.isAbiType('(core::integer::u8, core::integer::u32)')).toBe(true);
     expect(CairoTuple.isAbiType('(x:felt, y:felt)')).toBe(true);
     expect(CairoTuple.isAbiType('[core::integer::u8; 2]')).toBe(false);

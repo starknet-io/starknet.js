@@ -302,7 +302,7 @@ describe('CairoTypeResult', () => {
           )
       ).toThrow(
         new Error(
-          '"variant" parameter is mandatory when creating a new Cairo Result from a CairoOption.'
+          '"variant" parameter is mandatory when creating a new Cairo Result from a Cairo Enum or raw data.'
         )
       );
     });

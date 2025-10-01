@@ -47,6 +47,7 @@ import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 import { CairoStruct } from '../cairoDataTypes/cairoStruct';
 import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
+import { toHex } from '../num';
 
 // TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
 
@@ -144,7 +145,7 @@ function parseCalldataValue({
   // value is Array
   if (Array.isArray(element)) {
     const result: string[] = [];
-    result.push(felt(element.length)); // Add length to array
+    result.push(toHex(felt(element.length))); // Add length to array
     const arrayType = getArrayType(type);
 
     return element.reduce((acc, it) => {

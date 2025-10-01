@@ -120,6 +120,10 @@ export class CairoTypeResult extends CairoType {
     if (content instanceof CairoResult) {
       // "content" is a CairoResult
       if (!subType) {
+        assert(
+          isUndefined(variant),
+          'when "content" parameter is a CairoResult and subType is false, do not define "variant" parameter.'
+        );
         const variantForResult = content.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err;
         const result = new CairoTypeResult(
           content.unwrap(),

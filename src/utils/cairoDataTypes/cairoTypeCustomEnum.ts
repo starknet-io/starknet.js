@@ -32,7 +32,7 @@ import { CairoTypeResult } from './cairoTypeResult';
 export class CairoTypeCustomEnum extends CairoType {
   public readonly dynamicSelector: string;
 
-  /* CairoType instance representing the content of a Cairo enum. */
+  /* CairoType instance representing the content of the Cairo enum. */
   public readonly content: CairoType;
 
   /** Cairo named custom enum type definition */
@@ -42,34 +42,32 @@ export class CairoTypeCustomEnum extends CairoType {
   public readonly enumVariant: number;
 
   /**
-   * CairoTypeResult provides a complete implementation for handling Cairo's result,
-   * which have the form "core::result::Result::<type1, type2>" (e.g., "core::result::Result::<core::integer::u8, core::integer::u16>").
+   * CairoTypeCustomEnum provides a complete implementation for handling Cairo's enums,
+   * which have the form "my_contract::enum_name".
+   *
    * Internal usage class (users are using "CairoResult" class).
+   *
    * It supports nested types, type validation, encoding, and parsing from various sources.
    * @param {unknown} content - Input data (array, object, BigNumberish,
    * Iterator<string>, CairoOption, CairoResult, CairoCustomEnum, or CairoType instance).
-   * @param {string} resultCairoType - Cairo result type string (e.g., "core::result::Result::<core::integer::u8, core::integer::u8>").
-   * @param {ParsingStrategy} strategy - Parsing strategy for element type handling (e.g. hdParsingStrategy).
-   * @param {CairoResultVariant | number} [variant] - (optional) variant of the result: CairoResultVariant.Ok (0), or CairoResultVariant.Err (1). If "content" is an iterator, this parameter must be omitted.
+   * @param {AbiEnum} abiEnum - Abi definition of the enum.
+   * @param {AllowArray<ParsingStrategy>} parsingStrategy - Parsing strategy for element type handling.
+   * @param {number} [variant] - (optional) variant number of the custom enum. If "content" is an iterator or a CairoCustomEnum, this parameter must be omitted.
    * @param {boolean} [subType=false] - optional default=false. Use "true" if called in nested CairoResult instances.
    * @example
    * ```typescript
-   * import { CairoTypeResult, hdParsingStrategy, CairoResultVariant } from 'starknet';
-   * // Simple Result with Ok variant
-   * const myResult1 = new CairoTypeResult(7, "core::result::Result::<core::integer::u8, core::integer::u8>", hdParsingStrategy, CairoResultVariant.Ok);
-   * console.log(myResult1.toApiRequest()); // ['0x01','0x7b']
-   * console.log(myResult1.decompose(hdParsingStrategy)); // CairoResult instance with content 7n and Ok variant.
-   * // Simple Result with Err variant
-   * const myResult2 = new CairoTypeResult(11, "core::result::Result::<core::integer::u8, core::integer::u8>", hdParsingStrategy, CairoResultVariant.Err);
+   * import { CairoTypeCustomEnum } from 'starknet';
+   * // from a CairoCustomEnum instance:
+   * const strategies = myTestContract.callData.parser.parsingStrategies;
+   * const abiMyEnum = myTestContract.abi.find((data: AbiEntry) => data.name == "enums::MyEnum") as AbiEnum;
+   * const myEnum = new CairoCustomEnum({ valid: 15n });
+   * const myTypeEnum1 = new CairoTypeCustomEnum(myEnum, abiMyEnum, strategies);
+   * console.log(myTypeEnum1.toApiRequest()); // ['0x01','0xf']
+   * console.log(myTypeEnum1.decompose(strategies)); // CairoCustomEnum instance with content 15n and `valid` variant.
    *
-   * // Nested Cairo types
-   * const myTuple0 = new CairoTuple([234, [1, 2, 3]], "(core::integer::u8, core::array::Array::<core::integer::u8>)", hdParsingStrategy);
-   * const myResult3 = new CairoTypeResult(myTuple0, "core::result::Result::<(core::integer::u8, core::array::Array::<core::integer::u8>), core::integer::u16>", hdParsingStrategy, CairoResultVariant.Ok);
-   * console.log(CallData.compile([myResult3])); // [ "0", "234", "3", "1", "2", "3" ]
-   *
-   * // From API response
-   * const apiData = ['0x0', '0x20'][Symbol.iterator]();
-   * const fromApiResult = new CairoTypeResult(apiData, "core::result::Result::<core::integer::u8, core::integer::u8>", hdParsingStrategy); // CairoResult instance with content 32n and Ok variant.
+   * // From API response:
+   * const apiData = ['0x1', '0x20'][Symbol.iterator]();
+   * const fromApiResult = new CairoTypeCustomEnum(apiData, abiMyEnum, strategies); // CairoTypeCustomEnum instance with content 32n and `valid` variant.
    * ```
    */
 
@@ -95,7 +93,6 @@ export class CairoTypeCustomEnum extends CairoType {
       const variantFromIterator = Number(getNext(content as Iterator<string>));
       this.enumVariant = variantFromIterator;
       const elementTypes: string[] = CairoTypeCustomEnum.getVariantTypes(abiEnum);
-
       const parsedContent: CairoType = CairoTypeCustomEnum.parser(
         content as Iterator<string>,
         elementTypes[variantFromIterator],
@@ -127,8 +124,8 @@ export class CairoTypeCustomEnum extends CairoType {
       return;
     }
 
+    // "content" is a CairoOption
     if (content instanceof CairoOption) {
-      // "content" is a CairoOption
       assert(
         !isUndefined(variant),
         '"variant" parameter is mandatory when creating a new Cairo custom enum from a CairoOption.'
@@ -143,8 +140,9 @@ export class CairoTypeCustomEnum extends CairoType {
       this.enumVariant = variant;
       return;
     }
+
+    // "content" is a CairoResult
     if (content instanceof CairoResult) {
-      // "content" is a CairoResult
       assert(
         !isUndefined(variant),
         '"variant" parameter is mandatory when creating a new Cairo custom enum from a CairoResult.'
@@ -223,8 +221,8 @@ export class CairoTypeCustomEnum extends CairoType {
    * - Unknown types (stored as raw strings for later error handling)
    *
    * @param {Iterator<string>} responseIterator - Iterator over string data to parse
-   * @param {string} elementType - The Cairo result type (e.g., "core::result::Result::<core::integer::u8, core::integer::u8>")
-   * @param {ParsingStrategy} strategy - The parsing strategy containing constructors and selectors
+   * @param {string} variantCairoType - The Cairo type of the variant of the custom enum (e.g., "core::integer::u8")
+   * @param {ParsingStrategy[]} parsingStrategies - The parsing strategy containing constructors and selectors
    * @returns {CairoType} CairoType instance
    * @private
    */
@@ -263,37 +261,11 @@ export class CairoTypeCustomEnum extends CairoType {
   }
 
   /**
-   * Retrieve the Cairo content type from a Cairo Result type.
-   * @param {string} type - The Cairo Result type string.
-   * @returns {string[]} The Cairo types of the possible contents of the Cairo Result.
-   * @example
-   * ```typescript
-   * const result = CairoTypeResult.getVariantSomeType("core::result::Result::<core::integer::u8, core::integer::u16>");
-   * // result = [" core::integer::u8", "core::integer::u16"]
-   * ```
-   */
-  // static getVariantTypes(type: string): string[] {
-  //   const matchArray = type.match(/(?<=<).+(?=>)/);
-  //   if (matchArray === null)
-  //     throw new Error(`ABI type ${type} do not includes 2 types enclosed in <>.`);
-  //   const subTypes = CairoTuple.extractCairo1Tuple(`(${matchArray[0]})`) as string[];
-  //   assert(
-  //     subTypes.length === 2,
-  //     `ABI type ${type} is not including 2 sub types. Found ${subTypes.length}.`
-  //   );
-  //   return subTypes;
-  // }
-
-  /**
-   * Validate input data for CairoTypeResult creation.
+   * Validate input data for CairoTypeCustomEnum creation.
    * @param {unknown} input - Input data to validate
-   * @param {string} type - The Cairo Result type string (e.g., "core::result::Result::<core::integer::u8, core::integer::u8>")
+   * @param {AbiEnum} abiEnum - The Abi definition of the enum
+   * @param {VariantType} variant - optional - The variant of the enum (0, "1", 2, ...)
    * @throws Error if input is invalid
-   * @example
-   * ```typescript
-   * CairoTypeResult.validate(200, "core::result::Result::<core::integer::u8, core::integer::u16>", CairoResultVariant.Err); // passes
-   * CairoTypeResult.validate(200, "wrong", 3); // throws
-   * ```
    */
   static validate(_input: unknown, abiEnum: AbiEnum, variant: VariantType | undefined): void {
     assert(
@@ -310,16 +282,11 @@ export class CairoTypeCustomEnum extends CairoType {
   }
 
   /**
-   * Check if input data is valid for CairoTypeResult creation.
+   * Check if input data is valid for CairoTypeCustomEnum creation.
    * @param {unknown} input - Input data to check
-   * @param {string} type - The Cairo Result type (e.g., "core::result::Result::<core::integer::u8, core::integer::u16>")
-   * @param {VariantType} variant - The variant of the Result: CairoResultVariant.Ok (0), or CairoResultVariant.Err (1)
+   * @param {string} type - The Cairo Custom Enum type (e.g. "core::integer::u16")
+   * @param {VariantType} variant - The variant of the enum.
    * @returns {boolean} true if valid, false otherwise
-   * @example
-   * ```typescript
-   * const isValid1 = CairoTypeResult.is(200, "core::result::Result::<core::integer::u8, core::integer::u16>", CairoResultVariant.Ok"); // true
-   * const isValid2 = CairoTypeResult.is(200, "wrong", 3); // false
-   * ```
    */
   static is(input: unknown, type: string, variant: VariantType): boolean {
     try {
@@ -331,15 +298,13 @@ export class CairoTypeCustomEnum extends CairoType {
   }
 
   /**
-   * Checks if the given string represents a valid Cairo Result type format.
-   *
-   * A valid Cairo Result type must follow the pattern: "core::result::Result::<type1, type2>"
-   * where type is any valid Cairo type.
+   * Checks if the given string represents a valid Cairo custom enum variant type format.
+   * Type is any valid Cairo type.
    * @param {string} type - The type string to validate
-   * @returns {boolean} `true` if the type is a valid Cairo Result format, `false` otherwise
+   * @returns {boolean} `true` if the type is a valid Cairo custom enum format, `false` otherwise
    * @example
    * ```typescript
-   * CairoTypeResult.isAbiType("core::result::Result::<core::integer::u8, core::integer::u16>");     // true
+   * CairoTypeCustomEnum.isAbiType("my_contract::my_enum"); // true
    * ```
    */
   static isAbiType(type: string): boolean {
@@ -350,6 +315,19 @@ export class CairoTypeCustomEnum extends CairoType {
    * Extract the Cairo type of each property of a named Cairo Enum
    * @param {AbiEnum} type - Abi definition of the enum
    * @returns {string[]} an array of Cairo types
+   * @example
+   * ```typescript
+   * const abiEnum: AbiEnum = {
+   *   type: "enum",
+   *   name: "my_enum",
+   *   variants: [
+   *     { name: "variant1", type: "core::integer::u8" },
+   *     { name: "variant2", type: "core::integer::u16" }
+   *   ]
+   * };
+   * const types = CairoTypeCustomEnum.getVariantTypes(abiEnum);
+   * // types = ["core::integer::u8", "core::integer::u16"]
+   * ```
    */
   private static getVariantTypes(type: AbiEnum): string[] {
     return type.variants.map((member) => member.type);
@@ -359,23 +337,40 @@ export class CairoTypeCustomEnum extends CairoType {
    *Extract the Cairo names of each property of a Cairo custom enum
    * @param {AbiStruct} type - Abi definition of the enum
    * @returns {string[]} an array of Cairo enum property names
+   * @example
+   * ```typescript
+   * const abiEnum: AbiEnum = {
+   *   type: "enum",
+   *   name: "my_enum",
+   *   variants: [
+   *     { name: "variant1", type: "core::integer::u8" },
+   *     { name: "variant2", type: "core::integer::u16" }
+   *   ]
+   * };
+   * const variantList = CairoTypeCustomEnum.extractEnumMembersNames(abiEnum);
+   * // variantList = ["variant1", "variant2"]
+   * ```
    */
   public static extractEnumMembersNames(type: AbiEnum): string[] {
     return type.variants.map((member) => member.name);
   }
 
   /**
-   * Serialize the Cairo Result into hex strings for Starknet API requests.
+   * Serialize the Cairo custom enum into hex strings for Starknet API requests.
    *
-   * Converts all CairoType elements in this Cairo Result into their hex string representation
-   * by calling toApiRequest(). This is used when
+   * Converts all CairoType elements in this Cairo custom enum into their hex string representation
+   * by calling `toApiRequest()`. This is used when
    * sending data to the Starknet network.
    *
    * @returns {string[]} Array of hex strings ready for API requests
    * @example
    * ```typescript
-   * const myResult = new CairoTypeResult(8, "core::result::Result::<core::integer::u8, core::integer::u16>", strategy, CairoResultVariant.Err);
-   * const result = myResult.toApiRequest(); // ['0x1', '0x8']
+   * const strategies = myTestContract.callData.parser.parsingStrategies;
+   * const abiMyEnum = myTestContract.abi.find((data: AbiEntry) => data.name == "enums::MyEnum") as AbiEnum;
+   * const myEnum = new CairoCustomEnum({ valid: 15n });
+   * const myTypeEnum1 = new CairoTypeCustomEnum(myEnum, abiMyEnum, strategies);
+   * const encoded = myTypeEnum1.toApiRequest());
+   * // encoded = ['0x01','0xf']
    * ```
    */
   public toApiRequest(): string[] {
@@ -391,12 +386,16 @@ export class CairoTypeCustomEnum extends CairoType {
    * response parsers (e.g., CairoUint8 → BigInt). This method is used primarily for
    * parsing API responses into user-friendly formats.
    *
-   * @param {ParsingStrategy} strategy - Parsing strategy for response parsing
-   * @returns {CairoResult<any, any>} a CairoResultInstance, with parsed variant (BigInt, numbers, nested arrays, etc.)
+   * @param {AllowArray<ParsingStrategy>} strategyDecompose - Parsing strategy for response parsing
+   * @returns {CairoCustomEnum} a CairoCustomEnum instance, with parsed variant (BigInt, numbers, nested arrays, etc.)
    * @example
    * ```typescript
-   * const myResult = new CairoTypedResult(3, "core::result::Result::<core::integer::u8, core::integer::u16>", hdParsingStrategy, CairoResultVariant.Some);
-   * const parsed = myResult.decompose(hdParsingStrategy); // CairoResult{ Some: 3n }
+   * const strategies = myTestContract.callData.parser.parsingStrategies;
+   * const abiMyEnum = myTestContract.abi.find((data: AbiEntry) => data.name == "enums::MyEnum") as AbiEnum;
+   * const myEnum = new CairoCustomEnum({ valid: 15n });
+   * const myTypeEnum1 = new CairoTypeCustomEnum(myEnum, abiMyEnum, strategies);
+   * const parsed = myTypeEnum1.decompose(strategies);
+   * // parsed = CairoCustomEnum{ valid: 15n }
    * ```
    */
   public decompose(strategyDecompose: AllowArray<ParsingStrategy>): CairoCustomEnum {

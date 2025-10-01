@@ -21,14 +21,14 @@ describe('CairoStruct', () => {
   const myCallData = new CallData(contracts.TestCairoType.sierra.abi);
   const strategies = myCallData.parser.parsingStrategies as ParsingStrategy[];
   const abiPoint: AbiStruct = contracts.TestCairoType.sierra.abi.find(
-    (item) => item.name === 'test_enums::Point'
+    (item) => item.name === 'enums::Point'
   );
   const abiCat: AbiStruct = contracts.TestCairoType.sierra.abi.find(
-    (item) => item.name === 'test_enums::Cat'
+    (item) => item.name === 'enums::Cat'
   );
   describe('constructor variant', () => {
     test('content is an object', () => {
-      const myCairoStruct = new CairoStruct({ x: 1, y: 2 }, abiPoint, strategies);
+      const myCairoStruct = new CairoStruct({ y: 2, x: 1 }, abiPoint, strategies); // wrong order of properties
       expect(myCairoStruct.toApiRequest()).toEqual(['0x1', '0x2']);
       expect(myCairoStruct.decompose(strategies)).toEqual({ x: 1n, y: 2n });
     });
@@ -88,7 +88,7 @@ describe('CairoStruct', () => {
 
     test('CairoType: result of an array', () => {
       const abiDog: AbiStruct = contracts.TestCairoType.sierra.abi.find(
-        (item) => item.name === 'test_enums::Dog'
+        (item) => item.name === 'enums::Dog'
       );
       const myStruct0 = new CairoStruct({ age: 2, colors: [1, 2, 3] }, abiDog, strategies);
       const myStruct1 = new CairoStruct(
@@ -111,7 +111,7 @@ describe('CairoStruct', () => {
 
     test('CairoType: result of a fixed array', () => {
       const abiHorse: AbiStruct = contracts.TestCairoType.sierra.abi.find(
-        (item) => item.name === 'test_enums::Horse'
+        (item) => item.name === 'enums::Horse'
       );
       const myResult0 = new CairoStruct({ age: 2, legs_color: [1, 2, 3, 4] }, abiHorse, strategies);
       const myResult1 = new CairoStruct(
@@ -162,7 +162,7 @@ describe('CairoStruct', () => {
 
     test('CairoType: result of an option', () => {
       const abiTruck: AbiStruct = contracts.TestCairoType.sierra.abi.find(
-        (item) => item.name === 'test_enums::Truck'
+        (item) => item.name === 'enums::Truck'
       );
       const option0 = new CairoOption<BigNumberish>(CairoOptionVariant.Some, 2n);
       const myTypeOption = new CairoTypeOption(
@@ -181,7 +181,7 @@ describe('CairoStruct', () => {
 
     test('CairoType: result from a result', () => {
       const abiDestruction: AbiStruct = contracts.TestCairoType.sierra.abi.find(
-        (item) => item.name === 'test_enums::Destruction'
+        (item) => item.name === 'enums::Destruction'
       );
       const result = new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Err, 5n);
       const typeResult = new CairoTypeResult(
@@ -199,7 +199,7 @@ describe('CairoStruct', () => {
 
     test('CairoType: nested structs', () => {
       const abiPoint2: AbiStruct = contracts.TestCairoType.sierra.abi.find(
-        (item) => item.name === 'test_enums::Point2'
+        (item) => item.name === 'enums::Point2'
       );
       const point1 = { x: 1, y: 2 };
       const structPoint1 = new CairoStruct(point1, abiPoint, strategies);
@@ -254,7 +254,7 @@ describe('CairoStruct', () => {
     test('should copy properties when constructed from another CairoStruct', () => {
       const original = new CairoStruct({ x: 1, y: 2 }, abiPoint, strategies);
       const abiPoint2: AbiStruct = contracts.TestCairoType.sierra.abi.find(
-        (item) => item.name === 'test_enums::Point2'
+        (item) => item.name === 'enums::Point2'
       );
       const copy = new CairoStruct(original, abiPoint2, strategies);
       expect(copy.content).toEqual(original.content);

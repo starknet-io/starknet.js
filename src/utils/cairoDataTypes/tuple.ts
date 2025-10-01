@@ -644,9 +644,11 @@ export class CairoTuple extends CairoType {
       const strategyDecomposeNum = strategies.findIndex(
         (strategy: ParsingStrategy) => strategy.response[parserName]
       );
-      const responseParser = strategies[strategyDecomposeNum].response[parserName];
-      if (responseParser) {
-        return responseParser(element, strategies);
+      if (strategyDecomposeNum >= 0) {
+        const responseParser = strategies[strategyDecomposeNum].response[parserName];
+        if (responseParser) {
+          return responseParser(element, strategies);
+        }
       }
       // No response parser found - throw error instead of fallback magic
       throw new Error(

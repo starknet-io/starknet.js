@@ -8,6 +8,7 @@ import {
   ETH_ADDRESS,
   hdParsingStrategy,
   NON_ZERO_PREFIX,
+  type AbiEntry,
 } from '../../../src';
 
 describe('requestParser', () => {
@@ -30,7 +31,7 @@ describe('requestParser', () => {
       const argsIterator = args[Symbol.iterator]();
       const parsedField = parseCalldataField({
         argsIterator,
-        input: getAbiEntry('core::array::Array::<felt>'),
+        input: getAbiEntry('core::array::Array::<felt252>'),
         structs: getAbiStructs(),
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry('core::array::Array::<felt>')], hdParsingStrategy),
@@ -243,7 +244,7 @@ describe('requestParser', () => {
           enums: getAbiEnums(),
           parser: new AbiParser1([getAbiEntry('enum')], hdParsingStrategy),
         })
-      ).toThrow(new Error(`Not find in abi : Enum has no 'test' variant.`));
+      ).toThrow(new Error(`The type test_cairo is not a Cairo Enum. Needs impl::name.`));
     });
 
     test('should throw an error for CairoUint256 abi type when wrong arg is provided', () => {
@@ -267,13 +268,14 @@ describe('requestParser', () => {
     test('should throw an error if provided tuple size do not match', () => {
       const args = [{ min: true }, { max: true }];
       const argsIterator = args[Symbol.iterator]();
+      const abiItem: AbiEntry = getAbiEntry('(core::bool,core::bool)');
       expect(() =>
         parseCalldataField({
           argsIterator,
-          input: getAbiEntry('(core::bool, core::bool)'),
+          input: abiItem,
           structs: getAbiStructs(),
           enums: getAbiEnums(),
-          parser: new AbiParser1([getAbiEntry('(core::bool, core::bool)')], hdParsingStrategy),
+          parser: new AbiParser1([abiItem], hdParsingStrategy),
         })
       ).toThrow(new Error('"core::bool,core::bool" is not a valid Cairo type'));
     });
