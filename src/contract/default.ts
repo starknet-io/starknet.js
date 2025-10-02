@@ -33,7 +33,7 @@ import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
 import { createAbiParser, ParsingStrategy } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
-import { cleanHex } from '../utils/num';
+import { toHex } from '../utils/num';
 import { ContractInterface } from './interface';
 import { logger } from '../global/logger';
 import { defaultProvider } from '../provider';
@@ -392,7 +392,7 @@ export class Contract implements ContractInterface {
                 ...event,
               };
             })
-            .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || []; // TODO: what data is in this that is cleaned out ?
+            .filter((event) => toHex(event.from_address) === toHex(this.address), []) || []; // TODO: what data is in this that is cleaned out ?
         parsed = parseRawEvents(
           emittedEvents,
           this.events,
