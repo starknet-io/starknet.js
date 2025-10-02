@@ -128,7 +128,7 @@ export function buf2hex(buffer: Uint8Array): string {
  * ```
  */
 export function removeHexPrefix(hex: string): string {
-  return hex.replace(/^0x/i, '');
+  return hex.startsWith('0x') || hex.startsWith('0X') ? hex.slice(2) : hex;
 }
 
 /**
@@ -342,16 +342,12 @@ export function concatenateArrayBuffer(uint8arrays: Uint8Array[]): Uint8Array {
  * ```
  */
 export function hexStringToUint8Array(hex: string): Uint8Array {
-  // Remove 0x prefix if present
-  const cleanHex = hex.startsWith('0x') ? hex.slice(2) : hex;
-
-  // Validate hex string (only 0-9, a-f, A-F allowed)
-  if (cleanHex.length > 0 && !/^[0-9a-fA-F]+$/.test(cleanHex)) {
-    throw new Error(`Invalid hex string: "${hex}" contains non-hexadecimal characters`);
+  // Validate hex string (only 0-9, a-f, A-F allowed) regardless of prefix
+  if (!isHexString(addHexPrefix(hex))) {
+    throw new Error(`Invalid hex string: "${hex}"`);
   }
-
-  // Pad to even length
-  const paddedHex = cleanHex.length % 2 !== 0 ? `0${cleanHex}` : cleanHex;
+  // Pad to even length without prefix
+  const paddedHex = removeHexPrefix(sanitizeHex(hex));
   // Create Uint8Array directly
   const bytes = new Uint8Array(paddedHex.length / 2);
   for (let i = 0; i < paddedHex.length; i += 2) {

@@ -102,18 +102,10 @@ describe('hexToUint8Array', () => {
   });
 
   test('should throw error for non-hex characters', () => {
-    expect(() => hexStringToUint8Array('i am great')).toThrow(
-      'Invalid hex string: "i am great" contains non-hexadecimal characters'
-    );
-    expect(() => hexStringToUint8Array('0xg123')).toThrow(
-      'Invalid hex string: "0xg123" contains non-hexadecimal characters'
-    );
-    expect(() => hexStringToUint8Array('hello')).toThrow(
-      'Invalid hex string: "hello" contains non-hexadecimal characters'
-    );
-    expect(() => hexStringToUint8Array('12z4')).toThrow(
-      'Invalid hex string: "12z4" contains non-hexadecimal characters'
-    );
+    expect(() => hexStringToUint8Array('i am great')).toThrow('Invalid hex string: "i am great"');
+    expect(() => hexStringToUint8Array('0xg123')).toThrow('Invalid hex string: "0xg123"');
+    expect(() => hexStringToUint8Array('hello')).toThrow('Invalid hex string: "hello"');
+    expect(() => hexStringToUint8Array('12z4')).toThrow('Invalid hex string: "12z4"');
   });
 });
 

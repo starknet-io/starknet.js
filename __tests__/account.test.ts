@@ -38,7 +38,7 @@ import {
 } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
-const { cleanHex, hexToDecimalString, toBigInt } = num;
+const { toHex, hexToDecimalString, toBigInt } = num;
 const { randomAddress } = stark;
 const { Signature } = ec.starkCurve;
 
@@ -560,7 +560,7 @@ describe('deploy and test Account', () => {
       const udcEvent = account.deployer.parseDeployerEvent(
         txReceipt.value as InvokeTransactionReceiptResponse
       );
-      expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
+      expect(toHex(deployment.contract_address[0])).toBe(toHex(udcEvent.contract_address));
     });
 
     test('UDC Deploy non-unique', async () => {
@@ -579,7 +579,7 @@ describe('deploy and test Account', () => {
       const udcEvent = account.deployer.parseDeployerEvent(
         txReceipt.value as InvokeTransactionReceiptResponse
       );
-      expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
+      expect(toHex(deployment.contract_address[0])).toBe(toHex(udcEvent.contract_address));
     });
 
     test('UDC multi Deploy', async () => {

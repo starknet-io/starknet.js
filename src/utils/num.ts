@@ -62,6 +62,7 @@ export function tryToBigInt(value: BigNumberish | undefined) {
  * ```typescript
  * toHex(100); // '0x64'
  * toHex('200'); // '0xc8'
+ * toHex('0x00023AB'); // '0x23ab'
  * ```
  */
 export function toHex(value: BigNumberish): string {
@@ -72,6 +73,18 @@ export function toHex(value: BigNumberish): string {
  * Alias of ToHex
  */
 export const toHexString = toHex;
+
+/**
+ * Remove hex-string leading zeroes and lowercase it
+ *
+ * @example
+ * ```typescript
+ * cleanHex('0x00023AB'); // '0x23ab'
+ * ```
+ */
+export function cleanHex(hex: string): string {
+  return toHex(hex);
+}
 
 /**
  * Convert BigNumberish to storage-key-string
@@ -125,20 +138,6 @@ export function toHex64(number: BigNumberish): string {
  */
 export function hexToDecimalString(hex: string): string {
   return BigInt(addHexPrefix(hex)).toString(10);
-}
-
-/**
- * Remove hex-string leading zeroes and lowercase it
- *
- * @param {string} hex hex-string
- * @returns {string} updated string in hex-string format
- * @example
- * ```typescript
- * cleanHex('0x00023AB'); // '0x23ab'
- * ```
- */
-export function cleanHex(hex: string): string {
-  return hex.toLowerCase().replace(/^(0x)0+/, '$1');
 }
 
 /**
