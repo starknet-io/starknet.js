@@ -1,3 +1,9 @@
+## [8.5.5](https://github.com/starknet-io/starknet.js/compare/v8.5.4...v8.5.5) (2025-10-03)
+
+### Bug Fixes
+
+- ensure cleanHex has valid output ([f5123b6](https://github.com/starknet-io/starknet.js/commit/f5123b6f9c7fa49ad104a48fd4a1f62e2520488e))
+
 ## [8.5.4](https://github.com/starknet-io/starknet.js/compare/v8.5.3...v8.5.4) (2025-09-17)
 
 ### Bug Fixes
