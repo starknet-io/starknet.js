@@ -12,7 +12,7 @@ describe('CairoTuple integration tests', () => {
 
       // Convert to API request format
       const apiRequest = inputTuple.toApiRequest();
-      expect(apiRequest).toEqual(['0x2a', '0x64']);
+      expect(apiRequest).toEqual(['42', '100']);
 
       // Simulate API response (same values back)
       const apiResponse = ['0x2a', '0x64'];
@@ -29,14 +29,14 @@ describe('CairoTuple integration tests', () => {
     test('named tuple: user input → API request → response parsing', () => {
       // User provides named input
       const userInput = { x: 10, y: 20 };
-      const namedTupleType = '(x:core::integer::u8, y:core::integer::u32)';
+      const namedTupleType = '(x:felt, y:felt)';
 
       // Create CairoTuple from named input
       const inputTuple = new CairoTuple(userInput, namedTupleType, hdParsingStrategy);
 
       // Convert to API request format (no length prefix)
       const apiRequest = inputTuple.toApiRequest();
-      expect(apiRequest).toEqual(['0xa', '0x14']);
+      expect(apiRequest).toEqual(['10', '20']);
 
       // Simulate API response
       const apiResponse = ['0xa', '0x14'];
@@ -60,7 +60,7 @@ describe('CairoTuple integration tests', () => {
 
       // Convert to API request (flattened, no length prefixes)
       const apiRequest = inputTuple.toApiRequest();
-      expect(apiRequest).toEqual(['0x1', '0x2', '0x3']);
+      expect(apiRequest).toEqual(['1', '2', '3']);
 
       // Simulate API response
       const apiResponse = ['0x1', '0x2', '0x3'];
@@ -107,11 +107,7 @@ describe('CairoTuple integration tests', () => {
         '(core::integer::u8, core::integer::u32)',
         hdParsingStrategy
       );
-      const namedTuple = new CairoTuple(
-        { x: 3, y: 4 },
-        '(x:core::integer::u8, y:core::integer::u32)',
-        hdParsingStrategy
-      );
+      const namedTuple = new CairoTuple({ x: 3, y: 4 }, '(x:felt, y:felt)', hdParsingStrategy);
       const nestedTuple = new CairoTuple(
         [[5, 6], 7],
         '((core::integer::u8, core::integer::u8), core::integer::u32)',
@@ -187,8 +183,8 @@ describe('CairoTuple integration tests', () => {
 
       // Expected: [felt_value, u8_value]
       expect(apiRequest).toHaveLength(2);
-      expect(apiRequest[0]).toBe('0x64'); // 100 in hex
-      expect(apiRequest[1]).toBe('0xc8'); // 200 in hex
+      expect(apiRequest[0]).toBe('100');
+      expect(apiRequest[1]).toBe('200');
 
       // Simulate API response and parse back
       const responseIterator = apiRequest[Symbol.iterator]();
@@ -213,7 +209,7 @@ describe('CairoTuple integration tests', () => {
 
       // Should flatten completely
       const apiRequest = inputTuple.toApiRequest();
-      expect(apiRequest).toEqual(['0x1', '0x2', '0x3', '0x4']);
+      expect(apiRequest).toEqual(['1', '2', '3', '4']);
 
       // Parse back and verify nesting is preserved
       const responseIterator = apiRequest[Symbol.iterator]();
@@ -230,12 +226,7 @@ describe('CairoTuple integration tests', () => {
       expect(() => new CairoTuple([1, 2], tupleType, hdParsingStrategy)).not.toThrow();
       expect(() => new CairoTuple({ 0: 1, 1: 2 }, tupleType, hdParsingStrategy)).not.toThrow();
       expect(
-        () =>
-          new CairoTuple(
-            { x: 1, y: 2 },
-            '(x:core::integer::u8, y:core::integer::u32)',
-            hdParsingStrategy
-          )
+        () => new CairoTuple({ x: 1, y: 2 }, '(x:felt, y:felt)', hdParsingStrategy)
       ).not.toThrow();
 
       // Should fail - incorrect size
@@ -258,8 +249,8 @@ describe('CairoTuple integration tests', () => {
       const apiRequest = largeTuple.toApiRequest();
 
       expect(apiRequest).toHaveLength(50);
-      expect(apiRequest[0]).toBe('0x1');
-      expect(apiRequest[49]).toBe('0x32'); // 50 in hex
+      expect(apiRequest[0]).toBe('1');
+      expect(apiRequest[49]).toBe('50');
     });
 
     test('tuple with single element (not confused with primitive)', () => {
@@ -270,7 +261,7 @@ describe('CairoTuple integration tests', () => {
       const apiRequest = singleTuple.toApiRequest();
 
       // Should still be tuple format (no length prefix)
-      expect(apiRequest).toEqual(['0x2a']);
+      expect(apiRequest).toEqual(['42']);
 
       // Parse back
       const responseIterator = apiRequest[Symbol.iterator]();

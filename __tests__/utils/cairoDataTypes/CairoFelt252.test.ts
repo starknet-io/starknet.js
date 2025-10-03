@@ -299,11 +299,11 @@ describe('CairoFelt252 class Unit Tests', () => {
   describe('toApiRequest method', () => {
     test('should return hex string array', () => {
       const felt = new CairoFelt252(123n);
-      expect(felt.toApiRequest()).toEqual(['0x7b']);
+      expect(felt.toApiRequest()).toEqual(['123']);
 
       const largeFelt = new CairoFelt252(2n ** 200n);
       expect(largeFelt.toApiRequest()).toEqual([
-        '0x100000000000000000000000000000000000000000000000000',
+        '1606938044258990275541962092341162602522202993782792835301376',
       ]);
     });
   });

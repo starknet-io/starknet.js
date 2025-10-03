@@ -55,9 +55,9 @@ export class CallData {
 
   parser: AbiParserInterface;
 
-  protected readonly structs: AbiStructs;
+  readonly structs: AbiStructs;
 
-  protected readonly enums: AbiEnums;
+  readonly enums: AbiEnums;
 
   constructor(abi: Abi, parsingStrategy: ParsingStrategy = hdParsingStrategy) {
     this.structs = CallData.getAbiStruct(abi);

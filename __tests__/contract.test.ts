@@ -930,21 +930,15 @@ describe('Complex interaction', () => {
       const res0 = myCallData.decodeParameters('core::felt252', ['474107654995566025798705']);
       expect(res0).toBe(474107654995566025798705n);
       const res1 = myCallData.decodeParameters('echo::StructY', [
-        '474107654995566025798705',
+        '1844674407370955',
         '3534634645645',
       ]);
-      expect(res1).toEqual({ y1: 474107654995566025798705n, y2: 3534634645645n });
+      expect(res1).toEqual({ y1: 1844674407370955n, y2: 3534634645645n });
 
       const res2 = myCallData.decodeParameters('core::integer::u256', ['47410765', '35346645']);
       expect(res2).toBe(12027840023314154934885372750905072692667575885n);
-      const res3 = myCallData.decodeParameters('echo::Struct32', [
-        '47410765',
-        '35346645',
-        '1',
-        '2',
-        '3',
-      ]);
-      expect(res3).toEqual({ b: 47410765n, c: { '0': 35346645n, '1': 1n, '2': 2n, '3': 3n } });
+      const res3 = myCallData.decodeParameters('echo::Struct32', ['47410765', '45', '1', '2', '3']);
+      expect(res3).toEqual({ b: 47410765n, c: { '0': 45n, '1': 1n, '2': 2n, '3': 3n } });
 
       const res4 = myCallData.decodeParameters(
         '(core::felt252, core::felt252, core::felt252, core::felt252)',

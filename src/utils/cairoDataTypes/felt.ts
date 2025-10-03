@@ -104,11 +104,15 @@ export class CairoFelt252 extends CairoType {
     return addHexPrefix(this.toBigInt().toString(16));
   }
 
+  toDecimalString() {
+    return this.toBigInt().toString(10);
+  }
+
   toApiRequest(): string[] {
     /**
      * HexString representation of the felt252
      */
-    return addCompiledFlag([this.toHexString()]);
+    return addCompiledFlag([this.toDecimalString()]);
   }
 
   static validate(data: BigNumberish | boolean | unknown): void {

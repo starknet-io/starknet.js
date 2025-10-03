@@ -1,6 +1,6 @@
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
-import { getNext, toHex } from '../num';
+import { getNext } from '../num';
 import { type ParsingStrategy, type VariantType } from '../calldata/parser/parsingStrategy.type';
 import { CairoType } from './cairoType.interface';
 import { isCairo1Type } from '../calldata/cairo';
@@ -374,7 +374,7 @@ export class CairoTypeCustomEnum extends CairoType {
    * ```
    */
   public toApiRequest(): string[] {
-    const result = [toHex(this.enumVariant)];
+    const result: string[] = [this.enumVariant.toString(10)];
     result.push(this.content!.toApiRequest());
     return addCompiledFlag(result.flat());
   }

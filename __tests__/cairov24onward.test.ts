@@ -59,14 +59,14 @@ describe('Cairo v2.4 onwards', () => {
 
       const myCallData = new CallData(contracts.C240.sierra.abi);
       const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
-      expect(myCalldata1).toEqual([encodeShortString(str)]);
+      expect(myCalldata1).toEqual([hexToDecimalString(encodeShortString(str))]);
 
       const myCalldata2 = myCallData.compile('proceed_bytes31', { str });
-      expect(myCalldata2).toEqual([encodeShortString(str)]);
+      expect(myCalldata2).toEqual([hexToDecimalString(encodeShortString(str))]);
       const myCall1 = stringContract.populate('proceed_bytes31', [str]);
-      expect(myCall1.calldata).toEqual([encodeShortString(str)]);
+      expect(myCall1.calldata).toEqual([hexToDecimalString(encodeShortString(str))]);
       const myCall2 = stringContract.populate('proceed_bytes31', { str });
-      expect(myCall2.calldata).toEqual([encodeShortString(str)]);
+      expect(myCall2.calldata).toEqual([hexToDecimalString(encodeShortString(str))]);
     });
 
     test('bytes31 too long', async () => {
@@ -143,7 +143,7 @@ describe('Cairo v2.4 onwards', () => {
 
     test('Tuple (EthAddress, u256)', async () => {
       const res4 = await tupleContract.call('get_tuple4', []);
-      expect(res4).toEqual({ '0': 123n, '1': 500n });
+      expect(res4).toEqual({ '0': { address: 123n }, '1': 500n });
     });
 
     test('Tuple (Result<u64, u8>, u8)', async () => {
@@ -439,7 +439,7 @@ describe('Cairo v2.4 onwards', () => {
   describe('Cairo v2.9.2 fixed-array', () => {
     const myArray: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
     const myWrongArray = [...myArray, 9];
-    const expectedCalldata = myArray.map((val) => `0x${val.toString(16)}`);
+    const expectedCalldata = myArray.map((val) => val.toString(10));
     let fixedArrayContract: Contract;
 
     beforeAll(async () => {

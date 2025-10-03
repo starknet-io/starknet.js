@@ -66,7 +66,7 @@ describe('CairoArray Integration Tests', () => {
       const requestParser = parser.getRequestParser('core::array::Array::<core::integer::u8>');
 
       const result = requestParser([1, 2, 3], 'core::array::Array::<core::integer::u8>');
-      expect(result).toEqual(['0x3', '0x1', '0x2', '0x3']);
+      expect(result).toEqual(['3', '1', '2', '3']);
     });
 
     test('should work with AbiParser2 response parsing', () => {
@@ -90,7 +90,7 @@ describe('CairoArray Integration Tests', () => {
         [[1, 2], [3]],
         'core::array::Array::<core::array::Array::<core::integer::u8>>'
       );
-      expect(result).toEqual(['0x2', '0x2', '0x1', '0x2', '0x1', '0x3']);
+      expect(result).toEqual(['2', '2', '1', '2', '1', '3']);
     });
 
     test('should handle empty arrays in AbiParser2', () => {
@@ -98,7 +98,7 @@ describe('CairoArray Integration Tests', () => {
       const requestParser = parser.getRequestParser('core::array::Array::<core::integer::u8>');
 
       const result = requestParser([], 'core::array::Array::<core::integer::u8>');
-      expect(result).toEqual(['0x0']);
+      expect(result).toEqual(['0']);
     });
   });
 
@@ -194,7 +194,7 @@ describe('CairoArray Integration Tests', () => {
       );
 
       const serialized = array.toApiRequest();
-      expect(serialized[0]).toBe('0x32'); // Length prefix
+      expect(serialized[0]).toBe('50'); // Length prefix
       expect(serialized.length).toBe(51); // 50 elements + 1 length prefix
 
       // Test just the serialization part, not roundtrip since large data has iterator issues
@@ -231,7 +231,7 @@ describe('CairoArray Integration Tests', () => {
       );
 
       const serialized = array.toApiRequest();
-      expect(serialized[0]).toBe('0x4'); // Length prefix
+      expect(serialized[0]).toBe('4'); // Length prefix
       expect(serialized.length).toBe(5); // 4 elements + 1 length prefix
     });
 
@@ -254,7 +254,7 @@ describe('CairoArray Integration Tests', () => {
 
       // Both should serialize the same way
       expect(arraySerialized).toEqual(spanSerialized);
-      expect(arraySerialized).toEqual(['0x3', '0x1', '0x2', '0x3']);
+      expect(arraySerialized).toEqual(['3', '1', '2', '3']);
     });
   });
 

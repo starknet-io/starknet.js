@@ -696,21 +696,21 @@ describe('Cairo 1', () => {
         { address: 1193046n, is_claimed: true },
         { address: 624485n, is_claimed: false },
       ]);
-      const res4 = c1v2CallData.decodeParameters('core::integer::u8', ['0x123456']);
-      expect(res4).toBe(1193046n);
+      const res4 = c1v2CallData.decodeParameters('core::integer::u8', ['0x12']);
+      expect(res4).toBe(18n);
       const res5 = c1v2CallData.decodeParameters('core::bool', ['0x1']);
       expect(res5).toBe(true);
       const res6 = c1v2CallData.decodeParameters('core::felt252', ['0x123456']);
       expect(res6).toBe(1193046n);
       const res7 = c1v2CallData.decodeParameters('core::integer::u256', ['0x123456', '0x789']);
       expect(num.toHex(res7.toString())).toBe('0x78900000000000000000000000000123456');
-      const res8 = c1v2CallData.decodeParameters('core::array::Array::<core::integer::u16>', [
+      const res8 = c1v2CallData.decodeParameters('core::array::Array::<core::integer::u32>', [
         '2',
         '0x123456',
         '0x789',
       ]);
       expect(res8).toEqual([1193046n, 1929n]);
-      const res9 = c1v2CallData.decodeParameters('core::array::Span::<core::integer::u16>', [
+      const res9 = c1v2CallData.decodeParameters('core::array::Span::<core::integer::u32>', [
         '2',
         '0x123456',
         '0x789',

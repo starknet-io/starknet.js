@@ -145,7 +145,7 @@ describe('CairoTypeResult', () => {
       const iter1 = ['1', '100', '2'][Symbol.iterator]();
       const typeCairo1 = 'core::result::Result::<core::integer::u8, [core::integer::u16; 2]>';
       const cairoTypeResult1 = new CairoTypeResult(iter1, typeCairo1, hdParsingStrategy);
-      expect(cairoTypeResult1.toApiRequest()).toEqual(['0x01', '0x64', '0x2']);
+      expect(cairoTypeResult1.toApiRequest()).toEqual(['1', '100', '2']);
     });
   });
 
@@ -173,11 +173,11 @@ describe('CairoTypeResult', () => {
         hdParsingStrategy,
         CairoResultVariant.Ok
       );
-      expect(myResult0.toApiRequest()).toEqual(['0x00', '0x3', '0x1', '0x2', '0x3']);
+      expect(myResult0.toApiRequest()).toEqual(['0', '3', '1', '2', '3']);
       expect(myResult0.decompose(hdParsingStrategy)).toEqual(
         new CairoResult<Array<bigint>, bigint>(CairoResultVariant.Ok, [1n, 2n, 3n])
       );
-      expect(myResult1.toApiRequest()).toEqual(['0x00', '0x3', '0x1', '0x2', '0x3']);
+      expect(myResult1.toApiRequest()).toEqual(['0', '3', '1', '2', '3']);
       expect(myResult1.decompose(hdParsingStrategy)).toEqual(
         new CairoResult<Array<bigint>, bigint>(CairoResultVariant.Ok, [1n, 2n, 3n])
       );
@@ -208,11 +208,11 @@ describe('CairoTypeResult', () => {
         hdParsingStrategy,
         CairoResultVariant.Err
       );
-      expect(myResult0.toApiRequest()).toEqual(['0x01', '0x1', '0x2', '0x3']);
+      expect(myResult0.toApiRequest()).toEqual(['1', '1', '2', '3']);
       expect(myResult0.decompose(hdParsingStrategy)).toEqual(
         new CairoResult<bigint, Array<bigint>>(CairoResultVariant.Err, [1n, 2n, 3n])
       );
-      expect(myResult1.toApiRequest()).toEqual(['0x01', '0x1', '0x2', '0x3']);
+      expect(myResult1.toApiRequest()).toEqual(['1', '1', '2', '3']);
       expect(myResult1.decompose(hdParsingStrategy)).toEqual(
         new CairoResult<bigint, Array<bigint>>(CairoResultVariant.Err, [1n, 2n, 3n])
       );
@@ -243,11 +243,11 @@ describe('CairoTypeResult', () => {
         hdParsingStrategy,
         CairoResultVariant.Ok
       );
-      expect(myResult0.toApiRequest()).toEqual(['0x00', '0x5', '0x6']);
+      expect(myResult0.toApiRequest()).toEqual(['0', '5', '6']);
       expect(myResult0.decompose(hdParsingStrategy)).toEqual(
         new CairoResult<object, BigNumberish>(CairoResultVariant.Ok, { '0': 5n, '1': 6n })
       );
-      expect(myResult1.toApiRequest()).toEqual(['0x00', '0x5', '0x6']);
+      expect(myResult1.toApiRequest()).toEqual(['0', '5', '6']);
       expect(myResult1.decompose(hdParsingStrategy)).toEqual(
         new CairoResult<object, BigNumberish>(CairoResultVariant.Ok, { '0': 5n, '1': 6n })
       );
@@ -285,11 +285,11 @@ describe('CairoTypeResult', () => {
         hdParsingStrategy,
         CairoResultVariant.Err
       );
-      expect(myResult0.toApiRequest()).toEqual(['0x01', '0x00', '0x5']);
+      expect(myResult0.toApiRequest()).toEqual(['1', '0', '5']);
       expect(myResult0.decompose(hdParsingStrategy)).toEqual(
         new CairoResult<BigNumberish, CairoOption<BigNumberish>>(CairoResultVariant.Err, option0)
       );
-      expect(myResult1.toApiRequest()).toEqual(['0x01', '0x00', '0x5']);
+      expect(myResult1.toApiRequest()).toEqual(['1', '0', '5']);
       expect(myResult1.decompose(hdParsingStrategy)).toEqual(
         new CairoResult<BigNumberish, CairoOption<BigNumberish>>(CairoResultVariant.Err, option0)
       );
@@ -328,11 +328,11 @@ describe('CairoTypeResult', () => {
         strategies,
         CairoResultVariant.Err
       );
-      expect(myResult1.toApiRequest()).toEqual(['0x01', '0x4', '0x5']);
+      expect(myResult1.toApiRequest()).toEqual(['1', '4', '5']);
       expect(myResult1.decompose(strategies)).toEqual(
         new CairoResult<BigNumberish, Point>(CairoResultVariant.Err, { x: 4n, y: 5n })
       );
-      expect(myResult2.toApiRequest()).toEqual(['0x01', '0x4', '0x5']);
+      expect(myResult2.toApiRequest()).toEqual(['1', '4', '5']);
       expect(myResult2.decompose(strategies)).toEqual(
         new CairoResult<BigNumberish, Point>(CairoResultVariant.Err, { x: 4n, y: 5n })
       );
@@ -353,7 +353,7 @@ describe('CairoTypeResult', () => {
         'core::result::Result::<core::integer::u16, core::result::Result::<core::result::Result::<core::integer::u16, core::integer::u8>, core::integer::u16>>',
         hdParsingStrategy
       );
-      expect(myResult.toApiRequest()).toEqual(['0x01', '0x00', '0x01', '0x5']);
+      expect(myResult.toApiRequest()).toEqual(['1', '0', '1', '5']);
       expect(myResult.decompose(hdParsingStrategy)).toEqual(result2);
     });
   });

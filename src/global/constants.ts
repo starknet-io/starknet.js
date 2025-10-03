@@ -32,6 +32,7 @@ export const RANGE_U32 = range(ZERO, 2n ** 32n - 1n);
 export const RANGE_U64 = range(ZERO, 2n ** 64n - 1n);
 export const RANGE_U96 = range(ZERO, 2n ** 96n - 1n);
 export const RANGE_U128 = range(ZERO, 2n ** 128n - 1n);
+export const RANGE_ETH_ADDRESS = range(ZERO, 2n ** 160n - 1n);
 
 // Signed integer ranges
 export const RANGE_I8 = range(-(2n ** 7n), 2n ** 7n - 1n);

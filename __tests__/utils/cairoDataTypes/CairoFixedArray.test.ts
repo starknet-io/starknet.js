@@ -256,7 +256,7 @@ describe('CairoFixedArray class Unit test', () => {
         hdParsingStrategy
       );
       const result = fixedArray.toApiRequest();
-      expect(result).toEqual(['0x1', '0x2', '0x3']);
+      expect(result).toEqual(['1', '2', '3']);
     });
 
     test('should create and serialize from object input', () => {
@@ -266,7 +266,7 @@ describe('CairoFixedArray class Unit test', () => {
         hdParsingStrategy
       );
       const result = fixedArray.toApiRequest();
-      expect(result).toEqual(['0x1', '0x2', '0x3']);
+      expect(result).toEqual(['1', '2', '3']);
     });
 
     test('should work with parsing strategy', () => {
@@ -277,8 +277,8 @@ describe('CairoFixedArray class Unit test', () => {
       const result2 = array2.toApiRequest();
 
       // Unified parsing strategy approach for API serialization
-      expect(result1).toEqual(['0x1', '0x2']);
-      expect(result2).toEqual(['0x1', '0x2']);
+      expect(result1).toEqual(['1', '2']);
+      expect(result2).toEqual(['1', '2']);
     });
 
     test('should throw for invalid inputs', () => {
@@ -303,7 +303,7 @@ describe('CairoFixedArray class Unit test', () => {
         hdParsingStrategy
       );
       const result = fixedArray.toApiRequest();
-      expect(result).toEqual(['0x1', '0x2', '0x3', '0x4']);
+      expect(result).toEqual(['1', '2', '3', '4']);
     });
 
     test('should handle edge cases', () => {
@@ -315,7 +315,7 @@ describe('CairoFixedArray class Unit test', () => {
       // Single element
       const singleArray = new CairoFixedArray([42], '[core::integer::u8; 1]', hdParsingStrategy);
       const singleResult = singleArray.toApiRequest();
-      expect(singleResult).toEqual(['0x2a']);
+      expect(singleResult).toEqual(['42']);
     });
   });
 
@@ -327,7 +327,7 @@ describe('CairoFixedArray class Unit test', () => {
         hdParsingStrategy
       );
       const result = fixedArray.toApiRequest();
-      expect(result).toEqual(['0x1', '0x2', '0x3']);
+      expect(result).toEqual(['1', '2', '3']);
     });
 
     test('should work with hdParsingStrategy', () => {
@@ -337,8 +337,8 @@ describe('CairoFixedArray class Unit test', () => {
       const result1 = array1.toApiRequest();
       const result2 = array2.toApiRequest();
 
-      expect(result1).toEqual(['0x64', '0xc8']);
-      expect(result2).toEqual(['0x64', '0xc8']);
+      expect(result1).toEqual(['100', '200']);
+      expect(result2).toEqual(['100', '200']);
     });
 
     test('should handle nested arrays', () => {
@@ -351,7 +351,7 @@ describe('CairoFixedArray class Unit test', () => {
         hdParsingStrategy
       );
       const result = nestedArray.toApiRequest();
-      expect(result).toEqual(['0x1', '0x2', '0x3', '0x4']);
+      expect(result).toEqual(['1', '2', '3', '4']);
     });
 
     test('should throw for unsupported element types', () => {
@@ -404,7 +404,7 @@ describe('CairoFixedArray class Unit test', () => {
         hdParsingStrategy
       );
       const result = complexArray.toApiRequest();
-      expect(result).toEqual(['0x1', '0x2', '0x3', '0x4', '0x5', '0x6', '0x7', '0x8']);
+      expect(result).toEqual(['1', '2', '3', '4', '5', '6', '7', '8']);
     });
 
     test('should handle mixed data types in content', () => {

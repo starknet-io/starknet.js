@@ -138,7 +138,7 @@ describe('CairoTypeOption', () => {
         hdParsingStrategy,
         CairoOptionVariant.Some
       );
-      expect(myOption.toApiRequest()).toEqual(['0x00', '0x3', '0x1', '0x2', '0x3']);
+      expect(myOption.toApiRequest()).toEqual(['0', '3', '1', '2', '3']);
       expect(myOption.decompose(hdParsingStrategy)).toEqual(
         new CairoOption<Array<bigint>>(CairoOptionVariant.Some, [1n, 2n, 3n])
       );
@@ -151,7 +151,7 @@ describe('CairoTypeOption', () => {
         hdParsingStrategy,
         CairoOptionVariant.Some
       );
-      expect(myOption.toApiRequest()).toEqual(['0x00', '0x1', '0x2', '0x3']);
+      expect(myOption.toApiRequest()).toEqual(['0', '1', '2', '3']);
       expect(myOption.decompose(hdParsingStrategy)).toEqual(
         new CairoOption<Array<bigint>>(CairoOptionVariant.Some, [1n, 2n, 3n])
       );
@@ -164,7 +164,7 @@ describe('CairoTypeOption', () => {
         hdParsingStrategy,
         CairoOptionVariant.Some
       );
-      expect(myOption.toApiRequest()).toEqual(['0x00', '0x5', '0x6']);
+      expect(myOption.toApiRequest()).toEqual(['0', '5', '6']);
       expect(myOption.decompose(hdParsingStrategy)).toEqual(
         new CairoOption<object>(CairoOptionVariant.Some, { '0': 5n, '1': 6n })
       );
@@ -189,11 +189,11 @@ describe('CairoTypeOption', () => {
         hdParsingStrategy,
         CairoOptionVariant.Some
       );
-      expect(myOption0.toApiRequest()).toEqual(['0x00', '0x00', '0x6']);
+      expect(myOption0.toApiRequest()).toEqual(['0', '0', '6']);
       expect(myOption0.decompose(hdParsingStrategy)).toEqual(
         new CairoOption<CairoResult<BigNumberish, BigNumberish>>(CairoOptionVariant.Some, myResult)
       );
-      expect(myOption1.toApiRequest()).toEqual(['0x00', '0x00', '0x6']);
+      expect(myOption1.toApiRequest()).toEqual(['0', '0', '6']);
       expect(myOption1.decompose(hdParsingStrategy)).toEqual(
         new CairoOption<CairoResult<BigNumberish, BigNumberish>>(CairoOptionVariant.Some, myResult)
       );
@@ -220,11 +220,11 @@ describe('CairoTypeOption', () => {
         strategies,
         CairoOptionVariant.Some
       );
-      expect(myOption0.toApiRequest()).toEqual(['0x00', '0x4', '0x5']);
+      expect(myOption0.toApiRequest()).toEqual(['0', '4', '5']);
       expect(myOption0.decompose(strategies)).toEqual(
         new CairoOption<Point>(CairoOptionVariant.Some, { x: 4n, y: 5n })
       );
-      expect(myOption1.toApiRequest()).toEqual(['0x00', '0x4', '0x5']);
+      expect(myOption1.toApiRequest()).toEqual(['0', '4', '5']);
       expect(myOption1.decompose(strategies)).toEqual(
         new CairoOption<Point>(CairoOptionVariant.Some, { x: 4n, y: 5n })
       );
@@ -243,7 +243,7 @@ describe('CairoTypeOption', () => {
         hdParsingStrategy,
         CairoOptionVariant.Some
       );
-      expect(myOption.toApiRequest()).toEqual(['0x00', '0x00', '0x00', '0x5']);
+      expect(myOption.toApiRequest()).toEqual(['0', '0', '0', '5']);
       expect(myOption.decompose(hdParsingStrategy)).toEqual(option2);
     });
 
@@ -259,7 +259,7 @@ describe('CairoTypeOption', () => {
         hdParsingStrategy,
         CairoOptionVariant.Some
       );
-      expect(myOption.toApiRequest()).toEqual(['0x00', '0x2', '0x7', '0x8']);
+      expect(myOption.toApiRequest()).toEqual(['0', '2', '7', '8']);
       expect(myOption.decompose(hdParsingStrategy)).toEqual(
         new CairoOption<Array<bigint>>(CairoOptionVariant.Some, [7n, 8n])
       );

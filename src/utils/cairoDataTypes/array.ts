@@ -1,6 +1,6 @@
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
-import { getNext, toHex } from '../num';
+import { getNext } from '../num';
 import { felt, getArrayType, isTypeArray } from '../calldata/cairo';
 import { type ParsingStrategy } from '../calldata/parser/parsingStrategy.type';
 import { CairoType } from './cairoType.interface';
@@ -330,7 +330,7 @@ export class CairoArray extends CairoType {
    */
   public toApiRequest(): string[] {
     // Start with array length
-    const result = [toHex(felt(this.content.length))];
+    const result = [felt(this.content.length)];
 
     // Then add all elements (flattened)
     result.push(...this.content.flatMap((element) => element.toApiRequest()));

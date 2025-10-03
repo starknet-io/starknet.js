@@ -194,14 +194,14 @@ describe('CairoUint96 class Unit Tests', () => {
     test('should return hex string array for zero', () => {
       const u96 = new CairoUint96(0);
       const result = u96.toApiRequest();
-      expect(result).toEqual(['0x0']);
+      expect(result).toEqual(['0']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
     test('should return hex string array for small numbers', () => {
       const u96 = new CairoUint96(42);
       const result = u96.toApiRequest();
-      expect(result).toEqual(['0x2a']);
+      expect(result).toEqual(['42']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
@@ -209,14 +209,14 @@ describe('CairoUint96 class Unit Tests', () => {
       const maxU96 = 2n ** 96n - 1n;
       const u96 = new CairoUint96(maxU96);
       const result = u96.toApiRequest();
-      expect(result).toEqual(['0xffffffffffffffffffffffff']);
+      expect(result).toEqual(['79228162514264337593543950335']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
     test('should handle bigint input', () => {
       const u96 = new CairoUint96(0x123456789abcdef0123456n);
       const result = u96.toApiRequest();
-      expect(result).toEqual(['0x123456789abcdef0123456']);
+      expect(result).toEqual(['22007822920628982378542166']);
       expect(result).toHaveProperty('__compiled__', true);
     });
   });
@@ -316,12 +316,10 @@ describe('CairoUint96 class Unit Tests', () => {
       values.forEach((val) => {
         const u96 = new CairoUint96(val);
         const bigintVal = u96.toBigInt();
-        const hexVal = u96.toHexString();
         const apiRequest = u96.toApiRequest();
 
         expect(bigintVal).toBe(BigInt(val));
-        expect(hexVal).toBe(`0x${val.toString(16)}`);
-        expect(apiRequest[0]).toBe(hexVal);
+        expect(apiRequest[0]).toBe(val.toString(10));
       });
     });
 

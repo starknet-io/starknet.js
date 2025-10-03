@@ -30,7 +30,7 @@ export class AbiParser1 implements AbiParserInterface {
           instance: CairoType,
           strategy: AllowArray<ParsingStrategy>
         ) => (instance as CairoStruct).decompose(strategy);
-        structStrategy.dynamicSelectors[struct.name] = (_type: string) => true;
+        structStrategy.dynamicSelectors[struct.name] = (_type: string) => _type === struct.name;
       }
     });
 

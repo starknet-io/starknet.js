@@ -281,14 +281,14 @@ describe('CairoInt16 class Unit Tests', () => {
     test('should return hex string array for zero', () => {
       const i16 = new CairoInt16(0);
       const result = i16.toApiRequest();
-      expect(result).toEqual(['0x0']);
+      expect(result).toEqual(['0']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
     test('should return hex string array for positive numbers', () => {
       const i16 = new CairoInt16(1000);
       const result = i16.toApiRequest();
-      expect(result).toEqual(['0x3e8']);
+      expect(result).toEqual(['1000']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
@@ -297,7 +297,7 @@ describe('CairoInt16 class Unit Tests', () => {
       const result = i16.toApiRequest();
       // Negative value -1000 becomes PRIME + (-1000) = PRIME - 1000
       const fieldElement = PRIME - 1000n;
-      const expectedValue = `0x${fieldElement.toString(16)}`;
+      const expectedValue = fieldElement.toString(10);
       expect(result).toEqual([expectedValue]);
       expect(result).toHaveProperty('__compiled__', true);
     });
@@ -306,9 +306,9 @@ describe('CairoInt16 class Unit Tests', () => {
       const minI16 = new CairoInt16(-32768);
       const maxI16 = new CairoInt16(32767);
       const minFieldElement = PRIME - 32768n;
-      const expectedMinValue = `0x${minFieldElement.toString(16)}`;
+      const expectedMinValue = minFieldElement.toString(10);
       expect(minI16.toApiRequest()).toEqual([expectedMinValue]);
-      expect(maxI16.toApiRequest()).toEqual(['0x7fff']);
+      expect(maxI16.toApiRequest()).toEqual(['32767']);
     });
   });
 
@@ -377,19 +377,19 @@ describe('CairoInt16 class Unit Tests', () => {
       values.forEach((val) => {
         const i16 = new CairoInt16(val);
         const bigintVal = i16.toBigInt();
-        const hexVal = i16.toHexString();
+        const decimalVal = i16.toDecimalString();
         const apiRequest = i16.toApiRequest();
 
         expect(bigintVal).toBe(BigInt(val));
         // For negative values, hex uses field element representation
         if (val < 0) {
           const fieldElement = PRIME + BigInt(val);
-          expect(hexVal).toBe(`0x${fieldElement.toString(16)}`);
+          expect(decimalVal).toBe(fieldElement.toString(10));
         } else {
-          expect(hexVal).toBe(`0x${val.toString(16)}`);
+          expect(decimalVal).toBe(val.toString(10));
         }
         // apiRequest should equal hexVal
-        expect(apiRequest[0]).toBe(hexVal);
+        expect(apiRequest[0]).toBe(decimalVal);
       });
     });
 

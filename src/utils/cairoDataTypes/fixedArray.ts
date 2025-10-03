@@ -379,7 +379,7 @@ export class CairoFixedArray extends CairoType {
    */
 
   /**
-   * Create an object from a Cairo fixed array.
+   * Create an object from a array representing a Fixed Array.
    * Be sure to have an array length conform to the ABI.
    * To be used with CallData.compile().
    * @param {Array<any>} input JS array representing a Cairo fixed array.

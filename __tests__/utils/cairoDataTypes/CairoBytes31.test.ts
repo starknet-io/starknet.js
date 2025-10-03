@@ -215,29 +215,29 @@ describe('CairoBytes31 class Unit Tests', () => {
   describe('toApiRequest method', () => {
     test('should return hex string array for empty data', () => {
       const bytes31 = new CairoBytes31('');
-      expect(bytes31.toApiRequest()).toEqual(['0x0']);
+      expect(bytes31.toApiRequest()).toEqual(['0']);
     });
 
     test('should return hex string array for text data', () => {
       const bytes31 = new CairoBytes31('A'); // ASCII 65
-      expect(bytes31.toApiRequest()).toEqual(['0x41']);
+      expect(bytes31.toApiRequest()).toEqual(['65']);
     });
 
     test('should return hex string array for multi-byte data', () => {
       const bytes31 = new CairoBytes31('AB'); // 0x4142 = 16706
-      expect(bytes31.toApiRequest()).toEqual(['0x4142']);
+      expect(bytes31.toApiRequest()).toEqual(['16706']);
     });
 
     test('should return hex string array for Buffer input', () => {
       const buffer = Buffer.from([1, 0]); // 0x0100 = 256
       const bytes31 = new CairoBytes31(buffer);
-      expect(bytes31.toApiRequest()).toEqual(['0x100']);
+      expect(bytes31.toApiRequest()).toEqual(['256']);
     });
 
     test('should return hex string array for large values', () => {
       const array = new Uint8Array([222, 173, 190, 239]); // 0xdeadbeef
       const bytes31 = new CairoBytes31(array);
-      expect(bytes31.toApiRequest()).toEqual(['0xdeadbeef']);
+      expect(bytes31.toApiRequest()).toEqual(['3735928559']);
     });
   });
 

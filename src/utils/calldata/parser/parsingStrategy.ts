@@ -26,6 +26,8 @@ import { CairoTypeOption } from '../../cairoDataTypes/cairoTypeOption';
 import { isUndefined } from '../../typed';
 import { CairoTypeResult } from '../../cairoDataTypes/cairoTypeResult';
 import type { ParsingStrategy, VariantType } from './parsingStrategy.type';
+import { CairoBool } from '../../cairoDataTypes';
+import { CairoEthAddress } from '../../cairoDataTypes/ethAddress';
 
 /**
  * More robust parsing strategy
@@ -53,6 +55,19 @@ export const hdParsingStrategy: ParsingStrategy = {
       }
       return new CairoFelt252(input);
     },
+    'core::starknet::class_hash::ClassHash': (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoFelt252.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoFelt252(input);
+    },
+    'core::starknet::contract_address::ContractAddress': (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoFelt252.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoFelt252(input);
+    },
+
     felt: (input: Iterator<string> | unknown) => {
       if (input && typeof input === 'object' && 'next' in input) {
         return CairoFelt252.factoryFromApiResponse(input as Iterator<string>);
@@ -71,6 +86,19 @@ export const hdParsingStrategy: ParsingStrategy = {
       }
       return new CairoUint512(input);
     },
+    [CairoBool.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoBool.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoBool(input);
+    },
+    [CairoEthAddress.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoEthAddress.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoEthAddress(input);
+    },
+
     [CairoUint8.abiSelector]: (input: Iterator<string> | unknown) => {
       if (input && typeof input === 'object' && 'next' in input) {
         return CairoUint8.factoryFromApiResponse(input as Iterator<string>);
@@ -192,19 +220,19 @@ export const hdParsingStrategy: ParsingStrategy = {
     },
   },
   dynamicSelectors: {
-    CairoFixedArray: (type: string) => {
+    [CairoFixedArray.dynamicSelector]: (type: string) => {
       return CairoFixedArray.isAbiType(type);
     },
     [CairoArray.dynamicSelector]: (type: string) => {
       return isTypeArray(type);
     },
-    CairoTuple: (type: string) => {
+    [CairoTuple.dynamicSelector]: (type: string) => {
       return isTypeTuple(type);
     },
-    CairoTypeOption: (type: string) => {
+    [CairoTypeOption.dynamicSelector]: (type: string) => {
       return isTypeOption(type);
     },
-    CairoTypeResult: (type: string) => {
+    [CairoTypeResult.dynamicSelector]: (type: string) => {
       return isTypeResult(type);
     },
     // TODO: add more dynamic selectors here
@@ -214,9 +242,16 @@ export const hdParsingStrategy: ParsingStrategy = {
     [CairoByteArray.abiSelector]: (instance: CairoType) =>
       (instance as CairoByteArray).decodeUtf8(),
     [CairoFelt252.abiSelector]: (instance: CairoType) => (instance as CairoFelt252).toBigInt(),
+    'core::starknet::class_hash::ClassHash': (instance: CairoType) =>
+      (instance as CairoFelt252).toBigInt(),
+    'core::starknet::contract_address::ContractAddress': (instance: CairoType) =>
+      (instance as CairoFelt252).toBigInt(),
     felt: (instance: CairoType) => (instance as CairoFelt252).toBigInt(),
     [CairoUint256.abiSelector]: (instance: CairoType) => (instance as CairoUint256).toBigInt(),
     [CairoUint512.abiSelector]: (instance: CairoType) => (instance as CairoUint512).toBigInt(),
+    [CairoBool.abiSelector]: (instance: CairoType) => (instance as CairoBool).toBoolean(),
+    [CairoEthAddress.abiSelector]: (instance: CairoType) =>
+      (instance as CairoEthAddress).toBigInt(),
     [CairoUint8.abiSelector]: (instance: CairoType) => (instance as CairoUint8).toBigInt(),
     [CairoUint16.abiSelector]: (instance: CairoType) => (instance as CairoUint16).toBigInt(),
     [CairoUint32.abiSelector]: (instance: CairoType) => (instance as CairoUint32).toBigInt(),

@@ -314,7 +314,7 @@ export class CairoTypeResult extends CairoType {
    * ```
    */
   public toApiRequest(): string[] {
-    const result = [this.isVariantOk ? '0x00' : '0x01'];
+    const result = [this.isVariantOk ? '0' : '1'];
     result.push(this.content!.toApiRequest());
     return addCompiledFlag(result.flat());
   }

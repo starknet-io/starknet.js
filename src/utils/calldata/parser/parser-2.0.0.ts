@@ -11,7 +11,7 @@ import {
 } from '../../../types';
 import { CairoStruct } from '../../cairoDataTypes/cairoStruct';
 import type { CairoType } from '../../cairoDataTypes/cairoType.interface';
-import { isTypeArray, isTypeOption, isTypeResult } from '../cairo';
+import { isTypeArray, isTypeEthAddress, isTypeOption, isTypeResult } from '../cairo';
 import { AbiParserInterface } from './interface';
 import { ParsingStrategy, type VariantType } from './parsingStrategy.type';
 import { CairoTypeCustomEnum } from '../../cairoDataTypes/cairoTypeCustomEnum';
@@ -35,7 +35,7 @@ export class AbiParser2 implements AbiParserInterface {
     };
     structs.forEach((struct: AbiStruct) => {
       // Span are defined as Struct in Abi, but are useless here
-      if (!isTypeArray(struct.name)) {
+      if (!isTypeArray(struct.name) && !isTypeEthAddress(struct.name)) {
         structAndEnumStrategy.constructors[struct.name] = (input: Iterator<string> | unknown) => {
           return new CairoStruct(input, struct, [parsingStrategy, structAndEnumStrategy]);
         };
@@ -43,7 +43,8 @@ export class AbiParser2 implements AbiParserInterface {
           instance: CairoType,
           strategy: AllowArray<ParsingStrategy>
         ) => (instance as CairoStruct).decompose(strategy);
-        structAndEnumStrategy.dynamicSelectors[struct.name] = (_type: string) => true;
+        structAndEnumStrategy.dynamicSelectors[struct.name] = (_type: string) =>
+          _type === struct.name;
       }
     });
     enums.forEach((enumDef: AbiEnum) => {
@@ -55,7 +56,6 @@ export class AbiParser2 implements AbiParserInterface {
           _type?: string,
           variant?: VariantType
         ) => {
-          // assert(!!variant, 'CairoTypeCustomEnum constructor requires "variant" parameter.');
           assert(!(typeof variant === 'string'), 'variant needs to be an integer.');
           return new CairoTypeCustomEnum(
             input,
@@ -68,7 +68,8 @@ export class AbiParser2 implements AbiParserInterface {
           instance: CairoType,
           strategy: AllowArray<ParsingStrategy>
         ) => (instance as CairoTypeCustomEnum).decompose(strategy);
-        structAndEnumStrategy.dynamicSelectors[enumDef.name] = (_type: string) => true;
+        structAndEnumStrategy.dynamicSelectors[enumDef.name] = (_type: string) =>
+          _type === enumDef.name;
       }
     });
     this.parsingStrategies = [parsingStrategy, structAndEnumStrategy];

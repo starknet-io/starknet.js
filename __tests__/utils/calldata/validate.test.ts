@@ -349,7 +349,7 @@ describe('validateFields', () => {
     });
 
     test('should throw an error if tupple validation fails', () => {
-      const error = new Error(`Validate: arg test should be a tuple (defined as object)`);
+      const error = new Error(`Validate: arg test should be a tuple (defined as object or array)`);
 
       expect(() =>
         validateFields(

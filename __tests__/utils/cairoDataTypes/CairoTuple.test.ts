@@ -23,10 +23,13 @@ describe('CairoTuple class Unit test', () => {
       'core::integer::u8',
       'core::integer::u32',
     ]);
-    // missing space
     expect(() => {
       CairoTuple.getTupleElementTypes('(core::integer::u8,core::integer::u32)');
-    }).toThrow(new Error('abc'));
+    }).toThrow(
+      new Error(
+        '"(core::integer::u8,core::integer::u32)" is not a valid Cairo type (missing space after comma)'
+      )
+    );
     expect(CairoTuple.isAbiType('(core::integer::u8, core::integer::u32)')).toBe(true);
     expect(CairoTuple.isAbiType('(x:felt, y:felt)')).toBe(true);
     expect(CairoTuple.isAbiType('[core::integer::u8; 2]')).toBe(false);
@@ -199,8 +202,8 @@ describe('CairoTuple class Unit test', () => {
         hdParsingStrategy
       );
       const result = tuple.toApiRequest();
-      // Should NOT have length prefix: ['0x1', '0x2', '0x3']
-      expect(result).toEqual(['0x1', '0x2', '0x3']);
+      // Should NOT have length prefix: ['1', '2', '3']
+      expect(result).toEqual(['1', '2', '3']);
     });
 
     test('should create and serialize from object input', () => {
@@ -210,8 +213,8 @@ describe('CairoTuple class Unit test', () => {
         hdParsingStrategy
       );
       const result = tuple.toApiRequest();
-      // Should NOT have length prefix: ['0x1', '0x2', '0x3']
-      expect(result).toEqual(['0x1', '0x2', '0x3']);
+      // Should NOT have length prefix: ['1', '2', '3']
+      expect(result).toEqual(['1', '2', '3']);
     });
 
     test('should create and serialize from named object input', () => {
@@ -221,8 +224,8 @@ describe('CairoTuple class Unit test', () => {
         hdParsingStrategy
       );
       const result = tuple.toApiRequest();
-      // Should NOT have length prefix: ['0x1', '0x2', '0x3']
-      expect(result).toEqual(['0x1', '0x2', '0x3']);
+      // Should NOT have length prefix: ['1', '2', '3']
+      expect(result).toEqual(['1', '2', '3']);
     });
 
     test('should work with parsing strategy', () => {
@@ -241,8 +244,8 @@ describe('CairoTuple class Unit test', () => {
       const result2 = tuple2.toApiRequest();
 
       // Both should serialize the same way (no length prefix)
-      expect(result1).toEqual(['0x1', '0x2']);
-      expect(result2).toEqual(['0x1', '0x2']);
+      expect(result1).toEqual(['1', '2']);
+      expect(result2).toEqual(['1', '2']);
     });
 
     test('should throw for invalid inputs', () => {
@@ -260,7 +263,7 @@ describe('CairoTuple class Unit test', () => {
       );
       const result = tuple.toApiRequest();
       // Nested tuple should be flattened: [inner_elem1, inner_elem2, outer_elem]
-      expect(result).toEqual(['0x1', '0x2', '0x3']);
+      expect(result).toEqual(['1', '2', '3']);
     });
 
     test('should handle tuple size mismatch', () => {
@@ -280,7 +283,7 @@ describe('CairoTuple class Unit test', () => {
       );
       const result = tuple.toApiRequest();
       // No length prefix for tuples
-      expect(result).toEqual(['0x1', '0x2', '0x3']);
+      expect(result).toEqual(['1', '2', '3']);
     });
 
     test('should work with hdParsingStrategy', () => {
@@ -291,7 +294,7 @@ describe('CairoTuple class Unit test', () => {
       );
 
       const result = tuple1.toApiRequest();
-      expect(result).toEqual(['0x64', '0xc8']);
+      expect(result).toEqual(['100', '200']);
     });
 
     test('should handle nested tuples with proper flattening', () => {
@@ -305,7 +308,7 @@ describe('CairoTuple class Unit test', () => {
       );
       const result = nestedTuple.toApiRequest();
       // Should be completely flattened (no length prefixes anywhere)
-      expect(result).toEqual(['0x1', '0x2', '0x3', '0x4']);
+      expect(result).toEqual(['1', '2', '3', '4']);
     });
 
     test('should throw for unsupported element types', () => {
@@ -335,7 +338,7 @@ describe('CairoTuple class Unit test', () => {
     test('should handle single-element tuples', () => {
       const singleTuple = new CairoTuple([42], '(core::integer::u8)', hdParsingStrategy);
       expect(singleTuple.content.length).toBe(1);
-      expect(singleTuple.toApiRequest()).toEqual(['0x2a']);
+      expect(singleTuple.toApiRequest()).toEqual(['42']);
     });
 
     test('should handle complex nested structures', () => {
@@ -348,7 +351,7 @@ describe('CairoTuple class Unit test', () => {
       );
       const result = complexTuple.toApiRequest();
       // Expected: all flattened
-      expect(result).toEqual(['0x1', '0x2', '0x3', '0x4']);
+      expect(result).toEqual(['1', '2', '3', '4']);
     });
 
     test('should handle mixed data types in content', () => {

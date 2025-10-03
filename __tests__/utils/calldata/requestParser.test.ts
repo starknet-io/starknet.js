@@ -2,14 +2,19 @@ import { parseCalldataField } from '../../../src/utils/calldata/requestParser';
 import { getAbiEnums, getAbiStructs, getAbiEntry } from '../../factories/abi';
 import {
   AbiParser1,
+  AbiParser2,
   CairoCustomEnum,
   CairoOption,
+  CairoOptionVariant,
   CairoResult,
+  CallData,
   ETH_ADDRESS,
   hdParsingStrategy,
   NON_ZERO_PREFIX,
   type AbiEntry,
+  type AbiEnum,
 } from '../../../src';
+import { contracts } from '../../config/fixtures';
 
 describe('requestParser', () => {
   describe('parseCalldataField', () => {
@@ -23,7 +28,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry('felt')], hdParsingStrategy),
       });
-      expect(parsedField).toEqual(['0x100']);
+      expect(parsedField).toEqual(['256']);
     });
 
     test('should return parsed calldata field for Array type', () => {
@@ -34,9 +39,9 @@ describe('requestParser', () => {
         input: getAbiEntry('core::array::Array::<felt252>'),
         structs: getAbiStructs(),
         enums: getAbiEnums(),
-        parser: new AbiParser1([getAbiEntry('core::array::Array::<felt>')], hdParsingStrategy),
+        parser: new AbiParser2([getAbiEntry('core::array::Array::<felt>')], hdParsingStrategy),
       });
-      expect(parsedField).toEqual(['0x2', '0x100', '0x80']);
+      expect(parsedField).toEqual(['2', '256', '128']);
     });
 
     test('should return parsed calldata field for Array type(string input)', () => {
@@ -47,9 +52,9 @@ describe('requestParser', () => {
         input: getAbiEntry('core::array::Array::<felt>'),
         structs: getAbiStructs(),
         enums: getAbiEnums(),
-        parser: new AbiParser1([getAbiEntry('core::array::Array::<felt>')], hdParsingStrategy),
+        parser: new AbiParser2([getAbiEntry('core::array::Array::<felt>')], hdParsingStrategy),
       });
-      expect(parsedField).toEqual(['0x1', '0x736f6d655f746573745f76616c7565']);
+      expect(parsedField).toEqual(['1', '599374153440608178282648329058547045']);
     });
 
     test('should return parsed calldata field for NonZero type', () => {
@@ -62,7 +67,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry(`${NON_ZERO_PREFIX}core::bool`)], hdParsingStrategy),
       });
-      expect(parsedField).toEqual(['0x1']);
+      expect(parsedField).toEqual(['1']);
     });
 
     test('should return parsed calldata field for EthAddress type', () => {
@@ -75,7 +80,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry(`${ETH_ADDRESS}felt`)], hdParsingStrategy),
       });
-      expect(parsedField).toEqual(['0x74657374']);
+      expect(parsedField).toEqual(['1952805748']);
     });
 
     test('should return parsed calldata field for Struct type', () => {
@@ -88,7 +93,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry('struct')], hdParsingStrategy),
       });
-      expect(parsedField).toEqual(['0x74657374']);
+      expect(parsedField).toEqual(['1952805748']);
     });
 
     test('should return parsed calldata field for Tuple type', () => {
@@ -112,20 +117,20 @@ describe('requestParser', () => {
         input: getAbiEntry('core::integer::u256'),
         structs: getAbiStructs(),
         enums: getAbiEnums(),
-        parser: new AbiParser1([getAbiEntry('core::integer::u256')], hdParsingStrategy),
+        parser: new AbiParser2([getAbiEntry('core::integer::u256')], hdParsingStrategy),
       });
       expect(parsedField).toEqual(['252', '0']);
     });
 
     test('should return parsed calldata field for Enum Option type None', () => {
-      const args = [new CairoOption<string>(1, 'content')];
+      const args = [new CairoOption<boolean>(CairoOptionVariant.None)];
       const argsIterator = args[Symbol.iterator]();
       const parsedField = parseCalldataField({
         argsIterator,
         input: getAbiEntry('core::option::Option::<core::bool>'),
         structs: getAbiStructs(),
         enums: { 'core::option::Option::<core::bool>': getAbiEnums().enum },
-        parser: new AbiParser1(
+        parser: new AbiParser2(
           [getAbiEntry('core::option::Option::<core::bool>')],
           hdParsingStrategy
         ),
@@ -134,7 +139,7 @@ describe('requestParser', () => {
     });
 
     test('should return parsed calldata field for Enum Option type Some', () => {
-      const args = [new CairoOption<string>(0, 'content')];
+      const args = [new CairoOption<string>(CairoOptionVariant.Some, 'content')];
       const argsIterator = args[Symbol.iterator]();
       const abiEnum = getAbiEnums().enum;
       abiEnum.variants.push({
@@ -144,11 +149,11 @@ describe('requestParser', () => {
       });
       const parsedField = parseCalldataField({
         argsIterator,
-        input: getAbiEntry('core::option::Option::<core::bool>'),
+        input: getAbiEntry('core::option::Option::<core::bytes_31::bytes31>'),
         structs: getAbiStructs(),
-        enums: { 'core::option::Option::<core::bool>': abiEnum },
-        parser: new AbiParser1(
-          [getAbiEntry('core::option::Option::<core::bool>')],
+        enums: { 'core::option::Option::<core::bytes_31::bytes31>': abiEnum },
+        parser: new AbiParser2(
+          [getAbiEntry('core::option::Option::<core::bytes_31::bytes31>')],
           hdParsingStrategy
         ),
       });
@@ -164,7 +169,7 @@ describe('requestParser', () => {
           input: getAbiEntry('core::option::Option::core::bool'),
           structs: getAbiStructs(),
           enums: { 'core::option::Option::core::bool': getAbiEnums().enum },
-          parser: new AbiParser1(
+          parser: new AbiParser2(
             [getAbiEntry('core::option::Option::core::bool')],
             hdParsingStrategy
           ),
@@ -172,28 +177,6 @@ describe('requestParser', () => {
       ).toThrow(
         new Error(`ABI type core::option::Option::core::bool do not includes a valid type of data.`)
       );
-    });
-
-    test('should return parsed calldata field for Enum Result type Ok', () => {
-      const args = [new CairoResult<string, string>(0, 'Ok')];
-      const argsIterator = args[Symbol.iterator]();
-      const abiEnum = getAbiEnums().enum;
-      abiEnum.variants.push({
-        name: 'Ok',
-        type: 'cairo_struct_variant',
-        offset: 1,
-      });
-      const parsedField = parseCalldataField({
-        argsIterator,
-        input: getAbiEntry('core::result::Result::core::bool'),
-        structs: getAbiStructs(),
-        enums: { 'core::result::Result::core::bool': abiEnum },
-        parser: new AbiParser1(
-          [getAbiEntry('core::result::Result::core::bool')],
-          hdParsingStrategy
-        ),
-      });
-      expect(parsedField).toEqual(['0x0', '0x4f6b']);
     });
 
     test('should throw an error for Enum Result has no "Ok" variant', () => {
@@ -205,32 +188,35 @@ describe('requestParser', () => {
           input: getAbiEntry('core::result::Result::core::bool'),
           structs: getAbiStructs(),
           enums: { 'core::result::Result::core::bool': getAbiEnums().enum },
-          parser: new AbiParser1(
+          parser: new AbiParser2(
             [getAbiEntry('core::result::Result::core::bool')],
             hdParsingStrategy
           ),
         })
-      ).toThrow(new Error(`Error in abi : Result has no 'Ok' variant.`));
+      ).toThrow(
+        new Error(
+          `ABI type core::result::Result::core::bool do not includes 2 types enclosed in <>.`
+        )
+      );
     });
 
     test('should return parsed calldata field for Custom Enum type', () => {
-      const activeVariantName = 'custom_enum';
-      const args = [new CairoCustomEnum({ [activeVariantName]: 'content' })];
+      const { abi } = contracts.TestCairoType.sierra;
+      const abiOfEnum: AbiEnum = abi.find((item) => item.name === 'enums::MyEnum');
+      const abiEnum = { name: abiOfEnum.type, type: abiOfEnum.name };
+      const myCallData = new CallData(abi);
+      const activeVariantName = 'Success';
+      const args = [new CairoCustomEnum({ [activeVariantName]: 100 })];
       const argsIterator = args[Symbol.iterator]();
-      const abiEnum = getAbiEnums().enum;
-      abiEnum.variants.push({
-        name: activeVariantName,
-        type: 'cairo_struct_variant',
-        offset: 1,
-      });
+
       const parsedField = parseCalldataField({
         argsIterator,
-        input: getAbiEntry('enum'),
-        structs: getAbiStructs(),
-        enums: { enum: abiEnum },
-        parser: new AbiParser1([getAbiEntry('enum')], hdParsingStrategy),
+        input: abiEnum,
+        structs: myCallData.structs,
+        enums: myCallData.enums,
+        parser: new AbiParser2(abi, hdParsingStrategy),
       });
-      expect(parsedField).toEqual(['0x1', '0x636f6e74656e74']);
+      expect(parsedField).toEqual(['0', '100']);
     });
 
     test('should throw an error for Custom Enum type when there is not active variant', () => {
@@ -242,7 +228,7 @@ describe('requestParser', () => {
           input: getAbiEntry('enum'),
           structs: getAbiStructs(),
           enums: getAbiEnums(),
-          parser: new AbiParser1([getAbiEntry('enum')], hdParsingStrategy),
+          parser: new AbiParser2([getAbiEntry('enum')], hdParsingStrategy),
         })
       ).toThrow(new Error(`The type test_cairo is not a Cairo Enum. Needs impl::name.`));
     });
@@ -256,7 +242,7 @@ describe('requestParser', () => {
           input: getAbiEntry('core::integer::u256'),
           structs: getAbiStructs(),
           enums: getAbiEnums(),
-          parser: new AbiParser1([getAbiEntry('core::integer::u256')], hdParsingStrategy),
+          parser: new AbiParser2([getAbiEntry('core::integer::u256')], hdParsingStrategy),
         })
       ).toThrow(
         new Error(
@@ -275,9 +261,11 @@ describe('requestParser', () => {
           input: abiItem,
           structs: getAbiStructs(),
           enums: getAbiEnums(),
-          parser: new AbiParser1([abiItem], hdParsingStrategy),
+          parser: new AbiParser2([abiItem], hdParsingStrategy),
         })
-      ).toThrow(new Error('"core::bool,core::bool" is not a valid Cairo type'));
+      ).toThrow(
+        new Error('"(core::bool,core::bool)" is not a valid Cairo type (missing space after comma)')
+      );
     });
 
     test('should throw an error if there is missing parameter for type Struct', () => {
@@ -289,7 +277,7 @@ describe('requestParser', () => {
           input: getAbiEntry('struct'),
           structs: getAbiStructs(),
           enums: getAbiEnums(),
-          parser: new AbiParser1([getAbiEntry('struct')], hdParsingStrategy),
+          parser: new AbiParser2([getAbiEntry('struct')], hdParsingStrategy),
         })
       ).toThrow(new Error('Missing parameter for type test_type'));
     });
@@ -303,7 +291,7 @@ describe('requestParser', () => {
           input: getAbiEntry('core::array::Array::<felt>'),
           structs: getAbiStructs(),
           enums: getAbiEnums(),
-          parser: new AbiParser1([getAbiEntry('core::array::Array::<felt>')], hdParsingStrategy),
+          parser: new AbiParser2([getAbiEntry('core::array::Array::<felt>')], hdParsingStrategy),
         })
       ).toThrow(new Error('ABI expected parameter test to be array or long string, got 256'));
     });

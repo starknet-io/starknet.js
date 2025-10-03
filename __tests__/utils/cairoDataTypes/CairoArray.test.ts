@@ -220,8 +220,7 @@ describe('CairoArray class Unit test', () => {
         hdParsingStrategy
       );
       const result = array.toApiRequest();
-      // Should have length prefix: ['0x3', '0x1', '0x2', '0x3']
-      expect(result).toEqual(['0x3', '0x1', '0x2', '0x3']);
+      expect(result).toEqual(['3', '1', '2', '3']);
     });
 
     test('should create and serialize from object input', () => {
@@ -231,8 +230,7 @@ describe('CairoArray class Unit test', () => {
         hdParsingStrategy
       );
       const result = array.toApiRequest();
-      // Should have length prefix: ['0x3', '0x1', '0x2', '0x3']
-      expect(result).toEqual(['0x3', '0x1', '0x2', '0x3']);
+      expect(result).toEqual(['3', '1', '2', '3']);
     });
 
     test('should work with parsing strategy', () => {
@@ -251,8 +249,8 @@ describe('CairoArray class Unit test', () => {
       const result2 = array2.toApiRequest();
 
       // Unified parsing strategy approach for API serialization with length prefix
-      expect(result1).toEqual(['0x2', '0x1', '0x2']);
-      expect(result2).toEqual(['0x2', '0x1', '0x2']);
+      expect(result1).toEqual(['2', '1', '2']);
+      expect(result2).toEqual(['2', '1', '2']);
     });
 
     test('should throw for invalid inputs', () => {
@@ -277,7 +275,7 @@ describe('CairoArray class Unit test', () => {
       );
       const result = array.toApiRequest();
       // Outer length=2, first inner [length=2, 1, 2], second inner [length=2, 3, 4]
-      expect(result).toEqual(['0x2', '0x2', '0x1', '0x2', '0x2', '0x3', '0x4']);
+      expect(result).toEqual(['2', '2', '1', '2', '2', '3', '4']);
     });
 
     test('should handle edge cases', () => {
@@ -289,7 +287,7 @@ describe('CairoArray class Unit test', () => {
       );
       const emptyResult = emptyArray.toApiRequest();
       // Just the length prefix: ['0x0']
-      expect(emptyResult).toEqual(['0x0']);
+      expect(emptyResult).toEqual(['0']);
 
       // Single element
       const singleArray = new CairoArray(
@@ -298,7 +296,7 @@ describe('CairoArray class Unit test', () => {
         hdParsingStrategy
       );
       const singleResult = singleArray.toApiRequest();
-      expect(singleResult).toEqual(['0x1', '0x2a']);
+      expect(singleResult).toEqual(['1', '42']);
     });
   });
 
@@ -311,7 +309,7 @@ describe('CairoArray class Unit test', () => {
       );
       const result = array.toApiRequest();
       // Length prefix + elements
-      expect(result).toEqual(['0x3', '0x1', '0x2', '0x3']);
+      expect(result).toEqual(['3', '1', '2', '3']);
     });
 
     test('should work with hdParsingStrategy', () => {
@@ -329,8 +327,8 @@ describe('CairoArray class Unit test', () => {
       const result1 = array1.toApiRequest();
       const result2 = array2.toApiRequest();
 
-      expect(result1).toEqual(['0x2', '0x64', '0xc8']);
-      expect(result2).toEqual(['0x2', '0x64', '0xc8']);
+      expect(result1).toEqual(['2', '100', '200']);
+      expect(result2).toEqual(['2', '100', '200']);
     });
 
     test('should handle nested arrays with proper length prefixes', () => {
@@ -344,7 +342,7 @@ describe('CairoArray class Unit test', () => {
       );
       const result = nestedArray.toApiRequest();
       // Outer array: length=2, then two inner arrays each with their own length prefixes
-      expect(result).toEqual(['0x2', '0x2', '0x1', '0x2', '0x2', '0x3', '0x4']);
+      expect(result).toEqual(['2', '2', '1', '2', '2', '3', '4']);
     });
 
     test('should throw for unsupported element types', () => {
@@ -373,7 +371,7 @@ describe('CairoArray class Unit test', () => {
       );
       expect(emptyArray.content).toEqual([]);
       expect(CairoArray.getArrayElementType(emptyArray.arrayType)).toBe('core::integer::u8');
-      expect(emptyArray.toApiRequest()).toEqual(['0x0']); // Just length prefix
+      expect(emptyArray.toApiRequest()).toEqual(['0']); // Just length prefix
     });
 
     test('should handle large arrays', () => {
@@ -386,7 +384,7 @@ describe('CairoArray class Unit test', () => {
       expect(largeArray.content.length).toBe(100);
       expect(CairoArray.getArrayElementType(largeArray.arrayType)).toBe('core::integer::u8');
       const result = largeArray.toApiRequest();
-      expect(result[0]).toBe('0x64'); // Length prefix
+      expect(result[0]).toBe('100'); // Length prefix
       expect(result.length).toBe(101); // 100 elements + 1 length prefix
     });
 
@@ -411,21 +409,21 @@ describe('CairoArray class Unit test', () => {
       // Expected: outer_len=2, first_mid_len=2, first_inner_len=2, 1, 2, second_inner_len=2, 3, 4,
       //           second_mid_len=2, third_inner_len=2, 5, 6, fourth_inner_len=2, 7, 8
       expect(result).toEqual([
-        '0x2',
-        '0x2',
-        '0x2',
-        '0x1',
-        '0x2',
-        '0x2',
-        '0x3',
-        '0x4',
-        '0x2',
-        '0x2',
-        '0x5',
-        '0x6',
-        '0x2',
-        '0x7',
-        '0x8',
+        '2',
+        '2',
+        '2',
+        '1',
+        '2',
+        '2',
+        '3',
+        '4',
+        '2',
+        '2',
+        '5',
+        '6',
+        '2',
+        '7',
+        '8',
       ]);
     });
 
@@ -438,7 +436,7 @@ describe('CairoArray class Unit test', () => {
       );
       const result = mixedArray.toApiRequest();
       expect(result.length).toBe(5); // 1 length prefix + 4 elements
-      expect(result[0]).toBe('0x4'); // Length prefix
+      expect(result[0]).toBe('4'); // Length prefix
     });
 
     test('should validate type format edge cases', () => {

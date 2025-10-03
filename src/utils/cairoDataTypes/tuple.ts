@@ -142,11 +142,7 @@ export class CairoTuple extends CairoType {
           const [selectorName] = matchingSelector as [string, (type: string) => boolean];
           const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
           if (dynamicConstructor) {
-            return dynamicConstructor(
-              contentItem,
-              strategies[strategyDynamicNum],
-              tupleContentType[index]
-            );
+            return dynamicConstructor(contentItem, strategies, tupleContentType[index]);
           }
         }
         throw new Error(`"${tupleContentType[index]}" is not a valid Cairo type`);
@@ -424,29 +420,14 @@ export class CairoTuple extends CairoType {
         default: {
           const commaIndex = input.indexOf(',', currentIndex);
           limitIndex = commaIndex !== -1 ? commaIndex : Number.POSITIVE_INFINITY;
+          if (commaIndex !== -1 && input[commaIndex + 1] !== ' ') {
+            throw new Error(`"${type}" is not a valid Cairo type (missing space after comma)`);
+          }
         }
       }
 
       const elementString = input.slice(currentIndex, limitIndex);
-
-      // Check if this element is named (contains a single colon not preceded by another colon)
-      const colonIndex = elementString.indexOf(':');
-      const isNamedElement =
-        colonIndex !== -1 &&
-        elementString.charAt(colonIndex - 1) !== ':' &&
-        elementString.charAt(colonIndex + 1) !== ':' &&
-        !elementString.includes('<');
-
-      if (isNamedElement) {
-        // This is a named tuple element
-        const name = elementString.substring(0, colonIndex);
-        const elementType = elementString.substring(colonIndex + 1);
-        result.push({ name, type: elementType });
-      } else {
-        // This is an unnamed tuple element
-        result.push(elementString);
-      }
-
+      result.push(elementString);
       currentIndex = limitIndex + 2; // +2 to skip ', '
     }
 
@@ -600,6 +581,26 @@ export class CairoTuple extends CairoType {
     // Flatten all elements (no length prefix for tuples)
     const result = this.content.flatMap((element) => element.toApiRequest());
     return addCompiledFlag(result);
+  }
+
+  /**
+   * Create an object from an array representing a Cairo tuple.
+   * Be sure to have an array length conform to the ABI.
+   *
+   * To be used with CallData.compile().
+   * @param {Array<any>} input JS array representing a Cairo Tuple.
+   * @returns {Object} a specific struct representing a Cairo Tuple.
+   * @example
+   * ```typescript
+   * const result = CairoTuple.compile([10,20,30]);
+   * // result = { '0': 10, '1': 20, '2': 30 }
+   * ```
+   */
+  static compile(input: Array<any>): Object {
+    return input.reduce((acc: any, item: any, idx: number) => {
+      acc[idx] = item;
+      return acc;
+    }, {});
   }
 
   /**

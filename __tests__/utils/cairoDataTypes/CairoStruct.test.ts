@@ -29,24 +29,24 @@ describe('CairoStruct', () => {
   describe('constructor variant', () => {
     test('content is an object', () => {
       const myCairoStruct = new CairoStruct({ y: 2, x: 1 }, abiPoint, strategies); // wrong order of properties
-      expect(myCairoStruct.toApiRequest()).toEqual(['0x1', '0x2']);
+      expect(myCairoStruct.toApiRequest()).toEqual(['1', '2']);
       expect(myCairoStruct.decompose(strategies)).toEqual({ x: 1n, y: 2n });
     });
 
     test('content is an array', () => {
       const myCairoStruct = new CairoStruct([1, 2], abiPoint, strategies);
-      expect(myCairoStruct.toApiRequest()).toEqual(['0x1', '0x2']);
+      expect(myCairoStruct.toApiRequest()).toEqual(['1', '2']);
       expect(myCairoStruct.decompose(strategies)).toEqual({ x: 1n, y: 2n });
     });
 
     test('content is an iterator', () => {
       const iter = ['0', '100'][Symbol.iterator]();
       const myCairoStruct = new CairoStruct(iter, abiPoint, strategies);
-      expect(myCairoStruct.toApiRequest()).toEqual(['0x0', '0x64']);
+      expect(myCairoStruct.toApiRequest()).toEqual(['0', '100']);
       expect(myCairoStruct.decompose(strategies)).toEqual({ x: 0n, y: 100n });
       const iter2 = ['2', '11', '12', '13', '14'][Symbol.iterator]();
       const myCairoStruct2 = new CairoStruct(iter2, abiCat, strategies);
-      expect(myCairoStruct2.toApiRequest()).toEqual(['0x2', '0xb', '0xc', '0xd', '0xe']);
+      expect(myCairoStruct2.toApiRequest()).toEqual(['2', '11', '12', '13', '14']);
       expect(myCairoStruct2.decompose(strategies)).toEqual({
         age: 2n,
         legs: { '0': 11n, '1': 12n, '2': 13n, '3': 14n },
@@ -69,7 +69,7 @@ describe('CairoStruct', () => {
         },
       };
       const myCairoStruct = new CairoStruct({ x: 1, y: 2 }, abiPoint, customStrategy);
-      expect(myCairoStruct.toApiRequest()).toEqual(['0x1', '0x2']);
+      expect(myCairoStruct.toApiRequest()).toEqual(['1', '2']);
       expect(myCairoStruct.decompose(customStrategy)).toEqual({ x: 1n, y: 2n });
     });
   });
@@ -103,9 +103,9 @@ describe('CairoStruct', () => {
         abiDog,
         strategies
       );
-      expect(myStruct0.toApiRequest()).toEqual(['0x2', '0x3', '0x1', '0x2', '0x3']);
+      expect(myStruct0.toApiRequest()).toEqual(['2', '3', '1', '2', '3']);
       expect(myStruct0.decompose(hdParsingStrategy)).toEqual({ age: 2n, colors: [1n, 2n, 3n] });
-      expect(myStruct1.toApiRequest()).toEqual(['0x2', '0x3', '0x1', '0x2', '0x3']);
+      expect(myStruct1.toApiRequest()).toEqual(['2', '3', '1', '2', '3']);
       expect(myStruct1.decompose(hdParsingStrategy)).toEqual({ age: 2n, colors: [1n, 2n, 3n] });
     });
 
@@ -122,12 +122,12 @@ describe('CairoStruct', () => {
         abiHorse,
         strategies
       );
-      expect(myResult0.toApiRequest()).toEqual(['0x2', '0x1', '0x2', '0x3', '0x4']);
+      expect(myResult0.toApiRequest()).toEqual(['2', '1', '2', '3', '4']);
       expect(myResult0.decompose(hdParsingStrategy)).toEqual({
         age: 2n,
         legs_color: [1n, 2n, 3n, 4n],
       });
-      expect(myResult1.toApiRequest()).toEqual(['0x2', '0x1', '0x2', '0x3', '0x4']);
+      expect(myResult1.toApiRequest()).toEqual(['2', '1', '2', '3', '4']);
       expect(myResult1.decompose(hdParsingStrategy)).toEqual({
         age: 2n,
         legs_color: [1n, 2n, 3n, 4n],
@@ -148,12 +148,12 @@ describe('CairoStruct', () => {
         abiCat,
         strategies
       );
-      expect(myStruct0.toApiRequest()).toEqual(['0x2', '0x5', '0x6', '0x7', '0x8']);
+      expect(myStruct0.toApiRequest()).toEqual(['2', '5', '6', '7', '8']);
       expect(myStruct0.decompose(strategies)).toEqual({
         age: 2n,
         legs: { '0': 5n, '1': 6n, '2': 7n, '3': 8n },
       });
-      expect(myStruct1.toApiRequest()).toEqual(['0x2', '0x5', '0x6', '0x7', '0x8']);
+      expect(myStruct1.toApiRequest()).toEqual(['2', '5', '6', '7', '8']);
       expect(myStruct1.decompose(strategies)).toEqual({
         age: 2n,
         legs: { '0': 5n, '1': 6n, '2': 7n, '3': 8n },
@@ -173,9 +173,9 @@ describe('CairoStruct', () => {
       );
       const myStruct0 = new CairoStruct({ power: 512, turbo: option0 }, abiTruck, strategies);
       const myStruct1 = new CairoStruct({ power: 512, turbo: myTypeOption }, abiTruck, strategies);
-      expect(myStruct0.toApiRequest()).toEqual(['0x200', '0x00', '0x2']);
+      expect(myStruct0.toApiRequest()).toEqual(['512', '0', '2']);
       expect(myStruct0.decompose(hdParsingStrategy)).toEqual({ power: 512n, turbo: option0 });
-      expect(myStruct1.toApiRequest()).toEqual(['0x200', '0x00', '0x2']);
+      expect(myStruct1.toApiRequest()).toEqual(['512', '0', '2']);
       expect(myStruct1.decompose(hdParsingStrategy)).toEqual({ power: 512n, turbo: option0 });
     });
 
@@ -191,9 +191,9 @@ describe('CairoStruct', () => {
       );
       const myStruct0 = new CairoStruct({ area: 512, res: result }, abiDestruction, strategies);
       const myStruct1 = new CairoStruct({ area: 512, res: typeResult }, abiDestruction, strategies);
-      expect(myStruct0.toApiRequest()).toEqual(['0x200', '0x01', '0x5']);
+      expect(myStruct0.toApiRequest()).toEqual(['512', '1', '5']);
       expect(myStruct0.decompose(strategies)).toEqual({ area: 512n, res: result });
-      expect(myStruct1.toApiRequest()).toEqual(['0x200', '0x01', '0x5']);
+      expect(myStruct1.toApiRequest()).toEqual(['512', '1', '5']);
       expect(myStruct1.decompose(strategies)).toEqual({ area: 512n, res: result });
     });
 
@@ -211,12 +211,12 @@ describe('CairoStruct', () => {
       );
       const struct0 = new CairoStruct(point2, abiPoint2, strategies);
       const struct2 = new CairoStruct(structPoint2, abiPoint2, strategies);
-      expect(struct0.toApiRequest()).toEqual(['0x3', '0x1', '0x2']);
+      expect(struct0.toApiRequest()).toEqual(['3', '1', '2']);
       expect(struct0.decompose(strategies)).toEqual({
         thickness: 3n,
         location: { x: 1n, y: 2n },
       });
-      expect(struct2.toApiRequest()).toEqual(['0x3', '0x1', '0x2']);
+      expect(struct2.toApiRequest()).toEqual(['3', '1', '2']);
       expect(struct2.decompose(strategies)).toEqual({
         thickness: 3n,
         location: { x: 1n, y: 2n },

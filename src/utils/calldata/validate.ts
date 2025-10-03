@@ -23,7 +23,7 @@ import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
 import { isHex, toBigInt } from '../num';
 import { isLongText } from '../shortString';
-import { isBoolean, isNumber, isString, isBigInt, isObject } from '../typed';
+import { isNumber, isString, isBigInt, isObject } from '../typed';
 import {
   getArrayType,
   isLen,
@@ -45,6 +45,8 @@ import { CairoCustomEnum, CairoOption, CairoResult } from './enum';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 import { CairoStruct } from '../cairoDataTypes/cairoStruct';
 import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
+import { CairoBool } from '../cairoDataTypes';
+import { CairoEthAddress } from '../cairoDataTypes/ethAddress';
 
 // TODO: separate validate is redundant as CairoTypes are validated during construction.
 // TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
@@ -180,7 +182,7 @@ const validateUint = (parameter: any, input: AbiEntry) => {
 
 const validateBool = (parameter: any, input: AbiEntry) => {
   assert(
-    isBoolean(parameter),
+    CairoBool.is(parameter),
     `Validate: arg ${input.name} of cairo type ${input.type} should be type (Boolean)`
   );
 };
@@ -193,12 +195,9 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
   }
 
   if (isTypeEthAddress(input.type)) {
-    assert(!isObject(parameter), `EthAddress type is waiting a BigNumberish. Got "${parameter}"`);
-    const param = BigInt(parameter.toString(10));
     assert(
-      // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
-      param >= 0n && param <= 2n ** 160n - 1n,
-      `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^160-1]`
+      CairoEthAddress.is(parameter),
+      `EthAddress type is waiting a BigNumberish < (2 ** 160 - 1). Got "${parameter}"`
     );
     return;
   }
@@ -262,7 +261,10 @@ const validateTuple = (parameter: any, input: AbiEntry) => {
     return;
   }
 
-  assert(isObject(parameter), `Validate: arg ${input.name} should be a tuple (defined as object)`);
+  assert(
+    isObject(parameter) || Array.isArray(parameter),
+    `Validate: arg ${input.name} should be a tuple (defined as object or array)`
+  );
   // todo: skip tuple structural validation for now
 };
 
