@@ -45,6 +45,8 @@ import { CairoStruct } from '../cairoDataTypes/cairoStruct';
 import { getAbiEnum, getAbiStruct } from './calldataUtils';
 import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
 import { isInstanceOf as isInstanceOfClasses } from '../helpers';
+import { CairoNonZero } from '../cairoDataTypes/nonZero';
+import { CairoEthAddress } from '../cairoDataTypes';
 
 export * as cairo from './cairo';
 export { parseCalldataField } from './requestParser';
@@ -240,6 +242,8 @@ export class CallData {
                 CairoTuple,
                 CairoArray,
                 CairoFixedArray,
+                CairoNonZero,
+                CairoEthAddress,
               ])
             ) {
               const apiRequest = value.toApiRequest();

@@ -31,7 +31,6 @@ import {
   isCairo1Type,
   isLen,
   isTypeArray,
-  isTypeBool,
   isTypeEnum,
   isTypeEthAddress,
   isTypeNonZero,
@@ -46,6 +45,7 @@ import type { CairoStruct } from '../cairoDataTypes/cairoStruct';
 import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
+import { CairoBool } from '../cairoDataTypes';
 
 /**
  * Parse base types
@@ -56,9 +56,9 @@ import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInterface) {
   let temp;
   switch (true) {
-    case isTypeBool(type):
-      temp = it.next().value;
-      return Boolean(BigInt(temp));
+    case CairoBool.isAbiType(type):
+      const bool = CairoBool.factoryFromApiResponse(it);
+      return bool.toBoolean();
     case CairoUint256.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case CairoUint512.isAbiType(type):

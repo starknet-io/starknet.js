@@ -46,23 +46,23 @@ describe('CairoEthAddress class Unit Tests', () => {
 
     test('should reject negative values', () => {
       expect(() => new CairoEthAddress(-1)).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
       expect(() => new CairoEthAddress(-100n)).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
       expect(() => new CairoEthAddress('-1')).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
     });
 
     test('should reject values greater than 255', () => {
       expect(() => new CairoEthAddress(RANGE_ETH_ADDRESS.max + 1n)).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
       expect(
         () => new CairoEthAddress('99999999999999999999999999999999999999999999999999999999999999')
-      ).toThrow('Validate: arg should be in range [0, 2^160-1]');
+      ).toThrow('Validate: EthAddress arg should be in range [0, 2^160-1]');
     });
 
     test('should handle valid string inputs correctly', () => {
@@ -113,10 +113,10 @@ describe('CairoEthAddress class Unit Tests', () => {
 
       // Out of range values as unknown
       expect(() => new CairoEthAddress((2n ** 161n) as unknown)).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
       expect(() => new CairoEthAddress(-1 as unknown)).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
     });
 
@@ -131,10 +131,10 @@ describe('CairoEthAddress class Unit Tests', () => {
 
     test('should validate string inputs with out-of-range values', () => {
       expect(() => new CairoEthAddress((2n ** 162n).toString(10))).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
       expect(() => new CairoEthAddress('0xfffffffffffffffffffffffffffffffffffffffffff')).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
     });
   });
@@ -225,16 +225,16 @@ describe('CairoEthAddress class Unit Tests', () => {
 
     test('should reject negative values', () => {
       expect(() => CairoEthAddress.validate(-1)).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
       expect(() => CairoEthAddress.validate(-100n)).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
     });
 
     test('should reject values exceeding ethAddr range', () => {
       expect(() => CairoEthAddress.validate(RANGE_ETH_ADDRESS.max + 1n)).toThrow(
-        'Validate: arg should be in range [0, 2^160-1]'
+        'Validate: EthAddress arg should be in range [0, 2^160-1]'
       );
     });
 

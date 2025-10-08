@@ -409,7 +409,7 @@ describe('validateFields', () => {
     });
 
     test('should throw an error for EthAddress struct if type is not a BigNumberish', () => {
-      const error = new Error('EthAddress type is waiting a BigNumberish. Got "[object Object]"');
+      const error = new Error('Invalid input: objects are not supported for EthAddress');
 
       expect(() => {
         const abiStructs = {
@@ -421,9 +421,7 @@ describe('validateFields', () => {
     });
 
     test('should throw an error for EthAddress struct if it is not in range', () => {
-      const error = new Error(
-        `Validate: arg test cairo typed ${ETH_ADDRESS} should be in range [0, 2^160-1]`
-      );
+      const error = new Error(`Validate: EthAddress arg should be in range [0, 2^160-1]`);
 
       expect(() => {
         const abiStructs = {
@@ -552,7 +550,7 @@ describe('validateFields', () => {
     });
 
     test('should throw an error if type is not authorized', () => {
-      const error = new Error('Validate: test type is not authorized for NonZero type.');
+      const error = new Error('Validate: core::bool type is not authorized for NonZero type.');
 
       expect(() =>
         validateFields(
@@ -591,7 +589,7 @@ describe('validateFields', () => {
     });
 
     test('should throw an error if value 0 iz provided for any uint type', () => {
-      const error = new Error('Validate: value 0 is not authorized in NonZero uint type.');
+      const error = new Error('Validate: value 0 is not authorized in NonZero uint8 type.');
 
       expect(() =>
         validateFields(

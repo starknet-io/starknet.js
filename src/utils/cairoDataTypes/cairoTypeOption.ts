@@ -51,7 +51,7 @@ export class CairoTypeOption extends CairoType {
    * import { CairoTypeOption, hdParsingStrategy, CairoOptionVariant } from 'starknet';
    * // Simple Option with Some variant
    * const myOption1 = new CairoTypeOption(7, "core::option::Option::<core::integer::u8>", hdParsingStrategy, CairoOptionVariant.Some);
-   * console.log(myOption1.toApiRequest()); // ['0x00', '0x7']
+   * console.log(myOption1.toApiRequest()); // ['0', '7']
    * console.log(myOption1.decompose(hdParsingStrategy)); // CairoOption instance with content 7n and Some variant.
    * // Simple Option with None variant
    * const myOption2 = new CairoTypeOption(undefined, "core::option::Option::<core::integer::u8>", hdParsingStrategy, CairoOptionVariant.None);
@@ -314,17 +314,17 @@ export class CairoTypeOption extends CairoType {
   }
 
   /**
-   * Serialize the Cairo option into hex strings for Starknet API requests.
+   * Serialize the Cairo option into decimal strings for Starknet API requests.
    *
    * Converts all CairoType elements in this Cairo option into their hex string representation
    * by calling toApiRequest(). This is used when
    * sending data to the Starknet network.
    *
-   * @returns {string[]} Array of hex strings ready for API requests
+   * @returns {string[]} Array of decimal strings ready for API requests
    * @example
    * ```typescript
    * const myOption = new CairoTypeOption(8, "core::option::Option::<core::integer::u8>", strategy, CairoOptionVariant.Some);
-   * const result = myOption.toApiRequest(); // ['0x0', '0x8']
+   * const result = myOption.toApiRequest(); // ['0', '8']
    * ```
    */
   public toApiRequest(): string[] {

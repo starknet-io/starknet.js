@@ -29,7 +29,7 @@ import type { AllowArray } from '../../types';
  *
  * // Simple dynamic array
  * const simple = new CairoArray([1, 2, 3], 'core::array::Array::<core::integer::u8>', hdParsingStrategy);
- * console.log(simple.toApiRequest()); // ['0x3', '0x1', '0x2', '0x3'] (length first)
+ * console.log(simple.toApiRequest()); // ['3', '1', '2', '3'] (length first)
  * console.log(simple.decompose(hdParsingStrategy)); // [1n, 2n, 3n]
  *
  * // Nested dynamic arrays
@@ -308,21 +308,21 @@ export class CairoArray extends CairoType {
   }
 
   /**
-   * Serialize the Cairo dynamic array into hex strings for Starknet API requests.
+   * Serialize the Cairo dynamic array into decimal strings for Starknet API requests.
    *
    * Converts the array into a length-prefixed format: [length, element1, element2, ...]
    * by calling toApiRequest() on each element and flattening the results. This follows
    * the Cairo ABI standard for dynamic arrays.
    *
-   * @returns Array of hex strings ready for API requests (length-prefixed)
+   * @returns Array of decimal strings ready for API requests (length-prefixed)
    * @example
    * ```typescript
    * const dynArray = new CairoArray([1, 2, 3], "core::array::Array::<core::integer::u8>", strategy);
-   * const result = dynArray.toApiRequest(); // ['0x3', '0x1', '0x2', '0x3']
+   * const result = dynArray.toApiRequest(); // ['3', '1', '2', '3']
    *
    * // Nested arrays include nested length prefixes
    * const nested = new CairoArray([[1, 2], [3]], "core::array::Array::<core::array::Array::<core::integer::u8>>", strategy);
-   * const flatResult = nested.toApiRequest(); // ['0x2', '0x2', '0x1', '0x2', '0x1', '0x3']
+   * const flatResult = nested.toApiRequest(); // ['2', '2', '1', '2', '1', '3']
    * //                                           ^^^^  ^^^^  --------- ^^^^  --------
    * //                                           outer inner  [1,2]     inner   [3]
    * //                                           length length        length

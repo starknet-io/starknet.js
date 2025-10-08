@@ -25,3 +25,4 @@ export * from './cairoStruct';
 export * from './cairoTypeCustomEnum';
 export * from './bool';
 export * from './ethAddress';
+export * from './nonZero';

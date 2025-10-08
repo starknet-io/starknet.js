@@ -243,7 +243,7 @@ export default function orderPropsByAbi(
         // none(())
         return new CairoTypeOption(
           undefined,
-          abiObject.type,
+          abiObject.name,
           parseStrategy,
           CairoOptionVariant.None
         );

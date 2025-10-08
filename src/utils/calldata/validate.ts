@@ -33,7 +33,6 @@ import {
   isTypeEthAddress,
   isTypeFelt,
   isTypeLiteral,
-  isTypeNonZero,
   isTypeOption,
   isTypeResult,
   isTypeStruct,
@@ -47,6 +46,7 @@ import { CairoStruct } from '../cairoDataTypes/cairoStruct';
 import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
 import { CairoBool } from '../cairoDataTypes';
 import { CairoEthAddress } from '../cairoDataTypes/ethAddress';
+import { CairoNonZero } from '../cairoDataTypes/nonZero';
 
 // TODO: separate validate is redundant as CairoTypes are validated during construction.
 // TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
@@ -195,10 +195,7 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
   }
 
   if (isTypeEthAddress(input.type)) {
-    assert(
-      CairoEthAddress.is(parameter),
-      `EthAddress type is waiting a BigNumberish < (2 ** 160 - 1). Got "${parameter}"`
-    );
+    CairoEthAddress.validate(parameter);
     return;
   }
 
@@ -345,54 +342,6 @@ const validateArray = (
   }
 };
 
-const validateNonZero = (parameter: any, input: AbiEntry) => {
-  // Telegram : https://t.me/sncorestars/11902/45433
-  // Author : Ori Ziv (08/apr/2024)
-  // "NonZero is only supported for purely numeric types (u*, i* and felt252) and EcPoint."
-  //
-  // As EcPoint do not includes trait Serde, it can't be seen in an ABI.
-  // u512 is not compatible.
-  // i* are not currently handled by Starknet.js (and core::zeroable::NonZero::<i*> seems not to work in Cairo 2.6.3).
-  // so, are authorized here : u8, u16, u32, u64, u128, u256 and felt252.
-
-  const baseType = getArrayType(input.type);
-
-  assert(
-    (isTypeUint(baseType) && baseType !== CairoUint512.abiSelector) || isTypeFelt(baseType),
-    `Validate: ${input.name} type is not authorized for NonZero type.`
-  );
-  switch (true) {
-    case isTypeFelt(baseType):
-      validateFelt(parameter, input);
-      assert(
-        BigInt(parameter.toString(10)) > 0,
-        'Validate: value 0 is not authorized in NonZero felt252 type.'
-      );
-      break;
-    case isTypeUint(baseType):
-      validateUint(parameter, { name: '', type: baseType });
-
-      switch (baseType) {
-        case Uint.u256:
-          assert(
-            new CairoUint256(parameter).toBigInt() > 0,
-            'Validate: value 0 is not authorized in NonZero uint256 type.'
-          );
-          break;
-        default:
-          assert(
-            toBigInt(parameter) > 0,
-            'Validate: value 0 is not authorized in NonZero uint type.'
-          );
-      }
-      break;
-    default:
-      throw new Error(
-        `Validate Unhandled: argument ${input.name}, type ${input.type}, value "${parameter}"`
-      );
-  }
-};
-
 /**
  * Validate cairo contract method arguments
  * Flow: Determine type from abi and than validate against parameter
@@ -499,8 +448,8 @@ export default function validateFields(
       case isTypeTuple(input.type):
         validateTuple(parameter, input);
         break;
-      case isTypeNonZero(input.type):
-        validateNonZero(parameter, input);
+      case CairoNonZero.isAbiType(input.type):
+        CairoNonZero.validate(parameter, input.type);
         break;
       default:
         throw new Error(

@@ -26,7 +26,7 @@ import type { AllowArray } from '../../types';
  *
  * // Simple fixed array
  * const simple = new CairoFixedArray([1, 2, 3], '[core::integer::u8; 3]', hdParsingStrategy);
- * console.log(simple.toApiRequest()); // ['0x1', '0x2', '0x3']
+ * console.log(simple.toApiRequest()); // ['1', '2', '3']
  * console.log(simple.decompose(hdParsingStrategy)); // [1n, 2n, 3n]
  *
  * // Nested fixed arrays
@@ -339,21 +339,21 @@ export class CairoFixedArray extends CairoType {
   }
 
   /**
-   * Serialize the Cairo fixed array into hex strings for Starknet API requests.
+   * Serialize the Cairo fixed array into decimal strings for Starknet API requests.
    *
    * Converts all CairoType elements in this fixed array into their hex string representation
    * by calling toApiRequest() on each element and flattening the results. This is used when
    * sending data to the Starknet network.
    *
-   * @returns Array of hex strings ready for API requests
+   * @returns Array of decimal strings ready for API requests
    * @example
    * ```typescript
    * const fArray = new CairoFixedArray([1, 2, 3], "[core::integer::u8; 3]", strategy);
-   * const result = fArray.toApiRequest(); // ['0x1', '0x2', '0x3']
+   * const result = fArray.toApiRequest(); // ['1', '2', '3']
    *
    * // Nested arrays are flattened
    * const nested = new CairoFixedArray([[1, 2], [3, 4]], "[[core::integer::u8; 2]; 2]", strategy);
-   * const flatResult = nested.toApiRequest(); // ['0x1', '0x2', '0x3', '0x4']
+   * const flatResult = nested.toApiRequest(); // ['1', '2', '3', '4']
    * ```
    */
   public toApiRequest(): string[] {

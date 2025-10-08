@@ -28,7 +28,7 @@ import type { AllowArray } from '../../types';
  *
  * // Simple tuple
  * const simple = new CairoTuple([1, 2], '(core::integer::u8, core::integer::u32)', hdParsingStrategy);
- * console.log(simple.toApiRequest()); // ['0x1', '0x2'] (no length prefix)
+ * console.log(simple.toApiRequest()); // ['1', '2'] (no length prefix)
  * console.log(simple.decompose(hdParsingStrategy)); // [1n, 2n]
  *
  * // Named tuple
@@ -564,17 +564,17 @@ export class CairoTuple extends CairoType {
   }
 
   /**
-   * Serialize the Cairo tuple into hex strings for Starknet API requests.
+   * Serialize the Cairo tuple into decimal strings for Starknet API requests.
    *
    * Converts the tuple into a flat array of hex strings WITHOUT a length prefix.
    * This follows the Cairo ABI standard for tuples which are serialized as
    * consecutive elements without length information.
    *
-   * @returns {string[]} Array of hex strings ready for API requests (no length prefix)
+   * @returns {string[]} Array of decimal strings ready for API requests (no length prefix)
    * @example
    * ```typescript
    * const tuple = new CairoTuple([1, 2], "(core::integer::u8, core::integer::u32)", strategy);
-   * const result = tuple.toApiRequest(); // ['0x1', '0x2']
+   * const result = tuple.toApiRequest(); // '1', '2']
    * ```
    */
   public toApiRequest(): string[] {

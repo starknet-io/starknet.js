@@ -47,6 +47,7 @@ import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 import { CairoStruct } from '../cairoDataTypes/cairoStruct';
 import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
+import { CairoNonZero } from '../cairoDataTypes/nonZero';
 
 // TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
 
@@ -247,7 +248,8 @@ function parseCalldataValue({
   }
 
   if (isTypeNonZero(type)) {
-    return parseBaseTypes({ type: getArrayType(type), val: element, parser });
+    const nonZero = new CairoNonZero(element, type, parser.parsingStrategies);
+    return nonZero.toApiRequest();
   }
 
   if (typeof element === 'object') {

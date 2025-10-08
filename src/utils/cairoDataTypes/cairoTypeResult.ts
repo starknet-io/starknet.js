@@ -51,7 +51,7 @@ export class CairoTypeResult extends CairoType {
    * import { CairoTypeResult, hdParsingStrategy, CairoResultVariant } from 'starknet';
    * // Simple Result with Ok variant
    * const myResult1 = new CairoTypeResult(7, "core::result::Result::<core::integer::u8, core::integer::u8>", hdParsingStrategy, CairoResultVariant.Ok);
-   * console.log(myResult1.toApiRequest()); // ['0x01','0x7b']
+   * console.log(myResult1.toApiRequest()); // ['1','7']
    * console.log(myResult1.decompose(hdParsingStrategy)); // CairoResult instance with content 7n and Ok variant.
    * // Simple Result with Err variant
    * const myResult2 = new CairoTypeResult(11, "core::result::Result::<core::integer::u8, core::integer::u8>", hdParsingStrategy, CairoResultVariant.Err);
@@ -300,17 +300,17 @@ export class CairoTypeResult extends CairoType {
   }
 
   /**
-   * Serialize the Cairo Result into hex strings for Starknet API requests.
+   * Serialize the Cairo Result into decimal strings for Starknet API requests.
    *
    * Converts all CairoType elements in this Cairo Result into their hex string representation
    * by calling toApiRequest(). This is used when
    * sending data to the Starknet network.
    *
-   * @returns {string[]} Array of hex strings ready for API requests
+   * @returns {string[]} Array of decimal strings ready for API requests
    * @example
    * ```typescript
    * const myResult = new CairoTypeResult(8, "core::result::Result::<core::integer::u8, core::integer::u16>", strategy, CairoResultVariant.Err);
-   * const result = myResult.toApiRequest(); // ['0x1', '0x8']
+   * const result = myResult.toApiRequest(); // ['1', '8']
    * ```
    */
   public toApiRequest(): string[] {

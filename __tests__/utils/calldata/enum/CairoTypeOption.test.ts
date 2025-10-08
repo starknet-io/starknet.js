@@ -13,6 +13,9 @@ import {
   type AbiStruct,
   type ParsingStrategy,
   CairoStruct,
+  type AbiEnum,
+  CairoTypeCustomEnum,
+  CairoCustomEnum,
 } from '../../../../src';
 import { contracts } from '../../../config/fixtures';
 
@@ -227,6 +230,54 @@ describe('CairoTypeOption', () => {
       expect(myOption1.toApiRequest()).toEqual(['0', '4', '5']);
       expect(myOption1.decompose(strategies)).toEqual(
         new CairoOption<Point>(CairoOptionVariant.Some, { x: 4n, y: 5n })
+      );
+    });
+
+    test('optionCairoType: option of an enum', () => {
+      const abiEnum: AbiEnum = contracts.TestCairoType.sierra.abi.find(
+        (item) => item.name === 'enums::MyEnum'
+      );
+      const myCallData = new CallData(contracts.TestCairoType.sierra.abi);
+      const strategies = myCallData.parser.parsingStrategies as ParsingStrategy[];
+      const myEnum0 = new CairoCustomEnum({ Success: 5 });
+      const myTypeEnum0 = new CairoTypeCustomEnum(myEnum0, abiEnum, strategies);
+      const myOption0 = new CairoTypeOption(
+        myEnum0,
+        'core::option::Option::<enums::MyEnum>',
+        strategies,
+        CairoOptionVariant.Some
+      );
+      const myOption1 = new CairoTypeOption(
+        myTypeEnum0,
+        'core::option::Option::<enums::MyEnum>',
+        strategies,
+        CairoOptionVariant.Some
+      );
+      expect(myOption0.toApiRequest()).toEqual(['0', '0', '5']);
+      const empty = {
+        Damage: undefined,
+        Empty: undefined,
+        ErrorList: undefined,
+        LocationError: undefined,
+        Parents: undefined,
+        Report: undefined,
+        Status: undefined,
+        Success: undefined,
+        TwoErrors: undefined,
+      };
+      const enRes = { Success: 5n };
+      expect(myOption0.decompose(strategies)).toEqual(
+        new CairoOption<CairoCustomEnum>(
+          CairoOptionVariant.Some,
+          new CairoCustomEnum({ ...empty, ...enRes })
+        )
+      );
+      expect(myOption1.toApiRequest()).toEqual(['0', '0', '5']);
+      expect(myOption1.decompose(strategies)).toEqual(
+        new CairoOption<CairoCustomEnum>(
+          CairoOptionVariant.Some,
+          new CairoCustomEnum({ ...empty, ...enRes })
+        )
       );
     });
 

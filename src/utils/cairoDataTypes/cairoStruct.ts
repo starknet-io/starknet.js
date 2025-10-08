@@ -263,12 +263,12 @@ export class CairoStruct extends CairoType {
   }
 
   /**
-   * Serialize the CairoStruct into hex strings for Starknet API requests.
+   * Serialize the CairoStruct into decimal strings for Starknet API requests.
    * @returns {string[]} Array of hex strings ready for API requests
    * ```typescript
    * // for a struct {x:1, y:2}
    * const result = myStruct.toApiRequest();
-   * // result = ['0x1', '0x2']
+   * // result = ['1', '2']
    * ```
    */
   toApiRequest(): string[] {

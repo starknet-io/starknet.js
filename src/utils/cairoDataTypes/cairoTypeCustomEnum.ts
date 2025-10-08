@@ -62,7 +62,7 @@ export class CairoTypeCustomEnum extends CairoType {
    * const abiMyEnum = myTestContract.abi.find((data: AbiEntry) => data.name == "enums::MyEnum") as AbiEnum;
    * const myEnum = new CairoCustomEnum({ valid: 15n });
    * const myTypeEnum1 = new CairoTypeCustomEnum(myEnum, abiMyEnum, strategies);
-   * console.log(myTypeEnum1.toApiRequest()); // ['0x01','0xf']
+   * console.log(myTypeEnum1.toApiRequest()); // ['1','15']
    * console.log(myTypeEnum1.decompose(strategies)); // CairoCustomEnum instance with content 15n and `valid` variant.
    *
    * // From API response:
@@ -112,7 +112,7 @@ export class CairoTypeCustomEnum extends CairoType {
       this.abiEnum = content.abiEnum;
       return;
     }
-    CairoTypeCustomEnum.validate(content, abiEnum, variant);
+    CairoTypeCustomEnum.validate(content, abiEnum.name, variant);
     // "content" is a CairoType
     if (content && typeof content === 'object' && content !== null && 'toApiRequest' in content) {
       assert(
@@ -185,6 +185,11 @@ export class CairoTypeCustomEnum extends CairoType {
     assert(
       !isUndefined(variant),
       '"variant" parameter is mandatory when creating a new Cairo custom enum from a Cairo Enum or raw data.'
+    );
+    const numberVariant = Number(variant);
+    assert(
+      numberVariant < abiEnum.variants.length && numberVariant >= 0,
+      `The custom enum ${abiEnum.name} variant must be in the range 0..${abiEnum.variants.length - 1}. You requested variant #${numberVariant}`
     );
     this.enumVariant = variant;
     const elementType = CairoTypeCustomEnum.getVariantTypes(abiEnum)[variant];
@@ -262,23 +267,16 @@ export class CairoTypeCustomEnum extends CairoType {
 
   /**
    * Validate input data for CairoTypeCustomEnum creation.
-   * @param {unknown} input - Input data to validate
-   * @param {AbiEnum} abiEnum - The Abi definition of the enum
-   * @param {VariantType} variant - optional - The variant of the enum (0, "1", 2, ...)
+   * @param {unknown} _input - Input data to validate
+   * @param {string} type - The Abi definition of the enum
+   * @param {VariantType} _variant - The variant of the enum (0, "1", 2, ...)
    * @throws Error if input is invalid
    */
-  static validate(_input: unknown, abiEnum: AbiEnum, variant: VariantType | undefined): void {
+  static validate(_input: unknown, type: string, _variant: VariantType | undefined): void {
     assert(
-      CairoTypeCustomEnum.isAbiType(abiEnum.name),
-      `The type ${abiEnum.name} is not a Cairo Enum. Needs impl::name.`
+      CairoTypeCustomEnum.isAbiType(type),
+      `The type ${type} is not a Cairo Enum. Needs impl::name.`
     );
-    if (!isUndefined(variant)) {
-      const numberVariant = Number(variant);
-      assert(
-        numberVariant < abiEnum.variants.length && numberVariant >= 0,
-        `The custom enum ${abiEnum.name} variant must be in the range 0..${abiEnum.variants.length - 1}. You requested variant #${numberVariant}`
-      );
-    }
   }
 
   /**
@@ -290,7 +288,7 @@ export class CairoTypeCustomEnum extends CairoType {
    */
   static is(input: unknown, type: string, variant: VariantType): boolean {
     try {
-      CairoTypeResult.validate(input, type, variant);
+      CairoTypeCustomEnum.validate(input, type, variant);
       return true;
     } catch {
       return false;
@@ -356,13 +354,13 @@ export class CairoTypeCustomEnum extends CairoType {
   }
 
   /**
-   * Serialize the Cairo custom enum into hex strings for Starknet API requests.
+   * Serialize the Cairo custom enum into decimal strings for Starknet API requests.
    *
    * Converts all CairoType elements in this Cairo custom enum into their hex string representation
    * by calling `toApiRequest()`. This is used when
    * sending data to the Starknet network.
    *
-   * @returns {string[]} Array of hex strings ready for API requests
+   * @returns {string[]} Array of decimal strings ready for API requests
    * @example
    * ```typescript
    * const strategies = myTestContract.callData.parser.parsingStrategies;
@@ -370,7 +368,7 @@ export class CairoTypeCustomEnum extends CairoType {
    * const myEnum = new CairoCustomEnum({ valid: 15n });
    * const myTypeEnum1 = new CairoTypeCustomEnum(myEnum, abiMyEnum, strategies);
    * const encoded = myTypeEnum1.toApiRequest());
-   * // encoded = ['0x01','0xf']
+   * // encoded = ['1','15']
    * ```
    */
   public toApiRequest(): string[] {

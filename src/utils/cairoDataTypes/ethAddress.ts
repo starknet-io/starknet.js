@@ -35,7 +35,10 @@ export class CairoEthAddress {
 
   static validate(data: BigNumberish | boolean | unknown): void {
     assert(data !== null && data !== undefined, 'Invalid input: null or undefined');
-    assert(!isObject(data) && !Array.isArray(data), 'Invalid input: objects are not supported');
+    assert(
+      !isObject(data) && !Array.isArray(data),
+      'Invalid input: objects are not supported for EthAddress'
+    );
     assert(
       !isNumber(data) || Number.isInteger(data),
       'Invalid input: decimal numbers are not supported, only integers'
@@ -45,7 +48,7 @@ export class CairoEthAddress {
     assert(
       // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
       value >= RANGE_ETH_ADDRESS.min && value <= RANGE_ETH_ADDRESS.max,
-      'Validate: arg should be in range [0, 2^160-1]'
+      'Validate: EthAddress arg should be in range [0, 2^160-1]'
     );
   }
 

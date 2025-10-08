@@ -143,7 +143,7 @@ describe('Cairo v2.4 onwards', () => {
 
     test('Tuple (EthAddress, u256)', async () => {
       const res4 = await tupleContract.call('get_tuple4', []);
-      expect(res4).toEqual({ '0': { address: 123n }, '1': 500n });
+      expect(res4).toEqual({ '0': 123n, '1': 500n });
     });
 
     test('Tuple (Result<u64, u8>, u8)', async () => {

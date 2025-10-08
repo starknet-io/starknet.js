@@ -16,6 +16,9 @@ import {
   type ParsingStrategy,
   CairoStruct,
   type AbiStruct,
+  CairoCustomEnum,
+  CairoTypeCustomEnum,
+  type AbiEnum,
 } from '../../../../src';
 import { contracts } from '../../../config/fixtures';
 
@@ -256,6 +259,48 @@ describe('CairoTypeResult', () => {
           new CairoTypeResult(
             [5, 6],
             'core::result::Result::<(core::integer::u8, core::integer::u16), core::integer::u32>',
+            hdParsingStrategy
+          )
+      ).toThrow(
+        new Error(
+          '"variant" parameter is mandatory when creating a new Cairo Result from a Cairo Enum or raw data.'
+        )
+      );
+    });
+
+    test('resultCairoType: result of an enum', () => {
+      const abiEnum: AbiEnum = contracts.TestCairoType.sierra.abi.find(
+        (item) => item.name === 'enums::MyEnum'
+      );
+      const myCallData = new CallData(contracts.TestCairoType.sierra.abi);
+      const strategies = myCallData.parser.parsingStrategies as ParsingStrategy[];
+      const enum0 = new CairoCustomEnum({ Success: 5n });
+      const myTypeEnum = new CairoTypeCustomEnum(enum0, abiEnum, strategies);
+      const myResult0 = new CairoTypeResult(
+        enum0,
+        'core::result::Result::<core::integer::u8, enums::MyEnum>',
+        strategies,
+        CairoResultVariant.Err
+      );
+      const myResult1 = new CairoTypeResult(
+        myTypeEnum,
+        'core::result::Result::<core::integer::u8, enums::MyEnum>',
+        strategies,
+        CairoResultVariant.Err
+      );
+      expect(myResult0.toApiRequest()).toEqual(['1', '0', '5']);
+      expect(myResult0.decompose(strategies)).toEqual(
+        new CairoResult<BigNumberish, CairoCustomEnum>(CairoResultVariant.Err, enum0)
+      );
+      expect(myResult1.toApiRequest()).toEqual(['1', '0', '5']);
+      expect(myResult1.decompose(strategies)).toEqual(
+        new CairoResult<BigNumberish, CairoCustomEnum>(CairoResultVariant.Err, enum0)
+      );
+      expect(
+        () =>
+          new CairoTypeResult(
+            enum0,
+            'core::result::Result::<core::integer::u32, core::option::Option::<core::integer::u8>>',
             hdParsingStrategy
           )
       ).toThrow(
