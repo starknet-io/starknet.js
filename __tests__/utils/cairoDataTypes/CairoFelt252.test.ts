@@ -1,5 +1,6 @@
-import { CairoFelt252 } from '../../../src/utils/cairoDataTypes/felt';
-import { uint8ArrayToBigInt } from '../../../src/utils/encode';
+import { CairoFelt252, encode } from '../../../src';
+
+const { uint8ArrayToBigInt } = encode;
 
 describe('CairoFelt252 class Unit Tests', () => {
   describe('constructor with different input types', () => {

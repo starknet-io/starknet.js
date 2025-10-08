@@ -1,5 +1,4 @@
-import { CairoFelt252 } from '../../../src/utils/cairoDataTypes/felt';
-import { CairoUint32 } from '../../../src/utils/cairoDataTypes/uint32';
+import { CairoFelt252, CairoUint32 } from '../../../src';
 
 describe('CairoUint32 class Unit Tests', () => {
   describe('constructor with different input types', () => {

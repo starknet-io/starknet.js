@@ -455,8 +455,8 @@ describe('Complex interaction', () => {
       classHash,
       account,
       constructorCalldata: CallData.compile({
-        name: CairoByteArray.byteArrayFromString('Token'),
-        symbol: CairoByteArray.byteArrayFromString('ERC20'),
+        name: new CairoByteArray('Token'),
+        symbol: new CairoByteArray('ERC20'),
         amount: cairo.uint256('1000000000'),
         recipient: account.address,
         owner: '0x823d5a0c0eefdc9a6a1cb0e064079a6284f3b26566b677a32c71bbe7bf9f8c',

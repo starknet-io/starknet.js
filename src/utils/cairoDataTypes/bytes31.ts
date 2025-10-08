@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { addHexPrefix, stringToUint8Array, uint8ArrayToBigInt } from '../encode';
+import { addHexPrefix, buf2hex, stringToUint8Array, uint8ArrayToBigInt } from '../encode';
 import { getNext } from '../num';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
@@ -16,7 +16,9 @@ export class CairoBytes31 extends CairoType {
   constructor(data: string | Uint8Array | Buffer | unknown) {
     super();
     CairoBytes31.validate(data);
-    this.data = CairoBytes31.__processData(data);
+    const processedData = CairoBytes31.__processData(data);
+    this.data = new Uint8Array(CairoBytes31.MAX_BYTE_SIZE); // ensure data has an exact size
+    this.data.set(processedData, CairoBytes31.MAX_BYTE_SIZE - processedData.length);
   }
 
   static __processData(data: Uint8Array | string | Buffer | unknown): Uint8Array {
@@ -24,7 +26,7 @@ export class CairoBytes31 extends CairoType {
       return stringToUint8Array(data);
     }
     if (isBuffer(data)) {
-      return new Uint8Array(data as Buffer);
+      return new Uint8Array(data);
     }
     if (data instanceof Uint8Array) {
       return new Uint8Array(data);
@@ -41,11 +43,18 @@ export class CairoBytes31 extends CairoType {
   }
 
   decodeUtf8() {
-    return new TextDecoder().decode(this.data);
+    // strip leading zeros for decode to avoid leading null characters
+    const cutoff = this.data.findIndex((x) => x > 0);
+    const pruned = this.data.subarray(cutoff >= 0 ? cutoff : Infinity);
+    return new TextDecoder().decode(pruned);
   }
 
-  toHexString() {
-    return addHexPrefix(this.toBigInt().toString(16));
+  /**
+   * @param padded flag for including leading zeros
+   */
+  toHexString(padded?: 'padded') {
+    const hex = padded === 'padded' ? buf2hex(this.data) : this.toBigInt().toString(16);
+    return addHexPrefix(hex);
   }
 
   toDecimalString() {

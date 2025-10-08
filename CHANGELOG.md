@@ -1,3 +1,57 @@
+## [8.5.4](https://github.com/starknet-io/starknet.js/compare/v8.5.3...v8.5.4) (2025-09-17)
+
+### Bug Fixes
+
+- fix waitfortransaction for rotating nodes services with lifeCycleRetries default 3 ([7296850](https://github.com/starknet-io/starknet.js/commit/72968500c9b0f4b889e9e388b3a98a0ea0de3b43))
+
+## [8.5.3](https://github.com/starknet-io/starknet.js/compare/v8.5.2...v8.5.3) (2025-09-05)
+
+### Bug Fixes
+
+- enforce fixed size for cairo bytes ([6a56166](https://github.com/starknet-io/starknet.js/commit/6a56166e65c79d68e012083cefff3fb532e150ac))
+
+## [8.5.2](https://github.com/starknet-io/starknet.js/compare/v8.5.1...v8.5.2) (2025-08-27)
+
+### Bug Fixes
+
+- preserve leading zeros for cairo bytes data ([5542a00](https://github.com/starknet-io/starknet.js/commit/5542a0015d0cc3cae186d63fe4258c9942ff07d2))
+
+## [8.5.1](https://github.com/starknet-io/starknet.js/compare/v8.5.0...v8.5.1) (2025-08-27)
+
+### Bug Fixes
+
+- preserve leading zeros for pending word within byte array ([5d7ab04](https://github.com/starknet-io/starknet.js/commit/5d7ab042ce1a81e4f31a5ec4488db758308e872a))
+
+# [8.5.0](https://github.com/starknet-io/starknet.js/compare/v8.4.0...v8.5.0) (2025-08-18)
+
+### Features
+
+- **provider:** Add Brother ID domain resolution support ([#1313](https://github.com/starknet-io/starknet.js/issues/1313)) ([0bea966](https://github.com/starknet-io/starknet.js/commit/0bea966d29b51b026c6ed5d9916d9039d5fd6a17))
+
+# [8.4.0](https://github.com/starknet-io/starknet.js/compare/v8.3.1...v8.4.0) (2025-08-15)
+
+### Features
+
+- fast execute ([#1463](https://github.com/starknet-io/starknet.js/issues/1463)) ([d76fb63](https://github.com/starknet-io/starknet.js/commit/d76fb6321782b87a9bfc18c9ac859d21acb4f47e))
+
+## [8.3.1](https://github.com/starknet-io/starknet.js/compare/v8.3.0...v8.3.1) (2025-08-15)
+
+### Bug Fixes
+
+- ensure a Buffer type is available for all environments ([6e67834](https://github.com/starknet-io/starknet.js/commit/6e678343876504082d3c232a115b1c48a8f6ce96))
+
+# [8.3.0](https://github.com/starknet-io/starknet.js/compare/v8.2.0...v8.3.0) (2025-08-15)
+
+### Features
+
+- implement websocket 0.9 ([#1467](https://github.com/starknet-io/starknet.js/issues/1467)) ([7e988c4](https://github.com/starknet-io/starknet.js/commit/7e988c417ac2b4c862dc438b56a149ba7c20439d))
+
+# [8.2.0](https://github.com/starknet-io/starknet.js/compare/v8.1.2...v8.2.0) (2025-08-15)
+
+### Features
+
+- a CairoByteArray, CairoTypes, updates ([#1469](https://github.com/starknet-io/starknet.js/issues/1469)) ([430fb70](https://github.com/starknet-io/starknet.js/commit/430fb70e5c54d59f9fde9acadd701632170aca25)), closes [#1472](https://github.com/starknet-io/starknet.js/issues/1472)
+
 ## [8.1.2](https://github.com/starknet-io/starknet.js/compare/v8.1.1...v8.1.2) (2025-08-04)
 
 ### Bug Fixes

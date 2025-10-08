@@ -1,6 +1,6 @@
-import { CairoInt8 } from '../../../src/utils/cairoDataTypes/int8';
-import { PRIME } from '../../../src/global/constants';
+import { CairoInt8, constants } from '../../../src';
 
+const { PRIME } = constants;
 describe('CairoInt8 class Unit Tests', () => {
   describe('constructor with different input types', () => {
     test('should handle positive number input', () => {

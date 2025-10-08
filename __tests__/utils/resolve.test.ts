@@ -169,6 +169,6 @@ describe('toApiVersion', () => {
     expect(toApiVersion('0.8')).toBe('v0_8');
     expect(toApiVersion('1.2.3')).toBe('v1_2');
     expect(toApiVersion('1.2')).toBe('v1_2');
-    expect(toApiVersion('v0.7.0')).toBe('v0_7');
+    expect(toApiVersion('v0.9.0')).toBe('v0_9');
   });
 });

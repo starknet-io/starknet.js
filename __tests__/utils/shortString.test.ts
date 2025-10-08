@@ -53,9 +53,7 @@ describe('shortString', () => {
 
   test('convert string to ByteArray', () => {
     expect(
-      CairoByteArray.byteArrayFromString(
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ12345AAADEFGHIJKLMNOPQRSTUVWXYZ12345A'
-      )
+      new CairoByteArray('ABCDEFGHIJKLMNOPQRSTUVWXYZ12345AAADEFGHIJKLMNOPQRSTUVWXYZ12345A')
     ).toEqual({
       data: [
         '0x4142434445464748494a4b4c4d4e4f505152535455565758595a3132333435',
@@ -64,17 +62,17 @@ describe('shortString', () => {
       pending_word: '0x41',
       pending_word_len: 1,
     });
-    expect(CairoByteArray.byteArrayFromString('ABCDEFGHIJKLMNOPQRSTUVWXYZ12345')).toEqual({
+    expect(new CairoByteArray('ABCDEFGHIJKLMNOPQRSTUVWXYZ12345')).toEqual({
       data: ['0x4142434445464748494a4b4c4d4e4f505152535455565758595a3132333435'],
       pending_word: '0x00',
       pending_word_len: 0,
     });
-    expect(CairoByteArray.byteArrayFromString('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234')).toEqual({
+    expect(new CairoByteArray('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234')).toEqual({
       data: [],
       pending_word: '0x4142434445464748494a4b4c4d4e4f505152535455565758595a31323334',
       pending_word_len: 30,
     });
-    expect(CairoByteArray.byteArrayFromString('')).toEqual({
+    expect(new CairoByteArray('')).toEqual({
       data: [],
       pending_word: '0x00',
       pending_word_len: 0,
@@ -83,7 +81,7 @@ describe('shortString', () => {
 
   test('convert ByteArray to string', () => {
     expect(
-      CairoByteArray.stringFromByteArray({
+      new CairoByteArray({
         data: [
           '0x4142434445464748494a4b4c4d4e4f505152535455565758595a3132333435',
           '0x4141414445464748494a4b4c4d4e4f505152535455565758595a3132333435',
@@ -94,14 +92,14 @@ describe('shortString', () => {
     ).toBe('ABCDEFGHIJKLMNOPQRSTUVWXYZ12345AAADEFGHIJKLMNOPQRSTUVWXYZ12345A');
   });
   expect(
-    CairoByteArray.stringFromByteArray({
+    new CairoByteArray({
       data: [],
       pending_word: '0x4142434445464748494a4b4c4d4e4f505152535455565758595a31323334',
       pending_word_len: 30,
     })
   ).toBe('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234');
   expect(
-    CairoByteArray.stringFromByteArray({
+    new CairoByteArray({
       data: [],
       pending_word: '0x00',
       pending_word_len: 0,

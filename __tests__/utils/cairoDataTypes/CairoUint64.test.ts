@@ -1,4 +1,4 @@
-import { CairoUint64 } from '../../../src/utils/cairoDataTypes/uint64';
+import { CairoUint64 } from '../../../src';
 
 describe('CairoUint64 class Unit Tests', () => {
   describe('constructor with different input types', () => {
