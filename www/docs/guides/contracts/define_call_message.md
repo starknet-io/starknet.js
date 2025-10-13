@@ -163,7 +163,7 @@ await myContract.my_function('http://addressOfMyERC721pictures/image1.jpg');
 To force to send a shortString as a ByteArray with `CallData.compile()`:
 
 ```typescript
-const myCalldata = Calldata.compile([byteArray.byteArrayFromString('Take care.')]);
+const myCalldata = Calldata.compile([cairo.byteArray('Take care.')]);
 ```
 
 If you want to split yourself your longString in 31 chars substrings:
@@ -185,7 +185,7 @@ const longString: string[] = shortString
 ### tuple
 
 Starknet is waiting for a list of felts.  
-You can send it to Starknet.js methods: `cairo.tuple()`, object.
+You can send it to Starknet.js methods: `cairo.tuple()`, object, array.
 
 ```typescript
 const myTpl = cairo.tuple('0x0a', 200);

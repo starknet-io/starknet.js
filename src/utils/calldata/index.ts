@@ -37,7 +37,6 @@ import { hdParsingStrategy } from './parser/parsingStrategy';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 // import { parseCalldataField } from './requestParser';
-import validateFields from './validate';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
 import { CairoStruct } from '../cairoDataTypes/cairoStruct';
@@ -107,9 +106,6 @@ export class CallData {
         `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
       );
     }
-
-    // validate parameters
-    validateFields(abiMethod, args, this.structs, this.enums);
   }
 
   /**
@@ -151,8 +147,6 @@ export class CallData {
         parserStrategy
       );
       args = Object.values(orderedObject);
-      //   // validate array elements to abi
-      validateFields(abiMethod, args, this.structs, this.enums);
     }
 
     const argsIterator = args[Symbol.iterator]();
