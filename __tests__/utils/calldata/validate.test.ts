@@ -63,37 +63,6 @@ describe('validateFields', () => {
       );
       expect(result).toBeUndefined();
     });
-
-    test('should throw an error if parameter is not the type of string', () => {
-      const validateBytes31 = (params: unknown[]) =>
-        validateFields(
-          getFunctionAbi('core::bytes_31::bytes31'),
-          params,
-          getAbiStructs(),
-          getAbiEnums()
-        );
-
-      const error = new Error('Validate: arg test should be a string.');
-
-      expect(() => validateBytes31([0, BigInt(22), new Map(), true, Symbol('test')])).toThrow(
-        error
-      );
-    });
-
-    test('should throw an error if parameter is less than 32 chars', () => {
-      const validateBytes31 = (params: unknown[]) =>
-        validateFields(
-          getFunctionAbi('core::bytes_31::bytes31'),
-          params,
-          getAbiStructs(),
-          getAbiEnums()
-        );
-
-      const error = new Error(
-        'Validate: arg test cairo typed core::bytes_31::bytes31 should be a string of less than 32 characters.'
-      );
-      expect(() => validateBytes31(['String_that_is_bigger_than_32_characters'])).toThrow(error);
-    });
   });
 
   describe('Uint validation', () => {
@@ -365,20 +334,6 @@ describe('validateFields', () => {
         getAbiEnums()
       );
       expect(result).toBeUndefined();
-    });
-
-    test('should throw an error if byte array validation fails', () => {
-      const validateByteArray = (params: unknown[]) =>
-        validateFields(
-          getFunctionAbi('core::byte_array::ByteArray'),
-          params,
-          getAbiStructs(),
-          getAbiEnums()
-        );
-
-      const error = new Error(`Validate: arg test should be a string.`);
-
-      expect(() => validateByteArray([false, 0, {}, new Map(), Symbol('test')])).toThrow(error);
     });
   });
 

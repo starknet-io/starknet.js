@@ -8,6 +8,7 @@ import type {
 import type {
   DeclareTransactionReceiptResponse,
   EstimateFeeResponseOverhead,
+  InvokeFunctionResponse,
   ProviderOptions,
 } from '../../provider/types/index.type';
 import type { ResourceBoundsBN } from '../../provider/types/spec.type';
@@ -21,7 +22,7 @@ import type { SupportedTransactionVersion } from '../../global/constants';
 import type { PaymasterInterface } from '../../paymaster';
 import type { ProviderInterface } from '../../provider/interface';
 import type { DeployerInterface } from '../../deployer';
-import type { TipEstimate } from '../../utils/modules';
+import type { TipType } from '../../provider/modules/tip';
 import type { DeployContractUDCResponse } from '../../deployer/types/index.type';
 
 /**
@@ -46,7 +47,7 @@ export type AccountOptions = {
    * Default tip type to use for sending transactions (optional)
    * @default 'recommendedTip'
    */
-  defaultTipType?: Exclude<keyof TipEstimate, 'metrics'>;
+  defaultTipType?: TipType;
 };
 
 export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;
@@ -77,8 +78,6 @@ export interface PaymasterDetails {
   deploymentData?: PAYMASTER_API.AccountDeploymentData;
   timeBounds?: PaymasterTimeBounds;
 }
-
-export interface EstimateFeeDetails extends UniversalDetails {}
 
 export interface DeployContractResponse {
   contract_address: string;
@@ -111,4 +110,9 @@ export type StarkProfile = {
   twitter?: string;
   github?: string;
   proofOfPersonhood?: boolean;
+};
+
+export type fastExecuteResponse = {
+  txResult: InvokeFunctionResponse;
+  isReady: boolean;
 };

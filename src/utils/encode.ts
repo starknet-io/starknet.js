@@ -45,8 +45,23 @@ export function arrayBufferToString(array: ArrayBuffer): string {
  * // result = Uint8Array(2) [ 72, 105 ]
  * ```
  */
-export function utf8ToArray(str: string): Uint8Array {
+export function utf8ToUint8Array(str: string): Uint8Array {
   return new TextEncoder().encode(str);
+}
+
+/**
+ * @deprecated use utf8ToUint8Array instead
+ */
+export const utf8ToArray = utf8ToUint8Array;
+
+/**
+ * Convert utf8-string to bigint
+ *
+ * @param str The UTF-8 string to convert.
+ * @returns The converted bigint.
+ */
+export function utf8ToBigInt(str: string): bigint {
+  return uint8ArrayToBigInt(utf8ToUint8Array(str));
 }
 
 /**
@@ -113,7 +128,7 @@ export function buf2hex(buffer: Uint8Array): string {
  * ```
  */
 export function removeHexPrefix(hex: string): string {
-  return hex.replace(/^0x/i, '');
+  return hex.startsWith('0x') || hex.startsWith('0X') ? hex.slice(2) : hex;
 }
 
 /**
@@ -310,4 +325,158 @@ export function concatenateArrayBuffer(uint8arrays: Uint8Array[]): Uint8Array {
     offset += uint8array.byteLength;
   });
   return result;
+}
+
+/**
+ * Convert hex string to Uint8Array
+ *
+ * @param {string} hex The hex string to convert (with or without '0x' prefix)
+ * @returns {Uint8Array} The converted byte array
+ * @throws {Error} If the string contains non-hexadecimal characters
+ *
+ * @example
+ * ```typescript
+ * const hexString = '0x48656c6c6f';
+ * const result = encode.hexStringToUint8Array(hexString);
+ * // result = Uint8Array(5) [ 72, 101, 108, 108, 111 ]
+ * ```
+ */
+export function hexStringToUint8Array(hex: string): Uint8Array {
+  // Validate hex string (only 0-9, a-f, A-F allowed) regardless of prefix
+  if (!isHexString(addHexPrefix(hex))) {
+    throw new Error(`Invalid hex string: "${hex}"`);
+  }
+  // Pad to even length without prefix
+  const paddedHex = removeHexPrefix(sanitizeHex(hex));
+  // Create Uint8Array directly
+  const bytes = new Uint8Array(paddedHex.length / 2);
+  for (let i = 0; i < paddedHex.length; i += 2) {
+    bytes[i / 2] = parseInt(paddedHex.substring(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+/**
+ * Check if string is a hex string (starts with 0x/0X followed by hex digits)
+ * @param hex string to check
+ * @returns true if hex string
+ */
+function isHexString(hex: string): boolean {
+  return /^0[xX][0-9a-fA-F]*$/.test(hex);
+}
+
+/**
+ * Check if string contains only decimal digits
+ * @param str string to check
+ * @returns true if decimal string
+ */
+function isDecimalString(str: string): boolean {
+  return /^[0-9]+$/.test(str);
+}
+
+/**
+ * Convert any string to Uint8Array
+ *
+ * Handles three types of strings:
+ * - Hex strings (e.g., '0x123f') - converts hex bytes to Uint8Array
+ * - Decimal strings (e.g., '124324332') - converts decimal number to bytes
+ * - Text strings (e.g., 'I am cool ☥') - converts UTF-8 text to bytes
+ *
+ * @param {string} str The string to convert
+ * @returns {Uint8Array} The converted byte array
+ *
+ * @example
+ * ```typescript
+ * // Hex string
+ * const hex = stringToUint8Array('0x48656c6c6f');
+ * // result = Uint8Array(5) [ 72, 101, 108, 108, 111 ]
+ *
+ * // Decimal string
+ * const decimal = stringToUint8Array('256');
+ * // result = Uint8Array(2) [ 1, 0 ]
+ *
+ * // Text string
+ * const text = stringToUint8Array('Hello ☥');
+ * // result = UTF-8 encoded bytes
+ * ```
+ */
+export function stringToUint8Array(str: string): Uint8Array {
+  // Check if it's a hex string
+  if (isHexString(str)) {
+    return hexStringToUint8Array(str);
+  }
+
+  // Check if it's a decimal string
+  if (isDecimalString(str)) {
+    // Convert decimal string to bigint then to bytes
+    const value = BigInt(str);
+    return bigIntToUint8Array(value);
+  }
+
+  // Otherwise treat as UTF-8 text
+  return utf8ToUint8Array(str);
+}
+
+/**
+ * Convert bigint to Uint8Array (big-endian)
+ *
+ * @param {bigint} value The bigint value to convert (must be non-negative)
+ * @returns {Uint8Array} The converted byte array in big-endian byte order
+ * @throws {Error} If value is negative
+ *
+ * @example
+ * ```typescript
+ * const value = 256n; // 0x0100
+ * const result = encode.bigIntToUint8Array(value);
+ * // result = Uint8Array([1, 0]) - big-endian, MSB first
+ * ```
+ */
+export function bigIntToUint8Array(value: bigint): Uint8Array {
+  // Validate non-negative
+  if (value < 0n) {
+    throw new Error(`Cannot convert negative bigint ${value} to Uint8Array`);
+  }
+
+  // Special case for 0
+  if (value === 0n) {
+    return new Uint8Array([0]);
+  }
+
+  // Convert to hex string without '0x' prefix
+  let hex = value.toString(16);
+  // Pad to even length
+  if (hex.length % 2 !== 0) {
+    hex = `0${hex}`;
+  }
+  // Create Uint8Array from hex
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+/**
+ * Convert Uint8Array to bigint (big-endian)
+ *
+ * @param {Uint8Array} data The Uint8Array to convert (interpreted as big-endian)
+ * @returns {bigint} The converted bigint value
+ *
+ * @example
+ * ```typescript
+ * const data = new Uint8Array([1, 0]); // Big-endian representation
+ * const result = encode.uint8ArrayToBigInt(data);
+ * // result = 256n (0x0100)
+ * ```
+ */
+export function uint8ArrayToBigInt(data: Uint8Array): bigint {
+  if (!data || data.length === 0) {
+    return 0n;
+  }
+  // Convert Uint8Array to hex string
+  let hex = '0x';
+  for (let i = 0; i < data.length; i += 1) {
+    hex += data[i].toString(16).padStart(2, '0');
+  }
+  return BigInt(hex);
 }

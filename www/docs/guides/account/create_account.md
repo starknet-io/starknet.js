@@ -73,7 +73,11 @@ curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d00155
 If you have sent enough STRK to this new address, you can go forward to the final step:
 
 ```typescript
-const OZaccount = new Account(myProvider, OZcontractAddress, privateKey);
+const OZaccount = new Account({
+  provider: myProvider,
+  address: OZcontractAddress,
+  signer: privateKey,
+});
 
 const { transaction_hash, contract_address } = await OZaccount.deployAccount({
   classHash: OZaccountClassHash,
@@ -149,7 +153,11 @@ Then you have to fund this address.
 If you have sent enough STRK to this new address, you can go forward to the final step:
 
 ```typescript
-const accountAX = new Account(myProvider, AXcontractAddress, privateKeyAX);
+const accountAX = new Account({
+  provider: myProvider,
+  address: AXcontractAddress,
+  signer: privateKeyAX,
+});
 
 const deployAccountPayload = {
   classHash: argentXaccountClassHash,
@@ -284,7 +292,12 @@ Then you have to fund this address with some STRK.
 If you have sent enough funds to this new address, you can go forward to the final step:
 
 ```typescript
-const ethAccount = new Account(myProvider, contractETHaddress, ethSigner);
+const ethAccount = new Account({
+  provider: myProvider,
+  address: contractETHaddress,
+  signer: ethSigner,
+});
+
 const deployPayload = {
   classHash: accountEthClassHash,
   constructorCalldata: accountETHconstructorCalldata,
@@ -339,7 +352,11 @@ const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 // initialize existing pre-deployed account 0 of Devnet
 const privateKey0 = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
 const accountAddress0 = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
-const account0 = new Account(myProvider, accountAddress0, privateKey0);
+const account0 = new Account({
+  provider: myProvider,
+  address: accountAddress0,
+  signer: privateKey0,
+});
 
 // new account abstraction
 // Generate public and private key pair.
@@ -386,7 +403,12 @@ const { data: answer } = await axios.post(
 console.log('Answer mint =', answer);
 
 // deploy account
-const AAaccount = new Account(myProvider, AAcontractAddress, AAprivateKey);
+const AAaccount = new Account({
+  provider: myProvider,
+  address: AAcontractAddress,
+  signer: AAprivateKey,
+});
+
 const { transaction_hash, contract_address } = await AAaccount.deployAccount({
   classHash: AAaccountClassHash,
   constructorCalldata: AAaccountConstructorCallData,

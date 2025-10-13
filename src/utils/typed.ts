@@ -88,6 +88,19 @@ export function isString(value: unknown): value is string {
 }
 
 /**
+ * Check if a value is a Buffer.
+ *
+ * @param {unknown} obj - The value to check.
+ * @returns {boolean} Returns true if the value is a Buffer, otherwise returns false.
+ * @example
+ * ```typescript
+ * const result = isBuffer(Buffer.from([1, 2, 3]));
+ */
+export function isBuffer(obj: unknown): obj is Buffer {
+  return typeof Buffer !== 'undefined' && obj instanceof Buffer;
+}
+
+/**
  * Checks if a given value is an object (Object or Array)
  * @param {unknown} item the tested item
  * @returns {boolean}
@@ -97,6 +110,15 @@ export function isString(value: unknown): value is string {
  * // result = true
  * ```
  */
-export function isObject(item: unknown | undefined): boolean {
+export function isObject(item: unknown | undefined): item is object {
   return !!item && typeof item === 'object' && !Array.isArray(item);
+}
+
+/**
+ * Checks if a given value is an integer.
+ * @param {unknown} value the value to be checked.
+ * @returns {boolean} returns true if the value is an integer, false otherwise.
+ */
+export function isInteger(value: unknown): value is number {
+  return Number.isInteger(value);
 }

@@ -9,7 +9,7 @@ import {
 import { CallData } from '../utils/calldata';
 import { starkCurve } from '../utils/ec';
 import { calculateContractAddressFromHash } from '../utils/hash';
-import { cleanHex, toCairoBool, toHex } from '../utils/num';
+import { toCairoBool, toHex } from '../utils/num';
 import { randomAddress } from '../utils/stark';
 import { getCompiledCalldata } from '../utils/transaction/getCompiledCalldata';
 import type { DeployerInterface } from './interface';
@@ -87,7 +87,7 @@ export class Deployer implements DeployerInterface {
       throw new Error('Deployer emitted event is empty');
     }
     const event = txReceipt.events.find(
-      (it: any) => cleanHex(it.from_address) === cleanHex(toHex(this.address))
+      (it: any) => toHex(it.from_address) === toHex(this.address)
     ) || {
       data: [],
     };

@@ -39,9 +39,7 @@ export * as src5 from './utils/src5';
 export * from './utils/resolve';
 export * from './utils/batch';
 export * from './utils/responseParser';
-export * from './utils/cairoDataTypes/uint256';
-export * from './utils/cairoDataTypes/uint512';
-export * from './utils/cairoDataTypes/fixedArray';
+export * from './utils/cairoDataTypes';
 export * from './utils/address';
 export * from './utils/calldata';
 export * from './utils/calldata/enum';
@@ -53,10 +51,3 @@ export * as walletV5 from './wallet/connectV5';
 export * from './global/config';
 export * from './global/logger';
 export * from './global/logger.type';
-export * from './utils/modules';
-
-/**
- * Backward compatibility utilities
- * @deprecated These methods are provided for backward compatibility. Use the new object-based APIs instead.
- */
-export * from './utils/backward';

@@ -1,8 +1,8 @@
 import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
-import { EDataAvailabilityMode, ETransactionType, SUBSCRIPTION_BLOCK_TAG } from '../api';
+import { EDataAvailabilityMode, ETransactionType, SUBSCRIPTION_BLOCK_ID } from '../api';
 import { CairoEnum } from '../cairoEnum';
-import { Abi, CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
+import { Abi, AbiEntry, CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 import {
   BlockTag,
   ResourceBoundsBN,
@@ -28,6 +28,17 @@ export type ByteArray = {
  * decimal-string array
  */
 export type Calldata = string[] & { readonly __compiled__?: true };
+
+/**
+ * "Abi Entry type"
+ * @example
+ * 'core::bytes_31::bytes31'
+ * 'core::bool'
+ * 'core::felt'
+ * 'core::uint256'
+ * 'core::uint512'
+ */
+export type AbiEntryType = AbiEntry['type'];
 
 /**
  * Represents an integer in the range [0, 2^256)
@@ -260,8 +271,8 @@ export type BlockNumber = BlockTag | null | number;
  * null return 'pending' block tag
  */
 export type BlockIdentifier = BlockNumber | BigNumberish;
-
-export type SubscriptionBlockIdentifier = SUBSCRIPTION_BLOCK_TAG | (string & {}) | number | bigint;
+type SubscriptionBlockTag = Extract<SUBSCRIPTION_BLOCK_ID, string>;
+export type SubscriptionBlockIdentifier = SubscriptionBlockTag | (string & {}) | number | bigint;
 
 /**
  * items used by AccountInvocations
@@ -302,9 +313,32 @@ export type ParsedStruct = {
 };
 
 export type waitForTransactionOptions = {
+  /**
+   * Define the number of retries before throwing an error for the transaction life cycle when the transaction is not found after it had a valid status.
+   * This is useful for nodes that are not fully synced yet when connecting to service that rotate nodes.
+   */
+  lifeCycleRetries?: number;
+  /**
+   * Define the number of retries before throwing an error
+   */
+  retries?: number;
+  /**
+   * Define the time interval between retries in milliseconds
+   */
   retryInterval?: number;
+  /**
+   * Define which states are considered as successful
+   */
   successStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
+  /**
+   * Define which states are considered as errors
+   */
   errorStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
+};
+
+export type fastWaitForTransactionOptions = {
+  retries?: number;
+  retryInterval?: number;
 };
 
 export type getSimulateTransactionOptions = {

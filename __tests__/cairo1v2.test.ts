@@ -27,6 +27,7 @@ import {
 import { contracts } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
+import { createAbiParser } from '../src/utils/calldata/parser';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
@@ -939,6 +940,7 @@ describe('Cairo 1', () => {
       const abiEvents = events.getAbiEvents(abi);
       const abiStructs = CallData.getAbiStruct(abi);
       const abiEnums = CallData.getAbiEnum(abi);
+      const parser = createAbiParser(abi);
       const rawEventNested = {
         block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
         block_number: 69198,
@@ -968,7 +970,13 @@ describe('Cairo 1', () => {
         ],
         transaction_hash: '0x4e38fcce79c115b6fe2c486e3514efc1bd4da386b91c104e97230177d0bf181',
       };
-      const parsedEvent = events.parseEvents([rawEventNested], abiEvents, abiStructs, abiEnums);
+      const parsedEvent = events.parseEvents(
+        [rawEventNested],
+        abiEvents,
+        abiStructs,
+        abiEnums,
+        parser
+      );
       expect(parsedEvent).toEqual([
         {
           'kurosawa_akira::ExchangeBalanceComponent::exchange_balance_logic_component::Trade': {
@@ -1037,7 +1045,8 @@ describe('Cairo 1', () => {
         [rawEventNestedDeposit1],
         abiEvents,
         abiStructs,
-        abiEnums
+        abiEnums,
+        parser
       );
       expect(parsedEventNestedDeposit1).toEqual([
         {
@@ -1056,7 +1065,8 @@ describe('Cairo 1', () => {
         [rawEventNestedDeposit2],
         abiEvents,
         abiStructs,
-        abiEnums
+        abiEnums,
+        parser
       );
       expect(parsedEventNestedDeposit2).toEqual([
         {
@@ -1085,7 +1095,13 @@ describe('Cairo 1', () => {
         ],
         transaction_hash: '0x2da31a929a9848e9630906275a75a531e1718d4830501e10b0bccacd55f6fe0',
       };
-      const parsedEventFlat = events.parseEvents([rawEventFlat], abiEvents, abiStructs, abiEnums);
+      const parsedEventFlat = events.parseEvents(
+        [rawEventFlat],
+        abiEvents,
+        abiStructs,
+        abiEnums,
+        parser
+      );
       expect(parsedEventFlat).toEqual([
         {
           'openzeppelin::token::erc20::erc20::ERC20Component::Transfer': {

@@ -8,27 +8,28 @@ import { addHexPrefix } from '../encode';
 import { CairoFelt } from './felt';
 import { UINT_128_MAX } from './uint256';
 import { isObject } from '../typed';
+import { getNext, isBigNumberish } from '../num';
+import assert from '../assert';
 
 export const UINT_512_MAX = (1n << 512n) - 1n;
 export const UINT_512_MIN = 0n;
 export const UINT_128_MIN = 0n;
 
 export class CairoUint512 {
-  public limb0: bigint;
+  public limb0: bigint; // TODO should be u128
 
-  public limb1: bigint;
+  public limb1: bigint; // TODO should be u128
 
-  public limb2: bigint;
+  public limb2: bigint; // TODO should be u128
 
-  public limb3: bigint;
+  public limb3: bigint; // TODO should be u128
 
   static abiSelector = 'core::integer::u512';
 
   /**
    * Default constructor (Lib usage)
-   * @param bigNumberish BigNumberish value representing u512
    */
-  public constructor(bigNumberish: BigNumberish);
+  public constructor(bigNumberish: BigNumberish | Uint512 | unknown);
   /**
    * Direct props initialization (Api response)
    */
@@ -38,11 +39,6 @@ export class CairoUint512 {
     limb2: BigNumberish,
     limb3: BigNumberish
   );
-  /**
-   * Initialization from Uint512 object
-   */
-  public constructor(uint512: Uint512);
-
   public constructor(...arr: any[]) {
     if (
       isObject(arr[0]) &&
@@ -53,10 +49,10 @@ export class CairoUint512 {
       'limb3' in arr[0]
     ) {
       const props = CairoUint512.validateProps(
-        arr[0].limb0,
-        arr[0].limb1,
-        arr[0].limb2,
-        arr[0].limb3
+        arr[0].limb0 as BigNumberish,
+        arr[0].limb1 as BigNumberish,
+        arr[0].limb2 as BigNumberish,
+        arr[0].limb3 as BigNumberish
       );
       this.limb0 = props.limb0;
       this.limb1 = props.limb1;
@@ -82,10 +78,17 @@ export class CairoUint512 {
   /**
    * Validate if BigNumberish can be represented as Uint512
    */
-  static validate(bigNumberish: BigNumberish): bigint {
-    const bigInt = BigInt(bigNumberish);
-    if (bigInt < UINT_512_MIN) throw Error('bigNumberish is smaller than UINT_512_MIN.');
-    if (bigInt > UINT_512_MAX) throw Error('bigNumberish is bigger than UINT_512_MAX.');
+  static validate(bigNumberish: BigNumberish | unknown): bigint {
+    assert(bigNumberish !== null, 'null value is not allowed for u512');
+    assert(bigNumberish !== undefined, 'undefined value is not allowed for u512');
+    assert(
+      isBigNumberish(bigNumberish) || isObject(bigNumberish),
+      `Unsupported data type '${typeof bigNumberish}' for u512. Expected string, number, bigint, or Uint512 object`
+    );
+
+    const bigInt = BigInt(bigNumberish as BigNumberish);
+    assert(bigInt >= UINT_512_MIN, 'bigNumberish is smaller than UINT_512_MIN.');
+    assert(bigInt <= UINT_512_MAX, 'bigNumberish is bigger than UINT_512_MAX.');
     return bigInt;
   }
 
@@ -103,9 +106,10 @@ export class CairoUint512 {
     const l2 = BigInt(limb2);
     const l3 = BigInt(limb3);
     [l0, l1, l2, l3].forEach((value: bigint, index) => {
-      if (value < UINT_128_MIN || value > UINT_128_MAX) {
-        throw Error(`limb${index} is not in the range of a u128 number`);
-      }
+      assert(
+        value >= UINT_128_MIN && value <= UINT_128_MAX,
+        `limb${index} is not in the range of a u128 number`
+      );
     });
     return { limb0: l0, limb1: l1, limb2: l2, limb3: l3 };
   }
@@ -113,7 +117,7 @@ export class CairoUint512 {
   /**
    * Check if BigNumberish can be represented as Uint512
    */
-  static is(bigNumberish: BigNumberish): boolean {
+  static is(bigNumberish: BigNumberish | unknown): boolean {
     try {
       CairoUint512.validate(bigNumberish);
     } catch (error) {
@@ -127,6 +131,14 @@ export class CairoUint512 {
    */
   static isAbiType(abiType: string): boolean {
     return abiType === CairoUint512.abiSelector;
+  }
+
+  static factoryFromApiResponse(responseIterator: Iterator<string>) {
+    const limb0 = getNext(responseIterator);
+    const limb1 = getNext(responseIterator);
+    const limb2 = getNext(responseIterator);
+    const limb3 = getNext(responseIterator);
+    return new CairoUint512(limb0, limb1, limb2, limb3);
   }
 
   /**

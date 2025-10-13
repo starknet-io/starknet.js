@@ -29,7 +29,7 @@ import {
   CairoResultVariant,
 } from './enum';
 import formatter from './formatter';
-import { createAbiParser, isNoConstructorValid } from './parser';
+import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
@@ -39,6 +39,7 @@ import validateFields from './validate';
 export * as cairo from './cairo';
 export * as byteArray from './byteArray';
 export { parseCalldataField } from './requestParser';
+export * from './parser';
 
 export class CallData {
   abi: Abi;
@@ -49,10 +50,10 @@ export class CallData {
 
   protected readonly enums: AbiEnums;
 
-  constructor(abi: Abi) {
+  constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
     this.structs = CallData.getAbiStruct(abi);
     this.enums = CallData.getAbiEnum(abi);
-    this.parser = createAbiParser(abi);
+    this.parser = createAbiParser(abi, parsingStrategy);
     this.abi = this.parser.getLegacyFormat();
   }
 
@@ -144,7 +145,15 @@ export class CallData {
       (acc, input) =>
         isLen(input.name) && !isCairo1Type(input.type)
           ? acc
-          : acc.concat(parseCalldataField(argsIterator, input, this.structs, this.enums)),
+          : acc.concat(
+              parseCalldataField({
+                argsIterator,
+                input,
+                structs: this.structs,
+                enums: this.enums,
+                parser: this.parser,
+              })
+            ),
       [] as Calldata
     );
 
@@ -252,7 +261,14 @@ export class CallData {
 
     const parsed = outputs.flat().reduce((acc, output, idx) => {
       const propName = output.name ?? idx;
-      acc[propName] = responseParser(responseIterator, output, this.structs, this.enums, acc);
+      acc[propName] = responseParser({
+        responseIterator,
+        output,
+        structs: this.structs,
+        enums: this.enums,
+        parsedResult: acc,
+        parser: this.parser,
+      });
       if (acc[propName] && acc[`${propName}_len`]) {
         delete acc[`${propName}_len`];
       }
@@ -348,12 +364,13 @@ export class CallData {
     const responseIterator = response.flat()[Symbol.iterator]();
     const decodedArray = typeCairoArray.map(
       (typeParam) =>
-        responseParser(
+        responseParser({
           responseIterator,
-          { name: '', type: typeParam },
-          this.structs,
-          this.enums
-        ) as CallResult
+          output: { name: '', type: typeParam },
+          parser: this.parser,
+          structs: this.structs,
+          enums: this.enums,
+        }) as CallResult
     );
     return decodedArray.length === 1 ? decodedArray[0] : decodedArray;
   }

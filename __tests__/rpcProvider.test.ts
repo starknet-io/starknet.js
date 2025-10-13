@@ -6,7 +6,6 @@ import {
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
-  describeIfRpc081,
   describeIfTestnet,
   waitNextBlock,
 } from './config/fixtures';
@@ -33,6 +32,7 @@ import {
   toAnyPatchVersion,
   BlockTag,
   logger,
+  type GasPrices,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { isBoolean } from '../src/utils/typed';
@@ -162,6 +162,16 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof spec).toBe('string');
   });
 
+  test('getGasPrices', async () => {
+    const gasPrices: GasPrices = await rpcProvider.getGasPrices('latest');
+    expect(gasPrices).toHaveProperty('l1DataGasPrice');
+    expect(gasPrices).toHaveProperty('l1GasPrice');
+    expect(gasPrices).toHaveProperty('l2GasPrice');
+    expect(typeof gasPrices.l1DataGasPrice).toBe('bigint');
+    expect(typeof gasPrices.l1GasPrice).toBe('bigint');
+    expect(typeof gasPrices.l2GasPrice).toBe('bigint');
+  });
+
   test('configurable fee overhead on instance', async () => {
     const p = new RpcProvider({
       nodeUrl: provider.channel.nodeUrl,
@@ -211,51 +221,27 @@ describeIfRpc('RPCProvider', () => {
       await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
     });
 
-    describeIfRpc081('estimate message fee rpc 0.8', () => {
-      test('estimate message fee Cairo 1', async () => {
-        const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
-        const estimationCairo1 = await rpcProvider.estimateMessageFee({
-          from_address: L1_ADDRESS,
-          to_address: l1l2ContractCairo1Address,
-          entry_point_selector: 'increase_bal',
-          payload: ['100'],
-        });
-        expect(estimationCairo1).toEqual(
-          expect.objectContaining({
-            l1_data_gas_consumed: expect.anything(),
-            l1_data_gas_price: expect.anything(),
-            l1_gas_consumed: expect.anything(),
-            l1_gas_price: expect.anything(),
-            l2_gas_consumed: expect.anything(),
-            l2_gas_price: expect.anything(),
-            overall_fee: expect.anything(),
-            unit: expect.anything(),
-          })
-        );
+    test('estimate message fee Cairo 1', async () => {
+      const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
+      const estimationCairo1 = await rpcProvider.estimateMessageFee({
+        from_address: L1_ADDRESS,
+        to_address: l1l2ContractCairo1Address,
+        entry_point_selector: 'increase_bal',
+        payload: ['100'],
       });
+      expect(estimationCairo1).toEqual(
+        expect.objectContaining({
+          l1_data_gas_consumed: expect.anything(),
+          l1_data_gas_price: expect.anything(),
+          l1_gas_consumed: expect.anything(),
+          l1_gas_price: expect.anything(),
+          l2_gas_consumed: expect.anything(),
+          l2_gas_price: expect.anything(),
+          overall_fee: expect.anything(),
+          unit: expect.anything(), // removed from spec but still supplied by nodes
+        })
+      );
     });
-
-    /*     describeIfRpc071('estimate message fee rpc 0.7', () => {
-      test('estimate message fee Cairo 1', async () => {
-        const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
-        const estimationCairo1 = await rpcProvider.estimateMessageFee({
-          from_address: L1_ADDRESS,
-          to_address: l1l2ContractCairo1Address,
-          entry_point_selector: 'increase_bal',
-          payload: ['100'],
-        });
-        expect(estimationCairo1).toEqual(
-          expect.objectContaining({
-            data_gas_consumed: expect.anything(),
-            data_gas_price: expect.anything(),
-            gas_consumed: expect.anything(),
-            gas_price: expect.anything(),
-            overall_fee: expect.anything(),
-            unit: expect.anything(),
-          })
-        );
-      });
-    }); */
   });
 
   describe('waitForTransaction', () => {
@@ -310,6 +296,77 @@ describeIfRpc('RPCProvider', () => {
     test('no error state; timed-out', async () => {
       const options = generateOptions({ errorStates: [] });
       await expect(rpcProvider.waitForTransaction(0, options)).rejects.toThrow(/timed-out/);
+    });
+  });
+
+  describe('fastWaitForTransaction()', () => {
+    test('timeout due to low tip', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'RECEIVED' };
+        });
+      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 10, {
+        retries: 2,
+        retryInterval: 100,
+      });
+      spyProvider.mockRestore();
+      expect(resp).toBe(false);
+    });
+
+    test('timeout due to missing new nonce', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'PRE_CONFIRMED', execution_status: 'SUCCEEDED' };
+        });
+      const spyChannel = jest
+        .spyOn(rpcProvider.channel, 'getNonceForAddress')
+        .mockImplementation(async () => {
+          return '0x8';
+        });
+      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 8, {
+        retries: 2,
+        retryInterval: 100,
+      });
+      spyProvider.mockRestore();
+      spyChannel.mockRestore();
+      expect(resp).toBe(false);
+    });
+
+    test('transaction reverted', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'PRE_CONFIRMED', execution_status: 'REVERTED' };
+        });
+      await expect(
+        rpcProvider.fastWaitForTransaction('0x123', '0x456', 10, {
+          retries: 2,
+          retryInterval: 100,
+        })
+      ).rejects.toThrow('REVERTED: PRE_CONFIRMED');
+      spyProvider.mockRestore();
+    });
+
+    test('Normal behavior', async () => {
+      const spyProvider = jest
+        .spyOn(rpcProvider.channel, 'getTransactionStatus')
+        .mockImplementation(async () => {
+          return { finality_status: 'ACCEPTED_ON_L2', execution_status: 'SUCCEEDED' };
+        });
+      const spyChannel = jest
+        .spyOn(rpcProvider.channel, 'getNonceForAddress')
+        .mockImplementation(async () => {
+          return '0x9';
+        });
+      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 8, {
+        retries: 2,
+        retryInterval: 100,
+      });
+      spyProvider.mockRestore();
+      spyChannel.mockRestore();
+      expect(resp).toBe(true);
     });
   });
 

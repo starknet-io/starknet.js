@@ -21,6 +21,8 @@ export class CairoFixedArray {
       CairoFixedArray.isTypeFixedArray(arrayType),
       `The type ${arrayType} is not a Cairo fixed array. Needs [type; length].`
     );
+
+    // Validate that the type includes content type
     try {
       CairoFixedArray.getFixedArrayType(arrayType);
     } catch {
@@ -28,16 +30,20 @@ export class CairoFixedArray {
         `The type ${arrayType} do not includes any content type. Needs [type; length].`
       );
     }
+
+    // Validate that the type includes array size
+    let arraySize: number;
     try {
-      CairoFixedArray.getFixedArraySize(arrayType);
+      arraySize = CairoFixedArray.getFixedArraySize(arrayType);
     } catch {
       throw new Error(
         `The type ${arrayType} type do not includes any length. Needs [type; length].`
       );
     }
+
     assert(
-      CairoFixedArray.getFixedArraySize(arrayType) === content.length,
-      `The ABI type ${arrayType} is expecting ${CairoFixedArray.getFixedArraySize(arrayType)} items. ${content.length} items provided.`
+      arraySize === content.length,
+      `The ABI type ${arrayType} is expecting ${arraySize} items. ${content.length} items provided.`
     );
     this.content = content;
     this.arrayType = arrayType;
@@ -141,6 +147,7 @@ export class CairoFixedArray {
 
   /**
    * Checks if the given Cairo type is a fixed-array type.
+   * structure: [string; number]
    *
    * @param {string} type - The type to check.
    * @returns - `true` if the type is a fixed array type, `false` otherwise.

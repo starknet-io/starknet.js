@@ -8,7 +8,14 @@ import {
   Uint,
 } from '../../types';
 import assert from '../assert';
+import { CairoByteArray } from '../cairoDataTypes/byteArray';
+import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoInt8 } from '../cairoDataTypes/int8';
+import { CairoInt16 } from '../cairoDataTypes/int16';
+import { CairoInt32 } from '../cairoDataTypes/int32';
+import { CairoInt64 } from '../cairoDataTypes/int64';
+import { CairoInt128 } from '../cairoDataTypes/int128';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { isHex, toBigInt } from '../num';
@@ -19,8 +26,6 @@ import {
   isLen,
   isTypeArray,
   isTypeBool,
-  isTypeByteArray,
-  isTypeBytes31,
   isTypeEnum,
   isTypeEthAddress,
   isTypeFelt,
@@ -32,6 +37,10 @@ import {
   isTypeTuple,
   isTypeUint,
 } from './cairo';
+
+// TODO: separate validate is redundant as CairoTypes are validated during construction.
+// TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
+// TODO: Something like: store_message(a -> *INVALID JS TYPE*, b, c -> *MISSING REQUIRED ARG*)
 
 const validateFelt = (parameter: any, input: AbiEntry) => {
   assert(
@@ -45,18 +54,6 @@ const validateFelt = (parameter: any, input: AbiEntry) => {
     param >= 0n && param <= 2n ** 252n - 1n,
     `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
   );
-};
-
-const validateBytes31 = (parameter: any, input: AbiEntry) => {
-  assert(isString(parameter), `Validate: arg ${input.name} should be a string.`);
-  assert(
-    parameter.length < 32,
-    `Validate: arg ${input.name} cairo typed ${input.type} should be a string of less than 32 characters.`
-  );
-};
-
-const validateByteArray = (parameter: any, input: AbiEntry) => {
-  assert(isString(parameter), `Validate: arg ${input.name} should be a string.`);
 };
 
 const validateUint = (parameter: any, input: AbiEntry) => {
@@ -80,13 +77,13 @@ const validateUint = (parameter: any, input: AbiEntry) => {
   let param: bigint;
   switch (input.type) {
     case Uint.u256:
-      param = new CairoUint256(parameter).toBigInt();
+      param = new CairoUint256(parameter as BigNumberish).toBigInt();
       break;
     case Uint.u512:
-      param = new CairoUint512(parameter).toBigInt();
+      param = new CairoUint512(parameter as BigNumberish).toBigInt();
       break;
     default:
-      param = toBigInt(parameter);
+      param = toBigInt(parameter as BigNumberish);
   }
   switch (input.type) {
     case Uint.u8:
@@ -422,8 +419,8 @@ export default function validateFields(
       case isTypeFelt(input.type):
         validateFelt(parameter, input);
         break;
-      case isTypeBytes31(input.type):
-        validateBytes31(parameter, input);
+      case CairoBytes31.isAbiType(input.type):
+        CairoBytes31.validate(parameter);
         break;
       case isTypeUint(input.type) || isTypeLiteral(input.type):
         validateUint(parameter, input);
@@ -431,8 +428,23 @@ export default function validateFields(
       case isTypeBool(input.type):
         validateBool(parameter, input);
         break;
-      case isTypeByteArray(input.type):
-        validateByteArray(parameter, input);
+      case CairoByteArray.isAbiType(input.type):
+        CairoByteArray.validate(parameter);
+        break;
+      case CairoInt8.isAbiType(input.type):
+        CairoInt8.validate(parameter);
+        break;
+      case CairoInt16.isAbiType(input.type):
+        CairoInt16.validate(parameter);
+        break;
+      case CairoInt32.isAbiType(input.type):
+        CairoInt32.validate(parameter);
+        break;
+      case CairoInt64.isAbiType(input.type):
+        CairoInt64.validate(parameter);
+        break;
+      case CairoInt128.isAbiType(input.type):
+        CairoInt128.validate(parameter);
         break;
       case isTypeArray(input.type) || CairoFixedArray.isTypeFixedArray(input.type):
         validateArray(parameter, input, structs, enums);

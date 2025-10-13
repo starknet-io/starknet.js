@@ -2,16 +2,19 @@ import type { BlockHash, TransactionHash } from '../../types/api';
 import type { CairoEnum } from '../../types/cairoEnum';
 import type {
   Abi,
+  BigNumberish,
   BlockNumber,
   Calldata,
   DeclareAndDeployContractPayload,
   ParsedStruct,
+  RawArgs,
   RawArgsArray,
   Signature,
 } from '../../types/lib';
 import type { UniversalDetails } from '../../account/types/index.type';
 import type { ProviderInterface } from '../../provider';
 import type { AccountInterface } from '../../account/interface';
+import type { ParsingStrategy } from '../../utils/calldata/parser';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
@@ -57,17 +60,23 @@ export type ArgsOrCalldataWithOptions =
   | [...Calldata]
   | [...Calldata, ContractOptions];
 
-type CommonContractOptions = {
+export type CommonContractOptions = {
   /**
    * compile and validate arguments
    * @default true
    */
   parseRequest?: boolean;
+
   /**
    * Parse elements of the response array and structuring them into response object
    * @default true
    */
   parseResponse?: boolean;
+
+  /**
+   * Custom parsing strategy for request/response processing
+   */
+  parsingStrategy?: ParsingStrategy;
 };
 
 export type ContractOptions = {
@@ -84,7 +93,6 @@ export type ContractOptions = {
    * Class hash of the contract
    */
   classHash?: string;
-  deployTransactionHash?: string;
 } & CommonContractOptions;
 
 export type ExecuteOptions = Pick<CommonContractOptions, 'parseRequest'> & {
@@ -96,6 +104,11 @@ export type ExecuteOptions = Pick<CommonContractOptions, 'parseRequest'> & {
    * Deployer contract salt
    */
   salt?: string;
+  /**
+   * Wait for transaction to be included in a block
+   * @default false
+   */
+  waitForTransaction?: boolean;
 } & Partial<UniversalDetails>;
 
 export type CallOptions = CommonContractOptions & {
@@ -110,7 +123,9 @@ export type ParsedEvent = { [name: string]: ParsedStruct } & {
   transaction_hash?: TransactionHash;
 };
 
-export type ParsedEvents = Array<ParsedEvent>;
+export type ParsedEvents = Array<ParsedEvent> & {
+  getByPath?(path: string): ParsedStruct | null;
+};
 
 // TODO: This should be in formatResponse type
 /**
@@ -142,7 +157,7 @@ export function isAccount(
   return 'execute' in providerOrAccount;
 }
 
-export type FactoryParams = DeclareAndDeployContractPayload & {
+type FactoryParamsBase = {
   account: AccountInterface;
   /**
    * Parse arguments to calldata.
@@ -151,3 +166,15 @@ export type FactoryParams = DeclareAndDeployContractPayload & {
    */
   parseRequest?: boolean;
 };
+
+type DeclareAndDeployParams = FactoryParamsBase & DeclareAndDeployContractPayload;
+
+type DeployOnlyParams = FactoryParamsBase & {
+  classHash: BigNumberish;
+  salt?: string;
+  unique?: boolean;
+  constructorCalldata?: RawArgs;
+  abi?: Abi;
+};
+
+export type FactoryParams = (DeclareAndDeployParams | DeployOnlyParams) & CommonContractOptions;

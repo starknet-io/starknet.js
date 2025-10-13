@@ -14,6 +14,8 @@ import {
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  type fastWaitForTransactionOptions,
+  type GasPrices,
   GetBlockResponse,
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
@@ -43,8 +45,8 @@ import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { getTipStatsFromBlocks, TipAnalysisOptions } from '../utils/modules/tip';
-import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
+import { getTipStatsFromBlocks, TipAnalysisOptions, TipEstimate } from './modules/tip';
+import { createTransactionReceipt } from '../utils/transactionReceipt/transactionReceipt';
 import { ProviderInterface } from './interface';
 import type {
   DeclaredTransaction,
@@ -53,7 +55,8 @@ import type {
   L1_HANDLER_TXN,
   TransactionWithHash,
 } from './types/spec.type';
-import { verifyMessageInStarknet } from '../utils/modules/verifyMessageInStarknet';
+import { verifyMessageInStarknet } from './modules/verifyMessageInStarknet';
+import { getGasPrices } from './modules';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -212,6 +215,24 @@ export class RpcProvider implements ProviderInterface {
       .then(this.responseParser.parseL1GasPriceResponse);
   }
 
+  /**
+   * Get the gas prices related to a block.
+   * @param {BlockIdentifier} [blockIdentifier = this.identifier] - Optional. Can be 'pending', 'latest' or a block number (an integer type).
+   * @returns {Promise<GasPrices>} an object with l1DataGasPrice, l1GasPrice, l2GasPrice properties (all bigint type).
+   * @example
+   * ```ts
+   * const result = await myProvider.getGasPrices();
+   * // result = { l1DataGasPrice: 3039n, l1GasPrice: 55590341542890n, l2GasPrice: 8441845008n }
+   * ```
+   */
+  public async getGasPrices(
+    blockIdentifier: BlockIdentifier = this.channel.blockIdentifier
+  ): Promise<GasPrices> {
+    if (this.channel instanceof RPC09.RpcChannel)
+      return getGasPrices(this.channel, blockIdentifier);
+    throw new LibraryError('Unsupported method for RPC version');
+  }
+
   public async getL1MessageHash(l2TxHash: BigNumberish): Promise<string> {
     const transaction = (await this.channel.getTransactionByHash(l2TxHash)) as TransactionWithHash;
     assert(transaction.type === 'L1_HANDLER', 'This L2 transaction is not a L1 message.');
@@ -268,7 +289,7 @@ export class RpcProvider implements ProviderInterface {
     const txReceiptWoHelper = await this.channel.getTransactionReceipt(txHash);
     const txReceiptWoHelperModified =
       this.responseParser.parseTransactionReceipt(txReceiptWoHelper);
-    return new ReceiptTx(txReceiptWoHelperModified);
+    return createTransactionReceipt(txReceiptWoHelperModified);
   }
 
   public async getTransactionTrace(
@@ -300,7 +321,38 @@ export class RpcProvider implements ProviderInterface {
       options
     )) as GetTxReceiptResponseWithoutHelper;
 
-    return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
+    return createTransactionReceipt(receiptWoHelper);
+  }
+
+  /**
+   * Wait up until a new transaction is possible with same the account.
+   * This method is fast, but Events and transaction report are not yet
+   * available. Useful for gaming activity.
+   * - only rpc 0.9 and onwards.
+   * @param {BigNumberish} txHash - transaction hash
+   * @param {string} address - address of the account
+   * @param {BigNumberish} initNonce - initial nonce of the account (before the transaction).
+   * @param {fastWaitForTransactionOptions} [options={retries: 50, retryInterval: 500}] - options to scan the network for the next possible transaction. `retries` is the number of times to retry.
+   * @returns {Promise<boolean>} Returns true if the next transaction is possible,
+   * false if the timeout has been reached,
+   * throw an error in case of provider communication.
+   */
+  public async fastWaitForTransaction(
+    txHash: BigNumberish,
+    address: string,
+    initNonce: BigNumberish,
+    options?: fastWaitForTransactionOptions
+  ): Promise<boolean> {
+    if (this.channel instanceof RPC09.RpcChannel) {
+      const isSuccess = await this.channel.fastWaitForTransaction(
+        txHash,
+        address,
+        initNonce,
+        options
+      );
+      return isSuccess;
+    }
+    throw new Error('Unsupported channel type');
   }
 
   public async getStorageAt(
@@ -375,17 +427,12 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ) {
-    const estimates = await this.getEstimateFeeBulk(
-      [
-        {
-          type: ETransactionType.INVOKE,
-          ...invocation,
-          ...details,
-        },
-      ],
-      { blockIdentifier, skipValidate }
-    );
-    return estimates[0]; // Return the first (and only) estimate
+    return (
+      await this.getEstimateFeeBulk(
+        [{ type: ETransactionType.INVOKE, ...invocation, ...details }],
+        { blockIdentifier, skipValidate }
+      )
+    )[0]; // Return the first (and only) estimate
   }
 
   public async getDeclareEstimateFee(
@@ -394,17 +441,12 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ) {
-    const estimates = await this.getEstimateFeeBulk(
-      [
-        {
-          type: ETransactionType.DECLARE,
-          ...invocation,
-          ...details,
-        },
-      ],
-      { blockIdentifier, skipValidate }
-    );
-    return estimates[0]; // Return the first (and only) estimate
+    return (
+      await this.getEstimateFeeBulk(
+        [{ type: ETransactionType.DECLARE, ...invocation, ...details }],
+        { blockIdentifier, skipValidate }
+      )
+    )[0]; // Return the first (and only) estimate
   }
 
   public async getDeployAccountEstimateFee(
@@ -413,22 +455,17 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ) {
-    const estimates = await this.getEstimateFeeBulk(
-      [
-        {
-          type: ETransactionType.DEPLOY_ACCOUNT,
-          ...invocation,
-          ...details,
-        },
-      ],
-      { blockIdentifier, skipValidate }
-    );
-    return estimates[0]; // Return the first (and only) estimate
+    return (
+      await this.getEstimateFeeBulk(
+        [{ type: ETransactionType.DEPLOY_ACCOUNT, ...invocation, ...details }],
+        { blockIdentifier, skipValidate }
+      )
+    )[0]; // Return the first (and only) estimate
   }
 
   public async getEstimateFeeBulk(
     invocations: AccountInvocations,
-    options: getEstimateFeeBulkOptions
+    options?: getEstimateFeeBulkOptions
   ) {
     return this.channel
       .getEstimateFee(invocations, options)
@@ -570,7 +607,10 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getCompiledCasm(classHash);
   }
 
-  public async getEstimateTip(blockIdentifier?: BlockIdentifier, options: TipAnalysisOptions = {}) {
+  public async getEstimateTip(
+    blockIdentifier?: BlockIdentifier,
+    options: TipAnalysisOptions = {}
+  ): Promise<TipEstimate> {
     return getTipStatsFromBlocks(this, blockIdentifier, options);
   }
 }
