@@ -1,10 +1,13 @@
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
-import { getNext } from '../num';
+import { getNext, isBigNumberish } from '../num';
 import { felt, getArrayType, isTypeArray } from '../calldata/cairo';
 import { type ParsingStrategy } from '../calldata/parser/parsingStrategy.type';
 import { CairoType } from './cairoType.interface';
 import type { AllowArray } from '../../types';
+import { CairoFelt252 } from './felt';
+import { CairoBytes31 } from './bytes31';
+import { splitLongString } from '../shortString';
 
 /**
  * Represents a Cairo dynamic array with runtime-determined length.
@@ -105,44 +108,55 @@ export class CairoArray extends CairoType {
       this.arrayType = content.arrayType;
       return;
     }
-    CairoArray.validate(content, arrayType);
     const arrayContentType = CairoArray.getArrayElementType(arrayType);
-    const resultContent: any[] = CairoArray.extractValuesArray(content).map((contentItem: any) => {
-      if (
-        contentItem &&
-        typeof contentItem === 'object' &&
-        contentItem !== null &&
-        'toApiRequest' in contentItem
-      ) {
-        // "content" is a CairoType
-        return contentItem as CairoType;
-      }
-      // not an iterator, not an CairoType -> so is low level data (BigNumberish, array, object, Cairo Enums)
-
-      const strategyConstructorNum = strategies.findIndex(
-        (strategy: ParsingStrategy) => strategy.constructors[arrayContentType]
-      );
-      if (strategyConstructorNum >= 0) {
-        const constructor = strategies[strategyConstructorNum].constructors[arrayContentType];
-        return constructor(contentItem, strategies, arrayContentType);
-      }
-      const strategyDynamicNum = strategies.findIndex((strategy: ParsingStrategy) => {
-        const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-        return dynamicSelectors.find(([, selectorFn]) => selectorFn(arrayContentType));
-      });
-      if (strategyDynamicNum >= 0) {
-        const dynamicSelectors = Object.entries(strategies[strategyDynamicNum].dynamicSelectors);
-        const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
-          selectorFn(arrayContentType)
-        );
-        const [selectorName] = matchingSelector as [string, (type: string) => boolean];
-        const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
-        if (dynamicConstructor) {
-          return dynamicConstructor(contentItem, strategies, arrayContentType);
+    let processedContent = content;
+    if (
+      typeof content === 'string' &&
+      !isBigNumberish(content) &&
+      (arrayContentType === CairoFelt252.abiSelector ||
+        arrayContentType === CairoBytes31.abiSelector)
+    ) {
+      processedContent = splitLongString(content);
+    }
+    CairoArray.validate(processedContent, arrayType);
+    const resultContent: any[] = CairoArray.extractValuesArray(processedContent).map(
+      (contentItem: any) => {
+        if (
+          contentItem &&
+          typeof contentItem === 'object' &&
+          contentItem !== null &&
+          'toApiRequest' in contentItem
+        ) {
+          // "content" is a CairoType
+          return contentItem as CairoType;
         }
+        // not an iterator, not an CairoType -> so is low level data (BigNumberish, array, object, Cairo Enums)
+
+        const strategyConstructorNum = strategies.findIndex(
+          (strategy: ParsingStrategy) => strategy.constructors[arrayContentType]
+        );
+        if (strategyConstructorNum >= 0) {
+          const constructor = strategies[strategyConstructorNum].constructors[arrayContentType];
+          return constructor(contentItem, strategies, arrayContentType);
+        }
+        const strategyDynamicNum = strategies.findIndex((strategy: ParsingStrategy) => {
+          const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+          return dynamicSelectors.find(([, selectorFn]) => selectorFn(arrayContentType));
+        });
+        if (strategyDynamicNum >= 0) {
+          const dynamicSelectors = Object.entries(strategies[strategyDynamicNum].dynamicSelectors);
+          const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+            selectorFn(arrayContentType)
+          );
+          const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+          const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
+          if (dynamicConstructor) {
+            return dynamicConstructor(contentItem, strategies, arrayContentType);
+          }
+        }
+        throw new Error(`"${arrayContentType}" is not a valid Cairo type`);
       }
-      throw new Error(`"${arrayContentType}" is not a valid Cairo type`);
-    });
+    );
     this.content = resultContent;
   }
 

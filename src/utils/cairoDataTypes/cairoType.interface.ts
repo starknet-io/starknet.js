@@ -38,5 +38,5 @@ export abstract class CairoType {
   /**
    * Convert the CairoType to the API request format
    */
-  abstract toApiRequest(): any;
+  abstract toApiRequest(): string[];
 }

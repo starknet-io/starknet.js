@@ -47,6 +47,7 @@ import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
 import { CairoBool } from '../cairoDataTypes';
 import { CairoEthAddress } from '../cairoDataTypes/ethAddress';
 import { CairoNonZero } from '../cairoDataTypes/nonZero';
+import { hdParsingStrategy } from './parser';
 
 // TODO: separate validate is redundant as CairoTypes are validated during construction.
 // TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
@@ -448,9 +449,11 @@ export default function validateFields(
       case isTypeTuple(input.type):
         validateTuple(parameter, input);
         break;
-      case CairoNonZero.isAbiType(input.type):
-        CairoNonZero.validate(parameter, input.type);
+      case CairoNonZero.isAbiType(input.type): {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const tmp = new CairoNonZero(parameter, input.type, hdParsingStrategy);
         break;
+      }
       default:
         throw new Error(
           `Validate Unhandled: argument ${input.name}, type ${input.type}, value ${parameter}`

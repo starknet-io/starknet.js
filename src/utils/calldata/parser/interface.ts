@@ -32,14 +32,12 @@ export abstract class AbiParserInterface {
    * @param abiType AbiEntryType
    * @returns Parser function
    */
-  public abstract getRequestParser(abiType: AbiEntryType): (val: unknown, type?: string) => any;
+  public abstract parseRequestField(requestContent: any, abiType: AbiEntryType): string[];
 
   /**
    * Get response parser for the given abi type
    * @param abiType AbiEntryType
    * @returns Parser function
    */
-  public abstract getResponseParser(
-    abiType: AbiEntryType
-  ): (responseIterator: Iterator<string>, type?: string) => any;
+  public abstract parseResponse(responseIterator: Iterator<string>, abiType: string): any;
 }

@@ -63,30 +63,23 @@ describe('CairoArray Integration Tests', () => {
 
     test('should work with AbiParser2 request parsing', () => {
       const parser = new AbiParser2(mockAbi, hdParsingStrategy);
-      const requestParser = parser.getRequestParser('core::array::Array::<core::integer::u8>');
-
-      const result = requestParser([1, 2, 3], 'core::array::Array::<core::integer::u8>');
+      const result = parser.parseRequestField([1, 2, 3], 'core::array::Array::<core::integer::u8>');
       expect(result).toEqual(['3', '1', '2', '3']);
     });
 
     test('should work with AbiParser2 response parsing', () => {
       const parser = new AbiParser2(mockAbi, hdParsingStrategy);
-      const responseParser = parser.getResponseParser('core::array::Array::<core::integer::u8>');
 
       const mockResponse = ['0x2', '0xa', '0xb']; // length=2, elements=[10, 11]
       const iterator = mockResponse[Symbol.iterator]();
-      const result = responseParser(iterator, 'core::array::Array::<core::integer::u8>');
+      const result = parser.parseResponse(iterator, 'core::array::Array::<core::integer::u8>');
 
       expect(result).toEqual([10n, 11n]);
     });
 
     test('should handle nested arrays in AbiParser2', () => {
       const parser = new AbiParser2(mockAbi, hdParsingStrategy);
-      const requestParser = parser.getRequestParser(
-        'core::array::Array::<core::array::Array::<core::integer::u8>>'
-      );
-
-      const result = requestParser(
+      const result = parser.parseRequestField(
         [[1, 2], [3]],
         'core::array::Array::<core::array::Array::<core::integer::u8>>'
       );
@@ -95,9 +88,7 @@ describe('CairoArray Integration Tests', () => {
 
     test('should handle empty arrays in AbiParser2', () => {
       const parser = new AbiParser2(mockAbi, hdParsingStrategy);
-      const requestParser = parser.getRequestParser('core::array::Array::<core::integer::u8>');
-
-      const result = requestParser([], 'core::array::Array::<core::integer::u8>');
+      const result = parser.parseRequestField([], 'core::array::Array::<core::integer::u8>');
       expect(result).toEqual(['0']);
     });
   });
@@ -170,13 +161,14 @@ describe('CairoArray Integration Tests', () => {
       const originalData = [100, 200, 300];
 
       // Request parsing (serialize)
-      const requestParser = parser.getRequestParser('core::array::Array::<core::integer::u32>');
-      const serialized = requestParser(originalData, 'core::array::Array::<core::integer::u32>');
+      const serialized = parser.parseRequestField(
+        originalData,
+        'core::array::Array::<core::integer::u32>'
+      );
 
       // Response parsing (deserialize)
-      const responseParser = parser.getResponseParser('core::array::Array::<core::integer::u32>');
       const iterator = serialized[Symbol.iterator]();
-      const result = responseParser(iterator, 'core::array::Array::<core::integer::u32>');
+      const result = parser.parseResponse(iterator, 'core::array::Array::<core::integer::u32>');
 
       expect(result).toEqual([100n, 200n, 300n]);
     });

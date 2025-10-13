@@ -214,7 +214,7 @@ export class CairoNonZero extends CairoType {
     ];
     if (isInstanceOf(cairoInstance, nonZeroUints)) {
       assert(
-        (cairoInstance as CairoUint8).toBigInt() > 0n, // TODO: find a more elegant way to access to .toBigInt() property
+        (cairoInstance as CairoType & { toBigInt: Function }).toBigInt() > 0n,
         'ValidateValue: value 0 is not authorized in NonZero type.'
       );
       return;

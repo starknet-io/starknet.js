@@ -293,7 +293,11 @@ describe('CairoUint96 class Unit Tests', () => {
 
   describe('isAbiType static method', () => {
     test('should identify correct ABI type', () => {
-      expect(CairoUint96.isAbiType('core::integer::u96')).toBe(true);
+      expect(
+        CairoUint96.isAbiType(
+          'core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>'
+        )
+      ).toBe(true);
       expect(CairoUint96.isAbiType('core::integer::u64')).toBe(false);
       expect(CairoUint96.isAbiType('core::integer::u128')).toBe(false);
       expect(CairoUint96.isAbiType('felt252')).toBe(false);

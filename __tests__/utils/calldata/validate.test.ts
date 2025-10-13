@@ -562,8 +562,8 @@ describe('validateFields', () => {
       ).toThrow(error);
     });
 
-    test('should throw an error if value 0 iz provided for felt252 type', () => {
-      const error = new Error('Validate: value 0 is not authorized in NonZero felt252 type.');
+    test('should throw an error if value 0 is provided for felt252 type', () => {
+      const error = new Error('ValidateValue: value 0 is not authorized in NonZero type.');
 
       expect(() =>
         validateFields(
@@ -575,8 +575,8 @@ describe('validateFields', () => {
       ).toThrow(error);
     });
 
-    test('should throw an error if value 0 iz provided for uint256 type', () => {
-      const error = new Error('Validate: value 0 is not authorized in NonZero uint256 type.');
+    test('should throw an error if value 0 is provided for uint256 type', () => {
+      const error = new Error('ValidateValue: value 0 is not authorized in NonZero type.');
 
       expect(() =>
         validateFields(
@@ -588,8 +588,8 @@ describe('validateFields', () => {
       ).toThrow(error);
     });
 
-    test('should throw an error if value 0 iz provided for any uint type', () => {
-      const error = new Error('Validate: value 0 is not authorized in NonZero uint8 type.');
+    test('should throw an error if value 0 is provided for any uint type', () => {
+      const error = new Error('ValidateValue: value 0 is not authorized in NonZero type.');
 
       expect(() =>
         validateFields(

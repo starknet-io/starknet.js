@@ -980,7 +980,7 @@ describe('Cairo 1', () => {
 
     test('ByteArray', async () => {
       const message = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ12345AAADEFGHIJKLMNOPQRSTUVWXYZ12345A';
-      const callD = CallData.compile([message]);
+      const callD = CallData.compile([new CairoByteArray(message).toObject()]);
       const expectedResult = [
         '2',
         hexToDecimalString('0x4142434445464748494a4b4c4d4e4f505152535455565758595a3132333435'),
@@ -989,9 +989,9 @@ describe('Cairo 1', () => {
         '1',
       ];
       expect(callD).toEqual(expectedResult);
-      const callD2 = CallData.compile({ mess: message });
+      const callD2 = CallData.compile({ mess: new CairoByteArray(message).toObject() });
       expect(callD2).toEqual(expectedResult);
-      const callD3 = CallData.compile({ mess: new CairoByteArray('Take care.') });
+      const callD3 = CallData.compile({ mess: new CairoByteArray('Take care.').toObject() });
       expect(callD3).toEqual(['0', '398475857363345939260718', '10']);
       const str1 = await stringContract.get_string();
       expect(str1).toBe(

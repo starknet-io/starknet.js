@@ -75,20 +75,18 @@ export class AbiParser2 implements AbiParserInterface {
     this.parsingStrategies = [parsingStrategy, structAndEnumStrategy];
   }
 
-  public getRequestParser(abiType: AbiEntryType): (val: unknown, type?: string) => any {
+  public parseRequestField(requestData: any, abiType: AbiEntryType): string[] {
     // Check direct constructors first
     const strategyConstructorNum = this.parsingStrategies.findIndex(
       (strategy: ParsingStrategy) => strategy.constructors[abiType]
     );
     if (strategyConstructorNum >= 0) {
-      return (val: unknown, type?: string) => {
-        const instance = this.parsingStrategies[strategyConstructorNum].constructors[abiType](
-          val,
-          this.parsingStrategies,
-          type
-        );
-        return instance.toApiRequest();
-      };
+      const instance = this.parsingStrategies[strategyConstructorNum].constructors[abiType](
+        requestData,
+        this.parsingStrategies,
+        abiType
+      );
+      return instance.toApiRequest();
     }
     // Check dynamic selectors
     const strategyDynamicNum = this.parsingStrategies.findIndex((strategy: ParsingStrategy) => {
@@ -106,35 +104,26 @@ export class AbiParser2 implements AbiParserInterface {
       const dynamicConstructor =
         this.parsingStrategies[strategyDynamicNum].constructors[selectorName];
       if (dynamicConstructor) {
-        return (val: unknown, type?: string) => {
-          const instance = dynamicConstructor(val, this.parsingStrategies, type || abiType);
-          return instance.toApiRequest();
-        };
+        const instance = dynamicConstructor(requestData, this.parsingStrategies, abiType);
+        return instance.toApiRequest();
       }
     }
-
     throw new Error(`Parser for ${abiType} not found`);
   }
 
-  public getResponseParser(
-    abiType: AbiEntryType
-  ): (responseIterator: Iterator<string>, type?: string) => any {
+  public parseResponse(responseIterator: Iterator<string>, abiType: string): any {
     // Check direct constructors first
     const strategyConstructorNum = this.parsingStrategies.findIndex(
       (strategy: ParsingStrategy) => strategy.constructors[abiType] && strategy.response[abiType]
     );
     if (strategyConstructorNum >= 0) {
-      return (responseIterator: Iterator<string>, type?: string) => {
-        const instance = this.parsingStrategies[strategyConstructorNum].constructors[abiType](
-          responseIterator,
-          this.parsingStrategies,
-          type
-        );
-        return this.parsingStrategies[strategyConstructorNum].response[abiType](
-          instance,
-          this.parsingStrategies
-        );
-      };
+      const instance: CairoType = this.parsingStrategies[strategyConstructorNum].constructors[
+        abiType
+      ](responseIterator, this.parsingStrategies);
+      return this.parsingStrategies[strategyConstructorNum].response[abiType](
+        instance,
+        this.parsingStrategies
+      );
     }
     // Check dynamic selectors
     const strategyDynamicNum = this.parsingStrategies.findIndex((strategy: ParsingStrategy) => {
@@ -151,14 +140,12 @@ export class AbiParser2 implements AbiParserInterface {
         this.parsingStrategies[strategyDynamicNum].constructors[selectorName];
       const responseParser = this.parsingStrategies[strategyDynamicNum].response[selectorName];
       if (dynamicConstructor && responseParser) {
-        return (responseIterator: Iterator<string>, type?: string) => {
-          const instance = dynamicConstructor(
-            responseIterator,
-            this.parsingStrategies,
-            type || abiType
-          );
-          return responseParser(instance, this.parsingStrategies);
-        };
+        const instance: CairoType = dynamicConstructor(
+          responseIterator,
+          this.parsingStrategies,
+          abiType
+        );
+        return responseParser(instance, this.parsingStrategies);
       }
     }
 

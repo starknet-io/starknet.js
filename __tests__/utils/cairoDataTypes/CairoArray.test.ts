@@ -253,6 +253,33 @@ describe('CairoArray class Unit test', () => {
       expect(result2).toEqual(['2', '1', '2']);
     });
 
+    test('Long string to array', () => {
+      const arr0 = new CairoArray(
+        'Bug is back, for ever, here and everywhere',
+        'core::array::Array::<core::felt252>',
+        hdParsingStrategy
+      ).toApiRequest();
+      const expectedResponse = [
+        '2',
+        '117422190885827407409664260607192623408641871979684112605616397634538401380',
+        '39164769268277364419555941',
+      ];
+      expect(arr0).toEqual(expectedResponse);
+      const arr1 = new CairoArray(
+        'Bug is back, for ever, here and everywhere',
+        'core::array::Array::<core::bytes_31::bytes31>',
+        hdParsingStrategy
+      ).toApiRequest();
+      expect(arr1).toEqual(expectedResponse);
+      expect(() =>
+        new CairoArray(
+          'Bug is back, for ever, here and everywhere',
+          'core::array::Array::<core::integer::u8>',
+          hdParsingStrategy
+        ).toApiRequest()
+      ).toThrow(new Error('Invalid input: expected Array or Object, got string'));
+    });
+
     test('should throw for invalid inputs', () => {
       expect(() => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars

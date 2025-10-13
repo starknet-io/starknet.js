@@ -200,6 +200,20 @@ export class CairoByteArray extends CairoType {
   }
 
   /**
+   * Converts the encoded  ByteArray into a plain object representation.
+   * @returns {Record<string, any>} plain object representation of the CairoByteArray instance.
+   * @example
+   * ```ts
+   * const byteArray = new CairoByteArray("Token").toObject();
+   * // byteArray = { '0': '0', '1': '362646562158', '2': '5' }
+   * ```
+   */
+  toObject(): Record<string, any> {
+    this.assertInitialized();
+    return { ...this.toApiRequest() };
+  }
+
+  /**
    * Private helper to check if the CairoByteArray is properly initialized
    */
   private assertInitialized(): void {

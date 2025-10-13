@@ -11,7 +11,8 @@ import { addCompiledFlag } from '../helpers';
 export class CairoUint96 {
   data: bigint;
 
-  static abiSelector = 'core::integer::u96';
+  static abiSelector =
+    'core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>';
 
   constructor(data: BigNumberish | boolean | unknown) {
     CairoUint96.validate(data);

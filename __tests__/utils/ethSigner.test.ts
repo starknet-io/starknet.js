@@ -84,7 +84,7 @@ describe('Ethereum signer', () => {
 
     test('secp256k1', async () => {
       const myCallData = new CallData(ethPubKContract.abi);
-      const ethPubKey =
+      const ethPubKey: string =
         '0x8c7aea7d673a5858bdca128d124fb0765cceb2c16f198f4c14b328aa571331e6f6c87f51d5224d73d118765cb19d7565212f80be5048bff926ba791c17541c92';
       const resp3 = await ethPubKContract.test_public_key(ethPubKey);
       expect(num.toHex(resp3)).toBe(ethPubKey);

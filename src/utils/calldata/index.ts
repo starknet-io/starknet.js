@@ -15,7 +15,7 @@ import {
   ValidateType,
 } from '../../types';
 import assert from '../assert';
-import { toHex } from '../num';
+import { getNext, toHex } from '../num';
 import { isBigInt } from '../typed';
 import { getSelectorFromName } from '../hash/selector';
 import { isLongText } from '../shortString';
@@ -36,8 +36,7 @@ import { createAbiParser, isNoConstructorValid, type ParsingStrategy } from './p
 import { hdParsingStrategy } from './parser/parsingStrategy';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
-import { parseCalldataField } from './requestParser';
-import responseParser from './responseParser';
+// import { parseCalldataField } from './requestParser';
 import validateFields from './validate';
 import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
 import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
@@ -49,7 +48,7 @@ import { CairoNonZero } from '../cairoDataTypes/nonZero';
 import { CairoEthAddress } from '../cairoDataTypes';
 
 export * as cairo from './cairo';
-export { parseCalldataField } from './requestParser';
+// export { parseCalldataField } from './requestParser';
 export * from './parser';
 
 export class CallData {
@@ -162,15 +161,7 @@ export class CallData {
       (acc, input) =>
         isLen(input.name) && !isCairo1Type(input.type)
           ? acc
-          : acc.concat(
-              parseCalldataField({
-                argsIterator,
-                input,
-                structs: this.structs,
-                enums: this.enums,
-                parser: this.parser,
-              })
-            ),
+          : acc.concat(this.parser.parseRequestField(getNext(argsIterator), input.type)),
       [] as Calldata
     );
 
@@ -297,17 +288,7 @@ export class CallData {
 
     const parsed = outputs.flat().reduce((acc, output, idx) => {
       const propName = output.name ?? idx;
-      acc[propName] = responseParser({
-        responseIterator,
-        output,
-        structs: this.structs,
-        enums: this.enums,
-        parsedResult: acc,
-        parser: this.parser,
-      });
-      if (acc[propName] && acc[`${propName}_len`]) {
-        delete acc[`${propName}_len`];
-      }
+      acc[propName] = this.parser.parseResponse(responseIterator, output.type);
       return acc;
     }, {} as Args);
 
@@ -380,15 +361,8 @@ export class CallData {
   ): AllowArray<CallResult> {
     const typeCairoArray = Array.isArray(typeCairo) ? typeCairo : [typeCairo];
     const responseIterator = response.flat()[Symbol.iterator]();
-    const decodedArray = typeCairoArray.map(
-      (typeParam) =>
-        responseParser({
-          responseIterator,
-          output: { name: '', type: typeParam },
-          parser: this.parser,
-          structs: this.structs,
-          enums: this.enums,
-        }) as CallResult
+    const decodedArray = typeCairoArray.map((typeParam) =>
+      this.parser.parseResponse(responseIterator, typeParam)
     );
     return decodedArray.length === 1 ? decodedArray[0] : decodedArray;
   }

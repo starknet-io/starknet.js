@@ -100,7 +100,11 @@ describe('CairoNonZero', () => {
     test('content is a u96', () => {
       expect(
         () =>
-          new CairoNonZero(0, 'core::zeroable::NonZero::<core::integer::u96>', hdParsingStrategy)
+          new CairoNonZero(
+            0,
+            'core::zeroable::NonZero::<core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>>',
+            hdParsingStrategy
+          )
       ).toThrow(new Error('ValidateValue: value 0 is not authorized in NonZero type.'));
     });
     test('content is a u128', () => {

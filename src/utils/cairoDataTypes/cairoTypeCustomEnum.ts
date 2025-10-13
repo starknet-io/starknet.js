@@ -373,7 +373,7 @@ export class CairoTypeCustomEnum extends CairoType {
    */
   public toApiRequest(): string[] {
     const result: string[] = [this.enumVariant.toString(10)];
-    result.push(this.content!.toApiRequest());
+    result.push(...this.content!.toApiRequest());
     return addCompiledFlag(result.flat());
   }
 
