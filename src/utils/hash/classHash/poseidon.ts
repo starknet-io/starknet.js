@@ -72,7 +72,7 @@ export function hashByteCodeSegments(casm: CompiledSierraCasm): bigint {
  * // result = "0x4087905743b4fa2b3affc1fc71333f1390c8c5d1e8ea47d6ba70786de3fc01a"
 ```
  */
-export function computeCompiledClassHash(casm: CompiledSierraCasm): string {
+export function computeCompiledClassHashPoseidon(casm: CompiledSierraCasm): string {
   // Hash compiled class version
   const compiledClassVersion = BigInt(encodeShortString(COMPILED_CLASS_V1));
 

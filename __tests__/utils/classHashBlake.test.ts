@@ -6,7 +6,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     test('Rust test_contract.casm - Blake2s hash matches expected value', () => {
       // This is the exact test contract used in the Rust sequencer tests
       // Source: /sequencer/crates/blockifier_test_utils/resources/feature_contracts/cairo1/compiled/test_contract.casm.json
-      const { casm } = contracts.RustTestContract;
+      const { casm } = contracts.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
 
@@ -20,7 +20,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Rust test_contract.casm - Poseidon hash for comparison', () => {
-      const { casm } = contracts.RustTestContract;
+      const { casm } = contracts.Blake2sVerificationContract;
 
       const poseidonHash = hash.computeCompiledClassHash(casm);
 
@@ -33,7 +33,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Rust test_contract.casm - Blake2s differs from Poseidon', () => {
-      const { casm } = contracts.RustTestContract;
+      const { casm } = contracts.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
       const poseidonHash = hash.computeCompiledClassHash(casm);

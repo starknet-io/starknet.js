@@ -106,7 +106,6 @@
     "@starknet-io/starknet-types-08": "npm:@starknet-io/types-js@~0.8.4",
     "@starknet-io/starknet-types-09": "npm:@starknet-io/types-js@~0.9.1",
     "abi-wan-kanabi": "2.2.4",
-    "blakejs": "^1.2.1",
     "lossless-json": "^4.2.0",
     "pako": "^2.0.4",
     "ts-mixer": "^6.0.3"

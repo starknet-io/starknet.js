@@ -79,7 +79,7 @@ const compiledContracts = {
   CairoByteArray: 'byteArray/target/dev/test_ByteArrayStorage',
   IntegerTypes: 'integerTypes/target/dev/test_IntegerTypesStorage',
   // CASM-only contracts (used for Blake2s hash verification against Rust implementation)
-  RustTestContract: readContractCasmOnly('test_contract_rust'),
+  Blake2sVerificationContract: readContractCasmOnly('test_contract_rust'),
 };
 export const contracts = mapContractSets(compiledContracts);
 

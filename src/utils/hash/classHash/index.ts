@@ -1,18 +1,24 @@
 /**
  * Class Hash Exports
  */
-import { CompiledContract, CompiledSierra, LegacyCompiledContract } from '../../../types';
+import {
+  CompiledContract,
+  CompiledSierra,
+  CompiledSierraCasm,
+  LegacyCompiledContract,
+} from '../../../types';
 import { parse } from '../../json';
 import { isString } from '../../typed';
 import { computeLegacyContractClassHash } from './pedersen';
-import { computeSierraContractClassHash } from './poseidon';
+import { computeCompiledClassHashPoseidon, computeSierraContractClassHash } from './poseidon';
+import { computeCompiledClassHashBlake } from './blake';
+import { SupportedRpcVersion } from '../../../global/constants';
+import { compareVersions } from '../../resolve';
 
 export * from './pedersen';
 export * from './poseidon';
 export * from './blake';
 export * from './util';
-
-// TODO: Add check to use Blake2s hash for Cairo 1 contracts if starknet version is >= 0.14.1
 /**
  * Compute ClassHash (sierra or legacy) based on provided contract
  * @param {CompiledContract | string} contract Cairo 1 contract content
@@ -32,4 +38,17 @@ export function computeContractClassHash(contract: CompiledContract | string): s
   }
 
   return computeLegacyContractClassHash(compiledContract as LegacyCompiledContract);
+}
+
+export function computeCompiledClassHash(
+  casm: CompiledSierraCasm,
+  /**
+   * Used to determine which hashing algorithm to use
+   */
+  specVersion?: SupportedRpcVersion
+): string {
+  if (specVersion && compareVersions(specVersion, '0.10.0') >= 0) {
+    return computeCompiledClassHashBlake(casm);
+  }
+  return computeCompiledClassHashPoseidon(casm);
 }

@@ -1,7 +1,8 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-restricted-syntax */
-import { blake2s } from 'blakejs';
+import { blake2s } from '@noble/hashes/blake2s';
+// import { blake2s } from 'blakejs';
 
 import { toHex } from '../../num';
 import { encodeShortString } from '../../shortString';
@@ -69,7 +70,9 @@ function blake2sHashMany(data: bigint[]): bigint {
   }
 
   // Compute Blake2s hash (32 bytes output)
-  const hash = blake2s(bytes, undefined, 32);
+  // TODO: switch to blakejs when removing Paul's version
+  // const hash = blake2s(bytes, undefined, 32); // blakejs version
+  const hash = blake2s(bytes, { dkLen: 32 }); // Paul version
 
   // Convert hash from little-endian to bigint
   let hashBigInt = 0n;
