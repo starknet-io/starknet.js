@@ -441,6 +441,13 @@ describe('CairoByteArray Unit Tests', () => {
       expect(byteArray.toBigInt()).toBe(expected);
     });
 
+    describe('toDecimalString method', () => {
+      test('should convert short string to bigint', () => {
+        const byteArray = new CairoByteArray('Test');
+        expect(byteArray.toDecimalString()).toBe('1415934836');
+      });
+    });
+
     test('should convert long string with multiple chunks to bigint', () => {
       const str = 'This is a very long string that exceeds 31 bytes limit for testing';
       const byteArray = new CairoByteArray(str);

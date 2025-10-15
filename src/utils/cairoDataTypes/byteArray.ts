@@ -169,7 +169,7 @@ export class CairoByteArray extends CairoType {
   }
 
   toDecimalString() {
-    return addHexPrefix(this.toBigInt().toString(10));
+    return this.toBigInt().toString(10);
   }
 
   toBuffer() {
