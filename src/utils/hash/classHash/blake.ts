@@ -20,66 +20,56 @@ import { COMPILED_CLASS_VERSION as COMPILED_CLASS_V1, encodeBuiltins } from './u
  * 3. Computes Blake2s hash (32-byte output)
  * 4. Interprets hash as little-endian Felt
  */
-function blake2sHashMany(data: bigint[]): bigint {
+export function blake2sHashMany(data: bigint[]): bigint {
   const SMALL_THRESHOLD = 0x8000000000000000n; // 2^63
   const BIG_MARKER = 0x80000000; // 1 << 31
 
   // Encode each Felt to u32 words
   const u32Words: number[] = [];
-
+  const buf = new ArrayBuffer(32);
+  const feltView = new DataView(buf);
   for (const felt of data) {
     // Convert to 32-byte big-endian representation
-    const feltBytes = new Uint8Array(32);
-    let value = felt;
-    for (let i = 31; i >= 0; i--) {
-      feltBytes[i] = Number(value & 0xffn);
-      value >>= 8n;
-    }
-
+    const u64_0 = felt & 0xffffffffffffffffn;
+    const u64_1 = (felt & 0xffffffffffffffff0000000000000000n) >> 64n;
+    const u64_2 = (felt & 0xffffffffffffffff00000000000000000000000000000000n) >> 128n;
+    const u64_3 =
+      (felt & 0xffffffffffffffff000000000000000000000000000000000000000000000000n) >> 192n;
+    feltView.setBigUint64(0, u64_3, false);
+    feltView.setBigUint64(8, u64_2, false);
+    feltView.setBigUint64(16, u64_1, false);
+    feltView.setBigUint64(24, u64_0, false);
     if (felt < SMALL_THRESHOLD) {
       // Small value: 2 u32 words from last 8 bytes
-      const hi =
-        (feltBytes[24] << 24) | (feltBytes[25] << 16) | (feltBytes[26] << 8) | feltBytes[27];
-      const lo =
-        (feltBytes[28] << 24) | (feltBytes[29] << 16) | (feltBytes[30] << 8) | feltBytes[31];
-      u32Words.push(hi, lo);
+      const hi0 = feltView.getUint32(24, false);
+      const lo0 = feltView.getUint32(28, false);
+      u32Words.push(hi0, lo0);
     } else {
       // Large value: 8 u32 words with MSB marker
-      const startIdx = u32Words.length;
-      for (let i = 0; i < 32; i += 4) {
-        const word =
-          (feltBytes[i] << 24) |
-          (feltBytes[i + 1] << 16) |
-          (feltBytes[i + 2] << 8) |
-          feltBytes[i + 3];
-        u32Words.push(word);
-      }
       // Set MSB of first word as marker
-      u32Words[startIdx] |= BIG_MARKER;
+      const word0 = feltView.getUint32(0, false) | BIG_MARKER;
+      const word1 = feltView.getUint32(4, false);
+      const word2 = feltView.getUint32(8, false);
+      const word3 = feltView.getUint32(12, false);
+      const word4 = feltView.getUint32(16, false);
+      const word5 = feltView.getUint32(20, false);
+      const word6 = feltView.getUint32(24, false);
+      const word7 = feltView.getUint32(28, false);
+      u32Words.push(word0, word1, word2, word3, word4, word5, word6, word7);
     }
   }
 
   // Serialize u32 words as little-endian bytes
-  const bytes = new Uint8Array(u32Words.length * 4);
+  const bytes = new ArrayBuffer(u32Words.length * 4);
+  const bytesView = new DataView(bytes);
   for (let i = 0; i < u32Words.length; i++) {
-    const word = u32Words[i];
-    bytes[i * 4] = word & 0xff;
-    bytes[i * 4 + 1] = (word >>> 8) & 0xff;
-    bytes[i * 4 + 2] = (word >>> 16) & 0xff;
-    bytes[i * 4 + 3] = (word >>> 24) & 0xff;
+    bytesView.setUint32(i * 4, u32Words[i], true);
   }
-
-  // Compute Blake2s hash (32 bytes output)
-  // TODO: switch to blakejs when removing Paul's version
-  // const hash = blake2s(bytes, undefined, 32); // blakejs version
-  const hash = blake2s(bytes, { dkLen: 32 }); // Paul version
-
-  // Convert hash from little-endian to bigint
+  const hash = blake2s(new Uint8Array(bytes), { dkLen: 32 }); // Paul version
   let hashBigInt = 0n;
   for (let i = 0; i < 32; i++) {
     hashBigInt |= BigInt(hash[i]) << BigInt(i * 8);
   }
-
   return hashBigInt % PRIME;
 }
 
