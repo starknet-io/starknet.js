@@ -1,8 +1,7 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-restricted-syntax */
-import { blake2s } from '@noble/hashes/blake2s';
-// import { blake2s } from 'blakejs';
+import blake from '../../connect/blake';
 
 import { toHex } from '../../num';
 import { encodeShortString } from '../../shortString';
@@ -65,7 +64,7 @@ export function blake2sHashMany(data: bigint[]): bigint {
   for (let i = 0; i < u32Words.length; i++) {
     bytesView.setUint32(i * 4, u32Words[i], true);
   }
-  const hash = blake2s(new Uint8Array(bytes), { dkLen: 32 }); // Paul version
+  const hash = blake(new Uint8Array(bytes));
   let hashBigInt = 0n;
   for (let i = 0; i < 32; i++) {
     hashBigInt |= BigInt(hash[i]) << BigInt(i * 8);

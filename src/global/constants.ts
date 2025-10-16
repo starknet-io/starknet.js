@@ -120,6 +120,18 @@ export const DEFAULT_GLOBAL_CONFIG: {
   fetch: any;
   websocket: any;
   buffer: any;
+  /**
+   * Custom blake function
+   * @param uint8Array - The uint8Array to hash
+   * @returns The hash of the uint8Array
+   * @example
+   * ```typescript
+   * config.set('blake', (uint8Array: Uint8Array) => {
+   *   return blake2s(uint8Array, { dkLen: 32 });
+   * });
+   * ```
+   */
+  blake: Function | undefined;
 } = {
   rpcVersion: '0.9.0',
   transactionVersion: ETransactionVersion.V3, // Starknet 0.14.0 only V3 transactions
@@ -142,6 +154,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   fetch: undefined,
   websocket: undefined,
   buffer: undefined,
+  blake: undefined,
 };
 
 export const RPC_DEFAULT_NODES = {
