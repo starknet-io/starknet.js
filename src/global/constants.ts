@@ -131,7 +131,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
    * });
    * ```
    */
-  blake: (uint8Array: Uint8Array) => Uint8Array | undefined;
+  blake: ((uint8Array: Uint8Array) => Uint8Array) | undefined;
 } = {
   rpcVersion: '0.9.0',
   transactionVersion: ETransactionVersion.V3, // Starknet 0.14.0 only V3 transactions
