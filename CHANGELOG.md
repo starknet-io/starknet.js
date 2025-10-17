@@ -1,3 +1,9 @@
+# [8.6.0](https://github.com/starknet-io/starknet.js/compare/v8.5.5...v8.6.0) (2025-10-17)
+
+### Features
+
+- blake2s ([#1502](https://github.com/starknet-io/starknet.js/issues/1502)) ([dd3f8ec](https://github.com/starknet-io/starknet.js/commit/dd3f8eca44091a01d240f03e488a25b1119af524))
+
 ## [8.5.5](https://github.com/starknet-io/starknet.js/compare/v8.5.4...v8.5.5) (2025-10-03)
 
 ### Bug Fixes
