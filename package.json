@@ -57,6 +57,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
+    "@napi-rs/blake-hash": "^1.3.5",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",
@@ -72,6 +73,7 @@
     "@typescript-eslint/parser": "^7.4.0",
     "ajv": "^8.12.0",
     "ajv-keywords": "^5.1.0",
+    "blakejs": "^1.2.1",
     "eslint": "^8.56.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
@@ -86,6 +88,7 @@
     "jest-environment-jsdom": "^30.0.0",
     "jest-json-schema": "^6.1.0",
     "lint-staged": "^16.0.0",
+    "npm": "^11.6.2",
     "prettier": "^3.2.5",
     "prettier-plugin-import-sort": "^0.0.7",
     "semantic-release": "^24.0.0",

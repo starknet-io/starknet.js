@@ -26,6 +26,10 @@ const readContractSet = (name: string, pathPrefix: string = 'cairo') => ({
   casm: readContractSierraCasm(`${pathPrefix}/${name}`),
 });
 
+const readContractCasmOnly = (name: string, pathPrefix: string = 'cairo') => ({
+  casm: readContractSierraCasm(`${pathPrefix}/${name}`),
+});
+
 const mapContractSets = <T extends Record<string, any>>(
   contractRecord: T,
   pathPrefix?: string
@@ -74,6 +78,8 @@ const compiledContracts = {
   deployer: 'cairo2100/deployer',
   CairoByteArray: 'byteArray/target/dev/test_ByteArrayStorage',
   IntegerTypes: 'integerTypes/target/dev/test_IntegerTypesStorage',
+  // CASM-only contracts (used for Blake2s hash verification against Rust implementation)
+  Blake2sVerificationContract: readContractCasmOnly('test_contract_rust'),
 };
 export const contracts = mapContractSets(compiledContracts);
 

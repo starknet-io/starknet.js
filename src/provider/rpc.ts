@@ -543,7 +543,10 @@ export class RpcProvider implements ProviderInterface {
   ) {
     let classHash: string;
     if (!contractClassIdentifier.classHash && 'contract' in contractClassIdentifier) {
-      const hashes = extractContractHashes(contractClassIdentifier);
+      const hashes = extractContractHashes(
+        contractClassIdentifier,
+        await this.channel.setUpSpecVersion()
+      );
       classHash = hashes.classHash;
     } else if (contractClassIdentifier.classHash) {
       classHash = contractClassIdentifier.classHash;

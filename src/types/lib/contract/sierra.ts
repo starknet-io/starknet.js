@@ -1,7 +1,7 @@
 import { Abi } from './abi';
 import { EntryPointsByType } from './legacy';
 
-/** SYSTEM TYPES */
+/** Cairo Assembly .casm */
 export type CairoAssembly = {
   prime: string;
   compiler_version: string;
