@@ -49,7 +49,7 @@ import type { DeployContractUDCResponse } from '../deployer/types/index.type';
  * - Transaction signing with the account's private key
  * - Interaction with the account contract's __execute__ entrypoint
  */
-export abstract class AccountInterface extends ProviderInterface {
+export abstract class AccountInterface implements ProviderInterface {
   /**
    * The address of the account contract on Starknet
    */
