@@ -127,7 +127,7 @@ In this example, if you want to read the events recorded in the last 10 blocks, 
 import { RpcProvider } from 'starknet';
 const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 const lastBlock = await myProvider.getBlock('latest');
-const keyFilter = [[num.toHex(hash.starknetKeccak('EventPanic')), '0x8']];
+const keyFilter = [[num.toHex(hash.starknetKeccak('EventPanic'))], ['0x8']];
 const eventsList = await myProvider.getEvents({
   address: myContractAddress,
   from_block: { block_number: lastBlock.block_number - 9 },
@@ -142,8 +142,11 @@ const eventsList = await myProvider.getEvents({
 :::
 
 :::tip
-If you don't want to filter by key, you can either remove the `keys` parameter, or affect it this way: `[[]]` .
-:::
+
+- If you don't want to filter by key, you can either remove the `keys` parameter, or affect it this way: `[[]]`.
+- `keys` is an array of accepted keys values (see [SNIP-13](https://github.com/starknet-io/SNIPs/tree/main/SNIPS/snip-13.md#specification)). If you are looking at only A in first key : use [[A]].
+  If you want A or B in the first key: use [[A,B]]. If you want A in the first key, and B in the second key, use [[A],[B]]. If you want A or B in the first key AND C in the second key, use `[[A,B],[C]]`.
+  :::
 
 :::warning CAUTION
 An event can be nested in a Cairo component (See the Cairo code of the contract to verify). In this case, the array of keys will start with additional hashes, and you will have to adapt your code in consequence; in this example, we have to skip one hash:
@@ -166,25 +169,27 @@ To limit the workload of the node, the parameter `chunk_size` defines a size of 
 Hereunder a code to read all the chunks of a request:
 
 ```typescript
-const keyFilter = [num.toHex(hash.starknetKeccak('EventPanic')), '0x8'];
-let block = await myProvider.getBlock('latest');
+import type { EMITTED_EVENT } from '@starknet-io/types-js';
+const keyFilter = [[num.toHex(hash.starknetKeccak('EventPanic'))], ['0x8']];
+const block = await myProvider.getBlock('latest');
 console.log('bloc #', block.block_number);
-
 let continuationToken: string | undefined = '0';
 let chunkNum: number = 1;
+const collectedEvents: EMITTED_EVENT[] = [];
 while (continuationToken) {
   const eventsRes = await myProvider.getEvents({
     from_block: {
-      block_number: block.block_number - 30,
+      block_number: Math.max(0, block.block_number - 30),
     },
     to_block: {
       block_number: block.block_number,
     },
-    address: myContractAddress,
-    keys: [keyFilter],
+    address: myTestContract.address,
+    keys: keyFilter,
     chunk_size: 5,
     continuation_token: continuationToken === '0' ? undefined : continuationToken,
   });
+  collectedEvents.push(...eventsRes.events);
   const nbEvents = eventsRes.events.length;
   continuationToken = eventsRes.continuation_token;
   console.log('chunk nb =', chunkNum, '.', nbEvents, 'events recovered.');
@@ -209,9 +214,11 @@ while (continuationToken) {
 If you want to parse an array of events of the same contract (abi of the contract available):
 
 ```typescript
-const abiEvents = events.getAbiEvents(abi);
-const abiStructs = CallData.getAbiStruct(abi);
-const abiEnums = CallData.getAbiEnum(abi);
-const parsed = events.parseEvents(eventsRes.events, abiEvents, abiStructs, abiEnums);
-console.log('parsed events=', parsed);
+const myTestCallData = new CallData((compiledSierra as CompiledSierra).abi);
+const abiEvents = events.getAbiEvents(myTestCallData.abi);
+const abiStructs = CallData.getAbiStruct(myTestCallData.abi);
+const abiEnums = CallData.getAbiEnum(myTestCallData.abi);
+const parser = myTestCallData.parser;
+const parsedEvents = events.parseEvents(collectedEvents, abiEvents, abiStructs, abiEnums, parser);
+console.log('parsed events =', parsedEvents);
 ```
