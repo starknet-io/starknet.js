@@ -151,7 +151,11 @@ export class Contract implements ContractInterface {
     this.parsingStrategy = options.parsingStrategy;
     const parser = createAbiParser(options.abi, options.parsingStrategy);
     this.abi = parser.getLegacyFormat();
-    this.address = options.address && options.address.toLowerCase();
+    this.address = options.address.toLowerCase();
+    assert(
+      typeof this.address === 'string' && this.address.length > 0,
+      'contract is not connected to an address'
+    );
     this.providerOrAccount = options.providerOrAccount ?? defaultProvider;
 
     // Optional params
@@ -217,7 +221,11 @@ export class Contract implements ContractInterface {
 
   public attach(address: string, abi?: Abi): void {
     // TODO: if changing address, probably changing abi also !? Also nonsense method as if you change abi and address, you need to create a new contract instance.
-    this.address = address;
+    this.address = address.toLowerCase();
+    assert(
+      typeof this.address === 'string' && this.address.length > 0,
+      'contract is not connected to an address'
+    );
     if (abi) {
       const parser = createAbiParser(abi, this.parsingStrategy);
       this.abi = parser.getLegacyFormat();
@@ -228,6 +236,10 @@ export class Contract implements ContractInterface {
   }
 
   public async isDeployed(): Promise<this> {
+    assert(
+      typeof this.address === 'string' && this.address.length > 0,
+      'contract is not connected to an address'
+    );
     try {
       await this.providerOrAccount.getClassHashAt(this.address);
     } catch (error) {
@@ -248,7 +260,10 @@ export class Contract implements ContractInterface {
       blockIdentifier = undefined,
     }: CallOptions = {}
   ): Promise<CallResult> {
-    assert(this.address !== null, 'contract is not connected to an address');
+    assert(
+      typeof this.address === 'string' && this.address.length > 0,
+      'contract is not connected to an address'
+    );
 
     const calldata = getCompiledCalldata(args, () => {
       if (parseRequest) {
@@ -300,7 +315,10 @@ export class Contract implements ContractInterface {
     options: ExecuteOptions = {}
   ): Promise<SuccessfulTransactionReceiptResponseHelper | InvokeFunctionResponse> {
     const { parseRequest = true, signature, waitForTransaction, ...RestInvokeOptions } = options;
-    assert(this.address !== null, 'contract is not connected to an address');
+    assert(
+      typeof this.address === 'string' && this.address.length > 0,
+      'contract is not connected to an address'
+    );
 
     const calldata = getCompiledCalldata(args, () => {
       if (parseRequest) {
@@ -352,7 +370,10 @@ export class Contract implements ContractInterface {
     args: ArgsOrCalldata = [],
     estimateDetails: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
-    assert(this.address !== null, 'contract is not connected to an address');
+    assert(
+      typeof this.address === 'string' && this.address.length > 0,
+      'contract is not connected to an address'
+    );
 
     if (!getCompiledCalldata(args, () => false)) {
       this.callData.validate(ValidateType.INVOKE, method, args);
