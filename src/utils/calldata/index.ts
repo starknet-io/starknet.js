@@ -15,7 +15,7 @@ import {
   ValidateType,
 } from '../../types';
 import assert from '../assert';
-import { toHex } from '../num';
+import { getNext, toHex } from '../num';
 import { isBigInt } from '../typed';
 import { getSelectorFromName } from '../hash/selector';
 import { isLongText } from '../shortString';
@@ -32,15 +32,22 @@ import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoArray } from '../cairoDataTypes/array';
 import { CairoTuple } from '../cairoDataTypes/tuple';
 import formatter from './formatter';
-import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
+import { createAbiParser, isNoConstructorValid, type ParsingStrategy } from './parser';
+import { hdParsingStrategy } from './parser/parsingStrategy';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
-import { parseCalldataField } from './requestParser';
-import responseParser from './responseParser';
-import validateFields from './validate';
+// import { parseCalldataField } from './requestParser';
+import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
+import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
+import { CairoStruct } from '../cairoDataTypes/cairoStruct';
+import { getAbiEnum, getAbiStruct } from './calldataUtils';
+import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
+import { isInstanceOf as isInstanceOfClasses } from '../helpers';
+import { CairoNonZero } from '../cairoDataTypes/nonZero';
+import { CairoEthAddress } from '../cairoDataTypes';
 
 export * as cairo from './cairo';
-export { parseCalldataField } from './requestParser';
+// export { parseCalldataField } from './requestParser';
 export * from './parser';
 
 export class CallData {
@@ -48,11 +55,11 @@ export class CallData {
 
   parser: AbiParserInterface;
 
-  protected readonly structs: AbiStructs;
+  readonly structs: AbiStructs;
 
-  protected readonly enums: AbiEnums;
+  readonly enums: AbiEnums;
 
-  constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
+  constructor(abi: Abi, parsingStrategy: ParsingStrategy = hdParsingStrategy) {
     this.structs = CallData.getAbiStruct(abi);
     this.enums = CallData.getAbiEnum(abi);
     this.parser = createAbiParser(abi, parsingStrategy);
@@ -99,17 +106,15 @@ export class CallData {
         `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
       );
     }
-
-    // validate parameters
-    validateFields(abiMethod, args, this.structs, this.enums);
   }
 
   /**
    * Compile contract callData with abi
    * Parse the calldata by using input fields from the abi for that method
-   * @param method string - method name
-   * @param argsCalldata RawArgs - arguments passed to the method. Can be an array of arguments (in the order of abi definition), or an object constructed in conformity with abi (in this case, the parameter can be in a wrong order).
-   * @return Calldata - parsed arguments in format that contract is expecting
+   * @param {string} method string - method name
+   * @param {RawArgs} argsCalldata RawArgs - arguments passed to the method. Can be an array of arguments (in the order of abi definition), or an object constructed in conformity with abi (in this case, the parameter can be in a wrong order).
+   * @param {ParsingStrategy} [parserStrategy = hdParsingStrategy] - optional parsing strategy to override the default one
+   * @return {Calldata} parsed arguments in format that contract is expecting
    * @example
    * ```typescript
    * const calldata = myCallData.compile("constructor", ["0x34a", [1, 3n]]);
@@ -118,7 +123,11 @@ export class CallData {
    * const calldata2 = myCallData.compile("constructor", {list:[1, 3n], balance:"0x34"}); // wrong order is valid
    * ```
    */
-  public compile(method: string, argsCalldata: RawArgs): Calldata {
+  public compile(
+    method: string,
+    argsCalldata: RawArgs,
+    parserStrategy: AllowArray<ParsingStrategy> = this.parser.parsingStrategies
+  ): Calldata {
     const abiMethod = this.abi.find((abiFunction) => abiFunction.name === method) as FunctionAbi;
 
     if (isNoConstructorValid(method, argsCalldata, abiMethod)) {
@@ -134,11 +143,10 @@ export class CallData {
         argsCalldata,
         abiMethod.inputs,
         this.structs,
-        this.enums
+        this.enums,
+        parserStrategy
       );
       args = Object.values(orderedObject);
-      //   // validate array elements to abi
-      validateFields(abiMethod, args, this.structs, this.enums);
     }
 
     const argsIterator = args[Symbol.iterator]();
@@ -147,15 +155,7 @@ export class CallData {
       (acc, input) =>
         isLen(input.name) && !isCairo1Type(input.type)
           ? acc
-          : acc.concat(
-              parseCalldataField({
-                argsIterator,
-                input,
-                structs: this.structs,
-                enums: this.enums,
-                parser: this.parser,
-              })
-            ),
+          : acc.concat(this.parser.parseRequestField(getNext(argsIterator), input.type)),
       [] as Calldata
     );
 
@@ -218,27 +218,22 @@ export class CallData {
               }
               return getEntries({ 0: activeVariantNb, 1: myEnum.unwrap() }, `${prefix}${kk}.`);
             }
-            if (value instanceof CairoFixedArray) {
-              // CairoFixedArray - use toApiRequest() to get flat array, then convert to tree structure
+            if (
+              isInstanceOfClasses(value, [
+                CairoTypeOption,
+                CairoTypeResult,
+                CairoStruct,
+                CairoTypeCustomEnum,
+                CairoTuple,
+                CairoArray,
+                CairoFixedArray,
+                CairoNonZero,
+                CairoEthAddress,
+              ])
+            ) {
               const apiRequest = value.toApiRequest();
               const compiledObj = Object.fromEntries(
-                apiRequest.map((item, idx) => [idx.toString(), item])
-              );
-              return getEntries(compiledObj, `${prefix}${kk}.`);
-            }
-            if (value instanceof CairoArray) {
-              // CairoArray - use toApiRequest() to get length-prefixed array, then convert to tree structure
-              const apiRequest = value.toApiRequest();
-              const compiledObj = Object.fromEntries(
-                apiRequest.map((item, idx) => [idx.toString(), item])
-              );
-              return getEntries(compiledObj, `${prefix}${kk}.`);
-            }
-            if (value instanceof CairoTuple) {
-              // CairoTuple - use toApiRequest() to get flat array (no length prefix), then convert to tree structure
-              const apiRequest = value.toApiRequest();
-              const compiledObj = Object.fromEntries(
-                apiRequest.map((item, idx) => [idx.toString(), item])
+                apiRequest.map((item: any, idx: number) => [idx.toString(), item])
               );
               return getEntries(compiledObj, `${prefix}${kk}.`);
             }
@@ -287,17 +282,7 @@ export class CallData {
 
     const parsed = outputs.flat().reduce((acc, output, idx) => {
       const propName = output.name ?? idx;
-      acc[propName] = responseParser({
-        responseIterator,
-        output,
-        structs: this.structs,
-        enums: this.enums,
-        parsedResult: acc,
-        parser: this.parser,
-      });
-      if (acc[propName] && acc[`${propName}_len`]) {
-        delete acc[`${propName}_len`];
-      }
+      acc[propName] = this.parser.parseResponse(responseIterator, output.name, output.type);
       return acc;
     }, {} as Args);
 
@@ -323,15 +308,7 @@ export class CallData {
    * @returns AbiStructs - structs from abi
    */
   static getAbiStruct(abi: Abi): AbiStructs {
-    return abi
-      .filter((abiEntry) => abiEntry.type === 'struct')
-      .reduce(
-        (acc, abiEntry) => ({
-          ...acc,
-          [abiEntry.name]: abiEntry,
-        }),
-        {}
-      );
+    return getAbiStruct(abi);
   }
 
   /**
@@ -340,17 +317,7 @@ export class CallData {
    * @returns AbiEnums - enums from abi
    */
   static getAbiEnum(abi: Abi): AbiEnums {
-    const fullEnumList = abi
-      .filter((abiEntry) => abiEntry.type === 'enum')
-      .reduce(
-        (acc, abiEntry) => ({
-          ...acc,
-          [abiEntry.name]: abiEntry,
-        }),
-        {}
-      );
-    delete fullEnumList['core::bool'];
-    return fullEnumList;
+    return getAbiEnum(abi);
   }
 
   /**
@@ -388,15 +355,8 @@ export class CallData {
   ): AllowArray<CallResult> {
     const typeCairoArray = Array.isArray(typeCairo) ? typeCairo : [typeCairo];
     const responseIterator = response.flat()[Symbol.iterator]();
-    const decodedArray = typeCairoArray.map(
-      (typeParam) =>
-        responseParser({
-          responseIterator,
-          output: { name: '', type: typeParam },
-          parser: this.parser,
-          structs: this.structs,
-          enums: this.enums,
-        }) as CallResult
+    const decodedArray = typeCairoArray.map((typeParam) =>
+      this.parser.parseResponse(responseIterator, '', typeParam)
     );
     return decodedArray.length === 1 ? decodedArray[0] : decodedArray;
   }

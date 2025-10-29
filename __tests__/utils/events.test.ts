@@ -4,6 +4,7 @@ import {
   type AbiEvent,
   type AbiStructs,
   type CairoEventVariant,
+  CallData,
   type InvokeTransactionReceiptResponse,
   type RPC,
   events,
@@ -141,173 +142,100 @@ describe('getAbiEvents', () => {
 
 describe('parseEvents', () => {
   test('should return parsed events', () => {
-    const abiEventAndVariantName = 'cairo_event_struct';
-    const abiCairoEventStruct: AbiEvent = {
-      kind: 'struct',
-      members: [
-        {
-          name: 'test_name',
-          type: 'test_type',
-          kind: 'data',
-        },
-      ],
-      name: abiEventAndVariantName,
-      type: 'event',
-    };
-
-    const abiCairoEventEnum: CairoEventVariant = {
-      kind: 'enum',
-      variants: [
-        {
-          name: 'test_name',
-          type: abiEventAndVariantName,
-          kind: 'data',
-        },
-      ],
-      name: 'test_cairo_event',
-      type: 'event',
-    };
-
-    const abiEvents = getAbiEvents([getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum]);
-
-    const abiStructs: AbiStructs = {
-      abi_structs: {
-        members: [
-          {
-            name: 'test_name',
-            type: 'test_type',
-            offset: 1,
-          },
-        ],
-        size: 2,
-        name: 'cairo_event_struct',
-        type: 'struct',
-      },
-    };
-
-    const abiEnums: AbiEnums = {
-      abi_enums: {
-        variants: [
-          {
-            name: 'test_name',
-            type: 'cairo_event_struct_variant',
-            offset: 1,
-          },
-        ],
-        size: 2,
-        name: 'test_cairo_event',
-        type: 'enum',
-      },
-    };
-
     const event: RPC.EmittedEvent = {
-      from_address: 'test_address',
-      keys: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
-      data: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
+      data: [
+        '0x395a96a5b6343fc0f543692fd36e7034b54c2a276cd1a021e8c0b02aee1f43',
+        '0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8',
+        '0x5615d4fedf6800',
+        '0x0',
+      ],
+      from_address: '0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+      keys: ['0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9'],
       block_hash: '0x1234',
       block_number: 567,
       transaction_hash: '0x789',
     };
 
-    const abi = [getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum];
+    const abi = [
+      {
+        type: 'impl',
+        name: 'ERC20Impl',
+        interface_name: 'openzeppelin::token::erc20::interface::IERC20',
+      },
+      {
+        type: 'interface',
+        name: 'openzeppelin::token::erc20::interface::IERC20',
+        items: [],
+      },
+      {
+        type: 'event',
+        name: 'src::strk::erc20_lockable::ERC20Lockable::Transfer',
+        kind: 'struct',
+        members: [
+          {
+            name: 'from',
+            type: 'core::starknet::contract_address::ContractAddress',
+            kind: 'data',
+          },
+          {
+            name: 'to',
+            type: 'core::starknet::contract_address::ContractAddress',
+            kind: 'data',
+          },
+          {
+            name: 'value',
+            type: 'core::integer::u256',
+            kind: 'data',
+          },
+        ],
+      },
+      {
+        type: 'struct',
+        name: 'core::integer::u256',
+        members: [
+          {
+            name: 'low',
+            type: 'core::integer::u128',
+          },
+          {
+            name: 'high',
+            type: 'core::integer::u128',
+          },
+        ],
+      },
+      {
+        type: 'event',
+        name: 'src::strk::erc20_lockable::ERC20Lockable::Event',
+        kind: 'enum',
+        variants: [
+          {
+            name: 'Transfer',
+            type: 'src::strk::erc20_lockable::ERC20Lockable::Transfer',
+            kind: 'nested',
+          },
+        ],
+      },
+    ];
+
     const parser = createAbiParser(abi);
-    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums, parser);
+    const parsedEvents = parseEvents(
+      [event],
+      getAbiEvents(abi),
+      CallData.getAbiStruct(abi),
+      CallData.getAbiEnum(abi),
+      parser
+    );
 
     const result = [
       {
-        cairo_event_struct: {
-          test_name: 1708719217404197029088109386680815809747762070431461851150711916567020191623n,
+        'src::strk::erc20_lockable::ERC20Lockable::Transfer': {
+          from: 101335501307061673760165623468268869343867322091122131773587832584929156931n,
+          to: 493682666880028149457439048758834463666448583632766410742816449610329486296n,
+          value: 24230852550420480n,
         },
         block_hash: '0x1234',
         block_number: 567,
         transaction_hash: '0x789',
-      },
-    ];
-
-    expect(parsedEvents).toStrictEqual(result);
-  });
-
-  test('should return parsed  emitted events', () => {
-    const abiEventAndVariantName = 'cairo_event_struct';
-    const abiCairoEventStruct: AbiEvent = {
-      kind: 'struct',
-      members: [
-        {
-          name: 'test_name',
-          type: 'test_type',
-          kind: 'data',
-        },
-      ],
-      name: abiEventAndVariantName,
-      type: 'event',
-    };
-
-    const abiCairoEventEnum: CairoEventVariant = {
-      kind: 'enum',
-      variants: [
-        {
-          name: 'test_name',
-          type: abiEventAndVariantName,
-          kind: 'data',
-        },
-      ],
-      name: 'test_cairo_event',
-      type: 'event',
-    };
-
-    const abiEvents = getAbiEvents([getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum]);
-
-    const abiStructs: AbiStructs = {
-      abi_structs: {
-        members: [
-          {
-            name: 'test_name',
-            type: 'test_type',
-            offset: 1,
-          },
-        ],
-        size: 2,
-        name: 'cairo_event_struct',
-        type: 'struct',
-      },
-    };
-
-    const abiEnums: AbiEnums = {
-      abi_enums: {
-        variants: [
-          {
-            name: 'test_name',
-            type: 'cairo_event_struct_variant',
-            offset: 1,
-          },
-        ],
-        size: 2,
-        name: 'test_cairo_event',
-        type: 'enum',
-      },
-    };
-
-    const event: RPC.EmittedEvent = {
-      from_address: 'test_address',
-      keys: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
-      data: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
-      block_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34d',
-      block_number: 1,
-      transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
-    };
-
-    const abi = [getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum];
-    const parser = createAbiParser(abi);
-    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums, parser);
-
-    const result = [
-      {
-        cairo_event_struct: {
-          test_name: 1708719217404197029088109386680815809747762070431461851150711916567020191623n,
-        },
-        block_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34d',
-        block_number: 1,
-        transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
       },
     ];
 

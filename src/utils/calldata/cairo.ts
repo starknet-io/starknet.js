@@ -12,6 +12,7 @@ import {
   Uint256,
   Uint512,
 } from '../../types';
+import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoFelt } from '../cairoDataTypes/felt';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
@@ -231,6 +232,9 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
 
 /**
  * Create Uint256 Cairo type (helper for common struct type)
+ * Useful for CallData.compile() method.
+ * @param it BigNumberish representation of a 256 bits unsigned number
+ * @returns Uint256 struct
  * @example
  * ```typescript
  * uint256('892349863487563453485768723498');
@@ -242,6 +246,7 @@ export const uint256 = (it: BigNumberish): Uint256 => {
 
 /**
  * Create Uint512 Cairo type (helper for common struct type)
+ * Useful for CallData.compile() method.
  * @param it BigNumberish representation of a 512 bits unsigned number
  * @returns Uint512 struct
  * @example
@@ -254,10 +259,13 @@ export const uint512 = (it: BigNumberish): Uint512 => {
 };
 
 /**
- * Create unnamed tuple Cairo type (helper same as common struct type)
+ * Create unnamed tuple Cairo type (helper same as common struct type).
+ * Useful for CallData.compile() method.
+ * @param args BigNumberish, JS tuple or object representation of the tuple elements.
  * @example
  * ```typescript
- * tuple(1, '0x101', 16);
+ * const calldata = CallData.compile({ a1: cairo.tuple(1, '0x10', 9)});
+ * // calldata = ['1', '16', '9']
  * ```
  */
 export const tuple = (
@@ -266,8 +274,23 @@ export const tuple = (
 
 /**
  * Create felt Cairo type (cairo type helper)
+ * @param it BigNumberish representation of a felt
  * @returns format: felt-string
  */
 export function felt(it: BigNumberish): string {
   return CairoFelt(it);
+}
+
+/**
+ * Converts a string into a plain object representation of a ByteArray.
+ * Useful for CallData.compile() method.
+ * @returns {Record<string, any>} plain object representation of a CairoByteArray instance.
+ * @example
+ * ```ts
+ * const calldata = CallData.compile({ a1: cairo.byteArray("Token")});
+ * // calldata = ['0', '362646562158', '5']
+ * ```
+ */
+export function byteArray(it: string): Record<string, any> {
+  return new CairoByteArray(it).toObject();
 }

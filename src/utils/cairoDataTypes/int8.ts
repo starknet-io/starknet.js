@@ -29,7 +29,7 @@ export class CairoInt8 {
   }
 
   toApiRequest(): string[] {
-    return addCompiledFlag([this.toHexString()]);
+    return addCompiledFlag([this.toDecimalString()]);
   }
 
   toBigInt() {
@@ -54,6 +54,10 @@ export class CairoInt8 {
       return addHexPrefix(fieldElement.toString(16));
     }
     return addHexPrefix(value.toString(16));
+  }
+
+  toDecimalString() {
+    return BigInt(this.toHexString()).toString(10);
   }
 
   static validate(data: BigNumberish | boolean | unknown): void {

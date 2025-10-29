@@ -404,12 +404,7 @@ export function encodeValue(
     case 'string': {
       if (revision === Revision.ACTIVE) {
         const byteArray = new CairoByteArray(data as string);
-        const elements = [
-          byteArray.data.length,
-          ...byteArray.data,
-          byteArray.pending_word,
-          byteArray.pending_word_len,
-        ];
+        const elements = byteArray.toApiRequest();
         return [type, revisionConfiguration[revision].hashMethod(elements as BigNumberish[])];
       } // else fall through to default
       return [type, getHex(data as string)];

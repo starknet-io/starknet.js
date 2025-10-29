@@ -1,3 +1,5 @@
+import type { VariantType } from '../calldata';
+
 export abstract class CairoType {
   // Static methods cannot be abstract, but can provide base implementation
   // TODO: Check when ts resolves this issue
@@ -7,7 +9,7 @@ export abstract class CairoType {
    * @param _data - The data to check
    * @returns True if the data is a valid CairoType, false otherwise
    */
-  static is(_data: any, _type?: string): boolean {
+  static is(_data: any, _type?: string, _variant?: VariantType): boolean {
     throw new Error('Static method must be implemented by derived class');
   }
 
@@ -36,5 +38,5 @@ export abstract class CairoType {
   /**
    * Convert the CairoType to the API request format
    */
-  abstract toApiRequest(): any;
+  abstract toApiRequest(): string[];
 }

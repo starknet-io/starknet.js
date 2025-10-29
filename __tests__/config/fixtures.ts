@@ -74,6 +74,7 @@ const compiledContracts = {
   deployer: 'cairo2100/deployer',
   CairoByteArray: 'byteArray/target/dev/test_ByteArrayStorage',
   IntegerTypes: 'integerTypes/target/dev/test_IntegerTypesStorage',
+  TestCairoType: 'cairo2120/enums_test_enums',
 };
 export const contracts = mapContractSets(compiledContracts);
 

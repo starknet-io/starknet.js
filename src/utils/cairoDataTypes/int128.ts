@@ -29,7 +29,7 @@ export class CairoInt128 {
   }
 
   toApiRequest(): string[] {
-    return addCompiledFlag([this.toHexString()]);
+    return addCompiledFlag([this.toDecimalString()]);
   }
 
   toBigInt() {
@@ -54,6 +54,16 @@ export class CairoInt128 {
       return addHexPrefix(fieldElement.toString(16));
     }
     return addHexPrefix(value.toString(16));
+  }
+
+  toDecimalString() {
+    const value = this.toBigInt();
+    // For negative values, convert to field element representation
+    if (value < 0n) {
+      const fieldElement = PRIME + value;
+      return fieldElement.toString(10);
+    }
+    return BigInt(this.toHexString()).toString(10);
   }
 
   static validate(data: BigNumberish | boolean | unknown): void {

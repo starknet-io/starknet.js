@@ -195,28 +195,28 @@ describe('CairoUint32 class Unit Tests', () => {
   describe('toApiRequest method', () => {
     test('should return hex string array for zero', () => {
       const u32 = new CairoUint32(0);
-      expect(u32.toApiRequest()).toEqual(['0x0']);
+      expect(u32.toApiRequest()).toEqual(['0']);
     });
 
     test('should return hex string array for small numbers', () => {
       const u32 = new CairoUint32(42);
-      expect(u32.toApiRequest()).toEqual(['0x2a']);
+      expect(u32.toApiRequest()).toEqual(['42']);
     });
 
     test('should return hex string array for large numbers', () => {
       const u32 = new CairoUint32(1000000);
-      expect(u32.toApiRequest()).toEqual(['0xf4240']);
+      expect(u32.toApiRequest()).toEqual(['1000000']);
     });
 
     test('should return hex string array for maximum u32', () => {
       const maxU32 = 2n ** 32n - 1n;
       const u32 = new CairoUint32(maxU32);
-      expect(u32.toApiRequest()).toEqual(['0xffffffff']);
+      expect(u32.toApiRequest()).toEqual(['4294967295']);
     });
 
     test('should handle bigint input', () => {
       const u32 = new CairoUint32(12345n);
-      expect(u32.toApiRequest()).toEqual(['0x3039']);
+      expect(u32.toApiRequest()).toEqual(['12345']);
     });
   });
 
@@ -281,7 +281,7 @@ describe('CairoUint32 class Unit Tests', () => {
 
   describe('isAbiType static method', () => {
     test('should identify correct ABI type', () => {
-      expect(CairoUint32.isAbiType('core::u32::u32')).toBe(true);
+      expect(CairoUint32.isAbiType('core::integer::u32')).toBe(true);
       expect(CairoUint32.isAbiType('u32')).toBe(false);
       expect(CairoUint32.isAbiType('core::u64::u64')).toBe(false);
       expect(CairoUint32.isAbiType('core::felt252')).toBe(false);
@@ -474,11 +474,11 @@ describe('CairoUint32 class Unit Tests', () => {
 
     describe('isAbiType method', () => {
       test('should return true for correct ABI selector', () => {
-        expect(CairoUint32.isAbiType('core::u32::u32')).toBe(true);
+        expect(CairoUint32.isAbiType('core::integer::u32')).toBe(true);
       });
 
       test('should return false for incorrect ABI selector', () => {
-        expect(CairoUint32.isAbiType('core::u64::u64')).toBe(false);
+        expect(CairoUint32.isAbiType('core::integer::u64')).toBe(false);
         expect(CairoUint32.isAbiType('core::felt252')).toBe(false);
         expect(CairoUint32.isAbiType('')).toBe(false);
       });

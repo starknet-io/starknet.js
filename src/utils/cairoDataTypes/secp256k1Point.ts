@@ -10,7 +10,6 @@
 
 import { BigNumberish } from '../../types';
 import { addHexPrefix, removeHexPrefix } from '../encode';
-import { CairoFelt } from './felt';
 import { UINT_128_MAX } from './uint256';
 import { isObject } from '../typed';
 import { getNext, isBigNumberish } from '../num';
@@ -220,10 +219,10 @@ export class CairoSecp256k1Point extends CairoType {
    */
   toApiRequest(): string[] {
     const result = [
-      CairoFelt(this.xLow),
-      CairoFelt(this.xHigh),
-      CairoFelt(this.yLow),
-      CairoFelt(this.yHigh),
+      this.xLow.toString(10),
+      this.xHigh.toString(10),
+      this.yLow.toString(10),
+      this.yHigh.toString(10),
     ];
     return addCompiledFlag(result);
   }

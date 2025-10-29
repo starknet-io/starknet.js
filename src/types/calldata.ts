@@ -13,7 +13,7 @@ export const Uint = {
   u16: 'core::integer::u16',
   u32: 'core::integer::u32',
   u64: 'core::integer::u64',
-  u96: 'core::integer::u96',
+  u96: 'core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>',
   u128: 'core::integer::u128',
   u256: 'core::integer::u256', // This one is struct
   u512: 'core::integer::u512', // This one is struct

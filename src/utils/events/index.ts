@@ -16,7 +16,6 @@ import {
 import assert from '../assert';
 import { isCairo1Abi } from '../calldata/cairo';
 import { AbiParserInterface } from '../calldata/parser/interface';
-import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
 import { isUndefined, isObject } from '../typed';
@@ -229,25 +228,19 @@ export function parseEvents(
         (abiEvent as LegacyEvent).data;
 
       abiEventKeys.forEach((key) => {
-        parsedEvent[abiEvent.name as string][key.name] = responseParser({
-          responseIterator: keysIter,
-          output: key,
-          structs: abiStructs,
-          enums: abiEnums,
-          parser,
-          parsedResult: parsedEvent[abiEvent.name as string],
-        });
+        parsedEvent[abiEvent.name as string][key.name] = parser.parseResponse(
+          keysIter,
+          key.name,
+          key.type
+        );
       });
 
       abiEventData.forEach((data) => {
-        parsedEvent[abiEvent.name as string][data.name] = responseParser({
-          responseIterator: dataIter,
-          output: data,
-          structs: abiStructs,
-          enums: abiEnums,
-          parser,
-          parsedResult: parsedEvent[abiEvent.name as string],
-        });
+        parsedEvent[abiEvent.name as string][data.name] = parser.parseResponse(
+          dataIter,
+          data.name,
+          data.type
+        );
       });
       if ('block_hash' in currentEvent) parsedEvent.block_hash = currentEvent.block_hash;
       if ('block_number' in currentEvent) parsedEvent.block_number = currentEvent.block_number;

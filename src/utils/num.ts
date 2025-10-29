@@ -403,7 +403,7 @@ export function isBigNumberish(input: unknown): input is BigNumberish {
  * @returns The next value from the iterator.
  * @throws Error if the iterator is done.
  */
-export function getNext(iterator: Iterator<string>): string {
+export function getNext(iterator: Iterator<any>): any {
   const it = iterator.next();
   if (it.done) throw new Error('Unexpected end of response');
   return it.value;

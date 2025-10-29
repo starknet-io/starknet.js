@@ -1,4 +1,12 @@
-import { AbiEntry, AbiEnums, AbiStructs, CairoEnum, RawArgsObject } from '../../types';
+import {
+  AbiEntry,
+  AbiEnums,
+  AbiStructs,
+  CairoEnum,
+  RawArgsObject,
+  type AllowArray,
+  type CairoTypeEnum,
+} from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import {
@@ -28,6 +36,11 @@ import { CairoArray } from '../cairoDataTypes/array';
 import { CairoTuple } from '../cairoDataTypes/tuple';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
+import { CairoTypeOption } from '../cairoDataTypes/cairoTypeOption';
+import { type ParsingStrategy } from './parser';
+import { CairoTypeResult } from '../cairoDataTypes/cairoTypeResult';
+import { CairoStruct } from '../cairoDataTypes/cairoStruct';
+import { CairoTypeCustomEnum } from '../cairoDataTypes/cairoTypeCustomEnum';
 
 function errorU256(key: string) {
   return Error(
@@ -45,7 +58,8 @@ export default function orderPropsByAbi(
   unorderedObject: RawArgsObject,
   abiOfObject: AbiEntry[],
   structs: AbiStructs,
-  enums: AbiEnums
+  enums: AbiEnums,
+  parseStrategy: AllowArray<ParsingStrategy>
 ): object {
   const orderInput = (unorderedItem: any, abiType: string): any => {
     if (CairoFixedArray.isAbiType(abiType)) {
@@ -101,6 +115,9 @@ export default function orderPropsByAbi(
         throw errorU512(abiType);
       }
       return { limb0: u512.limb0, limb1: u512.limb1, limb2: u512.limb2, limb3: u512.limb3 };
+    }
+    if (CairoStruct.isAbiType(abiType)) {
+      return unorderedItem;
     }
     if (isTypeStruct(abiType, structs)) {
       const abiOfStruct = structs[abiType].members;
@@ -192,60 +209,68 @@ export default function orderPropsByAbi(
     return orderedObject2;
   }
 
-  const orderEnum = (unorderedObject2: CairoEnum, abiObject: AbiEntry): CairoEnum => {
+  const orderEnum = (
+    unorderedObject2: CairoEnum | CairoTypeEnum,
+    abiObject: AbiEntry
+  ): CairoTypeEnum => {
     if (isTypeResult(abiObject.name)) {
-      const unorderedResult = unorderedObject2 as CairoResult<any, any>;
-      const resultOkType: string = abiObject.name.substring(
-        abiObject.name.indexOf('<') + 1,
-        abiObject.name.lastIndexOf(',')
-      );
-      const resultErrType: string = abiObject.name.substring(
-        abiObject.name.indexOf(',') + 1,
-        abiObject.name.lastIndexOf('>')
-      );
-      if (unorderedResult.isOk()) {
-        return new CairoResult<any, any>(
-          CairoResultVariant.Ok,
-          orderInput(unorderedObject2.unwrap(), resultOkType)
+      if (unorderedObject2 instanceof CairoResult) {
+        const unorderedResult = unorderedObject2 as CairoResult<any, any>;
+        const resultType: string = CairoTypeResult.getVariantTypes(abiObject.name)[
+          unorderedResult.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err
+        ];
+        return new CairoTypeResult(
+          orderInput(unorderedResult.unwrap(), resultType),
+          abiObject.name,
+          parseStrategy,
+          unorderedResult.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err
         );
       }
-      return new CairoResult<any, any>(
-        CairoResultVariant.Err,
-        orderInput(unorderedObject2.unwrap(), resultErrType)
-      );
+      return unorderedObject2 as CairoTypeResult;
     }
     if (isTypeOption(abiObject.name)) {
-      const unorderedOption = unorderedObject2 as CairoOption<any>;
-      const resultSomeType: string = abiObject.name.substring(
-        abiObject.name.indexOf('<') + 1,
-        abiObject.name.lastIndexOf('>')
-      );
-      if (unorderedOption.isSome()) {
-        return new CairoOption<any>(
-          CairoOptionVariant.Some,
-          orderInput(unorderedOption.unwrap(), resultSomeType)
+      if (unorderedObject2 instanceof CairoOption) {
+        const unorderedOption = unorderedObject2 as CairoOption<Object>;
+        if (unorderedOption.isSome()) {
+          const resultSomeType: string = CairoTypeOption.getVariantSomeType(abiObject.name);
+          return new CairoTypeOption(
+            orderInput(unorderedOption.unwrap(), resultSomeType),
+            abiObject.name,
+            parseStrategy,
+            CairoOptionVariant.Some
+          );
+        }
+        // none(())
+        return new CairoTypeOption(
+          undefined,
+          abiObject.name,
+          parseStrategy,
+          CairoOptionVariant.None
         );
       }
-      // none(())
-      return new CairoOption<any>(CairoOptionVariant.None, {});
+      return unorderedObject2 as CairoTypeOption;
     }
     // custom Enum
-    const unorderedCustomEnum = unorderedObject2 as CairoCustomEnum;
-    const variants = Object.entries(unorderedCustomEnum.variant);
-    const newEntries = variants.map((variant) => {
-      if (isUndefined(variant[1])) {
-        return variant;
-      }
-      const variantType: string = abiObject.type.substring(
-        abiObject.type.lastIndexOf('<') + 1,
-        abiObject.type.lastIndexOf('>')
+    if (unorderedObject2 instanceof CairoCustomEnum) {
+      const unorderedCustomEnum = unorderedObject2;
+      const variantList = Object.values(enums[abiObject.name].variants);
+      const newEntries = variantList.map((abiEntry) => {
+        if (isUndefined(unorderedCustomEnum.variant[abiEntry.name])) {
+          return [abiEntry.name, undefined];
+        }
+        return [abiEntry.name, orderInput(unorderedCustomEnum.unwrap(), abiEntry.type)];
+      });
+      const variantIndex = variantList.findIndex(
+        (variant) => variant.name === unorderedCustomEnum.activeVariant()
       );
-      if (variantType === '()') {
-        return variant;
-      }
-      return [variant[0], orderInput(unorderedCustomEnum.unwrap(), variantType)];
-    });
-    return new CairoCustomEnum(Object.fromEntries(newEntries));
+      return new CairoTypeCustomEnum(
+        new CairoCustomEnum(Object.fromEntries(newEntries)),
+        enums[abiObject.name],
+        parseStrategy,
+        variantIndex
+      );
+    }
+    return unorderedObject2 as CairoTypeCustomEnum;
   };
 
   // Order Call Parameters

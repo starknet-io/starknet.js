@@ -130,7 +130,7 @@ export class CairoByteArray extends CairoType {
     this.assertInitialized();
 
     return addCompiledFlag([
-      addHexPrefix(this.data.length.toString(16)),
+      this.data.length.toString(10),
       ...this.data.flatMap((bytes31) => bytes31.toApiRequest()),
       ...this.pending_word.toApiRequest(),
       ...this.pending_word_len.toApiRequest(),
@@ -168,6 +168,10 @@ export class CairoByteArray extends CairoType {
     return addHexPrefix(hexValue);
   }
 
+  toDecimalString() {
+    return this.toBigInt().toString(10);
+  }
+
   toBuffer() {
     const allBytes = concatenateArrayBuffer(this.toElements());
     return Buffer.from(allBytes);
@@ -193,6 +197,20 @@ export class CairoByteArray extends CairoType {
     }
 
     return allChunks;
+  }
+
+  /**
+   * Converts the encoded  ByteArray into a plain object representation.
+   * @returns {Record<string, any>} plain object representation of the CairoByteArray instance.
+   * @example
+   * ```ts
+   * const byteArray = new CairoByteArray("Token").toObject();
+   * // byteArray = { '0': '0', '1': '362646562158', '2': '5' }
+   * ```
+   */
+  toObject(): Record<string, any> {
+    this.assertInitialized();
+    return { ...this.toApiRequest() };
   }
 
   /**

@@ -1,11 +1,11 @@
-import { Abi, AbiEntryType, FunctionAbi } from '../../../types';
-import { ParsingStrategy } from './parsingStrategy';
+import { Abi, AbiEntryType, FunctionAbi, type AllowArray } from '../../../types';
+import { ParsingStrategy } from './parsingStrategy.type';
 
 /**
  * Abi parser interface
  */
 export abstract class AbiParserInterface {
-  abstract parsingStrategy: ParsingStrategy;
+  abstract parsingStrategies: AllowArray<ParsingStrategy>;
 
   /**
    * Helper to calculate inputs length from abi
@@ -32,14 +32,16 @@ export abstract class AbiParserInterface {
    * @param abiType AbiEntryType
    * @returns Parser function
    */
-  public abstract getRequestParser(abiType: AbiEntryType): (val: unknown, type?: string) => any;
+  public abstract parseRequestField(requestContent: any, abiType: AbiEntryType): string[];
 
   /**
    * Get response parser for the given abi type
    * @param abiType AbiEntryType
    * @returns Parser function
    */
-  public abstract getResponseParser(
-    abiType: AbiEntryType
-  ): (responseIterator: Iterator<string>, type?: string) => any;
+  public abstract parseResponse(
+    responseIterator: Iterator<string>,
+    fieldName: string,
+    abiType: string
+  ): any;
 }

@@ -35,7 +35,7 @@ export class CairoBytes31 extends CairoType {
   }
 
   toApiRequest(): string[] {
-    return addCompiledFlag([this.toHexString()]);
+    return addCompiledFlag([this.toDecimalString()]);
   }
 
   toBigInt() {
@@ -55,6 +55,10 @@ export class CairoBytes31 extends CairoType {
   toHexString(padded?: 'padded') {
     const hex = padded === 'padded' ? buf2hex(this.data) : this.toBigInt().toString(16);
     return addHexPrefix(hex);
+  }
+
+  toDecimalString() {
+    return this.toBigInt().toString(10);
   }
 
   static validate(data: Uint8Array | string | Buffer | unknown): void {

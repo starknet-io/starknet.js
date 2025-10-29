@@ -1,8 +1,9 @@
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { getNext } from '../num';
-import { type ParsingStrategy } from '../calldata/parser/parsingStrategy';
+import { type ParsingStrategy } from '../calldata/parser/parsingStrategy.type';
 import { CairoType } from './cairoType.interface';
+import type { AllowArray } from '../../types';
 
 /**
  * Represents a Cairo fixed-size array with compile-time known length.
@@ -25,7 +26,7 @@ import { CairoType } from './cairoType.interface';
  *
  * // Simple fixed array
  * const simple = new CairoFixedArray([1, 2, 3], '[core::integer::u8; 3]', hdParsingStrategy);
- * console.log(simple.toApiRequest()); // ['0x1', '0x2', '0x3']
+ * console.log(simple.toApiRequest()); // ['1', '2', '3']
  * console.log(simple.decompose(hdParsingStrategy)); // [1n, 2n, 3n]
  *
  * // Nested fixed arrays
@@ -39,6 +40,8 @@ import { CairoType } from './cairoType.interface';
  */
 export class CairoFixedArray extends CairoType {
   static dynamicSelector = 'CairoFixedArray' as const;
+
+  public readonly dynamicSelector = CairoFixedArray.dynamicSelector;
 
   /**
    * Array of CairoType instances representing a Cairo fixed array.
@@ -63,7 +66,7 @@ export class CairoFixedArray extends CairoType {
    *
    * @param content - Input data (array, object, Iterator<string>, or CairoType instances)
    * @param arrayType - Fixed array type string (e.g., "[core::integer::u8; 3]")
-   * @param strategy - Parsing strategy for element type handling
+   * @param parsingStrategy - Parsing strategy for element type handling
    * @example
    * ```typescript
    * // From user array
@@ -80,22 +83,69 @@ export class CairoFixedArray extends CairoType {
    * const nested = new CairoFixedArray([[1, 2], [3, 4]], '[[core::integer::u8; 2]; 2]', hdParsingStrategy);
    * ```
    */
-  constructor(content: unknown, arrayType: string, strategy: ParsingStrategy) {
+  constructor(content: unknown, arrayType: string, parsingStrategy: AllowArray<ParsingStrategy>) {
     super();
-
-    // If content is already a CairoFixedArray instance, just copy its properties
+    this.arrayType = arrayType;
+    const strategies = Array.isArray(parsingStrategy) ? parsingStrategy : [parsingStrategy];
+    if (content && typeof content === 'object' && 'next' in content) {
+      // "content" is an iterator
+      const parsedContent: CairoType[] = CairoFixedArray.parser(
+        content as Iterator<string>,
+        arrayType,
+        strategies
+      );
+      this.content = parsedContent;
+      return;
+    }
     if (content instanceof CairoFixedArray) {
       this.content = content.content;
       this.arrayType = content.arrayType;
       return;
     }
-
-    // Always use parser for unified processing
-    const iterator = CairoFixedArray.prepareIterator(content, arrayType);
-    const parsedContent = CairoFixedArray.parser(iterator, arrayType, strategy);
-
-    this.content = parsedContent;
-    this.arrayType = arrayType;
+    CairoFixedArray.validate(content, arrayType);
+    const arrayContentType = CairoFixedArray.getFixedArrayType(arrayType);
+    const resultContent: any[] = CairoFixedArray.extractValuesArray(content).map(
+      (contentItem: any) => {
+        if (
+          contentItem &&
+          typeof contentItem === 'object' &&
+          contentItem !== null &&
+          'toApiRequest' in contentItem
+        ) {
+          // "content" is a CairoType
+          return contentItem as CairoType;
+        }
+        // not an iterator, not an CairoType -> so is low level data (BigNumberish, array, object, Cairo Enums)
+        const strategyConstructorNum = strategies.findIndex(
+          (strategy: ParsingStrategy) => strategy.constructors[arrayContentType]
+        );
+        if (strategyConstructorNum >= 0) {
+          const constructor = strategies[strategyConstructorNum].constructors[arrayContentType];
+          return constructor(contentItem, strategies, arrayContentType);
+        }
+        const strategyDynamicNum = strategies.findIndex((strategy: ParsingStrategy) => {
+          const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+          return dynamicSelectors.find(([, selectorFn]) => selectorFn(arrayContentType));
+        });
+        if (strategyDynamicNum >= 0) {
+          const dynamicSelectors = Object.entries(strategies[strategyDynamicNum].dynamicSelectors);
+          const matchingSelector = dynamicSelectors.find(([, selectorFn]) =>
+            selectorFn(arrayContentType)
+          );
+          const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+          const dynamicConstructor = strategies[strategyDynamicNum].constructors[selectorName];
+          if (dynamicConstructor) {
+            return dynamicConstructor(contentItem, strategies, arrayContentType);
+          }
+        }
+        throw new Error(`"${arrayContentType}" is not a valid Cairo type`);
+      }
+    );
+    assert(
+      resultContent.length === CairoFixedArray.getFixedArraySize(arrayType),
+      `ABI type ${arrayType}: expected ${CairoFixedArray.getFixedArraySize(arrayType)} items, got ${resultContent.length} items.`
+    );
+    this.content = resultContent;
   }
 
   /**
@@ -109,35 +159,44 @@ export class CairoFixedArray extends CairoType {
    *
    * @param responseIterator - Iterator over string data to parse
    * @param arrayType - The fixed array type (e.g., "[core::integer::u32; 4]")
-   * @param strategy - The parsing strategy containing constructors and selectors
+   * @param parsingStrategies - The parsing strategy containing constructors and selectors
    * @returns Array of parsed CairoType instances
    * @private
    */
   private static parser(
     responseIterator: Iterator<string>,
     arrayType: string,
-    strategy: ParsingStrategy
+    parsingStrategies: ParsingStrategy[]
   ): CairoType[] {
     const elementType = CairoFixedArray.getFixedArrayType(arrayType);
     const outerSize = CairoFixedArray.getFixedArraySize(arrayType);
 
     // First check direct constructors
-    const constructor = strategy.constructors[elementType];
-
-    if (constructor) {
-      return Array.from({ length: outerSize }, () => constructor(responseIterator, elementType));
+    const strategyConstructorNum = parsingStrategies.findIndex(
+      (strategy: ParsingStrategy) => strategy.constructors[elementType]
+    );
+    if (strategyConstructorNum >= 0) {
+      const constructor = parsingStrategies[strategyConstructorNum].constructors[elementType];
+      return Array.from({ length: outerSize }, () =>
+        constructor(responseIterator, parsingStrategies, elementType)
+      );
     }
 
     // Check dynamic selectors (includes CairoFixedArray, future: tuples, structs, etc.)
-    const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
-    const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
-
-    if (matchingSelector) {
-      const [selectorName] = matchingSelector;
-      const dynamicConstructor = strategy.constructors[selectorName];
+    const strategyDynamicNum = parsingStrategies.findIndex((strategy: ParsingStrategy) => {
+      const dynamicSelectors = Object.entries(strategy.dynamicSelectors);
+      return dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+    });
+    if (strategyDynamicNum >= 0) {
+      const dynamicSelectors = Object.entries(
+        parsingStrategies[strategyDynamicNum].dynamicSelectors
+      );
+      const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(elementType));
+      const [selectorName] = matchingSelector as [string, (type: string) => boolean];
+      const dynamicConstructor = parsingStrategies[strategyDynamicNum].constructors[selectorName];
       if (dynamicConstructor) {
         return Array.from({ length: outerSize }, () =>
-          dynamicConstructor(responseIterator, elementType)
+          dynamicConstructor(responseIterator, parsingStrategies, elementType)
         );
       }
     }
@@ -145,47 +204,6 @@ export class CairoFixedArray extends CairoType {
     // Unknown type - collect raw values, defer error
     const rawValues = Array.from({ length: outerSize }, () => getNext(responseIterator));
     return rawValues as unknown as CairoType[];
-  }
-
-  /**
-   * Prepare a string iterator from any input type for unified processing.
-   *
-   * This method normalizes all possible input types into a consistent Iterator<string>
-   * that can be consumed by the parser. It handles three main scenarios:
-   * 1. Iterator<string> from API responses → pass through unchanged
-   * 2. CairoType instances → serialize to API strings and create iterator
-   * 3. User input (arrays/objects) → flatten to strings and create iterator
-   *
-   * @param content - Input data (Iterator, array, object, or CairoType instances)
-   * @param arrayType - Fixed array type for validation and processing
-   * @returns Iterator over string values ready for parsing
-   * @private
-   */
-  private static prepareIterator(content: unknown, arrayType: string): Iterator<string> {
-    // If already an iterator (API response), return as-is
-    if (content && typeof content === 'object' && 'next' in content) {
-      return content as Iterator<string>;
-    }
-
-    // For user input, validate and convert to string iterator
-    CairoFixedArray.validate(content, arrayType);
-    const values = CairoFixedArray.extractValuesArray(content);
-
-    // If values are already CairoType instances, serialize them to strings
-    if (
-      values.length > 0 &&
-      typeof values[0] === 'object' &&
-      values[0] !== null &&
-      'toApiRequest' in values[0]
-    ) {
-      // Convert CairoType instances to their API string representation
-      const stringValues = values.flatMap((cairoType) => (cairoType as any).toApiRequest());
-      return stringValues[Symbol.iterator]();
-    }
-
-    // Convert user input to flattened string array and return iterator
-    const flatStringValues = CairoFixedArray.flattenUserInput(values, arrayType);
-    return flatStringValues[Symbol.iterator]();
   }
 
   /**
@@ -207,44 +225,6 @@ export class CairoFixedArray extends CairoType {
       return input;
     }
     return Object.values(input as object);
-  }
-
-  /**
-   * Flatten user input into a sequence of strings for parser consumption.
-   *
-   * Recursively processes user input to create a flat sequence of strings that matches
-   * the format expected by API responses. For nested fixed arrays, it recursively
-   * flattens all nested structures into a single sequential stream of values.
-   *
-   * @param values - Array of user input values to flatten
-   * @param arrayType - Fixed array type to determine element processing
-   * @returns Flattened array of strings ready for parser consumption
-   * @private
-   * @example
-   * // Simple array: [1, 2, 3] → ['1', '2', '3']
-   * // Nested array: [[1, 2], [3, 4]] → ['1', '2', '3', '4']
-   */
-  private static flattenUserInput(values: any[], arrayType: string): string[] {
-    const elementType = CairoFixedArray.getFixedArrayType(arrayType);
-
-    // If element type is itself a fixed array, we need to flatten recursively
-    if (CairoFixedArray.isAbiType(elementType)) {
-      return values.flatMap((value) => {
-        if (
-          Array.isArray(value) ||
-          (typeof value === 'object' && value !== null && !('toApiRequest' in value))
-        ) {
-          // Recursively flatten nested arrays
-          const nestedValues = CairoFixedArray.extractValuesArray(value);
-          return CairoFixedArray.flattenUserInput(nestedValues, elementType);
-        }
-        // Single value, convert to string
-        return String(value);
-      });
-    }
-
-    // For primitive types, just convert all values to strings
-    return values.map((value) => String(value));
   }
 
   /**
@@ -359,21 +339,21 @@ export class CairoFixedArray extends CairoType {
   }
 
   /**
-   * Serialize the Cairo fixed array into hex strings for Starknet API requests.
+   * Serialize the Cairo fixed array into decimal strings for Starknet API requests.
    *
    * Converts all CairoType elements in this fixed array into their hex string representation
    * by calling toApiRequest() on each element and flattening the results. This is used when
    * sending data to the Starknet network.
    *
-   * @returns Array of hex strings ready for API requests
+   * @returns Array of decimal strings ready for API requests
    * @example
    * ```typescript
    * const fArray = new CairoFixedArray([1, 2, 3], "[core::integer::u8; 3]", strategy);
-   * const result = fArray.toApiRequest(); // ['0x1', '0x2', '0x3']
+   * const result = fArray.toApiRequest(); // ['1', '2', '3']
    *
    * // Nested arrays are flattened
    * const nested = new CairoFixedArray([[1, 2], [3, 4]], "[[core::integer::u8; 2]; 2]", strategy);
-   * const flatResult = nested.toApiRequest(); // ['0x1', '0x2', '0x3', '0x4']
+   * const flatResult = nested.toApiRequest(); // ['1', '2', '3', '4']
    * ```
    */
   public toApiRequest(): string[] {
@@ -389,7 +369,7 @@ export class CairoFixedArray extends CairoType {
    * response parsers (e.g., CairoUint8 → BigInt). This method is used primarily for
    * parsing API responses into user-friendly formats.
    *
-   * @param strategy - Parsing strategy for response parsing
+   * @param strategyDecompose - Parsing strategy for response parsing
    * @returns Array of parsed values (BigInt, numbers, nested arrays, etc.)
    * @example
    * ```typescript
@@ -397,25 +377,48 @@ export class CairoFixedArray extends CairoType {
    * const parsed = fixedArray.decompose(hdParsingStrategy); // [1n, 2n, 3n]
    * ```
    */
-  public decompose(strategy: ParsingStrategy): any[] {
-    // Use response parsers to get final parsed values (for API response parsing)
-    const elementType = CairoFixedArray.getFixedArrayType(this.arrayType);
 
+  /**
+   * Create an object from a array representing a Fixed Array.
+   * Be sure to have an array length conform to the ABI.
+   * To be used with CallData.compile().
+   * @param {Array<any>} input JS array representing a Cairo fixed array.
+   * @returns {Object} a specific struct representing a fixed Array.
+   * @example
+   * ```typescript
+   * const result = CairoFixedArray.compile([10,20,30]);
+   * // result = { '0': 10, '1': 20, '2': 30 }
+   * ```
+   */
+  static compile(input: Array<any>): Object {
+    return input.reduce((acc: any, item: any, idx: number) => {
+      acc[idx] = item;
+      return acc;
+    }, {});
+  }
+
+  public decompose(strategyDecompose: AllowArray<ParsingStrategy>): any[] {
+    // Use response parsers to get final parsed values (for API response parsing)
+    const strategies = Array.isArray(strategyDecompose) ? strategyDecompose : [strategyDecompose];
+    const elementType = CairoFixedArray.getFixedArrayType(this.arrayType);
     return this.content.map((element) => {
-      if (element instanceof CairoFixedArray) {
-        // For nested arrays, decompose recursively with strategy
-        return element.decompose(strategy);
-      }
       // For raw string values (unsupported types), throw error
       if (typeof element === 'string') {
         throw new Error(`No parser found for element type: ${elementType} in parsing strategy`);
       }
-
-      // For primitive types, use the response parser to get final values
-      const responseParser = strategy.response[elementType];
-
+      let parserName: string = elementType;
+      if (element instanceof CairoType) {
+        if ('dynamicSelector' in element) {
+          // dynamic recursive CairoType
+          parserName = (element as any).dynamicSelector;
+        }
+      }
+      const strategyDecomposeNum = strategies.findIndex(
+        (strategy: ParsingStrategy) => strategy.response[parserName]
+      );
+      const responseParser = strategies[strategyDecomposeNum].response[parserName];
       if (responseParser) {
-        return responseParser(element);
+        return responseParser(element, strategies);
       }
 
       // No response parser found - throw error instead of fallback magic

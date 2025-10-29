@@ -12,9 +12,9 @@ describe('CairoByteArray Unit Tests', () => {
 
       // Verify API request format
       const apiRequest = byteArray.toApiRequest();
-      expect(apiRequest[0]).toBe('0x0'); // data length
-      expect(apiRequest[1]).toBe('0x48656c6c6f2c20576f726c6421'); // pending_word as hex
-      expect(apiRequest[2]).toBe('0xd'); // pending_word_len
+      expect(apiRequest[0]).toBe('0'); // data length
+      expect(apiRequest[1]).toBe('5735816763073854918203775149089');
+      expect(apiRequest[2]).toBe('13'); // pending_word_len
     });
 
     test('should handle exactly 31 bytes string', () => {
@@ -27,7 +27,7 @@ describe('CairoByteArray Unit Tests', () => {
 
       // Verify API request format
       const apiRequest = byteArray.toApiRequest();
-      expect(apiRequest[0]).toBe('0x1'); // data length
+      expect(apiRequest[0]).toBe('1'); // data length
       expect(apiRequest.length).toBe(4); // 1 (length) + 1 (chunk data) + 1 (pending_word) + 1 (pending_word_len)
     });
 
@@ -41,7 +41,7 @@ describe('CairoByteArray Unit Tests', () => {
 
       // Verify API request format
       const apiRequest = byteArray.toApiRequest();
-      expect(apiRequest[0]).toBe('0x2'); // data length
+      expect(apiRequest[0]).toBe('2'); // data length
       expect(apiRequest.length).toBe(5); // 1 (length) + 2 (chunk data) + 1 (pending_word) + 1 (pending_word_len)
     });
 
@@ -54,9 +54,9 @@ describe('CairoByteArray Unit Tests', () => {
 
       // Verify API request format
       const apiRequest = byteArray.toApiRequest();
-      expect(apiRequest[0]).toBe('0x0'); // data length
-      expect(apiRequest[1]).toBe('0x0'); // pending_word as hex
-      expect(apiRequest[2]).toBe('0x0'); // pending_word_len
+      expect(apiRequest[0]).toBe('0'); // data length
+      expect(apiRequest[1]).toBe('0'); // pending_word as hex
+      expect(apiRequest[2]).toBe('0'); // pending_word_len
     });
   });
 
@@ -293,9 +293,9 @@ describe('CairoByteArray Unit Tests', () => {
       const byteArray = new CairoByteArray('Test');
       const apiRequest = byteArray.toApiRequest();
 
-      expect(apiRequest[0]).toBe('0x0'); // data length (0 chunks)
-      expect(apiRequest[1]).toBe('0x54657374'); // pending_word "Test" as hex
-      expect(apiRequest[2]).toBe('0x4'); // pending_word_len
+      expect(apiRequest[0]).toBe('0'); // data length (0 chunks)
+      expect(apiRequest[1]).toBe('1415934836'); // pending_word "Test"
+      expect(apiRequest[2]).toBe('4'); // pending_word_len
     });
 
     test('should handle data with multiple chunks', () => {
@@ -303,7 +303,7 @@ describe('CairoByteArray Unit Tests', () => {
       const byteArray = new CairoByteArray(longString);
       const apiRequest = byteArray.toApiRequest();
 
-      expect(apiRequest[0]).toBe('0x1'); // data length (1 chunk)
+      expect(apiRequest[0]).toBe('1'); // data length (1 chunk)
       expect(apiRequest.length).toBe(4); // 1 (length) + 1 (chunk data) + 1 (pending_word) + 1 (pending_word_len)
     });
 
@@ -439,6 +439,13 @@ describe('CairoByteArray Unit Tests', () => {
         expected = expected * 256n + BigInt(str.charCodeAt(i));
       }
       expect(byteArray.toBigInt()).toBe(expected);
+    });
+
+    describe('toDecimalString method', () => {
+      test('should convert short string to bigint', () => {
+        const byteArray = new CairoByteArray('Test');
+        expect(byteArray.toDecimalString()).toBe('1415934836');
+      });
     });
 
     test('should convert long string with multiple chunks to bigint', () => {
@@ -590,9 +597,9 @@ describe('CairoByteArray Unit Tests', () => {
 
       // Verify API request structure
       expect(apiRequest).toBeInstanceOf(Array);
-      expect(apiRequest[0]).toBe('0x0'); // data length (no complete chunks)
+      expect(apiRequest[0]).toBe('0'); // data length (no complete chunks)
       expect(typeof apiRequest[1]).toBe('string'); // pending_word as hex string
-      expect(apiRequest[2]).toBe('0x10'); // pending_word_len
+      expect(apiRequest[2]).toBe('16'); // pending_word_len
 
       // Deserialize from API response
       const iterator = apiRequest[Symbol.iterator]();
@@ -635,9 +642,9 @@ describe('CairoByteArray Unit Tests', () => {
 
       // Verify API request structure
       expect(apiRequest).toBeInstanceOf(Array);
-      expect(apiRequest[0]).toBe('0x0'); // data length
-      expect(apiRequest[1]).toBe('0x0'); // pending_word
-      expect(apiRequest[2]).toBe('0x0'); // pending_word_len
+      expect(apiRequest[0]).toBe('0'); // data length
+      expect(apiRequest[1]).toBe('0'); // pending_word
+      expect(apiRequest[2]).toBe('0'); // pending_word_len
 
       // Deserialize from API response
       const iterator = apiRequest[Symbol.iterator]();
