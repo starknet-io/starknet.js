@@ -39,5 +39,9 @@ export abstract class AbiParserInterface {
    * @param abiType AbiEntryType
    * @returns Parser function
    */
-  public abstract parseResponse(responseIterator: Iterator<string>, abiType: string): any;
+  public abstract parseResponse(
+    responseIterator: Iterator<string>,
+    fieldName: string,
+    abiType: string
+  ): any;
 }

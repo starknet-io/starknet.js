@@ -81,6 +81,12 @@ export const hdParsingStrategy: ParsingStrategy = {
       }
       return new CairoUint256(input);
     },
+    Uint256: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoUint256.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoUint256(input);
+    },
     [CairoUint512.abiSelector]: (input: Iterator<string> | unknown) => {
       if (input && typeof input === 'object' && 'next' in input) {
         return CairoUint512.factoryFromApiResponse(input as Iterator<string>);
@@ -260,6 +266,7 @@ export const hdParsingStrategy: ParsingStrategy = {
       (instance as CairoFelt252).toBigInt(),
     felt: (instance: CairoType) => (instance as CairoFelt252).toBigInt(),
     [CairoUint256.abiSelector]: (instance: CairoType) => (instance as CairoUint256).toBigInt(),
+    Uint256: (instance: CairoType) => (instance as CairoUint256).toBigInt(),
     [CairoUint512.abiSelector]: (instance: CairoType) => (instance as CairoUint512).toBigInt(),
     [CairoBool.abiSelector]: (instance: CairoType) => (instance as CairoBool).toBoolean(),
     [CairoEthAddress.abiSelector]: (instance: CairoType) =>

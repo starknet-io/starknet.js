@@ -111,7 +111,11 @@ export class AbiParser2 implements AbiParserInterface {
     throw new Error(`Parser for ${abiType} not found`);
   }
 
-  public parseResponse(responseIterator: Iterator<string>, abiType: string): any {
+  public parseResponse(
+    responseIterator: Iterator<string>,
+    _fieldName: string,
+    abiType: string
+  ): any {
     // Check direct constructors first
     const strategyConstructorNum = this.parsingStrategies.findIndex(
       (strategy: ParsingStrategy) => strategy.constructors[abiType] && strategy.response[abiType]

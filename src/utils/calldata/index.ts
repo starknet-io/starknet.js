@@ -282,7 +282,7 @@ export class CallData {
 
     const parsed = outputs.flat().reduce((acc, output, idx) => {
       const propName = output.name ?? idx;
-      acc[propName] = this.parser.parseResponse(responseIterator, output.type);
+      acc[propName] = this.parser.parseResponse(responseIterator, output.name, output.type);
       return acc;
     }, {} as Args);
 
@@ -356,7 +356,7 @@ export class CallData {
     const typeCairoArray = Array.isArray(typeCairo) ? typeCairo : [typeCairo];
     const responseIterator = response.flat()[Symbol.iterator]();
     const decodedArray = typeCairoArray.map((typeParam) =>
-      this.parser.parseResponse(responseIterator, typeParam)
+      this.parser.parseResponse(responseIterator, '', typeParam)
     );
     return decodedArray.length === 1 ? decodedArray[0] : decodedArray;
   }

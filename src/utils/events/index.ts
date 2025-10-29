@@ -228,11 +228,19 @@ export function parseEvents(
         (abiEvent as LegacyEvent).data;
 
       abiEventKeys.forEach((key) => {
-        parsedEvent[abiEvent.name as string][key.name] = parser.parseResponse(keysIter, key.type);
+        parsedEvent[abiEvent.name as string][key.name] = parser.parseResponse(
+          keysIter,
+          key.name,
+          key.type
+        );
       });
 
       abiEventData.forEach((data) => {
-        parsedEvent[abiEvent.name as string][data.name] = parser.parseResponse(dataIter, data.type);
+        parsedEvent[abiEvent.name as string][data.name] = parser.parseResponse(
+          dataIter,
+          data.name,
+          data.type
+        );
       });
       if ('block_hash' in currentEvent) parsedEvent.block_hash = currentEvent.block_hash;
       if ('block_number' in currentEvent) parsedEvent.block_number = currentEvent.block_number;
