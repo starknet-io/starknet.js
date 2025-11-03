@@ -79,7 +79,7 @@ export type ReconnectOptions = {
    * Whether to use the exponential backoff (delay being doubled for each subsequent retry).
    * @default true
    */
-  exponential?: number;
+  exponential?: number | boolean;
 };
 
 /**
@@ -222,7 +222,7 @@ export class WebSocketChannel {
     this.reconnectOptions = {
       retries: options.reconnectOptions?.retries ?? 5,
       delay: options.reconnectOptions?.delay ?? 2000,
-      exponential: options.reconnectOptions?.exponential ?? true
+      exponential: options.reconnectOptions?.exponential ?? true,
     };
     this.requestTimeout = options.requestTimeout ?? 60000;
 
@@ -532,9 +532,9 @@ export class WebSocketChannel {
       };
 
       this.websocket.onerror = () => {
-        const delay = this.reconnectOptions.exponential ?
-          this.reconnectOptions.delay * 2 ** (this.reconnectAttempts - 1) :
-          this.reconnectOptions.delay;
+        const delay = this.reconnectOptions.exponential
+          ? this.reconnectOptions.delay * 2 ** (this.reconnectAttempts - 1)
+          : this.reconnectOptions.delay;
         logger.info(`WebSocket: Reconnect attempt failed. Retrying in ${delay}ms.`);
         this.reconnectTimeoutId = setTimeout(tryReconnect, delay);
       };
