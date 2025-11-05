@@ -2,25 +2,27 @@ import fetch from '../../src/utils/connect/fetch';
 import { BatchClient } from '../../src/utils/batch';
 import {
   createBlockForDevnet,
-  createTestProvider,
-  describeIfRpc071,
   describeIfRpc081,
+  describeIfRpc09,
+  getTestProvider,
 } from '../config/fixtures';
 import { initializeMatcher } from '../config/schema';
-import { ProviderInterface } from '../../src';
+import { RPC } from '../../src/types';
+import { createTestProvider } from '../config/fixturesInit';
 
-describe('Batch Client', () => {
+describe('BatchClient', () => {
   initializeMatcher(expect);
-  let provider: ProviderInterface;
-  let batchClient: BatchClient;
+  const provider = getTestProvider();
 
-  beforeAll(async () => {
-    provider = await createTestProvider(false);
-    batchClient = new BatchClient({
+  let batchClient: BatchClient<RPC.Methods>;
+
+  beforeEach(() => {
+    batchClient = new BatchClient<RPC.Methods>({
       nodeUrl: provider.channel.nodeUrl,
       headers: provider.channel.headers,
       interval: 0,
       baseFetch: fetch,
+      rpcMethods: {} as RPC.Methods, // Type information only, not used at runtime
     });
   });
 
@@ -36,14 +38,14 @@ describe('Batch Client', () => {
       ]);
 
       expect(typeof blockNumber.result).toBe('number');
-      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts');
+      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts08');
 
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       fetchSpy.mockRestore();
     });
   });
 
-  describeIfRpc071('should batch two requests RPC0.7.1', () => {
+  describeIfRpc09('should batch two requests RPC0.9.0', () => {
     test('should batch two requests', async () => {
       await createBlockForDevnet();
 
@@ -55,7 +57,7 @@ describe('Batch Client', () => {
       ]);
 
       expect(typeof blockNumber.result).toBe('number');
-      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts071');
+      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts');
 
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       fetchSpy.mockRestore();

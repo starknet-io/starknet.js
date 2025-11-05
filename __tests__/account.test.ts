@@ -9,26 +9,36 @@ import {
   TransactionType,
   cairo,
   ec,
-  events,
   num,
   hash,
   stark,
   type Calldata,
   type InvokeTransactionReceiptResponse,
+  Deployer,
+  RPC,
+  RpcProvider,
+  BlockTag,
+  type Call,
 } from '../src';
 import {
   C1v2ClassHash,
-  TEST_TX_VERSION,
   contracts,
-  createTestProvider,
   describeIfDevnet,
-  devnetFeeTokenAddress,
+  describeIfNotDevnet,
   erc20ClassHash,
-  getTestAccount,
+  getTestProvider,
 } from './config/fixtures';
+import {
+  createTestProvider,
+  getTestAccount,
+  devnetFeeTokenAddress,
+  adaptAccountIfDevnet,
+  TEST_TX_VERSION,
+  STRKtokenAddress,
+} from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
-const { cleanHex, hexToDecimalString, toBigInt } = num;
+const { toHex, hexToDecimalString, toBigInt } = num;
 const { randomAddress } = stark;
 const { Signature } = ec.starkCurve;
 
@@ -65,7 +75,11 @@ describe('deploy and test Account', () => {
       constructorCalldata: erc20Constructor,
     });
     erc20Address = dd.deploy.contract_address;
-    erc20 = new Contract(contracts.Erc20OZ.sierra.abi, erc20Address, provider);
+    erc20 = new Contract({
+      abi: contracts.Erc20OZ.sierra.abi,
+      address: erc20Address,
+      providerOrAccount: provider,
+    });
 
     const balance = await erc20.balanceOf(account.address);
     expect(balance).toStrictEqual(1000n);
@@ -75,8 +89,17 @@ describe('deploy and test Account', () => {
       casm: contracts.C1v2.casm,
     });
 
-    dapp = new Contract(contracts.C1v2.sierra.abi, dappResponse.deploy.contract_address, provider);
+    dapp = new Contract({
+      abi: contracts.C1v2.sierra.abi,
+      address: dappResponse.deploy.contract_address,
+      providerOrAccount: provider,
+    });
     dappClassHash = num.toHex(dappResponse.declare.class_hash);
+  });
+
+  test('declare and deploy', async () => {
+    expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
+    expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
   });
 
   describeIfDevnet('Test on Devnet', () => {
@@ -111,12 +134,13 @@ describe('deploy and test Account', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      const accountOZ = new Account(
-        provider,
-        toBeAccountAddress,
-        privKey,
-        undefined,
-        TEST_TX_VERSION
+      const accountOZ = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: toBeAccountAddress,
+          signer: privKey,
+          transactionVersion: TEST_TX_VERSION,
+        })
       );
       const deployed = await accountOZ.deploySelf({
         classHash: accountClassHash,
@@ -287,7 +311,13 @@ describe('deploy and test Account', () => {
         { publicKey: starkKeyPub },
         0
       );
-      const newAccount = new Account(provider, precalculatedAddress, privateKey);
+      const newAccount = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: precalculatedAddress,
+          signer: privateKey,
+        })
+      );
 
       const res = await newAccount.simulateTransaction([
         {
@@ -360,6 +390,61 @@ describe('deploy and test Account', () => {
     expect(after - before).toStrictEqual(57n);
   });
 
+  describe('fastExecute()', () => {
+    test('Only Rpc0.9', async () => {
+      const provider08 = new RpcProvider({
+        nodeUrl: 'dummy',
+        blockIdentifier: BlockTag.PRE_CONFIRMED,
+        specVersion: '0.8.1',
+      });
+      const testAccount = new Account({
+        provider: provider08,
+        address: '0x123',
+        signer: '0x456',
+      });
+      const myCall: Call = { contractAddress: '0x036', entrypoint: 'withdraw', calldata: [] };
+      await expect(testAccount.fastExecute(myCall)).rejects.toThrow(
+        'Wrong Rpc version in Provider. At least Rpc v0.9 required.'
+      );
+    });
+
+    test('Only provider with PRE_CONFIRMED blockIdentifier', async () => {
+      const providerLatest = new RpcProvider({
+        nodeUrl: 'dummy',
+        blockIdentifier: BlockTag.LATEST,
+        specVersion: '0.9.0',
+      });
+      const testAccount = new Account({
+        provider: providerLatest,
+        address: '0x123',
+        signer: '0x456',
+      });
+      const myCall: Call = { contractAddress: '0x036', entrypoint: 'withdraw', calldata: [] };
+      await expect(testAccount.fastExecute(myCall)).rejects.toThrow(
+        'Provider needs to be initialized with `pre_confirmed` blockIdentifier option.'
+      );
+    });
+
+    test('fast consecutive txs', async () => {
+      const testProvider = getTestProvider(false, {
+        blockIdentifier: BlockTag.PRE_CONFIRMED,
+      });
+      const testAccount = getTestAccount(testProvider);
+      const myCall: Call = {
+        contractAddress: STRKtokenAddress,
+        entrypoint: 'transfer',
+        calldata: [testAccount.address, cairo.uint256(100)],
+      };
+      const tx1 = await testAccount.fastExecute(myCall);
+      expect(tx1.isReady).toBe(true);
+      expect(tx1.txResult.transaction_hash).toMatch(/^0x/);
+      const tx2 = await testAccount.fastExecute(myCall);
+      await provider.waitForTransaction(tx2.txResult.transaction_hash); // to be sure to have the right nonce in `provider`, that is set with BlockTag.LATEST (otherwise next tests will fail)
+      expect(tx2.isReady).toBe(true);
+      expect(tx2.txResult.transaction_hash).toMatch(/^0x/);
+    });
+  });
+
   describe('EIP712 verification', () => {
     // currently only in Starknet-Devnet, because can fail in Sepolia.
     test('sign and verify EIP712 message fail', async () => {
@@ -379,13 +464,12 @@ describe('deploy and test Account', () => {
       );
       expect(verifyMessageResponse).toBe(false);
 
-      const wrongAccount = new Account(
+      const wrongAccount = new Account({
         provider,
-        '0x037891',
-        '0x026789',
-        undefined,
-        TEST_TX_VERSION
-      ); // non existing account
+        address: '0x037891',
+        signer: '0x026789',
+        transactionVersion: TEST_TX_VERSION,
+      }); // non existing account
       await expect(
         wrongAccount.verifyMessageInStarknet(typedDataExample, signature2, wrongAccount.address)
       ).rejects.toThrow();
@@ -417,7 +501,7 @@ describe('deploy and test Account', () => {
 
     test('change from provider to account', async () => {
       expect(erc20.providerOrAccount).toBeInstanceOf(Provider);
-      erc20.connect(account);
+      erc20.providerOrAccount = account;
       expect(erc20.providerOrAccount).toBeInstanceOf(Account);
     });
 
@@ -452,8 +536,7 @@ describe('deploy and test Account', () => {
       expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
       expect(hexToDecimalString(declareTx.class_hash)).toEqual(hexToDecimalString(erc20ClassHash));
     });
-
-    test('UDC DeployContract', async () => {
+    test('UDC DeployContract - on default ACCEPTED_ON_L2', async () => {
       const deployResponse = await account.deployContract({
         classHash: erc20ClassHash,
         constructorCalldata: erc20Constructor,
@@ -474,8 +557,10 @@ describe('deploy and test Account', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = events.parseUDCEvent(txReceipt.value as InvokeTransactionReceiptResponse);
-      expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
+      const udcEvent = account.deployer.parseDeployerEvent(
+        txReceipt.value as InvokeTransactionReceiptResponse
+      );
+      expect(toHex(deployment.contract_address[0])).toBe(toHex(udcEvent.contract_address));
     });
 
     test('UDC Deploy non-unique', async () => {
@@ -491,8 +576,10 @@ describe('deploy and test Account', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = events.parseUDCEvent(txReceipt.value as InvokeTransactionReceiptResponse);
-      expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
+      const udcEvent = account.deployer.parseDeployerEvent(
+        txReceipt.value as InvokeTransactionReceiptResponse
+      );
+      expect(toHex(deployment.contract_address[0])).toBe(toHex(udcEvent.contract_address));
     });
 
     test('UDC multi Deploy', async () => {
@@ -534,7 +621,13 @@ describe('deploy and test Account', () => {
         { publicKey: starkKeyPub },
         0
       );
-      newAccount = new Account(provider, precalculatedAddress, privateKey);
+      newAccount = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: precalculatedAddress,
+          signer: privateKey,
+        })
+      );
     });
 
     test('estimateAccountDeployFee Cairo 1', async () => {
@@ -544,7 +637,7 @@ describe('deploy and test Account', () => {
         addressSalt: starkKeyPub,
         contractAddress: precalculatedAddress,
       });
-      expect(result).toMatchSchemaRef('EstimateFee');
+      expect(result).toMatchSchemaRef('EstimateFeeResponseOverhead');
     });
 
     test('estimate fee bulk on empty invocations', async () => {
@@ -574,7 +667,7 @@ describe('deploy and test Account', () => {
       ]);
 
       estimatedFeeBulk.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFee');
+        expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
       });
       expect(estimatedFeeBulk.length).toEqual(2);
       // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
@@ -617,7 +710,7 @@ describe('deploy and test Account', () => {
       ]);
       expect(res).toHaveLength(2);
       res.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFee');
+        expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
       });
     });
 
@@ -672,7 +765,7 @@ describe('deploy and test Account', () => {
 
         const res = await account.estimateFeeBulk(invocations);
         res.forEach((value) => {
-          expect(value).toMatchSchemaRef('EstimateFee');
+          expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
         });
       });
 
@@ -713,7 +806,7 @@ describe('deploy and test Account', () => {
 
         const res = await account.estimateFeeBulk(invocations);
         res.forEach((value) => {
-          expect(value).toMatchSchemaRef('EstimateFee');
+          expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
         });
       });
     });
@@ -721,23 +814,92 @@ describe('deploy and test Account', () => {
     // Order is important, declare c1 must be last else estimate and simulate will error
     // with contract already declared
     test('estimateInvokeFee Cairo 1', async () => {
-      // TODO @dhruvkelawala check expectation for feeTransactionVersion
       // Cairo 1 contract
       const ddc1: DeclareDeployUDCResponse = await account.declareAndDeploy({
         contract: contracts.C260.sierra,
         casm: contracts.C260.casm,
       });
 
-      // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-      const result = await account.estimateInvokeFee({
-        contractAddress: ddc1.deploy.address,
-        entrypoint: 'set_name',
-        calldata: ['Hello'],
-      });
+      const latestBlock = await provider.getBlock('latest');
 
-      expect(result).toMatchSchemaRef('EstimateFee');
-      // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-      // innerInvokeEstFeeSpy.mockClear();
+      // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const result = account.estimateInvokeFee(
+        {
+          contractAddress: ddc1.deploy.address, // 0x630f529021f2686e9869b83121ca36f4cbb2b1d617d29d5b079c765f4ef409e
+          entrypoint: 'set_name',
+          calldata: ['Hello'],
+        },
+        {
+          tip: 0,
+          blockIdentifier: latestBlock.block_number,
+        }
+      );
+
+      const result1 = account.estimateInvokeFee(
+        {
+          contractAddress: ddc1.deploy.address,
+          entrypoint: 'set_name',
+          calldata: ['Hello'],
+        },
+        {
+          tip: 1000000000000000000,
+          blockIdentifier: latestBlock.block_number,
+        }
+      );
+
+      const [resolvedResult, resolvedResult1] = await Promise.all([result, result1]);
+      expect(resolvedResult).toMatchSchemaRef('EstimateFeeResponseOverhead');
+
+      // TODO: Different tips should produce different fees on estimate Fee.
+      expect(resolvedResult.resourceBounds.l2_gas.max_price_per_unit).toBe(
+        resolvedResult1.resourceBounds.l2_gas.max_price_per_unit
+      );
+      expect(resolvedResult.overall_fee).toBe(resolvedResult1.overall_fee);
+    });
+  });
+  describe('Custom Cairo 1 Deployer', () => {
+    let accountCustomDeployer: Account;
+    beforeAll(async () => {
+      const deployerResponse = await account.declareAndDeploy({
+        contract: contracts.deployer.sierra,
+        casm: contracts.deployer.casm,
+      });
+      const customDeployer = new Deployer(
+        deployerResponse.deploy.contract_address,
+        'deploy_contract'
+      );
+      accountCustomDeployer = new Account({
+        address: account.address,
+        provider,
+        signer: account.signer,
+        deployer: customDeployer,
+      });
+    });
+    test('Deploy contract', async () => {
+      const deployResponse = await accountCustomDeployer.deployContract({
+        classHash: erc20ClassHash,
+        constructorCalldata: erc20Constructor,
+      });
+      expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
+    });
+  });
+
+  describeIfNotDevnet('Not Devnet', () => {
+    test('UDC DeployContract - on PRE_CONFIRMED', async () => {
+      const deployResponse = await account.deployContract(
+        {
+          classHash: erc20ClassHash,
+          constructorCalldata: erc20Constructor,
+        },
+        {
+          successStates: [
+            RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
+            RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
+            RPC.ETransactionFinalityStatus.PRE_CONFIRMED,
+          ],
+        }
+      );
+      expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
     });
   });
 });

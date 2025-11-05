@@ -27,7 +27,14 @@ import {
 } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { getDecimalString } from '../src/utils/num';
-import { contracts, createTestProvider, getTestAccount, STRKtokenAddress } from './config/fixtures';
+import { contracts } from './config/fixtures';
+import {
+  adaptAccountIfDevnet,
+  createTestProvider,
+  getTestAccount,
+  STRKtokenAddress,
+} from './config/fixturesInit';
+import { initializeMatcher } from './config/schema';
 
 describe('Account and OutsideExecution', () => {
   let provider: Provider;
@@ -48,12 +55,17 @@ describe('Account and OutsideExecution', () => {
   const hour_ago = (now_seconds - 3600).toString();
   const hour_later = (now_seconds + 3600).toString();
 
+  initializeMatcher(expect);
+
   beforeAll(async () => {
     provider = new Provider(await createTestProvider());
     executorAccount = getTestAccount(provider);
     recipientAccount = executorAccount;
-    strkContract = new Contract(contracts.Erc20OZ.sierra.abi, STRKtokenAddress, provider);
-
+    strkContract = new Contract({
+      abi: contracts.Erc20OZ.sierra.abi,
+      address: STRKtokenAddress,
+      providerOrAccount: provider,
+    });
     call1 = {
       contractAddress: STRKtokenAddress,
       entrypoint: 'transfer',
@@ -86,7 +98,13 @@ describe('Account and OutsideExecution', () => {
       constructorCalldata: constructorAXCallData,
     });
     const targetAddress = response.deploy.contract_address;
-    signerAccount = new Account(provider, targetAddress, targetPK);
+    signerAccount = adaptAccountIfDevnet(
+      new Account({
+        provider,
+        address: targetAddress,
+        signer: targetPK,
+      })
+    );
 
     // Transfer dust of STRK token to the signer account
     const transferCall = {
@@ -381,21 +399,8 @@ describe('Account and OutsideExecution', () => {
     );
     const outsideExecutionCall: Call[] =
       outsideExecution.buildExecuteFromOutsideCall(outsideTransaction);
-    const estimateFee = await executorAccount.estimateFee(outsideExecutionCall);
-    expect(Object.keys(estimateFee).sort()).toEqual(
-      [
-        'overall_fee',
-        'unit',
-        'suggestedMaxFee',
-        'resourceBounds',
-        'l1_gas_consumed',
-        'l1_data_gas_consumed',
-        'l1_data_gas_price',
-        'l1_gas_price',
-        'l2_gas_consumed',
-        'l2_gas_price',
-      ].sort()
-    );
+    const estimateFee = await executorAccount.estimateInvokeFee(outsideExecutionCall);
+    expect(estimateFee).toMatchSchemaRef('EstimateFeeResponseOverhead');
 
     const invocations: Invocations = [
       {
@@ -404,14 +409,7 @@ describe('Account and OutsideExecution', () => {
       },
     ];
     const responseSimulate = await executorAccount.simulateTransaction(invocations);
-    expect(Object.keys(responseSimulate[0]).sort()).toEqual(
-      Object.keys({
-        transaction_trace: 0,
-        fee_estimation: 0,
-        suggestedMaxFee: 0,
-        resourceBounds: 0,
-      }).sort()
-    );
+    expect(responseSimulate).toMatchSchemaRef('SimulateTransactionOverheadResponse');
   });
 
   test('ERC165 introspection', async () => {

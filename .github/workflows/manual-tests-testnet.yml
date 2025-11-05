@@ -32,12 +32,12 @@ on:
         description: 'Protocol: WS'
         type: boolean
         default: true
-      matrix-version-v0_7:
-        description: 'RPC version: 0.7'
-        type: boolean
-        default: true
       matrix-version-v0_8:
         description: 'RPC version: 0.8'
+        type: boolean
+        default: true
+      matrix-version-v0_9:
+        description: 'RPC version: 0.9'
         type: boolean
         default: true
 
@@ -78,9 +78,6 @@ jobs:
         node: ${{ fromJson(needs.prepare-matrix.outputs.matrix).node }}
         protocol: ${{ fromJson(needs.prepare-matrix.outputs.matrix).protocol }}
         version: ${{ fromJson(needs.prepare-matrix.outputs.matrix).version }}
-        exclude:
-          - version: v0_7
-            protocol: WS
 
     uses: ./.github/workflows/_test.yml
     with:

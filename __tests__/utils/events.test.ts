@@ -1,14 +1,18 @@
-import type {
-  AbiEntry,
-  AbiEnums,
-  AbiEvent,
-  AbiStructs,
-  CairoEventVariant,
-  InvokeTransactionReceiptResponse,
-  RPC,
+import {
+  type AbiEntry,
+  type AbiEnums,
+  type AbiEvent,
+  type AbiStructs,
+  type CairoEventVariant,
+  type InvokeTransactionReceiptResponse,
+  type RPC,
+  events,
+  legacyDeployer,
 } from '../../src';
-import { isAbiEvent, getAbiEvents, parseEvents, parseUDCEvent } from '../../src/utils/events';
 import { getFunctionAbi, getInterfaceAbi, getAbiEntry } from '../factories/abi';
+import { createAbiParser } from '../../src/utils/calldata/parser';
+
+const { isAbiEvent, getAbiEvents, parseEvents } = events;
 
 const getBaseTxReceiptData = (): InvokeTransactionReceiptResponse => ({
   type: 'INVOKE',
@@ -205,7 +209,9 @@ describe('parseEvents', () => {
       transaction_hash: '0x789',
     };
 
-    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums);
+    const abi = [getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum];
+    const parser = createAbiParser(abi);
+    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums, parser);
 
     const result = [
       {
@@ -290,7 +296,9 @@ describe('parseEvents', () => {
       transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
     };
 
-    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums);
+    const abi = [getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum];
+    const parser = createAbiParser(abi);
+    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums, parser);
 
     const result = [
       {
@@ -376,7 +384,9 @@ describe('parseEvents', () => {
     };
 
     abiEvents['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'].name = '';
-    expect(() => parseEvents([event], abiEvents, abiStructs, abiEnums)).toBeTruthy();
+    const abi = [getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum];
+    const parser = createAbiParser(abi);
+    expect(() => parseEvents([event], abiEvents, abiStructs, abiEnums, parser)).toBeTruthy();
   });
 });
 
@@ -413,7 +423,7 @@ describe('parseUDCEvent', () => {
       ],
     };
 
-    const parsedUDCEvent = parseUDCEvent(txReceipt);
+    const parsedUDCEvent = legacyDeployer.parseDeployerEvent(txReceipt);
     const result = {
       transaction_hash: '0x6eebff0d931f36222268705ca791fd0de8d059eaf01887eecf1ce99a6c27f49',
       contract_address: '0x1f1209f331cda3e84202f5495446028cd8730159ab24e08a5fd96125257673f',
@@ -438,6 +448,8 @@ describe('parseUDCEvent', () => {
       events: [],
     };
 
-    expect(() => parseUDCEvent(txReceipt)).toThrow(new Error('UDC emitted event is empty'));
+    expect(() => legacyDeployer.parseDeployerEvent(txReceipt)).toThrow(
+      new Error('Deployer emitted event is empty')
+    );
   });
 });

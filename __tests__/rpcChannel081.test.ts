@@ -1,5 +1,6 @@
 import { LibraryError, RPC08, RpcError } from '../src';
-import { createBlockForDevnet, createTestProvider, describeIfRpc081 } from './config/fixtures';
+import { createBlockForDevnet, describeIfRpc081 } from './config/fixtures';
+import { createTestProvider } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 describeIfRpc081('RpcChannel', () => {
@@ -50,7 +51,7 @@ describeIfRpc081('RpcChannel', () => {
   describe('RPC 0.8.1', () => {
     test('getBlockWithReceipts', async () => {
       const response = await channel08.getBlockWithReceipts('latest');
-      expect(response).toMatchSchemaRef('BlockWithTxReceipts');
+      expect(response).toMatchSchemaRef('BlockWithTxReceipts08');
     });
   });
 });

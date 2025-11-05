@@ -1,7 +1,7 @@
 import { Abi } from './abi';
 import { EntryPointsByType } from './legacy';
 
-/** SYSTEM TYPES */
+/** Cairo Assembly .casm */
 export type CairoAssembly = {
   prime: string;
   compiler_version: string;
@@ -31,10 +31,14 @@ export type CompiledSierra = {
  *
  * CompressedCompiledSierra
  */
-export type SierraContractClass = Omit<CompiledSierra, 'abi' | 'sierra_program_debug_info'> & {
+export type SierraContractClass = Omit<
+  CompiledSierra,
+  'abi' | 'sierra_program' | 'sierra_program_debug_info'
+> & {
   sierra_program: string;
   abi: string;
 };
+
 export type CompiledSierraCasm = CairoAssembly;
 
 /** SUBTYPES */

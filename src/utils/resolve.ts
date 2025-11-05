@@ -49,7 +49,7 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
  * @returns {boolean} True if the response matches the version, false otherwise.
  * @example
  * ``` typescript
- * const result = provider.isVersion("0.7","0.7.1");
+ * const result = provider.isVersion("0.9","0.9.0");
  * // result = true
  * ```
  */
@@ -93,6 +93,48 @@ export function toAnyPatchVersion(version: string) {
 export function toApiVersion(version: string): string {
   const [major, minor] = version.replace(/^v/, '').split('.');
   return `v${major}_${minor}`;
+}
+
+/**
+ * Compare two semantic version strings segment by segment.
+ * This function safely compares versions without collision risk between
+ * versions like '0.0.1000' and '0.1.0'.
+ *
+ * @param {string} a First version string (e.g., '0.0.9')
+ * @param {string} b Second version string (e.g., '0.0.10')
+ * @returns {number} -1 if a < b, 0 if a === b, 1 if a > b
+ * @example
+ * ```typescript
+ * const result1 = compareVersions('0.0.9', '0.0.10');
+ * // result1 = -1 (0.0.9 < 0.0.10)
+ *
+ * const result2 = compareVersions('0.1.0', '0.0.1000');
+ * // result2 = 1 (0.1.0 > 0.0.1000, correctly different!)
+ *
+ * const result3 = compareVersions('1.2.3', '1.2.3');
+ * // result3 = 0 (equal versions)
+ *
+ * // Usage for version checks:
+ * if (compareVersions(specVersion, '0.14.1') >= 0) {
+ *   // Use Blake2s hash for version >= 0.14.1
+ * }
+ * ```
+ */
+export function compareVersions(a: string, b: string): number {
+  const aParts = a.split('.').map(Number);
+  const bParts = b.split('.').map(Number);
+
+  const maxLen = Math.max(aParts.length, bParts.length);
+
+  for (let i = 0; i < maxLen; i += 1) {
+    const aNum = aParts[i] || 0;
+    const bNum = bParts[i] || 0;
+
+    if (aNum > bNum) return 1;
+    if (aNum < bNum) return -1;
+  }
+
+  return 0;
 }
 
 /**

@@ -3,18 +3,17 @@
 /* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
 
 import {
-  isRPC08_ResourceBounds,
+  isRPC08Plus_ResourceBoundsBN,
   type BigNumberish,
   type Call,
   type Calldata,
   type LedgerPathCalculation,
   type Signature,
-  type V2DeployAccountSignerDetails,
-  type V2InvocationsSignerDetails,
   type V3DeployAccountSignerDetails,
   type V3InvocationsSignerDetails,
 } from '../types';
 import { CallData } from '../utils/calldata';
+import Buffer from '../utils/connect/buffer';
 import type { SignerInterface } from './interface';
 import { getSelector } from '../utils/hash';
 import { concatenateArrayBuffer } from '../utils/encode';
@@ -28,7 +27,6 @@ import {
   encodeResourceBoundsL2,
   hashDAMode,
 } from '../utils/hash/transactionHash/v3';
-import type { RPCSPEC08 } from '../types/api';
 import { intDAM } from '../utils/stark';
 
 /**
@@ -69,71 +67,6 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
     pathFunction: LedgerPathCalculation = getLedgerPathBuffer221
   ) {
     super(transport, accountID, eip2645application, pathFunction);
-  }
-
-  /**
-   * Ask the Ledger Nano to display and sign a Starknet V1 transaction.
-   * @param {V2InvocationsSignerDetails} txDetails All the details needed for a txV1.
-   * @param {Call[]} calls array of Starknet invocations
-   * @returns an object including the transaction Hash and the signature
-   * @example
-   * ```typescript
-   * const calls: Call[] = [{contractAddress: "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-   *      entrypoint: "transfer",
-   *      calldata:["0x11f5fc2a92ac03434a7937fe982f5e5293b65ad438a989c5b78fb8f04a12016",
-   *        "0x9184e72a000", "0x0"]}];
-   * const txDet: V2InvocationsSignerDetails = {
-   *    walletAddress: txDetails.accountAddress,
-   *    chainId: constants.StarknetChainId.SN_MAIN,
-   *    cairoVersion: "1", maxFee: txDetails.max_fee,
-   *    nonce: txDetails.nonce, version: "0x1"
-   *  };
-   * const res = await myLedgerSigner.signTxV1(txDet, calls);
-   * // res = {hash:
-   * //   signature:
-   * // }
-   * ```
-   */
-  public async signTxV1(
-    txDetails: V2InvocationsSignerDetails,
-    calls: Call[]
-  ): Promise<{ hash: bigint; signature: Signature }> {
-    // APDU 0 for path
-    await this._transporter.send(Number('0x5a'), 4, 0, 0, Buffer.from(this.pathBuffer));
-    /* APDU 1 =
-        accountAddress (32 bytes) +
-        max_fee (32 bytes) +
-        chain_id (32 bytes) +
-        nonce (32 bytes) 
-      */
-    const accountAddressBuf: Uint8Array = this.convertBnToLedger(txDetails.walletAddress);
-    const maxFeeBuf: Uint8Array = this.convertBnToLedger(txDetails.maxFee);
-    const chainIdBuf: Uint8Array = this.convertBnToLedger(txDetails.chainId);
-    const nonceBuf: Uint8Array = this.convertBnToLedger(txDetails.nonce);
-    const dataBuf: Uint8Array = concatenateArrayBuffer([
-      accountAddressBuf,
-      maxFeeBuf,
-      chainIdBuf,
-      nonceBuf,
-    ]);
-    await this._transporter.send(Number('0x5a'), 4, 1, 0, Buffer.from(dataBuf));
-    // APDU 2 = Nb of calls
-    const nbCallsBuf: Uint8Array = this.convertBnToLedger(calls.length);
-    await this._transporter.send(Number('0x5a'), 4, 2, 0, Buffer.from(nbCallsBuf));
-    // APDU 3 = Calls
-    let respSign: Uint8Array = new Uint8Array(0);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const call of calls) {
-      const calldatas: Uint8Array[] = this.encodeCall(call);
-      respSign = await this._transporter.send(Number('0x5a'), 4, 3, 0, Buffer.from(calldatas[0]));
-      if (calldatas.length > 1) {
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        calldatas.slice(1).forEach(async (part: Uint8Array) => {
-          respSign = await this._transporter.send(Number('0x5a'), 4, 3, 1, Buffer.from(part));
-        });
-      }
-    }
-    return this.decodeSignatureLedger(respSign);
   }
 
   /**
@@ -199,12 +132,12 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
     await this._transporter.send(Number('0x5a'), 3, 1, 0, Buffer.from(dataBuf));
 
     // APDU 2 = fees
-    if (isRPC08_ResourceBounds(txDetails.resourceBounds)) {
+    if (isRPC08Plus_ResourceBoundsBN(txDetails.resourceBounds)) {
       const tipBuf = this.convertBnToLedger(txDetails.tip);
       const l1_gasBuf = this.convertBnToLedger(encodeResourceBoundsL1(txDetails.resourceBounds));
       const l2_gasBuf = this.convertBnToLedger(encodeResourceBoundsL2(txDetails.resourceBounds));
       const l1_data_gasBuf = this.convertBnToLedger(
-        encodeDataResourceBoundsL1(txDetails.resourceBounds as RPCSPEC08.ResourceBounds)
+        encodeDataResourceBoundsL1(txDetails.resourceBounds)
       );
       const feeBuf: Uint8Array = concatenateArrayBuffer([
         tipBuf,
@@ -212,13 +145,6 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
         l2_gasBuf,
         l1_data_gasBuf,
       ]);
-      await this._transporter.send(Number('0x5a'), 3, 2, 0, Buffer.from(feeBuf));
-    } else {
-      // Rpc0.7
-      const tipBuf = this.convertBnToLedger(txDetails.tip);
-      const l1_gasBuf = this.convertBnToLedger(encodeResourceBoundsL1(txDetails.resourceBounds));
-      const l2_gasBuf = this.convertBnToLedger(encodeResourceBoundsL2(txDetails.resourceBounds));
-      const feeBuf: Uint8Array = concatenateArrayBuffer([tipBuf, l1_gasBuf, l2_gasBuf]);
       await this._transporter.send(Number('0x5a'), 3, 2, 0, Buffer.from(feeBuf));
     }
 
@@ -255,88 +181,6 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
           respSign = await this._transporter.send(Number('0x5a'), 3, 6, 1, Buffer.from(part));
         });
       }
-    }
-    return this.decodeSignatureLedger(respSign);
-  }
-
-  /**
-   * Ask the Ledger Nano to display and sign a Starknet V1 account deployment.
-   * @param {V2DeployAccountSignerDetails} deployAccountDetail All the details needed for a V1 deploy account.
-   * @returns an object including the transaction Hash and the signature
-   * @example
-   * ```typescript
-   * const deployData: V2DeployAccountSignerDetails =
-   * {
-   *  tip: 0, paymasterData: [], accountDeploymentData: [],
-   *  nonceDataAvailabilityMode: 'L1', feeDataAvailabilityMode: 'L1',
-   *  resourceBounds: {
-   *    l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-   *    l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' }
-   *   },
-   *  classHash: '0x540d7f5ec7ecf317e68d48564934cb99259781b1ee3cedbbc37ec5337f8e688',
-   *  constructorCalldata: [
-   *    '89832696000889662999767022750851886674077821293893187900664573372145410755'
-   *  ],
-   *  contractAddress: '0x32c60fba64eb96831d064bbb2319375b7b7381543abe66da872e4344bcd72a0',
-   *  addressSalt: '0x0032d7efe2a9232f9b463e7206c68fdea4aeb13fec0cb308c6ba1d197d5922c3',
-   *  chainId: '0x534e5f5345504f4c4941', maxFee: 55050000000000n,
-   *  version: '0x1', nonce: 0n
-   *}
-   * const res = await myLedgerSigner.signDeployAccountV1(deployData);
-   * // res = {hash:
-   * //   signature:
-   * // }
-   * ```
-   */
-  public async signDeployAccountV1(
-    deployAccountDetail: V2DeployAccountSignerDetails
-  ): Promise<{ hash: bigint; signature: Signature }> {
-    // APDU 0 for path
-    await this._transporter.send(Number('0x5a'), 6, 0, 0, Buffer.from(this.pathBuffer));
-    /* APDU 1 =
-        contract_address (32 bytes) +
-        class_hash (32 bytes) +
-        contract_address_salt (32 bytes) +
-        max_fee (32 bytes) +
-        chain_id (32 bytes) +
-        nonce (32 bytes)
-      */
-    const accountAddressBuf: Uint8Array = this.convertBnToLedger(
-      deployAccountDetail.contractAddress
-    );
-    const classHashBuf: Uint8Array = this.convertBnToLedger(deployAccountDetail.classHash);
-    const saltBuf: Uint8Array = this.convertBnToLedger(deployAccountDetail.addressSalt);
-    const maxFeeBuf: Uint8Array = this.convertBnToLedger(deployAccountDetail.maxFee);
-    const chainIdBuf: Uint8Array = this.convertBnToLedger(deployAccountDetail.chainId);
-    const nonceBuf: Uint8Array = this.convertBnToLedger(deployAccountDetail.nonce);
-    const dataBuf: Uint8Array = concatenateArrayBuffer([
-      accountAddressBuf,
-      classHashBuf,
-      saltBuf,
-      maxFeeBuf,
-      chainIdBuf,
-      nonceBuf,
-    ]);
-    await this._transporter.send(Number('0x5a'), 6, 1, 0, Buffer.from(dataBuf));
-    // APDU 2 = constructor length
-    const compiledConstructor = CallData.compile(deployAccountDetail.constructorCalldata);
-    const constructorLengthBuf: Uint8Array = this.convertBnToLedger(compiledConstructor.length);
-    await this._transporter.send(Number('0x5a'), 6, 2, 0, Buffer.from(constructorLengthBuf));
-    // APDU 3 = constructor
-    const constructorBuf = concatenateArrayBuffer(
-      compiledConstructor.map((parameter: string): Uint8Array => {
-        const a = this.convertBnToLedger(parameter);
-        return a;
-      })
-    );
-    const constructorChunks: Uint8Array[] = [];
-    const chunkSize = 7 * 32; // 224 bytes
-    for (let i = 0; i < constructorBuf.length; i += chunkSize)
-      constructorChunks.push(constructorBuf.subarray(i, i + chunkSize));
-    let respSign: Uint8Array = new Uint8Array(0);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const chunk of constructorChunks) {
-      respSign = await this._transporter.send(Number('0x5a'), 6, 3, 0, Buffer.from(chunk));
     }
     return this.decodeSignatureLedger(respSign);
   }
@@ -406,7 +250,7 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
     ]);
     await this._transporter.send(Number('0x5a'), 5, 1, 0, Buffer.from(dataBuf));
     // APDU 2 = fees
-    if (isRPC08_ResourceBounds(deployAccountDetail.resourceBounds)) {
+    if (isRPC08Plus_ResourceBoundsBN(deployAccountDetail.resourceBounds)) {
       const tipBuf = this.convertBnToLedger(deployAccountDetail.tip);
       const l1_gasBuf = this.convertBnToLedger(
         encodeResourceBoundsL1(deployAccountDetail.resourceBounds)
@@ -415,7 +259,7 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
         encodeResourceBoundsL2(deployAccountDetail.resourceBounds)
       );
       const l1_data_gasBuf = this.convertBnToLedger(
-        encodeDataResourceBoundsL1(deployAccountDetail.resourceBounds as RPCSPEC08.ResourceBounds)
+        encodeDataResourceBoundsL1(deployAccountDetail.resourceBounds)
       );
       const feeBuf: Uint8Array = concatenateArrayBuffer([
         tipBuf,
@@ -423,17 +267,6 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
         l2_gasBuf,
         l1_data_gasBuf,
       ]);
-      await this._transporter.send(Number('0x5a'), 5, 2, 0, Buffer.from(feeBuf));
-    } else {
-      // Rpc0.7
-      const tipBuf = this.convertBnToLedger(deployAccountDetail.tip);
-      const l1_gasBuf = this.convertBnToLedger(
-        encodeResourceBoundsL1(deployAccountDetail.resourceBounds)
-      );
-      const l2_gasBuf = this.convertBnToLedger(
-        encodeResourceBoundsL2(deployAccountDetail.resourceBounds)
-      );
-      const feeBuf: Uint8Array = concatenateArrayBuffer([tipBuf, l1_gasBuf, l2_gasBuf]);
       await this._transporter.send(Number('0x5a'), 5, 2, 0, Buffer.from(feeBuf));
     }
     // APDU 3 = paymaster data

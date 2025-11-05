@@ -13,13 +13,11 @@ Starknet.js is a library that helps connect your website or your Decentralized A
 Some important topics that have to be understood:
 
 - You can connect your DAPP to several networks:
-
   - [Starknet mainnet](https://starkscan.co) (Layer 2 of [Ethereum network](https://etherscan.io/) ).
   - [Starknet testnet](https://sepolia.starkscan.co/) (Layer 2 of [Sepolia network](https://sepolia.etherscan.io/) (testnet of Ethereum)).
   - [Starknet-devnet](https://github.com/0xSpaceShard/starknet-devnet-rs) (your local Starknet network, for developers).
 
   and also to some more specific solutions:
-
   - private customized version of Starknet.
   - local Starknet node (connected to mainnet or testnet).
 

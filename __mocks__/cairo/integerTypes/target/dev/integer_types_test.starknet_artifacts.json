@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "contracts": [
+    {
+      "id": "ho17l970qe9j0",
+      "package_name": "integer_types_test",
+      "contract_name": "IntegerTypesStorage",
+      "module_path": "integer_types_test::IntegerTypesStorage",
+      "artifacts": {
+        "sierra": "integer_types_test_IntegerTypesStorage.contract_class.json",
+        "casm": "integer_types_test_IntegerTypesStorage.compiled_contract_class.json"
+      }
+    }
+  ]
+}

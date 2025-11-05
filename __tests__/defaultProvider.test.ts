@@ -1,8 +1,8 @@
 import {
   Account,
+  Block,
   BlockNumber,
   CallData,
-  GetBlockResponse,
   isPendingStateUpdate,
   LibraryError,
   Provider,
@@ -12,13 +12,8 @@ import {
   type Calldata,
   type RawArgs,
 } from '../src';
-import {
-  contracts,
-  createTestProvider,
-  erc20ClassHash,
-  getTestAccount,
-  wrongClassHash,
-} from './config/fixtures';
+import { contracts, erc20ClassHash, wrongClassHash } from './config/fixtures';
+import { createTestProvider, getTestAccount } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
 describe('defaultProvider', () => {
@@ -26,7 +21,7 @@ describe('defaultProvider', () => {
   let account: Account;
   let exampleTransactionHash: string;
   let erc20ContractAddress: string;
-  let exampleBlock: GetBlockResponse;
+  let exampleBlock: Block;
   let exampleBlockNumber: BlockNumber;
   let exampleBlockHash: string;
   let erc20Constructor: Calldata;
@@ -200,7 +195,7 @@ describe('defaultProvider', () => {
               user: '0xdeadbeef',
             }),
           })
-        ).rejects.toThrowError();
+        ).rejects.toThrow();
       });
     });
   });
