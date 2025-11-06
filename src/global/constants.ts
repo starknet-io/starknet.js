@@ -158,8 +158,8 @@ export const DEFAULT_GLOBAL_CONFIG: {
 };
 
 export const RPC_DEFAULT_NODES = {
-  SN_MAIN: [`https://starknet-mainnet.public.blastapi.io/rpc/`],
-  SN_SEPOLIA: [`https://starknet-sepolia.public.blastapi.io/rpc/`],
+  SN_MAIN: [`https://api.zan.top/public/starknet-mainnet/rpc/`],
+  SN_SEPOLIA: [`https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/`],
 } as const;
 
 export const PAYMASTER_RPC_NODES = {
