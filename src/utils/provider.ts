@@ -149,6 +149,12 @@ export function getDefaultNodes(rpcVersion: SupportedRpcVersion) {
 
   Object.keys(nodes).forEach(function (key, _) {
     nodes[key] = nodes[key].map((it: any) => {
+      if (it === 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/') {
+        return `${it}${toApiVersion(rpcVersion)}/uYLxCteYbHTFJpKSoKdVm`;
+      }
+      if (it === 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/') {
+        return `${it}${toApiVersion(rpcVersion)}/uYLxCteYbHTFJpKSoKdVm`;
+      }
       return `${it}${toApiVersion(rpcVersion)}`;
     });
   });
