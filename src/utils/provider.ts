@@ -152,6 +152,9 @@ export function getDefaultNodes(rpcVersion: SupportedRpcVersion) {
       if (it === 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/') {
         return `${it}${toApiVersion(rpcVersion)}/uYLxCteYbHTFJpKSoKdVm`;
       }
+      if (it === 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/') {
+        return `${it}${toApiVersion(rpcVersion)}/uYLxCteYbHTFJpKSoKdVm`;
+      }
       return `${it}${toApiVersion(rpcVersion)}`;
     });
   });
