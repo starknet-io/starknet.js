@@ -1,3 +1,13 @@
+# [8.7.0](https://github.com/starknet-io/starknet.js/compare/v8.6.0...v8.7.0) (2025-11-07)
+
+### Bug Fixes
+
+- public node hotfix ([#1510](https://github.com/starknet-io/starknet.js/issues/1510)) ([4165a3c](https://github.com/starknet-io/starknet.js/commit/4165a3c74c94053b60ed2aca12d8bebab5b72f68))
+
+### Features
+
+- configurable websocket exponential backoff ([#1503](https://github.com/starknet-io/starknet.js/issues/1503)) ([6d0593f](https://github.com/starknet-io/starknet.js/commit/6d0593f2fcdf6da79fb0aaccef42071a8c0e8126))
+
 # [8.6.0](https://github.com/starknet-io/starknet.js/compare/v8.5.5...v8.6.0) (2025-10-17)
 
 ### Features
