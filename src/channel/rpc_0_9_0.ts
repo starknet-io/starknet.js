@@ -298,6 +298,15 @@ export class RpcChannel {
   }
 
   /**
+   * Helper method to get the starknet version from the block, default latest block
+   * @returns Starknet version
+   */
+  public async getStarknetVersion(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block = await this.getBlockWithTxHashes(blockIdentifier);
+    return block.starknet_version;
+  }
+
+  /**
    * Get the most recent accepted block hash and number
    */
   public getBlockLatestAccepted() {
