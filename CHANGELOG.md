@@ -1,3 +1,14 @@
+# [8.8.0](https://github.com/starknet-io/starknet.js/compare/v8.7.0...v8.8.0) (2025-11-12)
+
+### Bug Fixes
+
+- both sepolia and mainet on alchemy ([f119081](https://github.com/starknet-io/starknet.js/commit/f1190815ba032a0b4094e6c16c3b6cd4cca216e1))
+- public node hotfix ([d35e39e](https://github.com/starknet-io/starknet.js/commit/d35e39eb600a30b46146630ec0bbc916db65d976))
+
+### Features
+
+- starknet version, use starknt version to determin declare hash instead of spec version ([70a23ee](https://github.com/starknet-io/starknet.js/commit/70a23ee4f14d5f7a0d754bfcfc3312cd5585b951))
+
 # [8.7.0](https://github.com/starknet-io/starknet.js/compare/v8.6.0...v8.7.0) (2025-11-07)
 
 ### Bug Fixes
