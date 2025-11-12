@@ -136,6 +136,11 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof count).toBe('number');
   });
 
+  test('getStarknetVersion', async () => {
+    const version = await rpcProvider.getStarknetVersion('latest');
+    expect(typeof version).toBe('string');
+  });
+
   test('getBlockHashAndNumber', async () => {
     const blockHashAndNumber = await rpcProvider.getBlockLatestAccepted();
     expect(blockHashAndNumber).toHaveProperty('block_hash');

@@ -117,7 +117,7 @@ export class WalletAccount extends Account implements AccountInterface {
   override async declare(payload: DeclareContractPayload) {
     const declareContractPayload = extractContractHashes(
       payload,
-      await this.channel.setUpSpecVersion()
+      await this.channel.getStarknetVersion()
     );
 
     // DISCUSS: HOTFIX: Adapt Abi format
