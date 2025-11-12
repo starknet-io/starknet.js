@@ -78,12 +78,12 @@ console.log(supported);
 /*
 [
     {
-        "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "token_address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
         "decimals": 18,
         "priceInStrk": "0x5ffeeacbaf058dfee0"
     },
     {
-        "address": "0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080",
+        "token_address": "0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080",
         "decimals": 6,
         "priceInStrk": "0x38aea"
     }
@@ -242,6 +242,7 @@ const App: FC = () => {
   }
 
   const onClickExecute = () => {
+    if (!gasToken) return;
     const calls = [
       {
         entrypoint: 'approve',
@@ -256,7 +257,7 @@ const App: FC = () => {
     setLoading(true);
     account
       .executePaymasterTransaction(calls, {
-        feeMode: { mode: 'default', gasToken: gasToken.address },
+        feeMode: { mode: 'default', gasToken: gasToken.token_address },
       })
       .then((res) => {
         setTx(res.transaction_hash);
@@ -276,10 +277,11 @@ const App: FC = () => {
         </p>
         {gasTokens.map((token) => (
           <button
-            disabled={token.tokenAddress === gasToken?.tokenAddress}
+            key={token.token_address}
+            disabled={token.token_address === gasToken?.token_address}
             onClick={() => setGasToken(token)}
           >
-            {token.tokenAddress}
+            {token.token_address}
           </button>
         ))}
       </div>
