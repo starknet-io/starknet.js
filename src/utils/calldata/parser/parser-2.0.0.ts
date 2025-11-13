@@ -5,14 +5,33 @@ import {
   AbiStruct,
   InterfaceAbi,
   type LegacyEvent,
+  AbiEntryType,
 } from '../../../types';
 import { AbiParserInterface } from './interface';
+import { fastParsingStrategy, ParsingStrategy } from './parsingStrategy';
 
 export class AbiParser2 implements AbiParserInterface {
   abi: Abi;
 
-  constructor(abi: Abi) {
+  parsingStrategy: ParsingStrategy;
+
+  constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
     this.abi = abi;
+    this.parsingStrategy = parsingStrategy || fastParsingStrategy;
+  }
+
+  public getRequestParser(abiType: AbiEntryType): (val: unknown) => any {
+    if (this.parsingStrategy.request[abiType]) {
+      return this.parsingStrategy.request[abiType];
+    }
+    throw new Error(`Parser for ${abiType} not found`);
+  }
+
+  public getResponseParser(abiType: AbiEntryType): (responseIterator: Iterator<string>) => any {
+    if (this.parsingStrategy.response[abiType]) {
+      return this.parsingStrategy.response[abiType];
+    }
+    throw new Error(`Parser for ${abiType} not found`);
   }
 
   /**

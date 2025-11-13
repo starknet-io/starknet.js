@@ -43,10 +43,7 @@ jobs:
       matrix:
         protocol: [RPC, WS]
         node: [Juno, Pathfinder]
-        version: [v0_7, v0_8]
-        exclude:
-          - version: v0_7
-            protocol: WS
+        version: [v0_8, v0_9]
 
     uses: ./.github/workflows/_test.yml
     with:

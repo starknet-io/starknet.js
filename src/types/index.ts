@@ -13,3 +13,10 @@ export * from '../paymaster/types/index.type';
 export * from '../deployer/types/index.type';
 
 export * as RPC from './api';
+
+// ensures a Buffer type is available for development environments without Node.js types
+declare global {
+  interface Buffer<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike>
+    // @ts-ignore - docs
+    extends Uint8Array<TArrayBuffer> {}
+}

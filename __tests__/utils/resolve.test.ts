@@ -4,6 +4,7 @@ import {
   isSupportedSpecVersion,
   constants,
   toApiVersion,
+  compareVersions,
 } from '../../src';
 
 describe('isVersion', () => {
@@ -169,6 +170,91 @@ describe('toApiVersion', () => {
     expect(toApiVersion('0.8')).toBe('v0_8');
     expect(toApiVersion('1.2.3')).toBe('v1_2');
     expect(toApiVersion('1.2')).toBe('v1_2');
-    expect(toApiVersion('v0.7.0')).toBe('v0_7');
+    expect(toApiVersion('v0.9.0')).toBe('v0_9');
+  });
+});
+
+describe('compareVersions', () => {
+  describe('basic comparisons', () => {
+    it('correctly compares patch versions', () => {
+      expect(compareVersions('0.0.9', '0.0.10')).toBe(-1);
+      expect(compareVersions('0.0.10', '0.0.9')).toBe(1);
+      expect(compareVersions('1.2.3', '1.2.4')).toBe(-1);
+      expect(compareVersions('1.2.4', '1.2.3')).toBe(1);
+    });
+
+    it('correctly compares minor versions', () => {
+      expect(compareVersions('0.1.0', '0.2.0')).toBe(-1);
+      expect(compareVersions('0.2.0', '0.1.0')).toBe(1);
+      expect(compareVersions('1.1.5', '1.2.0')).toBe(-1);
+      expect(compareVersions('1.2.0', '1.1.5')).toBe(1);
+    });
+
+    it('correctly compares major versions', () => {
+      expect(compareVersions('1.0.0', '2.0.0')).toBe(-1);
+      expect(compareVersions('2.0.0', '1.0.0')).toBe(1);
+      expect(compareVersions('0.9.9', '1.0.0')).toBe(-1);
+      expect(compareVersions('1.0.0', '0.9.9')).toBe(1);
+    });
+
+    it('returns 0 for equal versions', () => {
+      expect(compareVersions('0.0.9', '0.0.9')).toBe(0);
+      expect(compareVersions('1.2.3', '1.2.3')).toBe(0);
+      expect(compareVersions('0.14.1', '0.14.1')).toBe(0);
+    });
+  });
+
+  describe('edge cases', () => {
+    it('handles missing version segments (treats as 0)', () => {
+      expect(compareVersions('0.1', '0.1.0')).toBe(0);
+      expect(compareVersions('0.1.0', '0.1')).toBe(0);
+      expect(compareVersions('1', '1.0.0')).toBe(0);
+      expect(compareVersions('1.0', '1.0.0')).toBe(0);
+      expect(compareVersions('0.1', '0.1.1')).toBe(-1);
+      expect(compareVersions('0.1.1', '0.1')).toBe(1);
+    });
+
+    it('correctly handles versions with different segment counts', () => {
+      expect(compareVersions('0.0.99', '0.1')).toBe(-1);
+      expect(compareVersions('0.1', '0.0.99')).toBe(1);
+      expect(compareVersions('1.2', '1.2.3')).toBe(-1);
+      expect(compareVersions('1.2.3', '1.2')).toBe(1);
+    });
+
+    it('safely avoids collision between versions like 0.0.1000 and 0.1.0', () => {
+      // This is the key safety test - these should NOT be equal
+      expect(compareVersions('0.0.1000', '0.1.0')).toBe(-1);
+      expect(compareVersions('0.1.0', '0.0.1000')).toBe(1);
+      expect(compareVersions('0.0.1000', '0.0.1000')).toBe(0);
+      expect(compareVersions('0.1.0', '0.1.0')).toBe(0);
+    });
+
+    it('handles large version numbers', () => {
+      expect(compareVersions('0.0.999', '0.1.0')).toBe(-1);
+      expect(compareVersions('0.999.0', '1.0.0')).toBe(-1);
+      expect(compareVersions('10.500.2000', '10.500.2001')).toBe(-1);
+      expect(compareVersions('100.0.0', '99.999.999')).toBe(1);
+    });
+  });
+
+  describe('real-world starknet version comparisons', () => {
+    it('compares starknet RPC versions correctly', () => {
+      expect(compareVersions('0.8.1', '0.9.0')).toBe(-1);
+      expect(compareVersions('0.9.0', '0.8.1')).toBe(1);
+      expect(compareVersions('0.14.0', '0.14.1')).toBe(-1);
+      expect(compareVersions('0.14.1', '0.14.0')).toBe(1);
+    });
+
+    it('can be used for version threshold checks', () => {
+      // Example: Blake2s should be used for version >= 0.14.1
+      const useBlake = (version: string) => compareVersions(version, '0.14.1') >= 0;
+
+      expect(useBlake('0.14.0')).toBe(false);
+      expect(useBlake('0.14.1')).toBe(true);
+      expect(useBlake('0.14.2')).toBe(true);
+      expect(useBlake('0.15.0')).toBe(true);
+      expect(useBlake('1.0.0')).toBe(true);
+      expect(useBlake('0.13.9')).toBe(false);
+    });
   });
 });

@@ -37,14 +37,6 @@ describe('hexToDecimalString()', () => {
   });
 });
 
-describe('cleanHex()', () => {
-  test('parse 0xa23', () => {
-    expect(num.cleanHex('0x023Ab')).toBe('0x23ab');
-    expect(num.cleanHex('0x000023Ab')).toBe('0x23ab');
-    expect(num.cleanHex('0x23Ab')).toBe('0x23ab');
-  });
-});
-
 describe('getSelectorFromName()', () => {
   test('hash works for value="test"', () => {
     expect(hash.getSelectorFromName('test')).toBe(

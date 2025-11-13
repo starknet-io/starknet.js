@@ -1,6 +1,7 @@
 import { parseCalldataField } from '../../../src/utils/calldata/requestParser';
 import { getAbiEnums, getAbiStructs, getAbiEntry } from '../../factories/abi';
 import {
+  AbiParser1,
   CairoCustomEnum,
   CairoOption,
   CairoResult,
@@ -13,108 +14,117 @@ describe('requestParser', () => {
     test('should return parsed calldata field for base type', () => {
       const args = [256n, 128n];
       const argsIterator = args[Symbol.iterator]();
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry('felt'),
-        getAbiStructs(),
-        getAbiEnums()
-      );
+        input: getAbiEntry('felt'),
+        structs: getAbiStructs(),
+        enums: getAbiEnums(),
+        parser: new AbiParser1([getAbiEntry('felt')]),
+      });
       expect(parsedField).toEqual('256');
     });
 
     test('should return parsed calldata field for Array type', () => {
       const args = [[256n, 128n]];
       const argsIterator = args[Symbol.iterator]();
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry('core::array::Array::<felt>'),
-        getAbiStructs(),
-        getAbiEnums()
-      );
+        input: getAbiEntry('core::array::Array::<felt>'),
+        structs: getAbiStructs(),
+        enums: getAbiEnums(),
+        parser: new AbiParser1([getAbiEntry('core::array::Array::<felt>')]),
+      });
       expect(parsedField).toEqual(['2', '256', '128']);
     });
 
     test('should return parsed calldata field for Array type(string input)', () => {
       const args = ['some_test_value'];
       const argsIterator = args[Symbol.iterator]();
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry('core::array::Array::<felt>'),
-        getAbiStructs(),
-        getAbiEnums()
-      );
+        input: getAbiEntry('core::array::Array::<felt>'),
+        structs: getAbiStructs(),
+        enums: getAbiEnums(),
+        parser: new AbiParser1([getAbiEntry('core::array::Array::<felt>')]),
+      });
       expect(parsedField).toEqual(['1', '599374153440608178282648329058547045']);
     });
 
     test('should return parsed calldata field for NonZero type', () => {
       const args = [true];
       const argsIterator = args[Symbol.iterator]();
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry(`${NON_ZERO_PREFIX}core::bool`),
-        getAbiStructs(),
-        getAbiEnums()
-      );
+        input: getAbiEntry(`${NON_ZERO_PREFIX}core::bool`),
+        structs: getAbiStructs(),
+        enums: getAbiEnums(),
+        parser: new AbiParser1([getAbiEntry(`${NON_ZERO_PREFIX}core::bool`)]),
+      });
       expect(parsedField).toEqual('1');
     });
 
     test('should return parsed calldata field for EthAddress type', () => {
       const args = ['test'];
       const argsIterator = args[Symbol.iterator]();
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry(`${ETH_ADDRESS}felt`),
-        getAbiStructs(),
-        getAbiEnums()
-      );
+        input: getAbiEntry(`${ETH_ADDRESS}felt`),
+        structs: getAbiStructs(),
+        enums: getAbiEnums(),
+        parser: new AbiParser1([getAbiEntry(`${ETH_ADDRESS}felt`)]),
+      });
       expect(parsedField).toEqual('1952805748');
     });
 
     test('should return parsed calldata field for Struct type', () => {
       const args = [{ test_name: 'test' }];
       const argsIterator = args[Symbol.iterator]();
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry('struct'),
-        getAbiStructs(),
-        getAbiEnums()
-      );
+        input: getAbiEntry('struct'),
+        structs: getAbiStructs(),
+        enums: getAbiEnums(),
+        parser: new AbiParser1([getAbiEntry('struct')]),
+      });
       expect(parsedField).toEqual(['1952805748']);
     });
 
     test('should return parsed calldata field for Tuple type', () => {
       const args = [{ min: true, max: true }];
       const argsIterator = args[Symbol.iterator]();
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry('(core::bool, core::bool)'),
-        getAbiStructs(),
-        getAbiEnums()
-      );
+        input: getAbiEntry('(core::bool, core::bool)'),
+        structs: getAbiStructs(),
+        enums: getAbiEnums(),
+        parser: new AbiParser1([getAbiEntry('(core::bool, core::bool)')]),
+      });
       expect(parsedField).toEqual(['1', '1']);
     });
 
     test('should return parsed calldata field for CairoUint256 abi type', () => {
       const args = [252n];
       const argsIterator = args[Symbol.iterator]();
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry('core::integer::u256'),
-        getAbiStructs(),
-        getAbiEnums()
-      );
+        input: getAbiEntry('core::integer::u256'),
+        structs: getAbiStructs(),
+        enums: getAbiEnums(),
+        parser: new AbiParser1([getAbiEntry('core::integer::u256')]),
+      });
       expect(parsedField).toEqual(['252', '0']);
     });
 
     test('should return parsed calldata field for Enum Option type None', () => {
       const args = [new CairoOption<string>(1, 'content')];
       const argsIterator = args[Symbol.iterator]();
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry('core::option::Option::core::bool'),
-        getAbiStructs(),
-        { 'core::option::Option::core::bool': getAbiEnums().enum }
-      );
+        input: getAbiEntry('core::option::Option::core::bool'),
+        structs: getAbiStructs(),
+        enums: { 'core::option::Option::core::bool': getAbiEnums().enum },
+        parser: new AbiParser1([getAbiEntry('core::option::Option::core::bool')]),
+      });
       expect(parsedField).toEqual('1');
     });
 
@@ -127,12 +137,13 @@ describe('requestParser', () => {
         type: 'cairo_struct_variant',
         offset: 1,
       });
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry('core::option::Option::core::bool'),
-        getAbiStructs(),
-        { 'core::option::Option::core::bool': abiEnum }
-      );
+        input: getAbiEntry('core::option::Option::core::bool'),
+        structs: getAbiStructs(),
+        enums: { 'core::option::Option::core::bool': abiEnum },
+        parser: new AbiParser1([getAbiEntry('core::option::Option::core::bool')]),
+      });
       expect(parsedField).toEqual(['0', '27988542884245108']);
     });
 
@@ -140,12 +151,13 @@ describe('requestParser', () => {
       const args = [new CairoOption<string>(0, 'content')];
       const argsIterator = args[Symbol.iterator]();
       expect(() =>
-        parseCalldataField(
+        parseCalldataField({
           argsIterator,
-          getAbiEntry('core::option::Option::core::bool'),
-          getAbiStructs(),
-          { 'core::option::Option::core::bool': getAbiEnums().enum }
-        )
+          input: getAbiEntry('core::option::Option::core::bool'),
+          structs: getAbiStructs(),
+          enums: { 'core::option::Option::core::bool': getAbiEnums().enum },
+          parser: new AbiParser1([getAbiEntry('core::option::Option::core::bool')]),
+        })
       ).toThrow(new Error(`Error in abi : Option has no 'Some' variant.`));
     });
 
@@ -158,12 +170,13 @@ describe('requestParser', () => {
         type: 'cairo_struct_variant',
         offset: 1,
       });
-      const parsedField = parseCalldataField(
+      const parsedField = parseCalldataField({
         argsIterator,
-        getAbiEntry('core::result::Result::core::bool'),
-        getAbiStructs(),
-        { 'core::result::Result::core::bool': abiEnum }
-      );
+        input: getAbiEntry('core::result::Result::core::bool'),
+        structs: getAbiStructs(),
+        enums: { 'core::result::Result::core::bool': abiEnum },
+        parser: new AbiParser1([getAbiEntry('core::result::Result::core::bool')]),
+      });
       expect(parsedField).toEqual(['0', '20331']);
     });
 
@@ -171,12 +184,13 @@ describe('requestParser', () => {
       const args = [new CairoResult<string, string>(0, 'Ok')];
       const argsIterator = args[Symbol.iterator]();
       expect(() =>
-        parseCalldataField(
+        parseCalldataField({
           argsIterator,
-          getAbiEntry('core::result::Result::core::bool'),
-          getAbiStructs(),
-          { 'core::result::Result::core::bool': getAbiEnums().enum }
-        )
+          input: getAbiEntry('core::result::Result::core::bool'),
+          structs: getAbiStructs(),
+          enums: { 'core::result::Result::core::bool': getAbiEnums().enum },
+          parser: new AbiParser1([getAbiEntry('core::result::Result::core::bool')]),
+        })
       ).toThrow(new Error(`Error in abi : Result has no 'Ok' variant.`));
     });
 
@@ -190,8 +204,12 @@ describe('requestParser', () => {
         type: 'cairo_struct_variant',
         offset: 1,
       });
-      const parsedField = parseCalldataField(argsIterator, getAbiEntry('enum'), getAbiStructs(), {
-        enum: abiEnum,
+      const parsedField = parseCalldataField({
+        argsIterator,
+        input: getAbiEntry('enum'),
+        structs: getAbiStructs(),
+        enums: { enum: abiEnum },
+        parser: new AbiParser1([getAbiEntry('enum')]),
       });
       expect(parsedField).toEqual(['1', '27988542884245108']);
     });
@@ -200,7 +218,13 @@ describe('requestParser', () => {
       const args = [new CairoCustomEnum({ test: 'content' })];
       const argsIterator = args[Symbol.iterator]();
       expect(() =>
-        parseCalldataField(argsIterator, getAbiEntry('enum'), getAbiStructs(), getAbiEnums())
+        parseCalldataField({
+          argsIterator,
+          input: getAbiEntry('enum'),
+          structs: getAbiStructs(),
+          enums: getAbiEnums(),
+          parser: new AbiParser1([getAbiEntry('enum')]),
+        })
       ).toThrow(new Error(`Not find in abi : Enum has no 'test' variant.`));
     });
 
@@ -208,25 +232,31 @@ describe('requestParser', () => {
       const args = ['test'];
       const argsIterator = args[Symbol.iterator]();
       expect(() =>
-        parseCalldataField(
+        parseCalldataField({
           argsIterator,
-          getAbiEntry('core::integer::u256'),
-          getAbiStructs(),
-          getAbiEnums()
+          input: getAbiEntry('core::integer::u256'),
+          structs: getAbiStructs(),
+          enums: getAbiEnums(),
+          parser: new AbiParser1([getAbiEntry('core::integer::u256')]),
+        })
+      ).toThrow(
+        new Error(
+          "Unsupported data type 'string' for u256. Expected string, number, bigint, or Uint256 object"
         )
-      ).toThrow(new Error('Cannot convert test to a BigInt'));
+      );
     });
 
     test('should throw an error if provided tuple size do not match', () => {
       const args = [{ min: true }, { max: true }];
       const argsIterator = args[Symbol.iterator]();
       expect(() =>
-        parseCalldataField(
+        parseCalldataField({
           argsIterator,
-          getAbiEntry('(core::bool, core::bool)'),
-          getAbiStructs(),
-          getAbiEnums()
-        )
+          input: getAbiEntry('(core::bool, core::bool)'),
+          structs: getAbiStructs(),
+          enums: getAbiEnums(),
+          parser: new AbiParser1([getAbiEntry('(core::bool, core::bool)')]),
+        })
       ).toThrow(
         new Error(
           `ParseTuple: provided and expected abi tuple size do not match.
@@ -240,7 +270,13 @@ describe('requestParser', () => {
       const args = ['test'];
       const argsIterator = args[Symbol.iterator]();
       expect(() =>
-        parseCalldataField(argsIterator, getAbiEntry('struct'), getAbiStructs(), getAbiEnums())
+        parseCalldataField({
+          argsIterator,
+          input: getAbiEntry('struct'),
+          structs: getAbiStructs(),
+          enums: getAbiEnums(),
+          parser: new AbiParser1([getAbiEntry('struct')]),
+        })
       ).toThrow(new Error('Missing parameter for type test_type'));
     });
 
@@ -248,12 +284,13 @@ describe('requestParser', () => {
       const args = [256n, 128n];
       const argsIterator = args[Symbol.iterator]();
       expect(() =>
-        parseCalldataField(
+        parseCalldataField({
           argsIterator,
-          getAbiEntry('core::array::Array::<felt>'),
-          getAbiStructs(),
-          getAbiEnums()
-        )
+          input: getAbiEntry('core::array::Array::<felt>'),
+          structs: getAbiStructs(),
+          enums: getAbiEnums(),
+          parser: new AbiParser1([getAbiEntry('core::array::Array::<felt>')]),
+        })
       ).toThrow(new Error('ABI expected parameter test to be array or long string, got 256'));
     });
   });

@@ -14,6 +14,7 @@ import {
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  type fastWaitForTransactionOptions,
   type GasPrices,
   GetBlockResponse,
   getContractVersionOptions,
@@ -45,7 +46,7 @@ import { wait } from '../utils/provider';
 import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { getTipStatsFromBlocks, TipAnalysisOptions, TipEstimate } from './modules/tip';
-import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
+import { createTransactionReceipt } from '../utils/transactionReceipt/transactionReceipt';
 import { ProviderInterface } from './interface';
 import type {
   DeclaredTransaction,
@@ -142,6 +143,10 @@ export class RpcProvider implements ProviderInterface {
 
   public setUpSpecVersion() {
     return this.channel.setUpSpecVersion();
+  }
+
+  public async getStarknetVersion(blockIdentifier?: BlockIdentifier) {
+    return this.channel.getStarknetVersion(blockIdentifier);
   }
 
   public async getNonceForAddress(
@@ -288,7 +293,7 @@ export class RpcProvider implements ProviderInterface {
     const txReceiptWoHelper = await this.channel.getTransactionReceipt(txHash);
     const txReceiptWoHelperModified =
       this.responseParser.parseTransactionReceipt(txReceiptWoHelper);
-    return new ReceiptTx(txReceiptWoHelperModified);
+    return createTransactionReceipt(txReceiptWoHelperModified);
   }
 
   public async getTransactionTrace(
@@ -320,7 +325,38 @@ export class RpcProvider implements ProviderInterface {
       options
     )) as GetTxReceiptResponseWithoutHelper;
 
-    return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
+    return createTransactionReceipt(receiptWoHelper);
+  }
+
+  /**
+   * Wait up until a new transaction is possible with same the account.
+   * This method is fast, but Events and transaction report are not yet
+   * available. Useful for gaming activity.
+   * - only rpc 0.9 and onwards.
+   * @param {BigNumberish} txHash - transaction hash
+   * @param {string} address - address of the account
+   * @param {BigNumberish} initNonce - initial nonce of the account (before the transaction).
+   * @param {fastWaitForTransactionOptions} [options={retries: 50, retryInterval: 500}] - options to scan the network for the next possible transaction. `retries` is the number of times to retry.
+   * @returns {Promise<boolean>} Returns true if the next transaction is possible,
+   * false if the timeout has been reached,
+   * throw an error in case of provider communication.
+   */
+  public async fastWaitForTransaction(
+    txHash: BigNumberish,
+    address: string,
+    initNonce: BigNumberish,
+    options?: fastWaitForTransactionOptions
+  ): Promise<boolean> {
+    if (this.channel instanceof RPC09.RpcChannel) {
+      const isSuccess = await this.channel.fastWaitForTransaction(
+        txHash,
+        address,
+        initNonce,
+        options
+      );
+      return isSuccess;
+    }
+    throw new Error('Unsupported channel type');
   }
 
   public async getStorageAt(
@@ -511,7 +547,10 @@ export class RpcProvider implements ProviderInterface {
   ) {
     let classHash: string;
     if (!contractClassIdentifier.classHash && 'contract' in contractClassIdentifier) {
-      const hashes = extractContractHashes(contractClassIdentifier);
+      const hashes = extractContractHashes(
+        contractClassIdentifier,
+        await this.channel.getStarknetVersion()
+      );
       classHash = hashes.classHash;
     } else if (contractClassIdentifier.classHash) {
       classHash = contractClassIdentifier.classHash;

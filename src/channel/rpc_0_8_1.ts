@@ -21,7 +21,7 @@ import {
   RpcProviderOptions,
   waitForTransactionOptions,
 } from '../types';
-import { JRPC, RPCSPEC08 as RPC, RPCSPEC08 } from '../types/api';
+import { JRPC, RPCSPEC08 as RPC, RPCSPEC08, RPCSPEC09 } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -207,7 +207,7 @@ export class RpcChannel {
 
   /**
    * fetch rpc node specVersion
-   * @example this.specVersion = "0.7.1"
+   * @example this.specVersion = "0.8.1"
    */
   public getSpecVersion() {
     return this.fetchEndpoint('starknet_specVersion');
@@ -288,6 +288,15 @@ export class RpcChannel {
       contract_address,
       block_id,
     });
+  }
+
+  /**
+   * Helper method to get the starknet version from the block, default latest block
+   * @returns Starknet version
+   */
+  public async getStarknetVersion(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block = await this.getBlockWithTxHashes(blockIdentifier);
+    return block.starknet_version;
   }
 
   /**
@@ -396,22 +405,24 @@ export class RpcChannel {
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
     const transactionHash = toHex(txHash);
-    let { retries } = this;
+    let retries = options?.retries ?? this.retries;
+    let lifeCycleRetries = options?.lifeCycleRetries ?? 3;
     let onchain = false;
     let isErrorState = false;
     const retryInterval = options?.retryInterval ?? this.transactionRetryIntervalDefault;
-    const errorStates: any = options?.errorStates ?? [
-      RPC.ETransactionStatus.REJECTED,
-      // TODO: commented out to preserve the long-standing behavior of "reverted" not being treated as an error by default
-      // should decide which behavior to keep in the future
-      // RPC.ETransactionExecutionStatus.REVERTED,
-    ];
+    const errorStates: any = options?.errorStates ?? [RPC.ETransactionStatus.REJECTED];
     const successStates: any = options?.successStates ?? [
       // RPC.ETransactionExecutionStatus.SUCCEEDED, Starknet 0.14.0 this one can have incomplete events
       RPC.ETransactionStatus.ACCEPTED_ON_L2,
       RPC.ETransactionStatus.ACCEPTED_ON_L1,
     ];
+    const LifeCycleErrorMessages: Record<string, string> = {
+      [RPCSPEC09.ETransactionStatus.RECEIVED]: SYSTEM_MESSAGES.txEvictedFromMempool,
+      [RPCSPEC09.ETransactionStatus.PRE_CONFIRMED]: SYSTEM_MESSAGES.consensusFailed,
+      [RPCSPEC09.ETransactionStatus.CANDIDATE]: SYSTEM_MESSAGES.txFailsBlockBuildingValidation,
+    };
 
+    const txLife: string[] = [];
     let txStatus: RPC.TransactionStatus;
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
@@ -419,6 +430,7 @@ export class RpcChannel {
       try {
         // eslint-disable-next-line no-await-in-loop
         txStatus = await this.getTransactionStatus(transactionHash);
+        txLife.push(txStatus.finality_status);
 
         const executionStatus = txStatus.execution_status;
         const finalityStatus = txStatus.finality_status;
@@ -445,6 +457,15 @@ export class RpcChannel {
       } catch (error) {
         if (error instanceof Error && isErrorState) {
           throw error;
+        }
+
+        if (error instanceof RpcError && error.isType('TXN_HASH_NOT_FOUND')) {
+          logger.info('txLife: ', txLife);
+          const errorMessage = LifeCycleErrorMessages[txLife.at(-1) as string];
+          if (errorMessage && lifeCycleRetries <= 0) {
+            throw new Error(errorMessage);
+          }
+          lifeCycleRetries -= 1;
         }
 
         if (retries <= 0) {

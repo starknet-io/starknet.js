@@ -5,6 +5,7 @@ import {
   BigNumberish,
   ContractVersion,
   ETH_ADDRESS,
+  Int,
   Literal,
   NON_ZERO_PREFIX,
   Uint,
@@ -92,6 +93,13 @@ export const isTypeResult = (type: string) => type.startsWith('core::result::Res
  * @returns - Returns true if the value is a valid Uint type, otherwise false.
  */
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
+/**
+ * Checks if the given value is a valid Int type.
+ *
+ * @param {string} type - The value to check.
+ * @returns - Returns true if the value is a valid Int type, otherwise false.
+ */
+export const isTypeInt = (type: string) => Object.values(Int).includes(type as Int);
 // Legacy Export
 /**
  * Checks if the given type is `uint256`.
@@ -127,20 +135,6 @@ export const isTypeContractAddress = (type: string) => type === Literal.Contract
  * @returns - Returns true if the given type is 'core::starknet::eth_address::EthAddress', otherwise false.
  */
 export const isTypeEthAddress = (type: string) => type === ETH_ADDRESS;
-/**
- * Checks if the given type is 'core::bytes_31::bytes31'.
- *
- * @param {string} type - The type to check.
- * @returns - True if the type is 'core::bytes_31::bytes31', false otherwise.
- */
-export const isTypeBytes31 = (type: string) => type === 'core::bytes_31::bytes31';
-/**
- * Checks if the given type is equal to the 'core::byte_array::ByteArray'.
- *
- * @param {string} type - The type to check.
- * @returns - True if the given type is equal to 'core::byte_array::ByteArray', false otherwise.
- */
-export const isTypeByteArray = (type: string) => type === 'core::byte_array::ByteArray';
 
 /**
  * Checks if the given type is equal to the u96 type

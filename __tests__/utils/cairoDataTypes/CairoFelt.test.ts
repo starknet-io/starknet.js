@@ -1,5 +1,6 @@
-import { CairoFelt } from '../../../src/utils/cairoDataTypes/felt';
-import { encodeShortString } from '../../../src/utils/shortString';
+import { CairoFelt, shortString } from '../../../src';
+
+const { encodeShortString } = shortString;
 
 describe('CairoFelt function', () => {
   test('should throw error for non-integer input', () => {

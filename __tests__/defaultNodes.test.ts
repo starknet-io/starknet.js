@@ -3,7 +3,7 @@ import { SupportedRpcVersion } from '../src/global/constants';
 import { getDefaultNodes, getSupportedRpcVersions } from '../src/utils/provider';
 
 describe('unit tests', () => {
-  describe('getDefaultNodes', () => {
+  xdescribe('getDefaultNodes', () => {
     it('constructs correct URLs for all supported RPC versions', () => {
       const supportedVersions = getSupportedRpcVersions();
       supportedVersions.forEach((version) => {

@@ -4,7 +4,6 @@ import {
   assertInRange,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
-  cleanHex,
   getDecimalString,
   getHexString,
   getHexStringArray,
@@ -50,6 +49,16 @@ describe('toHex', () => {
   test('should properly convert to hex-string', () => {
     expect(toHex(100)).toBe('0x64');
     expect(toHex('200')).toBe('0xc8');
+    expect(toHex('0x00023AB')).toBe('0x23ab');
+  });
+});
+
+describe('cleanHex', () => {
+  test('should properly clean up the hex string', () => {
+    expect(num.cleanHex('0x00023AB')).toBe('0x23ab');
+    expect(num.cleanHex('0x23Ab')).toBe('0x23ab');
+    expect(num.cleanHex('0x000')).toBe('0x0');
+    expect(num.cleanHex('0X0')).toBe('0x0');
   });
 });
 
@@ -57,12 +66,6 @@ describe('hexToDecimalString', () => {
   test('should properly convert to decimal string', () => {
     expect(hexToDecimalString('64')).toBe('100');
     expect(hexToDecimalString('c8')).toBe('200');
-  });
-});
-
-describe('cleanHex', () => {
-  test('should properly clean up the hex string', () => {
-    expect(cleanHex('0x00023AB')).toBe('0x23ab');
   });
 });
 

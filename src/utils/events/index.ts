@@ -15,6 +15,7 @@ import {
 } from '../../types';
 import assert from '../assert';
 import { isCairo1Abi } from '../calldata/cairo';
+import { AbiParserInterface } from '../calldata/parser/interface';
 import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
@@ -158,11 +159,15 @@ function mergeAbiEvents(target: any, source: any): Object {
   const output = { ...target };
   if (isObject(target) && isObject(source)) {
     Object.keys(source).forEach((key) => {
-      if (isObject(source[key])) {
-        if (!(key in target)) Object.assign(output, { [key]: source[key] });
-        else output[key] = mergeAbiEvents(target[key], source[key]);
+      if (isObject(source[key as keyof typeof source])) {
+        if (!(key in target)) Object.assign(output, { [key]: source[key as keyof typeof source] });
+        else
+          output[key] = mergeAbiEvents(
+            target[key as keyof typeof target],
+            source[key as keyof typeof source]
+          );
       } else {
-        Object.assign(output, { [key]: source[key] });
+        Object.assign(output, { [key]: source[key as keyof typeof source] });
       }
     });
   }
@@ -193,7 +198,8 @@ export function parseEvents(
   providerReceivedEvents: RPC.EmittedEvent[],
   abiEvents: AbiEvents,
   abiStructs: AbiStructs,
-  abiEnums: AbiEnums
+  abiEnums: AbiEnums,
+  parser: AbiParserInterface
 ): ParsedEvents {
   const ret = providerReceivedEvents
     .flat()
@@ -223,23 +229,25 @@ export function parseEvents(
         (abiEvent as LegacyEvent).data;
 
       abiEventKeys.forEach((key) => {
-        parsedEvent[abiEvent.name as string][key.name] = responseParser(
-          keysIter,
-          key,
-          abiStructs,
-          abiEnums,
-          parsedEvent[abiEvent.name as string]
-        );
+        parsedEvent[abiEvent.name as string][key.name] = responseParser({
+          responseIterator: keysIter,
+          output: key,
+          structs: abiStructs,
+          enums: abiEnums,
+          parser,
+          parsedResult: parsedEvent[abiEvent.name as string],
+        });
       });
 
       abiEventData.forEach((data) => {
-        parsedEvent[abiEvent.name as string][data.name] = responseParser(
-          dataIter,
-          data,
-          abiStructs,
-          abiEnums,
-          parsedEvent[abiEvent.name as string]
-        );
+        parsedEvent[abiEvent.name as string][data.name] = responseParser({
+          responseIterator: dataIter,
+          output: data,
+          structs: abiStructs,
+          enums: abiEnums,
+          parser,
+          parsedResult: parsedEvent[abiEvent.name as string],
+        });
       });
       if ('block_hash' in currentEvent) parsedEvent.block_hash = currentEvent.block_hash;
       if ('block_number' in currentEvent) parsedEvent.block_number = currentEvent.block_number;

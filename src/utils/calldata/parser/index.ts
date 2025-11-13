@@ -3,6 +3,12 @@ import { isCairo1Abi } from '../cairo';
 import { AbiParserInterface } from './interface';
 import { AbiParser1 } from './parser-0-1.1.0';
 import { AbiParser2 } from './parser-2.0.0';
+import { ParsingStrategy } from './parsingStrategy';
+
+export { AbiParser2 };
+export { AbiParser1 };
+export { AbiParserInterface };
+export * from './parsingStrategy';
 
 /**
  * Creates ABI parser
@@ -17,13 +23,13 @@ import { AbiParser2 } from './parser-2.0.0';
  * const abiParser1 = createAbiParser([getFunctionAbi('struct')]);
  * // abiParser1 instanceof AbiParser1 === true
  */
-export function createAbiParser(abi: Abi): AbiParserInterface {
+export function createAbiParser(abi: Abi, parsingStrategy?: ParsingStrategy): AbiParserInterface {
   const version = getAbiVersion(abi);
   if (version === 0 || version === 1) {
-    return new AbiParser1(abi);
+    return new AbiParser1(abi, parsingStrategy);
   }
   if (version === 2) {
-    return new AbiParser2(abi);
+    return new AbiParser2(abi, parsingStrategy);
   }
   throw Error(`Unsupported ABI version ${version}`);
 }

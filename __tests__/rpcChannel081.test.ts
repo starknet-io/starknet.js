@@ -51,7 +51,7 @@ describeIfRpc081('RpcChannel', () => {
   describe('RPC 0.8.1', () => {
     test('getBlockWithReceipts', async () => {
       const response = await channel08.getBlockWithReceipts('latest');
-      expect(response).toMatchSchemaRef('BlockWithTxReceipts');
+      expect(response).toMatchSchemaRef('BlockWithTxReceipts08');
     });
   });
 });

@@ -114,8 +114,11 @@ export class WalletAccount extends Account implements AccountInterface {
     return addInvokeTransaction(this.walletProvider, params);
   }
 
-  override declare(payload: DeclareContractPayload) {
-    const declareContractPayload = extractContractHashes(payload);
+  override async declare(payload: DeclareContractPayload) {
+    const declareContractPayload = extractContractHashes(
+      payload,
+      await this.channel.getStarknetVersion()
+    );
 
     // DISCUSS: HOTFIX: Adapt Abi format
     const pContract = payload.contract as CompiledSierra;

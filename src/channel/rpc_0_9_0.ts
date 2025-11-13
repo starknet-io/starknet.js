@@ -21,6 +21,7 @@ import {
   RPC_ERROR,
   RpcProviderOptions,
   waitForTransactionOptions,
+  type fastWaitForTransactionOptions,
 } from '../types';
 import assert from '../utils/assert';
 import { ETransactionType, JRPC, RPCSPEC09 as RPC } from '../types/api';
@@ -213,7 +214,7 @@ export class RpcChannel {
 
   /**
    * fetch rpc node specVersion
-   * @example this.specVersion = "0.7.1"
+   * @example this.specVersion = "0.9.0"
    */
   public getSpecVersion() {
     return this.fetchEndpoint('starknet_specVersion');
@@ -221,7 +222,7 @@ export class RpcChannel {
 
   /**
    * fetch if undefined else just return this.specVersion
-   * @example this.specVersion = "0.8.1"
+   * @example this.specVersion = "0.9.0"
    */
   public async setUpSpecVersion() {
     if (!this.specVersion) {
@@ -294,6 +295,15 @@ export class RpcChannel {
       contract_address,
       block_id,
     });
+  }
+
+  /**
+   * Helper method to get the starknet version from the block, default latest block
+   * @returns Starknet version
+   */
+  public async getStarknetVersion(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block = await this.getBlockWithTxHashes(blockIdentifier);
+    return block.starknet_version;
   }
 
   /**
@@ -402,7 +412,8 @@ export class RpcChannel {
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
     const transactionHash = toHex(txHash);
-    let { retries } = this;
+    let retries = options?.retries ?? this.retries;
+    let lifeCycleRetries = options?.lifeCycleRetries ?? 3;
     let onchain = false;
     let isErrorState = false;
     const retryInterval = options?.retryInterval ?? this.transactionRetryIntervalDefault;
@@ -412,7 +423,13 @@ export class RpcChannel {
       RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
       RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
     ];
+    const errorMessages: Record<string, string> = {
+      [RPC.ETransactionStatus.RECEIVED]: SYSTEM_MESSAGES.txEvictedFromMempool,
+      [RPC.ETransactionStatus.PRE_CONFIRMED]: SYSTEM_MESSAGES.consensusFailed,
+      [RPC.ETransactionStatus.CANDIDATE]: SYSTEM_MESSAGES.txFailsBlockBuildingValidation,
+    };
 
+    const txLife: string[] = [];
     let txStatus: RPC.TransactionStatus;
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
@@ -420,6 +437,7 @@ export class RpcChannel {
       try {
         // eslint-disable-next-line no-await-in-loop
         txStatus = await this.getTransactionStatus(transactionHash);
+        txLife.push(txStatus.finality_status);
 
         const executionStatus = txStatus.execution_status;
         const finalityStatus = txStatus.finality_status;
@@ -446,6 +464,15 @@ export class RpcChannel {
       } catch (error) {
         if (error instanceof Error && isErrorState) {
           throw error;
+        }
+
+        if (error instanceof RpcError && error.isType('TXN_HASH_NOT_FOUND')) {
+          logger.info('txLife: ', txLife);
+          const errorMessage = errorMessages[txLife.at(-1) as string];
+          if (errorMessage && lifeCycleRetries <= 0) {
+            throw new Error(errorMessage);
+          }
+          lifeCycleRetries -= 1;
         }
 
         if (retries <= 0) {
@@ -475,6 +502,60 @@ export class RpcChannel {
       await wait(retryInterval);
     }
     return txReceipt as RPC.TXN_RECEIPT;
+  }
+
+  public async fastWaitForTransaction(
+    txHash: BigNumberish,
+    address: string,
+    initNonceBN: BigNumberish,
+    options?: fastWaitForTransactionOptions
+  ): Promise<boolean> {
+    const initNonce = BigInt(initNonceBN);
+    let retries = options?.retries ?? 50;
+    const retryInterval = options?.retryInterval ?? 500; // 0.5s
+    const errorStates: string[] = [RPC.ETransactionExecutionStatus.REVERTED];
+    const successStates: string[] = [
+      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
+      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
+      RPC.ETransactionFinalityStatus.PRE_CONFIRMED,
+    ];
+    let txStatus: RPC.TransactionStatus;
+    const start = new Date().getTime();
+    while (retries > 0) {
+      // eslint-disable-next-line no-await-in-loop
+      await wait(retryInterval);
+
+      // eslint-disable-next-line no-await-in-loop
+      txStatus = await this.getTransactionStatus(txHash);
+      logger.info(
+        `${retries} ${JSON.stringify(txStatus)} ${(new Date().getTime() - start) / 1000}s.`
+      );
+      const executionStatus = txStatus.execution_status ?? '';
+      const finalityStatus = txStatus.finality_status;
+      if (errorStates.includes(executionStatus)) {
+        const message = `${executionStatus}: ${finalityStatus}`;
+        const error = new Error(message) as Error & { response: RPC.TransactionStatus };
+        error.response = txStatus;
+        throw error;
+      } else if (successStates.includes(finalityStatus)) {
+        let currentNonce = initNonce;
+        while (currentNonce === initNonce && retries > 0) {
+          // eslint-disable-next-line no-await-in-loop
+          currentNonce = BigInt(await this.getNonceForAddress(address, BlockTag.PRE_CONFIRMED));
+          logger.info(
+            `${retries} Checking new nonce ${currentNonce} ${(new Date().getTime() - start) / 1000}s.`
+          );
+          if (currentNonce !== initNonce) return true;
+          // eslint-disable-next-line no-await-in-loop
+          await wait(retryInterval);
+          retries -= 1;
+        }
+        return false;
+      }
+
+      retries -= 1;
+    }
+    return false;
   }
 
   public getStorageAt(

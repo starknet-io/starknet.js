@@ -123,7 +123,7 @@ export function extractAbi(contract: ContractClass): Abi {
  * ```typescript
  * const result= provider.getDefaultNodeUrl(constants.NetworkName.SN_MAIN,false);
  * // console : "Using default public node url, please provide nodeUrl in provider options!"
- * // result = "https://starknet-mainnet.public.blastapi.io/rpc/v0_7"
+ * // result = "https://starknet-mainnet.public.blastapi.io/rpc/v0_9"
  * ```
  */
 export const getDefaultNodeUrl = (
@@ -149,6 +149,12 @@ export function getDefaultNodes(rpcVersion: SupportedRpcVersion) {
 
   Object.keys(nodes).forEach(function (key, _) {
     nodes[key] = nodes[key].map((it: any) => {
+      if (it === 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/') {
+        return `${it}${toApiVersion(rpcVersion)}/uYLxCteYbHTFJpKSoKdVm`;
+      }
+      if (it === 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/') {
+        return `${it}${toApiVersion(rpcVersion)}/uYLxCteYbHTFJpKSoKdVm`;
+      }
       return `${it}${toApiVersion(rpcVersion)}`;
     });
   });
