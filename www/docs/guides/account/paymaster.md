@@ -110,6 +110,40 @@ const res = await myAccount.executePaymasterTransaction(
 const txR = await myProvider.waitForTransaction(res.transaction_hash);
 ```
 
+### Paymaster transaction using Contract class
+
+```typescript
+const gasToken = '0x53b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080'; // USDC in Testnet
+const feesDetails: PaymasterDetails = {
+  feeMode: { mode: 'default', gasToken },
+};
+const tokenContract = new Contract({
+  abi: erc20Sierra.abi,
+  address: tokenAddress,
+  providerOrAccount: myAccount,
+});
+
+const feeEstimation = (await tokenContract.estimate(
+  'transfer',
+  [destinationAddress, cairo.uint256(100)],
+  { paymasterDetails: feesDetails }
+)) as PaymasterFeeEstimate;
+// ask here to the user to accept this fee
+const res1 = await tokenContract.invoke('transfer', [destinationAddress, cairo.uint256(100)], {
+  paymasterDetails: feesDetails,
+  maxFeeInGasToken: feeEstimation.suggested_max_fee_in_gas_token,
+});
+const txR1 = await myProvider.waitForTransaction(res1.transaction_hash);
+// or
+const res2 = await myTestContract
+  .withOptions({
+    paymasterDetails: feesDetails,
+    maxFeeInGasToken: feeEstimation.suggested_max_fee_in_gas_token,
+  })
+  .transfer(destinationAddress, cairo.uint256(100));
+const txR2 = await myProvider.waitForTransaction(res2.transaction_hash);
+```
+
 ### Sponsored Paymaster
 
 For a sponsored transaction, use:
