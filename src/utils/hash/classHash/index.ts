@@ -12,7 +12,6 @@ import { isString } from '../../typed';
 import { computeLegacyContractClassHash } from './pedersen';
 import { computeCompiledClassHashPoseidon, computeSierraContractClassHash } from './poseidon';
 import { computeCompiledClassHashBlake } from './blake';
-import { SupportedRpcVersion } from '../../../global/constants';
 import { compareVersions } from '../../resolve';
 
 export * from './pedersen';
@@ -45,9 +44,9 @@ export function computeCompiledClassHash(
   /**
    * Used to determine which hashing algorithm to use
    */
-  specVersion?: SupportedRpcVersion
+  starknetVersion?: string
 ): string {
-  if (specVersion && compareVersions(specVersion, '0.10.0') >= 0) {
+  if (starknetVersion && compareVersions(starknetVersion, '0.14.1') >= 0) {
     return computeCompiledClassHashBlake(casm);
   }
   return computeCompiledClassHashPoseidon(casm);

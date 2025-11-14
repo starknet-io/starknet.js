@@ -145,6 +145,10 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.setUpSpecVersion();
   }
 
+  public async getStarknetVersion(blockIdentifier?: BlockIdentifier) {
+    return this.channel.getStarknetVersion(blockIdentifier);
+  }
+
   public async getNonceForAddress(
     contractAddress: BigNumberish,
     blockIdentifier?: BlockIdentifier
@@ -545,7 +549,7 @@ export class RpcProvider implements ProviderInterface {
     if (!contractClassIdentifier.classHash && 'contract' in contractClassIdentifier) {
       const hashes = extractContractHashes(
         contractClassIdentifier,
-        await this.channel.setUpSpecVersion()
+        await this.channel.getStarknetVersion()
       );
       classHash = hashes.classHash;
     } else if (contractClassIdentifier.classHash) {

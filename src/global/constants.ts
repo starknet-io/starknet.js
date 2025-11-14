@@ -158,7 +158,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
 };
 
 export const RPC_DEFAULT_NODES = {
-  SN_MAIN: [`https://starknet-mainnet.g.alchemy.com/starknet/version/rpc`],
+  SN_MAIN: [`https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/`],
   SN_SEPOLIA: [`https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/`],
 } as const;
 

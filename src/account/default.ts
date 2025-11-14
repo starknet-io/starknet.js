@@ -192,7 +192,7 @@ export class Account extends Provider implements AccountInterface {
     const invocations = [
       {
         type: ETransactionType.DECLARE,
-        payload: extractContractHashes(payload, await this.channel.setUpSpecVersion()),
+        payload: extractContractHashes(payload, await this.channel.getStarknetVersion()),
       },
     ];
     const estimateBulk = await this.estimateFeeBulk(invocations, details);
@@ -400,7 +400,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeclareContractResponse> {
     const declareContractPayload = extractContractHashes(
       payload,
-      await this.channel.setUpSpecVersion()
+      await this.channel.getStarknetVersion()
     );
     try {
       await this.getClassByHash(declareContractPayload.classHash);
@@ -421,7 +421,7 @@ export class Account extends Provider implements AccountInterface {
 
     const declareContractPayload = extractContractHashes(
       payload,
-      await this.channel.setUpSpecVersion()
+      await this.channel.getStarknetVersion()
     );
     const detailsWithTip = await this.resolveDetailsWithTip(details);
 
@@ -791,7 +791,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeclareContractTransaction> {
     const { classHash, contract, compiledClassHash } = extractContractHashes(
       payload,
-      await this.channel.setUpSpecVersion()
+      await this.channel.getStarknetVersion()
     );
     const compressedCompiledContract = parseContract(contract);
 

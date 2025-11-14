@@ -1,4 +1,3 @@
-import { SupportedRpcVersion } from '../global/constants';
 import { ContractClassResponse } from '../types';
 import {
   CairoContract,
@@ -50,13 +49,13 @@ export function isSierra(
  */
 export function extractContractHashes(
   payload: DeclareContractPayload,
-  specVersion?: SupportedRpcVersion
+  starknetVersion?: string
 ): CompleteDeclareContractPayload {
   const response = { ...payload } as CompleteDeclareContractPayload;
 
   if (isSierra(payload.contract)) {
     if (!payload.compiledClassHash && payload.casm) {
-      response.compiledClassHash = computeCompiledClassHash(payload.casm, specVersion);
+      response.compiledClassHash = computeCompiledClassHash(payload.casm, starknetVersion);
     }
     if (!response.compiledClassHash)
       throw new Error(
