@@ -26,6 +26,7 @@ import {
   FactoryParams,
   UniversalDetails,
   DeclareAndDeployContractPayload,
+  type PaymasterFeeEstimate,
   SuccessfulTransactionReceiptResponseHelper,
 } from '../types';
 import type { AccountInterface } from '../account/interface';
@@ -298,8 +299,8 @@ export class Contract implements ContractInterface {
     method: string,
     args: ArgsOrCalldata = [],
     options: ExecuteOptions = {}
-  ): Promise<SuccessfulTransactionReceiptResponseHelper | InvokeFunctionResponse> {
-    const { parseRequest = true, signature, waitForTransaction, ...RestInvokeOptions } = options;
+  ): Promise<InvokeFunctionResponse> {
+    const { parseRequest = true, signature, waitForTransaction, ...restInvokeOptions } = options;
     assert(this.address !== null, 'contract is not connected to an address');
 
     const calldata = getCompiledCalldata(args, () => {
@@ -317,8 +318,20 @@ export class Contract implements ContractInterface {
       entrypoint: method,
     };
     if (isAccount(this.providerOrAccount)) {
+      if (restInvokeOptions.paymasterDetails) {
+        const myCall: Call = {
+          contractAddress: this.address,
+          entrypoint: method,
+          calldata: args,
+        };
+        return this.providerOrAccount.executePaymasterTransaction(
+          [myCall],
+          restInvokeOptions.paymasterDetails,
+          restInvokeOptions.maxFeeInGasToken
+        );
+      }
       const result: InvokeFunctionResponse = await this.providerOrAccount.execute(invocation, {
-        ...RestInvokeOptions,
+        ...restInvokeOptions,
       });
       if (waitForTransaction) {
         const result2: GetTransactionReceiptResponse =
@@ -331,7 +344,7 @@ export class Contract implements ContractInterface {
       return result;
     }
 
-    if (!RestInvokeOptions.nonce)
+    if (!restInvokeOptions.nonce)
       throw new Error(`Manual nonce is required when invoking a function without an account`);
     logger.warn(`Invoking ${method} without an account.`);
 
@@ -341,8 +354,8 @@ export class Contract implements ContractInterface {
         signature,
       },
       {
-        ...RestInvokeOptions,
-        nonce: RestInvokeOptions.nonce,
+        ...restInvokeOptions,
+        nonce: restInvokeOptions.nonce,
       }
     );
   }
@@ -350,16 +363,26 @@ export class Contract implements ContractInterface {
   public async estimate(
     method: string,
     args: ArgsOrCalldata = [],
-    estimateDetails: UniversalDetails = {}
-  ): Promise<EstimateFeeResponseOverhead> {
+    estimateDetails: ExecuteOptions = {}
+  ): Promise<EstimateFeeResponseOverhead | PaymasterFeeEstimate> {
     assert(this.address !== null, 'contract is not connected to an address');
 
     if (!getCompiledCalldata(args, () => false)) {
       this.callData.validate(ValidateType.INVOKE, method, args);
     }
-
     const invocation = this.populate(method, args);
     if (isAccount(this.providerOrAccount)) {
+      if (estimateDetails.paymasterDetails) {
+        const myCall: Call = {
+          contractAddress: this.address,
+          entrypoint: method,
+          calldata: args,
+        };
+        return this.providerOrAccount.estimatePaymasterTransactionFee(
+          [myCall],
+          estimateDetails.paymasterDetails
+        );
+      }
       return this.providerOrAccount.estimateInvokeFee(invocation, estimateDetails);
     }
     throw Error('Contract must be connected to the account contract to estimate');

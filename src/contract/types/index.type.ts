@@ -11,7 +11,7 @@ import type {
   RawArgsArray,
   Signature,
 } from '../../types/lib';
-import type { UniversalDetails } from '../../account/types/index.type';
+import type { PaymasterDetails, UniversalDetails } from '../../account/types/index.type';
 import type { ProviderInterface } from '../../provider';
 import type { AccountInterface } from '../../account/interface';
 import type { ParsingStrategy } from '../../utils/calldata/parser';
@@ -104,6 +104,8 @@ export type ExecuteOptions = Pick<CommonContractOptions, 'parseRequest'> & {
    * Deployer contract salt
    */
   salt?: string;
+  paymasterDetails?: PaymasterDetails;
+  maxFeeInGasToken?: BigNumberish;
   /**
    * Wait for transaction to be included in a block
    * @default false

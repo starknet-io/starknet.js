@@ -1,3 +1,9 @@
+# [8.9.0](https://github.com/starknet-io/starknet.js/compare/v8.8.0...v8.9.0) (2025-11-13)
+
+### Features
+
+- paymaster snip-29 in Contract class ([#1470](https://github.com/starknet-io/starknet.js/issues/1470)) ([a6b839e](https://github.com/starknet-io/starknet.js/commit/a6b839eec40c2d610e98edba6b838749c7e89053))
+
 # [8.8.0](https://github.com/starknet-io/starknet.js/compare/v8.7.0...v8.8.0) (2025-11-12)
 
 ### Bug Fixes

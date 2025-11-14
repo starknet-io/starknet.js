@@ -5,6 +5,7 @@ import {
   RpcProvider,
   config,
   getTipStatsFromBlocks,
+  type PaymasterInterface,
   type TipAnalysisOptions,
 } from '../../src';
 import { RpcProviderOptions, type BlockIdentifier } from '../../src/types';
@@ -58,7 +59,8 @@ export function adaptAccountIfDevnet(account: Account): Account {
 
 export const getTestAccount = (
   provider: ProviderInterface,
-  txVersion?: SupportedTransactionVersion
+  txVersion?: SupportedTransactionVersion,
+  paymasterSnip29?: PaymasterInterface
 ) => {
   return adaptAccountIfDevnet(
     new Account({
@@ -66,6 +68,7 @@ export const getTestAccount = (
       address: toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
       signer: process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
       transactionVersion: txVersion ?? TEST_TX_VERSION,
+      paymaster: paymasterSnip29,
     })
   );
 };
