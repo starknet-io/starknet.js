@@ -1,4 +1,4 @@
-import { RPC08, RPC09 } from '../channel';
+import { RPC09, RPC010 } from '../channel';
 import { config } from '../global/config';
 import { SupportedRpcVersion } from '../global/constants';
 import { logger } from '../global/logger';
@@ -25,7 +25,7 @@ import {
   Invocation,
   Invocations,
   InvocationsDetailsWithNonce,
-  PendingBlock,
+  PreConfirmedBlock,
   PreConfirmedStateUpdate,
   RPC,
   RpcProviderOptions,
@@ -35,7 +35,7 @@ import {
   type TypedData,
   waitForTransactionOptions,
 } from '../types';
-import { ETransactionType, RPCSPEC08, RPCSPEC09 } from '../types/api';
+import { ETransactionType, RPCSPEC010, RPCSPEC09 } from '../types/api';
 import assert from '../utils/assert';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { extractContractHashes, isSierra } from '../utils/contract';
@@ -61,7 +61,7 @@ import { getGasPrices } from './modules';
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
 
-  public channel: RPC08.RpcChannel | RPC09.RpcChannel;
+  public channel: RPC09.RpcChannel | RPC010.RpcChannel;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
@@ -73,17 +73,17 @@ export class RpcProvider implements ProviderInterface {
     } else {
       const options = optionsOrProvider as RpcProviderOptions | undefined;
       if (options && options.specVersion) {
-        if (isVersion('0.8', options.specVersion)) {
-          this.channel = new RPC08.RpcChannel({ ...options, waitMode: false });
-        } else if (isVersion('0.9', options.specVersion)) {
+        if (isVersion('0.9', options.specVersion)) {
           this.channel = new RPC09.RpcChannel({ ...options, waitMode: false });
+        } else if (isVersion('0.10', options.specVersion)) {
+          this.channel = new RPC010.RpcChannel({ ...options, waitMode: false });
         } else throw new Error(`unsupported channel for spec version: ${options.specVersion}`);
-      } else if (isVersion('0.8', config.get('rpcVersion'))) {
-        // default channel when unspecified
-        this.channel = new RPC08.RpcChannel({ ...options, waitMode: false });
       } else if (isVersion('0.9', config.get('rpcVersion'))) {
         // default channel when unspecified
         this.channel = new RPC09.RpcChannel({ ...options, waitMode: false });
+      } else if (isVersion('0.10', config.get('rpcVersion'))) {
+        // default channel when unspecified
+        this.channel = new RPC010.RpcChannel({ ...options, waitMode: false });
       } else throw new Error('unable to define spec version for channel');
 
       this.responseParser = new RPCResponseParser(options?.resourceBoundsOverhead);
@@ -99,7 +99,7 @@ export class RpcProvider implements ProviderInterface {
     this: { new (...args: ConstructorParameters<typeof RpcProvider>): T },
     optionsOrProvider?: RpcProviderOptions
   ): Promise<T> {
-    const channel = new RPC08.RpcChannel({ ...optionsOrProvider });
+    const channel = new RPC09.RpcChannel({ ...optionsOrProvider });
     const spec = await channel.getSpecVersion();
 
     // Optimistic Warning in case of the patch version
@@ -107,16 +107,16 @@ export class RpcProvider implements ProviderInterface {
       logger.warn(`Using incompatible node spec version ${spec}`);
     }
 
-    if (isVersion('0.8', spec)) {
-      return new this({
-        ...optionsOrProvider,
-        specVersion: SupportedRpcVersion.v0_8_1,
-      }) as T;
-    }
     if (isVersion('0.9', spec)) {
       return new this({
         ...optionsOrProvider,
         specVersion: SupportedRpcVersion.v0_9_0,
+      }) as T;
+    }
+    if (isVersion('0.10', spec)) {
+      return new this({
+        ...optionsOrProvider,
+        specVersion: SupportedRpcVersion.v0_10_0,
       }) as T;
     }
 
@@ -156,8 +156,8 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getNonceForAddress(contractAddress, blockIdentifier);
   }
 
-  public async getBlock(): Promise<PendingBlock>;
-  public async getBlock(blockIdentifier: 'pre_confirmed'): Promise<PendingBlock>;
+  public async getBlock(): Promise<PreConfirmedBlock>;
+  public async getBlock(blockIdentifier: 'pre_confirmed'): Promise<PreConfirmedBlock>;
   public async getBlock(blockIdentifier: 'latest'): Promise<Block>;
   public async getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
   public async getBlock(blockIdentifier?: BlockIdentifier) {
@@ -187,7 +187,6 @@ export class RpcProvider implements ProviderInterface {
     retryInterval: number = 5000
   ) {
     if (blockIdentifier === BlockTag.LATEST) return;
-    if (blockIdentifier === 'pending') return; // For RPC 0.8.1
     const currentBlock = await this.getBlockNumber();
     const targetBlock =
       blockIdentifier === BlockTag.PRE_CONFIRMED
@@ -221,7 +220,7 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * Get the gas prices related to a block.
-   * @param {BlockIdentifier} [blockIdentifier = this.identifier] - Optional. Can be 'pending', 'latest' or a block number (an integer type).
+   * @param {BlockIdentifier} [blockIdentifier = this.identifier]
    * @returns {Promise<GasPrices>} an object with l1DataGasPrice, l1GasPrice, l2GasPrice properties (all bigint type).
    * @example
    * ```ts
@@ -232,9 +231,7 @@ export class RpcProvider implements ProviderInterface {
   public async getGasPrices(
     blockIdentifier: BlockIdentifier = this.channel.blockIdentifier
   ): Promise<GasPrices> {
-    if (this.channel instanceof RPC09.RpcChannel)
-      return getGasPrices(this.channel, blockIdentifier);
-    throw new LibraryError('Unsupported method for RPC version');
+    return getGasPrices(this.channel, blockIdentifier);
   }
 
   public async getL1MessageHash(l2TxHash: BigNumberish): Promise<string> {
@@ -298,7 +295,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getTransactionTrace(
     txHash: BigNumberish
-  ): Promise<RPCSPEC08.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE> {
+  ): Promise<RPCSPEC010.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE> {
     return this.channel.getTransactionTrace(txHash);
   }
 
@@ -504,7 +501,7 @@ export class RpcProvider implements ProviderInterface {
   public async estimateMessageFee(
     message: RPCSPEC09.L1Message, // same as spec08.L1Message
     blockIdentifier?: BlockIdentifier
-  ): Promise<RPCSPEC08.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE> {
+  ): Promise<RPCSPEC010.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE> {
     return this.channel.estimateMessageFee(message, blockIdentifier);
   }
 
@@ -513,10 +510,10 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getEvents(
-    eventFilter: RPCSPEC08.EventFilter | RPCSPEC09.EventFilter
-  ): Promise<RPCSPEC08.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK> {
-    if (this.channel instanceof RPC08.RpcChannel) {
-      return this.channel.getEvents(eventFilter as RPCSPEC08.EventFilter);
+    eventFilter: RPCSPEC010.EventFilter | RPCSPEC09.EventFilter
+  ): Promise<RPCSPEC010.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK> {
+    if (this.channel instanceof RPC010.RpcChannel) {
+      return this.channel.getEvents(eventFilter as RPCSPEC010.EventFilter);
     }
     if (this.channel instanceof RPC09.RpcChannel) {
       return this.channel.getEvents(eventFilter as RPCSPEC09.EventFilter);
@@ -592,7 +589,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getL1MessagesStatus(
     transactionHash: BigNumberish
-  ): Promise<RPC.RPCSPEC08.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus> {
+  ): Promise<RPC.RPCSPEC010.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus> {
     return this.channel.getMessagesStatus(transactionHash);
   }
 

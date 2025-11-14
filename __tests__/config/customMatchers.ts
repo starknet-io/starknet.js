@@ -14,7 +14,7 @@ const customMatchers = {
     const { block_hash, block_number, transaction_hash, ...eventData } = received;
 
     // Check if required properties exist.
-    // Do not test block_hash & block_number. They are missing in a pending block.
+    // Do not test block_hash & block_number. They are missing in a pre confirmed block.
     const hasRequiredProps = transaction_hash;
 
     // Check if event data matches

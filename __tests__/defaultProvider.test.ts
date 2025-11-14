@@ -3,7 +3,6 @@ import {
   Block,
   BlockNumber,
   CallData,
-  isPendingStateUpdate,
   LibraryError,
   Provider,
   ProviderInterface,
@@ -11,6 +10,7 @@ import {
   num,
   type Calldata,
   type RawArgs,
+  isPreConfirmedStateUpdate,
 } from '../src';
 import { contracts, erc20ClassHash, wrongClassHash } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
@@ -93,8 +93,8 @@ describe('defaultProvider', () => {
 
       test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockHash);
-        if (isPendingStateUpdate(stateUpdate)) {
-          fail('exampleBlockHash is latest block, should not be pending');
+        if (isPreConfirmedStateUpdate(stateUpdate)) {
+          fail('exampleBlockHash is latest block, should not be pre confirmed');
         }
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
         expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
@@ -102,8 +102,8 @@ describe('defaultProvider', () => {
 
       test(`getStateUpdate(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockNumber);
-        if (isPendingStateUpdate(stateUpdate)) {
-          fail('exampleBlockHash is latest block, should not be pending');
+        if (isPreConfirmedStateUpdate(stateUpdate)) {
+          fail('exampleBlockHash is latest block, should not be pre confirmed');
         }
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
         expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');

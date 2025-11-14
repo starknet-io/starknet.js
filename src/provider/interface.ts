@@ -1,4 +1,4 @@
-import { RPC08, RPC09 } from '../channel';
+import { RPC09, RPC010 } from '../channel';
 import { StarknetChainId } from '../global/constants';
 import type {
   AccountInvocations,
@@ -23,7 +23,7 @@ import type {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Nonce,
-  PendingBlock,
+  PreConfirmedBlock,
   PreConfirmedStateUpdate,
   StateUpdate,
   StateUpdateResponse,
@@ -40,11 +40,11 @@ import type {
   TypedData,
 } from '../types';
 import { TipAnalysisOptions, TipEstimate } from './modules/tip';
-import { RPCSPEC08, RPCSPEC09 } from '../types/api';
+import { RPCSPEC09, RPCSPEC010 } from '../types/api';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 
 export abstract class ProviderInterface {
-  public abstract channel: RPC08.RpcChannel | RPC09.RpcChannel;
+  public abstract channel: RPC09.RpcChannel | RPC010.RpcChannel;
 
   public abstract responseParser: RPCResponseParser;
 
@@ -73,8 +73,8 @@ export abstract class ProviderInterface {
    * @param blockIdentifier block identifier
    * @returns the block object
    */
-  public abstract getBlock(): Promise<PendingBlock>;
-  public abstract getBlock(blockIdentifier: 'pre_confirmed'): Promise<PendingBlock>;
+  public abstract getBlock(): Promise<PreConfirmedBlock>;
+  public abstract getBlock(blockIdentifier: 'pre_confirmed'): Promise<PreConfirmedBlock>;
   public abstract getBlock(blockIdentifier: 'latest'): Promise<Block>;
   public abstract getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
 
@@ -497,7 +497,7 @@ export abstract class ProviderInterface {
    */
   public abstract getTransactionTrace(
     txHash: BigNumberish
-  ): Promise<RPCSPEC08.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
+  ): Promise<RPCSPEC010.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
 
   /**
    * Get the status of a transaction
@@ -555,7 +555,7 @@ export abstract class ProviderInterface {
   public abstract estimateMessageFee(
     message: RPCSPEC09.L1Message,
     blockIdentifier?: BlockIdentifier
-  ): Promise<RPCSPEC08.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
+  ): Promise<RPCSPEC010.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
 
   /**
    * Get node synchronization status
@@ -569,8 +569,8 @@ export abstract class ProviderInterface {
    * @returns Events and pagination info
    */
   public abstract getEvents(
-    eventFilter: RPCSPEC08.EventFilter | RPCSPEC09.EventFilter
-  ): Promise<RPCSPEC08.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
+    eventFilter: RPCSPEC010.EventFilter | RPCSPEC09.EventFilter
+  ): Promise<RPCSPEC010.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
 
   /**
    * Verify in Starknet a signature of a TypedData object or of a given hash.
@@ -627,7 +627,7 @@ export abstract class ProviderInterface {
    */
   public abstract getL1MessagesStatus(
     transactionHash: BigNumberish
-  ): Promise<RPC.RPCSPEC08.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
+  ): Promise<RPC.RPCSPEC010.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
 
   /**
    * Get Merkle paths in state tries

@@ -106,7 +106,7 @@ export function isBuffer(obj: unknown): obj is Buffer {
  * @returns {boolean}
  * @example
  * ```typescript
- * const result = events.isObject({event: "pending"});
+ * const result = events.isObject({event: "something"});
  * // result = true
  * ```
  */

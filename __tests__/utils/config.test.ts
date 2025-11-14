@@ -53,8 +53,8 @@ describe('Configuration', () => {
   describe('getAll()', () => {
     it('should return a copy of the configuration', () => {
       const all = config.getAll();
-      all.rpcVersion = '0.8.1'; // Modify the copy
-      expect(config.get('rpcVersion')).toBe('0.9.0'); // Original remains unaffected
+      all.rpcVersion = '0.9.0'; // Modify the copy
+      expect(config.get('rpcVersion')).toBe('0.10.0'); // Original remains unaffected
     });
   });
 

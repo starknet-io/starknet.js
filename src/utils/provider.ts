@@ -181,11 +181,11 @@ export const validBlockTags = Object.values(BlockTag);
  *
  * text string are detected as block tag. identifier return tag
  *
- * null is detected as 'pending' block tag. identifier return 'pending'
+ * null is detected as 'latest' block tag. identifier return 'latest'
  * @example
  * ```typescript
  * const result = new provider.Block(null).identifier;
- * // result = "pending"
+ * // result = "latest"
  * ```
  */
 export class Block {
@@ -200,7 +200,7 @@ export class Block {
   number: BlockIdentifier = null;
 
   /**
-   * @param {BlockIdentifier} tag if not null, contains "pending" or "latest"
+   * @param {BlockIdentifier} tag if not null, contains "pre_confirmed" or "latest"
    */
   tag: BlockIdentifier = null;
 
@@ -233,7 +233,7 @@ export class Block {
    * @param {BlockIdentifier} _identifier  hex string and BigInt are detected as block hashes.
    * decimal string and number are detected as block numbers.
    * text string are detected as block tag.
-   * null is considered as a 'pending' block tag.
+   * null is considered as a 'latest' block tag.
    */
   constructor(_identifier: BlockIdentifier) {
     this.setIdentifier(_identifier);

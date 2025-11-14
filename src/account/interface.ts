@@ -501,7 +501,7 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Get the current nonce of the account
    *
-   * @param blockIdentifier - Block to query nonce at (default: 'pending')
+   * @param blockIdentifier - Block to query nonce at (default: 'latest' tag)
    * @returns Account nonce as hex string
    * @example
    * ```typescript

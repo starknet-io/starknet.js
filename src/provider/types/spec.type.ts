@@ -1,7 +1,7 @@
 // this file aims to unify the RPC specification types used by the common Provider class
 
 import { SimpleOneOf } from '../../types/helpers';
-import { RPCSPEC09, RPCSPEC08 } from '../../types/api';
+import { RPCSPEC09, RPCSPEC010 } from '../../types/api';
 
 // taken from type-fest
 export type Simplify<T> = { [K in keyof T]: T[K] } & {};
@@ -62,22 +62,24 @@ export type ETransactionVersion3 = RPCSPEC09.ETransactionVersion3;
 export const { ETransactionVersion3 } = RPCSPEC09;
 
 // MERGES
-export type BLOCK_HASH = Merge<RPCSPEC08.BLOCK_HASH, RPCSPEC09.BLOCK_HASH>;
-export type BLOCK_NUMBER = Merge<RPCSPEC08.BLOCK_NUMBER, RPCSPEC09.BLOCK_NUMBER>;
-export type FELT = Merge<RPCSPEC08.FELT, RPCSPEC09.FELT>;
-export type TXN_HASH = Merge<RPCSPEC08.TXN_HASH, RPCSPEC09.TXN_HASH>;
+export type BLOCK_HASH = Merge<RPCSPEC010.BLOCK_HASH, RPCSPEC09.BLOCK_HASH>;
+export type BLOCK_NUMBER = Merge<RPCSPEC010.BLOCK_NUMBER, RPCSPEC09.BLOCK_NUMBER>;
+export type FELT = Merge<RPCSPEC010.FELT, RPCSPEC09.FELT>;
+export type TXN_HASH = Merge<RPCSPEC010.TXN_HASH, RPCSPEC09.TXN_HASH>;
 
-export type PRICE_UNIT = Merge<RPCSPEC08.PRICE_UNIT, RPCSPEC09.PRICE_UNIT>;
-export type RESOURCE_PRICE = Merge<RPCSPEC08.RESOURCE_PRICE, RPCSPEC09.RESOURCE_PRICE>;
-export type SIMULATION_FLAG = Merge<RPCSPEC08.SIMULATION_FLAG, RPCSPEC09.SIMULATION_FLAG>;
+export type PRICE_UNIT = Merge<RPCSPEC010.PRICE_UNIT, RPCSPEC09.PRICE_UNIT>;
+export type RESOURCE_PRICE = Merge<RPCSPEC010.RESOURCE_PRICE, RPCSPEC09.RESOURCE_PRICE>;
+export type SIMULATION_FLAG = Merge<RPCSPEC010.SIMULATION_FLAG, RPCSPEC09.SIMULATION_FLAG>;
 
-export type STATE_UPDATE = Merge<RPCSPEC08.STATE_UPDATE, RPCSPEC09.STATE_UPDATE>;
-export type PENDING_STATE_UPDATE = Merge<
-  RPCSPEC08.PENDING_STATE_UPDATE,
+export type STATE_UPDATE = Merge<RPCSPEC010.STATE_UPDATE, RPCSPEC09.STATE_UPDATE>;
+/* export type PENDING_STATE_UPDATE = Merge<
+  RPCSPEC010.PENDING_STATE_UPDATE,
+  RPCSPEC09.PRE_CONFIRMED_STATE_UPDATE
+>; */
+export type PRE_CONFIRMED_STATE_UPDATE = Merge<
+  RPCSPEC010.PRE_CONFIRMED_STATE_UPDATE,
   RPCSPEC09.PRE_CONFIRMED_STATE_UPDATE
 >;
-export type PRE_CONFIRMED_STATE_UPDATE = RPCSPEC09.PRE_CONFIRMED_STATE_UPDATE;
-
 // TODO: Can we remove all of this ?
 /* export type INVOKE_TXN_RECEIPT = IsInBlock<RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'INVOKE'>>;
 export type DECLARE_TXN_RECEIPT = IsInBlock<RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'DECLARE'>>;
@@ -86,7 +88,7 @@ export type DEPLOY_ACCOUNT_TXN_RECEIPT = IsInBlock<
 >;
 export type L1_HANDLER_TXN_RECEIPT = IsInBlock<RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'L1_HANDLER'>>; */
 
-export type PENDING_INVOKE_TXN_RECEIPT = RPCSPEC08.IsPending<
+/* export type PENDING_INVOKE_TXN_RECEIPT = RPCSPEC08.IsPending<
   RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'INVOKE'>
 >;
 export type PENDING_DECLARE_TXN_RECEIPT = RPCSPEC08.IsPending<
@@ -97,47 +99,47 @@ export type PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT = RPCSPEC08.IsPending<
 >;
 export type PENDING_L1_HANDLER_TXN_RECEIPT = RPCSPEC08.IsPending<
   RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'L1_HANDLER'>
->;
+>; */
 //
 
-export type BlockWithTxHashes = Merge<RPCSPEC08.BlockWithTxHashes, RPCSPEC09.BlockWithTxHashes>;
-export type ContractClassPayload = Merge<RPCSPEC08.ContractClass, RPCSPEC09.ContractClass>;
+export type BlockWithTxHashes = Merge<RPCSPEC010.BlockWithTxHashes, RPCSPEC09.BlockWithTxHashes>;
+export type ContractClassPayload = Merge<RPCSPEC010.ContractClass, RPCSPEC09.ContractClass>;
 export type DeclaredTransaction = Merge<
-  RPCSPEC08.DeclaredTransaction,
+  RPCSPEC010.DeclaredTransaction,
   RPCSPEC09.DeclaredTransaction
 >;
-export type InvokedTransaction = Merge<RPCSPEC08.InvokedTransaction, RPCSPEC09.InvokedTransaction>;
+export type InvokedTransaction = Merge<RPCSPEC010.InvokedTransaction, RPCSPEC09.InvokedTransaction>;
 export type DeployedAccountTransaction = Merge<
-  RPCSPEC08.DeployedAccountTransaction,
+  RPCSPEC010.DeployedAccountTransaction,
   RPCSPEC09.DeployedAccountTransaction
 >;
 
-export type L1_HANDLER_TXN = RPCSPEC08.L1_HANDLER_TXN;
-export type EDataAvailabilityMode = RPCSPEC08.EDataAvailabilityMode;
-export const { EDataAvailabilityMode } = RPCSPEC08;
-export type EDAMode = RPCSPEC08.EDAMode;
-export const { EDAMode } = RPCSPEC08;
-export type EmittedEvent = Merge<RPCSPEC08.EmittedEvent, RPCSPEC09.EmittedEvent>;
-export type Event = Merge<RPCSPEC08.Event, RPCSPEC09.Event>;
+export type L1_HANDLER_TXN = RPCSPEC010.L1_HANDLER_TXN;
+export type EDataAvailabilityMode = RPCSPEC010.EDataAvailabilityMode;
+export const { EDataAvailabilityMode } = RPCSPEC010;
+export type EDAMode = RPCSPEC010.EDAMode;
+export const { EDAMode } = RPCSPEC010;
+export type EmittedEvent = Merge<RPCSPEC010.EmittedEvent, RPCSPEC09.EmittedEvent>;
+export type Event = Merge<RPCSPEC010.Event, RPCSPEC09.Event>;
 
-export type PendingReceipt = Merge<
-  RPCSPEC08.TransactionReceiptPendingBlock,
+/* export type PendingReceipt = Merge<
+  RPCSPEC010.TransactionReceiptPendingBlock,
   RPCSPEC09.TransactionReceiptPreConfirmedBlock
->;
+>; */
 export type Receipt = Merge<
-  RPCSPEC08.TransactionReceiptProductionBlock,
+  RPCSPEC010.TransactionReceiptProductionBlock,
   RPCSPEC09.TransactionReceiptProductionBlock
 >;
 
 /**
  * original response from estimate fee without parsing
  */
-export type FeeEstimate = Merge<RPCSPEC08.FEE_ESTIMATE, RPCSPEC09.FEE_ESTIMATE>;
+export type FeeEstimate = Merge<RPCSPEC010.FEE_ESTIMATE, RPCSPEC09.FEE_ESTIMATE>;
 export type ApiEstimateFeeResponse = FeeEstimate[]; // 0.8 and 0.9
 
 export function isRPC08Plus_ResourceBounds(
   entry: ResourceBounds
-): entry is RPCSPEC08.ResourceBounds {
+): entry is RPCSPEC010.ResourceBounds {
   return 'l1_data_gas' in entry;
 }
 
@@ -145,7 +147,7 @@ export function isRPC08Plus_ResourceBoundsBN(entry: ResourceBoundsBN): entry is 
   return 'l1_data_gas' in entry;
 }
 
-export type ResourceBounds = Merge<RPCSPEC08.ResourceBounds, RPCSPEC09.ResourceBounds>; // same sa rpc0.8
+export type ResourceBounds = Merge<RPCSPEC010.ResourceBounds, RPCSPEC09.ResourceBounds>; // same sa rpc0.8
 
 export type EventFilter = RPCSPEC09.EventFilter;
 
@@ -174,38 +176,38 @@ export type ResourceBoundsBN = {
 
 export type SimulateTransaction = SimpleOneOf<
   RPCSPEC09.SimulateTransaction,
-  RPCSPEC08.SimulateTransaction
+  RPCSPEC010.SimulateTransaction
 >;
 export type SimulateTransactionResponse = SimpleOneOf<
   RPCSPEC09.SimulateTransactionResponse,
-  RPCSPEC08.SimulateTransactionResponse
+  RPCSPEC010.SimulateTransactionResponse
 >;
 
 export type TransactionTrace = SimpleOneOf<
   RPCSPEC09.TRANSACTION_TRACE,
-  RPCSPEC08.TRANSACTION_TRACE
+  RPCSPEC010.TRANSACTION_TRACE
 >;
 
 export type TransactionWithHash = Merge<
-  RPCSPEC08.TransactionWithHash,
+  RPCSPEC010.TransactionWithHash,
   RPCSPEC09.TransactionWithHash
 >;
 
-export type TransactionReceipt = Merge<RPCSPEC08.TransactionReceipt, RPCSPEC09.TransactionReceipt>;
-export type Methods = RPCSPEC08.Methods;
-export type TXN_STATUS = Merge<RPCSPEC08.TXN_STATUS, RPCSPEC09.TXN_STATUS>;
+export type TransactionReceipt = Merge<RPCSPEC010.TransactionReceipt, RPCSPEC09.TransactionReceipt>;
+export type Methods = RPCSPEC010.Methods;
+export type TXN_STATUS = Merge<RPCSPEC010.TXN_STATUS, RPCSPEC09.TXN_STATUS>;
 export type TXN_EXECUTION_STATUS = Merge<
-  RPCSPEC08.TXN_EXECUTION_STATUS,
+  RPCSPEC010.TXN_EXECUTION_STATUS,
   RPCSPEC09.TXN_EXECUTION_STATUS
 >;
-export type TransactionStatus = Merge<RPCSPEC08.TransactionStatus, RPCSPEC09.TransactionStatus>;
-export type ETransactionStatus = RPCSPEC08.ETransactionStatus;
-export const { ETransactionStatus } = RPCSPEC08;
-export type ETransactionExecutionStatus = RPCSPEC08.ETransactionExecutionStatus;
-export const { ETransactionExecutionStatus } = RPCSPEC08;
+export type TransactionStatus = Merge<RPCSPEC010.TransactionStatus, RPCSPEC09.TransactionStatus>;
+export type ETransactionStatus = RPCSPEC010.ETransactionStatus;
+export const { ETransactionStatus } = RPCSPEC010;
+export type ETransactionExecutionStatus = RPCSPEC010.ETransactionExecutionStatus;
+export const { ETransactionExecutionStatus } = RPCSPEC010;
 // export type TRANSACTION_TRACE = Merge<RPCSPEC08.TRANSACTION_TRACE, RPCSPEC09.TRANSACTION_TRACE>;
-export type FEE_ESTIMATE = Merge<RPCSPEC08.FEE_ESTIMATE, RPCSPEC09.FEE_ESTIMATE>;
-export type EVENTS_CHUNK = Merge<RPCSPEC08.EVENTS_CHUNK, RPCSPEC09.EVENTS_CHUNK>;
+export type FEE_ESTIMATE = Merge<RPCSPEC010.FEE_ESTIMATE, RPCSPEC09.FEE_ESTIMATE>;
+export type EVENTS_CHUNK = Merge<RPCSPEC010.EVENTS_CHUNK, RPCSPEC09.EVENTS_CHUNK>;
 
 export type TransactionType = RPCSPEC09.ETransactionType;
 export const { ETransactionType: TransactionType } = RPCSPEC09;
