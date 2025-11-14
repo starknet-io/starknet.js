@@ -348,7 +348,7 @@ describe('validateFields', () => {
       expect(result).toBeUndefined();
     });
 
-    test('should throw an error if tupple validation fails', () => {
+    test('should throw an error if tuple validation fails', () => {
       const error = new Error(`Validate: arg test should be a tuple (defined as object)`);
 
       expect(() =>
