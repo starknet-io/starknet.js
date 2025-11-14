@@ -17,7 +17,7 @@ import {
   ReceiptTx,
 } from '../src';
 
-import { contracts, describeIfRpc081 } from './config/fixtures';
+import { contracts } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
@@ -127,7 +127,7 @@ describe('contract module', () => {
         });
       });
 
-      describeIfRpc081('Request Type Transformation', () => {
+      describe('Request Type Transformation', () => {
         test('Parsing the felt in request', async () => {
           const resp = await typeTransformedContract.request_felt(3);
           const txR = await provider.waitForTransaction(resp.transaction_hash);

@@ -1,11 +1,6 @@
 import fetch from '../../src/utils/connect/fetch';
 import { BatchClient } from '../../src/utils/batch';
-import {
-  createBlockForDevnet,
-  describeIfRpc081,
-  describeIfRpc09,
-  getTestProvider,
-} from '../config/fixtures';
+import { createBlockForDevnet, getTestProvider } from '../config/fixtures';
 import { initializeMatcher } from '../config/schema';
 import { RPC } from '../../src/types';
 import { createTestProvider } from '../config/fixturesInit';
@@ -26,26 +21,7 @@ describe('BatchClient', () => {
     });
   });
 
-  describeIfRpc081('should batch two requests RPC0.8.1', () => {
-    test('should batch two requests', async () => {
-      await createBlockForDevnet();
-
-      const fetchSpy = jest.spyOn(batchClient as any, 'sendBatch');
-
-      const [blockNumber, blockWithReceipts] = await Promise.all([
-        batchClient.fetch('starknet_blockNumber'),
-        batchClient.fetch('starknet_getBlockWithReceipts', { block_id: 'latest' }),
-      ]);
-
-      expect(typeof blockNumber.result).toBe('number');
-      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts08');
-
-      expect(fetchSpy).toHaveBeenCalledTimes(1);
-      fetchSpy.mockRestore();
-    });
-  });
-
-  describeIfRpc09('should batch two requests RPC0.9.0', () => {
+  describe('should batch two requests RPC', () => {
     test('should batch two requests', async () => {
       await createBlockForDevnet();
 

@@ -391,11 +391,11 @@ describe('deploy and test Account', () => {
   });
 
   describe('fastExecute()', () => {
-    test('Only Rpc0.9', async () => {
+    test('Only Rpc X', async () => {
       const provider08 = new RpcProvider({
         nodeUrl: 'dummy',
         blockIdentifier: BlockTag.PRE_CONFIRMED,
-        specVersion: '0.8.1',
+        specVersion: '0.10.0',
       });
       const testAccount = new Account({
         provider: provider08,
