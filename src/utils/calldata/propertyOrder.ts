@@ -11,7 +11,6 @@ import {
   isTypeNonZero,
   isTypeOption,
   isTypeResult,
-  isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
   isTypeU96,
@@ -23,10 +22,12 @@ import {
   CairoResult,
   CairoResultVariant,
 } from './enum';
-import extractTupleMemberTypes from './tuple';
 import { isUndefined, isString } from '../typed';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoArray } from '../cairoDataTypes/array';
+import { CairoTuple } from '../cairoDataTypes/tuple';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
+import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
 
 function errorU256(key: string) {
   return Error(
@@ -47,7 +48,7 @@ export default function orderPropsByAbi(
   enums: AbiEnums
 ): object {
   const orderInput = (unorderedItem: any, abiType: string): any => {
-    if (CairoFixedArray.isTypeFixedArray(abiType)) {
+    if (CairoFixedArray.isAbiType(abiType)) {
       return orderFixedArray(unorderedItem, abiType);
     }
     if (isTypeArray(abiType)) {
@@ -57,6 +58,9 @@ export default function orderPropsByAbi(
       const abiObj = enums[abiType];
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return orderEnum(unorderedItem, abiObj);
+    }
+    if (unorderedItem instanceof CairoTuple) {
+      return unorderedItem;
     }
     if (isTypeTuple(abiType)) {
       return orderTuple(unorderedItem, abiType);
@@ -73,7 +77,7 @@ export default function orderPropsByAbi(
     if (isTypeU96(abiType)) {
       return unorderedItem;
     }
-    if (isTypeSecp256k1Point(abiType)) {
+    if (CairoSecp256k1Point.isAbiType(abiType)) {
       return unorderedItem;
     }
     if (CairoUint256.isAbiType(abiType)) {
@@ -126,7 +130,15 @@ export default function orderPropsByAbi(
     return orderedObject2;
   };
 
-  function orderArray(myArray: Array<any> | string, abiParam: string): Array<any> | string {
+  function orderArray(
+    myArray: Array<any> | string | CairoArray,
+    abiParam: string
+  ): Array<any> | string | CairoArray {
+    // If myArray is already a CairoArray instance, return it as-is
+    if (myArray instanceof CairoArray) {
+      return myArray;
+    }
+
     const typeInArray = getArrayType(abiParam);
     if (isString(myArray)) {
       return myArray; // longstring
@@ -134,7 +146,15 @@ export default function orderPropsByAbi(
     return myArray.map((myElem) => orderInput(myElem, typeInArray));
   }
 
-  function orderFixedArray(input: Array<any> | Record<string, any>, abiParam: string): Array<any> {
+  function orderFixedArray(
+    input: Array<any> | Record<string, any> | CairoFixedArray,
+    abiParam: string
+  ): Array<any> | CairoFixedArray {
+    // If input is already a CairoFixedArray instance, return it as-is
+    if (input instanceof CairoFixedArray) {
+      return input;
+    }
+
     const typeInFixedArray = CairoFixedArray.getFixedArrayType(abiParam);
     const arraySize = CairoFixedArray.getFixedArraySize(abiParam);
     if (Array.isArray(input)) {
@@ -154,18 +174,21 @@ export default function orderPropsByAbi(
   }
 
   function orderTuple(unorderedObject2: RawArgsObject, abiParam: string): object {
-    const typeList = extractTupleMemberTypes(abiParam);
-    const orderedObject2 = typeList.reduce((orderedObject: object, abiTypeCairoX: any, index) => {
-      const myObjKeys: string[] = Object.keys(unorderedObject2);
-      const setProperty = (value?: any) =>
-        Object.defineProperty(orderedObject, index.toString(), {
-          enumerable: true,
-          value: value ?? unorderedObject2[myObjKeys[index]],
-        });
-      const abiType: string = abiTypeCairoX?.type ? abiTypeCairoX.type : abiTypeCairoX; // Named tuple, or tuple
-      setProperty(orderInput(unorderedObject2[myObjKeys[index]], abiType));
-      return orderedObject;
-    }, {});
+    const typeList = CairoTuple.getTupleElementTypes(abiParam);
+    const orderedObject2 = typeList.reduce(
+      (orderedObject: object, abiTypeCairoX: any, index: number) => {
+        const myObjKeys: string[] = Object.keys(unorderedObject2);
+        const setProperty = (value?: any) =>
+          Object.defineProperty(orderedObject, index.toString(), {
+            enumerable: true,
+            value: value ?? unorderedObject2[myObjKeys[index]],
+          });
+        const abiType: string = abiTypeCairoX?.type ? abiTypeCairoX.type : abiTypeCairoX; // Named tuple, or tuple
+        setProperty(orderInput(unorderedObject2[myObjKeys[index]], abiType));
+        return orderedObject;
+      },
+      {}
+    );
     return orderedObject2;
   }
 

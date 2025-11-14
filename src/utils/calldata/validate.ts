@@ -11,6 +11,8 @@ import assert from '../assert';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoArray } from '../cairoDataTypes/array';
+import { CairoTuple } from '../cairoDataTypes/tuple';
 import { CairoInt8 } from '../cairoDataTypes/int8';
 import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
@@ -18,6 +20,7 @@ import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
+import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
 import { isHex, toBigInt } from '../num';
 import { isLongText } from '../shortString';
 import { isBoolean, isNumber, isString, isBigInt, isObject } from '../typed';
@@ -152,8 +155,8 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       break;
     case Literal.Secp256k1Point: {
       assert(
-        param >= 0n && param <= 2n ** 512n - 1n,
-        `Validate: arg ${input.name} must be ${input.type} : a 512 bits number.`
+        CairoSecp256k1Point.is(param),
+        `Validate: arg ${input.name} must be ${input.type} : a valid 512 bits secp256k1 point.`
       );
       break;
     }
@@ -232,16 +235,30 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
 };
 
 const validateTuple = (parameter: any, input: AbiEntry) => {
+  // If parameter is a CairoTuple instance, skip validation (it's already validated)
+  if (parameter instanceof CairoTuple) {
+    return;
+  }
+
   assert(isObject(parameter), `Validate: arg ${input.name} should be a tuple (defined as object)`);
   // todo: skip tuple structural validation for now
 };
 
 const validateArray = (
-  parameterArray: Array<any> | Record<string, any>,
+  parameterArray: Array<any> | Record<string, any> | CairoFixedArray | CairoArray | CairoTuple,
   input: AbiEntry,
   structs: AbiStructs,
   enums: AbiEnums
 ) => {
+  // If parameterArray is a CairoFixedArray, CairoArray, or CairoTuple instance, skip validation (it's already validated)
+  if (
+    parameterArray instanceof CairoFixedArray ||
+    parameterArray instanceof CairoArray ||
+    parameterArray instanceof CairoTuple
+  ) {
+    return;
+  }
+
   const isNormalArray = isTypeArray(input.type);
   const baseType = isNormalArray
     ? getArrayType(input.type)
@@ -446,7 +463,7 @@ export default function validateFields(
       case CairoInt128.isAbiType(input.type):
         CairoInt128.validate(parameter);
         break;
-      case isTypeArray(input.type) || CairoFixedArray.isTypeFixedArray(input.type):
+      case isTypeArray(input.type) || CairoFixedArray.isAbiType(input.type):
         validateArray(parameter, input, structs, enums);
         break;
       case isTypeStruct(input.type, structs):

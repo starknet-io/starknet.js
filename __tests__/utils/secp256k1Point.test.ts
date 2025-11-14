@@ -15,7 +15,7 @@ describe('secp256k1Point cairo type test', () => {
         public_key: point,
       });
     }).toThrow(
-      'Validate: arg public_key must be core::starknet::secp256k1::Secp256k1Point : a 512 bits number.'
+      'Validate: arg public_key must be core::starknet::secp256k1::Secp256k1Point : a valid 512 bits secp256k1 point.'
     );
   });
 

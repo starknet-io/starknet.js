@@ -13,6 +13,7 @@ import {
 import { contracts } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
 import { toHex } from '../src/utils/num';
+import { CairoType } from '../src/utils/cairoDataTypes/cairoType.interface';
 
 describe('CairoByteArray Manual Integration Tests', () => {
   let provider: ProviderInterface;
@@ -479,11 +480,12 @@ describe('CairoByteArray Contract Integration Tests', () => {
   test('should store and read Buffer file, custom response parsing strategy', async () => {
     // Create custom parsing strategy that extends hdParsingStrategy
     const customParsingStrategy: ParsingStrategy = {
-      request: hdParsingStrategy.request,
+      dynamicSelectors: hdParsingStrategy.dynamicSelectors,
+      constructors: hdParsingStrategy.constructors,
       response: {
         ...hdParsingStrategy.response,
-        [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
-          return CairoByteArray.factoryFromApiResponse(responseIterator).toBuffer();
+        [CairoByteArray.abiSelector]: (instance: CairoType) => {
+          return (instance as CairoByteArray).toBuffer();
         },
       },
     };
@@ -514,11 +516,12 @@ describe('CairoByteArray Contract Integration Tests', () => {
   xtest('should store and read large Buffer file without event, custom response parsing strategy', async () => {
     // Create custom parsing strategy that extends hdParsingStrategy
     const customParsingStrategy: ParsingStrategy = {
-      request: hdParsingStrategy.request,
+      dynamicSelectors: hdParsingStrategy.dynamicSelectors,
+      constructors: hdParsingStrategy.constructors,
       response: {
         ...hdParsingStrategy.response,
-        [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
-          return CairoByteArray.factoryFromApiResponse(responseIterator).toBuffer();
+        [CairoByteArray.abiSelector]: (instance: CairoType) => {
+          return (instance as CairoByteArray).toBuffer();
         },
       },
     };

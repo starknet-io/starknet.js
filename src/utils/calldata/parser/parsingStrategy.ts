@@ -1,8 +1,7 @@
 import { CairoBytes31 } from '../../cairoDataTypes/bytes31';
 import { CairoByteArray } from '../../cairoDataTypes/byteArray';
-import { AbiEntryType, BigNumberish } from '../../../types';
+import { AbiEntryType } from '../../../types';
 import { CairoFelt252 } from '../../cairoDataTypes/felt';
-import { felt } from '../cairo';
 import { CairoUint256 } from '../../cairoDataTypes/uint256';
 import { CairoUint512 } from '../../cairoDataTypes/uint512';
 import { CairoUint8 } from '../../cairoDataTypes/uint8';
@@ -15,220 +14,189 @@ import { CairoInt16 } from '../../cairoDataTypes/int16';
 import { CairoInt32 } from '../../cairoDataTypes/int32';
 import { CairoInt64 } from '../../cairoDataTypes/int64';
 import { CairoInt128 } from '../../cairoDataTypes/int128';
-import { getNext } from '../../num';
+import { CairoUint32 } from '../../cairoDataTypes/uint32';
+import { CairoFixedArray } from '../../cairoDataTypes/fixedArray';
+import { CairoArray } from '../../cairoDataTypes/array';
+import { CairoTuple } from '../../cairoDataTypes/tuple';
+import { CairoSecp256k1Point } from '../../cairoDataTypes/secp256k1Point';
+import { CairoType } from '../../cairoDataTypes/cairoType.interface';
+import assert from '../../assert';
+import { isTypeArray, isTypeTuple } from '../cairo';
 
 /**
- * Parsing map for parser, request and response parsers are separated
+ * Parsing map for constructors and response parsers
  * Configure parsing strategy for each abi type
  */
 export type ParsingStrategy = {
-  request: Record<AbiEntryType, (val: unknown) => any>;
-  response: Record<AbiEntryType, (responseIterator: Iterator<string>) => any>;
+  constructors: Record<
+    AbiEntryType,
+    (input: Iterator<string> | unknown, type?: string) => CairoType
+  >;
+  response: Record<AbiEntryType, (instance: CairoType) => any>;
+  dynamicSelectors: Record<string, (type: string) => boolean>;
 };
-
-// TODO: extend for complex types like structs, tuples, enums, arrays, etc.
 
 /**
  * More robust parsing strategy
  * Configuration mapping - data-driven approach
  * Configure parsing strategy for each abi type
  */
-export const hdParsingStrategy = {
-  // TODO: provjeri svi request parseri stvaraju array, dali je to ok sa requstParserom
-  request: {
-    [CairoBytes31.abiSelector]: (val: unknown) => {
-      return new CairoBytes31(val).toApiRequest();
+export const hdParsingStrategy: ParsingStrategy = {
+  constructors: {
+    [CairoBytes31.abiSelector]: (input: Iterator<string> | unknown) => {
+      // Check if input is an Iterator (API response) or user input
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoBytes31.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoBytes31(input);
     },
-    [CairoByteArray.abiSelector]: (val: unknown) => {
-      return new CairoByteArray(val).toApiRequest();
+    [CairoByteArray.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoByteArray.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoByteArray(input);
     },
-    [CairoFelt252.abiSelector]: (val: unknown) => {
-      return new CairoFelt252(val).toApiRequest();
+    [CairoFelt252.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoFelt252.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoFelt252(input);
     },
-    [CairoUint256.abiSelector]: (val: unknown) => {
-      return new CairoUint256(val).toApiRequest();
+    [CairoUint256.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoUint256.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoUint256(input);
     },
-    [CairoUint512.abiSelector]: (val: unknown) => {
-      return new CairoUint512(val).toApiRequest();
+    [CairoUint512.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoUint512.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoUint512(input);
     },
-    [CairoUint8.abiSelector]: (val: unknown) => {
-      return new CairoUint8(val).toApiRequest();
+    [CairoUint8.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoUint8.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoUint8(input);
     },
-    [CairoUint16.abiSelector]: (val: unknown) => {
-      return new CairoUint16(val).toApiRequest();
+    [CairoUint16.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoUint16.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoUint16(input);
     },
-    [CairoUint64.abiSelector]: (val: unknown) => {
-      return new CairoUint64(val).toApiRequest();
+    [CairoUint32.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoUint32.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoUint32(input);
     },
-    [CairoUint96.abiSelector]: (val: unknown) => {
-      return new CairoUint96(val).toApiRequest();
+    [CairoUint64.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoUint64.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoUint64(input);
     },
-    [CairoUint128.abiSelector]: (val: unknown) => {
-      return new CairoUint128(val).toApiRequest();
+    [CairoUint96.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoUint96.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoUint96(input);
     },
-    [CairoInt8.abiSelector]: (val: unknown) => {
-      return new CairoInt8(val).toApiRequest();
+    [CairoUint128.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoUint128.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoUint128(input);
     },
-    [CairoInt16.abiSelector]: (val: unknown) => {
-      return new CairoInt16(val).toApiRequest();
+    [CairoInt8.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoInt8.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoInt8(input);
     },
-    [CairoInt32.abiSelector]: (val: unknown) => {
-      return new CairoInt32(val).toApiRequest();
+    [CairoInt16.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoInt16.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoInt16(input);
     },
-    [CairoInt64.abiSelector]: (val: unknown) => {
-      return new CairoInt64(val).toApiRequest();
+    [CairoInt32.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoInt32.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoInt32(input);
     },
-    [CairoInt128.abiSelector]: (val: unknown) => {
-      return new CairoInt128(val).toApiRequest();
+    [CairoInt64.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoInt64.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoInt64(input);
     },
+    [CairoInt128.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoInt128.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoInt128(input);
+    },
+    [CairoSecp256k1Point.abiSelector]: (input: Iterator<string> | unknown) => {
+      if (input && typeof input === 'object' && 'next' in input) {
+        return CairoSecp256k1Point.factoryFromApiResponse(input as Iterator<string>);
+      }
+      return new CairoSecp256k1Point(input);
+    },
+    CairoFixedArray: (input: Iterator<string> | unknown, type?: string) => {
+      assert(!!type, 'CairoFixedArray constructor requires type parameter');
+      // Always use constructor - it handles both iterator and user input internally
+      return new CairoFixedArray(input, type, hdParsingStrategy);
+    },
+    CairoArray: (input: Iterator<string> | unknown, type?: string) => {
+      assert(!!type, 'CairoArray constructor requires type parameter');
+      // Always use constructor - it handles both iterator and user input internally
+      return new CairoArray(input, type, hdParsingStrategy);
+    },
+    CairoTuple: (input: Iterator<string> | unknown, type?: string) => {
+      assert(!!type, 'CairoTuple constructor requires type parameter');
+      // Always use constructor - it handles both iterator and user input internally
+      return new CairoTuple(input, type, hdParsingStrategy);
+    },
+  },
+  dynamicSelectors: {
+    CairoFixedArray: (type: string) => {
+      return CairoFixedArray.isAbiType(type);
+    },
+    CairoArray: (type: string) => {
+      return isTypeArray(type);
+    },
+    CairoTuple: (type: string) => {
+      return isTypeTuple(type);
+    },
+    // TODO: add more dynamic selectors here
   },
   response: {
-    [CairoBytes31.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoBytes31.factoryFromApiResponse(responseIterator).decodeUtf8();
-    },
-    [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoByteArray.factoryFromApiResponse(responseIterator).decodeUtf8();
-    },
-    [CairoFelt252.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoFelt252.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoUint256.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint256.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoUint512.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint512.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoUint8.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint8.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoUint16.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint16.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoUint64.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint64.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoUint96.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint96.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoUint128.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint128.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoInt8.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoInt8.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoInt16.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoInt16.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoInt32.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoInt32.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoInt64.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoInt64.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoInt128.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoInt128.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-  },
-} as const;
-
-/**
- * Faster parsing strategy
- * Configuration mapping - data-driven approach
- * Configure parsing strategy for each abi type
- */
-export const fastParsingStrategy: ParsingStrategy = {
-  request: {
-    [CairoBytes31.abiSelector]: (val: unknown) => {
-      return new CairoBytes31(val).toApiRequest();
-    },
-    [CairoByteArray.abiSelector]: (val: unknown) => {
-      return new CairoByteArray(val).toApiRequest();
-    },
-    [CairoFelt252.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
-    },
-    [CairoUint256.abiSelector]: (val: unknown) => {
-      return new CairoUint256(val).toApiRequest();
-    },
-    [CairoUint512.abiSelector]: (val: unknown) => {
-      return new CairoUint512(val).toApiRequest();
-    },
-    [CairoUint8.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
-    },
-    [CairoUint16.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
-    },
-    [CairoUint64.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
-    },
-    [CairoUint96.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
-    },
-    [CairoUint128.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
-    },
-    [CairoInt8.abiSelector]: (val: unknown) => {
-      return new CairoInt8(val).toApiRequest();
-    },
-    [CairoInt16.abiSelector]: (val: unknown) => {
-      return new CairoInt16(val).toApiRequest();
-    },
-    [CairoInt32.abiSelector]: (val: unknown) => {
-      return new CairoInt32(val).toApiRequest();
-    },
-    [CairoInt64.abiSelector]: (val: unknown) => {
-      return new CairoInt64(val).toApiRequest();
-    },
-    [CairoInt128.abiSelector]: (val: unknown) => {
-      return new CairoInt128(val).toApiRequest();
-    },
-  },
-  response: {
-    [CairoBytes31.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoBytes31.factoryFromApiResponse(responseIterator).decodeUtf8();
-    },
-    [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoByteArray.factoryFromApiResponse(responseIterator).decodeUtf8();
-    },
-    [CairoFelt252.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
-    [CairoUint256.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint256.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoUint512.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint512.factoryFromApiResponse(responseIterator).toBigInt();
-    },
-    [CairoUint8.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
-    [CairoUint16.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
-    [CairoUint64.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
-    [CairoUint96.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
-    [CairoUint128.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
-    [CairoInt8.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
-    [CairoInt16.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
-    [CairoInt32.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
-    [CairoInt64.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
-    [CairoInt128.abiSelector]: (responseIterator: Iterator<string>) => {
-      return BigInt(getNext(responseIterator));
-    },
+    [CairoBytes31.abiSelector]: (instance: CairoType) => (instance as CairoBytes31).decodeUtf8(),
+    [CairoByteArray.abiSelector]: (instance: CairoType) =>
+      (instance as CairoByteArray).decodeUtf8(),
+    [CairoFelt252.abiSelector]: (instance: CairoType) => (instance as CairoFelt252).toBigInt(),
+    [CairoUint256.abiSelector]: (instance: CairoType) => (instance as CairoUint256).toBigInt(),
+    [CairoUint512.abiSelector]: (instance: CairoType) => (instance as CairoUint512).toBigInt(),
+    [CairoUint8.abiSelector]: (instance: CairoType) => (instance as CairoUint8).toBigInt(),
+    [CairoUint16.abiSelector]: (instance: CairoType) => (instance as CairoUint16).toBigInt(),
+    [CairoUint32.abiSelector]: (instance: CairoType) => (instance as CairoUint32).toBigInt(),
+    [CairoUint64.abiSelector]: (instance: CairoType) => (instance as CairoUint64).toBigInt(),
+    [CairoUint96.abiSelector]: (instance: CairoType) => (instance as CairoUint96).toBigInt(),
+    [CairoUint128.abiSelector]: (instance: CairoType) => (instance as CairoUint128).toBigInt(),
+    [CairoInt8.abiSelector]: (instance: CairoType) => (instance as CairoInt8).toBigInt(),
+    [CairoInt16.abiSelector]: (instance: CairoType) => (instance as CairoInt16).toBigInt(),
+    [CairoInt32.abiSelector]: (instance: CairoType) => (instance as CairoInt32).toBigInt(),
+    [CairoInt64.abiSelector]: (instance: CairoType) => (instance as CairoInt64).toBigInt(),
+    [CairoInt128.abiSelector]: (instance: CairoType) => (instance as CairoInt128).toBigInt(),
+    [CairoSecp256k1Point.abiSelector]: (instance: CairoType) =>
+      (instance as CairoSecp256k1Point).toBigInt(),
+    CairoFixedArray: (instance: CairoType) =>
+      (instance as CairoFixedArray).decompose(hdParsingStrategy),
+    CairoArray: (instance: CairoType) => (instance as CairoArray).decompose(hdParsingStrategy),
+    CairoTuple: (instance: CairoType) => (instance as CairoTuple).decompose(hdParsingStrategy),
   },
 } as const;

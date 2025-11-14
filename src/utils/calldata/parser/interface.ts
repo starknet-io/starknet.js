@@ -1,9 +1,12 @@
 import { Abi, AbiEntryType, FunctionAbi } from '../../../types';
+import { ParsingStrategy } from './parsingStrategy';
 
 /**
  * Abi parser interface
  */
 export abstract class AbiParserInterface {
+  abstract parsingStrategy: ParsingStrategy;
+
   /**
    * Helper to calculate inputs length from abi
    * @param abiMethod FunctionAbi
@@ -29,7 +32,7 @@ export abstract class AbiParserInterface {
    * @param abiType AbiEntryType
    * @returns Parser function
    */
-  public abstract getRequestParser(abiType: AbiEntryType): (val: unknown) => any;
+  public abstract getRequestParser(abiType: AbiEntryType): (val: unknown, type?: string) => any;
 
   /**
    * Get response parser for the given abi type
@@ -38,5 +41,5 @@ export abstract class AbiParserInterface {
    */
   public abstract getResponseParser(
     abiType: AbiEntryType
-  ): (responseIterator: Iterator<string>) => any;
+  ): (responseIterator: Iterator<string>, type?: string) => any;
 }

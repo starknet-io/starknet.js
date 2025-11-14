@@ -24,7 +24,7 @@ export class CairoUint512 {
 
   public limb3: bigint; // TODO should be u128
 
-  static abiSelector = 'core::integer::u512';
+  static abiSelector = 'core::integer::u512' as const;
 
   /**
    * Default constructor (Lib usage)
