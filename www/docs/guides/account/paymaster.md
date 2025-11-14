@@ -290,7 +290,7 @@ const App: FC = () => {
       {!gasToken && <p>Select a gas token</p>}
       <div>
         {account && (
-          <button disabled={loading || !gasToken} onClick={onClickExecute}>
+          <button disabled={loading} onClick={onClickExecute}>
             {loading ? 'Loading' : 'Execute'}
           </button>
         )}
