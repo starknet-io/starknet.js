@@ -209,7 +209,7 @@ A demo DAPP is available [here](https://starknet-paymaster-snip-29.vercel.app/) 
 ```tsx
 import { FC, useEffect, useState } from 'react';
 import { connect } from 'get-starknet'; // v4 only
-import { Account, PaymasterRpc, TokenData, WalletAccount } from 'starknet'; // v7.4.0+
+import { Account, PaymasterRpc, TokenData, WalletAccount } from 'starknet'; // v8+
 
 const paymasterRpc = new PaymasterRpc({ default: true });
 
@@ -225,9 +225,7 @@ const App: FC = () => {
     if (!starknet) return;
     await starknet.enable();
     if (starknet.isConnected && starknet.provider && starknet.account.address) {
-      setAccount(
-        new WalletAccount(starknet.provider, starknet, undefined, undefined, paymasterRpc)
-      );
+      setAccount(await WalletAccount.connect(starknet.provider, starknet, undefined, paymasterRpc));
     }
   };
 
@@ -242,7 +240,6 @@ const App: FC = () => {
   }
 
   const onClickExecute = () => {
-    if (!gasToken) return;
     const calls = [
       {
         entrypoint: 'approve',
@@ -257,7 +254,7 @@ const App: FC = () => {
     setLoading(true);
     account
       .executePaymasterTransaction(calls, {
-        feeMode: { mode: 'default', gasToken: gasToken.token_address },
+        feeMode: { mode: 'default', gasToken: gasToken!.token_address },
       })
       .then((res) => {
         setTx(res.transaction_hash);
