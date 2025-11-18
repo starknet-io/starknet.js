@@ -90,7 +90,6 @@ import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
 import { defaultDeployer, Deployer } from '../deployer';
 import type { TipType } from '../provider/modules/tip';
-import { RPC09 } from '../channel';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -365,10 +364,6 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: UniversalDetails = {},
     waitDetail: fastWaitForTransactionOptions = {}
   ): Promise<fastExecuteResponse> {
-    assert(
-      this.channel instanceof RPC09.RpcChannel,
-      'Wrong Rpc version in Provider. At least Rpc v0.9 required.'
-    );
     assert(
       this.channel.blockIdentifier === BlockTag.PRE_CONFIRMED,
       'Provider needs to be initialized with `pre_confirmed` blockIdentifier option.'
