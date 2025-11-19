@@ -384,7 +384,7 @@ async function getTipStatsSequential(
 
     // Handle insufficient transaction data
     if (allTips.length < minTxsNecessary) {
-      logger.error(
+      logger.warn(
         `Insufficient transaction data: found ${allTips.length} V3 transactions with tips in ${blocksAnalyzed} blocks ` +
           `(block range: ${Math.max(0, startingBlockNumber - maxBlocks + 1)}-${startingBlockNumber}). ` +
           `Required: ${minTxsNecessary} transactions. Consider reducing minTxsNecessary or increasing maxBlocks.`

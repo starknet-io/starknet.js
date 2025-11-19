@@ -185,3 +185,5 @@ export const SYSTEM_MESSAGES = {
   consensusFailed: 'Consensus failed to finalize the block proposal',
   txFailsBlockBuildingValidation: 'Transaction fails block building validation',
 };
+
+export const L2_MIN_PRICE = 3n * 10n ** 9n; // 3 Gwei

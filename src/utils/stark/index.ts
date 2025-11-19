@@ -29,11 +29,13 @@ import {
 import { parse, stringify } from '../json';
 import {
   addPercent,
+  bigIntMax,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
   toHex,
 } from '../num';
 import { isBigInt, isObject, isString } from '../typed';
+import { L2_MIN_PRICE } from '../../global/constants';
 
 type V3Details = Required<
   Pick<
@@ -184,6 +186,7 @@ export function zeroResourceBounds(): ResourceBoundsBN {
 
 /**
  * Calculates the maximum resource bounds for fee estimation.
+ * Ensure that L2_MIN_PRICE is respected for l2_gas max_price_per_unit.
  *
  * @param {FeeEstimate} estimate The estimate for the fee.
  * @param {ResourceBoundsOverhead | false} [overhead] - The percentage overhead added to the max units and max price per unit. Pass `false` to disable overhead.
@@ -200,9 +203,12 @@ export function toOverheadResourceBounds(
         estimate.l2_gas_consumed,
         overhead !== false ? overhead.l2_gas.max_amount : 0
       ),
-      max_price_per_unit: addPercent(
-        estimate.l2_gas_price,
-        overhead !== false ? overhead.l2_gas.max_price_per_unit : 0
+      max_price_per_unit: bigIntMax(
+        L2_MIN_PRICE,
+        addPercent(
+          estimate.l2_gas_price,
+          overhead !== false ? overhead.l2_gas.max_price_per_unit : 0
+        )
       ),
     },
     l1_gas: {

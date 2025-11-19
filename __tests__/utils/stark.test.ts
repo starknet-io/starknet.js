@@ -8,6 +8,7 @@ import {
   EDataAvailabilityMode,
   ETransactionVersion,
   ArraySignatureType,
+  constants,
 } from '../../src';
 import sampleContract from '../../__mocks__/cairo/helloCairo2/compiled.sierra.json';
 
@@ -247,7 +248,7 @@ describe('stark', () => {
       expect(result.l1_gas.max_amount).toBe(2000n); // 1000 + 100%
       expect(result.l1_gas.max_price_per_unit).toBe(200n); // 100 + 100%
       expect(result.l2_gas.max_amount).toBe(400n); // 200 + 100%
-      expect(result.l2_gas.max_price_per_unit).toBe(40n); // 20 + 100%
+      expect(result.l2_gas.max_price_per_unit).toBe(constants.L2_MIN_PRICE);
     });
 
     test('calculates resource bounds with default overhead', () => {
@@ -257,7 +258,7 @@ describe('stark', () => {
         l1_data_gas_consumed: '500',
         l1_data_gas_price: '50',
         l2_gas_consumed: '200',
-        l2_gas_price: '20',
+        l2_gas_price: '4000000000',
         overall_fee: '0',
         unit: 'FRI',
       };
@@ -271,7 +272,7 @@ describe('stark', () => {
       expect(result.l1_gas.max_amount).toBe(1500n);
       expect(result.l1_gas.max_price_per_unit).toBe(150n);
       expect(result.l2_gas.max_amount).toBe(300n);
-      expect(result.l2_gas.max_price_per_unit).toBe(30n);
+      expect(result.l2_gas.max_price_per_unit).toBe(6000000000n);
       expect(result.l1_data_gas.max_amount).toBe(750n);
       expect(result.l1_data_gas.max_price_per_unit).toBe(75n);
     });
@@ -294,7 +295,7 @@ describe('stark', () => {
       expect(result.l1_gas.max_amount).toBe(1000n);
       expect(result.l1_gas.max_price_per_unit).toBe(100n);
       expect(result.l2_gas.max_amount).toBe(200n);
-      expect(result.l2_gas.max_price_per_unit).toBe(20n);
+      expect(result.l2_gas.max_price_per_unit).toBe(constants.L2_MIN_PRICE);
       expect(result.l1_data_gas.max_amount).toBe(500n);
       expect(result.l1_data_gas.max_price_per_unit).toBe(50n);
     });
@@ -486,7 +487,7 @@ describe('stark', () => {
         },
         l2_gas: {
           max_amount: 0n,
-          max_price_per_unit: 0n,
+          max_price_per_unit: constants.L2_MIN_PRICE,
         },
         l1_data_gas: {
           max_amount: 0n,

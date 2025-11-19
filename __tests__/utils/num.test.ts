@@ -233,3 +233,17 @@ describe('toStorageKey, toHex64', () => {
     expect(key4.length).toEqual(66);
   });
 });
+
+describe('min max of bigint array', () => {
+  test('bigIntMax should return the maximum bigint', () => {
+    const values = [10n, 5n, 20n, 3n];
+    const result = num.bigIntMax(...values);
+    expect(result).toBe(20n);
+  });
+
+  test('bigIntMin should return the minimum bigint', () => {
+    const values = [10n, 5n, 20n, 3n];
+    const result = num.bigIntMin(...values);
+    expect(result).toBe(3n);
+  });
+});

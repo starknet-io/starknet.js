@@ -407,3 +407,37 @@ export function getNext(iterator: Iterator<string>): string {
   if (it.done) throw new Error('Unexpected end of response');
   return it.value;
 }
+
+/**
+ * Get the maximum bigint from a list of bigints
+ * @param values - a collection of bigint values.
+ * @returns the largest bigint among the provided values.
+ * @example
+ * ```ts
+ * const res = bigIntMax(10n, 5n, 20n, 3n);
+ * // res = 20n
+ * ```
+ */
+export function bigIntMax(...values: bigint[]): bigint {
+  if (values.length === 0) {
+    throw new Error('Empty list in bigintMax.');
+  }
+  return values.reduce((max, current) => (current > max ? current : max), 0n);
+}
+
+/**
+ * Get the minimum bigint from a list of bigints
+ * @param values - a collection of bigint values.
+ * @returns the smallest bigint among the provided values.
+ * @example
+ * ```ts
+ * const res = bigIntMin(10n, 5n, 20n, 3n);
+ * // res = 3n
+ * ```
+ */
+export function bigIntMin(...values: bigint[]): bigint {
+  if (values.length === 0) {
+    throw new Error('Empty list in bigintMin.');
+  }
+  return values.reduce((max, current) => (current < max ? current : max), values[0]);
+}
