@@ -1,3 +1,19 @@
+# [9.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v8.9.0...v9.0.0-beta.1) (2025-11-20)
+
+### Bug Fixes
+
+- corrected also in getTipStatsParallel ([1db744f](https://github.com/starknet-io/starknet.js/commit/1db744f43c107142cee862c53818101c793dff82))
+- npm audith node-tar issue for the used npm version ([a06174e](https://github.com/starknet-io/starknet.js/commit/a06174e03318117e1c2fdf148389ea40e9ee2273))
+
+### Features
+
+- base refactor for v9, channel rpc 0.10, tests, types ([70ea529](https://github.com/starknet-io/starknet.js/commit/70ea52986a57d9059fa9bb774384e84509d8f1f5))
+- bump version\ ([228e34a](https://github.com/starknet-io/starknet.js/commit/228e34a1c7240c019039dedaf414a54ffe68ad19))
+
+### BREAKING CHANGES
+
+- starknetjs v9
+
 # [8.9.0](https://github.com/starknet-io/starknet.js/compare/v8.8.0...v8.9.0) (2025-11-13)
 
 ### Features
