@@ -344,16 +344,13 @@ export class RpcProvider implements ProviderInterface {
     initNonce: BigNumberish,
     options?: fastWaitForTransactionOptions
   ): Promise<boolean> {
-    if (this.channel instanceof RPC09.RpcChannel) {
-      const isSuccess = await this.channel.fastWaitForTransaction(
-        txHash,
-        address,
-        initNonce,
-        options
-      );
-      return isSuccess;
-    }
-    throw new Error('Unsupported channel type');
+    const isSuccess = await this.channel.fastWaitForTransaction(
+      txHash,
+      address,
+      initNonce,
+      options
+    );
+    return isSuccess;
   }
 
   public async getStorageAt(

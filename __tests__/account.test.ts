@@ -391,23 +391,6 @@ describe('deploy and test Account', () => {
   });
 
   describe('fastExecute()', () => {
-    test('Only Rpc X', async () => {
-      const provider08 = new RpcProvider({
-        nodeUrl: 'dummy',
-        blockIdentifier: BlockTag.PRE_CONFIRMED,
-        specVersion: '0.10.0',
-      });
-      const testAccount = new Account({
-        provider: provider08,
-        address: '0x123',
-        signer: '0x456',
-      });
-      const myCall: Call = { contractAddress: '0x036', entrypoint: 'withdraw', calldata: [] };
-      await expect(testAccount.fastExecute(myCall)).rejects.toThrow(
-        'Wrong Rpc version in Provider. At least Rpc v0.9 required.'
-      );
-    });
-
     test('Only provider with PRE_CONFIRMED blockIdentifier', async () => {
       const providerLatest = new RpcProvider({
         nodeUrl: 'dummy',
