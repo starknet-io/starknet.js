@@ -4,8 +4,10 @@ import type {
   WatchAssetParameters,
 } from '@starknet-io/starknet-types-08';
 
-import type { WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard/features';
-import type { StandardEventsChangeProperties } from '@wallet-standard/features';
+import type {
+  WalletWithStarknetFeatures,
+  StandardEventsChangeProperties,
+} from '@starknet-io/get-starknet-wallet-standard/features';
 
 import { Account, AccountInterface } from '../account';
 import { StarknetChainId } from '../global/constants';
