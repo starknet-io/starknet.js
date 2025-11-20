@@ -489,7 +489,10 @@ describe('Unit Test: Subscription Class', () => {
 
   beforeEach(() => {
     // Create a mock WebSocketChannel. We don't need a real one for these tests.
-    mockChannel = new WebSocketChannel({ nodeUrl: 'ws://dummy-url' });
+    mockChannel = new WebSocketChannel({
+      nodeUrl: 'ws://dummy-url',
+      autoReconnect: false,
+    });
     // Mock the parts of the channel that the subscription interacts with.
     mockChannel.unsubscribe = jest.fn().mockResolvedValue(true);
     mockChannel.removeSubscription = jest.fn();
