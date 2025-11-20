@@ -15,6 +15,7 @@ import {
   byteArray,
   RpcError,
   ReceiptTx,
+  RpcProvider,
 } from '../src';
 
 import { contracts } from './config/fixtures';
@@ -26,7 +27,7 @@ describe('contract module', () => {
   let provider: ProviderInterface;
   let account: Account;
   const erc20ClassHash = hash.computeContractClassHash(contracts.Erc20OZ.sierra);
-  const erc20CompiledClassHash = hash.computeCompiledClassHash(contracts.Erc20OZ.casm);
+  let erc20CompiledClassHash: string;
   const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
   let erc20Constructor: Calldata;
   let erc20ConstructorParams: RawArgs;
@@ -44,6 +45,11 @@ describe('contract module', () => {
       owner: account.address,
     };
     erc20Constructor = erc20CallData.compile('constructor', erc20ConstructorParams);
+
+    erc20CompiledClassHash = hash.computeCompiledClassHash(
+      contracts.Erc20OZ.casm,
+      await (provider as RpcProvider).getStarknetVersion()
+    );
   });
 
   describe('class Contract {}', () => {
