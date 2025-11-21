@@ -2,7 +2,7 @@ import type {
   AddStarknetChainParameters,
   Signature,
   WatchAssetParameters,
-} from '@starknet-io/starknet-types-08';
+} from '@starknet-io/starknet-types-010';
 
 import type {
   WalletWithStarknetFeatures,
