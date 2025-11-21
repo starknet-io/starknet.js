@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "8.5.5",
+  "version": "9.0.0-beta.1",
   "description": "JavaScript library for Starknet",
   "license": "MIT",
   "repository": {
@@ -57,6 +57,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
+    "@napi-rs/blake-hash": "^1.3.5",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",
@@ -72,6 +73,7 @@
     "@typescript-eslint/parser": "^7.4.0",
     "ajv": "^8.12.0",
     "ajv-keywords": "^5.1.0",
+    "blakejs": "^1.2.1",
     "eslint": "^8.56.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
@@ -86,6 +88,7 @@
     "jest-environment-jsdom": "^30.0.0",
     "jest-json-schema": "^6.1.0",
     "lint-staged": "^16.0.0",
+    "npm": "^11.6.0",
     "prettier": "^3.2.5",
     "prettier-plugin-import-sort": "^0.0.7",
     "semantic-release": "^24.0.0",
@@ -104,7 +107,7 @@
     "@scure/base": "~1.2.1",
     "@scure/starknet": "1.1.0",
     "@starknet-io/get-starknet-wallet-standard": "^5.0.0",
-    "@starknet-io/starknet-types-08": "npm:@starknet-io/types-js@~0.8.4",
+    "@starknet-io/starknet-types-010": "npm:@starknet-io/types-js@0.10.0-beta.1",
     "@starknet-io/starknet-types-09": "npm:@starknet-io/types-js@~0.9.1",
     "abi-wan-kanabi": "2.2.4",
     "lossless-json": "^4.2.0",

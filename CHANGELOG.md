@@ -1,3 +1,52 @@
+# [9.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v8.9.0...v9.0.0-beta.1) (2025-11-20)
+
+### Bug Fixes
+
+- corrected also in getTipStatsParallel ([1db744f](https://github.com/starknet-io/starknet.js/commit/1db744f43c107142cee862c53818101c793dff82))
+- npm audith node-tar issue for the used npm version ([a06174e](https://github.com/starknet-io/starknet.js/commit/a06174e03318117e1c2fdf148389ea40e9ee2273))
+
+### Features
+
+- base refactor for v9, channel rpc 0.10, tests, types ([70ea529](https://github.com/starknet-io/starknet.js/commit/70ea52986a57d9059fa9bb774384e84509d8f1f5))
+- bump version\ ([228e34a](https://github.com/starknet-io/starknet.js/commit/228e34a1c7240c019039dedaf414a54ffe68ad19))
+
+### BREAKING CHANGES
+
+- starknetjs v9
+
+# [8.9.0](https://github.com/starknet-io/starknet.js/compare/v8.8.0...v8.9.0) (2025-11-13)
+
+### Features
+
+- paymaster snip-29 in Contract class ([#1470](https://github.com/starknet-io/starknet.js/issues/1470)) ([a6b839e](https://github.com/starknet-io/starknet.js/commit/a6b839eec40c2d610e98edba6b838749c7e89053))
+
+# [8.8.0](https://github.com/starknet-io/starknet.js/compare/v8.7.0...v8.8.0) (2025-11-12)
+
+### Bug Fixes
+
+- both sepolia and mainet on alchemy ([f119081](https://github.com/starknet-io/starknet.js/commit/f1190815ba032a0b4094e6c16c3b6cd4cca216e1))
+- public node hotfix ([d35e39e](https://github.com/starknet-io/starknet.js/commit/d35e39eb600a30b46146630ec0bbc916db65d976))
+
+### Features
+
+- starknet version, use starknt version to determin declare hash instead of spec version ([70a23ee](https://github.com/starknet-io/starknet.js/commit/70a23ee4f14d5f7a0d754bfcfc3312cd5585b951))
+
+# [8.7.0](https://github.com/starknet-io/starknet.js/compare/v8.6.0...v8.7.0) (2025-11-07)
+
+### Bug Fixes
+
+- public node hotfix ([#1510](https://github.com/starknet-io/starknet.js/issues/1510)) ([4165a3c](https://github.com/starknet-io/starknet.js/commit/4165a3c74c94053b60ed2aca12d8bebab5b72f68))
+
+### Features
+
+- configurable websocket exponential backoff ([#1503](https://github.com/starknet-io/starknet.js/issues/1503)) ([6d0593f](https://github.com/starknet-io/starknet.js/commit/6d0593f2fcdf6da79fb0aaccef42071a8c0e8126))
+
+# [8.6.0](https://github.com/starknet-io/starknet.js/compare/v8.5.5...v8.6.0) (2025-10-17)
+
+### Features
+
+- blake2s ([#1502](https://github.com/starknet-io/starknet.js/issues/1502)) ([dd3f8ec](https://github.com/starknet-io/starknet.js/commit/dd3f8eca44091a01d240f03e488a25b1119af524))
+
 ## [8.5.5](https://github.com/starknet-io/starknet.js/compare/v8.5.4...v8.5.5) (2025-10-03)
 
 ### Bug Fixes

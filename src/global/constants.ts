@@ -99,10 +99,10 @@ export { _TransactionHashPrefix as TransactionHashPrefix };
  * dot format rpc versions
  */
 const _SupportedRpcVersion = {
-  '0.8.1': '0.8.1',
   '0.9.0': '0.9.0',
-  v0_8_1: '0.8.1',
+  '0.10.0': '0.10.0',
   v0_9_0: '0.9.0',
+  v0_10_0: '0.10.0',
 } as const;
 type _SupportedRpcVersion = ValuesType<typeof _SupportedRpcVersion>;
 export { _SupportedRpcVersion as SupportedRpcVersion };
@@ -120,8 +120,20 @@ export const DEFAULT_GLOBAL_CONFIG: {
   fetch: any;
   websocket: any;
   buffer: any;
+  /**
+   * Custom blake function
+   * @param uint8Array - The uint8Array to hash
+   * @returns The hash of the uint8Array
+   * @example
+   * ```typescript
+   * config.set('blake', (uint8Array: Uint8Array) => {
+   *   return blake2s(uint8Array, { dkLen: 32 });
+   * });
+   * ```
+   */
+  blake: ((uint8Array: Uint8Array) => Uint8Array) | undefined;
 } = {
-  rpcVersion: '0.9.0',
+  rpcVersion: '0.10.0',
   transactionVersion: ETransactionVersion.V3, // Starknet 0.14.0 only V3 transactions
   logLevel: 'INFO',
   resourceBoundsOverhead: {
@@ -142,11 +154,12 @@ export const DEFAULT_GLOBAL_CONFIG: {
   fetch: undefined,
   websocket: undefined,
   buffer: undefined,
+  blake: undefined,
 };
 
 export const RPC_DEFAULT_NODES = {
-  SN_MAIN: [`https://starknet-mainnet.public.blastapi.io/rpc/`],
-  SN_SEPOLIA: [`https://starknet-sepolia.public.blastapi.io/rpc/`],
+  SN_MAIN: [`https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/`],
+  SN_SEPOLIA: [`https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/`],
 } as const;
 
 export const PAYMASTER_RPC_NODES = {

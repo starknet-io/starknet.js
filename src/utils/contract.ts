@@ -48,13 +48,14 @@ export function isSierra(
  * ```
  */
 export function extractContractHashes(
-  payload: DeclareContractPayload
+  payload: DeclareContractPayload,
+  starknetVersion?: string
 ): CompleteDeclareContractPayload {
   const response = { ...payload } as CompleteDeclareContractPayload;
 
   if (isSierra(payload.contract)) {
     if (!payload.compiledClassHash && payload.casm) {
-      response.compiledClassHash = computeCompiledClassHash(payload.casm);
+      response.compiledClassHash = computeCompiledClassHash(payload.casm, starknetVersion);
     }
     if (!response.compiledClassHash)
       throw new Error(

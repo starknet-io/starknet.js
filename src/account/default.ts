@@ -190,7 +190,10 @@ export class Account extends Provider implements AccountInterface {
     );
     // Transform into invocations for bulk estimation
     const invocations = [
-      { type: ETransactionType.DECLARE, payload: extractContractHashes(payload) },
+      {
+        type: ETransactionType.DECLARE,
+        payload: extractContractHashes(payload, await this.channel.getStarknetVersion()),
+      },
     ];
     const estimateBulk = await this.estimateFeeBulk(invocations, details);
     return estimateBulk[0]; // Get the first (and only) estimate
@@ -395,7 +398,10 @@ export class Account extends Provider implements AccountInterface {
     payload: DeclareContractPayload,
     transactionsDetail: UniversalDetails = {}
   ): Promise<DeclareContractResponse> {
-    const declareContractPayload = extractContractHashes(payload);
+    const declareContractPayload = extractContractHashes(
+      payload,
+      await this.channel.getStarknetVersion()
+    );
     try {
       await this.getClassByHash(declareContractPayload.classHash);
     } catch (error) {
@@ -413,7 +419,10 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeclareContractResponse> {
     assert(isSierra(payload.contract), SYSTEM_MESSAGES.declareNonSierra);
 
-    const declareContractPayload = extractContractHashes(payload);
+    const declareContractPayload = extractContractHashes(
+      payload,
+      await this.channel.getStarknetVersion()
+    );
     const detailsWithTip = await this.resolveDetailsWithTip(details);
 
     // Estimate resource bounds if not provided
@@ -780,7 +789,10 @@ export class Account extends Provider implements AccountInterface {
     payload: DeclareContractPayload,
     details: InvocationsSignerDetails
   ): Promise<DeclareContractTransaction> {
-    const { classHash, contract, compiledClassHash } = extractContractHashes(payload);
+    const { classHash, contract, compiledClassHash } = extractContractHashes(
+      payload,
+      await this.channel.getStarknetVersion()
+    );
     const compressedCompiledContract = parseContract(contract);
 
     assert(

@@ -15,9 +15,10 @@ import {
   byteArray,
   RpcError,
   ReceiptTx,
+  RpcProvider,
 } from '../src';
 
-import { contracts, describeIfRpc081 } from './config/fixtures';
+import { contracts } from './config/fixtures';
 import { createTestProvider, getTestAccount } from './config/fixturesInit';
 import { initializeMatcher } from './config/schema';
 
@@ -26,7 +27,7 @@ describe('contract module', () => {
   let provider: ProviderInterface;
   let account: Account;
   const erc20ClassHash = hash.computeContractClassHash(contracts.Erc20OZ.sierra);
-  const erc20CompiledClassHash = hash.computeCompiledClassHash(contracts.Erc20OZ.casm);
+  let erc20CompiledClassHash: string;
   const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
   let erc20Constructor: Calldata;
   let erc20ConstructorParams: RawArgs;
@@ -44,6 +45,11 @@ describe('contract module', () => {
       owner: account.address,
     };
     erc20Constructor = erc20CallData.compile('constructor', erc20ConstructorParams);
+
+    erc20CompiledClassHash = hash.computeCompiledClassHash(
+      contracts.Erc20OZ.casm,
+      await (provider as RpcProvider).getStarknetVersion()
+    );
   });
 
   describe('class Contract {}', () => {
@@ -127,7 +133,7 @@ describe('contract module', () => {
         });
       });
 
-      describeIfRpc081('Request Type Transformation', () => {
+      describe('Request Type Transformation', () => {
         test('Parsing the felt in request', async () => {
           const resp = await typeTransformedContract.request_felt(3);
           const txR = await provider.waitForTransaction(resp.transaction_hash);

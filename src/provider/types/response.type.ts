@@ -8,14 +8,13 @@ import {
   IsReverted,
   IsSucceeded,
   IsType,
-  RPCSPEC08,
+  PRE_CONFIRMED_BLOCK_WITH_TX_HASHES,
   TransactionReceipt,
 } from '../../types/api';
 
 import { CompiledSierra, LegacyContractClass } from '../../types/lib';
 import {
   FELT,
-  PENDING_STATE_UPDATE,
   PRICE_UNIT,
   SIMULATION_FLAG,
   STATE_UPDATE,
@@ -30,7 +29,7 @@ import {
 } from './spec.type';
 
 export type Block = Simplify<BLOCK_WITH_TX_HASHES>;
-export type PendingBlock = Simplify<RPCSPEC08.PENDING_BLOCK_WITH_TX_HASHES>;
+export type PreConfirmedBlock = Simplify<PRE_CONFIRMED_BLOCK_WITH_TX_HASHES>;
 export type GetBlockResponse = Simplify<BlockWithTxHashes>;
 
 export type GetTxReceiptResponseWithoutHelper = TransactionReceipt;
@@ -78,10 +77,6 @@ export type SimulateTransactionOverheadResponse = SimulateTransactionOverhead[];
 export type PreConfirmedStateUpdate = PRE_CONFIRMED_STATE_UPDATE;
 export type StateUpdate = STATE_UPDATE;
 export type StateUpdateResponse = StateUpdate | PreConfirmedStateUpdate;
-/**
- * PreConfirmedStateUpdate but left old name
- */
-export type PendingStateUpdate = PENDING_STATE_UPDATE;
 
 /**
  * Standardized type

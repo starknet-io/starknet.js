@@ -26,6 +26,10 @@ const readContractSet = (name: string, pathPrefix: string = 'cairo') => ({
   casm: readContractSierraCasm(`${pathPrefix}/${name}`),
 });
 
+const readContractCasmOnly = (name: string, pathPrefix: string = 'cairo') => ({
+  casm: readContractSierraCasm(`${pathPrefix}/${name}`),
+});
+
 const mapContractSets = <T extends Record<string, any>>(
   contractRecord: T,
   pathPrefix?: string
@@ -74,6 +78,8 @@ const compiledContracts = {
   deployer: 'cairo2100/deployer',
   CairoByteArray: 'byteArray/target/dev/test_ByteArrayStorage',
   IntegerTypes: 'integerTypes/target/dev/test_IntegerTypesStorage',
+  // CASM-only contracts (used for Blake2s hash verification against Rust implementation)
+  Blake2sVerificationContract: readContractCasmOnly('test_contract_rust'),
 };
 export const contracts = mapContractSets(compiledContracts);
 
@@ -132,7 +138,7 @@ export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
 export const describeIfNotDevnet = describeIf(process.env.IS_DEVNET === 'false');
 export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
 export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
-export const describeIfRpc081 = describeIf(process.env.RPC_SPEC_VERSION === '0.8.1');
+export const testIfRpc010 = describeIf(process.env.RPC_SPEC_VERSION === '0.10.0');
 export const describeIfRpc09 = describeIf(process.env.RPC_SPEC_VERSION === '0.9.0');
 export const erc20ClassHash: string = hash.computeContractClassHash(contracts.Erc20OZ.sierra); // Cairo 1
 export const C1v2ClassHash: string = hash.computeContractClassHash(contracts.C1v2.sierra); // Cairo 1

@@ -4,11 +4,12 @@ import {
   GetBlockResponse,
   GetTransactionReceiptResponse,
   InvocationsDetailsWithNonce,
-  PendingBlock,
-  PendingStateUpdate,
+  PreConfirmedBlock,
+  PreConfirmedStateUpdate,
   StateUpdateResponse,
   V3TransactionDetails,
 } from '../types';
+import { EBlockStatus } from '../types/api/rpc';
 import { toHex } from './num';
 
 /**
@@ -96,49 +97,91 @@ export function toApiVersion(version: string): string {
 }
 
 /**
- * Guard Pending Block
- * @param {GetBlockResponse} response answer of myProvider.getBlock()
- * @return {boolean} true if block is the pending block
+ * Compare two semantic version strings segment by segment.
+ * This function safely compares versions without collision risk between
+ * versions like '0.0.1000' and '0.1.0'.
+ *
+ * @param {string} a First version string (e.g., '0.0.9')
+ * @param {string} b Second version string (e.g., '0.0.10')
+ * @returns {number} -1 if a < b, 0 if a === b, 1 if a > b
  * @example
  * ```typescript
- * const block = await myProvider.getBlock("pending");
- * const result = provider.isPendingBlock(block);
- * // result = true
+ * const result1 = compareVersions('0.0.9', '0.0.10');
+ * // result1 = -1 (0.0.9 < 0.0.10)
+ *
+ * const result2 = compareVersions('0.1.0', '0.0.1000');
+ * // result2 = 1 (0.1.0 > 0.0.1000, correctly different!)
+ *
+ * const result3 = compareVersions('1.2.3', '1.2.3');
+ * // result3 = 0 (equal versions)
+ *
+ * // Usage for version checks:
+ * if (compareVersions(specVersion, '0.14.1') >= 0) {
+ *   // Use Blake2s hash for version >= 0.14.1
+ * }
  * ```
  */
-export function isPendingBlock(response: GetBlockResponse): response is PendingBlock {
-  return response.status === 'PENDING';
+export function compareVersions(a: string, b: string): number {
+  const aParts = a.split('.').map(Number);
+  const bParts = b.split('.').map(Number);
+
+  const maxLen = Math.max(aParts.length, bParts.length);
+
+  for (let i = 0; i < maxLen; i += 1) {
+    const aNum = aParts[i] || 0;
+    const bNum = bParts[i] || 0;
+
+    if (aNum > bNum) return 1;
+    if (aNum < bNum) return -1;
+  }
+
+  return 0;
 }
 
 /**
- * Guard Pending Transaction
- * @param {GetTransactionReceiptResponse} response transaction Receipt
- * @return {boolean} true if the transaction is part of the pending block
+ * Guard Pre Confirmed Block
+ * @param {GetBlockResponse} response answer of myProvider.getBlock()
+ * @return {boolean} true if block is the pre confirmed block
  * @example
  * ```typescript
- * const block = await myProvider.getBlockWithTxs("pending");
- * const txR = await myProvider.getTransactionReceipt(block.transactions[0].transaction_hash);
- * const result = provider.isPendingTransaction(txR);
+ * const block = await myProvider.getBlock("pre_confirmed");
+ * const result = provider.isPreConfirmedBlock(block);
  * // result = true
  * ```
  */
-export function isPendingTransaction(response: GetTransactionReceiptResponse): boolean {
+export function isPreConfirmedBlock(response: GetBlockResponse): response is PreConfirmedBlock {
+  return response.status === EBlockStatus.PRE_CONFIRMED;
+}
+
+/**
+ * Guard Pre Confirmed Transaction
+ * @param {GetTransactionReceiptResponse} response transaction Receipt
+ * @return {boolean} true if the transaction is part of the pre confirmed block
+ * @example
+ * ```typescript
+ * const block = await myProvider.getBlockWithTxs("pre_confirmed");
+ * const txR = await myProvider.getTransactionReceipt(block.transactions[0].transaction_hash);
+ * const result = provider.isPreConfirmedTransaction(txR);
+ * // result = true
+ * ```
+ */
+export function isPreConfirmedTransaction(response: GetTransactionReceiptResponse): boolean {
   return !('block_hash' in response);
 }
 
 /**
- * Guard Pending State Update
+ * Guard Pre Confirmed State Update
  * @param {StateUpdateResponse} response State of a block
- * @return {boolean} true if the block is pending
+ * @return {boolean} true if the block is pre confirmed
  * @example
  * ```typescript
- * const state: StateUpdateResponse = await myProvider.getStateUpdate("pending");
- * const result = provider.isPendingStateUpdate(state);
+ * const state: StateUpdateResponse = await myProvider.getStateUpdate("pre_confirmed");
+ * const result = provider.isPreConfirmedStateUpdate(state);
  * // result = true
  * ```
  */
-export function isPendingStateUpdate(
+export function isPreConfirmedStateUpdate(
   response: StateUpdateResponse
-): response is PendingStateUpdate {
+): response is PreConfirmedStateUpdate {
   return !('block_hash' in response);
 }
