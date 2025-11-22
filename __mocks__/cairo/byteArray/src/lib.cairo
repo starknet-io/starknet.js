@@ -9,8 +9,8 @@ pub trait IByteArrayStorage<TContractState> {
 // ByteArray Storage Contract
 #[starknet::contract]
 pub mod ByteArrayStorage {
-    use starknet::get_caller_address;
-    use starknet::storage::*;
+    use starknet::{get_caller_address, ContractAddress};
+    use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess}; // New storage syntax specific
 
     #[storage]
     struct Storage {
@@ -25,25 +25,28 @@ pub mod ByteArrayStorage {
 
     #[derive(Drop, starknet::Event)]
     pub struct MessageStored {
-        pub caller: starknet::ContractAddress,
+        #[key] // Indexing the caller is usually best practice for filtering events
+        pub caller: ContractAddress,
         pub message: ByteArray,
     }
 
-    #[constructor]
-    fn constructor(ref self: ContractState) {
-        // Initialize with empty ByteArray
-        self.stored_message.write("");
-    }
+    // CONSTRUCTOR REMOVED:
+    // Storage is initialized to empty/zero by default. 
+    // Writing "" explicitly costs extra gas for no functional gain.
 
     #[abi(embed_v0)]
     impl ByteArrayStorageImpl of super::IByteArrayStorage<ContractState> {
+        
         fn store_message(ref self: ContractState, message: ByteArray) {
             let caller = get_caller_address();
             
-            // Store the message in storage
+            // CRITICAL OPTIMIZATION:
+            // We need 'message' for two things: Storage and Event.
+            // Since we cannot move it twice, we MUST clone once.
+            // Writing to storage consumes the instance.
             self.stored_message.write(message.clone());
             
-            // Emit event with the message
+            // The original 'message' is moved into the Event struct here.
             self.emit(Event::MessageStored(MessageStored { 
                 caller, 
                 message 
@@ -51,8 +54,10 @@ pub mod ByteArrayStorage {
         }
 
         fn store_message_noevent(ref self: ContractState, message: ByteArray) {
-            // Store the message in storage
-            self.stored_message.write(message.clone());
+            // OPTIMIZATION:
+            // Removed .clone(). The 'message' variable is owned by this function.
+            // We move it directly into storage. This saves memory allocation and gas.
+            self.stored_message.write(message);
         }
 
         fn read_message(self: @ContractState) -> ByteArray {
