@@ -185,3 +185,5 @@ export const SYSTEM_MESSAGES = {
   consensusFailed: 'Consensus failed to finalize the block proposal',
   txFailsBlockBuildingValidation: 'Transaction fails block building validation',
 };
+
+export const DEFAULT_STARKNET_VERSION = '0.14.1' as const;

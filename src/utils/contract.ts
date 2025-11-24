@@ -1,3 +1,4 @@
+import { DEFAULT_STARKNET_VERSION } from '../global/constants';
 import { ContractClassResponse } from '../types';
 import {
   CairoContract,
@@ -55,7 +56,10 @@ export function extractContractHashes(
 
   if (isSierra(payload.contract)) {
     if (!payload.compiledClassHash && payload.casm) {
-      response.compiledClassHash = computeCompiledClassHash(payload.casm, starknetVersion);
+      response.compiledClassHash = computeCompiledClassHash(
+        payload.casm,
+        starknetVersion ?? DEFAULT_STARKNET_VERSION
+      );
     }
     if (!response.compiledClassHash)
       throw new Error(
