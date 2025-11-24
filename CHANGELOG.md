@@ -1,3 +1,12 @@
+# [9.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.1...v9.0.0-beta.2) (2025-11-24)
+
+### Bug Fixes
+
+- fix also fastWaitForTransaction ([1c1fe69](https://github.com/starknet-io/starknet.js/commit/1c1fe693101cab332262646f7c334233533ec799))
+- remove not more necessary rpc version test ([c783cb2](https://github.com/starknet-io/starknet.js/commit/c783cb20420d460eda5e14917b667105a3606c6c))
+- remove test not rpc0.8 ([4ee93f0](https://github.com/starknet-io/starknet.js/commit/4ee93f04b39d99e4943b5e6545e89b6c5744b9fb))
+- spec 10rc2 ([13ddab9](https://github.com/starknet-io/starknet.js/commit/13ddab953cde0e95207813f849bf1f27fc82e42a))
+
 # [9.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v8.9.0...v9.0.0-beta.1) (2025-11-20)
 
 ### Bug Fixes
