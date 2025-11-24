@@ -1,28 +1,63 @@
-// Processes the RPC specification error types and logs the output to simplify the generation
-// of an error aggregating TS type and error code mapping object. Currently used in:
-// - src/types/errors.ts
-// - src/utils/errors/rpc.ts
+// Optimized processing script for StarkNet RPC error specifications.
+// This script aggregates error codes and names from multiple OpenRPC files
+// to simplify the generation of error-related code artifacts.
 
-const starknet_api_openrpc = require('starknet_specs/api/starknet_api_openrpc.json');
-const starknet_executables = require('starknet_specs/api/starknet_executables.json');
-const starknet_trace_api_openrpc = require('starknet_specs/api/starknet_trace_api_openrpc.json');
-const starknet_write_api = require('starknet_specs/api/starknet_write_api.json');
-const starknet_ws_api = require('starknet_specs/api/starknet_ws_api.json');
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
+
+// Define the base path for RPC specifications
+const SPECS_DIR = 'starknet_specs/api/';
+
+// 1. Aggregate all relevant spec files dynamically
+// We dynamically load all JSON files that contain error components.
+const specFiles = readdirSync(SPECS_DIR)
+    .filter(file => file.endsWith('_openrpc.json') || file.endsWith('.json'))
+    .map(file => join(SPECS_DIR, file));
+
+// 2. Load and merge error definitions from all specification files
+let mergedErrors = {};
+
+for (const filePath of specFiles) {
+    try {
+        // Use dynamic import for ESM environment
+        const spec = require(`./${filePath}`); 
+        // Merge the 'errors' component from each spec file
+        const errors = spec?.components?.errors || {};
+        
+        mergedErrors = {
+            ...mergedErrors,
+            ...errors,
+        };
+    } catch (error) {
+        // Robustness: Log an error if a file is missing or invalid JSON
+        console.error(`Error loading or parsing spec file: ${filePath}`, error);
+        // Continue processing other files
+    }
+}
+
+
+// 3. Transform the merged object into the final error name-to-code map
 
 const errorNameCodeMap = Object.fromEntries(
-  Object.entries({
-    ...starknet_api_openrpc.components.errors,
-    ...starknet_executables.components.errors,
-    ...starknet_trace_api_openrpc.components.errors,
-    ...starknet_write_api.components.errors,
-    ...starknet_ws_api.components.errors,
-  })
-    .map((e) => [e[0], e[1].code])
-    .sort((a, b) => a[1] - b[1])
+    Object.entries(mergedErrors)
+        // Use destructuring to immediately extract name and definition for clarity
+        .map(([errorName, errorDef]) => [errorName, errorDef.code])
+        // Sort the errors numerically by their code for consistent output
+        .sort(([_aName, aCode], [_bName, bCode]) => aCode - bCode)
 );
 
+
+// 4. Output the results for code generation purposes
+
 console.log('errorCodes:');
+// Output: { "InternalError": 1, "FailedToReceiveTransaction": 2, ... }
 console.log(errorNameCodeMap);
 console.log();
+
 console.log('errorTypes:');
-Object.keys(errorNameCodeMap).forEach((n) => console.log(`${n}: Errors.${n};`));
+// Output for TypeScript generation (e.g., in errors.ts):
+// InternalError: Errors.InternalError;
+// FailedToReceiveTransaction: Errors.FailedToReceiveTransaction;
+Object.keys(errorNameCodeMap).forEach((name) => 
+    console.log(`${name}: Errors.${name};`)
+);
