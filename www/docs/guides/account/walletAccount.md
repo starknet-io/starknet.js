@@ -6,7 +6,7 @@ sidebar_position: 6
 
 **Use wallets to sign transactions in your DAPP.**
 
-The [`WalletAccount`](../API/classes/WalletAccount) class is similar to the regular [`Account`](../API/classes/Account) class, with the added ability to ask a browser wallet to sign and send transactions. Some other cool functionalities will be detailed hereunder.
+The [`WalletAccount`](../../API/classes/WalletAccount) class is similar to the regular [`Account`](../../API/classes/Account) class, with the added ability to ask a browser wallet to sign and send transactions. Some other cool functionalities will be detailed hereunder.
 
 The private key of a `WalletAccount` is held in a browser wallet (such as ArgentX, Braavos, etc.), and any signature is managed by the wallet. With this approach DAPPs don't need to manage the security for any private key.
 
@@ -18,7 +18,7 @@ This class functions only within the scope of a DAPP. It can't be used in a Node
 
 ![](./pictures/WalletAccountArchitecture.png)
 
-When retrieving information from Starknet, a `WalletAccount` instance will read directly from the blockchain. That is why at the initialization of a `WalletAccount` a [`Provider`](../API/classes/Provider) instance is a required parameter, it will be used for all reading activities.
+When retrieving information from Starknet, a `WalletAccount` instance will read directly from the blockchain. That is why at the initialization of a `WalletAccount` a [`Provider`](../../API/classes/Provider) instance is a required parameter, it will be used for all reading activities.
 
 If you want to write to Starknet the `WalletAccount` will ask the browser wallet to sign and send the transaction using the Starknet Wallet API to communicate.
 

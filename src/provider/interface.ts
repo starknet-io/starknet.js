@@ -70,7 +70,6 @@ export abstract class ProviderInterface {
   /**
    * Gets the block information
    *
-   * @param blockIdentifier block identifier
    * @returns the block object
    */
   public abstract getBlock(): Promise<PreConfirmedBlock>;
@@ -368,7 +367,6 @@ export abstract class ProviderInterface {
    * Gets the state changes in a specific block (result of executing the requested block)
    * Alternative method name for getStateUpdate with specific overloads
    *
-   * @param blockIdentifier - block identifier
    * @returns StateUpdateResponse
    */
   public abstract getBlockStateUpdate(): Promise<StateUpdate>;

@@ -28,6 +28,7 @@
     "react-helmet": "^6.1.0"
   },
   "devDependencies": {
+    "@types/node": "^24.10.1",
     "@docusaurus/module-type-aliases": "^2.4.0",
     "@tsconfig/docusaurus": "^1.0.7",
     "docusaurus-plugin-typedoc": "^0.21.0",
