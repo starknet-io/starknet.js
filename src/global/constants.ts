@@ -186,4 +186,4 @@ export const SYSTEM_MESSAGES = {
   txFailsBlockBuildingValidation: 'Transaction fails block building validation',
 };
 
-export const SN_VERSION_IMPLEMENTING_BLAKE = '0.14.1' as const;
+export const SN_VERSION_IMPLEMENTING_BLAKE_FOR_COMPILED_CLASS = '0.14.1' as const;

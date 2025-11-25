@@ -13,7 +13,7 @@ import { computeLegacyContractClassHash } from './pedersen';
 import { computeCompiledClassHashPoseidon, computeSierraContractClassHash } from './poseidon';
 import { computeCompiledClassHashBlake } from './blake';
 import { compareVersions } from '../../resolve';
-import { SN_VERSION_IMPLEMENTING_BLAKE } from '../../../global/constants';
+import { SN_VERSION_IMPLEMENTING_BLAKE_FOR_COMPILED_CLASS } from '../../../global/constants';
 
 export * from './pedersen';
 export * from './poseidon';
@@ -45,9 +45,9 @@ export function computeCompiledClassHash(
   /**
    * Used to determine which hashing algorithm to use
    */
-  starknetVersion: string = SN_VERSION_IMPLEMENTING_BLAKE
+  starknetVersion: string = SN_VERSION_IMPLEMENTING_BLAKE_FOR_COMPILED_CLASS
 ): string {
-  if (compareVersions(starknetVersion, SN_VERSION_IMPLEMENTING_BLAKE) >= 0) {
+  if (compareVersions(starknetVersion, SN_VERSION_IMPLEMENTING_BLAKE_FOR_COMPILED_CLASS) >= 0) {
     return computeCompiledClassHashBlake(casm);
   }
   return computeCompiledClassHashPoseidon(casm);
