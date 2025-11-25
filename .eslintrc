@@ -1,47 +1,80 @@
 {
+  // --- Environment Configuration ---
   "env": {
-    "browser": true,
-    "es2021": true,
-    "node": true,
-    "jest": true
+    "browser": true, // Enable browser global variables
+    "es2021": true,  // Enable ES2021 global variables and parsing features
+    "node": true,    // Enable Node.js global variables and scoping
+    "jest": true     // Enable Jest testing global variables
   },
+
+  // --- Extended Configurations ---
+  // Apply community-standard rulesets in order:
   "extends": [
-    "airbnb-base",
-    "airbnb-typescript/base",
-    "prettier",
-    "plugin:prettier/recommended"
+    "airbnb-base",                  // Core JavaScript rules
+    "airbnb-typescript/base",       // TypeScript extensions of Airbnb (recommended)
+    "prettier",                     // Turns off ESLint rules that conflict with Prettier
+    "plugin:prettier/recommended"   // Enables prettier/prettier rule and sets it to 'error'
   ],
+
+  // --- Parser Setup ---
+  "parser": "@typescript-eslint/parser",
+
+  "parserOptions": {
+    // OPTIMIZATION: Use 'latest' to automatically enable the latest ECMAScript version (or keep it as 12/2021)
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    // Specifies the path to the tsconfig file used for type-aware linting
+    "project": "./tsconfig.eslint.json" 
+  },
+  
+  // OPTIMIZATION: Removed explicit "@typescript-eslint" from plugins as it's included via 'extends'
+
+  // --- Ignored Files ---
+  // Files that should be excluded from linting
   "ignorePatterns": [
-    "tsup.config.ts"
+    "tsup.config.ts" // Typically build/config files without strict linting needs
   ],
+
+  // --- Global Variables ---
+  // Define known global variables that shouldn't be reported as errors
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": 12,
-    "sourceType": "module",
-    "project": "./tsconfig.eslint.json"
-  },
-  "plugins": [
-    "@typescript-eslint"
-  ],
+
+  // --- Custom Rules / Overrides ---
   "rules": {
-    "class-methods-use-this": 0,
-    "import/prefer-default-export": 0,
-    "@typescript-eslint/no-redeclare": 0,
-    "@typescript-eslint/naming-convention": 0,
+    // Re-enabled: Enforcing no-redeclare prevents critical type safety issues.
+    "@typescript-eslint/no-redeclare": "error", 
+    
+    // Disabled (Project Specific): Allows classes methods to not use 'this' (e.g., utility/static methods).
+    "class-methods-use-this": "off", 
+    
+    // Disabled (Project Specific): Allows only named exports, which is common in utility libraries.
+    "import/prefer-default-export": "off", 
+    
+    // Disabled (Project Specific): Allows custom naming styles that might deviate from Airbnb.
+    "@typescript-eslint/naming-convention": "off", 
+    
+    // Custom: Allows unused variables if they start with an underscore (e.g., arguments in interfaces/callbacks).
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
         "argsIgnorePattern": "^_"
       }
     ],
+    
+    // Custom: Disallows using variables before they are defined, but allows functions to be used beforehand (hoisting).
     "@typescript-eslint/no-use-before-define": [
       "error",
-      "nofunc"
+      {
+        "functions": false, // Allow function hoisting
+        "classes": true,
+        "variables": true
+      }
     ],
-    "func-names": 0
+    
+    // Disabled (Project Specific): Allows anonymous functions and avoids forcing names on all functions.
+    "func-names": "off" 
   }
 }
