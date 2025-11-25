@@ -185,3 +185,5 @@ export const SYSTEM_MESSAGES = {
   consensusFailed: 'Consensus failed to finalize the block proposal',
   txFailsBlockBuildingValidation: 'Transaction fails block building validation',
 };
+
+export const SN_VERSION_IMPLEMENTING_BLAKE = '0.14.1' as const;
