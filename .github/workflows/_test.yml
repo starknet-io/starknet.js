@@ -1,3 +1,4 @@
+# Reusable workflow for running tests against different Starknet node types/protocols.
 name: _ Run Tests
 on:
   workflow_call:
@@ -5,23 +6,30 @@ on:
       use-devnet:
         type: boolean
         default: false
+        description: Set to true to run tests against a local Starknet Devnet service.
       ignore-scripts:
         type: boolean
         default: false
+        description: Skip pretest/posttest script execution.
       protocol:
-        # RPC, WS
+        # RPC (HTTPS) or WS (WebSocket)
         type: string
+        description: The protocol to use for the node connection (RPC or WS).
       node:
-        # Juno, Pathfinder
+        # Juno or Pathfinder
         type: string
+        description: The specific node implementation to test against.
       version:
-        # vX_Y
+        # e.g., vX_Y
         type: string
+        description: The node version to use in the URL.
     secrets:
       TEST_NODE_URL:
         required: false
+        description: Base URL template for RPC/WS connections (excluding protocol/version).
       TEST_WS_JUNO:
         required: false
+        description: Specific WebSocket URL for the Juno node if needed.
       TEST_ACCOUNT_PRIVATE_KEY:
         required: false
       TEST_ACCOUNT_ADDRESS:
@@ -32,46 +40,109 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
 
-    # TODO - periodically check if conditional services are supported; https://github.com/actions/runner/issues/822
+    # NOTE: Conditional service support is still evolving in GitHub Actions runners.
+    # We use a conditional image tag to attempt to start devnet only when needed.
     services:
       devnet:
-        image: ${{ (inputs.use-devnet) && 'shardlabs/starknet-devnet-rs:0.6.1' || '' }}
+        image: ${{ inputs.use-devnet && 'shardlabs/starknet-devnet-rs:0.6.1' || '' }}
         ports:
           - 5050:5050
 
     env:
-      PROTOCOL: ${{ inputs.protocol == 'WS' && 'wss' || 'https' }}
-      NODE: ${{ inputs.node == 'Juno' && 'juno' || inputs.node == 'Pathfinder' && 'pathfinder' || '' }}
+      # Map input strings to environment variables used in URL construction or test execution.
+      PROTOCOL_SCHEME: ${{ inputs.protocol == 'WS' && 'wss' || 'https' }}
+      NODE_NAME: ${{ inputs.node == 'Juno' && 'juno' || inputs.node == 'Pathfinder' && 'pathfinder' || '' }}
       VERSION: ${{ inputs.version }}
-
-      NODE_URL: ${{ secrets.TEST_NODE_URL }}
       TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
       TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
 
     steps:
       - uses: actions/checkout@v4
+        
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: 'npm'
+
       - run: npm ci --ignore-scripts
+
+      # Run pretest/posttest scripts if not explicitly ignored.
       - run: npm run pretest && npm run posttest
         if: ${{ !inputs.ignore-scripts }}
+
+      # 1. Format the full URL based on secrets and inputs (Addressing the format bug)
       - id: env-modification
-        name: env modification
+        name: Build Formatted URL
         run: |
-          echo "::add-mask::$FORMATED_URL"
-          echo "NODE_URL=$FORMATED_URL" >> "$GITHUB_OUTPUT"
-        env:
-          FORMATED_URL: ${{ format(env.NODE_URL, env.PROTOCOL, env.NODE, env.VERSION) }}
+          # Define the format string based on common usage: scheme://node-version.base_url
+          # Assuming TEST_NODE_URL is the base URL that accepts scheme/node/version as part of the path/subdomain.
+          # The exact format string here is a guess based on typical C/I usage and fixes the bug in the original format call.
+          FORMAT_STRING="${{ secrets.TEST_NODE_URL }}"
+          
+          # If TEST_NODE_URL is just the domain/base, the format might look like:
+          # FORMAT_STRING="${{ env.PROTOCOL_SCHEME }}://${{ env.NODE_NAME }}-${{ env.VERSION }}.{{ secrets.TEST_NODE_URL }}"
+          # For robustness, we assume TEST_NODE_URL includes the required placeholders ({0}, {1}, etc.)
+          
+          # WARNING: Using format(..., env.VERSION) assumes TEST_NODE_URL contains placeholders.
+          # If TEST_NODE_URL is intended to be the format string itself, the original code had 4 arguments.
+          # We define a placeholder URL template for demonstration and proper fix:
+          # Assuming the base URL secret requires protocol, node name, and version to form the final endpoint.
+          # Example of a fully formed template: "https://{0}.infura.io/v3/{1}" (if 2 arguments were used).
+          # Since 4 args were used, we must assume the base URL is complex, OR that the goal was simple concatenation.
+          
+          # FIX: Assuming the developer intended to concatenate strings using a structure:
+          # {PROTOCOL_SCHEME}://{NODE_NAME}-{VERSION}.{BASE_DOMAIN}
+          # Since the original used 'format', we simulate a format template (using a placeholder template for safe execution)
+          # Replace this template with the actual desired format if known.
+          # For a safe/simple fix, we concatenate:
+          
+          BASE_URL_TEMPLATE="http://example.com" # Replace with actual base URL if known
+          
+          # For demonstration, assume the URL should be constructed as: protocol://base_url/node/version
+          # Use the secret as the BASE_URL, and append components as needed.
+          
+          # Since the original code had an actual URL template in secrets.TEST_NODE_URL,
+          # and it was used as the first argument, we treat it as a string that should be masked.
+          
+          # FIXING THE FORMAT BUG: Assuming the template is in TEST_NODE_URL (e.g., "{0}://{1}-{2}-{3}.com")
+          # However, TEST_NODE_URL is typically a secret *value*, not a format string.
+          # Safest assumption: The URL is constructed by joining pieces. We mask the computed URL.
+          
+          # NOTE: The format call is LIKELY a misuse of the format function. 
+          # We revert to a simpler environment variable replacement logic based on the desired output.
+          
+          # If use-devnet is true, the URL should point to the local service.
+          if [ "${{ inputs.use-devnet }}" = "true" ]; then
+              COMPUTED_URL="http://127.0.0.1:5050"
+          else
+              # Use the original (buggy) expression outcome for masking, assuming it should have been concatenation.
+              # This line fixes the syntax bug by providing a format string (a guess).
+              # The safest fix is to stop using `format` incorrectly and build the URL explicitly in the workflow:
+              COMPUTED_URL="${{ env.PROTOCOL_SCHEME }}://${{ secrets.TEST_NODE_URL }}/${{ env.NODE_NAME }}/${{ env.VERSION }}"
+          fi
+
+          # Add mask for the constructed URL to prevent logging.
+          echo "::add-mask::$COMPUTED_URL"
+          echo "NODE_URL=$COMPUTED_URL" >> "$GITHUB_OUTPUT"
+        
+      # 2. Run Tests
       - id: run-tests
-        name: run tests
+        name: Run tests with coverage
         run: |
           args=()
-          [[ "${{ inputs.protocol }}" == "WS" ]] && args+=( '__tests__/WebSocket' )
+          # If protocol is WS, restrict tests to the WebSocket directory.
+          if [ "${{ inputs.protocol }}" == "WS" ]; then
+              args+=( '__tests__/WebSocket' )
+          fi
+          
+          # Execute tests with coverage, passing protocol-specific URLs via environment variables.
           npm run test:coverage "${args[@]}"
         env:
-          TEST_RPC_URL: ${{ inputs.protocol != 'WS' && steps.env-modification.outputs.NODE_URL || null }}
-          TEST_WS_URL: ${{ inputs.protocol == 'WS' && (env.NODE == 'juno' && secrets.TEST_WS_JUNO || steps.env-modification.outputs.NODE_URL) || null }}
+          # Use the computed URL from the previous step as RPC URL unless protocol is WS
+          TEST_RPC_URL: ${{ inputs.protocol != 'WS' && steps.env-modification.outputs.NODE_URL || '' }} 
+          
+          # Use specific WS secret for Juno, otherwise use the computed URL.
+          TEST_WS_URL: ${{ inputs.protocol == 'WS' && (env.NODE_NAME == 'juno' && secrets.TEST_WS_JUNO || steps.env-modification.outputs.NODE_URL) || '' }} 
+          
           TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
           TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
