@@ -106,7 +106,7 @@
     "@noble/hashes": "~1.6.0",
     "@scure/base": "~1.2.1",
     "@scure/starknet": "1.1.0",
-    "@starknet-io/starknet-types-010": "npm:@starknet-io/types-js@0.10.0-beta.2",
+    "@starknet-io/starknet-types-010": "npm:@starknet-io/types-js@0.10.0",
     "@starknet-io/starknet-types-09": "npm:@starknet-io/types-js@~0.9.1",
     "abi-wan-kanabi": "2.2.4",
     "lossless-json": "^4.2.0",
