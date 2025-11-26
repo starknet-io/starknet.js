@@ -9,14 +9,14 @@ describe('Hash Tester', () => {
 
   describe('Compute CompiledClassHash & ClassHash Cairo1', () => {
     test('Hello - CompiledClassHash', () => {
-      const compiledClassHash = hash.computeCompiledClassHash(contracts.HashSierra.casm);
+      const compiledClassHash = hash.computeCompiledClassHash(contracts.HashSierra.casm, '0.13.1');
       expect(compiledClassHash).toEqual(
         '0x5c82c98f2ab111bd50293ba64bb18cf49037374783ad2486c712709c4ba0d89'
       );
     });
 
     test('Hello - CompiledClassHash Cairo2.6.0 Sierra1.5.0', () => {
-      const compiledClassHash = hash.computeCompiledClassHash(contracts.C260.casm);
+      const compiledClassHash = hash.computeCompiledClassHash(contracts.C260.casm, '0.13.1');
       expect(compiledClassHash).toEqual(
         '0x1725af24fbfa8050f4514651990b30e06bb9993e4e5c1051206f1bef218b1c6'
       );
