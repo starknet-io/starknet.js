@@ -1,3 +1,10 @@
+# [9.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.2...v9.0.0-beta.3) (2025-11-26)
+
+### Bug Fixes
+
+- problem of default starknet version in extractContractHashes ([8a48ae2](https://github.com/starknet-io/starknet.js/commit/8a48ae21ad735e19585f9ddcfc8f820d3fb67849))
+- relocate default value of starknet version ([98c1be0](https://github.com/starknet-io/starknet.js/commit/98c1be0a30a1dd6b05d31f660febb8ea5ec17a9b))
+
 # [9.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.1...v9.0.0-beta.2) (2025-11-24)
 
 ### Bug Fixes
