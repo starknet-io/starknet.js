@@ -15,3 +15,7 @@ export * from './byteArray';
 export * from './bytes31';
 export * from './felt';
 export * from './uint32';
+export * from './tuple';
+export * from './array';
+export * from './secp256k1Point';
+export * from './cairoType.interface';

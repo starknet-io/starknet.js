@@ -14,6 +14,7 @@ import {
 } from '../encode';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
+import { CairoType } from './cairoType.interface';
 
 /**
  * @deprecated use the CairoFelt252 class instead, this one is limited to ASCII strings
@@ -61,7 +62,7 @@ export function CairoFelt(it: BigNumberish): string {
  * Any operation that uses felt252 will be computed modulo P.
  * 63 hex symbols (31 bytes + 4 bits), 252 bits
  */
-export class CairoFelt252 {
+export class CairoFelt252 extends CairoType {
   /**
    * byte representation of the felt252
    */
@@ -70,6 +71,7 @@ export class CairoFelt252 {
   static abiSelector = 'core::felt252' as const;
 
   constructor(data: BigNumberish | boolean | unknown) {
+    super();
     CairoFelt252.validate(data);
     const processedData = CairoFelt252.__processData(data as BigNumberish | boolean);
     // remove leading zeros, ensure data is an exact value/number

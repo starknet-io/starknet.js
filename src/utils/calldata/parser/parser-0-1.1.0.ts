@@ -1,7 +1,7 @@
 import { Abi, AbiEntryType, FunctionAbi } from '../../../types';
 import { isLen } from '../cairo';
 import { AbiParserInterface } from './interface';
-import { fastParsingStrategy, ParsingStrategy } from './parsingStrategy';
+import { hdParsingStrategy, ParsingStrategy } from './parsingStrategy';
 
 export class AbiParser1 implements AbiParserInterface {
   abi: Abi;
@@ -10,20 +10,63 @@ export class AbiParser1 implements AbiParserInterface {
 
   constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
     this.abi = abi;
-    this.parsingStrategy = parsingStrategy || fastParsingStrategy;
+    this.parsingStrategy = parsingStrategy || hdParsingStrategy;
   }
 
-  public getRequestParser(abiType: AbiEntryType): (val: unknown) => any {
-    if (this.parsingStrategy.request[abiType]) {
-      return this.parsingStrategy.request[abiType];
+  public getRequestParser(abiType: AbiEntryType): (val: unknown, type?: string) => any {
+    // Check direct constructors first
+    if (this.parsingStrategy.constructors[abiType]) {
+      return (val: unknown, type?: string) => {
+        const instance = this.parsingStrategy.constructors[abiType](val, type);
+        return instance.toApiRequest();
+      };
     }
+
+    // Check dynamic selectors
+    const dynamicSelectors = Object.entries(this.parsingStrategy.dynamicSelectors);
+    const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(abiType));
+
+    if (matchingSelector) {
+      const [selectorName] = matchingSelector;
+      const dynamicConstructor = this.parsingStrategy.constructors[selectorName];
+      if (dynamicConstructor) {
+        return (val: unknown, type?: string) => {
+          const instance = dynamicConstructor(val, type || abiType);
+          return instance.toApiRequest();
+        };
+      }
+    }
+
     throw new Error(`Parser for ${abiType} not found`);
   }
 
-  public getResponseParser(abiType: AbiEntryType): (responseIterator: Iterator<string>) => any {
-    if (this.parsingStrategy.response[abiType]) {
-      return this.parsingStrategy.response[abiType];
+  public getResponseParser(
+    abiType: AbiEntryType
+  ): (responseIterator: Iterator<string>, type?: string) => any {
+    // Check direct constructors first
+    if (this.parsingStrategy.constructors[abiType] && this.parsingStrategy.response[abiType]) {
+      return (responseIterator: Iterator<string>, type?: string) => {
+        const instance = this.parsingStrategy.constructors[abiType](responseIterator, type);
+        return this.parsingStrategy.response[abiType](instance);
+      };
     }
+
+    // Check dynamic selectors
+    const dynamicSelectors = Object.entries(this.parsingStrategy.dynamicSelectors);
+    const matchingSelector = dynamicSelectors.find(([, selectorFn]) => selectorFn(abiType));
+
+    if (matchingSelector) {
+      const [selectorName] = matchingSelector;
+      const dynamicConstructor = this.parsingStrategy.constructors[selectorName];
+      const responseParser = this.parsingStrategy.response[selectorName];
+      if (dynamicConstructor && responseParser) {
+        return (responseIterator: Iterator<string>, type?: string) => {
+          const instance = dynamicConstructor(responseIterator, type || abiType);
+          return responseParser(instance);
+        };
+      }
+    }
+
     throw new Error(`Parser for ${abiType} not found`);
   }
 

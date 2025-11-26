@@ -19,7 +19,7 @@ import { toHex } from '../num';
 import { isBigInt } from '../typed';
 import { getSelectorFromName } from '../hash/selector';
 import { isLongText } from '../shortString';
-import { byteArrayFromString } from './byteArray';
+import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { felt, isCairo1Type, isLen } from './cairo';
 import {
   CairoCustomEnum,
@@ -28,6 +28,9 @@ import {
   CairoResult,
   CairoResultVariant,
 } from './enum';
+import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoArray } from '../cairoDataTypes/array';
+import { CairoTuple } from '../cairoDataTypes/tuple';
 import formatter from './formatter';
 import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
 import { AbiParserInterface } from './parser/interface';
@@ -37,7 +40,6 @@ import responseParser from './responseParser';
 import validateFields from './validate';
 
 export * as cairo from './cairo';
-export * as byteArray from './byteArray';
 export { parseCalldataField } from './requestParser';
 export * from './parser';
 
@@ -178,7 +180,7 @@ export class CallData {
         return Object.entries(oe).flatMap(([k, v]) => {
           let value = v;
           if (k === 'entrypoint') value = getSelectorFromName(value);
-          else if (isLongText(value)) value = byteArrayFromString(value);
+          else if (isLongText(value)) value = new CairoByteArray(value);
           const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
           if (isBigInt(value)) return [[`${prefix}${kk}`, felt(value)]];
           if (Object(value) === value) {
@@ -215,6 +217,30 @@ export class CallData {
                 return [[`${prefix}${kk}`, felt(activeVariantNb)]];
               }
               return getEntries({ 0: activeVariantNb, 1: myEnum.unwrap() }, `${prefix}${kk}.`);
+            }
+            if (value instanceof CairoFixedArray) {
+              // CairoFixedArray - use toApiRequest() to get flat array, then convert to tree structure
+              const apiRequest = value.toApiRequest();
+              const compiledObj = Object.fromEntries(
+                apiRequest.map((item, idx) => [idx.toString(), item])
+              );
+              return getEntries(compiledObj, `${prefix}${kk}.`);
+            }
+            if (value instanceof CairoArray) {
+              // CairoArray - use toApiRequest() to get length-prefixed array, then convert to tree structure
+              const apiRequest = value.toApiRequest();
+              const compiledObj = Object.fromEntries(
+                apiRequest.map((item, idx) => [idx.toString(), item])
+              );
+              return getEntries(compiledObj, `${prefix}${kk}.`);
+            }
+            if (value instanceof CairoTuple) {
+              // CairoTuple - use toApiRequest() to get flat array (no length prefix), then convert to tree structure
+              const apiRequest = value.toApiRequest();
+              const compiledObj = Object.fromEntries(
+                apiRequest.map((item, idx) => [idx.toString(), item])
+              );
+              return getEntries(compiledObj, `${prefix}${kk}.`);
             }
             // normal object
             return getEntries(value, `${prefix}${kk}.`);

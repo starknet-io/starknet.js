@@ -10,7 +10,7 @@ import {
   type Signature,
 } from '../types';
 import assert from './assert';
-import { byteArrayFromString } from './calldata/byteArray';
+import { CairoByteArray } from './cairoDataTypes/byteArray';
 import { starkCurve } from './ec';
 import {
   computePedersenHash,
@@ -403,14 +403,14 @@ export function encodeValue(
     }
     case 'string': {
       if (revision === Revision.ACTIVE) {
-        const byteArray = byteArrayFromString(data as string);
+        const byteArray = new CairoByteArray(data as string);
         const elements = [
           byteArray.data.length,
           ...byteArray.data,
           byteArray.pending_word,
           byteArray.pending_word_len,
         ];
-        return [type, revisionConfiguration[revision].hashMethod(elements)];
+        return [type, revisionConfiguration[revision].hashMethod(elements as BigNumberish[])];
       } // else fall through to default
       return [type, getHex(data as string)];
     }

@@ -13,6 +13,7 @@ import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFelt252 } from '../cairoDataTypes/felt';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { CairoTuple } from '../cairoDataTypes/tuple';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { CairoUint8 } from '../cairoDataTypes/uint8';
@@ -25,7 +26,6 @@ import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
 import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
-import { addHexPrefix, removeHexPrefix } from '../encode';
 import {
   getArrayType,
   isCairo1Type,
@@ -47,7 +47,6 @@ import {
   CairoResultVariant,
 } from './enum';
 import { AbiParserInterface } from './parser/interface';
-import extractTupleMemberTypes from './tuple';
 
 /**
  * Parse base types
@@ -91,12 +90,7 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
     case CairoBytes31.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case isTypeSecp256k1Point(type):
-      const xLow = removeHexPrefix(it.next().value).padStart(32, '0');
-      const xHigh = removeHexPrefix(it.next().value).padStart(32, '0');
-      const yLow = removeHexPrefix(it.next().value).padStart(32, '0');
-      const yHigh = removeHexPrefix(it.next().value).padStart(32, '0');
-      const pubK = BigInt(addHexPrefix(xHigh + xLow + yHigh + yLow));
-      return pubK;
+      return parser.getResponseParser(type)(it);
     default:
       // TODO: this is for all simple types felt and rest to BN, at the moment handle as felt
       return parser.getResponseParser(CairoFelt252.abiSelector)(it);
@@ -136,14 +130,11 @@ function parseResponseValue(
   }
 
   // type fixed-array
-  if (CairoFixedArray.isTypeFixedArray(element.type)) {
-    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
-    const el: AbiEntry = { name: '', type: CairoFixedArray.getFixedArrayType(element.type) };
-    const arraySize = CairoFixedArray.getFixedArraySize(element.type);
-    while (parsedDataArr.length < arraySize) {
-      parsedDataArr.push(parseResponseValue(responseIterator, el, parser, structs, enums));
-    }
-    return parsedDataArr;
+  if (CairoFixedArray.isAbiType(element.type)) {
+    return parser.getResponseParser(CairoFixedArray.dynamicSelector)(
+      responseIterator,
+      element.type
+    );
   }
 
   // type c1 array
@@ -217,14 +208,8 @@ function parseResponseValue(
 
   // type tuple
   if (isTypeTuple(element.type)) {
-    const memberTypes = extractTupleMemberTypes(element.type);
-    return memberTypes.reduce((acc, it: any, idx) => {
-      const name = it?.name ? it.name : idx;
-      const type = it?.type ? it.type : it;
-      const el = { name, type };
-      acc[name] = parseResponseValue(responseIterator, el, parser, structs, enums);
-      return acc;
-    }, {} as any);
+    const tuple = new CairoTuple(responseIterator, element.type, parser.parsingStrategy);
+    return tuple.decompose(parser.parsingStrategy);
   }
 
   // TODO: duplicated, investigate why and what was an issue then de-duplicate
@@ -282,7 +267,7 @@ export default function responseParser({
     case enums && isTypeEnum(type, enums):
       return parseResponseValue(responseIterator, output, parser, structs, enums);
 
-    case CairoFixedArray.isTypeFixedArray(type):
+    case CairoFixedArray.isAbiType(type):
       return parseResponseValue(responseIterator, output, parser, structs, enums);
 
     case isTypeArray(type):

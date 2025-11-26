@@ -15,8 +15,9 @@ import Buffer from '../connect/buffer';
 import { CairoBytes31 } from './bytes31';
 import { CairoFelt252 } from './felt';
 import { CairoUint32 } from './uint32';
+import { CairoType } from './cairoType.interface';
 
-export class CairoByteArray {
+export class CairoByteArray extends CairoType {
   /**
    * entire dataset
    */
@@ -40,6 +41,7 @@ export class CairoByteArray {
   public constructor(data: CairoBytes31[], pendingWord: CairoFelt252, pendingWordLen: CairoUint32);
   public constructor(data: BigNumberish | Buffer | Uint8Array | unknown);
   public constructor(...arr: any[]) {
+    super();
     // Handle constructor from typed components
     if (arr.length === 3) {
       const [dataArg, pendingWord, pendingWordLen] = arr;

@@ -11,7 +11,7 @@ import { addCompiledFlag } from '../helpers';
 export class CairoUint8 {
   data: bigint;
 
-  static abiSelector = 'core::integer::u8';
+  static abiSelector = 'core::integer::u8' as const;
 
   constructor(data: BigNumberish | boolean | unknown) {
     CairoUint8.validate(data);

@@ -4,8 +4,9 @@ import { getNext } from '../num';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { isBuffer, isString } from '../typed';
+import { CairoType } from './cairoType.interface';
 
-export class CairoBytes31 {
+export class CairoBytes31 extends CairoType {
   static MAX_BYTE_SIZE = 31 as const;
 
   data: Uint8Array;
@@ -13,6 +14,7 @@ export class CairoBytes31 {
   static abiSelector = 'core::bytes_31::bytes31' as const;
 
   constructor(data: string | Uint8Array | Buffer | unknown) {
+    super();
     CairoBytes31.validate(data);
     const processedData = CairoBytes31.__processData(data);
     this.data = new Uint8Array(CairoBytes31.MAX_BYTE_SIZE); // ensure data has an exact size
