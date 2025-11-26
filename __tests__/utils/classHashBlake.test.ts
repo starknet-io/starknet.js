@@ -27,7 +27,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     test('Rust test_contract.casm - Poseidon hash for comparison', () => {
       const { casm } = contracts.Blake2sVerificationContract;
 
-      const poseidonHash = hash.computeCompiledClassHash(casm);
+      const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
 
       // Expected Poseidon hash from Rust test (for reference):
       // EXPECTED_V1_HASH = "2245949284953925157128824309232222003190483648336643262590914808143560524294"
@@ -41,7 +41,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
       const { casm } = contracts.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
-      const poseidonHash = hash.computeCompiledClassHash(casm);
+      const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
 
       expect(blake2sHash).not.toBe(poseidonHash);
     });
@@ -70,7 +70,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     test('Rust test_contract.casm - Poseidon hash for comparison', () => {
       const { casm } = contracts.Blake2sVerificationContract;
 
-      const poseidonHash = hash.computeCompiledClassHash(casm);
+      const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
 
       // Expected Poseidon hash from Rust test (for reference):
       // EXPECTED_V1_HASH = "2245949284953925157128824309232222003190483648336643262590914808143560524294"
@@ -84,7 +84,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
       const { casm } = contracts.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
-      const poseidonHash = hash.computeCompiledClassHash(casm);
+      const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
 
       expect(blake2sHash).not.toBe(poseidonHash);
     });
@@ -113,7 +113,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     test('Rust test_contract.casm - Poseidon hash for comparison', () => {
       const { casm } = contracts.Blake2sVerificationContract;
 
-      const poseidonHash = hash.computeCompiledClassHash(casm);
+      const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
 
       // Expected Poseidon hash from Rust test (for reference):
       // EXPECTED_V1_HASH = "2245949284953925157128824309232222003190483648336643262590914808143560524294"
@@ -127,7 +127,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
       const { casm } = contracts.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
-      const poseidonHash = hash.computeCompiledClassHash(casm);
+      const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
 
       expect(blake2sHash).not.toBe(poseidonHash);
     });
@@ -211,7 +211,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
   describe('Different from Poseidon hash', () => {
     test('Blake2s hash should differ from Poseidon hash', () => {
       const blake2sHash = hash.computeCompiledClassHashBlake(contracts.C260.casm);
-      const poseidonHash = hash.computeCompiledClassHash(contracts.C260.casm);
+      const poseidonHash = hash.computeCompiledClassHash(contracts.C260.casm, '0.13.1');
 
       print(`Blake2s: ${blake2sHash}`);
       print(`Poseidon: ${poseidonHash}`);
