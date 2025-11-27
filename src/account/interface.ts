@@ -34,20 +34,18 @@ import type { PaymasterFeeEstimate, PreparedTransaction } from '../paymaster/typ
 import type { DeployContractUDCResponse } from '../deployer/types/index.type';
 
 /**
- * Interface for interacting with Starknet account contracts
+ * Interface for interacting with Starknet account contracts (e.g., wallet contracts).
  *
  * Extends ProviderInterface to provide account-specific functionality including:
  * - Transaction execution and signing
- * - Fee estimation for various transaction types
+ * - Fee estimation (supporting v1, v2, v3 transactions)
  * - Contract deployment through UDC (Universal Deployer Contract)
  * - Paymaster support for sponsored transactions
  * - EIP-712 message signing
  *
  * @remarks
- * Implementations of this interface typically handle the complexities of:
- * - Nonce management
- * - Transaction signing with the account's private key
- * - Interaction with the account contract's __execute__ entrypoint
+ * Implementations handle: Nonce management, transaction signing, and interaction 
+ * with the account contract's __execute__ entrypoint.
  */
 export abstract class AccountInterface extends ProviderInterface {
   /**
@@ -61,7 +59,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract signer: SignerInterface;
 
   /**
-   * Cairo version of the account contract implementation
+   * Cairo version of the account contract implementation (e.g., '1', '0')
    */
   public abstract cairoVersion: CairoVersion;
 
@@ -75,31 +73,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate fee for executing an INVOKE transaction on Starknet
    *
    * @param calls - Single call or array of calls to estimate fees for
-   * @param calls.contractAddress - The address of the contract to invoke
-   * @param calls.entrypoint - The function selector of the contract method
-   * @param calls.calldata - The serialized function parameters (defaults to [])
-   *
-   * @param estimateFeeDetails - Optional details for fee estimation
-   * @param estimateFeeDetails.blockIdentifier - Block to estimate against
-   * @param estimateFeeDetails.nonce - Account nonce (defaults to current nonce)
-   * @param estimateFeeDetails.skipValidate - Skip account validation (default: true)
-   * @param estimateFeeDetails.tip - Priority fee tip in fri/wei for faster inclusion
-   * @param estimateFeeDetails.accountDeploymentData - Include account deployment
-   * @param estimateFeeDetails.paymasterData - Paymaster sponsorship data
-   * @param estimateFeeDetails.nonceDataAvailabilityMode - DA mode for nonce
-   * @param estimateFeeDetails.feeDataAvailabilityMode - DA mode for fee
-   * @param estimateFeeDetails.version - Transaction version (v3 uses fri, v1/v2 use wei)
-   * @param estimateFeeDetails.resourceBounds - Resource limits for v3 transactions
-   *
+   * @param estimateFeeDetails - Optional universal transaction details for fee estimation
    * @returns Fee estimation including overall_fee and resourceBounds
-   * @example
-   * ```typescript
-   * const fee = await account.estimateInvokeFee({
-   *   contractAddress: '0x123...',
-   *   entrypoint: 'transfer',
-   *   calldata: [recipient, amount]
-   * });
-   * ```
+   * @inheritdoc estimateInvokeFee
    */
   public abstract estimateInvokeFee(
     calls: AllowArray<Call>,
@@ -110,26 +86,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate fee for executing a DECLARE transaction on Starknet
    *
    * @param contractPayload - Contract declaration payload
-   * @param contractPayload.contract - Compiled contract (Sierra JSON)
-   * @param contractPayload.casm - Compiled Cairo assembly (required for Cairo 1)
-   * @param contractPayload.classHash - Pre-computed class hash (optional optimization)
-   * @param contractPayload.compiledClassHash - Pre-computed CASM hash (alternative to casm)
-   *
-   * @param estimateFeeDetails - Optional details for fee estimation
-   * @param estimateFeeDetails.blockIdentifier - Block to estimate against
-   * @param estimateFeeDetails.nonce - Account nonce (defaults to current nonce)
-   * @param estimateFeeDetails.skipValidate - Skip account validation (default: true)
-   * @param estimateFeeDetails.tip - Priority fee tip for faster inclusion
-   * @param estimateFeeDetails.version - Transaction version (v3 uses fri, v1/v2 use wei)
-   *
+   * @param estimateFeeDetails - Optional universal transaction details for fee estimation
    * @returns Fee estimation including overall_fee and resourceBounds
-   * @example
-   * ```typescript
-   * const fee = await account.estimateDeclareFee({
-   *   contract: compiledContract,
-   *   casm: compiledCasm
-   * });
-   * ```
+   * @inheritdoc estimateInvokeFee
    */
   public abstract estimateDeclareFee(
     contractPayload: DeclareContractPayload,
@@ -140,23 +99,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate fee for executing a DEPLOY_ACCOUNT transaction on Starknet
    *
    * @param contractPayload - Account deployment payload
-   * @param contractPayload.classHash - Class hash of the account contract
-   * @param contractPayload.constructorCalldata - Constructor parameters
-   * @param contractPayload.contractAddress - Pre-computed account address
-   * @param contractPayload.addressSalt - Salt for address generation
-   *
-   * @param estimateFeeDetails - Optional details for fee estimation
-   * @inheritdoc estimateInvokeFee
-   *
+   * @param estimateFeeDetails - Optional universal transaction details for fee estimation
    * @returns Fee estimation including overall_fee and resourceBounds
-   * @example
-   * ```typescript
-   * const fee = await account.estimateAccountDeployFee({
-   *   classHash: accountClassHash,
-   *   constructorCalldata: { publicKey },
-   *   addressSalt: publicKey
-   * });
-   * ```
+   * @inheritdoc estimateInvokeFee
    */
   public abstract estimateAccountDeployFee(
     contractPayload: DeployAccountContractPayload,
@@ -167,23 +112,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate fee for deploying contract(s) through the Universal Deployer Contract (UDC)
    *
    * @param deployContractPayload - Single or array of deployment payloads
-   * @param deployContractPayload.classHash - Class hash of contract to deploy
-   * @param deployContractPayload.salt - Deployment salt (optional)
-   * @param deployContractPayload.unique - Ensure unique deployment address
-   * @param deployContractPayload.constructorCalldata - Constructor parameters
-   *
-   * @param estimateFeeDetails - Optional details for fee estimation
-   * @inheritdoc estimateInvokeFee
-   *
+   * @param estimateFeeDetails - Optional universal transaction details for fee estimation
    * @returns Fee estimation for the deployment transaction
-   * @example
-   * ```typescript
-   * const fee = await account.estimateDeployFee({
-   *   classHash: contractClassHash,
-   *   constructorCalldata: [param1, param2],
-   *   unique: true
-   * });
-   * ```
+   * @inheritdoc estimateInvokeFee
    */
   public abstract estimateDeployFee(
     deployContractPayload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
@@ -191,23 +122,12 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<EstimateFeeResponseOverhead>;
 
   /**
-   * Estimate fees for executing multiple transactions in a single request
+   * Estimate fees for executing multiple transactions in a single request (bulk estimation)
    *
-   * @param invocations - Array of transactions to estimate
-   * @param invocations.type - Transaction type: DECLARE, DEPLOY, INVOKE, DEPLOY_ACCOUNT
-   * @param invocations.payload - Transaction-specific payload
-   *
-   * @param details - Optional details for fee estimation
-   * @inheritdoc estimateInvokeFee
-   *
+   * @param invocations - Array of transactions (DECLARE, DEPLOY, INVOKE, DEPLOY_ACCOUNT) to estimate
+   * @param details - Optional universal transaction details for fee estimation
    * @returns Array of fee estimations for each transaction
-   * @example
-   * ```typescript
-   * const fees = await account.estimateFeeBulk([
-   *   { type: 'INVOKE', payload: { contractAddress, entrypoint, calldata } },
-   *   { type: 'DECLARE', payload: { contract, casm } }
-   * ]);
-   * ```
+   * @inheritdoc estimateInvokeFee
    */
   public abstract estimateFeeBulk(
     invocations: Invocations,
@@ -218,25 +138,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * Execute one or multiple calls through the account contract
    *
    * @param transactions - Single call or array of calls to execute
-   * @param transactions.contractAddress - Target contract address
-   * @param transactions.entrypoint - Function to invoke on the contract
-   * @param transactions.calldata - Function parameters
-   *
-   * @param transactionsDetail - Transaction execution options
-   * @param transactionsDetail.nonce - Override account nonce
-   * @param transactionsDetail.maxFee - Maximum fee for v1/v2 transactions
-   * @param transactionsDetail.resourceBounds - Resource limits for v3 transactions
-   * @param transactionsDetail.tip - Priority fee tip
-   * @param transactionsDetail.version - Force specific transaction version
-   *
+   * @param transactionsDetail - Optional details for transaction execution
    * @returns Transaction hash and response
-   * @example
-   * ```typescript
-   * const result = await account.execute([
-   *   { contractAddress: token, entrypoint: 'transfer', calldata: [to, amount] },
-   *   { contractAddress: nft, entrypoint: 'mint', calldata: [recipient] }
-   * ]);
-   * ```
+   * @inheritdoc execute
    */
   public abstract execute(
     transactions: AllowArray<Call>,
@@ -247,23 +151,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate fees for a paymaster-sponsored transaction
    *
    * @param calls - Array of calls to be sponsored
-   * @param calls.contractAddress - Target contract address
-   * @param calls.entrypoint - Function to invoke
-   * @param calls.calldata - Function parameters
-   *
-   * @param paymasterDetails - Paymaster configuration
-   * @param paymasterDetails.feeMode - Sponsorship mode: 'sponsored' or gas token
-   * @param paymasterDetails.deploymentData - Account deployment data if needed
-   * @param paymasterDetails.timeBounds - Valid execution time window
-   *
+   * @param paymasterDetails - Paymaster configuration (e.g., fee mode, deployment data)
    * @returns Fee estimates in both STRK and gas token
-   * @example
-   * ```typescript
-   * const fees = await account.estimatePaymasterTransactionFee(
-   *   [{ contractAddress, entrypoint, calldata }],
-   *   { feeMode: { mode: 'sponsored' } }
-   * );
-   * ```
+   * @inheritdoc estimatePaymasterTransactionFee
    */
   public abstract estimatePaymasterTransactionFee(
     calls: Call[],
@@ -271,20 +161,12 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<PaymasterFeeEstimate>;
 
   /**
-   * Build a transaction for paymaster execution
+   * Build a transaction for paymaster execution and signing
    *
    * @param calls - Array of calls to be sponsored
    * @param paymasterDetails - Paymaster configuration
-   * @inheritdoc estimatePaymasterTransactionFee
-   *
    * @returns Prepared transaction with typed data for signing
-   * @example
-   * ```typescript
-   * const prepared = await account.buildPaymasterTransaction(
-   *   calls,
-   *   { feeMode: { mode: 'default', gasToken: ETH_ADDRESS } }
-   * );
-   * ```
+   * @inheritdoc estimatePaymasterTransactionFee
    */
   public abstract buildPaymasterTransaction(
     calls: Call[],
@@ -296,23 +178,9 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @param calls - Array of calls to execute
    * @param paymasterDetails - Paymaster configuration
-   * @param paymasterDetails.feeMode - 'sponsored' or gas token payment
-   * @param paymasterDetails.deploymentData - Deploy account if needed
-   * @param paymasterDetails.timeBounds - Execution validity window (UNIX timestamps)
-   *
-   * @param maxFeeInGasToken - Maximum acceptable fee in gas token
-   *
+   * @param maxFeeInGasToken - Maximum acceptable fee in gas token (optional)
    * @returns Transaction hash if successful
-   * @throws {Error} If gas token price exceeds maxFeeInGasToken
-   * @throws {Error} If transaction parameters are modified by paymaster
-   * @example
-   * ```typescript
-   * const txHash = await account.executePaymasterTransaction(
-   *   calls,
-   *   { feeMode: { mode: 'sponsored' }, timeBounds: { executeBefore: Date.now()/1000 + 3600 } },
-   *   maxFeeETH
-   * );
-   * ```
+   * @inheritdoc executePaymasterTransaction
    */
   public abstract executePaymasterTransaction(
     calls: Call[],
@@ -324,22 +192,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * Declare a contract class on Starknet
    *
    * @param contractPayload - Contract declaration payload
-   * @param contractPayload.contract - Compiled Sierra contract
-   * @param contractPayload.classHash - Pre-computed class hash (optional)
-   * @param contractPayload.casm - Compiled CASM (required for Cairo 1)
-   * @param contractPayload.compiledClassHash - Pre-computed CASM hash
-   *
-   * @param transactionsDetail - Transaction execution options
-   * @inheritdoc execute
-   *
+   * @param transactionsDetail - Optional details for transaction execution
    * @returns Declaration transaction hash and class hash
-   * @example
-   * ```typescript
-   * const declareResult = await account.declare({
-   *   contract: compiledSierra,
-   *   casm: compiledCasm
-   * });
-   * ```
+   * @inheritdoc execute
    */
   public abstract declare(
     contractPayload: DeclareContractPayload,
@@ -350,22 +205,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * Deploy contract(s) using the Universal Deployer Contract (UDC)
    *
    * @param payload - Single or multiple deployment configurations
-   * @param payload.classHash - Class hash of declared contract
-   * @param payload.constructorCalldata - Constructor parameters
-   * @param payload.salt - Deployment salt (random if not specified)
-   * @param payload.unique - Modify salt for unique address (default: true)
-   *
-   * @param details - Transaction execution options
-   * @inheritdoc execute
-   *
+   * @param details - Optional details for transaction execution
    * @returns Deployed contract addresses and transaction hash
-   * @example
-   * ```typescript
-   * const deployment = await account.deploy([
-   *   { classHash: erc20ClassHash, constructorCalldata: [name, symbol] },
-   *   { classHash: nftClassHash, unique: true }
-   * ]);
-   * ```
+   * @inheritdoc execute
    */
   public abstract deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
@@ -376,22 +218,10 @@ export abstract class AccountInterface extends ProviderInterface {
    * Deploy and wait for a contract deployment to complete
    *
    * @param payload - Deployment configuration(s)
-   * @inheritdoc deploy
-   *
-   * @param details - Transaction execution options
-   * @inheritdoc execute
-   *
+   * @param details - Optional details for transaction execution
    * @returns Deployment result with contract address and UDC event details
-   * @remarks
-   * This method waits for transaction confirmation before returning
-   * @example
-   * ```typescript
-   * const result = await account.deployContract({
-   *   classHash: contractClassHash,
-   *   constructorCalldata: params
-   * });
-   * console.log('Deployed at:', result.address);
-   * ```
+   * @remarks This method waits for transaction confirmation before returning.
+   * @inheritdoc execute
    */
   public abstract deployContract(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
@@ -402,30 +232,10 @@ export abstract class AccountInterface extends ProviderInterface {
    * Declare and deploy a contract in a single method
    *
    * @param payload - Combined declare and deploy configuration
-   * @param payload.contract - Compiled Sierra contract
-   * @param payload.casm - Compiled CASM (required for Cairo 1)
-   * @param payload.compiledClassHash - Pre-computed CASM hash
-   * @param payload.classHash - Pre-computed class hash
-   * @param payload.constructorCalldata - Constructor parameters
-   * @param payload.salt - Deployment salt
-   * @param payload.unique - Ensure unique deployment address
-   *
-   * @param details - Transaction execution options
-   * @inheritdoc execute
-   *
+   * @param details - Optional details for transaction execution
    * @returns Declaration and deployment results
-   * @remarks
-   * - Automatically skips declaration if contract is already declared
-   * - Waits for both transactions to complete
-   * - Does not support batch operations
-   * @example
-   * ```typescript
-   * const result = await account.declareAndDeploy({
-   *   contract: compiledContract,
-   *   casm: compiledCasm,
-   *   constructorCalldata: [param1, param2]
-   * });
-   * ```
+   * @remarks Automatically skips declaration if contract is already declared, and waits for both transactions to complete.
+   * @inheritdoc execute
    */
   public abstract declareAndDeploy(
     payload: DeclareAndDeployContractPayload,
@@ -436,25 +246,10 @@ export abstract class AccountInterface extends ProviderInterface {
    * Deploy the account contract itself on Starknet
    *
    * @param contractPayload - Account deployment configuration
-   * @param contractPayload.classHash - Account contract class hash
-   * @param contractPayload.constructorCalldata - Constructor parameters
-   * @param contractPayload.addressSalt - Salt for address generation
-   * @param contractPayload.contractAddress - Pre-computed address
-   *
-   * @param transactionsDetail - Transaction execution options
-   * @inheritdoc execute
-   *
+   * @param transactionsDetail - Optional details for transaction execution
    * @returns Deployment transaction hash and contract address
-   * @remarks
-   * Used for deploying the account contract when using a pre-funded address
-   * @example
-   * ```typescript
-   * const deployment = await account.deployAccount({
-   *   classHash: accountClassHash,
-   *   constructorCalldata: { publicKey: pubKey },
-   *   addressSalt: pubKey
-   * });
-   * ```
+   * @remarks Used for deploying the account contract when using a pre-funded address.
+   * @inheritdoc execute
    */
   public abstract deployAccount(
     contractPayload: DeployAccountContractPayload,
@@ -462,23 +257,11 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<DeployContractResponse>;
 
   /**
-   * Sign a typed data message for off-chain verification
+   * Sign a typed data message (EIP-712 style) for off-chain verification
    *
    * @param typedData - EIP-712 style typed data structure
    * @returns Signature array [r, s]
-   * @remarks
-   * - Includes domain separation to prevent signature reuse
-   * - Compatible with Starknet's signature verification
-   * - Cannot be used to sign transactions
-   * @example
-   * ```typescript
-   * const signature = await account.signMessage({
-   *   domain: { name: 'MyDapp', chainId: 'SN_MAIN' },
-   *   types: { ... },
-   *   primaryType: 'Message',
-   *   message: { content: 'Hello Starknet!' }
-   * });
-   * ```
+   * @remarks Compatible with Starknet's signature verification. Cannot be used to sign transactions.
    */
   public abstract signMessage(typedData: TypedData): Promise<Signature>;
 
@@ -487,14 +270,7 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @param typedData - EIP-712 style typed data structure
    * @returns Message hash as hex string
-   * @remarks
-   * - Uses Pedersen hash function (not Keccak)
-   * - Includes domain separation
-   * - Result can be used for signature verification
-   * @example
-   * ```typescript
-   * const messageHash = await account.hashMessage(typedData);
-   * ```
+   * @remarks Uses Pedersen hash function (not Keccak). Result can be used for signature verification.
    */
   public abstract hashMessage(typedData: TypedData): Promise<string>;
 
@@ -503,27 +279,16 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @param blockIdentifier - Block to query nonce at (default: 'pending')
    * @returns Account nonce as hex string
-   * @example
-   * ```typescript
-   * const nonce = await account.getNonce();
-   * const historicalNonce = await account.getNonce('latest');
-   * ```
    */
   public abstract getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce>;
 
   /**
-   * Declare a contract class if not already declared
+   * Declare a contract class if it has not already been declared
    *
    * @param contractPayload - Contract declaration payload
-   * @param transactionsDetail - Transaction execution options
+   * @param transactionsDetail - Optional details for transaction execution
    * @returns Declaration result (with empty transaction_hash if already declared)
-   * @example
-   * ```typescript
-   * const result = await account.declareIfNot({
-   *   contract: compiledContract,
-   *   casm: compiledCasm
-   * });
-   * ```
+   * @inheritdoc execute
    */
   public abstract declareIfNot(
     contractPayload: DeclareContractPayload,
