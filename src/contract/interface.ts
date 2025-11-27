@@ -1,5 +1,4 @@
 import type { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
-
 import type {
   Abi,
   BigNumberish,
@@ -29,6 +28,10 @@ import { CairoOption } from '../utils/calldata/enum/CairoOption';
 import { CairoResult } from '../utils/calldata/enum/CairoResult';
 import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt/transactionReceipt.type';
 
+// MARK: - External Module Type Extension (Keeping it here for simplicity)
+/**
+ * Extends the 'abi-wan-kanabi' module config to support custom Starknet.js types.
+ */
 declare module 'abi-wan-kanabi' {
   export interface Config<OptionT = any, ResultT = any, ErrorT = any> {
     FeltType: BigNumberish;
@@ -46,108 +49,101 @@ declare module 'abi-wan-kanabi' {
   }
 }
 
-type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & ContractInterface;
+/**
+ * Type alias for a contract instance with type-safe methods based on a provided ABI.
+ * Combines the generic ContractInterface with abi-wan-kanabi's typed methods.
+ */
+type TypedContract<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & ContractInterface;
 
 /**
- * Interface for interacting with Starknet smart contracts
- *
- * Provides methods for calling contract functions, estimating fees, and managing contract state.
- * Supports both read-only calls and state-changing invocations.
- *
- * @remarks
- * The interface provides multiple ways to interact with contracts:
- * - Direct method calls for convenience
- * - Generic call/invoke methods for flexibility
- * - Fee estimation and transaction population
- * - Event parsing and contract validation
+ * Interface for interacting with Starknet smart contracts.
+ * * Provides methods for querying contract state (calls), executing state-changing 
+ * transactions (invokes), estimating fees, and managing contract metadata.
  */
 export abstract class ContractInterface {
   /**
-   * Contract ABI (Application Binary Interface)
+   * Contract ABI (Application Binary Interface).
    */
   public abstract abi: Abi;
 
   /**
-   * Contract address on Starknet
+   * Contract address on Starknet (e.g., '0x123...').
    */
   public abstract address: string;
 
   /**
-   * Provider for read operations or Account for write operations
+   * Provider for read-only operations or Account for state-changing transactions.
    */
   public abstract providerOrAccount: ProviderOrAccount;
 
   /**
-   * Optional contract class hash for optimization
+   * Optional contract class hash, often used for deployment verification or optimization.
    */
   public abstract classHash?: string;
 
   /**
-   * Contract methods that return promises (async operations)
+   * Dynamic property access for calling write methods (sends transactions).
+   * Maps to contract functions that return promises.
    */
   readonly functions!: { [name: string]: AsyncContractFunction };
 
   /**
-   * Contract methods for read-only calls (state queries)
+   * Dynamic property access for calling read-only methods (queries state).
+   * Maps to contract functions for 'callStatic' (view) operations.
    */
   readonly callStatic!: { [name: string]: AsyncContractFunction };
 
   /**
-   * Contract methods that return populated transactions for batching
+   * Dynamic property access for populating transaction data without sending it.
+   * Maps to contract functions for 'populateTransaction' operations.
    */
   readonly populateTransaction!: { [name: string]: ContractFunction };
 
   /**
-   * Contract methods for fee estimation
+   * Dynamic property access for estimating fees of a transaction.
+   * Maps to contract functions for 'estimateFee' operations.
    */
   readonly estimateFee!: { [name: string]: ContractFunction };
 
   /**
-   * Dynamic method access - allows calling contract methods directly
+   * Dynamic method access - allows calling contract methods directly (e.g., contract.transfer(...)).
    */
   readonly [key: string]: AsyncContractFunction | any;
 
   /**
-   * Attach the contract to a different address with optional new ABI
+   * Changes the contract's interaction context to a different address and optionally a new ABI.
    *
-   * @param address - New contract address to interact with
-   * @param abi - Optional new ABI to use (defaults to current ABI)
+   * @param address - New contract address to interact with.
+   * @param abi - Optional new ABI to use (defaults to current ABI).
    * @example
    * ```typescript
    * contract.attach('0x123...', newAbi);
-   * // Now contract.address === '0x123...' and uses newAbi
    * ```
    */
   public abstract attach(address: string, abi?: Abi): void;
 
   /**
-   * Verify that a contract is deployed at the current address
+   * Verifies that a contract is deployed at the current address.
    *
-   * @returns Promise resolving to this contract instance if deployed
-   * @throws {Error} If no contract is found at the address
+   * @returns Promise resolving to this contract instance if deployed.
+   * @throws {Error} If no contract is found at the address.
    * @example
    * ```typescript
-   * try {
-   *   await contract.isDeployed();
-   *   console.log('Contract is deployed');
-   * } catch (error) {
-   *   console.log('Contract not found at address');
-   * }
+   * await contract.isDeployed();
    * ```
    */
   public abstract isDeployed(): Promise<ContractInterface>;
 
   /**
-   * Call a read-only contract method (view function)
+   * Executes a read-only contract method (view function).
    *
-   * @param method - Name of the contract method to call
-   * @param args - Method arguments as array or calldata
-   * @param options - Call options including block identifier and parsing settings
-   * @returns Parsed result from the contract method
+   * @param method - Name of the contract method to call.
+   * @param args - Method arguments as array or Calldata.
+   * @param options - Call options including block identifier and parsing settings.
+   * @returns Parsed result from the contract method.
    * @example
    * ```typescript
    * const balance = await contract.call('balanceOf', [userAddress]);
-   * const name = await contract.call('name', [], { blockIdentifier: 'latest' });
    * ```
    */
   public abstract call(
@@ -157,16 +153,15 @@ export abstract class ContractInterface {
   ): Promise<CallResult>;
 
   /**
-   * Invoke a state-changing contract method (external function)
+   * Executes a state-changing contract method (external function).
    *
-   * @param method - Name of the contract method to invoke
-   * @param args - Method arguments as array or calldata
-   * @param options - Execution options including transaction details
-   * @returns Transaction response with hash
+   * @param method - Name of the contract method to invoke.
+   * @param args - Method arguments as array or Calldata.
+   * @param options - Execution options including transaction details.
+   * @returns Transaction response with transaction hash.
    * @example
    * ```typescript
    * const tx = await contract.invoke('transfer', [recipient, amount]);
-   * const receipt = await provider.waitForTransaction(tx.transaction_hash);
    * ```
    */
   public abstract invoke(
@@ -176,106 +171,89 @@ export abstract class ContractInterface {
   ): Promise<InvokeFunctionResponse>;
 
   /**
-   * Estimate fee for invoking a contract method
+   * Estimates the fee for invoking a contract method.
    *
-   * @param method - Name of the contract method to estimate
-   * @param args - Method arguments as array or calldata
-   * @param options - Estimation options including block identifier
-   * @returns Fee estimation details
+   * @param method - Name of the contract method to estimate.
+   * @param args - Method arguments as array or Calldata.
+   * @param options - Estimation options, typically includes `blockIdentifier`.
+   * @returns Fee estimation details.
    * @example
    * ```typescript
    * const feeEstimate = await contract.estimate('transfer', [recipient, amount]);
-   * console.log('Estimated fee:', feeEstimate.overall_fee);
    * ```
    */
   public abstract estimate(
     method: string,
     args?: ArgsOrCalldata,
-    options?: {
-      blockIdentifier?: BlockIdentifier;
-    }
+    // Use full ExecuteOptions for consistency, even if only blockIdentifier is primarily used
+    options?: ExecuteOptions
   ): Promise<EstimateFeeResponseOverhead | PaymasterFeeEstimate>;
 
   /**
-   * Populate transaction data for a contract method call
+   * Generates the transaction data for a contract method call without sending it.
    *
-   * @param method - Name of the contract method
-   * @param args - Method arguments as array or calldata
-   * @returns Invocation object for batching or inspection
+   * @param method - Name of the contract method.
+   * @param args - Method arguments as array or Calldata.
+   * @returns Invocation object ready for batch execution.
    * @example
    * ```typescript
    * const invocation = contract.populate('transfer', [recipient, amount]);
-   * // Use in account.execute([invocation1, invocation2, ...])
+   * // Use in account.execute([invocation, ...])
    * ```
    */
   public abstract populate(method: string, args?: ArgsOrCalldata): Invocation;
 
   /**
-   * Parse events from a transaction receipt using the contract's ABI
+   * Parses events from a transaction receipt using the contract's ABI.
    *
-   * @param receipt - Transaction receipt from waitForTransaction
-   * @returns Array of parsed events with decoded data
+   * @param receipt - Transaction receipt object.
+   * @returns Array of parsed events with decoded data.
    * @example
    * ```typescript
-   * const receipt = await provider.waitForTransaction(txHash);
    * const events = contract.parseEvents(receipt);
-   * events.forEach(event => {
-   *   console.log('Event:', event.name, event.data);
-   * });
    * ```
    */
   public abstract parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents;
 
   /**
-   * Check if the contract is implemented in Cairo 1
+   * Checks if the contract is implemented in Cairo 1 or later.
    *
-   * @returns True if the contract uses Cairo 1, false for Cairo 0 (legacy)
-   * @example
-   * ```typescript
-   * if (contract.isCairo1()) {
-   *   console.log('Using Cairo 1 features');
-   * }
-   * ```
+   * @returns True if the contract uses Cairo 1, false for Cairo 0 (legacy).
    */
   public abstract isCairo1(): boolean;
 
   /**
-   * Get the Cairo and compiler version of the contract
+   * Retrieves the Cairo and compiler version of the contract.
    *
-   * @returns Object containing cairo version and compiler version
+   * @returns Object containing cairo version and compiler version.
    * @example
    * ```typescript
    * const version = await contract.getVersion();
-   * console.log(`Cairo ${version.cairo}, Compiler ${version.compiler}`);
    * ```
    */
   public abstract getVersion(): Promise<ContractVersion>;
 
   /**
-   * Create a typed contract instance with full TypeScript support
+   * Creates a typed contract instance with full TypeScript support (IntelliSense).
    *
-   * @param tAbi - The typed ABI interface for compile-time type checking
-   * @returns Typed contract instance with IntelliSense support
+   * @param tAbi - The typed ABI interface for compile-time type checking.
+   * @returns Typed contract instance.
    * @example
    * ```typescript
-   * const typedContract = contract.typedv2(erc20Abi);
-   * // Now typedContract.transfer() has full type safety
+   * const typedContract = contract.typed(erc20Abi);
    * ```
    */
-  public abstract typedv2<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV2<TAbi>;
+  public abstract typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi>;
 
   /**
-   * Set execution options for subsequent contract interactions
+   * Creates a new contract instance with specified execution/call options, enabling method chaining.
+   * The returned instance will use these options for all subsequent interactions.
    *
-   * @param options - Options to override for contract interactions
-   * @returns This contract instance with the specified options applied
+   * @param options - Options to override for contract interactions (e.g., blockIdentifier).
+   * @returns A new ContractInterface instance with the specified options applied.
    * @example
    * ```typescript
-   * contract.withOptions({
-   *   blockIdentifier: 'latest',
-   *   parseResponse: false
-   * });
-   * // Now all subsequent calls use these options
+   * const latestContract = contract.withOptions({ blockIdentifier: 'latest' });
    * ```
    */
   public abstract withOptions(options: WithOptions): ContractInterface;
