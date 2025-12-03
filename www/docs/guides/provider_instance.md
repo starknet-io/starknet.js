@@ -64,6 +64,7 @@ import { RpcProvider } from 'starknet';
 |                     Node |  with public url  |   with API key    |
 | -----------------------: | :---------------: | :---------------: |
 |                  Alchemy |        No         | v0_8, v0_9, v0_10 |
+|                      Zan | v0_8, v0_9, v0_10 | v0_8, v0_9, v0_10 |
 |                   Infura |        No         |       v0_8        |
 |                     Lava |    v0_8, v0_9     |       v0_8        |
 | Local Pathfinder v0.21.1 | v0_8, v0_9, v0_10 |        N/A        |
@@ -74,6 +75,7 @@ import { RpcProvider } from 'starknet';
 |                     Node |  with public url  |   with API key    |
 | -----------------------: | :---------------: | :---------------: |
 |                  Alchemy |        No         | v0_8, v0_9, v0_10 |
+|                      Zan | v0_8, v0_9, v0_10 | v0_8, v0_9, v0_10 |
 |                   Infura |        No         |       v0_8        |
 |                     Lava |    v0_8, v0_9     |        No         |
 | Local Pathfinder v0.21.1 | v0_8, v0_9, v0_10 |        N/A        |
@@ -89,7 +91,8 @@ import { RpcProvider } from 'starknet';
 
 :::note
 
-This status has been verified 24/nov/2025.
+- This status has been verified 02/dec/2025.
+- Zan public node is limited to 15 calls per second, and has also monthly limitation.
 
 :::
 
@@ -113,9 +116,9 @@ Some examples of `RpcProvider` instantiation to connect to RPC node providers:
 ### Mainnet
 
 ```typescript
-// Infura node RPC 0.8.1 for Mainnet:
-const providerInfuraMainnet = new RpcProvider({
-  nodeUrl: 'https://starknet-mainnet.infura.io/v3/' + infuraKey,
+// Zan node RPC 0.10.0 for Mainnet (0.9 also available):
+const providerZanMainnet = new RpcProvider({
+  nodeUrl: 'https://api.zan.top/public/starknet-mainnet/rpc/v0_10',
 });
 // Lava node RPC 0.9.1 for Mainnet:
 const providerMainnetLava = new RpcProvider({
@@ -156,9 +159,9 @@ The Goerli Testnet is no longer in service.
 ### Sepolia Testnet
 
 ```typescript
-// Infura node RPC 0.8.1 for Sepolia Testnet:
-const providerInfuraSepoliaTestnet = new RpcProvider({
-  nodeUrl: 'https://starknet-sepolia.infura.io/v3/' + infuraKey,
+// Zan node RPC 0.10.0 for Mainnet (0.9 also available):
+const providerZanSepoliaTestnet = new RpcProvider({
+  nodeUrl: 'https://api.zan.top/public/starknet-sepolia/rpc/v0_10',
 });
 // Alchemy node RPC 0.10.0 for Sepolia Testnet (0.9 also available):
 const providerSepoliaTestnetAlchemyPublic = new RpcProvider({
