@@ -88,6 +88,7 @@ import { RpcProvider } from 'starknet';
 | starknet-devnet v0.2.x |      v0_7       |     N/A      |
 | starknet-devnet v0.4.x |      v0_8       |     N/A      |
 | starknet-devnet v0.6.x |      v0_9       |     N/A      |
+| starknet-devnet v0.7.x |      v0_10      |     N/A      |
 
 :::note
 
@@ -205,7 +206,7 @@ const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_10' });
 Example of a connection to a local development node, with starknet-devnet:
 
 ```typescript
-// For RPC 0.8.0 (starknet-devnet v0.4.3)
+// For RPC 0.10.0 (starknet-devnet v0.7.0)
 const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 
 // For RPC 0.9.1 (starknet-devnet v0.6.1)
