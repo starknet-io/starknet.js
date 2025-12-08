@@ -13,7 +13,7 @@ The first thing to do is to define which network you want to interact with (Main
 Then you need to select a node. A node is a safe way to connect with the Starknet blockchain. You can use:
 
 - a node supplied by a node provider - it can be free or not; it can have limitations or not; it can have WebSocket support or not.
-  > RPC node providers are for example Infura, Alchemy, Lava, Chainstack...
+  > RPC node providers are for example Infura, Alchemy, Zan, Lava, Chainstack...
 - your own node, located on your local computer or in your local network.
   > you can spin up your own node with Pathfinder, Juno, Papyrus, Deoxys, ...
 - a local development node, that simulates a Starknet network. Useful for devs to perform quick tests without spending precious fee token.
@@ -61,25 +61,25 @@ import { RpcProvider } from 'starknet';
 
 **Mainnet network:**
 
-|                     Node |  with public url  |   with API key    |
-| -----------------------: | :---------------: | :---------------: |
-|                  Alchemy |        No         | v0_8, v0_9, v0_10 |
-|                      Zan | v0_8, v0_9, v0_10 | v0_8, v0_9, v0_10 |
-|                   Infura |        No         |       v0_8        |
-|                     Lava |    v0_8, v0_9     |       v0_8        |
-| Local Pathfinder v0.21.1 | v0_8, v0_9, v0_10 |        N/A        |
-|      Local Juno v0.15.11 | v0_8, v0_9, v0_10 |        N/A        |
+|                     Node | with public url | with API key |
+| -----------------------: | :-------------: | :----------: |
+|                  Alchemy |       No        |  v0_8, v0_9  |
+|                      Zan |   v0_8, v0_9    |  v0_8, v0_9  |
+|                   Infura |       No        |     v0_8     |
+|                     Lava |   v0_8, v0_9    |     v0_8     |
+| Local Pathfinder v0.21.1 |   v0_8, v0_9    |     N/A      |
+|      Local Juno v0.15.11 |   v0_8, v0_9    |     N/A      |
 
 **Sepolia Testnet network:**
 
-|                     Node |  with public url  |   with API key    |
-| -----------------------: | :---------------: | :---------------: |
-|                  Alchemy |        No         | v0_8, v0_9, v0_10 |
-|                      Zan | v0_8, v0_9, v0_10 | v0_8, v0_9, v0_10 |
-|                   Infura |        No         |       v0_8        |
-|                     Lava |    v0_8, v0_9     |        No         |
-| Local Pathfinder v0.21.1 | v0_8, v0_9, v0_10 |        N/A        |
-|      Local Juno v0.15.11 | v0_8, v0_9, v0_10 |        N/A        |
+|                     Node | with public url | with API key |
+| -----------------------: | :-------------: | :----------: |
+|                  Alchemy |       No        |  v0_8, v0_9  |
+|                      Zan |   v0_8, v0_9    |  v0_8, v0_9  |
+|                   Infura |       No        |     v0_8     |
+|                     Lava |   v0_8, v0_9    |      No      |
+| Local Pathfinder v0.21.1 |   v0_8, v0_9    |     N/A      |
+|      Local Juno v0.15.11 |   v0_8, v0_9    |     N/A      |
 
 **Local Starknet Devnet network:**
 
@@ -164,9 +164,9 @@ The Goerli Testnet is no longer in service.
 const providerZanSepoliaTestnet = new RpcProvider({
   nodeUrl: 'https://api.zan.top/public/starknet-sepolia/rpc/v0_10',
 });
-// Alchemy node RPC 0.10.0 for Sepolia Testnet (0.9 also available):
-const providerSepoliaTestnetAlchemyPublic = new RpcProvider({
-  nodeUrl: 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/' + alchemyKey,
+// Zan node RPC 0.9.0 for Sepolia Testnet (0.8 also available):
+const providerZanSepoliaTestnet = new RpcProvider({
+  nodeUrl: 'https://api.zan.top/public/starknet-sepolia/rpc/v0_9',
 });
 // Public Lava node RPC 0.9.1 for Sepolia Testnet (0.8 also available):
 const providerSepoliaTestnetLavaPublic = new RpcProvider({
