@@ -99,10 +99,10 @@ export { _TransactionHashPrefix as TransactionHashPrefix };
  * dot format rpc versions
  */
 const _SupportedRpcVersion = {
-  '0.8.1': '0.8.1',
   '0.9.0': '0.9.0',
-  v0_8_1: '0.8.1',
+  '0.10.0': '0.10.0',
   v0_9_0: '0.9.0',
+  v0_10_0: '0.10.0',
 } as const;
 type _SupportedRpcVersion = ValuesType<typeof _SupportedRpcVersion>;
 export { _SupportedRpcVersion as SupportedRpcVersion };
@@ -133,7 +133,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
    */
   blake: ((uint8Array: Uint8Array) => Uint8Array) | undefined;
 } = {
-  rpcVersion: '0.9.0',
+  rpcVersion: '0.10.0',
   transactionVersion: ETransactionVersion.V3, // Starknet 0.14.0 only V3 transactions
   logLevel: 'INFO',
   resourceBoundsOverhead: {

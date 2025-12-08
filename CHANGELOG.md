@@ -1,3 +1,40 @@
+# [9.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.3...v9.0.0-beta.4) (2025-12-08)
+
+### Bug Fixes
+
+- replace alchemy with zan for public node ([1d9f0dd](https://github.com/starknet-io/starknet.js/commit/1d9f0dd0b80796c2ed2f459d84cafb92b4138eeb))
+
+# [9.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.2...v9.0.0-beta.3) (2025-11-26)
+
+### Bug Fixes
+
+- problem of default starknet version in extractContractHashes ([8a48ae2](https://github.com/starknet-io/starknet.js/commit/8a48ae21ad735e19585f9ddcfc8f820d3fb67849))
+- relocate default value of starknet version ([98c1be0](https://github.com/starknet-io/starknet.js/commit/98c1be0a30a1dd6b05d31f660febb8ea5ec17a9b))
+
+# [9.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.1...v9.0.0-beta.2) (2025-11-24)
+
+### Bug Fixes
+
+- fix also fastWaitForTransaction ([1c1fe69](https://github.com/starknet-io/starknet.js/commit/1c1fe693101cab332262646f7c334233533ec799))
+- remove not more necessary rpc version test ([c783cb2](https://github.com/starknet-io/starknet.js/commit/c783cb20420d460eda5e14917b667105a3606c6c))
+- remove test not rpc0.8 ([4ee93f0](https://github.com/starknet-io/starknet.js/commit/4ee93f04b39d99e4943b5e6545e89b6c5744b9fb))
+- spec 10rc2 ([13ddab9](https://github.com/starknet-io/starknet.js/commit/13ddab953cde0e95207813f849bf1f27fc82e42a))
+
+# [9.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v8.9.0...v9.0.0-beta.1) (2025-11-20)
+
+### Bug Fixes
+
+- corrected also in getTipStatsParallel ([1db744f](https://github.com/starknet-io/starknet.js/commit/1db744f43c107142cee862c53818101c793dff82))
+- npm audith node-tar issue for the used npm version ([a06174e](https://github.com/starknet-io/starknet.js/commit/a06174e03318117e1c2fdf148389ea40e9ee2273))
+
+### Features
+
+- base refactor for v9, channel rpc 0.10, tests, types ([70ea529](https://github.com/starknet-io/starknet.js/commit/70ea52986a57d9059fa9bb774384e84509d8f1f5))
+- bump version\ ([228e34a](https://github.com/starknet-io/starknet.js/commit/228e34a1c7240c019039dedaf414a54ffe68ad19))
+
+### BREAKING CHANGES
+
+- starknetjs v9
 ## [8.9.2](https://github.com/starknet-io/starknet.js/compare/v8.9.1...v8.9.2) (2025-12-08)
 
 ### Bug Fixes

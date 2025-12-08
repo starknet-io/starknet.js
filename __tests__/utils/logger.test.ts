@@ -19,7 +19,7 @@ const mockConfigStore: {
   [key: string]: any; // Add this index signature to allow any string key
 } = {
   logLevel: 'INFO' as LogLevel,
-  rpcVersion: '0.8',
+  rpcVersion: '0.10',
 };
 
 // Use doMock instead of mock (doesn't get hoisted)

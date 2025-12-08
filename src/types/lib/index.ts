@@ -268,7 +268,7 @@ export type BlockNumber = BlockTag | null | number;
  *
  * text string are detected as block tag
  *
- * null return 'pending' block tag
+ * null return 'latest' block tag
  */
 export type BlockIdentifier = BlockNumber | BigNumberish;
 type SubscriptionBlockTag = Extract<SUBSCRIPTION_BLOCK_ID, string>;

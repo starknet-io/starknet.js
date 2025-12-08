@@ -7,6 +7,7 @@ import {
   CairoOption,
   CairoOptionVariant,
   CallData,
+  compareVersions,
   constants,
   Contract,
   ec,
@@ -91,10 +92,15 @@ describe('Account and OutsideExecution', () => {
       owner: axSigner,
       guardian: axGuardian,
     });
+    const snVersion = await executorAccount.getStarknetVersion();
+    const compiledClassHash =
+      compareVersions(snVersion, '0.14.1') === -1
+        ? '0x7a663375245780bd307f56fde688e33e5c260ab02b76741a57711c5b60d47f6'
+        : '0x294a323246c017d00a98f11942e1e38d562c97bc79426742110a14ce497e9b5';
     const response = await executorAccount.declareAndDeploy({
       contract: contracts.ArgentX4Account.sierra,
       classHash: '0x36078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f',
-      compiledClassHash: '0x7a663375245780bd307f56fde688e33e5c260ab02b76741a57711c5b60d47f6',
+      compiledClassHash,
       constructorCalldata: constructorAXCallData,
     });
     const targetAddress = response.deploy.contract_address;
