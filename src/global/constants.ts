@@ -158,19 +158,13 @@ export const DEFAULT_GLOBAL_CONFIG: {
 };
 
 export const RPC_DEFAULT_NODES = {
-  SN_MAIN: [`https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/`],
-  SN_SEPOLIA: [`https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/`],
+  SN_MAIN: [`https://api.zan.top/public/starknet-mainnet/rpc/`],
+  SN_SEPOLIA: [`https://api.zan.top/public/starknet-sepolia/rpc/`],
 } as const;
 
 export const PAYMASTER_RPC_NODES = {
-  SN_MAIN: [
-    `https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/`,
-    'https://api.zan.top/public/starknet-mainnet/rpc/',
-  ],
-  SN_SEPOLIA: [
-    `https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/`,
-    'https://api.zan.top/public/starknet-sepolia/rpc/',
-  ],
+  SN_MAIN: [`https://starknet.paymaster.avnu.fi`],
+  SN_SEPOLIA: [`https://sepolia.paymaster.avnu.fi`],
 } as const;
 
 // Default system messages
