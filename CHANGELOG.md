@@ -1,3 +1,10 @@
+# [9.0.0-beta.5](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.4...v9.0.0-beta.5) (2025-12-08)
+
+### Bug Fixes
+
+- default value for starknetVersion has to be set ([8f3e675](https://github.com/starknet-io/starknet.js/commit/8f3e67538c981cc6880829e04413502f6973538e))
+- replace alchemy with zan for public node ([264d86b](https://github.com/starknet-io/starknet.js/commit/264d86b7831ced1967c3a8824ecb58bda70e19c2))
+
 # [9.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.3...v9.0.0-beta.4) (2025-12-08)
 
 ### Bug Fixes
@@ -35,6 +42,7 @@
 ### BREAKING CHANGES
 
 - starknetjs v9
+
 ## [8.9.2](https://github.com/starknet-io/starknet.js/compare/v8.9.1...v8.9.2) (2025-12-08)
 
 ### Bug Fixes
