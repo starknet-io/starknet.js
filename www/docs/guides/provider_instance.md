@@ -13,7 +13,7 @@ The first thing to do is to define which network you want to interact with (Main
 Then you need to select a node. A node is a safe way to connect with the Starknet blockchain. You can use:
 
 - a node supplied by a node provider - it can be free or not; it can have limitations or not; it can have WebSocket support or not.
-  > RPC node providers are for example Infura, Alchemy, Blast, Lava, Chainstack...
+  > RPC node providers are for example Infura, Alchemy, Zan, Lava, Chainstack...
 - your own node, located on your local computer or in your local network.
   > you can spin up your own node with Pathfinder, Juno, Papyrus, Deoxys, ...
 - a local development node, that simulates a Starknet network. Useful for devs to perform quick tests without spending precious fee token.
@@ -42,7 +42,9 @@ The Starknet.js version must align with the RPC version supported by the chosen 
 |            v0.9.x             | Starknet.js v8.x.x            |
 
 :::note
+
 From version 6.x.x, Starknet.js is compatible with two RPC spec versions.
+
 :::
 
 With the `RpcProvider` class, you define the Starknet RPC node to use:
@@ -59,33 +61,37 @@ import { RpcProvider } from 'starknet';
 
 |                     Node | with public url | with API key |
 | -----------------------: | :-------------: | :----------: |
-|                  Alchemy |       No        |     v0_7     |
-|                   Infura |       No        |     v0_7     |
-|                    Blast |   v0_7, v0_8    |  v0_7, v0_8  |
-|                     Lava |   v0_7, v0_8    |     v0_8     |
-| Local Pathfinder v0.16.2 |   v0_7, v0_8    |     N/A      |
-|       Local Juno v0.14.2 |   v0_7, v0_8    |     N/A      |
+|                  Alchemy |       No        |  v0_8, v0_9  |
+|                      Zan |   v0_8, v0_9    |  v0_8, v0_9  |
+|                   Infura |       No        |     v0_8     |
+|                     Lava |   v0_8, v0_9    |     v0_8     |
+| Local Pathfinder v0.21.1 |   v0_8, v0_9    |     N/A      |
+|      Local Juno v0.15.11 |   v0_8, v0_9    |     N/A      |
 
 **Sepolia Testnet network:**
 
 |                     Node | with public url | with API key |
 | -----------------------: | :-------------: | :----------: |
-|                  Alchemy |       No        |     v0_7     |
-|                   Infura |       No        |     v0_7     |
-|                    Blast |   v0_7, v0_8    |      No      |
-|                     Lava |   v0_7, v0_8    |      No      |
-| Local Pathfinder v0.16.2 |   v0_7, v0_8    |     N/A      |
-|       Local Juno v0.14.2 |   v0_7, v0_8    |     N/A      |
+|                  Alchemy |       No        |  v0_8, v0_9  |
+|                      Zan |   v0_8, v0_9    |  v0_8, v0_9  |
+|                   Infura |       No        |     v0_8     |
+|                     Lava |   v0_8, v0_9    |      No      |
+| Local Pathfinder v0.21.1 |   v0_8, v0_9    |     N/A      |
+|      Local Juno v0.15.11 |   v0_8, v0_9    |     N/A      |
 
 **Local Starknet Devnet network:**
 
 |                   Node | with public url | with API key |
 | ---------------------: | :-------------: | :----------: |
+| starknet-devnet v0.2.x |      v0_7       |     N/A      |
 | starknet-devnet v0.4.x |      v0_8       |     N/A      |
-| starknet-devnet v0.5.x |      v0_9       |     N/A      |
+| starknet-devnet v0.6.x |      v0_9       |     N/A      |
 
 :::note
-This status has been verified 02/apr/2025.
+
+- This status has been verified 02/dec/2025.
+- Zan public node is limited to 15 calls per second, and has also monthly limitation.
+
 :::
 
 ### Default RPC node
@@ -112,9 +118,9 @@ Some examples of `RpcProvider` instantiation to connect to RPC node providers:
 const providerInfuraMainnet = new RpcProvider({
   nodeUrl: 'https://starknet-mainnet.infura.io/v3/' + infuraKey,
 });
-// Blast node RPC 0.9.1 for Mainnet (0.8 also available):
-const providerBlastMainnet = new RpcProvider({
-  nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + '/rpc/v0_9',
+// Zan node RPC 0.9.0 for Mainnet (0.8 also available):
+const providerZanMainnet = new RpcProvider({
+  nodeUrl: 'https://api.zan.top/public/starknet-mainnet/rpc/v0_9',
 });
 // Lava node RPC 0.9.1 for Mainnet:
 const providerMainnetLava = new RpcProvider({
@@ -137,6 +143,7 @@ const providerLavaMainnet = new RpcProvider({
 > Take care to safely manage your API key. It's a confidential item!
 
 :::tip
+
 If you are not sure about the RPC version (0.8 or 0.9), use:
 
 ```typescript
@@ -144,12 +151,15 @@ const myProvider = await RpcProvider.create({ nodeUrl: `${myNodeUrl}` });
 ```
 
 Note that this approach is slower, it performs a request to the node.
+
 :::
 
 ### Goerli Testnet
 
 :::info
+
 The Goerli Testnet is no longer in service.
+
 :::
 
 ### Sepolia Testnet
@@ -159,9 +169,9 @@ The Goerli Testnet is no longer in service.
 const providerInfuraSepoliaTestnet = new RpcProvider({
   nodeUrl: 'https://starknet-sepolia.infura.io/v3/' + infuraKey,
 });
-// Public Blast node RPC 0.9.1 for Sepolia Testnet (0.8 also available):
-const providerSepoliaTestnetBlastPublic = new RpcProvider({
-  nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_9',
+// Zan node RPC 0.9.0 for Sepolia Testnet (0.8 also available):
+const providerZanSepoliaTestnet = new RpcProvider({
+  nodeUrl: 'https://api.zan.top/public/starknet-sepolia/rpc/v0_9',
 });
 // Public Lava node RPC 0.9.1 for Sepolia Testnet (0.8 also available):
 const providerSepoliaTestnetLavaPublic = new RpcProvider({
