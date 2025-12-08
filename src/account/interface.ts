@@ -75,21 +75,21 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate fee for executing an INVOKE transaction on Starknet
    *
    * @param calls - Single call or array of calls to estimate fees for
-   * @param calls.contractAddress - The address of the contract to invoke
-   * @param calls.entrypoint - The function selector of the contract method
-   * @param calls.calldata - The serialized function parameters (defaults to [])
+   * - .contractAddress - The address of the contract to invoke
+   * - .entrypoint - The function selector of the contract method
+   * - .calldata - The serialized function parameters (defaults to [])
    *
    * @param estimateFeeDetails - Optional details for fee estimation
-   * @param estimateFeeDetails.blockIdentifier - Block to estimate against
-   * @param estimateFeeDetails.nonce - Account nonce (defaults to current nonce)
-   * @param estimateFeeDetails.skipValidate - Skip account validation (default: true)
-   * @param estimateFeeDetails.tip - Priority fee tip in fri/wei for faster inclusion
-   * @param estimateFeeDetails.accountDeploymentData - Include account deployment
-   * @param estimateFeeDetails.paymasterData - Paymaster sponsorship data
-   * @param estimateFeeDetails.nonceDataAvailabilityMode - DA mode for nonce
-   * @param estimateFeeDetails.feeDataAvailabilityMode - DA mode for fee
-   * @param estimateFeeDetails.version - Transaction version (v3 uses fri, v1/v2 use wei)
-   * @param estimateFeeDetails.resourceBounds - Resource limits for v3 transactions
+   * - .blockIdentifier - Block to estimate against
+   * - .nonce - Account nonce (defaults to current nonce)
+   * - .skipValidate - Skip account validation (default: true)
+   * - .tip - Priority fee tip in fri/wei for faster inclusion
+   * - .accountDeploymentData - Include account deployment
+   * - .paymasterData - Paymaster sponsorship data
+   * - .nonceDataAvailabilityMode - DA mode for nonce
+   * - .feeDataAvailabilityMode - DA mode for fee
+   * - .version - Transaction version (v3 uses fri, v1/v2 use wei)
+   * - .resourceBounds - Resource limits for v3 transactions
    *
    * @returns Fee estimation including overall_fee and resourceBounds
    * @example
@@ -109,18 +109,19 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Estimate fee for executing a DECLARE transaction on Starknet
    *
-   * @param contractPayload - Contract declaration payload
-   * @param contractPayload.contract - Compiled contract (Sierra JSON)
-   * @param contractPayload.casm - Compiled Cairo assembly (required for Cairo 1)
-   * @param contractPayload.classHash - Pre-computed class hash (optional optimization)
-   * @param contractPayload.compiledClassHash - Pre-computed CASM hash (alternative to casm)
+   * @param contractPayload - Contract declaration payload.
+   * - .contract - Compiled contract (Sierra JSON).
+   * - .casm - Compiled Cairo assembly (required for Cairo 1).
+   * - .classHash - Pre-computed class hash (optional optimization).
+   * - .compiledClassHash - Pre-computed CASM hash (alternative to casm).
    *
-   * @param estimateFeeDetails - Optional details for fee estimation
-   * @param estimateFeeDetails.blockIdentifier - Block to estimate against
-   * @param estimateFeeDetails.nonce - Account nonce (defaults to current nonce)
-   * @param estimateFeeDetails.skipValidate - Skip account validation (default: true)
-   * @param estimateFeeDetails.tip - Priority fee tip for faster inclusion
-   * @param estimateFeeDetails.version - Transaction version (v3 uses fri, v1/v2 use wei)
+   * @param estimateFeeDetails - Optional details for fee estimation.
+   *
+   * - .blockIdentifier - Block to estimate against.
+   * - .nonce - Account nonce (defaults to current nonce)
+   * - .skipValidate - Skip account validation (default: true)
+   * - .tip - Priority fee tip for faster inclusion
+   * - .version - Transaction version (v3 uses fri, v1/v2 use wei)
    *
    * @returns Fee estimation including overall_fee and resourceBounds
    * @example
@@ -140,10 +141,10 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate fee for executing a DEPLOY_ACCOUNT transaction on Starknet
    *
    * @param contractPayload - Account deployment payload
-   * @param contractPayload.classHash - Class hash of the account contract
-   * @param contractPayload.constructorCalldata - Constructor parameters
-   * @param contractPayload.contractAddress - Pre-computed account address
-   * @param contractPayload.addressSalt - Salt for address generation
+   * - .classHash - Class hash of the account contract
+   * - .constructorCalldata - Constructor parameters
+   * - .contractAddress - Pre-computed account address
+   * - .addressSalt - Salt for address generation
    *
    * @param estimateFeeDetails - Optional details for fee estimation
    * @inheritdoc estimateInvokeFee
@@ -167,10 +168,10 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate fee for deploying contract(s) through the Universal Deployer Contract (UDC)
    *
    * @param deployContractPayload - Single or array of deployment payloads
-   * @param deployContractPayload.classHash - Class hash of contract to deploy
-   * @param deployContractPayload.salt - Deployment salt (optional)
-   * @param deployContractPayload.unique - Ensure unique deployment address
-   * @param deployContractPayload.constructorCalldata - Constructor parameters
+   * - .classHash - Class hash of contract to deploy
+   * - .salt - Deployment salt (optional)
+   * - .unique - Ensure unique deployment address
+   * - .constructorCalldata - Constructor parameters
    *
    * @param estimateFeeDetails - Optional details for fee estimation
    * @inheritdoc estimateInvokeFee
@@ -194,8 +195,8 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate fees for executing multiple transactions in a single request
    *
    * @param invocations - Array of transactions to estimate
-   * @param invocations.type - Transaction type: DECLARE, DEPLOY, INVOKE, DEPLOY_ACCOUNT
-   * @param invocations.payload - Transaction-specific payload
+   * - .type - Transaction type: DECLARE, DEPLOY, INVOKE, DEPLOY_ACCOUNT
+   * - .payload - Transaction-specific payload
    *
    * @param details - Optional details for fee estimation
    * @inheritdoc estimateInvokeFee
@@ -218,16 +219,16 @@ export abstract class AccountInterface extends ProviderInterface {
    * Execute one or multiple calls through the account contract
    *
    * @param transactions - Single call or array of calls to execute
-   * @param transactions.contractAddress - Target contract address
-   * @param transactions.entrypoint - Function to invoke on the contract
-   * @param transactions.calldata - Function parameters
+   * - .contractAddress - Target contract address
+   * - .entrypoint - Function to invoke on the contract
+   * - .calldata - Function parameters
    *
    * @param transactionsDetail - Transaction execution options
-   * @param transactionsDetail.nonce - Override account nonce
-   * @param transactionsDetail.maxFee - Maximum fee for v1/v2 transactions
-   * @param transactionsDetail.resourceBounds - Resource limits for v3 transactions
-   * @param transactionsDetail.tip - Priority fee tip
-   * @param transactionsDetail.version - Force specific transaction version
+   * - .nonce - Override account nonce
+   * - .maxFee - Maximum fee for v1/v2 transactions
+   * - .resourceBounds - Resource limits for v3 transactions
+   * - .tip - Priority fee tip
+   * - .version - Force specific transaction version
    *
    * @returns Transaction hash and response
    * @example
@@ -247,14 +248,14 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate fees for a paymaster-sponsored transaction
    *
    * @param calls - Array of calls to be sponsored
-   * @param calls.contractAddress - Target contract address
-   * @param calls.entrypoint - Function to invoke
-   * @param calls.calldata - Function parameters
+   * - .contractAddress - Target contract address
+   * - .entrypoint - Function to invoke
+   * - .calldata - Function parameters
    *
    * @param paymasterDetails - Paymaster configuration
-   * @param paymasterDetails.feeMode - Sponsorship mode: 'sponsored' or gas token
-   * @param paymasterDetails.deploymentData - Account deployment data if needed
-   * @param paymasterDetails.timeBounds - Valid execution time window
+   * - .feeMode - Sponsorship mode: 'sponsored' or gas token
+   * - .deploymentData - Account deployment data if needed
+   * - .timeBounds - Valid execution time window
    *
    * @returns Fee estimates in both STRK and gas token
    * @example
@@ -296,9 +297,9 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @param calls - Array of calls to execute
    * @param paymasterDetails - Paymaster configuration
-   * @param paymasterDetails.feeMode - 'sponsored' or gas token payment
-   * @param paymasterDetails.deploymentData - Deploy account if needed
-   * @param paymasterDetails.timeBounds - Execution validity window (UNIX timestamps)
+   * - .feeMode - 'sponsored' or gas token payment
+   * - .deploymentData - Deploy account if needed
+   * - .timeBounds - Execution validity window (UNIX timestamps)
    *
    * @param maxFeeInGasToken - Maximum acceptable fee in gas token
    *
@@ -323,11 +324,12 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Declare a contract class on Starknet
    *
-   * @param contractPayload - Contract declaration payload
-   * @param contractPayload.contract - Compiled Sierra contract
-   * @param contractPayload.classHash - Pre-computed class hash (optional)
-   * @param contractPayload.casm - Compiled CASM (required for Cairo 1)
-   * @param contractPayload.compiledClassHash - Pre-computed CASM hash
+   // eslint-disable-next-line prettier/prettier
+   * @param contractPayload - Contract declaration payload 
+   * - .contract - Compiled Sierra contract  
+   * - .classHash - Pre-computed class hash (optional)  
+   * - .casm - Compiled CASM (required for Cairo 1) 
+   * - .compiledClassHash - Pre-computed CASM hash  
    *
    * @param transactionsDetail - Transaction execution options
    * @inheritdoc execute
@@ -349,11 +351,11 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Deploy contract(s) using the Universal Deployer Contract (UDC)
    *
-   * @param payload - Single or multiple deployment configurations
-   * @param payload.classHash - Class hash of declared contract
-   * @param payload.constructorCalldata - Constructor parameters
-   * @param payload.salt - Deployment salt (random if not specified)
-   * @param payload.unique - Modify salt for unique address (default: true)
+   * @param payload - Single or multiple deployment configurations.
+   * - .classHash - Class hash of declared contract.
+   * - .constructorCalldata - Constructor parameters.
+   * - .salt - Deployment salt (random if not specified).
+   * - .unique - Modify salt for unique address (default: true).
    *
    * @param details - Transaction execution options
    * @inheritdoc execute
@@ -402,13 +404,13 @@ export abstract class AccountInterface extends ProviderInterface {
    * Declare and deploy a contract in a single method
    *
    * @param payload - Combined declare and deploy configuration
-   * @param payload.contract - Compiled Sierra contract
-   * @param payload.casm - Compiled CASM (required for Cairo 1)
-   * @param payload.compiledClassHash - Pre-computed CASM hash
-   * @param payload.classHash - Pre-computed class hash
-   * @param payload.constructorCalldata - Constructor parameters
-   * @param payload.salt - Deployment salt
-   * @param payload.unique - Ensure unique deployment address
+   * - .contract - Compiled Sierra contract
+   * - .casm - Compiled CASM (required for Cairo 1)
+   * - .compiledClassHash - Pre-computed CASM hash
+   * - .classHash - Pre-computed class hash
+   * - .constructorCalldata - Constructor parameters
+   * - .salt - Deployment salt
+   * - .unique - Ensure unique deployment address
    *
    * @param details - Transaction execution options
    * @inheritdoc execute
@@ -436,10 +438,10 @@ export abstract class AccountInterface extends ProviderInterface {
    * Deploy the account contract itself on Starknet
    *
    * @param contractPayload - Account deployment configuration
-   * @param contractPayload.classHash - Account contract class hash
-   * @param contractPayload.constructorCalldata - Constructor parameters
-   * @param contractPayload.addressSalt - Salt for address generation
-   * @param contractPayload.contractAddress - Pre-computed address
+   * - .classHash - Account contract class hash
+   * - .constructorCalldata - Constructor parameters
+   * - .addressSalt - Salt for address generation
+   * - .contractAddress - Pre-computed address
    *
    * @param transactionsDetail - Transaction execution options
    * @inheritdoc execute

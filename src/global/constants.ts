@@ -158,8 +158,8 @@ export const DEFAULT_GLOBAL_CONFIG: {
 };
 
 export const RPC_DEFAULT_NODES = {
-  SN_MAIN: [`https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/`],
-  SN_SEPOLIA: [`https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/`],
+  SN_MAIN: [`https://api.zan.top/public/starknet-mainnet/rpc/`],
+  SN_SEPOLIA: [`https://api.zan.top/public/starknet-sepolia/rpc/`],
 } as const;
 
 export const PAYMASTER_RPC_NODES = {
@@ -185,3 +185,5 @@ export const SYSTEM_MESSAGES = {
   consensusFailed: 'Consensus failed to finalize the block proposal',
   txFailsBlockBuildingValidation: 'Transaction fails block building validation',
 };
+
+export const SN_VERSION_IMPLEMENTING_BLAKE_FOR_COMPILED_CLASS = '0.14.1' as const;

@@ -199,7 +199,7 @@ export class RpcProvider implements ProviderInterface {
     while (!isTargetBlock) {
       // eslint-disable-next-line no-await-in-loop
       const currBlock = await this.getBlockNumber();
-      if (currBlock === targetBlock) {
+      if (currBlock >= targetBlock) {
         isTargetBlock = true;
       } else {
         // eslint-disable-next-line no-await-in-loop

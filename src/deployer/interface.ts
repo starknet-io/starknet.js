@@ -28,7 +28,6 @@ export abstract class DeployerInterface {
    * Parse Transaction Receipt Event from a Deployer contract transaction and
    * create DeployContractResponse compatible response with addition of the Deployer Event data
    * @param {InvokeTransactionReceiptResponse} txReceipt Transaction receipt
-   * @param {DeployerDefinition} deployer Deployer contract definition
    *
    * @returns {DeployContractUDCResponse} parsed Deployer event data
    */
