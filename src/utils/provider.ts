@@ -145,21 +145,13 @@ export const getDefaultNodeUrl = (
  * return Defaults RPC Nodes endpoints
  */
 export function getDefaultNodes(rpcVersion: SupportedRpcVersion) {
-  const nodes: any = { ...RPC_DEFAULT_NODES };
-
-  Object.keys(nodes).forEach(function (key, _) {
-    nodes[key] = nodes[key].map((it: any) => {
-      if (it === 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/') {
-        return `${it}${toApiVersion(rpcVersion)}/uYLxCteYbHTFJpKSoKdVm`;
-      }
-      if (it === 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/') {
-        return `${it}${toApiVersion(rpcVersion)}/uYLxCteYbHTFJpKSoKdVm`;
-      }
-      return `${it}${toApiVersion(rpcVersion)}`;
-    });
-  });
-
-  return nodes;
+  const apiVersion = toApiVersion(rpcVersion);
+  return Object.fromEntries(
+    Object.entries(RPC_DEFAULT_NODES).map(([key, urls]) => [
+      key,
+      urls.map((url) => `${url}${apiVersion}`),
+    ])
+  );
 }
 
 /**
