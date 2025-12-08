@@ -1,3 +1,9 @@
+## [8.9.2](https://github.com/starknet-io/starknet.js/compare/v8.9.1...v8.9.2) (2025-12-08)
+
+### Bug Fixes
+
+- replace alchemy with zan for public node ([264d86b](https://github.com/starknet-io/starknet.js/commit/264d86b7831ced1967c3a8824ecb58bda70e19c2))
+
 ## [8.9.1](https://github.com/starknet-io/starknet.js/compare/v8.9.0...v8.9.1) (2025-11-26)
 
 ### Bug Fixes
