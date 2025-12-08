@@ -1,3 +1,15 @@
+# [9.1.0](https://github.com/starknet-io/starknet.js/compare/v9.0.0...v9.1.0) (2025-12-08)
+
+### Bug Fixes
+
+- buildUDCCall ([9212f32](https://github.com/starknet-io/starknet.js/commit/9212f32297f09d74093a98c10419d1c4b04f0eb4))
+- bump to starknet types 10 ([7ffb4be](https://github.com/starknet-io/starknet.js/commit/7ffb4be6f86c1af3bab05796cd09a726c9176095))
+- package-lock ([ffc50a7](https://github.com/starknet-io/starknet.js/commit/ffc50a788036467ee006fcd12aea06c0c2fcce48))
+
+### Features
+
+- handling of get-starknet v5 ([b297d71](https://github.com/starknet-io/starknet.js/commit/b297d7199c018fe8394b867731393e0813f13483))
+
 # [9.0.0](https://github.com/starknet-io/starknet.js/compare/v8.9.2...v9.0.0) (2025-12-08)
 
 ### Bug Fixes
