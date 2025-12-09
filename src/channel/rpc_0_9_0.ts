@@ -53,12 +53,6 @@ import { logger } from '../global/logger';
 import { config } from '../global/config';
 // TODO: check if we can filet type before entering to this method, as so to specify here only RPC 0.8 types
 
-const defaultOptions = {
-  headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: BlockTag.LATEST,
-  retries: 200,
-};
-
 export class RpcChannel {
   readonly id = 'RPC090';
 
@@ -120,11 +114,12 @@ export class RpcChannel {
         this.channelSpecVersion
       );
     }
+    const channelsDefaults = config.get('channelsDefaults');
     this.baseFetch = baseFetch || config.get('fetch') || fetch;
-    this.blockIdentifier = blockIdentifier ?? defaultOptions.blockIdentifier;
+    this.blockIdentifier = blockIdentifier ?? channelsDefaults.options.blockIdentifier;
     this.chainId = chainId;
-    this.headers = { ...defaultOptions.headers, ...headers };
-    this.retries = retries ?? defaultOptions.retries;
+    this.headers = { ...channelsDefaults.options.headers, ...headers };
+    this.retries = retries ?? channelsDefaults.options.retries;
     this.specVersion = specVersion;
     this.transactionRetryIntervalFallback = transactionRetryIntervalFallback;
     this.waitMode = waitMode ?? false;
@@ -386,17 +381,19 @@ export class RpcChannel {
    * @param invocations AccountInvocations
    * @param simulateTransactionOptions blockIdentifier and flags to skip validation and fee charge<br/>
    * - blockIdentifier<br/>
-   * - skipValidate (default false)<br/>
+   * - skipValidate (default true)<br/>
    * - skipFeeCharge (default true)<br/>
    */
   public simulateTransaction(
     invocations: AccountInvocations,
     simulateTransactionOptions: getSimulateTransactionOptions = {}
   ) {
+    const channelsDefaults = config.get('channelsDefaults');
+    const methodDefaults = channelsDefaults.methods.simulateTransaction || {};
     const {
       blockIdentifier = this.blockIdentifier,
-      skipValidate = true,
-      skipFeeCharge = true,
+      skipValidate = methodDefaults.skipValidate,
+      skipFeeCharge = methodDefaults.skipFeeCharge,
     } = simulateTransactionOptions;
     const block_id = new Block(blockIdentifier).identifier;
     const simulationFlags: RPC.ESimulationFlag[] = [];
@@ -611,8 +608,12 @@ export class RpcChannel {
 
   public async getEstimateFee(
     invocations: AccountInvocations,
-    { blockIdentifier = this.blockIdentifier, skipValidate = true }: getEstimateFeeBulkOptions = {}
+    options: getEstimateFeeBulkOptions = {}
   ) {
+    const channelsDefaults = config.get('channelsDefaults');
+    const methodDefaults = channelsDefaults.methods.getEstimateFee || {};
+    const { blockIdentifier = this.blockIdentifier, skipValidate = methodDefaults.skipValidate } =
+      options;
     const block_id = new Block(blockIdentifier).identifier;
     const flags = {
       simulation_flags: (skipValidate
