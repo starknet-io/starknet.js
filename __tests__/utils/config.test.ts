@@ -1,4 +1,4 @@
-import { constants, config } from '../../src';
+import { constants, config, BlockTag } from '../../src';
 
 describe('Configuration', () => {
   // Reset the configuration before each test to avoid side effects
@@ -99,6 +99,21 @@ describe('Configuration', () => {
       config.set('LogLevel', 'DEBUG');
       expect(config.hasKey('LogLevel')).toBe(true);
       expect(config.hasKey('logLevel')).toBe(true); // Original key still exists
+    });
+
+    it('should handle nested configuration', () => {
+      config.set('channelsDefaults.options.blockIdentifier', BlockTag.PRE_CONFIRMED);
+      expect(config.get('channelsDefaults.options.blockIdentifier')).toBe(BlockTag.PRE_CONFIRMED);
+
+      config.set('channelsDefaults.methods.simulateTransaction.skipValidate', false);
+      expect(config.get('channelsDefaults.methods.simulateTransaction.skipValidate')).toBe(false);
+
+      config.set('channelsDefaults.methods.getEstimateFee.skipValidate', false);
+
+      const channelsDefaults = config.get('channelsDefaults');
+      expect(channelsDefaults.options.blockIdentifier).toBe(BlockTag.PRE_CONFIRMED);
+      expect(channelsDefaults.methods.simulateTransaction.skipValidate).toBe(false);
+      expect(channelsDefaults.methods.getEstimateFee.skipValidate).toBe(false);
     });
   });
 });
