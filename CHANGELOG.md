@@ -1,3 +1,9 @@
+## [9.1.1](https://github.com/starknet-io/starknet.js/compare/v9.1.0...v9.1.1) (2025-12-09)
+
+### Bug Fixes
+
+- **utils:** fetch bindings ([#1514](https://github.com/starknet-io/starknet.js/issues/1514)) ([45e063b](https://github.com/starknet-io/starknet.js/commit/45e063bc6dfe4cea9ffbd5d5f0ba2d829c54cf9a))
+
 # [9.1.0](https://github.com/starknet-io/starknet.js/compare/v9.0.0...v9.1.0) (2025-12-08)
 
 ### Bug Fixes
