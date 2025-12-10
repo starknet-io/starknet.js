@@ -113,12 +113,12 @@ export class RpcChannel {
         this.channelSpecVersion
       );
     }
-    const channelsDefaults = config.get('channelsDefaults');
+    const channelDefaults = config.get('channelDefaults');
     this.baseFetch = baseFetch || config.get('fetch') || fetch;
-    this.blockIdentifier = blockIdentifier ?? channelsDefaults.options.blockIdentifier;
+    this.blockIdentifier = blockIdentifier ?? channelDefaults.options.blockIdentifier;
     this.chainId = chainId;
-    this.headers = { ...channelsDefaults.options.headers, ...headers };
-    this.retries = retries ?? channelsDefaults.options.retries;
+    this.headers = { ...channelDefaults.options.headers, ...headers };
+    this.retries = retries ?? channelDefaults.options.retries;
     this.specVersion = specVersion;
     this.transactionRetryIntervalFallback = transactionRetryIntervalFallback;
     this.waitMode = waitMode ?? false;
@@ -387,8 +387,8 @@ export class RpcChannel {
     invocations: AccountInvocations,
     simulateTransactionOptions: getSimulateTransactionOptions = {}
   ) {
-    const channelsDefaults = config.get('channelsDefaults');
-    const methodDefaults = channelsDefaults.methods.simulateTransaction || {};
+    const channelDefaults = config.get('channelDefaults');
+    const methodDefaults = channelDefaults.methods.simulateTransaction || {};
     const {
       blockIdentifier = this.blockIdentifier,
       skipValidate = methodDefaults.skipValidate,
@@ -609,8 +609,8 @@ export class RpcChannel {
     invocations: AccountInvocations,
     options: getEstimateFeeBulkOptions = {}
   ) {
-    const channelsDefaults = config.get('channelsDefaults');
-    const methodDefaults = channelsDefaults.methods.getEstimateFee || {};
+    const channelDefaults = config.get('channelDefaults');
+    const methodDefaults = channelDefaults.methods.getEstimateFee || {};
     const { blockIdentifier = this.blockIdentifier, skipValidate = methodDefaults.skipValidate } =
       options;
     const block_id = new Block(blockIdentifier).identifier;

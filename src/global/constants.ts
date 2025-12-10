@@ -132,7 +132,7 @@ export type ChannelDefaultOptions = {
 /**
  * Channel defaults configuration
  */
-export type ChannelsDefaults = {
+export type ChannelDefaults = {
   options: ChannelDefaultOptions;
   methods: ChannelMethodOptions;
 };
@@ -144,7 +144,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   transactionVersion: SupportedTransactionVersion;
   resourceBoundsOverhead: ResourceBoundsOverhead;
   defaultTipType: TipType;
-  channelsDefaults: ChannelsDefaults;
+  channelDefaults: ChannelDefaults;
   fetch: any;
   websocket: any;
   buffer: any;
@@ -179,7 +179,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
     },
   },
   defaultTipType: 'recommendedTip',
-  channelsDefaults: {
+  channelDefaults: {
     options: {
       headers: { 'Content-Type': 'application/json' },
       blockIdentifier: BlockTag.LATEST,

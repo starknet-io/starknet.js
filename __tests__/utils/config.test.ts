@@ -102,18 +102,18 @@ describe('Configuration', () => {
     });
 
     it('should handle nested configuration', () => {
-      config.set('channelsDefaults.options.blockIdentifier', BlockTag.PRE_CONFIRMED);
-      expect(config.get('channelsDefaults.options.blockIdentifier')).toBe(BlockTag.PRE_CONFIRMED);
+      config.set('channelDefaults.options.blockIdentifier', BlockTag.PRE_CONFIRMED);
+      expect(config.get('channelDefaults.options.blockIdentifier')).toBe(BlockTag.PRE_CONFIRMED);
 
-      config.set('channelsDefaults.methods.simulateTransaction.skipValidate', false);
-      expect(config.get('channelsDefaults.methods.simulateTransaction.skipValidate')).toBe(false);
+      config.set('channelDefaults.methods.simulateTransaction.skipValidate', false);
+      expect(config.get('channelDefaults.methods.simulateTransaction.skipValidate')).toBe(false);
 
-      config.set('channelsDefaults.methods.getEstimateFee.skipValidate', false);
+      config.set('channelDefaults.methods.getEstimateFee.skipValidate', false);
 
-      const channelsDefaults = config.get('channelsDefaults');
-      expect(channelsDefaults.options.blockIdentifier).toBe(BlockTag.PRE_CONFIRMED);
-      expect(channelsDefaults.methods.simulateTransaction.skipValidate).toBe(false);
-      expect(channelsDefaults.methods.getEstimateFee.skipValidate).toBe(false);
+      const channelDefaults = config.get('channelDefaults');
+      expect(channelDefaults.options.blockIdentifier).toBe(BlockTag.PRE_CONFIRMED);
+      expect(channelDefaults.methods.simulateTransaction.skipValidate).toBe(false);
+      expect(channelDefaults.methods.getEstimateFee.skipValidate).toBe(false);
     });
   });
 });
