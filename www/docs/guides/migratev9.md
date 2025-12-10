@@ -16,6 +16,7 @@ If you encounter any missing changes, please let us know and we will update this
 2. **"Pending" → "PreConfirmed"** - All pending-related types, methods, and functions renamed
 3. **Type packages updated** - `@starknet-io/starknet-types-08` removed
 4. **Blake2s hash support** - For Starknet 0.14.1+ contract class hashing
+5. **Websocket channel use RPC 0.10** - single change regarding reorg event emitted
 
 **Quick migration steps:**
 
