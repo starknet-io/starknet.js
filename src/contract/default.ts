@@ -28,6 +28,7 @@ import {
   DeclareAndDeployContractPayload,
   type PaymasterFeeEstimate,
   SuccessfulTransactionReceiptResponseHelper,
+  RPC,
 } from '../types';
 import type { AccountInterface } from '../account/interface';
 import assert from '../utils/assert';
@@ -407,13 +408,11 @@ export class Contract implements ContractInterface {
           txR.events
             ?.map((event) => {
               return {
-                // TODO: this do not check that block is production and block_hash and block_number actually exists
-                // TODO: second issue is that ts do not complains about it
+                ...event,
+                transaction_hash: txR.transaction_hash,
                 block_hash: txR.block_hash,
                 block_number: txR.block_number,
-                transaction_hash: txR.transaction_hash,
-                ...event,
-              };
+              } as RPC.EmittedEvent;
             })
             .filter((event) => toHex(event.from_address) === toHex(this.address), []) || []; // TODO: what data is in this that is cleaned out ?
         parsed = parseRawEvents(
