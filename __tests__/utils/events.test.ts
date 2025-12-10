@@ -220,9 +220,11 @@ describe('Mocked: parseEvents', () => {
         cairo_event_struct: {
           test_name: 1708719217404197029088109386680815809747762070431461851150711916567020191623n,
         },
+        transaction_hash: '0x789',
+        transaction_index: 0,
+        event_index: 0,
         block_hash: '0x1234',
         block_number: 567,
-        transaction_hash: '0x789',
       },
     ];
 
@@ -309,9 +311,11 @@ describe('Mocked: parseEvents', () => {
         cairo_event_struct: {
           test_name: 1708719217404197029088109386680815809747762070431461851150711916567020191623n,
         },
+        transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
+        transaction_index: 0,
+        event_index: 0,
         block_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34d',
         block_number: 1,
-        transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
       },
     ];
 
