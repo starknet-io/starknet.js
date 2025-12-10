@@ -20,6 +20,22 @@ const mockConfigStore: {
 } = {
   logLevel: 'INFO' as LogLevel,
   rpcVersion: '0.10',
+  channelDefaults: {
+    options: {
+      headers: { 'Content-Type': 'application/json' },
+      blockIdentifier: 'latest',
+      retries: 200,
+    },
+    methods: {
+      simulateTransaction: {
+        skipValidate: true,
+        skipFeeCharge: true,
+      },
+      getEstimateFee: {
+        skipValidate: true,
+      },
+    },
+  },
 };
 
 // Use doMock instead of mock (doesn't get hoisted)
