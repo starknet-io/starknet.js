@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import type { SUBSCRIPTION_ID } from '../../types/api';
 import { logger } from '../../global/logger';
-import type { WebSocketChannel } from './ws_0_9';
+import type { WebSocketChannel } from './ws_0_10';
 import { EventEmitter } from '../../utils/eventEmitter';
 
 type SubscriptionEvents<T> = {
