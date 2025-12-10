@@ -1,3 +1,9 @@
+# [9.2.0](https://github.com/starknet-io/starknet.js/compare/v9.1.1...v9.2.0) (2025-12-10)
+
+### Features
+
+- default channel options, estimate and simulate flags defaults n… ([#1546](https://github.com/starknet-io/starknet.js/issues/1546)) ([d1d3cef](https://github.com/starknet-io/starknet.js/commit/d1d3cef8220c9b99c28b2bdfaf3b14db91ee09e9))
+
 ## [9.1.1](https://github.com/starknet-io/starknet.js/compare/v9.1.0...v9.1.1) (2025-12-09)
 
 ### Bug Fixes
