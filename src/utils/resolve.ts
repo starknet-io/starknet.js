@@ -4,11 +4,12 @@ import {
   GetBlockResponse,
   GetTransactionReceiptResponse,
   InvocationsDetailsWithNonce,
-  PendingBlock,
-  PendingStateUpdate,
+  PreConfirmedBlock,
+  PreConfirmedStateUpdate,
   StateUpdateResponse,
   V3TransactionDetails,
 } from '../types';
+import { EBlockStatus } from '../types/api/rpc';
 import { toHex } from './num';
 
 /**
@@ -138,49 +139,49 @@ export function compareVersions(a: string, b: string): number {
 }
 
 /**
- * Guard Pending Block
+ * Guard Pre Confirmed Block
  * @param {GetBlockResponse} response answer of myProvider.getBlock()
- * @return {boolean} true if block is the pending block
+ * @return {boolean} true if block is the pre confirmed block
  * @example
  * ```typescript
- * const block = await myProvider.getBlock("pending");
- * const result = provider.isPendingBlock(block);
+ * const block = await myProvider.getBlock("pre_confirmed");
+ * const result = provider.isPreConfirmedBlock(block);
  * // result = true
  * ```
  */
-export function isPendingBlock(response: GetBlockResponse): response is PendingBlock {
-  return response.status === 'PENDING';
+export function isPreConfirmedBlock(response: GetBlockResponse): response is PreConfirmedBlock {
+  return response.status === EBlockStatus.PRE_CONFIRMED;
 }
 
 /**
- * Guard Pending Transaction
+ * Guard Pre Confirmed Transaction
  * @param {GetTransactionReceiptResponse} response transaction Receipt
- * @return {boolean} true if the transaction is part of the pending block
+ * @return {boolean} true if the transaction is part of the pre confirmed block
  * @example
  * ```typescript
- * const block = await myProvider.getBlockWithTxs("pending");
+ * const block = await myProvider.getBlockWithTxs("pre_confirmed");
  * const txR = await myProvider.getTransactionReceipt(block.transactions[0].transaction_hash);
- * const result = provider.isPendingTransaction(txR);
+ * const result = provider.isPreConfirmedTransaction(txR);
  * // result = true
  * ```
  */
-export function isPendingTransaction(response: GetTransactionReceiptResponse): boolean {
+export function isPreConfirmedTransaction(response: GetTransactionReceiptResponse): boolean {
   return !('block_hash' in response);
 }
 
 /**
- * Guard Pending State Update
+ * Guard Pre Confirmed State Update
  * @param {StateUpdateResponse} response State of a block
- * @return {boolean} true if the block is pending
+ * @return {boolean} true if the block is pre confirmed
  * @example
  * ```typescript
- * const state: StateUpdateResponse = await myProvider.getStateUpdate("pending");
- * const result = provider.isPendingStateUpdate(state);
+ * const state: StateUpdateResponse = await myProvider.getStateUpdate("pre_confirmed");
+ * const result = provider.isPreConfirmedStateUpdate(state);
  * // result = true
  * ```
  */
-export function isPendingStateUpdate(
+export function isPreConfirmedStateUpdate(
   response: StateUpdateResponse
-): response is PendingStateUpdate {
+): response is PreConfirmedStateUpdate {
   return !('block_hash' in response);
 }

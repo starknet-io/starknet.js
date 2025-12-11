@@ -1,5 +1,7 @@
 /* eslint-disable no-underscore-dangle */
-import type { ResourceBoundsOverhead } from '../types';
+import type { getEstimateFeeBulkOptions, getSimulateTransactionOptions } from '../types/lib';
+import type { ResourceBoundsOverhead } from '../provider/types/spec.type';
+import { BlockTag } from '../provider/types/spec.type';
 import { ETransactionVersion } from '../types/api';
 import { ValuesType } from '../types/helpers/valuesType';
 import type { LogLevel } from './logger.type';
@@ -99,16 +101,41 @@ export { _TransactionHashPrefix as TransactionHashPrefix };
  * dot format rpc versions
  */
 const _SupportedRpcVersion = {
-  '0.8.1': '0.8.1',
   '0.9.0': '0.9.0',
-  v0_8_1: '0.8.1',
+  '0.10.0': '0.10.0',
   v0_9_0: '0.9.0',
+  v0_10_0: '0.10.0',
 } as const;
 type _SupportedRpcVersion = ValuesType<typeof _SupportedRpcVersion>;
 export { _SupportedRpcVersion as SupportedRpcVersion };
 
 export type SupportedTransactionVersion = typeof ETransactionVersion.V3;
 export type SupportedCairoVersion = '1';
+
+/**
+ * Channel method-specific options
+ */
+export type ChannelMethodOptions = {
+  simulateTransaction: Omit<getSimulateTransactionOptions, 'blockIdentifier'>;
+  getEstimateFee: Omit<getEstimateFeeBulkOptions, 'blockIdentifier'>;
+};
+
+/**
+ * Channel default options
+ */
+export type ChannelDefaultOptions = {
+  headers: Record<string, string>;
+  blockIdentifier: BlockTag;
+  retries: number;
+};
+
+/**
+ * Channel defaults configuration
+ */
+export type ChannelDefaults = {
+  options: ChannelDefaultOptions;
+  methods: ChannelMethodOptions;
+};
 
 // Default initial global config
 export const DEFAULT_GLOBAL_CONFIG: {
@@ -117,6 +144,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
   transactionVersion: SupportedTransactionVersion;
   resourceBoundsOverhead: ResourceBoundsOverhead;
   defaultTipType: TipType;
+  channelDefaults: ChannelDefaults;
   fetch: any;
   websocket: any;
   buffer: any;
@@ -133,7 +161,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
    */
   blake: ((uint8Array: Uint8Array) => Uint8Array) | undefined;
 } = {
-  rpcVersion: '0.9.0',
+  rpcVersion: '0.10.0',
   transactionVersion: ETransactionVersion.V3, // Starknet 0.14.0 only V3 transactions
   logLevel: 'INFO',
   resourceBoundsOverhead: {
@@ -151,6 +179,22 @@ export const DEFAULT_GLOBAL_CONFIG: {
     },
   },
   defaultTipType: 'recommendedTip',
+  channelDefaults: {
+    options: {
+      headers: { 'Content-Type': 'application/json' },
+      blockIdentifier: BlockTag.LATEST,
+      retries: 200,
+    },
+    methods: {
+      simulateTransaction: {
+        skipValidate: true,
+        skipFeeCharge: true,
+      },
+      getEstimateFee: {
+        skipValidate: true,
+      },
+    },
+  },
   fetch: undefined,
   websocket: undefined,
   buffer: undefined,

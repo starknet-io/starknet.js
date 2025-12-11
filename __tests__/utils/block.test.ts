@@ -97,7 +97,7 @@ describe('new Block()', () => {
     }).toThrow(TypeError);
   });
 
-  test('string `pending` BlockIdentifier', () => {
+  test('tag `pre_confirmed` BlockIdentifier', () => {
     const block1 = new Block('pre_confirmed');
     expect(block1.identifier).toBe('pre_confirmed');
     expect(block1.queryIdentifier).toBe('blockNumber=pre_confirmed');
@@ -106,7 +106,7 @@ describe('new Block()', () => {
     expect(block1.tag).toBe('pre_confirmed');
   });
 
-  test('string `latest` BlockIdentifier', () => {
+  test('tag `latest` BlockIdentifier', () => {
     const block1 = new Block('latest');
     expect(block1.identifier).toBe('latest');
     expect(block1.queryIdentifier).toBe('blockNumber=latest');

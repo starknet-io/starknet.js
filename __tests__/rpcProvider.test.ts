@@ -204,7 +204,7 @@ describeIfRpc('RPCProvider', () => {
       l1_data_gas_consumed: '0x2',
       l1_data_gas_price: '0x1',
       overall_fee: '0x4',
-      unit: 'WEI',
+      unit: 'FRI',
     };
     estimateSpy.mockResolvedValue([mockFeeEstimate]);
     const result = (await p.getEstimateFeeBulk([{} as any], {}))[0];
@@ -223,7 +223,7 @@ describeIfRpc('RPCProvider', () => {
         casm: contracts.C1v2.casm,
       });
       l1l2ContractCairo1Address = deploy2.contract_address;
-      await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
+      await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pre confirmed block validation before interacting
     });
 
     test('estimate message fee Cairo 1', async () => {
@@ -922,10 +922,8 @@ describeIfNotDevnet('If not devnet: waitForBlock', () => {
   });
 
   // NOTA : this test can have a duration up to block interval.
-  test('waitForBlock pending', async () => {
-    await providerStandard.waitForBlock('pending');
-    expect(true).toBe(true); // answer without timeout Error (blocks have to be spaced with 16 minutes maximum : 200 retries * 5000ms)
-
+  test('waitForBlock tags', async () => {
+    // answer without timeout Error (blocks have to be spaced with 16 minutes maximum : 200 retries * 5000ms)
     await providerStandard.waitForBlock(BlockTag.PRE_CONFIRMED);
     expect(true).toBe(true);
   });

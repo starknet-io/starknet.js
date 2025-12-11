@@ -1,3 +1,96 @@
+## [9.2.1](https://github.com/starknet-io/starknet.js/compare/v9.2.0...v9.2.1) (2025-12-11)
+
+### Bug Fixes
+
+- mark ws rpc 0.10, default expose rpc 0.10 ([aae081f](https://github.com/starknet-io/starknet.js/commit/aae081fed1bbcb547c5b4a7dc7026c229ea8a642))
+- patch parseEvents for rpc 0.10 ([6d8da90](https://github.com/starknet-io/starknet.js/commit/6d8da907cc33149847cd89bd6fb9d908e772281f))
+- simplify parseEvents and fix missing rpc 0.10 props ([b3ee82e](https://github.com/starknet-io/starknet.js/commit/b3ee82eb9f79de590123aef456b8545d95b86659))
+
+# [9.2.0](https://github.com/starknet-io/starknet.js/compare/v9.1.1...v9.2.0) (2025-12-10)
+
+### Features
+
+- default channel options, estimate and simulate flags defaults n… ([#1546](https://github.com/starknet-io/starknet.js/issues/1546)) ([d1d3cef](https://github.com/starknet-io/starknet.js/commit/d1d3cef8220c9b99c28b2bdfaf3b14db91ee09e9))
+
+## [9.1.1](https://github.com/starknet-io/starknet.js/compare/v9.1.0...v9.1.1) (2025-12-09)
+
+### Bug Fixes
+
+- **utils:** fetch bindings ([#1514](https://github.com/starknet-io/starknet.js/issues/1514)) ([45e063b](https://github.com/starknet-io/starknet.js/commit/45e063bc6dfe4cea9ffbd5d5f0ba2d829c54cf9a))
+
+# [9.1.0](https://github.com/starknet-io/starknet.js/compare/v9.0.0...v9.1.0) (2025-12-08)
+
+### Bug Fixes
+
+- buildUDCCall ([9212f32](https://github.com/starknet-io/starknet.js/commit/9212f32297f09d74093a98c10419d1c4b04f0eb4))
+- bump to starknet types 10 ([7ffb4be](https://github.com/starknet-io/starknet.js/commit/7ffb4be6f86c1af3bab05796cd09a726c9176095))
+- package-lock ([ffc50a7](https://github.com/starknet-io/starknet.js/commit/ffc50a788036467ee006fcd12aea06c0c2fcce48))
+
+### Features
+
+- handling of get-starknet v5 ([b297d71](https://github.com/starknet-io/starknet.js/commit/b297d7199c018fe8394b867731393e0813f13483))
+
+# [9.0.0](https://github.com/starknet-io/starknet.js/compare/v8.9.2...v9.0.0) (2025-12-08)
+
+### Bug Fixes
+
+- corrected also in getTipStatsParallel ([1db744f](https://github.com/starknet-io/starknet.js/commit/1db744f43c107142cee862c53818101c793dff82))
+- fix also fastWaitForTransaction ([1c1fe69](https://github.com/starknet-io/starknet.js/commit/1c1fe693101cab332262646f7c334233533ec799))
+- npm audith node-tar issue for the used npm version ([a06174e](https://github.com/starknet-io/starknet.js/commit/a06174e03318117e1c2fdf148389ea40e9ee2273))
+- problem of default starknet version in extractContractHashes ([8a48ae2](https://github.com/starknet-io/starknet.js/commit/8a48ae21ad735e19585f9ddcfc8f820d3fb67849))
+- relocate default value of starknet version ([98c1be0](https://github.com/starknet-io/starknet.js/commit/98c1be0a30a1dd6b05d31f660febb8ea5ec17a9b))
+- remove not more necessary rpc version test ([c783cb2](https://github.com/starknet-io/starknet.js/commit/c783cb20420d460eda5e14917b667105a3606c6c))
+- remove test not rpc0.8 ([4ee93f0](https://github.com/starknet-io/starknet.js/commit/4ee93f04b39d99e4943b5e6545e89b6c5744b9fb))
+- replace alchemy with zan for public node ([1d9f0dd](https://github.com/starknet-io/starknet.js/commit/1d9f0dd0b80796c2ed2f459d84cafb92b4138eeb))
+- spec 10rc2 ([13ddab9](https://github.com/starknet-io/starknet.js/commit/13ddab953cde0e95207813f849bf1f27fc82e42a))
+
+### Features
+
+- base refactor for v9, channel rpc 0.10, tests, types ([70ea529](https://github.com/starknet-io/starknet.js/commit/70ea52986a57d9059fa9bb774384e84509d8f1f5))
+- bump version\ ([228e34a](https://github.com/starknet-io/starknet.js/commit/228e34a1c7240c019039dedaf414a54ffe68ad19))
+
+### BREAKING CHANGES
+
+- starknetjs v9
+
+# [9.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.3...v9.0.0-beta.4) (2025-12-08)
+
+### Bug Fixes
+
+- replace alchemy with zan for public node ([1d9f0dd](https://github.com/starknet-io/starknet.js/commit/1d9f0dd0b80796c2ed2f459d84cafb92b4138eeb))
+
+# [9.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.2...v9.0.0-beta.3) (2025-11-26)
+
+### Bug Fixes
+
+- problem of default starknet version in extractContractHashes ([8a48ae2](https://github.com/starknet-io/starknet.js/commit/8a48ae21ad735e19585f9ddcfc8f820d3fb67849))
+- relocate default value of starknet version ([98c1be0](https://github.com/starknet-io/starknet.js/commit/98c1be0a30a1dd6b05d31f660febb8ea5ec17a9b))
+
+# [9.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v9.0.0-beta.1...v9.0.0-beta.2) (2025-11-24)
+
+### Bug Fixes
+
+- fix also fastWaitForTransaction ([1c1fe69](https://github.com/starknet-io/starknet.js/commit/1c1fe693101cab332262646f7c334233533ec799))
+- remove not more necessary rpc version test ([c783cb2](https://github.com/starknet-io/starknet.js/commit/c783cb20420d460eda5e14917b667105a3606c6c))
+- remove test not rpc0.8 ([4ee93f0](https://github.com/starknet-io/starknet.js/commit/4ee93f04b39d99e4943b5e6545e89b6c5744b9fb))
+- spec 10rc2 ([13ddab9](https://github.com/starknet-io/starknet.js/commit/13ddab953cde0e95207813f849bf1f27fc82e42a))
+
+# [9.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v8.9.0...v9.0.0-beta.1) (2025-11-20)
+
+### Bug Fixes
+
+- corrected also in getTipStatsParallel ([1db744f](https://github.com/starknet-io/starknet.js/commit/1db744f43c107142cee862c53818101c793dff82))
+- npm audith node-tar issue for the used npm version ([a06174e](https://github.com/starknet-io/starknet.js/commit/a06174e03318117e1c2fdf148389ea40e9ee2273))
+
+### Features
+
+- base refactor for v9, channel rpc 0.10, tests, types ([70ea529](https://github.com/starknet-io/starknet.js/commit/70ea52986a57d9059fa9bb774384e84509d8f1f5))
+- bump version\ ([228e34a](https://github.com/starknet-io/starknet.js/commit/228e34a1c7240c019039dedaf414a54ffe68ad19))
+
+### BREAKING CHANGES
+
+- starknetjs v9
+
 ## [8.9.2](https://github.com/starknet-io/starknet.js/compare/v8.9.1...v8.9.2) (2025-12-08)
 
 ### Bug Fixes

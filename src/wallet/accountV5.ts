@@ -1,16 +1,27 @@
+import type {
+  AddStarknetChainParameters,
+  Signature,
+  WatchAssetParameters,
+} from '@starknet-io/starknet-types-010';
+
+import type {
+  WalletWithStarknetFeatures,
+  StandardEventsChangeProperties,
+} from '@starknet-io/get-starknet-wallet-standard/features';
+
 import { Account, AccountInterface } from '../account';
 import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
-import type {
+import {
   AllowArray,
   CairoVersion,
   Call,
   CompiledSierra,
   DeclareContractPayload,
   MultiDeployContractResponse,
-  ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
+  type PaymasterOptions,
 } from '../types';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
@@ -19,56 +30,54 @@ import {
   addInvokeTransaction,
   addStarknetChain,
   getPermissions,
-  onAccountChange,
-  onNetworkChanged,
+  subscribeWalletEvent,
   requestAccounts,
   signMessage,
   switchStarknetChain,
   watchAsset,
-} from './connect';
-import type { StarknetWalletProvider, WalletAccountV4Options } from './types/index.type';
-import type { PaymasterOptions } from '../paymaster/types/index.type';
+} from './connectV5';
+import type { WalletAccountV5Options } from './types/index.type';
 import type { PaymasterInterface } from '../paymaster';
-import {
-  AccountChangeEventHandler,
-  NetworkChangeEventHandler,
-  WatchAssetParameters,
-  AddStarknetChainParameters,
-  Signature,
-} from '../types/api';
+import { defaultDeployer } from '../deployer';
 
-// Represent 'Selected Active' Account inside Connected Wallet
-export class WalletAccount extends Account implements AccountInterface {
-  public walletProvider: StarknetWalletProvider;
+/**
+ * WalletAccountV5 class.
+ * This class is used to create a wallet account that can be used to interact with a Starknet wallet browser extension, using get-starknet v5.
+ */
+export class WalletAccountV5 extends Account implements AccountInterface {
+  public walletProvider: WalletWithStarknetFeatures;
 
-  constructor(options: WalletAccountV4Options) {
+  /**
+   * The function to use to unsubscribe from the wallet events.
+   * To call before the instance is deleted.
+   */
+  private unsubscribe: () => void;
+
+  constructor(options: WalletAccountV5Options) {
     super({ ...options, signer: '' }); // At this point unknown address
     this.walletProvider = options.walletProvider;
 
-    // Update Address on change
-    this.walletProvider.on('accountsChanged', (res) => {
-      if (!res) return;
-      this.address = res[0].toLowerCase();
-    });
-
-    // Update Channel chainId on Network change
-    this.walletProvider.on('networkChanged', (res) => {
-      if (!res) return;
-      // Determine is it better to set chainId or replace channel with new one
-      // At the moment channel is stateless but it could change
-      this.channel.setChainId(res as StarknetChainId);
-    });
+    // Update Address/network on change
+    this.unsubscribe = this.walletProvider.features['standard:events'].on(
+      'change',
+      (change: StandardEventsChangeProperties) => {
+        if (!change.accounts?.length) return;
+        if (change.accounts[0].address) this.address = change.accounts[0].address;
+        if (change.accounts[0].chains)
+          this.channel.setChainId(change.accounts[0].chains[0].slice(9) as StarknetChainId);
+      }
+    );
   }
 
   /**
    * WALLET EVENTS
    */
-  public onAccountChange(callback: AccountChangeEventHandler): void {
-    onAccountChange(this.walletProvider, callback);
+  public onChange(callback: (change: StandardEventsChangeProperties) => void): void {
+    subscribeWalletEvent(this.walletProvider, callback);
   }
 
-  public onNetworkChanged(callback: NetworkChangeEventHandler): void {
-    onNetworkChanged(this.walletProvider, callback);
+  public unsubscribeChange(): void {
+    this.unsubscribe();
   }
 
   /**
@@ -114,38 +123,29 @@ export class WalletAccount extends Account implements AccountInterface {
     return addInvokeTransaction(this.walletProvider, params);
   }
 
-  override async declare(payload: DeclareContractPayload) {
-    const declareContractPayload = extractContractHashes(
-      payload,
-      await this.channel.getStarknetVersion()
-    );
-
+  override declare(payload: DeclareContractPayload) {
+    const declareContractPayload = extractContractHashes(payload);
     // DISCUSS: HOTFIX: Adapt Abi format
     const pContract = payload.contract as CompiledSierra;
     const cairo1Contract = {
       ...pContract,
       abi: stringify(pContract.abi),
     };
-
-    // Check FIx
     if (!declareContractPayload.compiledClassHash) {
       throw Error('compiledClassHash is required');
     }
-
     const params = {
       compiled_class_hash: declareContractPayload.compiledClassHash,
       contract_class: cairo1Contract,
     };
-
     return addDeclareTransaction(this.walletProvider, params);
   }
 
   override async deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Promise<MultiDeployContractResponse> {
-    const { calls, addresses } = this.deployer.buildDeployerCall(payload, this.address);
+    const { calls, addresses } = defaultDeployer.buildDeployerCall(payload, this.address);
     const invokeResponse = await this.execute(calls);
-
     return {
       ...invokeResponse,
       contract_address: addresses,
@@ -157,14 +157,14 @@ export class WalletAccount extends Account implements AccountInterface {
   }
 
   static async connect(
-    provider: ProviderOptions | ProviderInterface,
-    walletProvider: StarknetWalletProvider,
+    provider: ProviderInterface,
+    walletProvider: WalletWithStarknetFeatures,
     cairoVersion?: CairoVersion,
     paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
-    return new WalletAccount({
+    return new WalletAccountV5({
       provider,
       walletProvider,
       address: accountAddress,
@@ -175,11 +175,11 @@ export class WalletAccount extends Account implements AccountInterface {
 
   static async connectSilent(
     provider: ProviderInterface,
-    walletProvider: StarknetWalletProvider,
+    walletProvider: WalletWithStarknetFeatures,
     cairoVersion?: CairoVersion,
     paymaster?: PaymasterOptions | PaymasterInterface
   ) {
-    return WalletAccount.connect(provider, walletProvider, cairoVersion, paymaster, true);
+    return WalletAccountV5.connect(provider, walletProvider, cairoVersion, paymaster, true);
   }
 
   // TODO: MISSING ESTIMATES

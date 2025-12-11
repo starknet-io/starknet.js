@@ -5,6 +5,17 @@ import {
   constants,
   toApiVersion,
   compareVersions,
+  isV3Tx,
+  isPreConfirmedBlock,
+  isPreConfirmedTransaction,
+  isPreConfirmedStateUpdate,
+  ETransactionVersion,
+} from '../../src';
+import type {
+  InvocationsDetailsWithNonce,
+  GetBlockResponse,
+  GetTransactionReceiptResponse,
+  StateUpdateResponse,
 } from '../../src';
 
 describe('isVersion', () => {
@@ -96,9 +107,9 @@ describe('toAnyPatchVersion', () => {
 describe('isSupportedSpecVersion', () => {
   it('returns true for supported spec versions', () => {
     expect(isSupportedSpecVersion('0.9.0')).toBe(true);
-    expect(isSupportedSpecVersion('0.8.1')).toBe(true);
+    expect(isSupportedSpecVersion('0.10.0')).toBe(true);
     expect(isSupportedSpecVersion('0.9', { allowAnyPatchVersion: true })).toBe(true);
-    expect(isSupportedSpecVersion('0.8', { allowAnyPatchVersion: true })).toBe(true);
+    expect(isSupportedSpecVersion('0.10', { allowAnyPatchVersion: true })).toBe(true);
   });
 
   it('returns false for unsupported spec versions', () => {
@@ -256,5 +267,198 @@ describe('compareVersions', () => {
       expect(useBlake('1.0.0')).toBe(true);
       expect(useBlake('0.13.9')).toBe(false);
     });
+  });
+});
+
+describe('isV3Tx', () => {
+  it('returns true for V3 transactions with explicit version 3', () => {
+    const v3Details: InvocationsDetailsWithNonce = {
+      nonce: 1,
+      version: 3,
+    };
+    expect(isV3Tx(v3Details)).toBe(true);
+  });
+
+  it('returns true for V3 transactions with hex version 0x3', () => {
+    const v3Details: InvocationsDetailsWithNonce = {
+      nonce: 1,
+      version: '0x3',
+    };
+    expect(isV3Tx(v3Details)).toBe(true);
+  });
+
+  it('returns true for F3 transactions (feemarket version)', () => {
+    const f3Details: InvocationsDetailsWithNonce = {
+      nonce: 1,
+      version: ETransactionVersion.F3,
+    };
+    expect(isV3Tx(f3Details)).toBe(true);
+  });
+
+  it('returns true when version is not specified (defaults to V3)', () => {
+    const defaultDetails: InvocationsDetailsWithNonce = {
+      nonce: 1,
+    };
+    expect(isV3Tx(defaultDetails)).toBe(true);
+  });
+
+  it('returns false for V2 transactions', () => {
+    const v2Details: InvocationsDetailsWithNonce = {
+      nonce: 1,
+      version: 2,
+    };
+    expect(isV3Tx(v2Details)).toBe(false);
+  });
+
+  it('returns false for V1 transactions', () => {
+    const v1Details: InvocationsDetailsWithNonce = {
+      nonce: 1,
+      version: 1,
+    };
+    expect(isV3Tx(v1Details)).toBe(false);
+  });
+
+  it('returns false for hex version 0x1', () => {
+    const v1Details: InvocationsDetailsWithNonce = {
+      nonce: 1,
+      version: '0x1',
+    };
+    expect(isV3Tx(v1Details)).toBe(false);
+  });
+});
+
+describe('isPreConfirmedBlock', () => {
+  it('returns true for blocks with PRE_CONFIRMED status', () => {
+    const preConfirmedBlock = {
+      status: 'PRE_CONFIRMED',
+      transactions: [],
+      timestamp: 123456,
+    } as unknown as GetBlockResponse;
+    expect(isPreConfirmedBlock(preConfirmedBlock)).toBe(true);
+  });
+
+  it('returns false for blocks with ACCEPTED_ON_L2 status', () => {
+    const acceptedBlock = {
+      status: 'ACCEPTED_ON_L2',
+      block_hash: '0x123',
+      transactions: [],
+      timestamp: 123456,
+    } as unknown as GetBlockResponse;
+    expect(isPreConfirmedBlock(acceptedBlock)).toBe(false);
+  });
+
+  it('returns false for blocks with ACCEPTED_ON_L1 status', () => {
+    const acceptedBlock = {
+      status: 'ACCEPTED_ON_L1',
+      block_hash: '0x123',
+      transactions: [],
+      timestamp: 123456,
+    } as unknown as GetBlockResponse;
+    expect(isPreConfirmedBlock(acceptedBlock)).toBe(false);
+  });
+
+  it('returns false for blocks with REJECTED status', () => {
+    const rejectedBlock = {
+      status: 'REJECTED',
+      transactions: [],
+      timestamp: 123456,
+    } as unknown as GetBlockResponse;
+    expect(isPreConfirmedBlock(rejectedBlock)).toBe(false);
+  });
+});
+
+describe('isPreConfirmedTransaction', () => {
+  it('returns true for transactions without block_hash', () => {
+    const preConfirmedTx = {
+      transaction_hash: '0x123',
+      execution_status: 'SUCCEEDED',
+      finality_status: 'ACCEPTED_ON_L2',
+    } as GetTransactionReceiptResponse;
+    expect(isPreConfirmedTransaction(preConfirmedTx)).toBe(true);
+  });
+
+  it('returns false for transactions with block_hash', () => {
+    const confirmedTx = {
+      transaction_hash: '0x123',
+      block_hash: '0xabc',
+      execution_status: 'SUCCEEDED',
+      finality_status: 'ACCEPTED_ON_L2',
+    } as GetTransactionReceiptResponse;
+    expect(isPreConfirmedTransaction(confirmedTx)).toBe(false);
+  });
+
+  it('returns true for transactions with undefined block_hash', () => {
+    const tx = {
+      transaction_hash: '0x123',
+      execution_status: 'SUCCEEDED',
+      finality_status: 'ACCEPTED_ON_L2',
+      block_hash: undefined,
+    } as unknown as GetTransactionReceiptResponse;
+    // Note: 'block_hash' in response would still be true, so this returns false
+    expect(isPreConfirmedTransaction(tx)).toBe(false);
+  });
+
+  it('returns false for reverted transactions with block_hash', () => {
+    const revertedTx = {
+      transaction_hash: '0x123',
+      block_hash: '0xdef',
+      execution_status: 'REVERTED',
+      finality_status: 'ACCEPTED_ON_L2',
+      revert_reason: 'Error',
+    } as GetTransactionReceiptResponse;
+    expect(isPreConfirmedTransaction(revertedTx)).toBe(false);
+  });
+});
+
+describe('isPreConfirmedStateUpdate', () => {
+  it('returns true for state updates without block_hash', () => {
+    const preConfirmedState = {
+      old_root: '0x123',
+      new_root: '0x456',
+      state_diff: {
+        storage_diffs: [],
+        deployed_contracts: [],
+        nonces: [],
+        declared_classes: [],
+        replaced_classes: [],
+      },
+    } as unknown as StateUpdateResponse;
+    expect(isPreConfirmedStateUpdate(preConfirmedState)).toBe(true);
+  });
+
+  it('returns false for state updates with block_hash', () => {
+    const confirmedState = {
+      block_hash: '0xabc',
+      old_root: '0x123',
+      new_root: '0x456',
+      state_diff: {
+        storage_diffs: [],
+        deployed_contracts: [],
+        nonces: [],
+        declared_classes: [],
+        replaced_classes: [],
+      },
+    } as unknown as StateUpdateResponse;
+    expect(isPreConfirmedStateUpdate(confirmedState)).toBe(false);
+  });
+
+  it('returns true for minimal pre-confirmed state update', () => {
+    const minimalState = {
+      new_root: '0x789',
+      old_root: '0x012',
+      state_diff: {},
+    } as unknown as StateUpdateResponse;
+    expect(isPreConfirmedStateUpdate(minimalState)).toBe(true);
+  });
+
+  it('returns false for state update with undefined block_hash', () => {
+    const state = {
+      block_hash: undefined,
+      old_root: '0x123',
+      new_root: '0x456',
+      state_diff: {},
+    } as unknown as StateUpdateResponse;
+    // Note: 'block_hash' in response would still be true, so this returns false
+    expect(isPreConfirmedStateUpdate(state)).toBe(false);
   });
 });

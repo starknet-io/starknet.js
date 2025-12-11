@@ -139,7 +139,7 @@ describe('getAbiEvents', () => {
   });
 });
 
-describe('parseEvents', () => {
+describe('Mocked: parseEvents', () => {
   test('should return parsed events', () => {
     const abiEventAndVariantName = 'cairo_event_struct';
     const abiCairoEventStruct: AbiEvent = {
@@ -201,12 +201,14 @@ describe('parseEvents', () => {
     };
 
     const event: RPC.EmittedEvent = {
+      transaction_hash: '0x789',
+      transaction_index: 0,
+      event_index: 0,
+      block_hash: '0x1234',
+      block_number: 567,
       from_address: 'test_address',
       keys: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
       data: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
-      block_hash: '0x1234',
-      block_number: 567,
-      transaction_hash: '0x789',
     };
 
     const abi = [getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum];
@@ -218,9 +220,11 @@ describe('parseEvents', () => {
         cairo_event_struct: {
           test_name: 1708719217404197029088109386680815809747762070431461851150711916567020191623n,
         },
+        transaction_hash: '0x789',
+        transaction_index: 0,
+        event_index: 0,
         block_hash: '0x1234',
         block_number: 567,
-        transaction_hash: '0x789',
       },
     ];
 
@@ -288,12 +292,14 @@ describe('parseEvents', () => {
     };
 
     const event: RPC.EmittedEvent = {
+      transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
+      transaction_index: 0,
+      event_index: 0,
+      block_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34d',
+      block_number: 1,
       from_address: 'test_address',
       keys: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
       data: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
-      block_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34d',
-      block_number: 1,
-      transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
     };
 
     const abi = [getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum];
@@ -305,9 +311,11 @@ describe('parseEvents', () => {
         cairo_event_struct: {
           test_name: 1708719217404197029088109386680815809747762070431461851150711916567020191623n,
         },
+        transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
+        transaction_index: 0,
+        event_index: 0,
         block_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34d',
         block_number: 1,
-        transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
       },
     ];
 
@@ -375,12 +383,14 @@ describe('parseEvents', () => {
     };
 
     const event: RPC.EmittedEvent = {
+      transaction_hash: '0x789',
+      transaction_index: 0,
+      event_index: 0,
+      block_hash: '0x1234',
+      block_number: 567,
       from_address: 'test_address',
       keys: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
       data: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
-      block_hash: '0x1234',
-      block_number: 567,
-      transaction_hash: '0x789',
     };
 
     abiEvents['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'].name = '';

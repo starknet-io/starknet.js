@@ -1,4 +1,4 @@
-import { constants, config } from '../../src';
+import { constants, config, BlockTag } from '../../src';
 
 describe('Configuration', () => {
   // Reset the configuration before each test to avoid side effects
@@ -53,8 +53,8 @@ describe('Configuration', () => {
   describe('getAll()', () => {
     it('should return a copy of the configuration', () => {
       const all = config.getAll();
-      all.rpcVersion = '0.8.1'; // Modify the copy
-      expect(config.get('rpcVersion')).toBe('0.9.0'); // Original remains unaffected
+      all.rpcVersion = '0.9.0'; // Modify the copy
+      expect(config.get('rpcVersion')).toBe('0.10.0'); // Original remains unaffected
     });
   });
 
@@ -99,6 +99,21 @@ describe('Configuration', () => {
       config.set('LogLevel', 'DEBUG');
       expect(config.hasKey('LogLevel')).toBe(true);
       expect(config.hasKey('logLevel')).toBe(true); // Original key still exists
+    });
+
+    it('should handle nested configuration', () => {
+      config.set('channelDefaults.options.blockIdentifier', BlockTag.PRE_CONFIRMED);
+      expect(config.get('channelDefaults.options.blockIdentifier')).toBe(BlockTag.PRE_CONFIRMED);
+
+      config.set('channelDefaults.methods.simulateTransaction.skipValidate', false);
+      expect(config.get('channelDefaults.methods.simulateTransaction.skipValidate')).toBe(false);
+
+      config.set('channelDefaults.methods.getEstimateFee.skipValidate', false);
+
+      const channelDefaults = config.get('channelDefaults');
+      expect(channelDefaults.options.blockIdentifier).toBe(BlockTag.PRE_CONFIRMED);
+      expect(channelDefaults.methods.simulateTransaction.skipValidate).toBe(false);
+      expect(channelDefaults.methods.getEstimateFee.skipValidate).toBe(false);
     });
   });
 });

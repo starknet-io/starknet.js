@@ -19,7 +19,23 @@ const mockConfigStore: {
   [key: string]: any; // Add this index signature to allow any string key
 } = {
   logLevel: 'INFO' as LogLevel,
-  rpcVersion: '0.8',
+  rpcVersion: '0.10',
+  channelDefaults: {
+    options: {
+      headers: { 'Content-Type': 'application/json' },
+      blockIdentifier: 'latest',
+      retries: 200,
+    },
+    methods: {
+      simulateTransaction: {
+        skipValidate: true,
+        skipFeeCharge: true,
+      },
+      getEstimateFee: {
+        skipValidate: true,
+      },
+    },
+  },
 };
 
 // Use doMock instead of mock (doesn't get hoisted)
