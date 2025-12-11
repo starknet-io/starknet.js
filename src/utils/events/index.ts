@@ -19,6 +19,7 @@ import { AbiParserInterface } from '../calldata/parser/interface';
 import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
+import { toHex } from '../num';
 import { isUndefined, isObject } from '../typed';
 
 /**
@@ -201,60 +202,148 @@ export function parseEvents(
   abiEnums: AbiEnums,
   parser: AbiParserInterface
 ): ParsedEvents {
-  const ret = providerReceivedEvents
-    .flat()
-    .reduce((acc, recEvent: RPC.EmittedEvent | RPC.Event) => {
-      const currentEvent: RPC.EmittedEvent | RPC.Event = JSON.parse(JSON.stringify(recEvent));
-      let abiEvent: AbiEvent | AbiEvents = abiEvents[currentEvent.keys.shift() ?? 0];
-      if (!abiEvent) {
-        return acc;
-      }
-      while (!abiEvent.name) {
-        const hashName = currentEvent.keys.shift();
-        assert(!!hashName, 'Not enough data in "keys" property of this event.');
-        abiEvent = (abiEvent as AbiEvents)[hashName];
-      }
-      // Create our final event object
-      const parsedEvent: ParsedEvent = {};
-      parsedEvent[abiEvent.name as string] = {};
-      // Remove the event's name hashed from the keys array
-      const keysIter = currentEvent.keys[Symbol.iterator]();
-      const dataIter = currentEvent.data[Symbol.iterator]();
+  const ret = providerReceivedEvents.reduce((acc, recEvent: RPC.EmittedEvent | RPC.Event) => {
+    // Shallow clone to avoid mutating original event while processing keys
+    const eventKeys = [...recEvent.keys];
+    const eventData = [...recEvent.data];
 
-      const abiEventKeys =
-        (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'key') ||
-        (abiEvent as LegacyEvent).keys;
-      const abiEventData =
-        (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'data') ||
-        (abiEvent as LegacyEvent).data;
-
-      abiEventKeys.forEach((key) => {
-        parsedEvent[abiEvent.name as string][key.name] = responseParser({
-          responseIterator: keysIter,
-          output: key,
-          structs: abiStructs,
-          enums: abiEnums,
-          parser,
-          parsedResult: parsedEvent[abiEvent.name as string],
-        });
-      });
-
-      abiEventData.forEach((data) => {
-        parsedEvent[abiEvent.name as string][data.name] = responseParser({
-          responseIterator: dataIter,
-          output: data,
-          structs: abiStructs,
-          enums: abiEnums,
-          parser,
-          parsedResult: parsedEvent[abiEvent.name as string],
-        });
-      });
-      if ('block_hash' in currentEvent) parsedEvent.block_hash = currentEvent.block_hash;
-      if ('block_number' in currentEvent) parsedEvent.block_number = currentEvent.block_number;
-      if ('transaction_hash' in currentEvent)
-        parsedEvent.transaction_hash = currentEvent.transaction_hash;
-      acc.push(parsedEvent);
+    let abiEvent: AbiEvent | AbiEvents = abiEvents[eventKeys.shift() ?? 0];
+    if (!abiEvent) {
       return acc;
-    }, [] as ParsedEvents);
+    }
+    while (!abiEvent.name) {
+      const hashName = eventKeys.shift();
+      assert(!!hashName, 'Not enough data in "keys" property of this event.');
+      abiEvent = (abiEvent as AbiEvents)[hashName];
+    }
+
+    // Create our final event object with metadata only (exclude from_address, keys, data)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { from_address: _from, keys: _keys, data: _data, ...eventMetadata } = recEvent;
+    const parsedEvent: ParsedEvent = eventMetadata as ParsedEvent;
+
+    const eventName = abiEvent.name as string;
+    parsedEvent[eventName] = {};
+
+    // Get iterators for remaining keys and data (after shifts above)
+    const keysIter = eventKeys[Symbol.iterator]();
+    const dataIter = eventData[Symbol.iterator]();
+
+    const abiEventKeys =
+      (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'key') ||
+      (abiEvent as LegacyEvent).keys;
+    const abiEventData =
+      (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'data') ||
+      (abiEvent as LegacyEvent).data;
+
+    const parsedEventData = parsedEvent[eventName];
+
+    abiEventKeys.forEach((key) => {
+      parsedEventData[key.name] = responseParser({
+        responseIterator: keysIter,
+        output: key,
+        structs: abiStructs,
+        enums: abiEnums,
+        parser,
+        parsedResult: parsedEventData,
+      });
+    });
+
+    abiEventData.forEach((data) => {
+      parsedEventData[data.name] = responseParser({
+        responseIterator: dataIter,
+        output: data,
+        structs: abiStructs,
+        enums: abiEnums,
+        parser,
+        parsedResult: parsedEventData,
+      });
+    });
+
+    acc.push(parsedEvent);
+    return acc;
+  }, [] as ParsedEvents);
   return ret;
+}
+
+/**
+ * Add getByPath helper method to parsed events array
+ * This method allows finding events by partial key path matching
+ * @param parsedEvents - Array of parsed events to enhance
+ * @returns The same array with getByPath method attached
+ * @example
+ * ```typescript
+ * const events = addGetByPathMethod(parsedEvents);
+ * const transferEvent = events.getByPath('Transfer');
+ * ```
+ */
+export function addGetByPathMethod(parsedEvents: ParsedEvents): ParsedEvents {
+  Object.defineProperty(parsedEvents, 'getByPath', {
+    value: (path: string) => {
+      const event = parsedEvents.find((ev) => Object.keys(ev).some((key) => key.includes(path)));
+      const eventKey = Object.keys(event || {}).find((key) => key.includes(path));
+      return eventKey && event ? event[eventKey] : null;
+    },
+    writable: false,
+    enumerable: false,
+    configurable: false,
+  });
+  return parsedEvents;
+}
+
+/**
+ * Extract and prepare emitted events from a transaction receipt
+ * Optionally filters by contract address and enriches with transaction/block metadata
+ * @param receipt - Transaction receipt containing events and metadata
+ * @param contractAddress - Optional contract address to filter events by
+ * @returns Emitted events with transaction and block context, optionally filtered
+ * @example
+ * ```typescript
+ * // Get all emitted events
+ * const allEvents = getEmittedEvents(receipt);
+ *
+ * // Get events from specific contract
+ * const contractEvents = getEmittedEvents(receipt, contractAddress);
+ * ```
+ */
+export function getEmittedEvents(
+  receipt: {
+    events?: RPC.Event[];
+    transaction_hash: string;
+    block_hash?: string;
+    block_number?: number;
+  },
+  contractAddress?: string
+): RPC.EmittedEvent[] {
+  if (!receipt.events) return [];
+
+  // Filter first if contract address provided
+  const eventsToEnrich = contractAddress
+    ? filterEventsByAddress(receipt.events, contractAddress)
+    : receipt.events;
+
+  return eventsToEnrich.map((event) => ({
+    ...event,
+    transaction_hash: receipt.transaction_hash,
+    block_hash: receipt.block_hash,
+    block_number: receipt.block_number,
+  })) as RPC.EmittedEvent[];
+}
+
+/**
+ * Filter events by contract address
+ * @param events - Array of events to filter (defaults to empty array if undefined)
+ * @param contractAddress - Address to filter by
+ * @returns Filtered events matching the contract address
+ * @example
+ * ```typescript
+ * const myEvents = filterEventsByAddress(allEvents, '0x123...');
+ * ```
+ */
+export function filterEventsByAddress<T extends { from_address: string }>(
+  events: T[] | undefined,
+  contractAddress: string
+): T[] {
+  if (!events) return [];
+  return events.filter((event) => toHex(event.from_address) === toHex(contractAddress));
 }

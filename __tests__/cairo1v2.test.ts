@@ -942,8 +942,18 @@ describe('Cairo 1', () => {
       const abiEnums = CallData.getAbiEnum(abi);
       const parser = createAbiParser(abi);
       const rawEventNested = {
+        transaction_hash: '0x4e38fcce79c115b6fe2c486e3514efc1bd4da386b91c104e97230177d0bf181',
+        transaction_index: 0,
+        event_index: 0,
         block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
         block_number: 69198,
+        from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
+        keys: [
+          '0x22ea134d4126804c60797e633195f8c9aa5fd6d1567e299f4961d0e96f373ee',
+          '0x2e0a012a863e6b614014d113e7285b06e30d2999e42e6e03ba2ef6158b0a8f1',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+        ],
         data: [
           '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
           '0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
@@ -961,14 +971,6 @@ describe('Cairo 1', () => {
           '0x616b697261',
           '0x616b697261',
         ],
-        from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
-        keys: [
-          '0x22ea134d4126804c60797e633195f8c9aa5fd6d1567e299f4961d0e96f373ee',
-          '0x2e0a012a863e6b614014d113e7285b06e30d2999e42e6e03ba2ef6158b0a8f1',
-          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
-          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
-        ],
-        transaction_hash: '0x4e38fcce79c115b6fe2c486e3514efc1bd4da386b91c104e97230177d0bf181',
       };
       const parsedEvent = events.parseEvents(
         [rawEventNested],
@@ -1003,35 +1005,37 @@ describe('Cairo 1', () => {
           block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
           block_number: 69198,
           transaction_hash: '0x4e38fcce79c115b6fe2c486e3514efc1bd4da386b91c104e97230177d0bf181',
+          transaction_index: 0,
+          event_index: 0,
         },
       ]);
       // From component `DepositComponent`, event `Deposit` (same event name than next)
       const rawEventNestedDeposit1 = {
+        transaction_hash: '0x7768860d79bfb4c8463d215abea3c267899e373407c6882077f7447051c50de',
+        transaction_index: 0,
+        event_index: 0,
         block_hash: '0x31afd649a5042cb1855ce820708a555eab62fe6ea07a2a538fa9100cdc80383',
         block_number: 69198,
-        data: [
-          '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
-          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
-          '0x119b74ab81c000',
-          '0x0',
-        ],
         from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
         keys: [
           '0xa1db419bdf20c7726cf74c30394c4300e5645db4e3cacaf897da05faabae03',
           '0x9149d2123147c5f43d258257fef0b7b969db78269369ebcf5ebb9eef8592f2',
           '0x033e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
         ],
-        transaction_hash: '0x7768860d79bfb4c8463d215abea3c267899e373407c6882077f7447051c50de',
-      };
-      // From component `RouterComponent`, event `Deposit` (same event name than previous)
-      const rawEventNestedDeposit2 = {
-        block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
-        block_number: 69198,
         data: [
+          '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
           '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
           '0x119b74ab81c000',
           '0x0',
         ],
+      };
+      // From component `RouterComponent`, event `Deposit` (same event name than previous)
+      const rawEventNestedDeposit2 = {
+        transaction_hash: '0x2d5210e5334a83306abe6f7f5e7e65cd1feed72ad3b8e359a2f4614fa948e1d',
+        transaction_index: 0,
+        event_index: 0,
+        block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+        block_number: 69198,
         from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
         keys: [
           '0x1352a17d221f274db15a49e35cc827e5106495ba85330b210632597411d5a46',
@@ -1039,7 +1043,11 @@ describe('Cairo 1', () => {
           '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
           '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
         ],
-        transaction_hash: '0x2d5210e5334a83306abe6f7f5e7e65cd1feed72ad3b8e359a2f4614fa948e1d',
+        data: [
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x119b74ab81c000',
+          '0x0',
+        ],
       };
       const parsedEventNestedDeposit1 = events.parseEvents(
         [rawEventNestedDeposit1],
@@ -1059,6 +1067,8 @@ describe('Cairo 1', () => {
           block_hash: '0x31afd649a5042cb1855ce820708a555eab62fe6ea07a2a538fa9100cdc80383',
           block_number: 69198,
           transaction_hash: '0x7768860d79bfb4c8463d215abea3c267899e373407c6882077f7447051c50de',
+          transaction_index: 0,
+          event_index: 0,
         },
       ]);
       const parsedEventNestedDeposit2 = events.parseEvents(
@@ -1079,21 +1089,25 @@ describe('Cairo 1', () => {
           block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
           block_number: 69198,
           transaction_hash: '0x2d5210e5334a83306abe6f7f5e7e65cd1feed72ad3b8e359a2f4614fa948e1d',
+          transaction_index: 0,
+          event_index: 0,
         },
       ]);
 
       // parsing nested event with #[flat] attribute, from a Cairo component
       const rawEventFlat = {
+        transaction_hash: '0x2da31a929a9848e9630906275a75a531e1718d4830501e10b0bccacd55f6fe0',
+        transaction_index: 0,
+        event_index: 0,
         block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
         block_number: 69198,
-        data: ['0x119b74ab81c000', '0x0'],
         from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
         keys: [
           '0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9',
           '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
           '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
         ],
-        transaction_hash: '0x2da31a929a9848e9630906275a75a531e1718d4830501e10b0bccacd55f6fe0',
+        data: ['0x119b74ab81c000', '0x0'],
       };
       const parsedEventFlat = events.parseEvents(
         [rawEventFlat],
@@ -1112,6 +1126,8 @@ describe('Cairo 1', () => {
           block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
           block_number: 69198,
           transaction_hash: '0x2da31a929a9848e9630906275a75a531e1718d4830501e10b0bccacd55f6fe0',
+          transaction_index: 0,
+          event_index: 0,
         },
       ]);
     });
