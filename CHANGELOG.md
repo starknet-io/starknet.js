@@ -1,3 +1,11 @@
+## [9.2.1](https://github.com/starknet-io/starknet.js/compare/v9.2.0...v9.2.1) (2025-12-11)
+
+### Bug Fixes
+
+- mark ws rpc 0.10, default expose rpc 0.10 ([aae081f](https://github.com/starknet-io/starknet.js/commit/aae081fed1bbcb547c5b4a7dc7026c229ea8a642))
+- patch parseEvents for rpc 0.10 ([6d8da90](https://github.com/starknet-io/starknet.js/commit/6d8da907cc33149847cd89bd6fb9d908e772281f))
+- simplify parseEvents and fix missing rpc 0.10 props ([b3ee82e](https://github.com/starknet-io/starknet.js/commit/b3ee82eb9f79de590123aef456b8545d95b86659))
+
 # [9.2.0](https://github.com/starknet-io/starknet.js/compare/v9.1.1...v9.2.0) (2025-12-10)
 
 ### Features
