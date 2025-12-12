@@ -2,562 +2,217 @@
 sidebar_position: 12
 ---
 
-# Migrate from v7 to v8
+# Migrate from v8 to v9
 
-This document covers the features present in v7 which have changed in some significant way in v8.
+This document covers the breaking changes and major features that have changed in v9.
 
 If you encounter any missing changes, please let us know and we will update this guide.
 
-## Starknet 0.14
+## Quick Summary
 
-Starknet.js v8 introduces support for **Starknet protocol version 0.14**, which brings several important network-level changes that affect how you build and interact with Starknet:
+**Main breaking changes in v9:**
 
-### RPC 0.9 Support
+1. **RPC 0.8 removed** - Only RPC 0.9 and 0.10 supported (0.10 is default)
+2. **"Pending" → "PreConfirmed"** - All pending-related types, methods, and functions renamed
+3. **Type packages updated** - `@starknet-io/starknet-types-08` removed
+4. **Blake2s hash support** - For Starknet 0.14.1+ contract class hashing
+5. **Websocket channel use RPC 0.10** - single change regarding reorg event emitted
 
-Starknet.js v8 introduces support for **RPC 0.9** and maintains compatibility with **RPC 0.8**.
+**Quick migration steps:**
 
-**RPC 0.7 support has been removed.** If you were using **RPC 0.7** endpoints, you must upgrade to **0.8** or **0.9**.
-
-```typescript
-// Option 1: Use RPC 0.8
-const provider = new RpcProvider({
-  nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_8',
-  specVersion: '0.8.1',
-});
-
-// Option 2: Use RPC 0.9 (default)
-const provider = new RpcProvider({
-  nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_9',
-  // specVersion defaults to '0.9.0'
-});
-
-// Option 3: Automatic specVersion detection
-const provider = await RpcProvider.create({ nodeUrl: `${myNodeUrl}` });
+```bash
+# Update package
+npm install starknet@^9.0.0
 ```
 
-### Transaction Version Changes
-
-**Only V3 transactions are supported** - Starknet 0.14 has removed support for legacy transaction versions:
-
-- ❌ **V0, V1, V2** transactions are no longer supported on the network
-- ✅ Only **V3** transactions work with the new protocol
-- All transactions now use **STRK fees** instead of ETH fees (for an advanced alternative, check the [Paymaster guide](./account/paymaster))
-
 ```typescript
-const account = new Account({
-  provider,
-  address,
-  signer: privateKey,
-  // ❌ No longer supported, will fail on Starknet 0.14
-  transactionVersion: ETransactionVersion.V2,
-  // ✅ Default and only correct option for Starknet 0.14
-  transactionVersion: ETransactionVersion.V3,
-});
+// Remove RPC08 imports
+import { RPC09, RPC010 } from 'starknet'; // ✅ Use these
+
+// Update pending → pre_confirmed
+const block = await provider.getBlock('pre_confirmed'); // ✅ Was 'pending'
+
+// Update types
+import type { PreConfirmedBlock } from 'starknet'; // ✅ Was PendingBlock
+
+// Update helper functions
+isPreConfirmedBlock(block); // ✅ Was isPendingBlock
 ```
 
-### Transaction Tips
+## Starknet Protocol Support
 
-Starknet 0.14 introduces a **tip mechanism** for transaction prioritization in the mempool:
+Starknet.js v9 continues support for Starknet protocol version 0.14.x (same as v8).
 
-- Transactions can include tips to prioritize execution
-- Higher tips increase the likelihood of faster inclusion
-- Tips are separate from transaction fees and go to the sequencer
+### Blake2s Hash Support (Starknet 0.14.1+)
 
-Starknet.js applies a tip estimation for `Account` class interactions if a tip value is not provided. It can be accessed manually with [`getEstimateTip`](../API/classes/Provider#getestimatetip).
+V9 adds support for the new compiled class hash computation introduced in Starknet 0.14.1:
+
+- **Blake2s hashing**: Contract class hashes now use Blake2s instead of Pedersen hash when targeting Starknet 0.14.1+
+- The library automatically detects the Starknet version and uses the appropriate hash function
+
+## RPC Specification Support
+
+### Supported Versions
+
+Version 9 supports the following RPC specifications:
+
+- ✅ **RPC 0.9.0** - Supported
+- ✅ **RPC 0.10.0** - Supported (default)
+- ❌ **RPC 0.8.1** - Removed
+
+### Breaking Changes
+
+#### 1. Default RPC Version
+
+The default RPC version has been upgraded from ~~`0.9.0`~~ to `0.10.0`.
 
 ```typescript
-import { Account } from 'starknet';
+// V8 default
+config.get('rpcVersion'); // '0.9.0' ❌
 
-const account = new Account({
-  provider,
-  address: accountAddress,
-  signer: privateKey,
-  defaultTipType: 'recommendedTip', // 'minTip' | 'maxTip' | 'averageTip' | 'medianTip' | 'modeTip' | 'recommendedTip' | 'p90Tip' | 'p95Tip'
-});
-
-// Using tips in transactions
-const result = await account.execute(calls, {
-  tip: 1000n, // Custom tip amount in wei
-  // other transaction details
-});
-
-// Get recommended tip
-const tipEstimate = await provider.getEstimateTip();
-console.log('Recommended tip:', tipEstimate.recommendedTip);
+// V9 default
+config.get('rpcVersion'); // '0.10.0' ✅
 ```
 
-### Block State Changes
+#### 2. Removed RPC 0.8 Support
 
-**Important block handling changes:**
+All RPC 0.8 related code has been removed:
 
-- ❌ **Pending blocks have been removed** from the protocol
-- ✅ **New decentralized pre-confirmation state** replaces pending blocks
-- Block statuses are now: `PRE_CONFIRMED` → `ACCEPTED_ON_L2` → `ACCEPTED_ON_L1`
-
-**Starknet.js v8 now waits for transactions to reach `ACCEPTED_ON_L2` status:**
-
-- `waitForTransaction()` now waits for `ACCEPTED_ON_L2` instead of pending confirmation
+**❌ No longer available:**
 
 ```typescript
-// v8 behavior - waits for ACCEPTED_ON_L2
-const txReceipt = await account.waitForTransaction(txHash);
-// Transaction is now confirmed on L2
+import { RPC08 } from 'starknet';
 ```
 
-This affects how you handle transaction states and block confirmations in your applications.
-
-## Breaking Changes
-
-Starknet.js v8 also introduces several breaking changes unrelated to Starknet 0.14. The most significant change is the move from argument-based constructors to object-based APIs for better developer experience and extensibility.
-
-### Constructor API Changes
-
-All major classes now use object-based constructors instead of positional arguments for better clarity and extensibility.
-
-#### Account Class
-
-**v7 (Arguments-based):**
+**✅ Use instead:**
 
 ```typescript
-const account = new Account(
-  provider,
-  accountAddress,
-  privateKey,
-  undefined,
-  ETransactionVersion.V3
-);
+import { RPC09, RPC010 } from 'starknet';
 ```
 
-**v8 (Object-based):**
+#### 3. Channel Implementation
+
+- **Removed**: `src/channel/rpc_0_8_1.ts`
+- **Added**: `src/channel/rpc_0_10_0.ts`
+- **Default export**: Changed from ~~RPC 0.9~~ to RPC 0.10
 
 ```typescript
-const account = new Account({
-  provider,
-  address: accountAddress,
-  signer: privateKey,
-  cairoVersion: undefined, // optional
-  transactionVersion: ETransactionVersion.V3, // optional
-  paymaster: undefined, // optional
-  deployer: undefined, // optional - new in v8
-  defaultTipType: 'recommendedTip', // optional - new in v8
-});
+// V8
+import { RpcChannel } from 'starknet'; // Was RPC 0.9 ❌
+
+// V9
+import { RpcChannel } from 'starknet'; // Now RPC 0.10 ✅
 ```
 
-#### Contract Class
+#### 4. Type Package Dependencies
 
-**v7 (Arguments-based):**
+The underlying type packages have been updated:
 
 ```typescript
-const contract = new Contract(abi, contractAddress, provider);
+// V8 dependencies
+'@starknet-io/starknet-types-08'; // ❌ Removed
+'@starknet-io/starknet-types-09'; // ✅ Still supported
+
+// V9 dependencies
+'@starknet-io/starknet-types-09'; // ✅ Supported
+'@starknet-io/starknet-types-010'; // ✅ Added
 ```
 
-**v8 (Object-based):**
+Import paths updated:
+
+**❌ No longer available:**
 
 ```typescript
-const contract = new Contract({
-  abi,
-  address: contractAddress,
-  providerOrAccount: provider,
-  classHash: undefined, // optional - new in v8
-  parseRequest: true, // optional - new in v8
-  parseResponse: true, // optional - new in v8
-});
+import { RPCSPEC08, RPCSPEC09 } from 'starknet';
 ```
 
-#### WalletAccount Class
-
-**v7 (Arguments-based):**
+**✅ Use instead:**
 
 ```typescript
-const walletAccount = new WalletAccount(provider, walletProvider, address, cairoVersion);
+import { RPCSPEC09, RPCSPEC010 } from 'starknet';
 ```
 
-**v8 (Object-based):**
+## Block and State Changes
+
+### Pending → PreConfirmed Terminology
+
+The concept of ~~"pending"~~ blocks has been replaced with "pre-confirmed" blocks throughout the API:
+
+**❌ No longer available:**
 
 ```typescript
-const walletAccount = new WalletAccount({
-  provider,
-  walletProvider,
-  address,
-  cairoVersion, // optional
-  paymaster: undefined, // optional
-});
+import type { PendingBlock, PendingStateUpdate } from 'starknet';
+const block = await provider.getBlock('pending');
 ```
 
-### Removed Types Namespace
-
-The `types` namespace export has been removed. Types must now be imported directly from the main module.
-
-**v7:**
+**✅ Use instead:**
 
 ```typescript
-import { types } from 'starknet';
-
-const details: types.UniversalDetails = {
-  nonce: 1,
-  version: 3,
-};
-const call: types.Call = {
-  contractAddress: '0x...',
-  entrypoint: 'transfer',
-  calldata: ['0x1', '0x2'],
-};
+import type { PreConfirmedBlock, PreConfirmedStateUpdate } from 'starknet';
+const block = await provider.getBlock('pre_confirmed');
 ```
 
-**v8:**
+**Changed APIs:**
+
+- Type: `PendingBlock` → `PreConfirmedBlock`
+- Type: `PendingStateUpdate` → `PreConfirmedStateUpdate`
+- Method parameter: `'pending'` → `'pre_confirmed'`
+
+**Helper functions renamed:**
+
+**❌ No longer available:**
 
 ```typescript
-import { UniversalDetails, Call } from 'starknet';
+import { isPendingBlock, isPendingTransaction, isPendingStateUpdate } from 'starknet';
 
-const details: UniversalDetails = {
-  nonce: 1,
-  version: 3,
-};
-const call: Call = {
-  contractAddress: '0x...',
-  entrypoint: 'transfer',
-  calldata: ['0x1', '0x2'],
-};
-```
-
-### Contract Factory Changes
-
-The Contract factory API has been completely redesigned. The `Contract.connect()` method and `contractFactory` class have been removed.
-
-**v7:**
-
-```typescript
-import { Contract, contractFactory } from 'starknet';
-
-// Using connect method
-const contract = Contract.connect(abi, contractAddress, account);
-
-// Using contractFactory
-const factory = new contractFactory(contract, casm);
-const deployedContract = await factory.deploy(constructorCalldata);
-```
-
-**v8:**
-
-```typescript
-import { Contract } from 'starknet';
-
-// New async factory method
-const contract = await Contract.factory({
-  contract: sierraContract, // Compiled Sierra contract
-  casm: casmContract, // Compiled CASM contract
-  account: account,
-  constructorCalldata: {
-    name: 'Token',
-    symbol: 'ERC20',
-    amount: 1000n,
-    recipient: account.address,
-    owner: account.address,
-  }, // optional - normal arguments object, not compiled
-  classHash: '0x...', // optional
-  salt: '0x0', // optional
-  unique: true, // optional
-  deployer: account.deployer, // optional
-});
-```
-
-### Removed Helper Functions
-
-Several helper functions have been removed as they are now handled internally by the deployer system:
-
-- `parseUDCEvent()` - Use `defaultDeployer.parseDeployerEvent()` instead
-- `buildUDCCall()` - Use `defaultDeployer.buildDeployerCall()` instead
-
-**v7:**
-
-```typescript
-import { parseUDCEvent, buildUDCCall } from 'starknet';
-
-const { calls, addresses } = buildUDCCall(payload, accountAddress);
-const deployedContract = parseUDCEvent(txReceipt);
-```
-
-**v8:**
-
-```typescript
-import { defaultDeployer } from 'starknet';
-
-// These are now handled internally by the deployer
-const deployTx = await account.deploy(payload, details);
-const txReceipt = await account.waitForTransaction(deployTx.transaction_hash);
-const deployedContract = defaultDeployer.parseDeployerEvent(txReceipt);
-```
-
-### Response Parser Fee Estimate Changes
-
-The response parser now automatically adds overhead calculations to fee estimations, providing `resourceBounds` and `overall_fee` with configurable overhead margins.
-
-**All estimate methods now use `parseFeeEstimateBulkResponse`** internally, which:
-
-- Adds overhead to resource bounds for safety margin
-- Formats responses to include both `resourceBounds` and `overall_fee`
-- Returns `EstimateFeeResponseBulkOverhead` type with standardized structure
-
-**v7 Response Structure:**
-
-```typescript
-// Raw fee estimate from RPC
-{
-  l1_gas_consumed: "0x1000",
-  l1_gas_price: "0x20",
-  l1_data_gas_consumed: "0x500",
-  l1_data_gas_price: "0x10",
-  l2_gas_consumed: "0x200",
-  l2_gas_price: "0x5",
-  unit: "FRI"
+if (isPendingBlock(block)) {
+  // handle pending block
 }
 ```
 
-**v8 Response Structure:**
+**✅ Use instead:**
 
 ```typescript
-// Enhanced response with overhead and resource bounds
-{
-  resourceBounds: {
-    l1_gas: { amount: "0x1200", price: "0x20" },    // With overhead
-    l2_gas: { amount: "0x240", price: "0x5" },      // With overhead
-    l1_data_gas: { amount: "0x600", price: "0x10" } // With overhead
-  },
-  overall_fee: 12345n, // Total fee calculation with overhead
-  unit: "FRI"
-}
-```
-
-**Configuring Resource Bounds Overhead:**
-
-```typescript
-import { RpcProvider } from 'starknet';
-
-// Configure custom overhead percentages (default: 50% for all)
-const provider = new RpcProvider({
-  nodeUrl: 'https://your-node-url',
-  resourceBoundsOverhead: {
-    l1_gas: {
-      max_amount: 10, // 10% overhead for L1 gas amount
-      max_price_per_unit: 10, // 10% overhead for L1 gas price
-    },
-    l2_gas: {
-      max_amount: 5, // 5% overhead for L2 gas amount
-      max_price_per_unit: 5, // 5% overhead for L2 gas price
-    },
-    l1_data_gas: {
-      max_amount: 15, // 15% overhead for L1 data gas amount
-      max_price_per_unit: 15, // 15% overhead for L1 data gas price
-    },
-  },
-});
-
-// All estimate methods benefit from this overhead
-const invokeEstimate = await account.estimateInvokeFee(calls);
-const declareEstimate = await account.estimateDeclareFee(contract);
-const deployEstimate = await account.estimateDeployFee(payload);
-const bulkEstimate = await account.estimateFeeBulk(invocations);
-```
-
-This change ensures safer transaction execution by automatically adding a margin to prevent out-of-gas errors due to network fluctuations.
-
-### Removed Fee Utility Methods
-
-The following utility methods have been removed and replaced with new resource bounds methods:
-
-**Removed Methods:**
-
-- `RPCResponseParser.ZEROFee()` → replaced with `stark.ZeroFeeEstimate()`
-- `stark.estimatedFeeToMaxFee()` → replaced with `stark.toOverheadOverallFee()`
-- `stark.estimateFeeToBounds()` → replaced with `stark.toOverheadResourceBounds()`
-
-**Replaced Types:**
-
-- `EstimateFeeResponse` → replaced with `EstimateFeeResponseOverhead`
-- `EstimateFeeResponseBulk` → replaced with `EstimateFeeResponseBulkOverhead`
-
-The new overhead types provide enhanced structure with `resourceBounds` (ResourceBoundsBN) and `overall_fee` (bigint) instead of the previous flat structure with individual gas consumption fields.
-
-**New Resource Bounds Methods:**
-
-- `stark.zeroResourceBounds()` - Returns zero resource bounds
-- `stark.toOverheadResourceBounds()` - Converts fee estimates to resource bounds with overhead
-- `stark.resourceBoundsToEstimateFeeResponse()` - Converts resource bounds back to fee response format
-- `stark.toOverheadOverallFee()` - Calculates total fee with overhead
-- `stark.ZeroFeeEstimate()` - Returns zero fee estimate structure
-
-These new methods provide better handling of the enhanced resource bounds structure introduced in v8.
-
-:::tip Important: Default Overhead Configuration
-By default, all fee estimation methods now include a **50% overhead** on all resource bounds (l1_gas, l2_gas, l1_data_gas) for both `max_amount` and `max_price_per_unit`. This global configuration ensures safer transaction execution by preventing out-of-gas errors due to network fluctuations. You can customize this overhead using `resourceBoundsOverhead` in provider options, with custom parser or global config.
-`toOverheadOverallFee()` and `toOverheadResourceBounds()` use default global overhead
-if overhead not specified. This could be disabled by providing false to overhead argument.
-:::
-
-:::warning Fee Estimation Implementation Notice
-The current fee estimation calculation, particularly regarding tip handling, is still under discussion. The implementation may change based on the final solution determined by the Starknet protocol team. Future updates may modify how fees are calculated and structured.
-:::
-
-## New Features
-
-### Custom Deployer Support
-
-v8 allows you to specify a custom deployer for contract deployments. Starknet.js provides two built-in deployer options:
-
-- **`defaultDeployer`**: Uses UDC V2 (Universal Deployer Contract V2) - recommended for new projects
-- **`legacyDeployer`**: Uses the old UDC V1 - for backward compatibility
-
-```typescript
-import { Account, defaultDeployer, legacyDeployer, Deployer } from 'starknet';
-
-const account = new Account({
-  provider,
-  address: accountAddress,
-  signer: privateKey,
-
-  // Option 1: Use the default deployer (UDC V2)
-  deployer: defaultDeployer,
-
-  // Option 2: Use the legacy deployer (old UDC V1)
-  deployer: legacyDeployer,
-
-  // Option 3: Create a custom deployer
-  deployer: new Deployer({
-    address: '0x...', // Custom deployer contract address
-    entryPoint: 'deploy_contract', // Custom entry point
-  }),
-});
-```
-
-## Backward Compatibility
-
-To ease migration, you can create these helper functions that use the old API style but create v8 instances. **These are temporary migration helpers and should be removed once migration is complete.**
-
-<details>
-  <summary>Helpers</summary>
-
-```typescript
-// Temporary migration helpers - add these to your codebase during migration
-import { Account, Contract, WalletAccount } from 'starknet';
-import type {
-  AccountInterface,
-  ProviderInterface,
-  ContractInterface,
-  Abi,
-  CairoVersion,
-  SupportedTransactionVersion,
-  PaymasterInterface,
+import {
+  isPreConfirmedBlock,
+  isPreConfirmedTransaction,
+  isPreConfirmedStateUpdate,
 } from 'starknet';
 
-/**
- * @deprecated Use new Account({ ... }) constructor instead
- */
-export function createAccount(
-  provider: ProviderInterface,
-  address: string,
-  privateKey: string | Uint8Array,
-  cairoVersion?: CairoVersion,
-  transactionVersion?: SupportedTransactionVersion,
-  paymaster?: PaymasterInterface
-): AccountInterface {
-  return new Account({
-    provider,
-    address,
-    signer: privateKey,
-    cairoVersion,
-    transactionVersion,
-    paymaster,
-  });
+if (isPreConfirmedBlock(block)) {
+  // handle pre-confirmed block
 }
-
-/**
- * @deprecated Use new Contract({ ... }) constructor instead
- */
-export function createContract(
-  abi: Abi,
-  address: string,
-  providerOrAccount?: ProviderInterface | AccountInterface
-): ContractInterface {
-  return new Contract({
-    abi,
-    address,
-    providerOrAccount,
-  });
-}
-
-/**
- * @deprecated Use new WalletAccount({ ... }) constructor instead
- */
-export function createWalletAccount(
-  provider: ProviderInterface,
-  walletProvider: any,
-  address: string,
-  cairoVersion?: CairoVersion,
-  paymaster?: PaymasterInterface
-): WalletAccount {
-  return new WalletAccount({
-    provider,
-    walletProvider,
-    address,
-    cairoVersion,
-    paymaster,
-  });
-}
-
-// Usage during migration:
-const account = createAccount(provider, address, privateKey, cairoVersion, transactionVersion);
-const contract = createContract(abi, address, providerOrAccount);
-const walletAccount = createWalletAccount(provider, walletProvider, address, cairoVersion);
 ```
 
-</details>
+## Provider Changes
 
-## Migration Steps
+### Provider Initialization
 
-1. **Upgrade RPC endpoints**: Replace any RPC 0.7 endpoints with RPC 0.8 or 0.9
-2. **Update imports**: Remove any usage of the `types` namespace and import types directly
-3. **Update constructors**: Convert all class instantiations to use object-based APIs
-4. **Update Contract factory usage**: Replace with `await Contract.factory()`
-5. **Replace removed helpers**: Update code using `parseUDCEvent` and `buildUDCCall`
-6. **Test thoroughly**: Run your test suite to catch any remaining issues
-7. **Consider new features**: Optionally add tip support and custom deployment
-8. **Remove backward compatibility**: Once migration is complete, remove any usage of deprecated helpers
-
-## Common Migration Issues
-
-### TypeScript Compilation Errors
-
-If you encounter TypeScript errors after migration, ensure you're importing types directly:
+When creating a provider without specifying a version, v9 will use RPC 0.10:
 
 ```typescript
-// ❌ This will fail in v8
-import { types } from 'starknet';
-const call: types.Call = { ... };
+// V8 - defaults to RPC 0.9
+const provider = new RpcProvider();
 
-// ✅ Correct way in v8
-import { Call } from 'starknet';
-const call: Call = { ... };
+// V9 - defaults to RPC 0.10
+const provider = new RpcProvider();
+
+// V9 - explicit version selection
+const provider = new RpcProvider({ specVersion: '0.9.0' });
 ```
 
-...To be added as encountered.
+## Migration Checklist
 
-## Testing Your Migration
+When upgrading from v8 to v9:
 
-After completing the migration:
-
-1. **Compile your TypeScript**: Ensure no compilation errors
-2. **Run your test suite**: Verify all functionality works as expected
-3. **Test contract interactions**: Ensure contract calls and deployments work
-4. **Test account operations**: Verify transactions, signatures, and account management
-5. **Performance testing**: The new tip system may affect transaction timing
-
-## Need Help?
-
-If you encounter issues during migration:
-
-1. Check this guides
-2. Review the [API documentation](../API/) for detailed method signatures
-3. Open an issue on the [GitHub repository](https://github.com/starknet-io/starknet.js) if you find bugs
-4. Ask for help on [Discord](https://discord.com/channels/793094838509764618/1270119831559078061)
-
-The v8 migration requires updating constructor calls and import statements, but provides a more robust and extensible API for future development.
+- [ ] Update `starknet` package to v9.x
+- [ ] Remove any references to `RPC08` or `rpc_0_8_1`
+- [ ] Replace `'pending'` block identifier with `'pre_confirmed'`
+- [ ] Update type imports: `PendingBlock` → `PreConfirmedBlock`
+- [ ] Update type imports: `PendingStateUpdate` → `PreConfirmedStateUpdate`
+- [ ] Update helper functions: `isPendingBlock()` → `isPreConfirmedBlock()`
+- [ ] Update helper functions: `isPendingTransaction()` → `isPreConfirmedTransaction()`
+- [ ] Update helper functions: `isPendingStateUpdate()` → `isPreConfirmedStateUpdate()`
+- [ ] Update type imports: `RPCSPEC08` → use `RPCSPEC09` or `RPCSPEC010`
+- [ ] Test with RPC 0.10 endpoints (default)
+- [ ] If needed, explicitly specify RPC 0.9 using `specVersion: '0.9.0'`
