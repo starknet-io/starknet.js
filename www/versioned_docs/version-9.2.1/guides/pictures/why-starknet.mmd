@@ -1,0 +1,37 @@
+---
+config:
+  theme: neo-dark
+  layout: elk
+---
+flowchart LR
+ subgraph CLIENT["Client dApp"]
+        Browser["Browser"]
+        Nodejs["Node.js"]
+  end
+ subgraph LIBRARY["Starknet JS"]
+        Interface["Instance"]
+        Channel["Channel"]
+        Provider["Provider"]
+        Account["Account"]
+        Contract["Contract"]
+        Utils["Utils"]
+        Signer["Signer"]
+  end
+ subgraph NETWORK["Starknet Network"]
+        Starknet["Starknet RPC Node"]
+  end
+    Browser L_Browser_Interface_0@-- <br> --> Interface
+    Nodejs --> Interface
+    Interface --> Provider & Account & Contract & Channel
+    Channel L_Channel_Starknet_0@-- </br> --> Starknet
+    Provider L_Provider_Channel_0@-- <br> --> Channel
+    Account L_Account_Provider_0@-- <br> --> Provider
+    Contract L_Contract_Account_0@-- <br> --> Account
+    Contract --> Provider
+    Interface@{ shape: dbl-circ}
+    L_Browser_Interface_0@{ animation: slow } 
+    L_Interface_Contract_0@{ animation: slow } 
+    L_Channel_Starknet_0@{ animation: slow } 
+    L_Provider_Channel_0@{ animation: slow } 
+    L_Account_Provider_0@{ animation: slow } 
+    L_Contract_Account_0@{ animation: slow }
