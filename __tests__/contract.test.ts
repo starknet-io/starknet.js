@@ -245,10 +245,7 @@ describe('contract module', () => {
     });
 
     test('factory deployment of new contract with constructor arguments as already compiled calldata', async () => {
-      const loadedContract = contractLoader(
-        '/Users/tabaktoni/Work/starknet.js/__mocks__/cairo/cairo294'
-      );
-
+      const loadedContract = contractLoader('./__mocks__/cairo/cairo294');
       // Ensure casm is loaded
       expect(loadedContract.casm).toBeDefined();
 

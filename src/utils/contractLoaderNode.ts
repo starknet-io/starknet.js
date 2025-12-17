@@ -36,17 +36,21 @@ export function contractLoader(contractPath: string): LoadedContract {
   // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
   const path = require('path');
 
+  // Resolve relative paths to absolute paths
+  // This ensures consistent path handling throughout the function
+  const resolvedPath = path.resolve(contractPath);
+
   let dirPath: string;
   let specifiedSierraFile: string | undefined;
   let specifiedCasmFile: string | undefined;
 
   // Check if the path is a file or directory
-  const stats = fs.statSync(contractPath);
+  const stats = fs.statSync(resolvedPath);
 
   if (stats.isFile()) {
     // If it's a file, extract the directory and remember which file was specified
-    dirPath = path.dirname(contractPath);
-    const fileName = path.basename(contractPath);
+    dirPath = path.dirname(resolvedPath);
+    const fileName = path.basename(resolvedPath);
 
     if (
       fileName.endsWith('.sierra.json') ||
@@ -61,7 +65,7 @@ export function contractLoader(contractPath: string): LoadedContract {
       );
     }
   } else if (stats.isDirectory()) {
-    dirPath = contractPath;
+    dirPath = resolvedPath;
   } else {
     throw new Error(`Path is neither a file nor a directory: ${contractPath}`);
   }
