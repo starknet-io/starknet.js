@@ -66,12 +66,23 @@ const generateContractKey = (filePath: string): string => {
 };
 
 /**
+ * Generates a full key using directory + filename
+ */
+const generateFullContractKey = (filePath: string): string => {
+  const parts = filePath.split('/');
+  const nameParts = parts.flatMap((part) => part.split(/[_-]/));
+  return nameParts.map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('');
+};
+
+/**
  * Recursively discovers contract files in a directory and loads them
+ * Returns both the discovered contracts and the contract paths for collision detection
  */
 const discoverAndLoadContracts = (
   basePath: string,
   topLevelDir: string,
-  pathPrefix: string = ''
+  pathPrefix: string = '',
+  globalDiscovered: Record<string, any> = {}
 ): Record<string, any> => {
   const discovered: Record<string, any> = {};
   const fullPath = pathPrefix ? path.join(basePath, pathPrefix) : basePath;
@@ -85,7 +96,15 @@ const discoverAndLoadContracts = (
     if (entry.isDirectory()) {
       // Recursively discover contracts in subdirectories
       const subPath = pathPrefix ? `${pathPrefix}/${entry.name}` : entry.name;
-      Object.assign(discovered, discoverAndLoadContracts(basePath, topLevelDir, subPath));
+      const subContracts = discoverAndLoadContracts(
+        basePath,
+        topLevelDir,
+        subPath,
+        globalDiscovered
+      );
+      // Update both local and global discovered objects
+      Object.assign(discovered, subContracts);
+      Object.assign(globalDiscovered, subContracts);
     } else if (entry.name.endsWith('.sierra.json')) {
       const relativePath = pathPrefix ? `${pathPrefix}/${entry.name}` : entry.name;
       const contractPath = relativePath.replace('.sierra.json', '');
@@ -93,7 +112,13 @@ const discoverAndLoadContracts = (
       if (processedFiles.has(contractPath)) return;
       processedFiles.add(contractPath);
 
-      const contractKey = generateContractKey(contractPath);
+      let contractKey = generateContractKey(contractPath);
+
+      // If key already exists in global or local discovered, use full path to avoid collision
+      if (contractKey in globalDiscovered || contractKey in discovered) {
+        contractKey = generateFullContractKey(contractPath);
+      }
+
       // For .casm matching, handle edge case like "complex_sierra.sierra.json" -> "complex_sierra.casm"
       const baseName = entry.name.replace(/\.sierra\.json$/, '').replace(/\.sierra$/, '');
       const casmPath = path.join(fullPath, `${baseName}.casm`);
@@ -120,7 +145,13 @@ const discoverAndLoadContracts = (
       if (!fs.existsSync(sierraPath)) {
         // Casm only - wrap in {casm: ...} format
         processedFiles.add(contractPath);
-        const contractKey = generateContractKey(contractPath);
+        let contractKey = generateContractKey(contractPath);
+
+        // If key already exists in global or local discovered, use full path to avoid collision
+        if (contractKey in globalDiscovered || contractKey in discovered) {
+          contractKey = generateFullContractKey(contractPath);
+        }
+
         discovered[contractKey] = readContractCasmOnly(contractPath, topLevelDir);
       }
     }
@@ -138,7 +169,13 @@ export const autoDiscoverContracts = (
   const discovered: Record<string, any> = {};
 
   // Discover cairo contracts (flat structure - all in one namespace)
-  const cairoContracts = discoverAndLoadContracts(path.join(baseDir, 'cairo'), 'cairo');
+  // Pass discovered object for collision detection across all contracts
+  const cairoContracts = discoverAndLoadContracts(
+    path.join(baseDir, 'cairo'),
+    'cairo',
+    '',
+    discovered
+  );
 
   // Map cairo contracts (convert strings to {sierra, casm} objects)
   Object.assign(discovered, mapContractSets(cairoContracts, 'cairo'));
