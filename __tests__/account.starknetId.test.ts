@@ -1,6 +1,5 @@
 import { Account, Provider, num, shortString } from '../src';
-import { contracts } from './config/fixtures';
-import { createTestProvider, getTestAccount, STRKtokenAddress } from './config/fixturesInit';
+import { CONTRACTS, createTestProvider, getTestAccount, STRKtokenAddress } from './config';
 
 const { hexToDecimalString } = num;
 
@@ -17,32 +16,32 @@ describe('deploy and test Wallet', () => {
 
     // Deploy Starknet id contract
     const idResponse = await account.declareAndDeploy({
-      contract: contracts.starknetId.StarknetId.sierra,
-      casm: contracts.starknetId.StarknetId.casm,
+      contract: CONTRACTS.StarknetId.Identity.sierra,
+      casm: CONTRACTS.StarknetId.Identity.casm,
       constructorCalldata: [account.address, 0],
     });
     identityAddress = idResponse.deploy.contract_address;
 
     // Deploy pricing contract
     const pricingResponse = await account.declareAndDeploy({
-      contract: contracts.starknetId.Pricing.sierra,
-      casm: contracts.starknetId.Pricing.casm,
+      contract: CONTRACTS.StarknetId.Pricing.sierra,
+      casm: CONTRACTS.StarknetId.Pricing.casm,
       constructorCalldata: [STRKtokenAddress],
     });
     const pricingAddress = pricingResponse.deploy.contract_address;
 
     // Deploy naming contract
     const namingResponse = await account.declareAndDeploy({
-      contract: contracts.starknetId.Naming.sierra,
-      casm: contracts.starknetId.Naming.casm,
+      contract: CONTRACTS.StarknetId.Naming.sierra,
+      casm: CONTRACTS.StarknetId.Naming.casm,
       constructorCalldata: [identityAddress, pricingAddress, 0, account.address],
     });
     namingAddress = namingResponse.deploy.contract_address;
 
     // Deploy multicall contract
     const multicallResponse = await account.declareAndDeploy({
-      contract: contracts.starknetId.SidMulticall.sierra,
-      casm: contracts.starknetId.SidMulticall.casm,
+      contract: CONTRACTS.StarknetId.SidMulticall.sierra,
+      casm: CONTRACTS.StarknetId.SidMulticall.casm,
     });
     multicallAddress = multicallResponse.deploy.contract_address;
 

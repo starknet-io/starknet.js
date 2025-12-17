@@ -9,7 +9,7 @@ import {
   ETransactionVersion,
   ArraySignatureType,
 } from '../../src';
-import sampleContract from '../../__mocks__/cairo/helloCairo2/compiled.sierra.json';
+import sampleContract from '../../__mocks__/cairo/helloCairo2/C1v2.sierra.json';
 
 const { toBigInt, toHex } = num;
 

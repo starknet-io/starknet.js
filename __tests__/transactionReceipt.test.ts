@@ -11,8 +11,7 @@ import {
   createTransactionReceipt,
   GetTxReceiptResponseWithoutHelper,
 } from '../src';
-import { contracts } from './config/fixtures';
-import { createTestProvider, getTestAccount } from './config/fixturesInit';
+import { CONTRACTS, createTestProvider, getTestAccount } from './config';
 
 describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
   let provider: ProviderInterface;
@@ -26,12 +25,12 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
     account = getTestAccount(provider);
 
     dd = await account.declareAndDeploy({
-      contract: contracts.TestReject.sierra,
-      casm: contracts.TestReject.casm,
+      contract: CONTRACTS.TestReject.sierra,
+      casm: CONTRACTS.TestReject.casm,
     });
     await provider.waitForTransaction(dd.deploy.transaction_hash);
     contract = new Contract({
-      abi: contracts.TestReject.sierra.abi,
+      abi: CONTRACTS.TestReject.sierra.abi,
       address: dd.deploy.contract_address,
       providerOrAccount: account,
     });

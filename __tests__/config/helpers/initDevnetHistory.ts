@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { cairo } from '../../../src';
-import { createTestProvider, devnetFeeTokenAddress, getTestAccount } from '../fixturesInit';
+import { createTestProvider, devnetFeeTokenAddress, getTestAccount } from './testInstances';
 
 /** Create in Devnet 3 transactions to initiate tip history */
 export async function InitDevnetHistory() {

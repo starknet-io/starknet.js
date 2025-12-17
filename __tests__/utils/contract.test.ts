@@ -1,22 +1,22 @@
 import type { CompiledSierra } from '../../src';
 import { isSierra, extractContractHashes } from '../../src/utils/contract';
-import { contracts } from '../config/fixtures';
+import { CONTRACTS } from '../config/fixtures';
 
 describe('isSierra', () => {
   test('should return true for a contract in Sierra format', () => {
-    expect(isSierra(contracts.Erc20OZ.sierra)).toBe(true);
+    expect(isSierra(CONTRACTS.Erc20Oz100.sierra)).toBe(true);
   });
 
   test('should return false for a contract not in Sierra format', () => {
-    expect(isSierra(contracts.Erc20OZ.casm as any as CompiledSierra)).toBe(false);
+    expect(isSierra(CONTRACTS.Erc20Oz100.casm as any as CompiledSierra)).toBe(false);
   });
 });
 
 describe('extractContractHashes', () => {
   test('should properly extract hashes from contract, starknet < v0.14.1', () => {
     const declareContractPayload = {
-      contract: contracts.Erc20OZ.sierra,
-      casm: contracts.Erc20OZ.casm,
+      contract: CONTRACTS.Erc20Oz100.sierra,
+      casm: CONTRACTS.Erc20Oz100.casm,
     };
     const result = extractContractHashes(declareContractPayload, '0.13.0');
 
@@ -32,8 +32,8 @@ describe('extractContractHashes', () => {
 
   test('should properly extract hashes from contract, starknet = v0.14.1', () => {
     const declareContractPayload = {
-      contract: contracts.Erc20OZ.sierra,
-      casm: contracts.Erc20OZ.casm,
+      contract: CONTRACTS.Erc20Oz100.sierra,
+      casm: CONTRACTS.Erc20Oz100.casm,
     };
     const result = extractContractHashes(declareContractPayload, '0.14.1');
 
@@ -49,8 +49,8 @@ describe('extractContractHashes', () => {
 
   test('should properly extract hashes from contract, starknet > v0.14.1', () => {
     const declareContractPayload = {
-      contract: contracts.Erc20OZ.sierra,
-      casm: contracts.Erc20OZ.casm,
+      contract: CONTRACTS.Erc20Oz100.sierra,
+      casm: CONTRACTS.Erc20Oz100.casm,
     };
     const result = extractContractHashes(declareContractPayload, '0.15.0');
 
@@ -66,8 +66,8 @@ describe('extractContractHashes', () => {
 
   test('should properly extract hashes from contract, starknet default', () => {
     const declareContractPayload = {
-      contract: contracts.Erc20OZ.sierra,
-      casm: contracts.Erc20OZ.casm,
+      contract: CONTRACTS.Erc20Oz100.sierra,
+      casm: CONTRACTS.Erc20Oz100.casm,
     };
     const result = extractContractHashes(declareContractPayload);
 

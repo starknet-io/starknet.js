@@ -24,9 +24,7 @@ import {
   selector,
   shortString,
 } from '../src';
-import { contracts } from './config/fixtures';
-import { initializeMatcher } from './config/schema';
-import { createTestProvider, getTestAccount } from './config/fixturesInit';
+import { CONTRACTS, createTestProvider, getTestAccount, initializeMatcher } from './config';
 import { createAbiParser } from '../src/utils/calldata/parser';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -50,16 +48,16 @@ describe('Cairo 1', () => {
     beforeAll(async () => {
       // dd
       cairo1Contract = await Contract.factory({
-        contract: contracts.C1v2.sierra,
-        casm: contracts.C1v2.casm,
+        contract: CONTRACTS.C1v2.sierra,
+        casm: CONTRACTS.C1v2.casm,
         account,
       });
 
       // dd2
       cairo210Contract = await Contract.factory({
-        abi: contracts.C210.sierra.abi, // optional
-        contract: contracts.C210.sierra,
-        casm: contracts.C210.casm,
+        abi: CONTRACTS.Cairo210.sierra.abi, // optional
+        contract: CONTRACTS.Cairo210.sierra,
+        casm: CONTRACTS.Cairo210.casm,
         account,
       });
     });
@@ -83,12 +81,12 @@ describe('Cairo 1', () => {
 
       await account.declare({
         contract: cc0 as CompiledSierra,
-        casm: contracts.C1v2.casm,
+        casm: CONTRACTS.C1v2.casm,
       });
 
       await account.declare({
         contract: cc0_1 as CompiledSierra,
-        casm: contracts.C1v2.casm,
+        casm: CONTRACTS.C1v2.casm,
       });
     });
 
@@ -223,7 +221,7 @@ describe('Cairo 1', () => {
       const result = await cairo1Contract.call('new_types', compiled.calldata as Calldata);
       expect(result).toStrictEqual({ '0': 123456789n, '1': 987654321n, '2': 657563474357n });
 
-      const myCalldata = new CallData(contracts.C1v2.sierra.abi); // test arrays
+      const myCalldata = new CallData(CONTRACTS.C1v2.sierra.abi); // test arrays
       const compiled2 = myCalldata.compile('array_new_types', {
         tup: cairo.tuple(256, '0x1234567890', '0xe3456'),
         tupa: cairo.tuple(
@@ -601,7 +599,7 @@ describe('Cairo 1', () => {
         ],
       ];
 
-      const contractCallData: CallData = new CallData(contracts.ComplexSierra.abi);
+      const contractCallData: CallData = new CallData(CONTRACTS.ComplexSierra.sierra.abi);
       const callDataFromObject: Calldata = contractCallData.compile('constructor', myRawArgsObject);
       const callDataFromArray: Calldata = contractCallData.compile('constructor', myRawArgsArray);
       const expectedResult = [
@@ -677,7 +675,7 @@ describe('Cairo 1', () => {
     });
 
     test('myCallData.decodeParameters for Cairo 1', async () => {
-      const Cairo1Abi = contracts.C1v2.sierra;
+      const Cairo1Abi = CONTRACTS.C1v2.sierra;
       const c1v2CallData = new CallData(Cairo1Abi.abi);
 
       const res2 = c1v2CallData.decodeParameters(
@@ -788,12 +786,12 @@ describe('Cairo 1', () => {
     };
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: contracts.C1v2.sierra,
-        casm: contracts.C1v2.casm,
+        contract: CONTRACTS.C1v2.sierra,
+        casm: CONTRACTS.C1v2.casm,
       });
 
       eventContract = new Contract({
-        abi: contracts.C1v2.sierra.abi,
+        abi: CONTRACTS.C1v2.sierra.abi,
         address: deploy.contract_address,
         providerOrAccount: account,
       });
