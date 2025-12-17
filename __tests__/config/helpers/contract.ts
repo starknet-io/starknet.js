@@ -15,14 +15,22 @@ export const readContractSierra = readContract<CompiledSierra>;
 export const readContractSierraCasm = (name: string) =>
   readContract<CompiledSierraCasm>(name, 'casm');
 
-export const readContractSet = (name: string, pathPrefix: string = 'cairo') => ({
-  sierra: readContractSierra(`${pathPrefix}/${name}.sierra`),
-  casm: readContractSierraCasm(`${pathPrefix}/${name}`),
-});
+export const readContractSet = (name: string, pathPrefix: string = 'cairo') => {
+  const casm = readContractSierraCasm(`${pathPrefix}/${name}`);
+  return {
+    sierra: readContractSierra(`${pathPrefix}/${name}.sierra`),
+    casm,
+    compiler: casm.compiler_version,
+  };
+};
 
-export const readContractCasmOnly = (name: string, pathPrefix: string = 'cairo') => ({
-  casm: readContractSierraCasm(`${pathPrefix}/${name}`),
-});
+export const readContractCasmOnly = (name: string, pathPrefix: string = 'cairo') => {
+  const casm = readContractSierraCasm(`${pathPrefix}/${name}`);
+  return {
+    casm,
+    compiler: casm.compiler_version,
+  };
+};
 
 export const readContractSierraOnly = readContract<CompiledSierra>;
 
