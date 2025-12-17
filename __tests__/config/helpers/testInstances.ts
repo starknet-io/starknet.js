@@ -12,7 +12,6 @@ import {
   Provider,
   ProviderInterface,
   RpcProvider,
-  config,
   getTipStatsFromBlocks,
   type PaymasterInterface,
   type TipAnalysisOptions,
@@ -22,21 +21,16 @@ import { toHex } from '../../../src/utils/num';
 import '../customMatchers'; // ensures TS traversal
 import { SupportedRpcVersion, SupportedTransactionVersion } from '../../../src/global/constants';
 
-config.set('logLevel', 'ERROR');
-
 /**
  * Builds provider options with test environment configuration
  * @param setProviderOptions - Optional provider options to merge
  * @returns Provider options configured for test environment
  */
 function buildTestProviderOptions(setProviderOptions?: RpcProviderOptions): RpcProviderOptions {
-  const isDevnet = process.env.IS_DEVNET === 'true';
   return {
     ...setProviderOptions,
     nodeUrl: process.env.TEST_RPC_URL,
     specVersion: process.env.RPC_SPEC_VERSION as SupportedRpcVersion,
-    // accelerate the tests when running locally
-    ...(isDevnet && { transactionRetryIntervalFallback: 0 }),
   };
 }
 

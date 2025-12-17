@@ -120,7 +120,8 @@ export class RpcChannel {
     this.headers = { ...channelDefaults.options.headers, ...headers };
     this.retries = retries ?? channelDefaults.options.retries;
     this.specVersion = specVersion;
-    this.transactionRetryIntervalFallback = transactionRetryIntervalFallback;
+    this.transactionRetryIntervalFallback =
+      transactionRetryIntervalFallback ?? channelDefaults.options.transactionRetryIntervalFallback;
     this.waitMode = waitMode ?? false;
 
     this.requestId = 0;

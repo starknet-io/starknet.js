@@ -178,3 +178,17 @@ export const autoDiscoverContracts = (
   // Return discovered contracts (cairo contracts already mapped, grouped contracts already mapped)
   return discovered;
 };
+
+/**
+ * Auto-discovered contracts from __mocks__ directory.
+ * Contracts are automatically loaded based on their file structure:
+ * - Cairo contracts: __mocks__/cairo/**\/*.sierra.json + matching .casm files
+ * - Grouped contracts: __mocks__/{groupName}/**\/*.sierra.json + matching .casm files
+ *   (e.g., StarknetId contracts in __mocks__/starknetId/)
+ *
+ * Contract keys are generated from filenames in PascalCase:
+ * - cairo210.sierra.json -> Cairo210
+ * - openzeppelin_EthAccount090.sierra.json -> OpenzeppelinEthAccount090
+ * - starknetId directory -> StarknetId group
+ */
+export const CONTRACTS = autoDiscoverContracts();
