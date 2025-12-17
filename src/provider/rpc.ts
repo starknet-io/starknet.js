@@ -293,6 +293,12 @@ export class RpcProvider implements ProviderInterface {
     return createTransactionReceipt(txReceiptWoHelperModified);
   }
 
+  public async getTransactionTrace<V extends SupportedRpcVersion = SupportedRpcVersion>(
+    txHash: BigNumberish
+  ): Promise<V extends '0.10.0' ? RPCSPEC010.TRANSACTION_TRACE : RPCSPEC09.TRANSACTION_TRACE>;
+  public async getTransactionTrace(
+    txHash: BigNumberish
+  ): Promise<RPCSPEC010.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
   public async getTransactionTrace(
     txHash: BigNumberish
   ): Promise<RPCSPEC010.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE> {
@@ -495,6 +501,14 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.callContract(call, blockIdentifier);
   }
 
+  public async estimateMessageFee<V extends SupportedRpcVersion = SupportedRpcVersion>(
+    message: RPCSPEC09.L1Message,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<V extends '0.10.0' ? RPCSPEC010.FEE_ESTIMATE : RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
+  public async estimateMessageFee(
+    message: RPCSPEC09.L1Message,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<RPCSPEC010.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
   public async estimateMessageFee(
     message: RPCSPEC09.L1Message, // same as spec08.L1Message
     blockIdentifier?: BlockIdentifier
@@ -506,6 +520,12 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getSyncingStats();
   }
 
+  public async getEvents<V extends SupportedRpcVersion = SupportedRpcVersion>(
+    eventFilter: V extends '0.10.0' ? RPCSPEC010.EventFilter : RPCSPEC09.EventFilter
+  ): Promise<V extends '0.10.0' ? RPCSPEC010.EVENTS_CHUNK : RPCSPEC09.EVENTS_CHUNK>;
+  public async getEvents(
+    eventFilter: RPCSPEC010.EventFilter | RPCSPEC09.EventFilter
+  ): Promise<RPCSPEC010.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
   public async getEvents(
     eventFilter: RPCSPEC010.EventFilter | RPCSPEC09.EventFilter
   ): Promise<RPCSPEC010.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK> {
@@ -584,6 +604,14 @@ export class RpcProvider implements ProviderInterface {
     return bulk;
   }
 
+  public async getL1MessagesStatus<V extends SupportedRpcVersion = SupportedRpcVersion>(
+    transactionHash: BigNumberish
+  ): Promise<
+    V extends '0.10.0' ? RPC.RPCSPEC010.L1L2MessagesStatus : RPC.RPCSPEC09.L1L2MessagesStatus
+  >;
+  public async getL1MessagesStatus(
+    transactionHash: BigNumberish
+  ): Promise<RPC.RPCSPEC010.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
   public async getL1MessagesStatus(
     transactionHash: BigNumberish
   ): Promise<RPC.RPCSPEC010.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus> {
