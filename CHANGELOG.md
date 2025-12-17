@@ -1,3 +1,9 @@
+## [9.2.2](https://github.com/starknet-io/starknet.js/compare/v9.2.1...v9.2.2) (2025-12-17)
+
+### Bug Fixes
+
+- optional type narrow: getEvents, getTransactionTrace, estimateMessageFee, getL1MessagesStatus ([a3b8115](https://github.com/starknet-io/starknet.js/commit/a3b8115391be2efbebcd074ac2f64aba7a6a5f81))
+
 ## [9.2.1](https://github.com/starknet-io/starknet.js/compare/v9.2.0...v9.2.1) (2025-12-11)
 
 ### Bug Fixes
