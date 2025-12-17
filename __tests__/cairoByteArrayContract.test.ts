@@ -10,8 +10,7 @@ import {
   BigNumberish,
   logger,
 } from '../src';
-import { contracts } from './config/fixtures';
-import { createTestProvider, getTestAccount } from './config/fixturesInit';
+import { CONTRACTS, createTestProvider, getTestAccount } from './config';
 import { toHex } from '../src/utils/num';
 
 describe('CairoByteArray Manual Integration Tests', () => {
@@ -26,8 +25,8 @@ describe('CairoByteArray Manual Integration Tests', () => {
 
     // Deploy ByteArrayStorage contract using Contract.factory
     byteArrayContract = await Contract.factory({
-      contract: contracts.CairoByteArray.sierra,
-      casm: contracts.CairoByteArray.casm,
+      contract: CONTRACTS.TestByteArrayStorage.sierra,
+      casm: CONTRACTS.TestByteArrayStorage.casm,
       account,
       constructorCalldata: [],
     });
@@ -442,8 +441,8 @@ describe('CairoByteArray Contract Integration Tests', () => {
 
     // Deploy ByteArrayStorage contract using Contract.factory
     byteArrayContract = await Contract.factory({
-      contract: contracts.CairoByteArray.sierra,
-      casm: contracts.CairoByteArray.casm,
+      contract: CONTRACTS.TestByteArrayStorage.sierra,
+      casm: CONTRACTS.TestByteArrayStorage.casm,
       account,
       constructorCalldata: [],
       parsingStrategy: hdParsingStrategy,
@@ -489,7 +488,7 @@ describe('CairoByteArray Contract Integration Tests', () => {
     };
 
     const customByteArrayContract = new Contract({
-      abi: contracts.CairoByteArray.sierra.abi,
+      abi: CONTRACTS.TestByteArrayStorage.sierra.abi,
       address: byteArrayContract.address,
       providerOrAccount: account,
       parsingStrategy: customParsingStrategy,
@@ -530,7 +529,7 @@ describe('CairoByteArray Contract Integration Tests', () => {
     logger.setLogLevel('INFO');
 
     const customByteArrayContract = new Contract({
-      abi: contracts.CairoByteArray.sierra.abi,
+      abi: CONTRACTS.TestByteArrayStorage.sierra.abi,
       address: byteArrayContract.address,
       providerOrAccount: account,
       parsingStrategy: customParsingStrategy,

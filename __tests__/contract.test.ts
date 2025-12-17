@@ -18,17 +18,15 @@ import {
   RpcProvider,
 } from '../src';
 
-import { contracts } from './config/fixtures';
-import { createTestProvider, getTestAccount } from './config/fixturesInit';
-import { initializeMatcher } from './config/schema';
+import { CONTRACTS, createTestProvider, getTestAccount, initializeMatcher } from './config';
 
 describe('contract module', () => {
   let erc20Address: string;
   let provider: ProviderInterface;
   let account: Account;
-  const erc20ClassHash = hash.computeContractClassHash(contracts.Erc20OZ.sierra);
+  const erc20ClassHash = hash.computeContractClassHash(CONTRACTS.Erc20Oz100.sierra);
   let erc20CompiledClassHash: string;
-  const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
+  const erc20CallData = new CallData(CONTRACTS.Erc20Oz100.sierra.abi);
   let erc20Constructor: Calldata;
   let erc20ConstructorParams: RawArgs;
 
@@ -47,7 +45,7 @@ describe('contract module', () => {
     erc20Constructor = erc20CallData.compile('constructor', erc20ConstructorParams);
 
     erc20CompiledClassHash = hash.computeCompiledClassHash(
-      contracts.Erc20OZ.casm,
+      CONTRACTS.Erc20Oz100.casm,
       await (provider as RpcProvider).getStarknetVersion()
     );
   });
@@ -58,13 +56,13 @@ describe('contract module', () => {
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
-          contract: contracts.Erc20OZ.sierra,
-          casm: contracts.Erc20OZ.casm,
+          contract: CONTRACTS.Erc20Oz100.sierra,
+          casm: CONTRACTS.Erc20Oz100.casm,
           constructorCalldata: erc20Constructor,
         });
         erc20Address = deploy.address;
         erc20Contract = new Contract({
-          abi: contracts.Erc20OZ.sierra.abi,
+          abi: CONTRACTS.Erc20Oz100.sierra.abi,
           address: erc20Address,
           providerOrAccount: provider,
         });
@@ -106,7 +104,7 @@ describe('contract module', () => {
 
       test('isDeployed should throw error when contract not deployed', async () => {
         const nonExistentContract = new Contract({
-          abi: contracts.Erc20OZ.sierra.abi,
+          abi: CONTRACTS.Erc20Oz100.sierra.abi,
           address: '0x123456789abcdef123456789abcdef123456789abcdef123456789abcdef1234',
           providerOrAccount: provider,
         });
@@ -122,12 +120,12 @@ describe('contract module', () => {
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
-          contract: contracts.TypeTransformation.sierra,
-          casm: contracts.TypeTransformation.casm,
+          contract: CONTRACTS.TypeTransformation.sierra,
+          casm: CONTRACTS.TypeTransformation.casm,
         });
 
         typeTransformedContract = new Contract({
-          abi: contracts.TypeTransformation.sierra.abi,
+          abi: CONTRACTS.TypeTransformation.sierra.abi,
           address: deploy.contract_address,
           providerOrAccount: account,
         });
@@ -229,15 +227,15 @@ describe('contract module', () => {
   describe('class static factory()', () => {
     beforeAll(async () => {
       await account.declareAndDeploy({
-        contract: contracts.Erc20OZ.sierra,
-        casm: contracts.Erc20OZ.casm,
+        contract: CONTRACTS.Erc20Oz100.sierra,
+        casm: CONTRACTS.Erc20Oz100.casm,
         constructorCalldata: erc20Constructor,
       });
     });
 
     test('factory deployment of new contract with constructor arguments as js params', async () => {
       const erc20 = await Contract.factory({
-        contract: contracts.Erc20OZ.sierra,
+        contract: CONTRACTS.Erc20Oz100.sierra,
         compiledClassHash: erc20CompiledClassHash,
         account,
         constructorCalldata: erc20ConstructorParams,
@@ -247,8 +245,8 @@ describe('contract module', () => {
 
     test('factory deployment of new contract with constructor arguments as already compiled calldata', async () => {
       const erc20 = await Contract.factory({
-        contract: contracts.Erc20OZ.sierra,
-        casm: contracts.Erc20OZ.casm,
+        contract: CONTRACTS.Erc20Oz100.sierra,
+        casm: CONTRACTS.Erc20Oz100.casm,
         classHash: erc20ClassHash,
         account,
         constructorCalldata: erc20Constructor,
@@ -258,8 +256,8 @@ describe('contract module', () => {
 
     test('optimization, factory deployment of new contract with constructor arguments as already compiled calldata', async () => {
       const erc20 = await Contract.factory({
-        contract: contracts.Erc20OZ.sierra,
-        casm: contracts.Erc20OZ.casm,
+        contract: CONTRACTS.Erc20Oz100.sierra,
+        casm: CONTRACTS.Erc20Oz100.casm,
         classHash: erc20ClassHash,
         account,
         constructorCalldata: erc20Constructor,
@@ -270,8 +268,8 @@ describe('contract module', () => {
 
     test('factory deployment of declared contract with constructor arguments as js params', async () => {
       const erc20 = await Contract.factory({
-        contract: contracts.Erc20OZ.sierra,
-        casm: contracts.Erc20OZ.casm,
+        contract: CONTRACTS.Erc20Oz100.sierra,
+        casm: CONTRACTS.Erc20Oz100.casm,
         classHash: erc20ClassHash,
         account,
         constructorCalldata: erc20ConstructorParams,
@@ -283,7 +281,7 @@ describe('contract module', () => {
       test('deploy-only mode with classHash and provided ABI', async () => {
         const erc20 = await Contract.factory({
           classHash: erc20ClassHash,
-          abi: contracts.Erc20OZ.sierra.abi,
+          abi: CONTRACTS.Erc20Oz100.sierra.abi,
           account,
           constructorCalldata: erc20ConstructorParams,
         });
@@ -318,7 +316,7 @@ describe('contract module', () => {
       test('deploy-only mode with compiled calldata and parseRequest=false', async () => {
         const erc20 = await Contract.factory({
           classHash: erc20ClassHash,
-          abi: contracts.Erc20OZ.sierra.abi,
+          abi: CONTRACTS.Erc20Oz100.sierra.abi,
           account,
           constructorCalldata: erc20Constructor,
           parseRequest: false,
@@ -334,7 +332,7 @@ describe('contract module', () => {
         try {
           const erc20 = await Contract.factory({
             classHash: erc20ClassHash,
-            abi: contracts.Erc20OZ.sierra.abi,
+            abi: CONTRACTS.Erc20Oz100.sierra.abi,
             account,
             constructorCalldata: erc20ConstructorParams,
             salt: customSalt,
@@ -369,7 +367,7 @@ describe('contract module', () => {
 
       test('should handle BigNumberish classHash and verify internal parameters', async () => {
         // Use the original ABI for testing
-        const customAbi = contracts.Erc20OZ.sierra.abi;
+        const customAbi = CONTRACTS.Erc20Oz100.sierra.abi;
 
         // Mock the deployContract method to avoid full deployment
         const deployContractSpy = jest.spyOn(account, 'deployContract').mockResolvedValue({
@@ -420,15 +418,15 @@ describe('Complex interaction', () => {
   let echoContract: Contract;
   let provider: ProviderInterface;
   let account: Account;
-  const classHash = hash.computeContractClassHash(contracts.Erc20OZ.sierra);
+  const classHash = hash.computeContractClassHash(CONTRACTS.Erc20Oz100.sierra);
 
   beforeAll(async () => {
     provider = await createTestProvider();
     account = getTestAccount(provider);
 
     erc20Contract = await Contract.factory({
-      contract: contracts.Erc20OZ.sierra,
-      casm: contracts.Erc20OZ.casm,
+      contract: CONTRACTS.Erc20Oz100.sierra,
+      casm: CONTRACTS.Erc20Oz100.casm,
       classHash,
       account,
       constructorCalldata: {
@@ -441,8 +439,8 @@ describe('Complex interaction', () => {
     });
 
     echoContract = await Contract.factory({
-      contract: contracts.echo.sierra,
-      casm: contracts.echo.casm,
+      contract: CONTRACTS.Echo.sierra,
+      casm: CONTRACTS.Echo.casm,
       account,
     });
   });
@@ -456,8 +454,8 @@ describe('Complex interaction', () => {
   test('contractFactory.deploy with callData - all types constructor params', async () => {
     // Deploy with callData - OK
     const erc20Contract2 = await Contract.factory({
-      contract: contracts.Erc20OZ.sierra,
-      casm: contracts.Erc20OZ.casm,
+      contract: CONTRACTS.Erc20Oz100.sierra,
+      casm: CONTRACTS.Erc20Oz100.casm,
       classHash,
       account,
       constructorCalldata: CallData.compile({

@@ -12,6 +12,7 @@ import {
   Contract,
   ec,
   num,
+  hash,
   outsideExecution,
   OutsideExecutionVersion,
   Provider,
@@ -26,16 +27,14 @@ import {
   type TypedData,
   type WeierstrassSignatureType,
 } from '../src';
-import { getSelectorFromName } from '../src/utils/hash';
-import { getDecimalString } from '../src/utils/num';
-import { contracts } from './config/fixtures';
 import {
   adaptAccountIfDevnet,
+  CONTRACTS,
   createTestProvider,
   getTestAccount,
+  initializeMatcher,
   STRKtokenAddress,
-} from './config/fixturesInit';
-import { initializeMatcher } from './config/schema';
+} from './config';
 
 describe('Account and OutsideExecution', () => {
   let provider: Provider;
@@ -63,7 +62,7 @@ describe('Account and OutsideExecution', () => {
     executorAccount = getTestAccount(provider);
     recipientAccount = executorAccount;
     strkContract = new Contract({
-      abi: contracts.Erc20OZ.sierra.abi,
+      abi: CONTRACTS.Erc20Oz100.sierra.abi,
       address: STRKtokenAddress,
       providerOrAccount: provider,
     });
@@ -85,7 +84,7 @@ describe('Account and OutsideExecution', () => {
     };
 
     // Deploy the SNIP-9 signer account (ArgentX v 0.4.0, using SNIP-9 v2):
-    const calldataAX = new CallData(contracts.ArgentX4Account.sierra.abi);
+    const calldataAX = new CallData(CONTRACTS.AccountReady040.sierra.abi);
     const axSigner = new CairoCustomEnum({ Starknet: { pubkey: targetPubK } });
     const axGuardian = new CairoOption<unknown>(CairoOptionVariant.None);
     const constructorAXCallData = calldataAX.compile('constructor', {
@@ -98,7 +97,7 @@ describe('Account and OutsideExecution', () => {
         ? '0x7a663375245780bd307f56fde688e33e5c260ab02b76741a57711c5b60d47f6'
         : '0x294a323246c017d00a98f11942e1e38d562c97bc79426742110a14ce497e9b5';
     const response = await executorAccount.declareAndDeploy({
-      contract: contracts.ArgentX4Account.sierra,
+      contract: CONTRACTS.AccountReady040.sierra,
       classHash: '0x36078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f',
       compiledClassHash,
       constructorCalldata: constructorAXCallData,
@@ -128,7 +127,7 @@ describe('Account and OutsideExecution', () => {
   test('getOutsideCall', async () => {
     expect(outsideExecution.getOutsideCall(call1)).toEqual({
       to: STRKtokenAddress,
-      selector: getSelectorFromName(call1.entrypoint),
+      selector: hash.getSelectorFromName(call1.entrypoint),
       calldata: [num.hexToDecimalString(recipientAccount.address), '100', '0'],
     });
   });
@@ -158,7 +157,7 @@ describe('Account and OutsideExecution', () => {
         Calls: [
           {
             Calldata: [num.hexToDecimalString(recipientAccount.address), '100', '0'],
-            Selector: getSelectorFromName(call1.entrypoint),
+            Selector: hash.getSelectorFromName(call1.entrypoint),
             To: STRKtokenAddress,
           },
         ],
@@ -355,7 +354,7 @@ describe('Account and OutsideExecution', () => {
       {
         to: STRKtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
-        calldata: [getDecimalString(recipientAccount.address), '300', '0'],
+        calldata: [num.getDecimalString(recipientAccount.address), '300', '0'],
       },
     ]);
     // get outside transaction of a multiCall :
@@ -367,12 +366,12 @@ describe('Account and OutsideExecution', () => {
       {
         to: STRKtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
-        calldata: [getDecimalString(recipientAccount.address), '100', '0'],
+        calldata: [num.getDecimalString(recipientAccount.address), '100', '0'],
       },
       {
         to: STRKtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
-        calldata: [getDecimalString(recipientAccount.address), '200', '0'],
+        calldata: [num.getDecimalString(recipientAccount.address), '200', '0'],
       },
     ]);
     const bal0 = (await strkContract.balanceOf(signerAccount.address)) as bigint;

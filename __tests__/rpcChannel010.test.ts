@@ -1,7 +1,10 @@
 import { LibraryError, RPC010, RpcError } from '../src';
-import { createBlockForDevnet, testIfRpc010 } from './config/fixtures';
-import { createTestProvider } from './config/fixturesInit';
-import { initializeMatcher } from './config/schema';
+import {
+  createBlockForDevnet,
+  createTestProvider,
+  initializeMatcher,
+  testIfRpc010,
+} from './config';
 
 testIfRpc010('RpcChannel', () => {
   let nodeUrl: string;

@@ -1,3 +1,12 @@
+/**
+ * Test Instance Initialization
+ *
+ * This module provides factory functions for creating test providers and accounts:
+ * - createTestProvider: Async provider factory (recommended, uses Provider.create)
+ * - getTestProvider: Sync provider factory (legacy, uses direct constructor)
+ * - getTestAccount: Account factory with devnet adaptations
+ * - Token addresses and transaction version constants
+ */
 import {
   Account,
   Provider,
@@ -7,13 +16,29 @@ import {
   getTipStatsFromBlocks,
   type PaymasterInterface,
   type TipAnalysisOptions,
-} from '../../src';
-import { RpcProviderOptions, type BlockIdentifier } from '../../src/types';
-import { toHex } from '../../src/utils/num';
-import './customMatchers'; // ensures TS traversal
-import { SupportedRpcVersion, SupportedTransactionVersion } from '../../src/global/constants';
+} from '../../../src';
+import { RpcProviderOptions, type BlockIdentifier } from '../../../src/types';
+import { toHex } from '../../../src/utils/num';
+import '../customMatchers'; // ensures TS traversal
+import { SupportedRpcVersion, SupportedTransactionVersion } from '../../../src/global/constants';
 
 config.set('logLevel', 'ERROR');
+
+/**
+ * Builds provider options with test environment configuration
+ * @param setProviderOptions - Optional provider options to merge
+ * @returns Provider options configured for test environment
+ */
+function buildTestProviderOptions(setProviderOptions?: RpcProviderOptions): RpcProviderOptions {
+  const isDevnet = process.env.IS_DEVNET === 'true';
+  return {
+    ...setProviderOptions,
+    nodeUrl: process.env.TEST_RPC_URL,
+    specVersion: process.env.RPC_SPEC_VERSION as SupportedRpcVersion,
+    // accelerate the tests when running locally
+    ...(isDevnet && { transactionRetryIntervalFallback: 0 }),
+  };
+}
 
 export async function createTestProvider(
   isProvider?: true,
@@ -27,15 +52,24 @@ export async function createTestProvider(
   isProvider: boolean = true,
   setProviderOptions?: RpcProviderOptions
 ): Promise<ProviderInterface | RpcProvider> {
-  const isDevnet = process.env.IS_DEVNET === 'true';
-  const providerOptions: RpcProviderOptions = {
-    ...setProviderOptions,
-    nodeUrl: process.env.TEST_RPC_URL,
-    specVersion: process.env.RPC_SPEC_VERSION as SupportedRpcVersion,
-    // accelerate the tests when running locally
-    ...(isDevnet && { transactionRetryIntervalFallback: 1000 }),
-  };
+  const providerOptions = buildTestProviderOptions(setProviderOptions);
   return isProvider ? Provider.create(providerOptions) : RpcProvider.create(providerOptions);
+}
+
+export function getTestProvider(
+  isProvider?: true,
+  setProviderOptions?: RpcProviderOptions
+): ProviderInterface;
+export function getTestProvider(
+  isProvider?: false,
+  setProviderOptions?: RpcProviderOptions
+): RpcProvider;
+export function getTestProvider(
+  isProvider: boolean = true,
+  setProviderOptions?: RpcProviderOptions
+): ProviderInterface | RpcProvider {
+  const providerOptions = buildTestProviderOptions(setProviderOptions);
+  return isProvider ? new Provider(providerOptions) : new RpcProvider(providerOptions);
 }
 
 export const TEST_TX_VERSION = process.env.TX_VERSION as SupportedTransactionVersion;
