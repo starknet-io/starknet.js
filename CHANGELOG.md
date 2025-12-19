@@ -1,3 +1,9 @@
+# [9.3.0](https://github.com/starknet-io/starknet.js/compare/v9.2.2...v9.3.0) (2025-12-19)
+
+### Features
+
+- add transactionRetryIntervalFallback to the global config ([9014c3c](https://github.com/starknet-io/starknet.js/commit/9014c3c6725d7c0b12d2d369f7c57cb73b9e45af))
+
 ## [9.2.2](https://github.com/starknet-io/starknet.js/compare/v9.2.1...v9.2.2) (2025-12-17)
 
 ### Bug Fixes
