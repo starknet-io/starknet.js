@@ -7,24 +7,15 @@
  * - Conditional test suite helpers (describeIf*, testIf*)
  */
 import { config, hash } from '../../src';
-import { autoDiscoverContracts } from './helpers/contract';
+import { CONTRACTS } from './helpers/contract';
 
-/**
- * Auto-discovered contracts from __mocks__ directory.
- * Contracts are automatically loaded based on their file structure:
- * - Cairo contracts: __mocks__/cairo/**\/*.sierra.json + matching .casm files
- * - Grouped contracts: __mocks__/{groupName}/**\/*.sierra.json + matching .casm files
- *   (e.g., StarknetId contracts in __mocks__/starknetId/)
- *
- * Contract keys are generated from filenames in PascalCase:
- * - cairo210.sierra.json -> Cairo210
- * - openzeppelin_EthAccount090.sierra.json -> OpenzeppelinEthAccount090
- * - starknetId directory -> StarknetId group
- */
-export const CONTRACTS = autoDiscoverContracts();
+export { CONTRACTS };
 
 config.set('logLevel', 'ERROR');
-
+if (process.env.IS_DEVNET === 'true') {
+  // accelerate the tests when running locally devnet
+  config.set('channelDefaults.options.transactionRetryIntervalFallback', 0);
+}
 export const { TEST_WS_URL } = process.env;
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
