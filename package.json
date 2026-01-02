@@ -24,6 +24,12 @@
     "CHANGELOG.md",
     "dist"
   ],
+  "sideEffects": [
+    "./dist/index.*",
+    "./dist/provider/index.*",
+    "./dist/paymaster/index.*",
+    "./dist/deployer/index.*"
+  ],
   "scripts": {
     "prepare": "npm run build && husky",
     "build": "tsup && npm run build:esm && npm run build:iife && npm run build:dts",
