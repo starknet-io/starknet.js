@@ -10,6 +10,7 @@ import type {
   InvokeFunctionResponse,
   PaymasterFeeEstimate,
   RawArgs,
+  SuccessfulTransactionReceiptResponseHelper,
   Uint256,
 } from '../types';
 import type {
@@ -42,7 +43,7 @@ declare module 'abi-wan-kanabi' {
     Calldata: RawArgs | Calldata;
     CallOptions: CallOptions;
     InvokeOptions: ExecuteOptions;
-    InvokeFunctionResponse: InvokeFunctionResponse;
+    InvokeFunctionResponse: InvokeFunctionResponse | SuccessfulTransactionReceiptResponseHelper;
   }
 }
 
@@ -169,6 +170,16 @@ export abstract class ContractInterface {
    * const receipt = await provider.waitForTransaction(tx.transaction_hash);
    * ```
    */
+  public abstract invoke(
+    method: string,
+    args: ArgsOrCalldata,
+    options: ExecuteOptions & { waitForTransaction: true }
+  ): Promise<SuccessfulTransactionReceiptResponseHelper>;
+  public abstract invoke(
+    method: string,
+    args: ArgsOrCalldata,
+    options: ExecuteOptions & { waitForTransaction: false }
+  ): Promise<InvokeFunctionResponse>;
   public abstract invoke(
     method: string,
     args?: ArgsOrCalldata,
