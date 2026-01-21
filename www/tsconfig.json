@@ -1,10 +1,33 @@
 {
-  // This file is not used in compilation. It is here just for a nice editor experience.
+  // Inherits official Docusaurus standards for React and MDX support
   "extends": "@tsconfig/docusaurus/tsconfig.json",
   "compilerOptions": {
-    "jsx": "react",
-    "module": "Node16",
-    "baseUrl": "."
+    /* Base Configuration */
+    "baseUrl": ".",
+    "target": "ES2022",
+    "module": "NodeNext", // Modern Node.js resolution for ESM/CJS compatibility
+    "moduleResolution": "NodeNext",
+    
+    /* React Support */
+    "jsx": "react-jsx", // Optimization: Uses the modern React 17+ transform
+    
+    /* Developer Experience (DX) & Safety */
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowJs": true, // Essential for Docusaurus as many configs are in .js
+    
+    /* Path Mapping (Optional - highly recommended for clean imports) */
+    "paths": {
+      "@site/*": ["./*"]
+    }
   },
-  "exclude": ["node_modules", "docs"]
+  // Optimization: Keep 'docs' excluded to prevent MDX files from slowing down the TS server
+  "exclude": [
+    "node_modules",
+    "build",
+    ".docusaurus",
+    "docs"
+  ]
 }
