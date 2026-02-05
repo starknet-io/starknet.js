@@ -8,12 +8,6 @@ on:
       dry-run:
         type: boolean
         default: false
-    secrets:
-      # populated automatically
-      # GITHUB_TOKEN:
-      #   required: true
-      NPM_TOKEN:
-        required: true
 
 jobs:
   release:
@@ -36,5 +30,4 @@ jobs:
       - run: npm ci --ignore-scripts ${{ inputs.dry-run }}
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release --debug ${{ inputs.debug }} --dry-run ${{ inputs.dry-run }}
