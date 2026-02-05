@@ -12,9 +12,14 @@ import {
   type RawArgs,
   isPreConfirmedStateUpdate,
 } from '../src';
-import { contracts, erc20ClassHash, wrongClassHash } from './config/fixtures';
-import { createTestProvider, getTestAccount } from './config/fixturesInit';
-import { initializeMatcher } from './config/schema';
+import {
+  CONTRACTS,
+  createTestProvider,
+  erc20ClassHash,
+  getTestAccount,
+  initializeMatcher,
+  wrongClassHash,
+} from './config';
 
 describe('defaultProvider', () => {
   let testProvider: ProviderInterface;
@@ -26,7 +31,7 @@ describe('defaultProvider', () => {
   let exampleBlockHash: string;
   let erc20Constructor: Calldata;
   let erc20ConstructorParams: RawArgs;
-  const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
+  const erc20CallData = new CallData(CONTRACTS.Erc20Oz100.sierra.abi);
   const wallet = stark.randomAddress();
   initializeMatcher(expect);
 
@@ -45,8 +50,8 @@ describe('defaultProvider', () => {
     erc20Constructor = erc20CallData.compile('constructor', erc20ConstructorParams);
 
     const { deploy } = await account.declareAndDeploy({
-      contract: contracts.Erc20OZ.sierra,
-      casm: contracts.Erc20OZ.casm,
+      contract: CONTRACTS.Erc20Oz100.sierra,
+      casm: CONTRACTS.Erc20Oz100.casm,
       constructorCalldata: erc20Constructor,
     });
 

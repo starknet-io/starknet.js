@@ -2,8 +2,7 @@
 import { Provider, Subscription, SubscriptionNewHeadsEvent, WebSocketChannel } from '../src';
 import { logger } from '../src/global/logger';
 import { StarknetChainId } from '../src/global/constants';
-import { getTestProvider, TEST_WS_URL } from './config/fixtures';
-import { getTestAccount, STRKtokenAddress } from './config/fixturesInit';
+import { getTestAccount, getTestProvider, STRKtokenAddress, TEST_WS_URL } from './config';
 
 const describeIfWs = TEST_WS_URL ? describe : describe.skip;
 const NODE_URL = TEST_WS_URL!;

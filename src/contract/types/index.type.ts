@@ -120,9 +120,11 @@ export type CallOptions = CommonContractOptions & {
 export type WithOptions = ExecuteOptions & CallOptions;
 
 export type ParsedEvent = { [name: string]: ParsedStruct } & {
+  transaction_hash?: TransactionHash;
+  transaction_index?: number;
+  event_index?: number;
   block_hash?: BlockHash;
   block_number?: BlockNumber;
-  transaction_hash?: TransactionHash;
 };
 
 export type ParsedEvents = Array<ParsedEvent> & {

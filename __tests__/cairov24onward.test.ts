@@ -19,8 +19,7 @@ import {
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import { contracts } from './config/fixtures';
-import { createTestProvider, getTestAccount } from './config/fixturesInit';
+import { CONTRACTS, createTestProvider, getTestAccount } from './config';
 
 describe('Cairo v2.4 onwards', () => {
   let provider: ProviderInterface;
@@ -36,12 +35,12 @@ describe('Cairo v2.4 onwards', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: contracts.C240.sierra,
-        casm: contracts.C240.casm,
+        contract: CONTRACTS.String.sierra,
+        casm: CONTRACTS.String.casm,
       });
 
       stringContract = new Contract({
-        abi: contracts.C240.sierra.abi,
+        abi: CONTRACTS.String.sierra.abi,
         address: deploy.contract_address,
         providerOrAccount: account,
       });
@@ -56,7 +55,7 @@ describe('Cairo v2.4 onwards', () => {
       const callD2 = CallData.compile({ str });
       expect(callD2).toEqual([hexToDecimalString(encodeShortString(str))]);
 
-      const myCallData = new CallData(contracts.C240.sierra.abi);
+      const myCallData = new CallData(CONTRACTS.String.sierra.abi);
       const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
       expect(myCalldata1).toEqual([encodeShortString(str)]);
 
@@ -110,12 +109,12 @@ describe('Cairo v2.4 onwards', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: contracts.Tuple.sierra,
-        casm: contracts.Tuple.casm,
+        contract: CONTRACTS.TupleResponse.sierra,
+        casm: CONTRACTS.TupleResponse.casm,
       });
 
       tupleContract = new Contract({
-        abi: contracts.Tuple.sierra.abi,
+        abi: CONTRACTS.TupleResponse.sierra.abi,
         address: deploy.contract_address,
         providerOrAccount: account,
       });
@@ -230,8 +229,8 @@ describe('Cairo v2.4 onwards', () => {
   describe('Cairo v2.6.0 Sierra1.5.0', () => {
     test('declare Sierra 1.5.0', async () => {
       const declare260Response = await account.declareIfNot({
-        contract: contracts.C260.sierra,
-        casm: contracts.C260.casm,
+        contract: CONTRACTS.Hello260.sierra,
+        casm: CONTRACTS.Hello260.casm,
       });
       expect(declare260Response.class_hash).toBe(
         '0x6184f1a71cad4bd123ff8bb3b97dc9ec876ced6489d9479cfdaada81a2f06d6'
@@ -253,12 +252,12 @@ describe('Cairo v2.4 onwards', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: contracts.U512.sierra,
-        casm: contracts.U512.casm,
+        contract: CONTRACTS.U512.sierra,
+        casm: CONTRACTS.U512.casm,
       });
 
       u512Contract = new Contract({
-        abi: contracts.U512.sierra.abi,
+        abi: CONTRACTS.U512.sierra.abi,
         address: deploy.contract_address,
         providerOrAccount: account,
       });
@@ -333,11 +332,11 @@ describe('Cairo v2.4 onwards', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: contracts.NonZero.sierra,
-        casm: contracts.NonZero.casm,
+        contract: CONTRACTS.Zeroable.sierra,
+        casm: CONTRACTS.Zeroable.casm,
       });
       nonZeroContract = new Contract({
-        abi: contracts.NonZero.sierra.abi,
+        abi: CONTRACTS.Zeroable.sierra.abi,
         address: deploy.contract_address,
         providerOrAccount: account,
       });
@@ -404,11 +403,11 @@ describe('Cairo v2.4 onwards', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: contracts.U96.sierra,
-        casm: contracts.U96.casm,
+        contract: CONTRACTS.U96.sierra,
+        casm: CONTRACTS.U96.casm,
       });
       u96Contract = new Contract({
-        abi: contracts.U96.sierra.abi,
+        abi: CONTRACTS.U96.sierra.abi,
         address: deploy.contract_address,
         providerOrAccount: account,
       });
@@ -443,11 +442,11 @@ describe('Cairo v2.4 onwards', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: contracts.fixedArray.sierra,
-        casm: contracts.fixedArray.casm,
+        contract: CONTRACTS.FixedArray.sierra,
+        casm: CONTRACTS.FixedArray.casm,
       });
       fixedArrayContract = new Contract({
-        abi: contracts.fixedArray.sierra.abi,
+        abi: CONTRACTS.FixedArray.sierra.abi,
         address: deploy.contract_address,
         providerOrAccount: account,
       });

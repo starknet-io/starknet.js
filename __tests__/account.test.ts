@@ -22,21 +22,19 @@ import {
 } from '../src';
 import {
   C1v2ClassHash,
-  contracts,
+  CONTRACTS,
   describeIfDevnet,
   describeIfNotDevnet,
   erc20ClassHash,
   getTestProvider,
-} from './config/fixtures';
-import {
   createTestProvider,
   getTestAccount,
   devnetFeeTokenAddress,
   adaptAccountIfDevnet,
   TEST_TX_VERSION,
   STRKtokenAddress,
-} from './config/fixturesInit';
-import { initializeMatcher } from './config/schema';
+  initializeMatcher,
+} from './config';
 
 const { toHex, hexToDecimalString, toBigInt } = num;
 const { randomAddress } = stark;
@@ -61,7 +59,7 @@ describe('deploy and test Account', () => {
     account = getTestAccount(provider);
     expect(account).toBeInstanceOf(Account);
 
-    erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
+    erc20CallData = new CallData(CONTRACTS.Erc20Oz100.sierra.abi);
     erc20Constructor = erc20CallData.compile('constructor', {
       name: 'Token',
       symbol: 'ERC20',
@@ -70,13 +68,13 @@ describe('deploy and test Account', () => {
       owner: account.address,
     });
     dd = await account.declareAndDeploy({
-      contract: contracts.Erc20OZ.sierra,
-      casm: contracts.Erc20OZ.casm,
+      contract: CONTRACTS.Erc20Oz100.sierra,
+      casm: CONTRACTS.Erc20Oz100.casm,
       constructorCalldata: erc20Constructor,
     });
     erc20Address = dd.deploy.contract_address;
     erc20 = new Contract({
-      abi: contracts.Erc20OZ.sierra.abi,
+      abi: CONTRACTS.Erc20Oz100.sierra.abi,
       address: erc20Address,
       providerOrAccount: provider,
     });
@@ -85,12 +83,12 @@ describe('deploy and test Account', () => {
     expect(balance).toStrictEqual(1000n);
 
     const dappResponse = await account.declareAndDeploy({
-      contract: contracts.C1v2.sierra,
-      casm: contracts.C1v2.casm,
+      contract: CONTRACTS.C1v2.sierra,
+      casm: CONTRACTS.C1v2.casm,
     });
 
     dapp = new Contract({
-      abi: contracts.C1v2.sierra.abi,
+      abi: CONTRACTS.C1v2.sierra.abi,
       address: dappResponse.deploy.contract_address,
       providerOrAccount: provider,
     });
@@ -110,8 +108,8 @@ describe('deploy and test Account', () => {
 
       // declare account
       const declareAccount = await account.declareIfNot({
-        contract: contracts.C1Account.sierra,
-        casm: contracts.C1Account.casm,
+        contract: CONTRACTS.AccountOz080.sierra,
+        casm: CONTRACTS.AccountOz080.casm,
       });
       const accountClassHash = declareAccount.class_hash;
 
@@ -244,8 +242,8 @@ describe('deploy and test Account', () => {
         const invocation = await provider.prepareInvocations([
           {
             type: TransactionType.DECLARE,
-            contract: contracts.Minimalist.sierra,
-            casm: contracts.Minimalist.casm,
+            contract: CONTRACTS.Minimalist.sierra,
+            casm: CONTRACTS.Minimalist.casm,
           },
         ]);
 
@@ -296,8 +294,8 @@ describe('deploy and test Account', () => {
     });
     test('simulate DEPLOY_ACCOUNT - Cairo 1 Account', async () => {
       const declareAccount = await account.declareIfNot({
-        contract: contracts.C1Account.sierra,
-        casm: contracts.C1Account.casm,
+        contract: CONTRACTS.AccountOz080.sierra,
+        casm: CONTRACTS.AccountOz080.casm,
       });
       const accountClassHash = declareAccount.class_hash;
       if (declareAccount.transaction_hash) {
@@ -495,8 +493,8 @@ describe('deploy and test Account', () => {
 
     test('Declare ERC20 contract', async () => {
       const declareTx = await account.declareIfNot({
-        contract: contracts.Erc20OZ.sierra,
-        casm: contracts.Erc20OZ.casm,
+        contract: CONTRACTS.Erc20Oz100.sierra,
+        casm: CONTRACTS.Erc20Oz100.casm,
         classHash: erc20ClassHash,
       });
       if (declareTx.transaction_hash) {
@@ -509,8 +507,8 @@ describe('deploy and test Account', () => {
   describe('Declare and UDC Deploy Flow', () => {
     test('ERC20 Declare', async () => {
       const declareTx = await account.declareIfNot({
-        contract: contracts.Erc20OZ.sierra,
-        casm: contracts.Erc20OZ.casm,
+        contract: CONTRACTS.Erc20Oz100.sierra,
+        casm: CONTRACTS.Erc20Oz100.casm,
       });
 
       if (declareTx.transaction_hash) {
@@ -589,8 +587,8 @@ describe('deploy and test Account', () => {
 
     beforeAll(async () => {
       const declareAccount = await account.declareIfNot({
-        contract: contracts.C1Account.sierra,
-        casm: contracts.C1Account.casm,
+        contract: CONTRACTS.AccountOz080.sierra,
+        casm: CONTRACTS.AccountOz080.casm,
       });
       accountClassHash = declareAccount.class_hash;
       if (declareAccount.transaction_hash) {
@@ -705,7 +703,7 @@ describe('deploy and test Account', () => {
          */
 
         const isDeclaredCairo1 = await account.isClassDeclared({
-          classHash: hash.computeContractClassHash(contracts.C260.sierra),
+          classHash: hash.computeContractClassHash(CONTRACTS.Hello260.sierra),
         });
 
         const invocations = [
@@ -739,8 +737,8 @@ describe('deploy and test Account', () => {
                 {
                   // Cairo 1.1.0, if declared estimate error with can't redeclare same contract
                   type: TransactionType.DECLARE,
-                  contract: contracts.C260.sierra,
-                  casm: contracts.C260.casm,
+                  contract: CONTRACTS.Hello260.sierra,
+                  casm: CONTRACTS.Hello260.casm,
                 },
               ]
             : []),
@@ -782,8 +780,8 @@ describe('deploy and test Account', () => {
           {
             // Cairo 1.1.0, if declared estimate error with can't redeclare same contract
             type: TransactionType.DECLARE,
-            contract: contracts.C260.sierra,
-            casm: contracts.C260.casm,
+            contract: CONTRACTS.Hello260.sierra,
+            casm: CONTRACTS.Hello260.casm,
           },
         ]);
 
@@ -799,8 +797,8 @@ describe('deploy and test Account', () => {
     test('estimateInvokeFee Cairo 1', async () => {
       // Cairo 1 contract
       const ddc1: DeclareDeployUDCResponse = await account.declareAndDeploy({
-        contract: contracts.C260.sierra,
-        casm: contracts.C260.casm,
+        contract: CONTRACTS.Hello260.sierra,
+        casm: CONTRACTS.Hello260.casm,
       });
 
       const latestBlock = await provider.getBlock('latest');
@@ -844,8 +842,8 @@ describe('deploy and test Account', () => {
     let accountCustomDeployer: Account;
     beforeAll(async () => {
       const deployerResponse = await account.declareAndDeploy({
-        contract: contracts.deployer.sierra,
-        casm: contracts.deployer.casm,
+        contract: CONTRACTS.Deployer.sierra,
+        casm: CONTRACTS.Deployer.casm,
       });
       const customDeployer = new Deployer(
         deployerResponse.deploy.contract_address,
@@ -900,21 +898,21 @@ describe('unit', () => {
 
     test('declareIfNot', async () => {
       const declare = await account.declareIfNot({
-        contract: contracts.Minimalist.sierra,
-        casm: contracts.Minimalist.casm,
+        contract: CONTRACTS.Minimalist.sierra,
+        casm: CONTRACTS.Minimalist.casm,
       });
       expect(declare).toMatchSchemaRef('DeclareContractResponse');
 
       await expect(
         account.declare({
-          contract: contracts.Minimalist.sierra,
-          casm: contracts.Minimalist.casm,
+          contract: CONTRACTS.Minimalist.sierra,
+          casm: CONTRACTS.Minimalist.casm,
         })
       ).rejects.toThrow();
 
       const redeclare = await account.declareIfNot({
-        contract: contracts.Minimalist.sierra,
-        casm: contracts.Minimalist.casm,
+        contract: CONTRACTS.Minimalist.sierra,
+        casm: CONTRACTS.Minimalist.casm,
       });
       expect(redeclare.class_hash).toBe(declare.class_hash);
     });
