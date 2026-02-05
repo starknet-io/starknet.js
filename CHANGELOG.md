@@ -1,3 +1,9 @@
+## [9.3.1-beta.1](https://github.com/starknet-io/starknet.js/compare/v9.3.0...v9.3.1-beta.1) (2026-02-05)
+
+### Bug Fixes
+
+- semantic version, audit fix, ci permissions ([3c5dea3](https://github.com/starknet-io/starknet.js/commit/3c5dea301733c85cbd5a2785358e92f808874902))
+
 # [9.3.0](https://github.com/starknet-io/starknet.js/compare/v9.2.2...v9.3.0) (2025-12-19)
 
 ### Features
