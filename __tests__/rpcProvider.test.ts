@@ -1,15 +1,18 @@
 import { getStarkKey, Signature, utils } from '@scure/starknet';
 import { hasMixin } from 'ts-mixer';
 import {
-  contracts,
+  CONTRACTS,
   createBlockForDevnet,
+  createTestProvider,
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
   describeIfTestnet,
+  ETHtokenAddress,
+  getTestAccount,
+  initializeMatcher,
   waitNextBlock,
-} from './config/fixtures';
-import { initializeMatcher } from './config/schema';
+} from './config';
 import typedDataExample from '../__mocks__/typedData/baseExample.json';
 import {
   Account,
@@ -39,7 +42,6 @@ import { isBoolean } from '../src/utils/typed';
 import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
 import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
 import { StarknetId } from '../src/provider/extensions/starknetId';
-import { createTestProvider, ETHtokenAddress, getTestAccount } from './config/fixturesInit';
 
 /**
  * Helper function to create expected zero tip estimate for tests
@@ -219,8 +221,8 @@ describeIfRpc('RPCProvider', () => {
 
     beforeAll(async () => {
       const { deploy: deploy2 } = await account.declareAndDeploy({
-        contract: contracts.C1v2.sierra,
-        casm: contracts.C1v2.casm,
+        contract: CONTRACTS.C1v2.sierra,
+        casm: CONTRACTS.C1v2.casm,
       });
       l1l2ContractCairo1Address = deploy2.contract_address;
       await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pre confirmed block validation before interacting
@@ -434,7 +436,7 @@ describeIfRpc('RPCProvider', () => {
 
     describeIfDevnet('devnet only', () => {
       test('getEvents ', async () => {
-        const erc20CallData = new CallData(contracts.Erc20OZ.sierra.abi);
+        const erc20CallData = new CallData(CONTRACTS.Erc20Oz100.sierra.abi);
         const erc20ConstructorParams = {
           name: 'Token',
           symbol: 'ERC20',
@@ -449,13 +451,13 @@ describeIfRpc('RPCProvider', () => {
         );
 
         const { deploy } = await account.declareAndDeploy({
-          contract: contracts.Erc20OZ.sierra,
-          casm: contracts.Erc20OZ.casm,
+          contract: CONTRACTS.Erc20Oz100.sierra,
+          casm: CONTRACTS.Erc20Oz100.casm,
           constructorCalldata: erc20Constructor,
         });
 
         const erc20EchoContract = new Contract({
-          abi: contracts.Erc20OZ.sierra.abi,
+          abi: CONTRACTS.Erc20Oz100.sierra.abi,
           address: deploy.contract_address,
           providerOrAccount: account,
         });
@@ -505,8 +507,8 @@ describeIfRpc('RPCProvider', () => {
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
-          contract: contracts.C1Account.sierra,
-          casm: contracts.C1Account.casm,
+          contract: CONTRACTS.AccountOz080.sierra,
+          casm: CONTRACTS.AccountOz080.casm,
           constructorCalldata: [accountPublicKey],
           salt: accountPublicKey,
         });

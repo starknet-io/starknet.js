@@ -10,8 +10,7 @@ import {
   cairo,
   type PaymasterFeeEstimate,
 } from '../src';
-import { describeIfTestnet, getTestProvider } from './config/fixtures';
-import { getTestAccount, STRKtokenAddress } from './config/fixturesInit';
+import { describeIfTestnet, getTestAccount, getTestProvider, STRKtokenAddress } from './config';
 
 describeIfTestnet('Paymaster with Contract, in Testnet', () => {
   let provider: RpcProvider;

@@ -5,6 +5,7 @@
     "__mocks__/**/*",
     "__tests__/**/*",
     "src/**/*",
-    "jest.config.ts"
+    "jest.config.ts",
+    ".releaserc.mjs"
   ]
 }

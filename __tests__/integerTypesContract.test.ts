@@ -1,6 +1,5 @@
 import { Account, Contract, ProviderInterface, hdParsingStrategy } from '../src';
-import { contracts } from './config/fixtures';
-import { createTestProvider, getTestAccount } from './config/fixturesInit';
+import { CONTRACTS, createTestProvider, getTestAccount } from './config';
 import { CairoUint8 } from '../src/utils/cairoDataTypes/uint8';
 import { CairoUint16 } from '../src/utils/cairoDataTypes/uint16';
 import { CairoUint64 } from '../src/utils/cairoDataTypes/uint64';
@@ -19,8 +18,8 @@ describe('Integer Types Manual Integration Tests', () => {
 
     // Deploy IntegerTypesStorage contract using Contract.factory
     integerTypesContract = await Contract.factory({
-      contract: contracts.IntegerTypes.sierra,
-      casm: contracts.IntegerTypes.casm,
+      contract: CONTRACTS.TestIntegerTypesStorage.sierra,
+      casm: CONTRACTS.TestIntegerTypesStorage.casm,
       account,
       constructorCalldata: [],
     });
@@ -185,8 +184,8 @@ describe('Integer Types Contract Integration Tests', () => {
 
     // Deploy IntegerTypesStorage contract using Contract.factory with hdParsingStrategy
     integerTypesContract = await Contract.factory({
-      contract: contracts.IntegerTypes.sierra,
-      casm: contracts.IntegerTypes.casm,
+      contract: CONTRACTS.TestIntegerTypesStorage.sierra,
+      casm: CONTRACTS.TestIntegerTypesStorage.casm,
       account,
       constructorCalldata: [],
       parsingStrategy: hdParsingStrategy,

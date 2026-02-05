@@ -1,17 +1,21 @@
-import { blake2s } from 'blakejs';
-import { blake2s as blake2sNapi } from '@napi-rs/blake-hash';
 import { config, hash } from '../../src';
-import { contracts } from '../config/fixtures';
+import { CONTRACTS } from '../config/fixtures';
 
 // Helper to print without Jest annotations
 const print = (message: string) => process.stdout.write(`${message}\n`);
+
+// Lazy load Blake2s implementations to avoid early native module loading
+// Note: Native modules like @napi-rs/blake-hash will still cause Jest open handle
+// warnings, but this is expected behavior and safe to ignore for this test file
+let blake2s: any;
+let blake2sNapi: any;
 
 describe('Blake2s Compiled Class Hash Tests', () => {
   describe('Default implementation Cross-validation with Rust', () => {
     test('Rust test_contract.casm - Blake2s hash matches expected value', () => {
       // This is the exact test contract used in the Rust sequencer tests
-      // Source: /sequencer/crates/blockifier_test_utils/resources/feature_contracts/cairo1/compiled/test_contract.casm.json
-      const { casm } = contracts.Blake2sVerificationContract;
+      // Source: /sequencer/crates/blockifier_test_utils/resources/feature_CONTRACTS/cairo1/compiled/test_contract.casm.json
+      const { casm } = CONTRACTS.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
 
@@ -25,7 +29,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Rust test_contract.casm - Poseidon hash for comparison', () => {
-      const { casm } = contracts.Blake2sVerificationContract;
+      const { casm } = CONTRACTS.Blake2sVerificationContract;
 
       const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
 
@@ -38,7 +42,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Rust test_contract.casm - Blake2s differs from Poseidon', () => {
-      const { casm } = contracts.Blake2sVerificationContract;
+      const { casm } = CONTRACTS.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
       const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
@@ -48,13 +52,18 @@ describe('Blake2s Compiled Class Hash Tests', () => {
   });
 
   describe('Custom blakejs implementation Cross-validation', () => {
-    config.set('blake', (uint8Array: Uint8Array) => {
-      return blake2s(uint8Array, undefined, 32);
+    beforeAll(async () => {
+      const blakejsModule = await import('blakejs');
+      blake2s = blakejsModule.blake2s;
+      config.set('blake', (uint8Array: Uint8Array) => {
+        return blake2s(uint8Array, undefined, 32);
+      });
     });
+
     test('Rust test_contract.casm - Blake2s hash matches expected value', () => {
       // This is the exact test contract used in the Rust sequencer tests
-      // Source: /sequencer/crates/blockifier_test_utils/resources/feature_contracts/cairo1/compiled/test_contract.casm.json
-      const { casm } = contracts.Blake2sVerificationContract;
+      // Source: /sequencer/crates/blockifier_test_utils/resources/feature_CONTRACTS/cairo1/compiled/test_contract.casm.json
+      const { casm } = CONTRACTS.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
 
@@ -68,7 +77,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Rust test_contract.casm - Poseidon hash for comparison', () => {
-      const { casm } = contracts.Blake2sVerificationContract;
+      const { casm } = CONTRACTS.Blake2sVerificationContract;
 
       const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
 
@@ -81,7 +90,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Rust test_contract.casm - Blake2s differs from Poseidon', () => {
-      const { casm } = contracts.Blake2sVerificationContract;
+      const { casm } = CONTRACTS.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
       const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
@@ -91,13 +100,18 @@ describe('Blake2s Compiled Class Hash Tests', () => {
   });
 
   describe('Custom Napi implementation Cross-validation', () => {
-    config.set('blake', (uint8Array: Uint8Array) => {
-      return blake2sNapi(uint8Array);
+    beforeAll(async () => {
+      const napiModule = await import('@napi-rs/blake-hash');
+      blake2sNapi = napiModule.blake2s;
+      config.set('blake', (uint8Array: Uint8Array) => {
+        return blake2sNapi(uint8Array);
+      });
     });
+
     test('Rust test_contract.casm - Blake2s hash matches expected value', () => {
       // This is the exact test contract used in the Rust sequencer tests
-      // Source: /sequencer/crates/blockifier_test_utils/resources/feature_contracts/cairo1/compiled/test_contract.casm.json
-      const { casm } = contracts.Blake2sVerificationContract;
+      // Source: /sequencer/crates/blockifier_test_utils/resources/feature_CONTRACTS/cairo1/compiled/test_contract.casm.json
+      const { casm } = CONTRACTS.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
 
@@ -111,7 +125,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Rust test_contract.casm - Poseidon hash for comparison', () => {
-      const { casm } = contracts.Blake2sVerificationContract;
+      const { casm } = CONTRACTS.Blake2sVerificationContract;
 
       const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
 
@@ -124,7 +138,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Rust test_contract.casm - Blake2s differs from Poseidon', () => {
-      const { casm } = contracts.Blake2sVerificationContract;
+      const { casm } = CONTRACTS.Blake2sVerificationContract;
 
       const blake2sHash = hash.computeCompiledClassHashBlake(casm);
       const poseidonHash = hash.computeCompiledClassHash(casm, '0.13.1');
@@ -135,7 +149,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
 
   describe('Basic functionality', () => {
     test('Hello Cairo2.6.0 - CompiledClassHash with Blake2s', () => {
-      const compiledClassHash = hash.computeCompiledClassHashBlake(contracts.C260.casm);
+      const compiledClassHash = hash.computeCompiledClassHashBlake(CONTRACTS.Hello260.casm);
 
       // This will initially show the computed value for verification
       print(`Blake2s hash: ${compiledClassHash}`);
@@ -145,7 +159,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Hash Sierra - CompiledClassHash with Blake2s', () => {
-      const compiledClassHash = hash.computeCompiledClassHashBlake(contracts.HashSierra.casm);
+      const compiledClassHash = hash.computeCompiledClassHashBlake(CONTRACTS.Hash.casm);
 
       print(`Hash Sierra Blake2s hash: ${compiledClassHash}`);
 
@@ -154,7 +168,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Complex Sierra - CompiledClassHash with Blake2s', () => {
-      const compiledClassHash = hash.computeCompiledClassHashBlake(contracts.Erc20OZ.casm);
+      const compiledClassHash = hash.computeCompiledClassHashBlake(CONTRACTS.Erc20Oz100.casm);
 
       print(`Erc20OZ Blake2s hash: ${compiledClassHash}`);
 
@@ -165,14 +179,14 @@ describe('Blake2s Compiled Class Hash Tests', () => {
 
   describe('Entry point handling', () => {
     test('Contract with constructor', () => {
-      const compiledClassHash = hash.computeCompiledClassHashBlake(contracts.Erc20OZ.casm);
+      const compiledClassHash = hash.computeCompiledClassHashBlake(CONTRACTS.Erc20Oz100.casm);
 
       expect(compiledClassHash).toBeTruthy();
       expect(compiledClassHash).toMatch(/^0x[0-9a-f]+$/);
     });
 
     test('Contract without constructor (only constructor)', () => {
-      const compiledClassHash = hash.computeCompiledClassHashBlake(contracts.OnlyConstructor.casm);
+      const compiledClassHash = hash.computeCompiledClassHashBlake(CONTRACTS.OnlyConstructor.casm);
 
       print(`OnlyConstructor Blake2s hash: ${compiledClassHash}`);
 
@@ -183,7 +197,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
 
   describe('Bytecode segment handling', () => {
     test('Contract with bytecode segments (Cairo 2.6.0+)', () => {
-      const { casm } = contracts.C260;
+      const { casm } = CONTRACTS.Hello260;
 
       // Verify it has bytecode segments
       expect(casm.bytecode_segment_lengths).toBeDefined();
@@ -195,7 +209,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Contract without bytecode segments (older Cairo)', () => {
-      const { casm } = contracts.HashSierra;
+      const { casm } = CONTRACTS.Hash;
 
       // Check if it doesn't have bytecode segments
       const hasSegments = casm.bytecode_segment_lengths !== undefined;
@@ -210,8 +224,8 @@ describe('Blake2s Compiled Class Hash Tests', () => {
 
   describe('Different from Poseidon hash', () => {
     test('Blake2s hash should differ from Poseidon hash', () => {
-      const blake2sHash = hash.computeCompiledClassHashBlake(contracts.C260.casm);
-      const poseidonHash = hash.computeCompiledClassHash(contracts.C260.casm, '0.13.1');
+      const blake2sHash = hash.computeCompiledClassHashBlake(CONTRACTS.Hello260.casm);
+      const poseidonHash = hash.computeCompiledClassHash(CONTRACTS.Hello260.casm, '0.13.1');
 
       print(`Blake2s: ${blake2sHash}`);
       print(`Poseidon: ${poseidonHash}`);
@@ -224,8 +238,16 @@ describe('Blake2s Compiled Class Hash Tests', () => {
   describe('Performance comparison', () => {
     const iterations = 100;
 
+    beforeAll(async () => {
+      // Load both implementations for performance tests
+      const blakejsModule = await import('blakejs');
+      blake2s = blakejsModule.blake2s;
+      const napiModule = await import('@napi-rs/blake-hash');
+      blake2sNapi = napiModule.blake2s;
+    });
+
     test('Compare speed: Default vs Custom blakejs vs Napi', () => {
-      const { casm } = contracts.Blake2sVerificationContract;
+      const { casm } = CONTRACTS.Blake2sVerificationContract;
 
       print(`\n${'='.repeat(60)}`);
       print('Blake2s Implementation Performance Comparison');
@@ -297,7 +319,7 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     });
 
     test('Performance on complex contract (ERC20)', () => {
-      const { casm } = contracts.Erc20OZ;
+      const { casm } = CONTRACTS.Erc20Oz100;
 
       print(`\n${'='.repeat(60)}`);
       print('Complex Contract (ERC20) Performance Comparison');
