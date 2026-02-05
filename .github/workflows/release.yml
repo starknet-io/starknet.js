@@ -1,0 +1,114 @@
+name: '[Manual|PR] Release'
+on:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Debug'
+        type: boolean
+        default: true
+      dry-run:
+        description: 'Dry run'
+        type: boolean
+        default: true
+  pull_request:
+    branches:
+      - main
+      - beta
+      - develop
+      - next-version
+    paths:
+      - '__mocks__/**'
+      - '__tests__/**'
+      - 'src/**'
+      - 'package*'
+      - 'ts*'
+      - '!www/**'
+  push:
+    branches:
+      - main
+      - beta
+      - develop
+      - next-version
+    paths:
+      - '__mocks__/**'
+      - '__tests__/**'
+      - 'src/**'
+      - 'package*'
+      - 'ts*'
+      - '!www/**'
+
+jobs:
+  skip_check:
+    name: Skip check
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_duplicate.outputs.should_skip }}
+    steps:
+      - id: skip_duplicate
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          cancel_others: 'true'
+
+  tests-dev:
+    name: Run test on ${{ matrix.name }}
+    needs: [skip_check]
+    if: |
+      github.event_name != 'workflow_dispatch'
+      && needs.skip_check.outputs.should_skip != 'true'
+      && contains(fromJSON('["beta","develop","next-version"]'), github.base_ref || github.ref_name)
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: rpc-devnet
+            TEST_NODE_URL: http://127.0.0.1:5050/rpc
+
+    uses: ./.github/workflows/_test.yml
+    with:
+      use-devnet: ${{ matrix.TEST_NODE_URL != '' }}
+    secrets:
+      TEST_NODE_URL: ${{ matrix.TEST_NODE_URL }}
+
+  tests-main:
+    name: Run test on ${{ matrix.node }} ${{ matrix.protocol }} ${{ matrix.version }}
+    needs: [skip_check]
+    if: |
+      github.event_name != 'workflow_dispatch'
+      && needs.skip_check.outputs.should_skip != 'true'
+      && (github.base_ref || github.ref_name) == 'main'
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        protocol: [RPC, WS]
+        node: [Juno, Pathfinder]
+        version: [v0_8, v0_9]
+
+    uses: ./.github/workflows/_test.yml
+    with:
+      protocol: ${{ matrix.protocol }}
+      node: ${{ matrix.node }}
+      version: ${{ matrix.version }}
+    secrets: inherit
+
+  release-auto:
+    name: Release
+    needs: [skip_check, tests-dev, tests-main]
+    if: |
+      always()
+      && !failure()
+      && needs.skip_check.result != 'failure'
+      && needs.skip_check.outputs.should_skip != 'true'
+      && github.event_name == 'push'
+    uses: ./.github/workflows/_release.yml
+    secrets: inherit
+
+  release-manual:
+    name: Release (manual)
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_release.yml
+    with:
+      debug: ${{ inputs.debug }}
+      dry-run: ${{ inputs.dry-run }}
+    secrets: inherit
