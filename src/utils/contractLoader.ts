@@ -1,11 +1,19 @@
 import { CompiledSierra, CairoAssembly } from '../types/lib/contract/index';
 import { parse } from './json';
 
-export interface LoadedContract {
-  sierra: CompiledSierra;
-  casm?: CairoAssembly;
-  compiler?: string;
-}
+export type LoadedContract =
+  | {
+      sierra: CompiledSierra;
+      casm: CairoAssembly;
+      compiler?: string;
+      compiledClassHash?: never;
+    }
+  | {
+      sierra: CompiledSierra;
+      casm?: never;
+      compiler?: string;
+      compiledClassHash: string;
+    };
 
 /**
  * Helper function to check if filesystem access is available (Node.js environment)
@@ -26,21 +34,28 @@ export function isFileSystemAvailable(): boolean {
  * Accepts a directory path or a direct path to a .sierra.json or .casm file.
  * - If a directory is provided: searches for .sierra.json and .casm files
  * - If a file path is provided: loads that file and attempts to find the complementary file
+ * - If compiledClassHash is provided: .casm file is optional
+ * - If compiledClassHash is NOT provided: .casm file is required
  *
  * **Browser usage:**
  * Accepts a File object (from file input or drag-and-drop).
  * - Returns a Promise that resolves to LoadedContract
  * - Automatically detects .sierra.json and .casm files
  * - Can accept a single .sierra.json or .casm file, or multiple files
+ * - If compiledClassHash is provided: .casm file is optional
  *
  * @param {string | File | File[]} input - Path (Node.js) or File/File[] (browser)
+ * @param {string} [compiledClassHash] - Optional compiled class hash. If provided, .casm file becomes optional
  * @return {LoadedContract | Promise<LoadedContract>} - Contract data (sync in Node.js, async in browser)
- * @throws {Error} - If no .sierra.json file is found or file reading fails
+ * @throws {Error} - If no .sierra.json file is found, or if .casm is missing when compiledClassHash is not provided
  *
  * @example
  * ```typescript
- * // Node.js: Load from directory
+ * // Node.js: Load from directory (requires .casm)
  * const contract = contractLoader('./contracts/my_contract');
+ *
+ * // Node.js: Load with compiledClassHash (no .casm needed)
+ * const contract = contractLoader('./contracts/my_contract', '0x1234...');
  *
  * // Node.js: Load from .sierra.json file
  * const contract = contractLoader('./contracts/my_contract.sierra.json');
@@ -49,19 +64,20 @@ export function isFileSystemAvailable(): boolean {
  * const fileInput = document.querySelector('input[type="file"]');
  * const contract = await contractLoader(fileInput.files[0]);
  *
- * // Browser: Load from multiple files
- * const contract = await contractLoader([sierraFile, casmFile]);
+ * // Browser: Load with compiledClassHash (no .casm needed)
+ * const contract = await contractLoader(sierraFile, '0x1234...');
  * ```
  */
-export function contractLoader(contractPath: string): LoadedContract;
-export function contractLoader(file: File): Promise<LoadedContract>;
-export function contractLoader(files: File[]): Promise<LoadedContract>;
+export function contractLoader(contractPath: string, compiledClassHash?: string): LoadedContract;
+export function contractLoader(file: File, compiledClassHash?: string): Promise<LoadedContract>;
+export function contractLoader(files: File[], compiledClassHash?: string): Promise<LoadedContract>;
 export function contractLoader(
-  input: string | File | File[]
+  input: string | File | File[],
+  compiledClassHash?: string
 ): LoadedContract | Promise<LoadedContract> {
   // Browser path: File or File[]
   if (typeof File !== 'undefined' && (input instanceof File || Array.isArray(input))) {
-    return loadFromFileAPI(input);
+    return loadFromFileAPI(input, compiledClassHash);
   }
 
   // Node.js path: string
@@ -73,7 +89,7 @@ export function contractLoader(
           'Example: await contractLoader(fileInput.files[0])'
       );
     }
-    return loadFromFileSystem(input);
+    return loadFromFileSystem(input, compiledClassHash);
   }
 
   throw new Error(
@@ -84,7 +100,7 @@ export function contractLoader(
 /**
  * Load contract from Node.js filesystem (synchronous)
  */
-function loadFromFileSystem(contractPath: string): LoadedContract {
+function loadFromFileSystem(contractPath: string, compiledClassHash?: string): LoadedContract {
   // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
   const fs = require('fs');
   // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
@@ -172,25 +188,39 @@ function loadFromFileSystem(contractPath: string): LoadedContract {
   const sierraPath = path.join(dirPath, sierraFile);
   const sierraContent = parse(fs.readFileSync(sierraPath, 'utf8'));
 
-  const result: LoadedContract = {
-    sierra: sierraContent,
-  };
-
   // Load casm if available
   if (casmFile) {
     const casmPath = path.join(dirPath, casmFile);
     const casmContent = parse(fs.readFileSync(casmPath, 'utf8'));
-    result.casm = casmContent;
-    result.compiler = casmContent.compiler_version;
+    return {
+      sierra: sierraContent,
+      casm: casmContent,
+      compiler: casmContent.compiler_version,
+    };
   }
 
-  return result;
+  // If no casm file and no compiledClassHash provided, throw error
+  if (!compiledClassHash) {
+    throw new Error(
+      `No .casm file found for ${sierraFile} and no compiledClassHash provided. ` +
+        'Either provide a .casm file or pass compiledClassHash as second parameter.'
+    );
+  }
+
+  // Return with compiledClassHash
+  return {
+    sierra: sierraContent,
+    compiledClassHash,
+  };
 }
 
 /**
  * Load contract from browser File API (asynchronous)
  */
-async function loadFromFileAPI(input: File | File[]): Promise<LoadedContract> {
+async function loadFromFileAPI(
+  input: File | File[],
+  compiledClassHash?: string
+): Promise<LoadedContract> {
   const files = Array.isArray(input) ? input : [input];
 
   if (files.length === 0) {
@@ -230,18 +260,29 @@ async function loadFromFileAPI(input: File | File[]): Promise<LoadedContract> {
   // Read sierra file
   const sierraContent = parse(await readFileAsText(sierraFile));
 
-  const result: LoadedContract = {
-    sierra: sierraContent,
-  };
-
   // Read casm file if available
   if (casmFile) {
     const casmContent = parse(await readFileAsText(casmFile));
-    result.casm = casmContent;
-    result.compiler = casmContent.compiler_version;
+    return {
+      sierra: sierraContent,
+      casm: casmContent,
+      compiler: casmContent.compiler_version,
+    };
   }
 
-  return result;
+  // If no casm file and no compiledClassHash provided, throw error
+  if (!compiledClassHash) {
+    throw new Error(
+      'No .casm file found in provided files and no compiledClassHash provided. ' +
+        'Either provide a .casm file or pass compiledClassHash as second parameter.'
+    );
+  }
+
+  // Return with compiledClassHash
+  return {
+    sierra: sierraContent,
+    compiledClassHash,
+  };
 }
 
 /**

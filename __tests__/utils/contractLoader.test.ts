@@ -50,15 +50,26 @@ describe('contractLoader', () => {
   });
 
   describe('Sierra-only contracts', () => {
-    test('should return sierra without casm if no casm file exists', () => {
+    test('should throw error if no casm file and no compiledClassHash', () => {
       // Use complexInput which has only sierra file
       const sierraOnlyDir = path.join(mocksBase, 'cairo/complexInput');
-      const contract = contractLoader(sierraOnlyDir);
+
+      expect(() => contractLoader(sierraOnlyDir)).toThrow(
+        'No .casm file found for complex_sierra.sierra.json and no compiledClassHash provided'
+      );
+    });
+
+    test('should return sierra with compiledClassHash when casm does not exist', () => {
+      // Use complexInput which has only sierra file
+      const sierraOnlyDir = path.join(mocksBase, 'cairo/complexInput');
+      const mockCompiledClassHash = '0x1234567890abcdef';
+      const contract = contractLoader(sierraOnlyDir, mockCompiledClassHash);
 
       expect(contract).toBeDefined();
       expect(contract.sierra).toBeDefined();
       expect(contract.casm).toBeUndefined();
       expect(contract.compiler).toBeUndefined();
+      expect(contract.compiledClassHash).toBe(mockCompiledClassHash);
     });
   });
 
