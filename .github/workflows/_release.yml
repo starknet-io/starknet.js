@@ -17,6 +17,12 @@ on:
 
 jobs:
   release:
+    permissions:
+      packages: write
+      pull-requests: write
+      contents: write
+      issues: write
+      id-token: write
     name: Run release
     runs-on: ubuntu-latest
     steps:
