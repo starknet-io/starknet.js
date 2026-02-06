@@ -27,6 +27,8 @@ jobs:
         with:
           node-version: lts/*
           cache: 'npm'
+      - name: Update npm for OIDC trusted publishing
+        run: npm install -g npm@latest
       - run: npm ci --ignore-scripts ${{ inputs.dry-run }}
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
