@@ -1,3 +1,4 @@
+import { logger } from '../global/logger';
 import { CompiledSierra, CairoAssembly } from '../types/lib/contract/index';
 import { parse } from './json';
 
@@ -23,6 +24,7 @@ export function isFileSystemAvailable(): boolean {
   try {
     return typeof require !== 'undefined' && typeof require.resolve === 'function';
   } catch {
+    logger.info('isFileSystemAvailable: false');
     return false;
   }
 }
