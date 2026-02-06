@@ -103,6 +103,12 @@ jobs:
       && github.event_name == 'push'
     uses: ./.github/workflows/_release.yml
     secrets: inherit
+    permissions:
+      packages: write
+      pull-requests: write
+      contents: write
+      issues: write
+      id-token: write
 
   release-manual:
     name: Release (manual)
@@ -112,3 +118,9 @@ jobs:
       debug: ${{ inputs.debug }}
       dry-run: ${{ inputs.dry-run }}
     secrets: inherit
+    permissions:
+      packages: write
+      pull-requests: write
+      contents: write
+      issues: write
+      id-token: write
