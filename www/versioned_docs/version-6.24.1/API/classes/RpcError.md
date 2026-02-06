@@ -22,7 +22,7 @@ custom_edit_url: null
 
 ### constructor
 
-• **new RpcError**<`BaseErrorT`\>(`baseError`, `method`, `params`): [`RpcError`](RpcError.md)<`BaseErrorT`\>
+• **new RpcError**\<`BaseErrorT`\>(`baseError`, `method`, `params`): [`RpcError`](RpcError.md)\<`BaseErrorT`\>
 
 #### Type parameters
 
@@ -40,7 +40,7 @@ custom_edit_url: null
 
 #### Returns
 
-[`RpcError`](RpcError.md)<`BaseErrorT`\>
+[`RpcError`](RpcError.md)\<`BaseErrorT`\>
 
 #### Overrides
 
@@ -227,7 +227,7 @@ node_modules/@types/node/globals.d.ts:136
 
 ### isType
 
-▸ **isType**<`N`, `C`\>(`typeName`): this is RpcError<RPC_ERROR_SET[N] & Object\>
+▸ **isType**\<`N`, `C`\>(`typeName`): this is RpcError\<RPC_ERROR_SET[N] & Object\>
 
 Verifies the underlying RPC error, also serves as a type guard for the _baseError_ property
 
@@ -246,7 +246,7 @@ Verifies the underlying RPC error, also serves as a type guard for the _baseErro
 
 #### Returns
 
-this is RpcError<RPC_ERROR_SET[N] & Object\>
+this is RpcError\<RPC_ERROR_SET[N] & Object\>
 
 **`Example`**
 

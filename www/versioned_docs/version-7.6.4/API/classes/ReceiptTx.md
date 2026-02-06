@@ -143,11 +143,11 @@ GetTransactionReceiptResponse.match
 
 ### isSuccess
 
-▸ **isSuccess**(): this is GetTransactionReceiptResponse<"success"\>
+▸ **isSuccess**(): this is GetTransactionReceiptResponse\<"success"\>
 
 #### Returns
 
-this is GetTransactionReceiptResponse<"success"\>
+this is GetTransactionReceiptResponse\<"success"\>
 
 #### Implementation of
 
@@ -161,11 +161,11 @@ GetTransactionReceiptResponse.isSuccess
 
 ### isReverted
 
-▸ **isReverted**(): this is GetTransactionReceiptResponse<"reverted"\>
+▸ **isReverted**(): this is GetTransactionReceiptResponse\<"reverted"\>
 
 #### Returns
 
-this is GetTransactionReceiptResponse<"reverted"\>
+this is GetTransactionReceiptResponse\<"reverted"\>
 
 #### Implementation of
 
@@ -179,11 +179,11 @@ GetTransactionReceiptResponse.isReverted
 
 ### isError
 
-▸ **isError**(): this is GetTransactionReceiptResponse<"error"\>
+▸ **isError**(): this is GetTransactionReceiptResponse\<"error"\>
 
 #### Returns
 
-this is GetTransactionReceiptResponse<"error"\>
+this is GetTransactionReceiptResponse\<"error"\>
 
 #### Implementation of
 

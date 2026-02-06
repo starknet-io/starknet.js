@@ -270,7 +270,7 @@ Contract methods for fee estimation
 
 ### factory
 
-▸ **factory**(`params`, `details?`): `Promise`<[`Contract`](Contract.md)\>
+▸ **factory**(`params`, `details?`): `Promise`\<[`Contract`](Contract.md)\>
 
 Factory method to declare and/or deploy a contract creating a new Contract instance
 
@@ -289,7 +289,7 @@ When contract is provided without classHash, it will declare and deploy.
 
 #### Returns
 
-`Promise`<[`Contract`](Contract.md)\>
+`Promise`\<[`Contract`](Contract.md)\>
 
 Promise that resolves to a deployed Contract instance with address and transaction hash
 
@@ -424,13 +424,13 @@ contract.attach('0x123...', newAbi);
 
 ### isDeployed
 
-▸ **isDeployed**(): `Promise`<[`Contract`](Contract.md)\>
+▸ **isDeployed**(): `Promise`\<[`Contract`](Contract.md)\>
 
 Verify that a contract is deployed at the current address
 
 #### Returns
 
-`Promise`<[`Contract`](Contract.md)\>
+`Promise`\<[`Contract`](Contract.md)\>
 
 Promise resolving to this contract instance if deployed
 
@@ -461,7 +461,7 @@ try {
 
 ### call
 
-▸ **call**(`method`, `args?`, `«destructured»?`): `Promise`<[`CallResult`](../modules.md#callresult)\>
+▸ **call**(`method`, `args?`, `«destructured»?`): `Promise`\<[`CallResult`](../modules.md#callresult)\>
 
 Call a read-only contract method (view function)
 
@@ -475,7 +475,7 @@ Call a read-only contract method (view function)
 
 #### Returns
 
-`Promise`<[`CallResult`](../modules.md#callresult)\>
+`Promise`\<[`CallResult`](../modules.md#callresult)\>
 
 Parsed result from the contract method
 
@@ -498,21 +498,21 @@ const name = await contract.call('name', [], { blockIdentifier: 'latest' });
 
 ### invoke
 
-▸ **invoke**(`method`, `args`, `options`): `Promise`<[`SuccessfulTransactionReceiptResponseHelper`](../modules.md#successfultransactionreceiptresponsehelper)\>
+▸ **invoke**(`method`, `args`, `options`): `Promise`\<[`SuccessfulTransactionReceiptResponseHelper`](../modules.md#successfultransactionreceiptresponsehelper)\>
 
 Invoke a state-changing contract method (external function)
 
 #### Parameters
 
-| Name      | Type                                                                                                                                                                                                                                                                                                                   | Description                                     |
-| :-------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------- |
-| `method`  | `string`                                                                                                                                                                                                                                                                                                               | Name of the contract method to invoke           |
-| `args`    | [`ArgsOrCalldata`](../modules.md#argsorcalldata)                                                                                                                                                                                                                                                                       | Method arguments as array or calldata           |
-| `options` | `Pick`<[`CommonContractOptions`](../modules.md#commoncontractoptions), `"parseRequest"`\> & \{ `signature?`: [`Signature`](../modules.md#signature) ; `salt?`: `string` ; `waitForTransaction?`: `boolean` } & `Partial`<[`UniversalDetails`](../interfaces/UniversalDetails.md)\> & \{ `waitForTransaction`: `true` } | Execution options including transaction details |
+| Name      | Type                                                                                                                                                                                                                                                                                                                     | Description                                     |
+| :-------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------- |
+| `method`  | `string`                                                                                                                                                                                                                                                                                                                 | Name of the contract method to invoke           |
+| `args`    | [`ArgsOrCalldata`](../modules.md#argsorcalldata)                                                                                                                                                                                                                                                                         | Method arguments as array or calldata           |
+| `options` | `Pick`\<[`CommonContractOptions`](../modules.md#commoncontractoptions), `"parseRequest"`\> & \{ `signature?`: [`Signature`](../modules.md#signature) ; `salt?`: `string` ; `waitForTransaction?`: `boolean` } & `Partial`\<[`UniversalDetails`](../interfaces/UniversalDetails.md)\> & \{ `waitForTransaction`: `true` } | Execution options including transaction details |
 
 #### Returns
 
-`Promise`<[`SuccessfulTransactionReceiptResponseHelper`](../modules.md#successfultransactionreceiptresponsehelper)\>
+`Promise`\<[`SuccessfulTransactionReceiptResponseHelper`](../modules.md#successfultransactionreceiptresponsehelper)\>
 
 Transaction response with hash
 
@@ -531,19 +531,19 @@ const receipt = await provider.waitForTransaction(tx.transaction_hash);
 
 [src/contract/default.ts:282](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/contract/default.ts#L282)
 
-▸ **invoke**(`method`, `args`, `options`): `Promise`<\{ `transaction_hash`: `string` }\>
+▸ **invoke**(`method`, `args`, `options`): `Promise`\<\{ `transaction_hash`: `string` }\>
 
 #### Parameters
 
-| Name      | Type                                                                                                                                                                                                                                                                                                                    |
-| :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `method`  | `string`                                                                                                                                                                                                                                                                                                                |
-| `args`    | [`ArgsOrCalldata`](../modules.md#argsorcalldata)                                                                                                                                                                                                                                                                        |
-| `options` | `Pick`<[`CommonContractOptions`](../modules.md#commoncontractoptions), `"parseRequest"`\> & \{ `signature?`: [`Signature`](../modules.md#signature) ; `salt?`: `string` ; `waitForTransaction?`: `boolean` } & `Partial`<[`UniversalDetails`](../interfaces/UniversalDetails.md)\> & \{ `waitForTransaction`: `false` } |
+| Name      | Type                                                                                                                                                                                                                                                                                                                      |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `method`  | `string`                                                                                                                                                                                                                                                                                                                  |
+| `args`    | [`ArgsOrCalldata`](../modules.md#argsorcalldata)                                                                                                                                                                                                                                                                          |
+| `options` | `Pick`\<[`CommonContractOptions`](../modules.md#commoncontractoptions), `"parseRequest"`\> & \{ `signature?`: [`Signature`](../modules.md#signature) ; `salt?`: `string` ; `waitForTransaction?`: `boolean` } & `Partial`\<[`UniversalDetails`](../interfaces/UniversalDetails.md)\> & \{ `waitForTransaction`: `false` } |
 
 #### Returns
 
-`Promise`<\{ `transaction_hash`: `string` }\>
+`Promise`\<\{ `transaction_hash`: `string` }\>
 
 #### Implementation of
 
@@ -553,7 +553,7 @@ ContractInterface.invoke
 
 [src/contract/default.ts:287](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/contract/default.ts#L287)
 
-▸ **invoke**(`method`, `args?`, `options?`): `Promise`<\{ `transaction_hash`: `string` }\>
+▸ **invoke**(`method`, `args?`, `options?`): `Promise`\<\{ `transaction_hash`: `string` }\>
 
 #### Parameters
 
@@ -565,7 +565,7 @@ ContractInterface.invoke
 
 #### Returns
 
-`Promise`<\{ `transaction_hash`: `string` }\>
+`Promise`\<\{ `transaction_hash`: `string` }\>
 
 #### Implementation of
 
@@ -579,7 +579,7 @@ ContractInterface.invoke
 
 ### estimate
 
-▸ **estimate**(`method`, `args?`, `estimateDetails?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **estimate**(`method`, `args?`, `estimateDetails?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Estimate fee for invoking a contract method
 
@@ -593,7 +593,7 @@ Estimate fee for invoking a contract method
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Fee estimation details
 
@@ -720,13 +720,13 @@ if (contract.isCairo1()) {
 
 ### getVersion
 
-▸ **getVersion**(): `Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+▸ **getVersion**(): `Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 Get the Cairo and compiler version of the contract
 
 #### Returns
 
-`Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+`Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 Object containing cairo version and compiler version
 
@@ -749,7 +749,7 @@ console.log(`Cairo ${version.cairo}, Compiler ${version.compiler}`);
 
 ### typedv2
 
-▸ **typedv2**<`TAbi`\>(`tAbi`): [`TypedContractV2`](../modules.md#typedcontractv2)<`TAbi`\>
+▸ **typedv2**\<`TAbi`\>(`tAbi`): [`TypedContractV2`](../modules.md#typedcontractv2)\<`TAbi`\>
 
 Create a typed contract instance with full TypeScript support
 
@@ -767,7 +767,7 @@ Create a typed contract instance with full TypeScript support
 
 #### Returns
 
-[`TypedContractV2`](../modules.md#typedcontractv2)<`TAbi`\>
+[`TypedContractV2`](../modules.md#typedcontractv2)\<`TAbi`\>
 
 Typed contract instance with IntelliSense support
 

@@ -44,11 +44,11 @@ custom_edit_url: null
 
 ### baseFetch
 
-• `Readonly` `Abstract` **baseFetch**: (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`<`Response`\>
+• `Readonly` `Abstract` **baseFetch**: (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`\<`Response`\>
 
 #### Type declaration
 
-▸ (`input`, `init?`): `Promise`<`Response`\>
+▸ (`input`, `init?`): `Promise`\<`Response`\>
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/fetch)
 
@@ -61,7 +61,7 @@ custom_edit_url: null
 
 ##### Returns
 
-`Promise`<`Response`\>
+`Promise`\<`Response`\>
 
 #### Defined in
 
@@ -71,13 +71,13 @@ custom_edit_url: null
 
 ### isAvailable
 
-▸ **isAvailable**(): `Promise`<`boolean`\>
+▸ **isAvailable**(): `Promise`\<`boolean`\>
 
 Returns the status of the paymaster service
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 If the paymaster service is correctly functioning, return true. Else, return false
 
@@ -89,7 +89,7 @@ If the paymaster service is correctly functioning, return true. Else, return fal
 
 ### buildTransaction
 
-▸ **buildTransaction**(`transaction`, `parameters`): `Promise`<[`PreparedTransaction`](../modules.md#preparedtransaction)\>
+▸ **buildTransaction**(`transaction`, `parameters`): `Promise`\<[`PreparedTransaction`](../modules.md#preparedtransaction)\>
 
 Receives the transaction the user wants to execute. Returns the typed data along with
 the estimated gas cost and the maximum gas cost suggested to ensure execution
@@ -103,7 +103,7 @@ the estimated gas cost and the maximum gas cost suggested to ensure execution
 
 #### Returns
 
-`Promise`<[`PreparedTransaction`](../modules.md#preparedtransaction)\>
+`Promise`\<[`PreparedTransaction`](../modules.md#preparedtransaction)\>
 
 The transaction data required for execution along with an estimation of the fee
 
@@ -115,7 +115,7 @@ The transaction data required for execution along with an estimation of the fee
 
 ### executeTransaction
 
-▸ **executeTransaction**(`transaction`, `parameters`): `Promise`<[`ExecuteResponse`](../namespaces/RPC.RPCSPEC010.PAYMASTER_API.md#executeresponse)\>
+▸ **executeTransaction**(`transaction`, `parameters`): `Promise`\<[`ExecuteResponse`](../namespaces/RPC.RPCSPEC010.PAYMASTER_API.md#executeresponse)\>
 
 Sends the signed typed data to the paymaster service for execution
 
@@ -128,7 +128,7 @@ Sends the signed typed data to the paymaster service for execution
 
 #### Returns
 
-`Promise`<[`ExecuteResponse`](../namespaces/RPC.RPCSPEC010.PAYMASTER_API.md#executeresponse)\>
+`Promise`\<[`ExecuteResponse`](../namespaces/RPC.RPCSPEC010.PAYMASTER_API.md#executeresponse)\>
 
 The hash of the transaction broadcasted by the paymaster and the tracking ID corresponding to the user `execute` request
 
@@ -140,13 +140,13 @@ The hash of the transaction broadcasted by the paymaster and the tracking ID cor
 
 ### getSupportedTokens
 
-▸ **getSupportedTokens**(): `Promise`<[`TokenData`](../interfaces/TokenData.md)[]\>
+▸ **getSupportedTokens**(): `Promise`\<[`TokenData`](../interfaces/TokenData.md)[]\>
 
 Get a list of the tokens that the paymaster supports, together with their prices in STRK
 
 #### Returns
 
-`Promise`<[`TokenData`](../interfaces/TokenData.md)[]\>
+`Promise`\<[`TokenData`](../interfaces/TokenData.md)[]\>
 
 An array of token data
 

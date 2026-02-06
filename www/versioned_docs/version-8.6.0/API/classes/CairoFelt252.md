@@ -7,7 +7,7 @@ custom_edit_url: null
 ---
 
 felt252 is the basic field element used in Cairo.
-It corresponds to an integer in the range 0 ≤ x < P where P is a very large prime number currently equal to 2^251 + 17⋅2^192 + 1.
+It corresponds to an integer in the range 0 ≤ x \< P where P is a very large prime number currently equal to 2^251 + 17⋅2^192 + 1.
 Any operation that uses felt252 will be computed modulo P.
 63 hex symbols (31 bytes + 4 bits), 252 bits
 
@@ -141,9 +141,9 @@ byte representation of the felt252
 
 #### Parameters
 
-| Name               | Type                                      |
-| :----------------- | :---------------------------------------- |
-| `responseIterator` | `Iterator`<`string`, `any`, `undefined`\> |
+| Name               | Type                                       |
+| :----------------- | :----------------------------------------- |
+| `responseIterator` | `Iterator`\<`string`, `any`, `undefined`\> |
 
 #### Returns
 

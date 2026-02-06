@@ -31,7 +31,7 @@ custom_edit_url: null
 
 ### hints
 
-• **hints**: `Record`<`string`, [`Hint`](../namespaces/types.md#hint)[]\>
+• **hints**: `Record`\<`string`, [`Hint`](../namespaces/types.md#hint)[]\>
 
 #### Defined in
 
@@ -51,7 +51,7 @@ custom_edit_url: null
 
 ### attributes
 
-• `Optional` **attributes**: \{ `accessible_scopes?`: `string`[] ; `end_pc?`: `number` ; `flow_tracking_data?`: \{ `ap_tracking?`: \{ `group?`: `number` ; `offset?`: `number` } ; `reference_ids?`: `Record`<`string`, `number`\> } ; `name?`: `string` ; `start_pc?`: `number` ; `value?`: `string` \| `number` }[]
+• `Optional` **attributes**: \{ `accessible_scopes?`: `string`[] ; `end_pc?`: `number` ; `flow_tracking_data?`: \{ `ap_tracking?`: \{ `group?`: `number` ; `offset?`: `number` } ; `reference_ids?`: `Record`\<`string`, `number`\> } ; `name?`: `string` ; `start_pc?`: `number` ; `value?`: `string` \| `number` }[]
 
 #### Defined in
 
@@ -81,7 +81,7 @@ custom_edit_url: null
 
 ### identifiers
 
-• `Optional` **identifiers**: `Record`<`string`, \{ `destination`: `string` ; `type`: `"alias"` } \| \{ `decorators`: `string`[] ; `pc`: `number` ; `type`: `"function"` ; `implicit_args?`: \{ `full_name`: `string` ; `members`: `Record`<`string`, \{ `cairo_type`: `string` ; `offset`: `number` }\> ; `size`: `number` ; `type`: `"struct"` } ; `explicit_args?`: \{ `full_name`: `string` ; `members`: `Record`<`string`, \{ `cairo_type`: `string` ; `offset`: `number` }\> ; `size`: `number` ; `type`: `"struct"` } ; `return_type?`: \{ `cairo_type`: `string` ; `type`: `"type_definition"` } } \| \{ `full_name`: `string` ; `members`: `Record`<`string`, \{ `cairo_type`: `string` ; `offset`: `number` }\> \| `Record`<`string`, `never`\> ; `size`: `number` ; `type`: `"struct"` } \| \{ `cairo_type`: `string` ; `type`: `"type_definition"` } \| \{ `type`: `"namespace"` } \| \{ `type`: `"const"` ; `value`: `string` \| `number` } \| \{ `pc`: `number` ; `type`: `"label"` } \| \{ `cairo_type`: `string` ; `full_name`: `string` ; `references`: \{ `ap_tracking_data`: \{ `group`: `number` ; `offset`: `number` } ; `pc`: `number` ; `value`: `string` }[] ; `type`: `"reference"` }\>
+• `Optional` **identifiers**: `Record`\<`string`, \{ `destination`: `string` ; `type`: `"alias"` } \| \{ `decorators`: `string`[] ; `pc`: `number` ; `type`: `"function"` ; `implicit_args?`: \{ `full_name`: `string` ; `members`: `Record`\<`string`, \{ `cairo_type`: `string` ; `offset`: `number` }\> ; `size`: `number` ; `type`: `"struct"` } ; `explicit_args?`: \{ `full_name`: `string` ; `members`: `Record`\<`string`, \{ `cairo_type`: `string` ; `offset`: `number` }\> ; `size`: `number` ; `type`: `"struct"` } ; `return_type?`: \{ `cairo_type`: `string` ; `type`: `"type_definition"` } } \| \{ `full_name`: `string` ; `members`: `Record`\<`string`, \{ `cairo_type`: `string` ; `offset`: `number` }\> \| `Record`\<`string`, `never`\> ; `size`: `number` ; `type`: `"struct"` } \| \{ `cairo_type`: `string` ; `type`: `"type_definition"` } \| \{ `type`: `"namespace"` } \| \{ `type`: `"const"` ; `value`: `string` \| `number` } \| \{ `pc`: `number` ; `type`: `"label"` } \| \{ `cairo_type`: `string` ; `full_name`: `string` ; `references`: \{ `ap_tracking_data`: \{ `group`: `number` ; `offset`: `number` } ; `pc`: `number` ; `value`: `string` }[] ; `type`: `"reference"` }\>
 
 #### Defined in
 
@@ -91,7 +91,7 @@ custom_edit_url: null
 
 ### reference_manager
 
-• `Optional` **reference_manager**: `Record`<`string`, \{ `references`: `unknown`[] }\>
+• `Optional` **reference_manager**: `Record`\<`string`, \{ `references`: `unknown`[] }\>
 
 #### Defined in
 
@@ -101,7 +101,7 @@ custom_edit_url: null
 
 ### debug_info
 
-• `Optional` **debug_info**: `Record`<`string`, \{ `file_contents?`: `Record`<`string`, `string`\> ; `instruction_locations?`: `Record`<`string`, `unknown`[]\> }\>
+• `Optional` **debug_info**: `Record`\<`string`, \{ `file_contents?`: `Record`\<`string`, `string`\> ; `instruction_locations?`: `Record`\<`string`, `unknown`[]\> }\>
 
 #### Defined in
 

@@ -157,9 +157,9 @@ Builds a Call for execute(), estimateFee() and simulateTransaction() functions.
 
 #### Parameters
 
-| Name                 | Type                                                                                                    | Description                                                    |
-| :------------------- | :------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------- |
-| `outsideTransaction` | [`AllowArray`](types.md#allowarray)<[`OutsideTransaction`](../interfaces/types.OutsideTransaction.md)\> | an object that contains all the data for an Outside Execution. |
+| Name                 | Type                                                                                                     | Description                                                    |
+| :------------------- | :------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------- |
+| `outsideTransaction` | [`AllowArray`](types.md#allowarray)\<[`OutsideTransaction`](../interfaces/types.OutsideTransaction.md)\> | an object that contains all the data for an Outside Execution. |
 
 #### Returns
 

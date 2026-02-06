@@ -68,11 +68,14 @@ const myByteArray: ByteArray = byteArrayFromString('ABCDEFGHI');
 ```
 
 Result is :
+
+```ts
 {
 data: [],
 pending_word: '0x414243444546474849',
 pending_word_len: 9
 }
+```
 
 #### Defined in
 

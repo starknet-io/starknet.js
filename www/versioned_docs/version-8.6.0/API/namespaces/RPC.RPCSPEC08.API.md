@@ -357,7 +357,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/components.d.ts:62
 
 ### ENTRY_POINT_TYPE
 
-Ƭ **ENTRY_POINT_TYPE**: `Uppercase`<[`STATE_MUTABILITY_EXTERNAL`](RPC.RPCSPEC08.API.md#state_mutability_external)\> \| `Uppercase`<[`ABI_TYPE_L1_HANDLER`](RPC.RPCSPEC08.API.md#abi_type_l1_handler)\> \| `Uppercase`<[`ABI_TYPE_CONSTRUCTOR`](RPC.RPCSPEC08.API.md#abi_type_constructor)\>
+Ƭ **ENTRY_POINT_TYPE**: `Uppercase`\<[`STATE_MUTABILITY_EXTERNAL`](RPC.RPCSPEC08.API.md#state_mutability_external)\> \| `Uppercase`\<[`ABI_TYPE_L1_HANDLER`](RPC.RPCSPEC08.API.md#abi_type_l1_handler)\> \| `Uppercase`\<[`ABI_TYPE_CONSTRUCTOR`](RPC.RPCSPEC08.API.md#abi_type_constructor)\>
 
 Represents the type of an entry point.
 
@@ -406,7 +406,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/components.d.ts:81
 
 ### TXN_TYPE
 
-Ƭ **TXN_TYPE**: [`TXN_TYPE_DECLARE`](RPC.RPCSPEC08.API.md#txn_type_declare) \| [`TXN_TYPE_DEPLOY`](RPC.RPCSPEC08.API.md#txn_type_deploy) \| [`TXN_TYPE_DEPLOY_ACCOUNT`](RPC.RPCSPEC08.API.md#txn_type_deploy_account) \| [`TXN_TYPE_INVOKE`](RPC.RPCSPEC08.API.md#txn_type_invoke) \| `Uppercase`<[`ABI_TYPE_L1_HANDLER`](RPC.RPCSPEC08.API.md#abi_type_l1_handler)\>
+Ƭ **TXN_TYPE**: [`TXN_TYPE_DECLARE`](RPC.RPCSPEC08.API.md#txn_type_declare) \| [`TXN_TYPE_DEPLOY`](RPC.RPCSPEC08.API.md#txn_type_deploy) \| [`TXN_TYPE_DEPLOY_ACCOUNT`](RPC.RPCSPEC08.API.md#txn_type_deploy_account) \| [`TXN_TYPE_INVOKE`](RPC.RPCSPEC08.API.md#txn_type_invoke) \| `Uppercase`\<[`ABI_TYPE_L1_HANDLER`](RPC.RPCSPEC08.API.md#abi_type_l1_handler)\>
 
 #### Defined in
 
@@ -446,7 +446,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/components.d.ts:85
 
 ### BLOCK_SELECTOR
 
-Ƭ **BLOCK_SELECTOR**: `SimpleOneOf`<\{ `block_hash`: [`BLOCK_HASH`](RPC.RPCSPEC08.API.md#block_hash) }, \{ `block_number`: [`BLOCK_NUMBER`](RPC.RPCSPEC08.API.md#block_number) }\>
+Ƭ **BLOCK_SELECTOR**: `SimpleOneOf`\<\{ `block_hash`: [`BLOCK_HASH`](RPC.RPCSPEC08.API.md#block_hash) }, \{ `block_number`: [`BLOCK_NUMBER`](RPC.RPCSPEC08.API.md#block_number) }\>
 
 #### Defined in
 
@@ -1452,7 +1452,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/components.d.ts:436
 
 ### L1_HANDLER_TXN
 
-Ƭ **L1_HANDLER_TXN**: \{ `version`: typeof [`V0`](RPC.RPCSPEC08.API.md#v0) ; `type`: `Uppercase`<[`ABI_TYPE_L1_HANDLER`](RPC.RPCSPEC08.API.md#abi_type_l1_handler)\> ; `nonce`: [`NUM_AS_HEX`](RPC.RPCSPEC08.API.md#num_as_hex) } & [`FUNCTION_CALL`](RPC.RPCSPEC08.API.md#function_call)
+Ƭ **L1_HANDLER_TXN**: \{ `version`: typeof [`V0`](RPC.RPCSPEC08.API.md#v0) ; `type`: `Uppercase`\<[`ABI_TYPE_L1_HANDLER`](RPC.RPCSPEC08.API.md#abi_type_l1_handler)\> ; `nonce`: [`NUM_AS_HEX`](RPC.RPCSPEC08.API.md#num_as_hex) } & [`FUNCTION_CALL`](RPC.RPCSPEC08.API.md#function_call)
 
 #### Defined in
 
@@ -1462,7 +1462,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/components.d.ts:450
 
 ### COMMON_RECEIPT_PROPERTIES
 
-Ƭ **COMMON_RECEIPT_PROPERTIES**: \{ `transaction_hash`: [`TXN_HASH`](RPC.RPCSPEC08.API.md#txn_hash) ; `actual_fee`: [`FEE_PAYMENT`](RPC.RPCSPEC08.API.md#fee_payment) ; `finality_status`: [`TXN_FINALITY_STATUS`](RPC.RPCSPEC08.API.md#txn_finality_status) ; `messages_sent`: [`MSG_TO_L1`](RPC.RPCSPEC08.API.md#msg_to_l1)[] ; `events`: [`EVENT`](RPC.RPCSPEC08.API.md#event)[] ; `execution_resources`: [`EXECUTION_RESOURCES`](RPC.RPCSPEC08.API.md#execution_resources) } & `SimpleOneOf`<`SUCCESSFUL_COMMON_RECEIPT_PROPERTIES`, `REVERTED_COMMON_RECEIPT_PROPERTIES`\>
+Ƭ **COMMON_RECEIPT_PROPERTIES**: \{ `transaction_hash`: [`TXN_HASH`](RPC.RPCSPEC08.API.md#txn_hash) ; `actual_fee`: [`FEE_PAYMENT`](RPC.RPCSPEC08.API.md#fee_payment) ; `finality_status`: [`TXN_FINALITY_STATUS`](RPC.RPCSPEC08.API.md#txn_finality_status) ; `messages_sent`: [`MSG_TO_L1`](RPC.RPCSPEC08.API.md#msg_to_l1)[] ; `events`: [`EVENT`](RPC.RPCSPEC08.API.md#event)[] ; `execution_resources`: [`EXECUTION_RESOURCES`](RPC.RPCSPEC08.API.md#execution_resources) } & `SimpleOneOf`\<`SUCCESSFUL_COMMON_RECEIPT_PROPERTIES`, `REVERTED_COMMON_RECEIPT_PROPERTIES`\>
 
 #### Defined in
 
@@ -1512,7 +1512,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/components.d.ts:480
 
 ### L1_HANDLER_TXN_RECEIPT
 
-Ƭ **L1_HANDLER_TXN_RECEIPT**: \{ `type`: `Uppercase`<[`ABI_TYPE_L1_HANDLER`](RPC.RPCSPEC08.API.md#abi_type_l1_handler)\> ; `message_hash`: [`NUM_AS_HEX`](RPC.RPCSPEC08.API.md#num_as_hex) } & [`COMMON_RECEIPT_PROPERTIES`](RPC.RPCSPEC08.API.md#common_receipt_properties)
+Ƭ **L1_HANDLER_TXN_RECEIPT**: \{ `type`: `Uppercase`\<[`ABI_TYPE_L1_HANDLER`](RPC.RPCSPEC08.API.md#abi_type_l1_handler)\> ; `message_hash`: [`NUM_AS_HEX`](RPC.RPCSPEC08.API.md#num_as_hex) } & [`COMMON_RECEIPT_PROPERTIES`](RPC.RPCSPEC08.API.md#common_receipt_properties)
 
 #### Defined in
 
@@ -1921,7 +1921,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/components.d.ts:685
 
 ### MERKLE_NODE
 
-Ƭ **MERKLE_NODE**: `SimpleOneOf`<[`BINARY_NODE`](RPC.RPCSPEC08.API.md#binary_node), [`EDGE_NODE`](RPC.RPCSPEC08.API.md#edge_node)\>
+Ƭ **MERKLE_NODE**: `SimpleOneOf`\<[`BINARY_NODE`](RPC.RPCSPEC08.API.md#binary_node), [`EDGE_NODE`](RPC.RPCSPEC08.API.md#edge_node)\>
 
 a node in the Merkle-Patricia tree, can be a leaf, binary node, or an edge node
 
@@ -2028,14 +2028,14 @@ Represents a transaction trace for an invoke transaction.
 
 #### Type declaration
 
-| Name                       | Type                                                                                                              |
-| :------------------------- | :---------------------------------------------------------------------------------------------------------------- |
-| `type`                     | [`TXN_TYPE_INVOKE`](RPC.RPCSPEC08.API.md#txn_type_invoke)                                                         |
-| `execute_invocation`       | `SimpleOneOf`<[`FUNCTION_INVOCATION`](RPC.RPCSPEC08.API.md#function_invocation), \{ `revert_reason`: `string` }\> |
-| `validate_invocation?`     | [`FUNCTION_INVOCATION`](RPC.RPCSPEC08.API.md#function_invocation)                                                 |
-| `fee_transfer_invocation?` | [`FUNCTION_INVOCATION`](RPC.RPCSPEC08.API.md#function_invocation)                                                 |
-| `state_diff?`              | [`STATE_DIFF`](RPC.RPCSPEC08.API.md#state_diff)                                                                   |
-| `execution_resources`      | [`EXECUTION_RESOURCES`](RPC.RPCSPEC08.API.md#execution_resources)                                                 |
+| Name                       | Type                                                                                                               |
+| :------------------------- | :----------------------------------------------------------------------------------------------------------------- |
+| `type`                     | [`TXN_TYPE_INVOKE`](RPC.RPCSPEC08.API.md#txn_type_invoke)                                                          |
+| `execute_invocation`       | `SimpleOneOf`\<[`FUNCTION_INVOCATION`](RPC.RPCSPEC08.API.md#function_invocation), \{ `revert_reason`: `string` }\> |
+| `validate_invocation?`     | [`FUNCTION_INVOCATION`](RPC.RPCSPEC08.API.md#function_invocation)                                                  |
+| `fee_transfer_invocation?` | [`FUNCTION_INVOCATION`](RPC.RPCSPEC08.API.md#function_invocation)                                                  |
+| `state_diff?`              | [`STATE_DIFF`](RPC.RPCSPEC08.API.md#state_diff)                                                                    |
+| `execution_resources`      | [`EXECUTION_RESOURCES`](RPC.RPCSPEC08.API.md#execution_resources)                                                  |
 
 #### Defined in
 
@@ -2096,12 +2096,12 @@ Represents a transaction trace for an L1 handler transaction.
 
 #### Type declaration
 
-| Name                  | Type                                                                            |
-| :-------------------- | :------------------------------------------------------------------------------ |
-| `type`                | `Uppercase`<[`ABI_TYPE_L1_HANDLER`](RPC.RPCSPEC08.API.md#abi_type_l1_handler)\> |
-| `function_invocation` | [`FUNCTION_INVOCATION`](RPC.RPCSPEC08.API.md#function_invocation)               |
-| `state_diff?`         | [`STATE_DIFF`](RPC.RPCSPEC08.API.md#state_diff)                                 |
-| `execution_resources` | [`EXECUTION_RESOURCES`](RPC.RPCSPEC08.API.md#execution_resources)               |
+| Name                  | Type                                                                             |
+| :-------------------- | :------------------------------------------------------------------------------- |
+| `type`                | `Uppercase`\<[`ABI_TYPE_L1_HANDLER`](RPC.RPCSPEC08.API.md#abi_type_l1_handler)\> |
+| `function_invocation` | [`FUNCTION_INVOCATION`](RPC.RPCSPEC08.API.md#function_invocation)                |
+| `state_diff?`         | [`STATE_DIFF`](RPC.RPCSPEC08.API.md#state_diff)                                  |
+| `execution_resources` | [`EXECUTION_RESOURCES`](RPC.RPCSPEC08.API.md#execution_resources)                |
 
 #### Defined in
 
@@ -2231,7 +2231,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/components.d.ts:889
 
 ### ContractClass
 
-Ƭ **ContractClass**: `OneOf`<[[`CONTRACT_CLASS`](RPC.RPCSPEC08.API.md#contract_class), [`DEPRECATED_CONTRACT_CLASS`](RPC.RPCSPEC08.API.md#deprecated_contract_class)]\>
+Ƭ **ContractClass**: `OneOf`\<[[`CONTRACT_CLASS`](RPC.RPCSPEC08.API.md#contract_class), [`DEPRECATED_CONTRACT_CLASS`](RPC.RPCSPEC08.API.md#deprecated_contract_class)]\>
 
 #### Defined in
 
@@ -2305,7 +2305,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/nonspec.d.ts:16
 
 ### BlockWithTxs
 
-Ƭ **BlockWithTxs**: `OneOf`<[[`BLOCK_WITH_TXS`](RPC.RPCSPEC08.API.md#block_with_txs), [`PENDING_BLOCK_WITH_TXS`](RPC.RPCSPEC08.API.md#pending_block_with_txs)]\>
+Ƭ **BlockWithTxs**: `OneOf`\<[[`BLOCK_WITH_TXS`](RPC.RPCSPEC08.API.md#block_with_txs), [`PENDING_BLOCK_WITH_TXS`](RPC.RPCSPEC08.API.md#pending_block_with_txs)]\>
 
 #### Defined in
 
@@ -2315,7 +2315,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/nonspec.d.ts:20
 
 ### BlockWithTxHashes
 
-Ƭ **BlockWithTxHashes**: `OneOf`<[[`BLOCK_WITH_TX_HASHES`](RPC.RPCSPEC08.API.md#block_with_tx_hashes), [`PENDING_BLOCK_WITH_TX_HASHES`](RPC.RPCSPEC08.API.md#pending_block_with_tx_hashes)]\>
+Ƭ **BlockWithTxHashes**: `OneOf`\<[[`BLOCK_WITH_TX_HASHES`](RPC.RPCSPEC08.API.md#block_with_tx_hashes), [`PENDING_BLOCK_WITH_TX_HASHES`](RPC.RPCSPEC08.API.md#pending_block_with_tx_hashes)]\>
 
 #### Defined in
 
@@ -2325,7 +2325,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/nonspec.d.ts:21
 
 ### BlockWithTxReceipts
 
-Ƭ **BlockWithTxReceipts**: `OneOf`<[[`BLOCK_WITH_RECEIPTS`](RPC.RPCSPEC08.API.md#block_with_receipts), [`PENDING_BLOCK_WITH_RECEIPTS`](RPC.RPCSPEC08.API.md#pending_block_with_receipts)]\>
+Ƭ **BlockWithTxReceipts**: `OneOf`\<[[`BLOCK_WITH_RECEIPTS`](RPC.RPCSPEC08.API.md#block_with_receipts), [`PENDING_BLOCK_WITH_RECEIPTS`](RPC.RPCSPEC08.API.md#pending_block_with_receipts)]\>
 
 #### Defined in
 
@@ -2335,7 +2335,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/nonspec.d.ts:22
 
 ### StateUpdate
 
-Ƭ **StateUpdate**: `OneOf`<[[`STATE_UPDATE`](RPC.RPCSPEC08.API.md#state_update), [`PENDING_STATE_UPDATE`](RPC.RPCSPEC08.API.md#pending_state_update)]\>
+Ƭ **StateUpdate**: `OneOf`\<[[`STATE_UPDATE`](RPC.RPCSPEC08.API.md#state_update), [`PENDING_STATE_UPDATE`](RPC.RPCSPEC08.API.md#pending_state_update)]\>
 
 #### Defined in
 
@@ -2561,7 +2561,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/nonspec.d.ts:80
 
 ### TransactionReceiptProductionBlock
 
-Ƭ **TransactionReceiptProductionBlock**: [`IsInBlock`](RPC.RPCSPEC08.API.md#isinblock)<[`TransactionReceipt`](RPC.RPCSPEC08.API.md#transactionreceipt)\>
+Ƭ **TransactionReceiptProductionBlock**: [`IsInBlock`](RPC.RPCSPEC08.API.md#isinblock)\<[`TransactionReceipt`](RPC.RPCSPEC08.API.md#transactionreceipt)\>
 
 All Type Transaction Receipt from production block
 
@@ -2573,7 +2573,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/nonspec.d.ts:84
 
 ### TransactionReceiptPendingBlock
 
-Ƭ **TransactionReceiptPendingBlock**: [`IsPending`](RPC.RPCSPEC08.API.md#ispending)<[`TransactionReceipt`](RPC.RPCSPEC08.API.md#transactionreceipt)\>
+Ƭ **TransactionReceiptPendingBlock**: [`IsPending`](RPC.RPCSPEC08.API.md#ispending)\<[`TransactionReceipt`](RPC.RPCSPEC08.API.md#transactionreceipt)\>
 
 All Type Transaction Receipt from pending block
 
@@ -3347,7 +3347,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/executable.d.ts:263
 
 ### IsPending
 
-Ƭ **IsPending**<`T`\>: `Extract`<`T`, \{ `block_hash`: `never` ; `block_number`: `never` }\>
+Ƭ **IsPending**\<`T`\>: `Extract`\<`T`, \{ `block_hash`: `never` ; `block_number`: `never` }\>
 
 Possible permutations of transaction.
 BLOCK TYPE
@@ -3369,7 +3369,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/expansions/transactio
 
 ### IsInBlock
 
-Ƭ **IsInBlock**<`T`\>: `T` extends \{ `block_hash`: `string` ; `block_number`: `number` } ? `T` extends \{ `block_hash`: `never` } ? `never` : `T` : `never`
+Ƭ **IsInBlock**\<`T`\>: `T` extends \{ `block_hash`: `string` ; `block_number`: `number` } ? `T` extends \{ `block_hash`: `never` } ? `never` : `T` : `never`
 
 #### Type parameters
 
@@ -3385,7 +3385,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/expansions/transactio
 
 ### IsType
 
-Ƭ **IsType**<`T`, `ETransactionType`\>: `Extract`<`T`, \{ `type`: `ETransactionType` }\>
+Ƭ **IsType**\<`T`, `ETransactionType`\>: `Extract`\<`T`, \{ `type`: `ETransactionType` }\>
 
 #### Type parameters
 
@@ -3402,7 +3402,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/expansions/transactio
 
 ### IsSucceeded
 
-Ƭ **IsSucceeded**<`T`\>: `Extract`<`T`, \{ `execution_status`: `"SUCCEEDED"` }\>
+Ƭ **IsSucceeded**\<`T`\>: `Extract`\<`T`, \{ `execution_status`: `"SUCCEEDED"` }\>
 
 #### Type parameters
 
@@ -3418,7 +3418,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/expansions/transactio
 
 ### IsReverted
 
-Ƭ **IsReverted**<`T`\>: `Extract`<`T`, \{ `execution_status`: `"REVERTED"` }\>
+Ƭ **IsReverted**\<`T`\>: `Extract`\<`T`, \{ `execution_status`: `"REVERTED"` }\>
 
 #### Type parameters
 

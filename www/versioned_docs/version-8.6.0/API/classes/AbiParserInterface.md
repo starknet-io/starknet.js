@@ -129,7 +129,7 @@ Parser function
 
 ### getResponseParser
 
-▸ **getResponseParser**(`abiType`): (`responseIterator`: `Iterator`<`string`, `any`, `undefined`\>) => `any`
+▸ **getResponseParser**(`abiType`): (`responseIterator`: `Iterator`\<`string`, `any`, `undefined`\>) => `any`
 
 Get response parser for the given abi type
 
@@ -149,9 +149,9 @@ Parser function
 
 ##### Parameters
 
-| Name               | Type                                      |
-| :----------------- | :---------------------------------------- |
-| `responseIterator` | `Iterator`<`string`, `any`, `undefined`\> |
+| Name               | Type                                       |
+| :----------------- | :----------------------------------------- |
+| `responseIterator` | `Iterator`\<`string`, `any`, `undefined`\> |
 
 ##### Returns
 

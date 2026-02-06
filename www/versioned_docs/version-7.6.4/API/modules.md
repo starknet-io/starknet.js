@@ -1619,7 +1619,7 @@ Re-exports [PaymasterTimeBounds](interfaces/types.PaymasterTimeBounds.md)
 
 ### TypedContractV2
 
-Ƭ **TypedContractV2**<`TAbi`\>: `AbiWanTypedContract`<`TAbi`\> & [`Contract`](classes/Contract.md)
+Ƭ **TypedContractV2**\<`TAbi`\>: `AbiWanTypedContract`\<`TAbi`\> & [`Contract`](classes/Contract.md)
 
 #### Type parameters
 
@@ -1684,12 +1684,12 @@ Options for configuring the WebSocketChannel.
 
 #### Type declaration
 
-| Name        | Type                                                                                            |
-| :---------- | :---------------------------------------------------------------------------------------------- |
-| `nodeUrl`   | `string`                                                                                        |
-| `headers`   | `object`                                                                                        |
-| `interval`  | `number`                                                                                        |
-| `baseFetch` | `NonNullable`<[`RpcProviderOptions`](namespaces/types.md#rpcprovideroptions)[``"baseFetch"``]\> |
+| Name        | Type                                                                                             |
+| :---------- | :----------------------------------------------------------------------------------------------- |
+| `nodeUrl`   | `string`                                                                                         |
+| `headers`   | `object`                                                                                         |
+| `interval`  | `number`                                                                                         |
+| `baseFetch` | `NonNullable`\<[`RpcProviderOptions`](namespaces/types.md#rpcprovideroptions)[``"baseFetch"``]\> |
 
 #### Defined in
 
@@ -1699,7 +1699,7 @@ Options for configuring the WebSocketChannel.
 
 ### CairoEnumRaw
 
-Ƭ **CairoEnumRaw**: `Record`<`string`, `any`\>
+Ƭ **CairoEnumRaw**: `Record`\<`string`, `any`\>
 
 #### Defined in
 
@@ -1709,7 +1709,7 @@ Options for configuring the WebSocketChannel.
 
 ### CairoOptionVariant
 
-Ƭ **CairoOptionVariant**: `ValuesType`<typeof [`CairoOptionVariant`](modules.md#cairooptionvariant-1)\>
+Ƭ **CairoOptionVariant**: `ValuesType`\<typeof [`CairoOptionVariant`](modules.md#cairooptionvariant-1)\>
 
 #### Defined in
 
@@ -1721,7 +1721,7 @@ Options for configuring the WebSocketChannel.
 
 ### CairoResultVariant
 
-Ƭ **CairoResultVariant**: `ValuesType`<typeof [`CairoResultVariant`](modules.md#cairoresultvariant-1)\>
+Ƭ **CairoResultVariant**: `ValuesType`\<typeof [`CairoResultVariant`](modules.md#cairoresultvariant-1)\>
 
 #### Defined in
 
@@ -1733,7 +1733,7 @@ Options for configuring the WebSocketChannel.
 
 ### LogLevelIndex
 
-Ƭ **LogLevelIndex**: `ValuesType`<typeof [`LogLevelIndex`](modules.md#loglevelindex-1)\>
+Ƭ **LogLevelIndex**: `ValuesType`\<typeof [`LogLevelIndex`](modules.md#loglevelindex-1)\>
 
 #### Defined in
 
@@ -1998,7 +1998,7 @@ EIP2645 path = 2645'/starknet/application/0/accountId/0
 
 | Name               | Type     | Default value | Description                      |
 | :----------------- | :------- | :------------ | :------------------------------- |
-| `accountId`        | `number` | `undefined`   | Id of account. < 2\*\*31.        |
+| `accountId`        | `number` | `undefined`   | Id of account. \< 2\*\*31.       |
 | `applicationName?` | `string` | `'LedgerW'`   | utf8 string of application name. |
 
 #### Returns
@@ -2036,7 +2036,7 @@ EIP2645 path = 2645'/starknet'/application'/0'/accountId'/0
 
 | Name               | Type     | Default value | Description                      |
 | :----------------- | :------- | :------------ | :------------------------------- |
-| `accountId`        | `number` | `undefined`   | Id of account. < 2\*\*31.        |
+| `accountId`        | `number` | `undefined`   | Id of account. \< 2\*\*31.       |
 | `applicationName?` | `string` | `'LedgerW'`   | utf8 string of application name. |
 
 #### Returns
@@ -2473,7 +2473,7 @@ Parse one field of the calldata by using input field from the abi for that metho
 
 | Name           | Type                                           | Description                                                               |
 | :------------- | :--------------------------------------------- | :------------------------------------------------------------------------ |
-| `argsIterator` | `Iterator`<`any`, `any`, `undefined`\>         | Iterator for value of the field                                           |
+| `argsIterator` | `Iterator`\<`any`, `any`, `undefined`\>        | Iterator for value of the field                                           |
 | `input`        | [`AbiEntry`](namespaces/types.md#abientry)     | input(field) information from the abi that will be used to parse the data |
 | `structs`      | [`AbiStructs`](namespaces/types.md#abistructs) | structs from abi                                                          |
 | `enums`        | [`AbiEnums`](namespaces/types.md#abienums)     | enums from abi                                                            |

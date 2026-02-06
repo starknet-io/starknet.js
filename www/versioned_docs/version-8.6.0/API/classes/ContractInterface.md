@@ -186,13 +186,13 @@ contract.attach('0x123...', newAbi);
 
 ### isDeployed
 
-▸ **isDeployed**(): `Promise`<[`ContractInterface`](ContractInterface.md)\>
+▸ **isDeployed**(): `Promise`\<[`ContractInterface`](ContractInterface.md)\>
 
 Verify that a contract is deployed at the current address
 
 #### Returns
 
-`Promise`<[`ContractInterface`](ContractInterface.md)\>
+`Promise`\<[`ContractInterface`](ContractInterface.md)\>
 
 Promise resolving to this contract instance if deployed
 
@@ -219,7 +219,7 @@ try {
 
 ### call
 
-▸ **call**(`method`, `args?`, `options?`): `Promise`<[`CallResult`](../modules.md#callresult)\>
+▸ **call**(`method`, `args?`, `options?`): `Promise`\<[`CallResult`](../modules.md#callresult)\>
 
 Call a read-only contract method (view function)
 
@@ -233,7 +233,7 @@ Call a read-only contract method (view function)
 
 #### Returns
 
-`Promise`<[`CallResult`](../modules.md#callresult)\>
+`Promise`\<[`CallResult`](../modules.md#callresult)\>
 
 Parsed result from the contract method
 
@@ -252,7 +252,7 @@ const name = await contract.call('name', [], { blockIdentifier: 'latest' });
 
 ### invoke
 
-▸ **invoke**(`method`, `args?`, `options?`): `Promise`<\{ `transaction_hash`: `string` }\>
+▸ **invoke**(`method`, `args?`, `options?`): `Promise`\<\{ `transaction_hash`: `string` }\>
 
 Invoke a state-changing contract method (external function)
 
@@ -266,7 +266,7 @@ Invoke a state-changing contract method (external function)
 
 #### Returns
 
-`Promise`<\{ `transaction_hash`: `string` }\>
+`Promise`\<\{ `transaction_hash`: `string` }\>
 
 Transaction response with hash
 
@@ -285,7 +285,7 @@ const receipt = await provider.waitForTransaction(tx.transaction_hash);
 
 ### estimate
 
-▸ **estimate**(`method`, `args?`, `options?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **estimate**(`method`, `args?`, `options?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Estimate fee for invoking a contract method
 
@@ -300,7 +300,7 @@ Estimate fee for invoking a contract method
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Fee estimation details
 
@@ -411,13 +411,13 @@ if (contract.isCairo1()) {
 
 ### getVersion
 
-▸ **getVersion**(): `Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+▸ **getVersion**(): `Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 Get the Cairo and compiler version of the contract
 
 #### Returns
 
-`Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+`Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 Object containing cairo version and compiler version
 
@@ -436,7 +436,7 @@ console.log(`Cairo ${version.cairo}, Compiler ${version.compiler}`);
 
 ### typedv2
 
-▸ **typedv2**<`TAbi`\>(`tAbi`): `TypedContractV2`<`TAbi`\>
+▸ **typedv2**\<`TAbi`\>(`tAbi`): `TypedContractV2`\<`TAbi`\>
 
 Create a typed contract instance with full TypeScript support
 
@@ -454,7 +454,7 @@ Create a typed contract instance with full TypeScript support
 
 #### Returns
 
-`TypedContractV2`<`TAbi`\>
+`TypedContractV2`\<`TAbi`\>
 
 Typed contract instance with IntelliSense support
 

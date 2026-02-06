@@ -38,7 +38,7 @@ await sub.unsubscribe();
 
 ### constructor
 
-• **new Subscription**<`T`\>(`options`): [`Subscription`](Subscription.md)<`T`\>
+• **new Subscription**\<`T`\>(`options`): [`Subscription`](Subscription.md)\<`T`\>
 
 #### Type parameters
 
@@ -54,7 +54,7 @@ await sub.unsubscribe();
 
 #### Returns
 
-[`Subscription`](Subscription.md)<`T`\>
+[`Subscription`](Subscription.md)\<`T`\>
 
 #### Defined in
 
@@ -112,7 +112,7 @@ The unique identifier for this subscription.
 
 ### events
 
-• `Private` **events**: `EventEmitter`<`SubscriptionEvents`<`T`\>\>
+• `Private` **events**: `EventEmitter`\<`SubscriptionEvents`\<`T`\>\>
 
 #### Defined in
 
@@ -232,13 +232,13 @@ If a handler is already attached to this subscription.
 
 ### unsubscribe
 
-▸ **unsubscribe**(): `Promise`<`boolean`\>
+▸ **unsubscribe**(): `Promise`\<`boolean`\>
 
 Sends an unsubscribe request to the node and cleans up local resources.
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 A Promise that resolves to `true` if the unsubscription was successful.
 

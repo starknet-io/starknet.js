@@ -691,9 +691,9 @@ Expect the next value from an iterator
 
 #### Parameters
 
-| Name       | Type                                      | Description                              |
-| :--------- | :---------------------------------------- | :--------------------------------------- |
-| `iterator` | `Iterator`<`string`, `any`, `undefined`\> | The iterator to get the next value from. |
+| Name       | Type                                       | Description                              |
+| :--------- | :----------------------------------------- | :--------------------------------------- |
+| `iterator` | `Iterator`\<`string`, `any`, `undefined`\> | The iterator to get the next value from. |
 
 #### Returns
 

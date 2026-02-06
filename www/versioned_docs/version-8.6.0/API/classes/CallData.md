@@ -302,21 +302,21 @@ Result - parsed and formatted response object
 
 ### decodeParameters
 
-▸ **decodeParameters**(`typeCairo`, `response`): [`AllowArray`](../modules.md#allowarray)<[`CallResult`](../modules.md#callresult)\>
+▸ **decodeParameters**(`typeCairo`, `response`): [`AllowArray`](../modules.md#allowarray)\<[`CallResult`](../modules.md#callresult)\>
 
 Parse the elements of a contract response and structure them into one or several Result.
 In Cairo 0, arrays are not supported.
 
 #### Parameters
 
-| Name        | Type                                                | Description                                                         |
-| :---------- | :-------------------------------------------------- | :------------------------------------------------------------------ |
-| `typeCairo` | [`AllowArray`](../modules.md#allowarray)<`string`\> | string or string[] - Cairo type name, ex : "hello::hello::UserData" |
-| `response`  | `string`[]                                          | string[] - serialized data corresponding to typeCairo.              |
+| Name        | Type                                                 | Description                                                         |
+| :---------- | :--------------------------------------------------- | :------------------------------------------------------------------ |
+| `typeCairo` | [`AllowArray`](../modules.md#allowarray)\<`string`\> | string or string[] - Cairo type name, ex : "hello::hello::UserData" |
+| `response`  | `string`[]                                           | string[] - serialized data corresponding to typeCairo.              |
 
 #### Returns
 
-[`AllowArray`](../modules.md#allowarray)<[`CallResult`](../modules.md#callresult)\>
+[`AllowArray`](../modules.md#allowarray)\<[`CallResult`](../modules.md#callresult)\>
 
 Result or Result[] - parsed response corresponding to typeData.
 

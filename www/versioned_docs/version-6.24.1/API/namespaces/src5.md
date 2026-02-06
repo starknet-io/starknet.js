@@ -10,7 +10,7 @@ custom_edit_url: null
 
 ### supportsInterface
 
-▸ **supportsInterface**(`provider`, `contractAddress`, `interfaceId`): `Promise`<`boolean`\>
+▸ **supportsInterface**(`provider`, `contractAddress`, `interfaceId`): `Promise`\<`boolean`\>
 
 Implementation of ERC165 introspection.
 Verify if a contract has implemented some standard functionalities.
@@ -25,7 +25,7 @@ Verify if a contract has implemented some standard functionalities.
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 true if the interfaceId is implemented in this contract.
 

@@ -36,13 +36,13 @@ custom_edit_url: null
 
 ### getChainId
 
-▸ **getChainId**(): `Promise`<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
+▸ **getChainId**(): `Promise`\<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
 
 Gets the Starknet chain Id
 
 #### Returns
 
-`Promise`<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
+`Promise`\<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
 
 the chain Id
 
@@ -54,7 +54,7 @@ the chain Id
 
 ### callContract
 
-▸ **callContract**(`call`, `blockIdentifier?`): `Promise`<[`CallContractResponse`](../namespaces/types.md#callcontractresponse)\>
+▸ **callContract**(`call`, `blockIdentifier?`): `Promise`\<[`CallContractResponse`](../namespaces/types.md#callcontractresponse)\>
 
 Calls a function on the Starknet contract.
 
@@ -67,7 +67,7 @@ Calls a function on the Starknet contract.
 
 #### Returns
 
-`Promise`<[`CallContractResponse`](../namespaces/types.md#callcontractresponse)\>
+`Promise`\<[`CallContractResponse`](../namespaces/types.md#callcontractresponse)\>
 
 the result of the function on the smart contract.
 
@@ -79,7 +79,7 @@ the result of the function on the smart contract.
 
 ### getBlock
 
-▸ **getBlock**(`blockIdentifier?`): `Promise`<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/types.RPC.RPCSPEC08.API.md#l1_da_mode-1) ; `starknet_version`: `string` }\>
+▸ **getBlock**(`blockIdentifier?`): `Promise`\<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/types.RPC.RPCSPEC08.API.md#l1_da_mode-1) ; `starknet_version`: `string` }\>
 
 Gets the block information
 
@@ -91,7 +91,7 @@ Gets the block information
 
 #### Returns
 
-`Promise`<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/types.RPC.RPCSPEC08.API.md#l1_da_mode-1) ; `starknet_version`: `string` }\>
+`Promise`\<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/types.RPC.RPCSPEC08.API.md#l1_da_mode-1) ; `starknet_version`: `string` }\>
 
 the block object
 
@@ -99,7 +99,7 @@ the block object
 
 [src/provider/interface.ts:64](https://github.com/starknet-io/starknet.js/blob/v7.6.4/src/provider/interface.ts#L64)
 
-▸ **getBlock**(`blockIdentifier`): `Promise`<\{ `status`: [`BLOCK_STATUS`](../namespaces/types.RPC.RPCSPEC08.API.md#block_status) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/types.RPC.RPCSPEC08.API.md#l1_da_mode-1) ; `starknet_version`: `string` ; `transactions`: `string`[] }\>
+▸ **getBlock**(`blockIdentifier`): `Promise`\<\{ `status`: [`BLOCK_STATUS`](../namespaces/types.RPC.RPCSPEC08.API.md#block_status) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/types.RPC.RPCSPEC08.API.md#l1_da_mode-1) ; `starknet_version`: `string` ; `transactions`: `string`[] }\>
 
 #### Parameters
 
@@ -109,13 +109,13 @@ the block object
 
 #### Returns
 
-`Promise`<\{ `status`: [`BLOCK_STATUS`](../namespaces/types.RPC.RPCSPEC08.API.md#block_status) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/types.RPC.RPCSPEC08.API.md#l1_da_mode-1) ; `starknet_version`: `string` ; `transactions`: `string`[] }\>
+`Promise`\<\{ `status`: [`BLOCK_STATUS`](../namespaces/types.RPC.RPCSPEC08.API.md#block_status) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/types.RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/types.RPC.RPCSPEC08.API.md#l1_da_mode-1) ; `starknet_version`: `string` ; `transactions`: `string`[] }\>
 
 #### Defined in
 
 [src/provider/interface.ts:65](https://github.com/starknet-io/starknet.js/blob/v7.6.4/src/provider/interface.ts#L65)
 
-▸ **getBlock**(`blockIdentifier`): `Promise`<[`GetBlockResponse`](../namespaces/types.md#getblockresponse)\>
+▸ **getBlock**(`blockIdentifier`): `Promise`\<[`GetBlockResponse`](../namespaces/types.md#getblockresponse)\>
 
 #### Parameters
 
@@ -125,7 +125,7 @@ the block object
 
 #### Returns
 
-`Promise`<[`GetBlockResponse`](../namespaces/types.md#getblockresponse)\>
+`Promise`\<[`GetBlockResponse`](../namespaces/types.md#getblockresponse)\>
 
 #### Defined in
 
@@ -135,7 +135,7 @@ the block object
 
 ### getClassAt
 
-▸ **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
+▸ **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`\<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
 
 Gets the contract class of the deployed contract.
 
@@ -148,7 +148,7 @@ Gets the contract class of the deployed contract.
 
 #### Returns
 
-`Promise`<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
+`Promise`\<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
 
 Contract class of compiled contract
 
@@ -160,7 +160,7 @@ Contract class of compiled contract
 
 ### getL1GasPrice
 
-▸ **getL1GasPrice**(`blockIdentifier`): `Promise`<`string`\>
+▸ **getL1GasPrice**(`blockIdentifier`): `Promise`\<`string`\>
 
 Gets the price of l1 gas in the block
 
@@ -172,7 +172,7 @@ Gets the price of l1 gas in the block
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 gas price of the block
 
@@ -184,7 +184,7 @@ gas price of the block
 
 ### getL1MessageHash
 
-▸ **getL1MessageHash**(`l2TxHash`): `Promise`<`string`\>
+▸ **getL1MessageHash**(`l2TxHash`): `Promise`\<`string`\>
 
 Get L1 message hash from L2 transaction hash
 
@@ -196,7 +196,7 @@ Get L1 message hash from L2 transaction hash
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 Hex string of L1 message hash
 
@@ -219,7 +219,7 @@ const result = provider.getL1MessageHash(
 
 ### getClassHashAt
 
-▸ **getClassHashAt**(`contractAddress`, `blockIdentifier?`): `Promise`<`string`\>
+▸ **getClassHashAt**(`contractAddress`, `blockIdentifier?`): `Promise`\<`string`\>
 
 Returns the contract class hash in the given block for the contract deployed at the given address
 
@@ -232,7 +232,7 @@ Returns the contract class hash in the given block for the contract deployed at 
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 Class hash
 
@@ -244,7 +244,7 @@ Class hash
 
 ### getClassByHash
 
-▸ **getClassByHash**(`classHash`): `Promise`<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
+▸ **getClassByHash**(`classHash`): `Promise`\<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
 
 Returns the contract class deployed under the given class hash.
 
@@ -256,7 +256,7 @@ Returns the contract class deployed under the given class hash.
 
 #### Returns
 
-`Promise`<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
+`Promise`\<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
 
 Contract class of compiled contract
 
@@ -268,7 +268,7 @@ Contract class of compiled contract
 
 ### getNonceForAddress
 
-▸ **getNonceForAddress**(`contractAddress`, `blockIdentifier?`): `Promise`<`string`\>
+▸ **getNonceForAddress**(`contractAddress`, `blockIdentifier?`): `Promise`\<`string`\>
 
 Returns the nonce associated with the given address in the given block
 
@@ -281,7 +281,7 @@ Returns the nonce associated with the given address in the given block
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 the hex nonce
 
@@ -293,21 +293,21 @@ the hex nonce
 
 ### getStorageAt
 
-▸ **getStorageAt**(`contractAddress`, `key`, `blockIdentifier?`): `Promise`<`string`\>
+▸ **getStorageAt**(`contractAddress`, `key`, `blockIdentifier?`): `Promise`\<`string`\>
 
 Get the value of the storage (contract's variable) at the given address and key
 
 #### Parameters
 
-| Name               | Type                                                        | Description                                                |
-| :----------------- | :---------------------------------------------------------- | :--------------------------------------------------------- |
-| `contractAddress`  | `string`                                                    |                                                            |
-| `key`              | [`BigNumberish`](../namespaces/types.md#bignumberish)       | from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP) |
-| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier                                           |
+| Name               | Type                                                        | Description                                                 |
+| :----------------- | :---------------------------------------------------------- | :---------------------------------------------------------- |
+| `contractAddress`  | `string`                                                    |                                                             |
+| `key`              | [`BigNumberish`](../namespaces/types.md#bignumberish)       | from getStorageVarAddress('\<STORAGE_VARIABLE_NAME>') (WIP) |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier                                            |
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 the value of the storage variable
 
@@ -319,7 +319,7 @@ the value of the storage variable
 
 ### getTransaction
 
-▸ **getTransaction**(`transactionHash`): `Promise`<[`TransactionWithHash`](../namespaces/types.md#transactionwithhash)\>
+▸ **getTransaction**(`transactionHash`): `Promise`\<[`TransactionWithHash`](../namespaces/types.md#transactionwithhash)\>
 
 Gets the transaction information from a tx id.
 
@@ -331,9 +331,9 @@ Gets the transaction information from a tx id.
 
 #### Returns
 
-`Promise`<[`TransactionWithHash`](../namespaces/types.md#transactionwithhash)\>
+`Promise`\<[`TransactionWithHash`](../namespaces/types.md#transactionwithhash)\>
 
-the transaction object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
+the transaction object `{ transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }`
 
 #### Defined in
 
@@ -343,7 +343,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 ### getTransactionReceipt
 
-▸ **getTransactionReceipt**(`transactionHash`): `Promise`<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
+▸ **getTransactionReceipt**(`transactionHash`): `Promise`\<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
 
 Gets the transaction receipt from a tx hash.
 
@@ -355,7 +355,7 @@ Gets the transaction receipt from a tx hash.
 
 #### Returns
 
-`Promise`<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
+`Promise`\<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
 
 the transaction receipt object
 
@@ -367,7 +367,7 @@ the transaction receipt object
 
 ### deployAccountContract
 
-▸ **deployAccountContract**(`payload`, `details`): `Promise`<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
+▸ **deployAccountContract**(`payload`, `details`): `Promise`\<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
 
 Deploys a given compiled Account contract (json) to starknet
 
@@ -380,7 +380,7 @@ Deploys a given compiled Account contract (json) to starknet
 
 #### Returns
 
-`Promise`<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
+`Promise`\<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
 
 a confirmation of sending a transaction on the starknet contract
 
@@ -392,7 +392,7 @@ a confirmation of sending a transaction on the starknet contract
 
 ### invokeFunction
 
-▸ **invokeFunction**(`invocation`, `details`): `Promise`<\{ `transaction_hash`: `string` }\>
+▸ **invokeFunction**(`invocation`, `details`): `Promise`\<\{ `transaction_hash`: `string` }\>
 
 Invokes a function on starknet
 
@@ -405,7 +405,7 @@ Invokes a function on starknet
 
 #### Returns
 
-`Promise`<\{ `transaction_hash`: `string` }\>
+`Promise`\<\{ `transaction_hash`: `string` }\>
 
 response from addTransaction
 
@@ -417,7 +417,7 @@ response from addTransaction
 
 ### declareContract
 
-▸ **declareContract**(`transaction`, `details`): `Promise`<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
+▸ **declareContract**(`transaction`, `details`): `Promise`\<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
 
 Declares a given compiled contract (json) to starknet
 
@@ -430,7 +430,7 @@ Declares a given compiled contract (json) to starknet
 
 #### Returns
 
-`Promise`<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
+`Promise`\<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
 
 a confirmation of sending a transaction on the starknet contract
 
@@ -442,7 +442,7 @@ a confirmation of sending a transaction on the starknet contract
 
 ### getInvokeEstimateFee
 
-▸ **getInvokeEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
+▸ **getInvokeEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`\<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
 
 Estimates the fee for a given INVOKE transaction
 
@@ -457,7 +457,7 @@ Estimates the fee for a given INVOKE transaction
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
+`Promise`\<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
 
 the estimated fee
 
@@ -469,7 +469,7 @@ the estimated fee
 
 ### getDeclareEstimateFee
 
-▸ **getDeclareEstimateFee**(`transaction`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
+▸ **getDeclareEstimateFee**(`transaction`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`\<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
 
 Estimates the fee for a given DECLARE transaction
 
@@ -484,7 +484,7 @@ Estimates the fee for a given DECLARE transaction
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
+`Promise`\<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
 
 the estimated fee
 
@@ -496,7 +496,7 @@ the estimated fee
 
 ### getDeployAccountEstimateFee
 
-▸ **getDeployAccountEstimateFee**(`transaction`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
+▸ **getDeployAccountEstimateFee**(`transaction`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`\<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
 
 Estimates the fee for a given DEPLOY_ACCOUNT transaction
 
@@ -511,7 +511,7 @@ Estimates the fee for a given DEPLOY_ACCOUNT transaction
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
+`Promise`\<[`EstimateFeeResponse`](../namespaces/types.md#estimatefeeresponse)\>
 
 the estimated fee
 
@@ -523,7 +523,7 @@ the estimated fee
 
 ### getEstimateFeeBulk
 
-▸ **getEstimateFeeBulk**(`invocations`, `options?`): `Promise`<[`EstimateFeeResponseBulk`](../namespaces/types.md#estimatefeeresponsebulk)\>
+▸ **getEstimateFeeBulk**(`invocations`, `options?`): `Promise`\<[`EstimateFeeResponseBulk`](../namespaces/types.md#estimatefeeresponsebulk)\>
 
 Estimates the fee for a list of INVOKE transaction
 
@@ -536,7 +536,7 @@ Estimates the fee for a list of INVOKE transaction
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseBulk`](../namespaces/types.md#estimatefeeresponsebulk)\>
+`Promise`\<[`EstimateFeeResponseBulk`](../namespaces/types.md#estimatefeeresponsebulk)\>
 
 the estimated fee
 
@@ -548,7 +548,7 @@ the estimated fee
 
 ### waitForTransaction
 
-▸ **waitForTransaction**(`txHash`, `options?`): `Promise`<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
+▸ **waitForTransaction**(`txHash`, `options?`): `Promise`\<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
 
 Wait for the transaction to be accepted
 
@@ -561,7 +561,7 @@ Wait for the transaction to be accepted
 
 #### Returns
 
-`Promise`<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
+`Promise`\<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
 
 GetTransactionReceiptResponse
 
@@ -573,7 +573,7 @@ GetTransactionReceiptResponse
 
 ### getSimulateTransaction
 
-▸ **getSimulateTransaction**(`invocations`, `options?`): `Promise`<[`SimulateTransactionResponse`](../namespaces/types.md#simulatetransactionresponse)\>
+▸ **getSimulateTransaction**(`invocations`, `options?`): `Promise`\<[`SimulateTransactionResponse`](../namespaces/types.md#simulatetransactionresponse)\>
 
 Simulates the transaction and returns the transaction trace and estimated fee.
 
@@ -586,7 +586,7 @@ Simulates the transaction and returns the transaction trace and estimated fee.
 
 #### Returns
 
-`Promise`<[`SimulateTransactionResponse`](../namespaces/types.md#simulatetransactionresponse)\>
+`Promise`\<[`SimulateTransactionResponse`](../namespaces/types.md#simulatetransactionresponse)\>
 
 an array of transaction trace and estimated fee
 
@@ -598,7 +598,7 @@ an array of transaction trace and estimated fee
 
 ### getStateUpdate
 
-▸ **getStateUpdate**(`blockIdentifier?`): `Promise`<[`StateUpdateResponse`](../namespaces/types.md#stateupdateresponse)\>
+▸ **getStateUpdate**(`blockIdentifier?`): `Promise`\<[`StateUpdateResponse`](../namespaces/types.md#stateupdateresponse)\>
 
 Gets the state changes in a specific block (result of executing the requested block)
 
@@ -610,7 +610,7 @@ Gets the state changes in a specific block (result of executing the requested bl
 
 #### Returns
 
-`Promise`<[`StateUpdateResponse`](../namespaces/types.md#stateupdateresponse)\>
+`Promise`\<[`StateUpdateResponse`](../namespaces/types.md#stateupdateresponse)\>
 
 StateUpdateResponse
 
@@ -622,7 +622,7 @@ StateUpdateResponse
 
 ### getContractVersion
 
-▸ **getContractVersion**(`contractAddress`, `classHash?`, `options?`): `Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+▸ **getContractVersion**(`contractAddress`, `classHash?`, `options?`): `Promise`\<[`ContractVersion`](../namespaces/types.md#contractversion)\>
 
 Gets the contract version from the provided address
 
@@ -636,13 +636,13 @@ Gets the contract version from the provided address
 
 #### Returns
 
-`Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+`Promise`\<[`ContractVersion`](../namespaces/types.md#contractversion)\>
 
 #### Defined in
 
 [src/provider/interface.ts:338](https://github.com/starknet-io/starknet.js/blob/v7.6.4/src/provider/interface.ts#L338)
 
-▸ **getContractVersion**(`contractAddress`, `classHash`, `options?`): `Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+▸ **getContractVersion**(`contractAddress`, `classHash`, `options?`): `Promise`\<[`ContractVersion`](../namespaces/types.md#contractversion)\>
 
 Gets the contract version from the provided address
 
@@ -656,7 +656,7 @@ Gets the contract version from the provided address
 
 #### Returns
 
-`Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+`Promise`\<[`ContractVersion`](../namespaces/types.md#contractversion)\>
 
 #### Defined in
 

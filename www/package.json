@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "docusaurus start",
-    "build": "docusaurus build",
+    "generate-api": "typedoc --plugin typedoc-plugin-markdown --entryPoints ../src/index.ts --out ./docs/API --tsconfig ../tsconfig.json --readme none --mergeReadme false --entryFileName index.md --modulesFileName index.md --sanitizeComments true --cleanOutputDir true --includeHierarchySummary false   --categorizeByGroup false --outputFileStrategy members",
+    "postgenerate-api": "bash ./scripts/postTypedoc.sh",
+    "build": "npm run generate-api && docusaurus build",
+    "start": "npm run generate-api && docusaurus start",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -16,25 +18,23 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "2.4.3",
-    "@docusaurus/plugin-content-docs": "2.4.3",
-    "@docusaurus/preset-classic": "2.4.3",
-    "@docusaurus/types": "2.4.3",
-    "@mdx-js/react": "^1.6.22",
-    "clsx": "^1.1.1",
-    "prism-react-renderer": "^1.2.1",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
+    "@docusaurus/core": "^3.0.0",
+    "@docusaurus/preset-classic": "^3.0.0",
+    "@mdx-js/react": "^3.0.0",
+    "clsx": "^2.0.0",
+    "prism-react-renderer": "^2.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
-    "@docusaurus/module-type-aliases": "^2.4.0",
-    "@tsconfig/docusaurus": "^1.0.7",
-    "docusaurus-plugin-typedoc": "^0.21.0",
-    "typedoc": "^0.25.4",
-    "typedoc-plugin-markdown": "^3.17.1",
-    "typescript": "^5.0.4"
+    "@docusaurus/module-type-aliases": "^3.0.0",
+    "@docusaurus/tsconfig": "^3.0.0",
+    "@types/node": "^20.0.0",
+    "docusaurus-plugin-typedoc": "^1.4.1",
+    "typedoc": "^0.28.16",
+    "typedoc-plugin-markdown": "^4.9.0",
+    "typescript": "~5.7.0"
   },
   "browserslist": {
     "production": [
@@ -47,5 +47,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "engines": {
+    "node": ">=18.0"
   }
 }

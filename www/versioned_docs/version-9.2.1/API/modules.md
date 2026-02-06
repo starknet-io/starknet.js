@@ -179,7 +179,7 @@ Re-exports [TypedData](interfaces/RPC.RPCSPEC010.WALLET_API.TypedData.md)
 
 ### TypedContractV2
 
-Ƭ **TypedContractV2**<`TAbi`\>: `AbiWanTypedContract`<`TAbi`\> & [`Contract`](classes/Contract.md)
+Ƭ **TypedContractV2**\<`TAbi`\>: `AbiWanTypedContract`\<`TAbi`\> & [`Contract`](classes/Contract.md)
 
 #### Type parameters
 
@@ -259,7 +259,7 @@ Optional performance metrics for the analysis.
 
 ### TipType
 
-Ƭ **TipType**: `Exclude`<keyof [`TipEstimate`](modules.md#tipestimate), `"metrics"`\>
+Ƭ **TipType**: `Exclude`\<keyof [`TipEstimate`](modules.md#tipestimate), `"metrics"`\>
 
 #### Defined in
 
@@ -289,7 +289,7 @@ Options for customizing tip analysis behavior.
 
 ### SubscriptionNewHeadsEvent
 
-Ƭ **SubscriptionNewHeadsEvent**: [`Subscription`](classes/Subscription.md)<[`NewHeadsEvent`](namespaces/RPC.RPCSPEC010.API.md#newheadsevent)[``"result"``]\>
+Ƭ **SubscriptionNewHeadsEvent**: [`Subscription`](classes/Subscription.md)\<[`NewHeadsEvent`](namespaces/RPC.RPCSPEC010.API.md#newheadsevent)[``"result"``]\>
 
 #### Defined in
 
@@ -299,7 +299,7 @@ Options for customizing tip analysis behavior.
 
 ### SubscriptionStarknetEventsEvent
 
-Ƭ **SubscriptionStarknetEventsEvent**: [`Subscription`](classes/Subscription.md)<[`StarknetEventsEvent`](namespaces/RPC.RPCSPEC010.API.md#starkneteventsevent)[``"result"``]\>
+Ƭ **SubscriptionStarknetEventsEvent**: [`Subscription`](classes/Subscription.md)\<[`StarknetEventsEvent`](namespaces/RPC.RPCSPEC010.API.md#starkneteventsevent)[``"result"``]\>
 
 #### Defined in
 
@@ -309,7 +309,7 @@ Options for customizing tip analysis behavior.
 
 ### SubscriptionTransactionStatusEvent
 
-Ƭ **SubscriptionTransactionStatusEvent**: [`Subscription`](classes/Subscription.md)<[`TransactionsStatusEvent`](namespaces/RPC.RPCSPEC010.API.md#transactionsstatusevent)[``"result"``]\>
+Ƭ **SubscriptionTransactionStatusEvent**: [`Subscription`](classes/Subscription.md)\<[`TransactionsStatusEvent`](namespaces/RPC.RPCSPEC010.API.md#transactionsstatusevent)[``"result"``]\>
 
 #### Defined in
 
@@ -319,7 +319,7 @@ Options for customizing tip analysis behavior.
 
 ### SubscriptionNewTransactionReceiptsEvent
 
-Ƭ **SubscriptionNewTransactionReceiptsEvent**: [`Subscription`](classes/Subscription.md)<[`NewTransactionReceiptsEvent`](namespaces/RPC.RPCSPEC010.API.md#newtransactionreceiptsevent)[``"result"``]\>
+Ƭ **SubscriptionNewTransactionReceiptsEvent**: [`Subscription`](classes/Subscription.md)\<[`NewTransactionReceiptsEvent`](namespaces/RPC.RPCSPEC010.API.md#newtransactionreceiptsevent)[``"result"``]\>
 
 #### Defined in
 
@@ -329,7 +329,7 @@ Options for customizing tip analysis behavior.
 
 ### SubscriptionNewTransactionEvent
 
-Ƭ **SubscriptionNewTransactionEvent**: [`Subscription`](classes/Subscription.md)<[`NewTransactionEvent`](namespaces/RPC.RPCSPEC010.API.md#newtransactionevent)[``"result"``]\>
+Ƭ **SubscriptionNewTransactionEvent**: [`Subscription`](classes/Subscription.md)\<[`NewTransactionEvent`](namespaces/RPC.RPCSPEC010.API.md#newtransactionevent)[``"result"``]\>
 
 #### Defined in
 
@@ -550,7 +550,7 @@ Hexadecimal-string array
 
 ### AllowArray
 
-Ƭ **AllowArray**<`T`\>: `T` \| `T`[]
+Ƭ **AllowArray**\<`T`\>: `T` \| `T`[]
 
 #### Type parameters
 
@@ -566,7 +566,7 @@ Hexadecimal-string array
 
 ### OptionalPayload
 
-Ƭ **OptionalPayload**<`T`\>: \{ `payload`: `T` } \| `T`
+Ƭ **OptionalPayload**\<`T`\>: \{ `payload`: `T` } \| `T`
 
 #### Type parameters
 
@@ -665,7 +665,7 @@ Hexadecimal-string array
 
 ### DeployAccountContractTransaction
 
-Ƭ **DeployAccountContractTransaction**: `Omit`<[`DeployAccountContractPayload`](modules.md#deployaccountcontractpayload), `"contractAddress"`\> & \{ `signature?`: [`Signature`](modules.md#signature) }
+Ƭ **DeployAccountContractTransaction**: `Omit`\<[`DeployAccountContractPayload`](modules.md#deployaccountcontractpayload), `"contractAddress"`\> & \{ `signature?`: [`Signature`](modules.md#signature) }
 
 #### Defined in
 
@@ -719,7 +719,7 @@ DeclareContractPayload with classHash or contract defined
 
 ### DeclareAndDeployContractPayload
 
-Ƭ **DeclareAndDeployContractPayload**: `Omit`<[`UniversalDeployerContractPayload`](modules.md#universaldeployercontractpayload), `"classHash"`\> & [`DeclareContractPayload`](modules.md#declarecontractpayload)
+Ƭ **DeclareAndDeployContractPayload**: `Omit`\<[`UniversalDeployerContractPayload`](modules.md#universaldeployercontractpayload), `"classHash"`\> & [`DeclareContractPayload`](modules.md#declarecontractpayload)
 
 #### Defined in
 
@@ -805,7 +805,7 @@ DeclareContractPayload with classHash or contract defined
 
 ### InvocationsDetails
 
-Ƭ **InvocationsDetails**: \{ `nonce?`: [`BigNumberish`](modules.md#bignumberish) ; `maxFee?`: [`BigNumberish`](modules.md#bignumberish) ; `version?`: [`BigNumberish`](modules.md#bignumberish) } & `Partial`<[`V3TransactionDetails`](modules.md#v3transactiondetails)\>
+Ƭ **InvocationsDetails**: \{ `nonce?`: [`BigNumberish`](modules.md#bignumberish) ; `maxFee?`: [`BigNumberish`](modules.md#bignumberish) ; `version?`: [`BigNumberish`](modules.md#bignumberish) } & `Partial`\<[`V3TransactionDetails`](modules.md#v3transactiondetails)\>
 
 #### Defined in
 
@@ -934,7 +934,7 @@ Complete invocations array with account details (internal type from account -> p
 
 ### Invocations
 
-Ƭ **Invocations**: (\{ `type`: typeof [`DECLARE`](namespaces/RPC.RPCSPEC010.API.md#declare) } & [`OptionalPayload`](modules.md#optionalpayload)<[`DeclareContractPayload`](modules.md#declarecontractpayload)\> \| \{ `type`: typeof [`DEPLOY`](namespaces/RPC.RPCSPEC010.API.md#deploy) } & [`OptionalPayload`](modules.md#optionalpayload)<[`AllowArray`](modules.md#allowarray)<[`UniversalDeployerContractPayload`](modules.md#universaldeployercontractpayload)\>\> \| \{ `type`: typeof [`DEPLOY_ACCOUNT`](namespaces/RPC.RPCSPEC010.API.md#deploy_account) } & [`OptionalPayload`](modules.md#optionalpayload)<[`DeployAccountContractPayload`](modules.md#deployaccountcontractpayload)\> \| \{ `type`: typeof [`INVOKE`](namespaces/RPC.RPCSPEC010.API.md#invoke) } & [`OptionalPayload`](modules.md#optionalpayload)<[`AllowArray`](modules.md#allowarray)<[`Call`](modules.md#call)\>\>)[]
+Ƭ **Invocations**: (\{ `type`: typeof [`DECLARE`](namespaces/RPC.RPCSPEC010.API.md#declare) } & [`OptionalPayload`](modules.md#optionalpayload)\<[`DeclareContractPayload`](modules.md#declarecontractpayload)\> \| \{ `type`: typeof [`DEPLOY`](namespaces/RPC.RPCSPEC010.API.md#deploy) } & [`OptionalPayload`](modules.md#optionalpayload)\<[`AllowArray`](modules.md#allowarray)\<[`UniversalDeployerContractPayload`](modules.md#universaldeployercontractpayload)\>\> \| \{ `type`: typeof [`DEPLOY_ACCOUNT`](namespaces/RPC.RPCSPEC010.API.md#deploy_account) } & [`OptionalPayload`](modules.md#optionalpayload)\<[`DeployAccountContractPayload`](modules.md#deployaccountcontractpayload)\> \| \{ `type`: typeof [`INVOKE`](namespaces/RPC.RPCSPEC010.API.md#invoke) } & [`OptionalPayload`](modules.md#optionalpayload)\<[`AllowArray`](modules.md#allowarray)\<[`Call`](modules.md#call)\>\>)[]
 
 Invocations array user provide to bulk method (simulate)
 
@@ -1138,7 +1138,7 @@ Compressed or decompressed Cairo0 or Cairo1 Contract
 
 ### EntryPointType
 
-Ƭ **EntryPointType**: `ValuesType`<typeof [`EntryPointType`](modules.md#entrypointtype-1)\>
+Ƭ **EntryPointType**: `ValuesType`\<typeof [`EntryPointType`](modules.md#entrypointtype-1)\>
 
 #### Defined in
 
@@ -1150,7 +1150,7 @@ Compressed or decompressed Cairo0 or Cairo1 Contract
 
 ### Abi
 
-Ƭ **Abi**: `ReadonlyArray`<[`FunctionAbi`](modules.md#functionabi) \| [`AbiEvent`](modules.md#abievent) \| [`AbiStruct`](modules.md#abistruct) \| [`InterfaceAbi`](modules.md#interfaceabi) \| `any`\>
+Ƭ **Abi**: `ReadonlyArray`\<[`FunctionAbi`](modules.md#functionabi) \| [`AbiEvent`](modules.md#abievent) \| [`AbiStruct`](modules.md#abistruct) \| [`InterfaceAbi`](modules.md#interfaceabi) \| `any`\>
 
 ABI
 
@@ -1409,7 +1409,7 @@ format produced after compressing 'program' property
 
 ### LegacyCompiledContract
 
-Ƭ **LegacyCompiledContract**: `Omit`<[`LegacyContractClass`](modules.md#legacycontractclass), `"program"`\> & \{ `program`: [`Program`](interfaces/Program.md) }
+Ƭ **LegacyCompiledContract**: `Omit`\<[`LegacyContractClass`](modules.md#legacycontractclass), `"program"`\> & \{ `program`: [`Program`](interfaces/Program.md) }
 
 format produced after compiling .cairo to .json
 
@@ -1443,7 +1443,7 @@ SUBTYPES
 
 ### Hint
 
-Ƭ **Hint**: `Record`<`string`, `unknown`\>
+Ƭ **Hint**: `Record`\<`string`, `unknown`\>
 
 #### Defined in
 
@@ -1537,7 +1537,7 @@ sierra_program is hex array
 
 ### SierraContractClass
 
-Ƭ **SierraContractClass**: `Omit`<[`CompiledSierra`](modules.md#compiledsierra), `"abi"` \| `"sierra_program"` \| `"sierra_program_debug_info"`\> & \{ `sierra_program`: `string` ; `abi`: `string` }
+Ƭ **SierraContractClass**: `Omit`\<[`CompiledSierra`](modules.md#compiledsierra), `"abi"` \| `"sierra_program"` \| `"sierra_program_debug_info"`\> & \{ `sierra_program`: `string` ; `abi`: `string` }
 
 format produced after compressing 'sierra_program', stringifies 'abi' property and omit sierra_program_debug_info
 
@@ -1663,7 +1663,7 @@ SUBTYPES
 
 ### Block
 
-Ƭ **Block**: [`Simplify`](modules.md#simplify)<[`BLOCK_WITH_TX_HASHES`](namespaces/RPC.RPCSPEC010.API.md#block_with_tx_hashes)\>
+Ƭ **Block**: [`Simplify`](modules.md#simplify)\<[`BLOCK_WITH_TX_HASHES`](namespaces/RPC.RPCSPEC010.API.md#block_with_tx_hashes)\>
 
 #### Defined in
 
@@ -1673,7 +1673,7 @@ SUBTYPES
 
 ### PreConfirmedBlock
 
-Ƭ **PreConfirmedBlock**: [`Simplify`](modules.md#simplify)<[`PRE_CONFIRMED_BLOCK_WITH_TX_HASHES`](namespaces/RPC.RPCSPEC010.API.md#pre_confirmed_block_with_tx_hashes)\>
+Ƭ **PreConfirmedBlock**: [`Simplify`](modules.md#simplify)\<[`PRE_CONFIRMED_BLOCK_WITH_TX_HASHES`](namespaces/RPC.RPCSPEC010.API.md#pre_confirmed_block_with_tx_hashes)\>
 
 #### Defined in
 
@@ -1683,7 +1683,7 @@ SUBTYPES
 
 ### GetBlockResponse
 
-Ƭ **GetBlockResponse**: [`Simplify`](modules.md#simplify)<[`BlockWithTxHashes`](modules.md#blockwithtxhashes)\>
+Ƭ **GetBlockResponse**: [`Simplify`](modules.md#simplify)\<[`BlockWithTxHashes`](modules.md#blockwithtxhashes)\>
 
 #### Defined in
 
@@ -1703,7 +1703,7 @@ SUBTYPES
 
 ### SuccessfulTransactionReceiptResponse
 
-Ƭ **SuccessfulTransactionReceiptResponse**: [`IsSucceeded`](namespaces/RPC.RPCSPEC010.API.md#issucceeded)<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt)\>
+Ƭ **SuccessfulTransactionReceiptResponse**: [`IsSucceeded`](namespaces/RPC.RPCSPEC010.API.md#issucceeded)\<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt)\>
 
 #### Defined in
 
@@ -1713,7 +1713,7 @@ SUBTYPES
 
 ### RevertedTransactionReceiptResponse
 
-Ƭ **RevertedTransactionReceiptResponse**: [`IsReverted`](namespaces/RPC.RPCSPEC010.API.md#isreverted)<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt)\>
+Ƭ **RevertedTransactionReceiptResponse**: [`IsReverted`](namespaces/RPC.RPCSPEC010.API.md#isreverted)\<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt)\>
 
 #### Defined in
 
@@ -1723,7 +1723,7 @@ SUBTYPES
 
 ### InvokeTransactionReceiptResponse
 
-Ƭ **InvokeTransactionReceiptResponse**: [`IsType`](namespaces/RPC.RPCSPEC010.API.md#istype)<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt), `"INVOKE"`\>
+Ƭ **InvokeTransactionReceiptResponse**: [`IsType`](namespaces/RPC.RPCSPEC010.API.md#istype)\<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt), `"INVOKE"`\>
 
 #### Defined in
 
@@ -1743,7 +1743,7 @@ SUBTYPES
 
 ### DeclareTransactionReceiptResponse
 
-Ƭ **DeclareTransactionReceiptResponse**: [`IsType`](namespaces/RPC.RPCSPEC010.API.md#istype)<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt), `"DECLARE"`\>
+Ƭ **DeclareTransactionReceiptResponse**: [`IsType`](namespaces/RPC.RPCSPEC010.API.md#istype)\<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt), `"DECLARE"`\>
 
 #### Defined in
 
@@ -1753,7 +1753,7 @@ SUBTYPES
 
 ### DeployAccountTransactionReceiptResponse
 
-Ƭ **DeployAccountTransactionReceiptResponse**: [`IsType`](namespaces/RPC.RPCSPEC010.API.md#istype)<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt), `"DEPLOY_ACCOUNT"`\>
+Ƭ **DeployAccountTransactionReceiptResponse**: [`IsType`](namespaces/RPC.RPCSPEC010.API.md#istype)\<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt), `"DEPLOY_ACCOUNT"`\>
 
 #### Defined in
 
@@ -1763,7 +1763,7 @@ SUBTYPES
 
 ### L1HandlerTransactionReceiptResponse
 
-Ƭ **L1HandlerTransactionReceiptResponse**: [`IsType`](namespaces/RPC.RPCSPEC010.API.md#istype)<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt), `"L1_HANDLER"`\>
+Ƭ **L1HandlerTransactionReceiptResponse**: [`IsType`](namespaces/RPC.RPCSPEC010.API.md#istype)\<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt), `"L1_HANDLER"`\>
 
 #### Defined in
 
@@ -1923,7 +1923,7 @@ Estimate fee response with overhead
 
 ### ContractClassResponse
 
-Ƭ **ContractClassResponse**: [`LegacyContractClass`](modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](modules.md#compiledsierra), `"sierra_program_debug_info"`\>
+Ƭ **ContractClassResponse**: [`LegacyContractClass`](modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](modules.md#compiledsierra), `"sierra_program_debug_info"`\>
 
 Standardized type
 
@@ -1973,7 +1973,7 @@ price in fri of the layer 2 gas price.
 
 ### Simplify
 
-Ƭ **Simplify**<`T`\>: \{ [K in keyof T]: T[K] } & {}
+Ƭ **Simplify**\<`T`\>: \{ [K in keyof T]: T[K] } & {}
 
 #### Type parameters
 
@@ -1989,7 +1989,7 @@ price in fri of the layer 2 gas price.
 
 ### RequiredKeysOf
 
-Ƭ **RequiredKeysOf**<`T`\>: `Exclude`<\{ [K in keyof T]: T extends Record<K, T[K]\> ? K : never }[keyof `T`], `undefined`\>
+Ƭ **RequiredKeysOf**\<`T`\>: `Exclude`\<\{ [K in keyof T]: T extends Record\<K, T[K]\> ? K : never }[keyof `T`], `undefined`\>
 
 #### Type parameters
 
@@ -2041,7 +2041,7 @@ price in fri of the layer 2 gas price.
 
 ### BLOCK_HASH
 
-Ƭ **BLOCK_HASH**: `Merge`<[`BLOCK_HASH`](namespaces/RPC.RPCSPEC010.API.md#block_hash), [`BLOCK_HASH`](namespaces/RPC.RPCSPEC09.API.md#block_hash)\>
+Ƭ **BLOCK_HASH**: `Merge`\<[`BLOCK_HASH`](namespaces/RPC.RPCSPEC010.API.md#block_hash), [`BLOCK_HASH`](namespaces/RPC.RPCSPEC09.API.md#block_hash)\>
 
 #### Defined in
 
@@ -2051,7 +2051,7 @@ price in fri of the layer 2 gas price.
 
 ### BLOCK_NUMBER
 
-Ƭ **BLOCK_NUMBER**: `Merge`<[`BLOCK_NUMBER`](namespaces/RPC.RPCSPEC010.API.md#block_number), [`BLOCK_NUMBER`](namespaces/RPC.RPCSPEC09.API.md#block_number)\>
+Ƭ **BLOCK_NUMBER**: `Merge`\<[`BLOCK_NUMBER`](namespaces/RPC.RPCSPEC010.API.md#block_number), [`BLOCK_NUMBER`](namespaces/RPC.RPCSPEC09.API.md#block_number)\>
 
 #### Defined in
 
@@ -2061,7 +2061,7 @@ price in fri of the layer 2 gas price.
 
 ### FELT
 
-Ƭ **FELT**: `Merge`<[`FELT`](namespaces/RPC.RPCSPEC010.API.md#felt), [`FELT`](namespaces/RPC.RPCSPEC09.API.md#felt)\>
+Ƭ **FELT**: `Merge`\<[`FELT`](namespaces/RPC.RPCSPEC010.API.md#felt), [`FELT`](namespaces/RPC.RPCSPEC09.API.md#felt)\>
 
 #### Defined in
 
@@ -2071,7 +2071,7 @@ price in fri of the layer 2 gas price.
 
 ### TXN_HASH
 
-Ƭ **TXN_HASH**: `Merge`<[`TXN_HASH`](namespaces/RPC.RPCSPEC010.API.md#txn_hash), [`TXN_HASH`](namespaces/RPC.RPCSPEC09.API.md#txn_hash)\>
+Ƭ **TXN_HASH**: `Merge`\<[`TXN_HASH`](namespaces/RPC.RPCSPEC010.API.md#txn_hash), [`TXN_HASH`](namespaces/RPC.RPCSPEC09.API.md#txn_hash)\>
 
 #### Defined in
 
@@ -2081,7 +2081,7 @@ price in fri of the layer 2 gas price.
 
 ### PRICE_UNIT
 
-Ƭ **PRICE_UNIT**: `Merge`<[`PRICE_UNIT`](namespaces/RPC.RPCSPEC010.API.md#price_unit), [`PRICE_UNIT`](namespaces/RPC.RPCSPEC09.API.md#price_unit)\>
+Ƭ **PRICE_UNIT**: `Merge`\<[`PRICE_UNIT`](namespaces/RPC.RPCSPEC010.API.md#price_unit), [`PRICE_UNIT`](namespaces/RPC.RPCSPEC09.API.md#price_unit)\>
 
 #### Defined in
 
@@ -2091,7 +2091,7 @@ price in fri of the layer 2 gas price.
 
 ### RESOURCE_PRICE
 
-Ƭ **RESOURCE_PRICE**: `Merge`<[`RESOURCE_PRICE`](namespaces/RPC.RPCSPEC010.API.md#resource_price), [`RESOURCE_PRICE`](namespaces/RPC.RPCSPEC09.API.md#resource_price)\>
+Ƭ **RESOURCE_PRICE**: `Merge`\<[`RESOURCE_PRICE`](namespaces/RPC.RPCSPEC010.API.md#resource_price), [`RESOURCE_PRICE`](namespaces/RPC.RPCSPEC09.API.md#resource_price)\>
 
 #### Defined in
 
@@ -2101,7 +2101,7 @@ price in fri of the layer 2 gas price.
 
 ### SIMULATION_FLAG
 
-Ƭ **SIMULATION_FLAG**: `Merge`<[`SIMULATION_FLAG`](namespaces/RPC.RPCSPEC010.API.md#simulation_flag), [`SIMULATION_FLAG`](namespaces/RPC.RPCSPEC09.API.md#simulation_flag)\>
+Ƭ **SIMULATION_FLAG**: `Merge`\<[`SIMULATION_FLAG`](namespaces/RPC.RPCSPEC010.API.md#simulation_flag), [`SIMULATION_FLAG`](namespaces/RPC.RPCSPEC09.API.md#simulation_flag)\>
 
 #### Defined in
 
@@ -2111,7 +2111,7 @@ price in fri of the layer 2 gas price.
 
 ### STATE_UPDATE
 
-Ƭ **STATE_UPDATE**: `Merge`<[`STATE_UPDATE`](namespaces/RPC.RPCSPEC010.API.md#state_update), [`STATE_UPDATE`](namespaces/RPC.RPCSPEC09.API.md#state_update)\>
+Ƭ **STATE_UPDATE**: `Merge`\<[`STATE_UPDATE`](namespaces/RPC.RPCSPEC010.API.md#state_update), [`STATE_UPDATE`](namespaces/RPC.RPCSPEC09.API.md#state_update)\>
 
 #### Defined in
 
@@ -2121,7 +2121,7 @@ price in fri of the layer 2 gas price.
 
 ### PRE_CONFIRMED_STATE_UPDATE
 
-Ƭ **PRE_CONFIRMED_STATE_UPDATE**: `Merge`<[`PRE_CONFIRMED_STATE_UPDATE`](namespaces/RPC.RPCSPEC010.API.md#pre_confirmed_state_update), [`PRE_CONFIRMED_STATE_UPDATE`](namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>
+Ƭ **PRE_CONFIRMED_STATE_UPDATE**: `Merge`\<[`PRE_CONFIRMED_STATE_UPDATE`](namespaces/RPC.RPCSPEC010.API.md#pre_confirmed_state_update), [`PRE_CONFIRMED_STATE_UPDATE`](namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>
 
 #### Defined in
 
@@ -2131,7 +2131,7 @@ price in fri of the layer 2 gas price.
 
 ### BlockWithTxHashes
 
-Ƭ **BlockWithTxHashes**: `Merge`<[`BlockWithTxHashes`](namespaces/RPC.RPCSPEC010.API.md#blockwithtxhashes), [`BlockWithTxHashes`](namespaces/RPC.RPCSPEC09.API.md#blockwithtxhashes)\>
+Ƭ **BlockWithTxHashes**: `Merge`\<[`BlockWithTxHashes`](namespaces/RPC.RPCSPEC010.API.md#blockwithtxhashes), [`BlockWithTxHashes`](namespaces/RPC.RPCSPEC09.API.md#blockwithtxhashes)\>
 
 #### Defined in
 
@@ -2141,7 +2141,7 @@ price in fri of the layer 2 gas price.
 
 ### ContractClassPayload
 
-Ƭ **ContractClassPayload**: `Merge`<[`ContractClass`](namespaces/RPC.RPCSPEC010.API.md#contractclass), [`ContractClass`](namespaces/RPC.RPCSPEC09.API.md#contractclass)\>
+Ƭ **ContractClassPayload**: `Merge`\<[`ContractClass`](namespaces/RPC.RPCSPEC010.API.md#contractclass), [`ContractClass`](namespaces/RPC.RPCSPEC09.API.md#contractclass)\>
 
 #### Defined in
 
@@ -2151,7 +2151,7 @@ price in fri of the layer 2 gas price.
 
 ### DeclaredTransaction
 
-Ƭ **DeclaredTransaction**: `Merge`<[`DeclaredTransaction`](namespaces/RPC.RPCSPEC010.API.md#declaredtransaction), [`DeclaredTransaction`](namespaces/RPC.RPCSPEC09.API.md#declaredtransaction)\>
+Ƭ **DeclaredTransaction**: `Merge`\<[`DeclaredTransaction`](namespaces/RPC.RPCSPEC010.API.md#declaredtransaction), [`DeclaredTransaction`](namespaces/RPC.RPCSPEC09.API.md#declaredtransaction)\>
 
 #### Defined in
 
@@ -2161,7 +2161,7 @@ price in fri of the layer 2 gas price.
 
 ### InvokedTransaction
 
-Ƭ **InvokedTransaction**: `Merge`<[`InvokedTransaction`](namespaces/RPC.RPCSPEC010.API.md#invokedtransaction), [`InvokedTransaction`](namespaces/RPC.RPCSPEC09.API.md#invokedtransaction)\>
+Ƭ **InvokedTransaction**: `Merge`\<[`InvokedTransaction`](namespaces/RPC.RPCSPEC010.API.md#invokedtransaction), [`InvokedTransaction`](namespaces/RPC.RPCSPEC09.API.md#invokedtransaction)\>
 
 #### Defined in
 
@@ -2171,7 +2171,7 @@ price in fri of the layer 2 gas price.
 
 ### DeployedAccountTransaction
 
-Ƭ **DeployedAccountTransaction**: `Merge`<[`DeployedAccountTransaction`](namespaces/RPC.RPCSPEC010.API.md#deployedaccounttransaction), [`DeployedAccountTransaction`](namespaces/RPC.RPCSPEC09.API.md#deployedaccounttransaction)\>
+Ƭ **DeployedAccountTransaction**: `Merge`\<[`DeployedAccountTransaction`](namespaces/RPC.RPCSPEC010.API.md#deployedaccounttransaction), [`DeployedAccountTransaction`](namespaces/RPC.RPCSPEC09.API.md#deployedaccounttransaction)\>
 
 #### Defined in
 
@@ -2215,7 +2215,7 @@ price in fri of the layer 2 gas price.
 
 ### EmittedEvent
 
-Ƭ **EmittedEvent**: `Merge`<[`EmittedEvent`](namespaces/RPC.RPCSPEC010.API.md#emittedevent), [`EmittedEvent`](namespaces/RPC.RPCSPEC09.API.md#emittedevent)\>
+Ƭ **EmittedEvent**: `Merge`\<[`EmittedEvent`](namespaces/RPC.RPCSPEC010.API.md#emittedevent), [`EmittedEvent`](namespaces/RPC.RPCSPEC09.API.md#emittedevent)\>
 
 #### Defined in
 
@@ -2225,7 +2225,7 @@ price in fri of the layer 2 gas price.
 
 ### Event
 
-Ƭ **Event**: `Merge`<[`Event`](namespaces/RPC.RPCSPEC010.API.md#event-1), [`Event`](namespaces/RPC.RPCSPEC09.API.md#event-1)\>
+Ƭ **Event**: `Merge`\<[`Event`](namespaces/RPC.RPCSPEC010.API.md#event-1), [`Event`](namespaces/RPC.RPCSPEC09.API.md#event-1)\>
 
 #### Defined in
 
@@ -2235,7 +2235,7 @@ price in fri of the layer 2 gas price.
 
 ### Receipt
 
-Ƭ **Receipt**: `Merge`<[`TransactionReceiptProductionBlock`](namespaces/RPC.RPCSPEC010.API.md#transactionreceiptproductionblock), [`TransactionReceiptProductionBlock`](namespaces/RPC.RPCSPEC09.API.md#transactionreceiptproductionblock)\>
+Ƭ **Receipt**: `Merge`\<[`TransactionReceiptProductionBlock`](namespaces/RPC.RPCSPEC010.API.md#transactionreceiptproductionblock), [`TransactionReceiptProductionBlock`](namespaces/RPC.RPCSPEC09.API.md#transactionreceiptproductionblock)\>
 
 #### Defined in
 
@@ -2245,7 +2245,7 @@ price in fri of the layer 2 gas price.
 
 ### FeeEstimate
 
-Ƭ **FeeEstimate**: `Merge`<[`FEE_ESTIMATE`](namespaces/RPC.RPCSPEC010.API.md#fee_estimate), [`FEE_ESTIMATE`](namespaces/RPC.RPCSPEC09.API.md#fee_estimate)\>
+Ƭ **FeeEstimate**: `Merge`\<[`FEE_ESTIMATE`](namespaces/RPC.RPCSPEC010.API.md#fee_estimate), [`FEE_ESTIMATE`](namespaces/RPC.RPCSPEC09.API.md#fee_estimate)\>
 
 original response from estimate fee without parsing
 
@@ -2267,7 +2267,7 @@ original response from estimate fee without parsing
 
 ### ResourceBounds
 
-Ƭ **ResourceBounds**: `Merge`<[`ResourceBounds`](namespaces/RPC.RPCSPEC010.API.md#resourcebounds), [`ResourceBounds`](namespaces/RPC.RPCSPEC09.API.md#resourcebounds)\>
+Ƭ **ResourceBounds**: `Merge`\<[`ResourceBounds`](namespaces/RPC.RPCSPEC010.API.md#resourcebounds), [`ResourceBounds`](namespaces/RPC.RPCSPEC09.API.md#resourcebounds)\>
 
 #### Defined in
 
@@ -2312,7 +2312,7 @@ Resource bounds in big number format
 
 ### SimulateTransaction
 
-Ƭ **SimulateTransaction**: `SimpleOneOf`<[`SimulateTransaction`](namespaces/RPC.RPCSPEC09.API.md#simulatetransaction), [`SimulateTransaction`](namespaces/RPC.RPCSPEC010.API.md#simulatetransaction)\>
+Ƭ **SimulateTransaction**: `SimpleOneOf`\<[`SimulateTransaction`](namespaces/RPC.RPCSPEC09.API.md#simulatetransaction), [`SimulateTransaction`](namespaces/RPC.RPCSPEC010.API.md#simulatetransaction)\>
 
 #### Defined in
 
@@ -2322,7 +2322,7 @@ Resource bounds in big number format
 
 ### SimulateTransactionResponse
 
-Ƭ **SimulateTransactionResponse**: `SimpleOneOf`<[`SimulateTransactionResponse`](namespaces/RPC.RPCSPEC09.API.md#simulatetransactionresponse), [`SimulateTransactionResponse`](namespaces/RPC.RPCSPEC010.API.md#simulatetransactionresponse)\>
+Ƭ **SimulateTransactionResponse**: `SimpleOneOf`\<[`SimulateTransactionResponse`](namespaces/RPC.RPCSPEC09.API.md#simulatetransactionresponse), [`SimulateTransactionResponse`](namespaces/RPC.RPCSPEC010.API.md#simulatetransactionresponse)\>
 
 #### Defined in
 
@@ -2332,7 +2332,7 @@ Resource bounds in big number format
 
 ### TransactionTrace
 
-Ƭ **TransactionTrace**: `SimpleOneOf`<[`TRANSACTION_TRACE`](namespaces/RPC.RPCSPEC09.API.md#transaction_trace), [`TRANSACTION_TRACE`](namespaces/RPC.RPCSPEC010.API.md#transaction_trace)\>
+Ƭ **TransactionTrace**: `SimpleOneOf`\<[`TRANSACTION_TRACE`](namespaces/RPC.RPCSPEC09.API.md#transaction_trace), [`TRANSACTION_TRACE`](namespaces/RPC.RPCSPEC010.API.md#transaction_trace)\>
 
 #### Defined in
 
@@ -2342,7 +2342,7 @@ Resource bounds in big number format
 
 ### TransactionWithHash
 
-Ƭ **TransactionWithHash**: `Merge`<[`TransactionWithHash`](namespaces/RPC.RPCSPEC010.API.md#transactionwithhash), [`TransactionWithHash`](namespaces/RPC.RPCSPEC09.API.md#transactionwithhash)\>
+Ƭ **TransactionWithHash**: `Merge`\<[`TransactionWithHash`](namespaces/RPC.RPCSPEC010.API.md#transactionwithhash), [`TransactionWithHash`](namespaces/RPC.RPCSPEC09.API.md#transactionwithhash)\>
 
 #### Defined in
 
@@ -2352,7 +2352,7 @@ Resource bounds in big number format
 
 ### TransactionReceipt
 
-Ƭ **TransactionReceipt**: `Merge`<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt), [`TransactionReceipt`](namespaces/RPC.RPCSPEC09.API.md#transactionreceipt)\>
+Ƭ **TransactionReceipt**: `Merge`\<[`TransactionReceipt`](namespaces/RPC.RPCSPEC010.API.md#transactionreceipt), [`TransactionReceipt`](namespaces/RPC.RPCSPEC09.API.md#transactionreceipt)\>
 
 #### Defined in
 
@@ -2372,7 +2372,7 @@ Resource bounds in big number format
 
 ### TXN_STATUS
 
-Ƭ **TXN_STATUS**: `Merge`<[`TXN_STATUS`](namespaces/RPC.RPCSPEC010.API.md#txn_status), [`TXN_STATUS`](namespaces/RPC.RPCSPEC09.API.md#txn_status)\>
+Ƭ **TXN_STATUS**: `Merge`\<[`TXN_STATUS`](namespaces/RPC.RPCSPEC010.API.md#txn_status), [`TXN_STATUS`](namespaces/RPC.RPCSPEC09.API.md#txn_status)\>
 
 #### Defined in
 
@@ -2382,7 +2382,7 @@ Resource bounds in big number format
 
 ### TXN_EXECUTION_STATUS
 
-Ƭ **TXN_EXECUTION_STATUS**: `Merge`<[`TXN_EXECUTION_STATUS`](namespaces/RPC.RPCSPEC010.API.md#txn_execution_status), [`TXN_EXECUTION_STATUS`](namespaces/RPC.RPCSPEC09.API.md#txn_execution_status)\>
+Ƭ **TXN_EXECUTION_STATUS**: `Merge`\<[`TXN_EXECUTION_STATUS`](namespaces/RPC.RPCSPEC010.API.md#txn_execution_status), [`TXN_EXECUTION_STATUS`](namespaces/RPC.RPCSPEC09.API.md#txn_execution_status)\>
 
 #### Defined in
 
@@ -2392,7 +2392,7 @@ Resource bounds in big number format
 
 ### TransactionStatus
 
-Ƭ **TransactionStatus**: `Merge`<[`TransactionStatus`](namespaces/RPC.RPCSPEC010.API.md#transactionstatus), [`TransactionStatus`](namespaces/RPC.RPCSPEC09.API.md#transactionstatus)\>
+Ƭ **TransactionStatus**: `Merge`\<[`TransactionStatus`](namespaces/RPC.RPCSPEC010.API.md#transactionstatus), [`TransactionStatus`](namespaces/RPC.RPCSPEC09.API.md#transactionstatus)\>
 
 #### Defined in
 
@@ -2426,7 +2426,7 @@ Resource bounds in big number format
 
 ### FEE_ESTIMATE
 
-Ƭ **FEE_ESTIMATE**: `Merge`<[`FEE_ESTIMATE`](namespaces/RPC.RPCSPEC010.API.md#fee_estimate), [`FEE_ESTIMATE`](namespaces/RPC.RPCSPEC09.API.md#fee_estimate)\>
+Ƭ **FEE_ESTIMATE**: `Merge`\<[`FEE_ESTIMATE`](namespaces/RPC.RPCSPEC010.API.md#fee_estimate), [`FEE_ESTIMATE`](namespaces/RPC.RPCSPEC09.API.md#fee_estimate)\>
 
 #### Defined in
 
@@ -2436,7 +2436,7 @@ Resource bounds in big number format
 
 ### EVENTS_CHUNK
 
-Ƭ **EVENTS_CHUNK**: `Merge`<[`EVENTS_CHUNK`](namespaces/RPC.RPCSPEC010.API.md#events_chunk), [`EVENTS_CHUNK`](namespaces/RPC.RPCSPEC09.API.md#events_chunk)\>
+Ƭ **EVENTS_CHUNK**: `Merge`\<[`EVENTS_CHUNK`](namespaces/RPC.RPCSPEC010.API.md#events_chunk), [`EVENTS_CHUNK`](namespaces/RPC.RPCSPEC09.API.md#events_chunk)\>
 
 #### Defined in
 
@@ -2541,7 +2541,7 @@ Configuration options for creating an Account instance
 
 ### AccountInvocationsFactoryDetails
 
-Ƭ **AccountInvocationsFactoryDetails**: \{ `versions`: \`$\{ETransactionVersion3}\`[] ; `nonce?`: [`BigNumberish`](modules.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](modules.md#blockidentifier) ; `skipValidate?`: `boolean` } & `Partial`<[`V3TransactionDetails`](modules.md#v3transactiondetails)\>
+Ƭ **AccountInvocationsFactoryDetails**: \{ `versions`: \`$\{ETransactionVersion3}\`[] ; `nonce?`: [`BigNumberish`](modules.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](modules.md#blockidentifier) ; `skipValidate?`: `boolean` } & `Partial`\<[`V3TransactionDetails`](modules.md#v3transactiondetails)\>
 
 #### Defined in
 
@@ -2572,10 +2572,10 @@ Configuration options for creating an Account instance
 
 #### Type declaration
 
-| Name      | Type                                                                                                                                                           |
-| :-------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `declare` | \{ `class_hash`: [`BigNumberish`](modules.md#bignumberish) } & `Partial`<[`DeclareTransactionReceiptResponse`](modules.md#declaretransactionreceiptresponse)\> |
-| `deploy`  | [`DeployContractUDCResponse`](modules.md#deploycontractudcresponse)                                                                                            |
+| Name      | Type                                                                                                                                                            |
+| :-------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `declare` | \{ `class_hash`: [`BigNumberish`](modules.md#bignumberish) } & `Partial`\<[`DeclareTransactionReceiptResponse`](modules.md#declaretransactionreceiptresponse)\> |
+| `deploy`  | [`DeployContractUDCResponse`](modules.md#deploycontractudcresponse)                                                                                             |
 
 #### Defined in
 
@@ -2585,7 +2585,7 @@ Configuration options for creating an Account instance
 
 ### SimulateTransactionDetails
 
-Ƭ **SimulateTransactionDetails**: \{ `nonce?`: [`BigNumberish`](modules.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](modules.md#blockidentifier) ; `skipValidate?`: `boolean` ; `skipExecute?`: `boolean` } & `Partial`<[`V3TransactionDetails`](modules.md#v3transactiondetails)\>
+Ƭ **SimulateTransactionDetails**: \{ `nonce?`: [`BigNumberish`](modules.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](modules.md#blockidentifier) ; `skipValidate?`: `boolean` ; `skipExecute?`: `boolean` } & `Partial`\<[`V3TransactionDetails`](modules.md#v3transactiondetails)\>
 
 #### Defined in
 
@@ -2633,7 +2633,7 @@ Configuration options for creating an Account instance
 
 ### CairoEnum
 
-Ƭ **CairoEnum**: [`CairoCustomEnum`](classes/CairoCustomEnum.md) \| [`CairoOption`](classes/CairoOption.md)<`any`\> \| [`CairoResult`](classes/CairoResult.md)<`any`, `any`\>
+Ƭ **CairoEnum**: [`CairoCustomEnum`](classes/CairoCustomEnum.md) \| [`CairoOption`](classes/CairoOption.md)\<`any`\> \| [`CairoResult`](classes/CairoResult.md)\<`any`, `any`\>
 
 #### Defined in
 
@@ -2643,7 +2643,7 @@ Configuration options for creating an Account instance
 
 ### ValidateType
 
-Ƭ **ValidateType**: `ValuesType`<typeof [`ValidateType`](modules.md#validatetype-1)\>
+Ƭ **ValidateType**: `ValuesType`\<typeof [`ValidateType`](modules.md#validatetype-1)\>
 
 #### Defined in
 
@@ -2655,7 +2655,7 @@ Configuration options for creating an Account instance
 
 ### Uint
 
-Ƭ **Uint**: `ValuesType`<typeof [`Uint`](modules.md#uint-1)\>
+Ƭ **Uint**: `ValuesType`\<typeof [`Uint`](modules.md#uint-1)\>
 
 #### Defined in
 
@@ -2667,7 +2667,7 @@ Configuration options for creating an Account instance
 
 ### Int
 
-Ƭ **Int**: `ValuesType`<typeof [`Int`](modules.md#int-1)\>
+Ƭ **Int**: `ValuesType`\<typeof [`Int`](modules.md#int-1)\>
 
 #### Defined in
 
@@ -2679,7 +2679,7 @@ Configuration options for creating an Account instance
 
 ### Literal
 
-Ƭ **Literal**: `ValuesType`<typeof [`Literal`](modules.md#literal-1)\>
+Ƭ **Literal**: `ValuesType`\<typeof [`Literal`](modules.md#literal-1)\>
 
 #### Defined in
 
@@ -2691,7 +2691,7 @@ Configuration options for creating an Account instance
 
 ### AsyncContractFunction
 
-Ƭ **AsyncContractFunction**<`T`\>: (...`args`: [`ArgsOrCalldataWithOptions`](modules.md#argsorcalldatawithoptions)) => `Promise`<`T`\>
+Ƭ **AsyncContractFunction**\<`T`\>: (...`args`: [`ArgsOrCalldataWithOptions`](modules.md#argsorcalldatawithoptions)) => `Promise`\<`T`\>
 
 #### Type parameters
 
@@ -2701,7 +2701,7 @@ Configuration options for creating an Account instance
 
 #### Type declaration
 
-▸ (`...args`): `Promise`<`T`\>
+▸ (`...args`): `Promise`\<`T`\>
 
 ##### Parameters
 
@@ -2711,7 +2711,7 @@ Configuration options for creating an Account instance
 
 ##### Returns
 
-`Promise`<`T`\>
+`Promise`\<`T`\>
 
 #### Defined in
 
@@ -2803,7 +2803,7 @@ Configuration options for creating an Account instance
 
 ### ExecuteOptions
 
-Ƭ **ExecuteOptions**: `Pick`<[`CommonContractOptions`](modules.md#commoncontractoptions), `"parseRequest"`\> & \{ `signature?`: [`Signature`](modules.md#signature) ; `salt?`: `string` ; `paymasterDetails?`: [`PaymasterDetails`](interfaces/PaymasterDetails.md) ; `maxFeeInGasToken?`: [`BigNumberish`](modules.md#bignumberish) ; `waitForTransaction?`: `boolean` } & `Partial`<[`UniversalDetails`](interfaces/UniversalDetails.md)\>
+Ƭ **ExecuteOptions**: `Pick`\<[`CommonContractOptions`](modules.md#commoncontractoptions), `"parseRequest"`\> & \{ `signature?`: [`Signature`](modules.md#signature) ; `salt?`: `string` ; `paymasterDetails?`: [`PaymasterDetails`](interfaces/PaymasterDetails.md) ; `maxFeeInGasToken?`: [`BigNumberish`](modules.md#bignumberish) ; `waitForTransaction?`: `boolean` } & `Partial`\<[`UniversalDetails`](interfaces/UniversalDetails.md)\>
 
 #### Defined in
 
@@ -2813,7 +2813,7 @@ Configuration options for creating an Account instance
 
 ### CallOptions
 
-Ƭ **CallOptions**: [`CommonContractOptions`](modules.md#commoncontractoptions) & \{ `formatResponse?`: [`FormatResponse`](modules.md#formatresponse) } & `Pick`<[`UniversalDetails`](interfaces/UniversalDetails.md), `"blockIdentifier"` \| `"version"`\>
+Ƭ **CallOptions**: [`CommonContractOptions`](modules.md#commoncontractoptions) & \{ `formatResponse?`: [`FormatResponse`](modules.md#formatresponse) } & `Pick`\<[`UniversalDetails`](interfaces/UniversalDetails.md), `"blockIdentifier"` \| `"version"`\>
 
 #### Defined in
 
@@ -2977,7 +2977,7 @@ const formatAnswer = { id: 'number', description: 'string' };
 
 ### OutsideExecutionVersion
 
-Ƭ **OutsideExecutionVersion**: `ValuesType`<typeof [`OutsideExecutionVersion`](modules.md#outsideexecutionversion-1)\>
+Ƭ **OutsideExecutionVersion**: `ValuesType`\<typeof [`OutsideExecutionVersion`](modules.md#outsideexecutionversion-1)\>
 
 #### Defined in
 
@@ -3039,7 +3039,7 @@ const formatAnswer = { id: 'number', description: 'string' };
 
 ### V3DeployAccountSignerDetails
 
-Ƭ **V3DeployAccountSignerDetails**: `Required`<[`DeployAccountContractPayload`](modules.md#deployaccountcontractpayload)\> & [`V3TransactionDetails`](modules.md#v3transactiondetails) & \{ `contractAddress`: [`BigNumberish`](modules.md#bignumberish) ; `chainId`: [`StarknetChainId`](namespaces/constants.md#starknetchainid) ; `version`: \`$\{ETransactionVersion3}\` }
+Ƭ **V3DeployAccountSignerDetails**: `Required`\<[`DeployAccountContractPayload`](modules.md#deployaccountcontractpayload)\> & [`V3TransactionDetails`](modules.md#v3transactiondetails) & \{ `contractAddress`: [`BigNumberish`](modules.md#bignumberish) ; `chainId`: [`StarknetChainId`](namespaces/constants.md#starknetchainid) ; `version`: \`$\{ETransactionVersion3}\` }
 
 #### Defined in
 
@@ -3122,7 +3122,7 @@ const formatAnswer = { id: 'number', description: 'string' };
 
 ### TransactionReceiptCallbacksDefault
 
-Ƭ **TransactionReceiptCallbacksDefault**: `Partial`<[`TransactionReceiptCallbacksDefined`](modules.md#transactionreceiptcallbacksdefined)\> & \{ `_`: () => `void` }
+Ƭ **TransactionReceiptCallbacksDefault**: `Partial`\<[`TransactionReceiptCallbacksDefined`](modules.md#transactionreceiptcallbacksdefined)\> & \{ `_`: () => `void` }
 
 #### Defined in
 
@@ -3530,7 +3530,7 @@ Interface for Deployer contract payload
 
 ### BatchClientOptions
 
-Ƭ **BatchClientOptions**<`T`\>: `Object`
+Ƭ **BatchClientOptions**\<`T`\>: `Object`
 
 #### Type parameters
 
@@ -3540,13 +3540,13 @@ Interface for Deployer contract payload
 
 #### Type declaration
 
-| Name         | Type                                                                                   |
-| :----------- | :------------------------------------------------------------------------------------- |
-| `nodeUrl`    | `string`                                                                               |
-| `headers`    | `object`                                                                               |
-| `interval`   | `number`                                                                               |
-| `baseFetch`  | `NonNullable`<[`RpcProviderOptions`](modules.md#rpcprovideroptions)[``"baseFetch"``]\> |
-| `rpcMethods` | `T`                                                                                    |
+| Name         | Type                                                                                    |
+| :----------- | :-------------------------------------------------------------------------------------- |
+| `nodeUrl`    | `string`                                                                                |
+| `headers`    | `object`                                                                                |
+| `interval`   | `number`                                                                                |
+| `baseFetch`  | `NonNullable`\<[`RpcProviderOptions`](modules.md#rpcprovideroptions)[``"baseFetch"``]\> |
+| `rpcMethods` | `T`                                                                                     |
 
 #### Defined in
 
@@ -3563,10 +3563,10 @@ Configure parsing strategy for each abi type
 
 #### Type declaration
 
-| Name       | Type                                                                                                       |
-| :--------- | :--------------------------------------------------------------------------------------------------------- |
-| `request`  | `Record`<[`AbiEntryType`](modules.md#abientrytype), (`val`: `unknown`) => `any`\>                          |
-| `response` | `Record`<[`AbiEntryType`](modules.md#abientrytype), (`responseIterator`: `Iterator`<`string`\>) => `any`\> |
+| Name       | Type                                                                                                         |
+| :--------- | :----------------------------------------------------------------------------------------------------------- |
+| `request`  | `Record`\<[`AbiEntryType`](modules.md#abientrytype), (`val`: `unknown`) => `any`\>                           |
+| `response` | `Record`\<[`AbiEntryType`](modules.md#abientrytype), (`responseIterator`: `Iterator`\<`string`\>) => `any`\> |
 
 #### Defined in
 
@@ -3576,7 +3576,7 @@ Configure parsing strategy for each abi type
 
 ### CairoEnumRaw
 
-Ƭ **CairoEnumRaw**: `Record`<`string`, `any`\>
+Ƭ **CairoEnumRaw**: `Record`\<`string`, `any`\>
 
 #### Defined in
 
@@ -3586,7 +3586,7 @@ Configure parsing strategy for each abi type
 
 ### CairoOptionVariant
 
-Ƭ **CairoOptionVariant**: `ValuesType`<typeof [`CairoOptionVariant`](modules.md#cairooptionvariant-1)\>
+Ƭ **CairoOptionVariant**: `ValuesType`\<typeof [`CairoOptionVariant`](modules.md#cairooptionvariant-1)\>
 
 #### Defined in
 
@@ -3598,7 +3598,7 @@ Configure parsing strategy for each abi type
 
 ### CairoResultVariant
 
-Ƭ **CairoResultVariant**: `ValuesType`<typeof [`CairoResultVariant`](modules.md#cairoresultvariant-1)\>
+Ƭ **CairoResultVariant**: `ValuesType`\<typeof [`CairoResultVariant`](modules.md#cairoresultvariant-1)\>
 
 #### Defined in
 
@@ -3610,7 +3610,7 @@ Configure parsing strategy for each abi type
 
 ### LogLevelIndex
 
-Ƭ **LogLevelIndex**: `ValuesType`<typeof [`LogLevelIndex`](modules.md#loglevelindex-1)\>
+Ƭ **LogLevelIndex**: `ValuesType`\<typeof [`LogLevelIndex`](modules.md#loglevelindex-1)\>
 
 #### Defined in
 
@@ -4211,18 +4211,18 @@ Configure parsing strategy for each abi type
 
 #### Type declaration
 
-| Name                                   | Type                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| :------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `request`                              | \{ `core::bytes_31::bytes31`: (`val`: `unknown`) => `string`[] ; `core::byte_array::ByteArray`: (`val`: `unknown`) => `string`[] ; `core::felt252`: (`val`: `unknown`) => `string`[] ; `core::integer::u256`: (`val`: `unknown`) => `string`[] }                                                                                                                                                                             |
-| `request.core::bytes_31::bytes31`      | (`val`: `unknown`) => `string`[]                                                                                                                                                                                                                                                                                                                                                                                             |
-| `request.core::byte_array::ByteArray`  | (`val`: `unknown`) => `string`[]                                                                                                                                                                                                                                                                                                                                                                                             |
-| `request.core::felt252`                | (`val`: `unknown`) => `string`[]                                                                                                                                                                                                                                                                                                                                                                                             |
-| `request.core::integer::u256`          | (`val`: `unknown`) => `string`[]                                                                                                                                                                                                                                                                                                                                                                                             |
-| `response`                             | \{ `core::bytes_31::bytes31`: (`responseIterator`: `Iterator`<`string`, `any`, `undefined`\>) => `string` ; `core::byte_array::ByteArray`: (`responseIterator`: `Iterator`<`string`, `any`, `undefined`\>) => `string` ; `core::felt252`: (`responseIterator`: `Iterator`<`string`, `any`, `undefined`\>) => `bigint` ; `core::integer::u256`: (`responseIterator`: `Iterator`<`string`, `any`, `undefined`\>) => `bigint` } |
-| `response.core::bytes_31::bytes31`     | (`responseIterator`: `Iterator`<`string`, `any`, `undefined`\>) => `string`                                                                                                                                                                                                                                                                                                                                                  |
-| `response.core::byte_array::ByteArray` | (`responseIterator`: `Iterator`<`string`, `any`, `undefined`\>) => `string`                                                                                                                                                                                                                                                                                                                                                  |
-| `response.core::felt252`               | (`responseIterator`: `Iterator`<`string`, `any`, `undefined`\>) => `bigint`                                                                                                                                                                                                                                                                                                                                                  |
-| `response.core::integer::u256`         | (`responseIterator`: `Iterator`<`string`, `any`, `undefined`\>) => `bigint`                                                                                                                                                                                                                                                                                                                                                  |
+| Name                                   | Type                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| :------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `request`                              | \{ `core::bytes_31::bytes31`: (`val`: `unknown`) => `string`[] ; `core::byte_array::ByteArray`: (`val`: `unknown`) => `string`[] ; `core::felt252`: (`val`: `unknown`) => `string`[] ; `core::integer::u256`: (`val`: `unknown`) => `string`[] }                                                                                                                                                                                 |
+| `request.core::bytes_31::bytes31`      | (`val`: `unknown`) => `string`[]                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `request.core::byte_array::ByteArray`  | (`val`: `unknown`) => `string`[]                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `request.core::felt252`                | (`val`: `unknown`) => `string`[]                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `request.core::integer::u256`          | (`val`: `unknown`) => `string`[]                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `response`                             | \{ `core::bytes_31::bytes31`: (`responseIterator`: `Iterator`\<`string`, `any`, `undefined`\>) => `string` ; `core::byte_array::ByteArray`: (`responseIterator`: `Iterator`\<`string`, `any`, `undefined`\>) => `string` ; `core::felt252`: (`responseIterator`: `Iterator`\<`string`, `any`, `undefined`\>) => `bigint` ; `core::integer::u256`: (`responseIterator`: `Iterator`\<`string`, `any`, `undefined`\>) => `bigint` } |
+| `response.core::bytes_31::bytes31`     | (`responseIterator`: `Iterator`\<`string`, `any`, `undefined`\>) => `string`                                                                                                                                                                                                                                                                                                                                                     |
+| `response.core::byte_array::ByteArray` | (`responseIterator`: `Iterator`\<`string`, `any`, `undefined`\>) => `string`                                                                                                                                                                                                                                                                                                                                                     |
+| `response.core::felt252`               | (`responseIterator`: `Iterator`\<`string`, `any`, `undefined`\>) => `bigint`                                                                                                                                                                                                                                                                                                                                                     |
+| `response.core::integer::u256`         | (`responseIterator`: `Iterator`\<`string`, `any`, `undefined`\>) => `bigint`                                                                                                                                                                                                                                                                                                                                                     |
 
 #### Defined in
 
@@ -4337,7 +4337,7 @@ FATAL: 1,
 
 ### getTipStatsFromBlocks
 
-▸ **getTipStatsFromBlocks**(`provider`, `blockIdentifier?`, `options?`): `Promise`<[`TipEstimate`](modules.md#tipestimate)\>
+▸ **getTipStatsFromBlocks**(`provider`, `blockIdentifier?`, `options?`): `Promise`\<[`TipEstimate`](modules.md#tipestimate)\>
 
 Analyzes tip statistics from recent blocks to help determine optimal tip amounts.
 
@@ -4362,7 +4362,7 @@ appropriate tip for new transactions.
 
 #### Returns
 
-`Promise`<[`TipEstimate`](modules.md#tipestimate)\>
+`Promise`\<[`TipEstimate`](modules.md#tipestimate)\>
 
 Promise resolving to TipEstimate object
 
@@ -4430,7 +4430,7 @@ const historicalTips = await getTipStatsFromBlocks(provider, blockNumber);
 
 ### verifyMessageInStarknet
 
-▸ **verifyMessageInStarknet**(`provider`, `message`, `signature`, `accountAddress`, `signatureVerificationFunctionName?`, `signatureVerificationResponse?`): `Promise`<`boolean`\>
+▸ **verifyMessageInStarknet**(`provider`, `message`, `signature`, `accountAddress`, `signatureVerificationFunctionName?`, `signatureVerificationResponse?`): `Promise`\<`boolean`\>
 
 Verify in Starknet a signature of a TypedData object or of a given hash.
 
@@ -4450,7 +4450,7 @@ Verify in Starknet a signature of a TypedData object or of a given hash.
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 ```typescript
 const myTypedMessage: TypedMessage = .... ;
@@ -4470,7 +4470,7 @@ const result2 = await myRpcProvider.verifyMessageInStarknet(messageHash, sign, a
 
 ### getGasPrices
 
-▸ **getGasPrices**(`channel`, `blockIdentifier?`): `Promise`<[`GasPrices`](modules.md#gasprices)\>
+▸ **getGasPrices**(`channel`, `blockIdentifier?`): `Promise`\<[`GasPrices`](modules.md#gasprices)\>
 
 #### Parameters
 
@@ -4481,7 +4481,7 @@ const result2 = await myRpcProvider.verifyMessageInStarknet(messageHash, sign, a
 
 #### Returns
 
-`Promise`<[`GasPrices`](modules.md#gasprices)\>
+`Promise`\<[`GasPrices`](modules.md#gasprices)\>
 
 #### Defined in
 
@@ -4502,7 +4502,7 @@ EIP2645 path = 2645'/starknet/application/0/accountId/0
 
 | Name               | Type     | Default value | Description                      |
 | :----------------- | :------- | :------------ | :------------------------------- |
-| `accountId`        | `number` | `undefined`   | Id of account. < 2\*\*31.        |
+| `accountId`        | `number` | `undefined`   | Id of account. \< 2\*\*31.       |
 | `applicationName?` | `string` | `'LedgerW'`   | utf8 string of application name. |
 
 #### Returns
@@ -4540,7 +4540,7 @@ EIP2645 path = 2645'/starknet'/application'/0'/accountId'/0
 
 | Name               | Type     | Default value | Description                      |
 | :----------------- | :------- | :------------ | :------------------------------- |
-| `accountId`        | `number` | `undefined`   | Id of account. < 2\*\*31.        |
+| `accountId`        | `number` | `undefined`   | Id of account. \< 2\*\*31.       |
 | `applicationName?` | `string` | `'LedgerW'`   | utf8 string of application name. |
 
 #### Returns
@@ -4806,13 +4806,13 @@ versions like '0.0.1000' and '0.1.0'.
 
 `number`
 
--1 if a < b, 0 if a === b, 1 if a > b
+-1 if a \< b, 0 if a === b, 1 if a > b
 
 **`Example`**
 
 ```typescript
 const result1 = compareVersions('0.0.9', '0.0.10');
-// result1 = -1 (0.0.9 < 0.0.10)
+// result1 = -1 (0.0.9 \< 0.0.10)
 
 const result2 = compareVersions('0.1.0', '0.0.1000');
 // result2 = 1 (0.1.0 > 0.0.1000, correctly different!)
@@ -5123,7 +5123,7 @@ Parse one field of the calldata by using input field from the abi for that metho
 | Name             | Type                                                  |
 | :--------------- | :---------------------------------------------------- |
 | `«destructured»` | `Object`                                              |
-| › `argsIterator` | `Iterator`<`any`, `any`, `undefined`\>                |
+| › `argsIterator` | `Iterator`\<`any`, `any`, `undefined`\>               |
 | › `input`        | [`AbiEntry`](modules.md#abientry)                     |
 | › `structs`      | [`AbiStructs`](modules.md#abistructs)                 |
 | › `enums`        | [`AbiEnums`](modules.md#abienums)                     |

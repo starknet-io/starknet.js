@@ -16,7 +16,7 @@ custom_edit_url: null
 
 ### constructor
 
-• **new BatchClient**<`T`\>(`options`): [`BatchClient`](BatchClient.md)<`T`\>
+• **new BatchClient**\<`T`\>(`options`): [`BatchClient`](BatchClient.md)\<`T`\>
 
 #### Type parameters
 
@@ -26,13 +26,13 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name      | Type                                                           |
-| :-------- | :------------------------------------------------------------- |
-| `options` | [`BatchClientOptions`](../modules.md#batchclientoptions)<`T`\> |
+| Name      | Type                                                            |
+| :-------- | :-------------------------------------------------------------- |
+| `options` | [`BatchClientOptions`](../modules.md#batchclientoptions)\<`T`\> |
 
 #### Returns
 
-[`BatchClient`](BatchClient.md)<`T`\>
+[`BatchClient`](BatchClient.md)\<`T`\>
 
 #### Defined in
 
@@ -82,7 +82,7 @@ custom_edit_url: null
 
 ### pendingRequests
 
-• `Private` **pendingRequests**: `Record`<`string` \| `number`, [`RequestBody`](../namespaces/RPC.JRPC.md#requestbody)\> = `{}`
+• `Private` **pendingRequests**: `Record`\<`string` \| `number`, [`RequestBody`](../namespaces/RPC.JRPC.md#requestbody)\> = `{}`
 
 #### Defined in
 
@@ -92,7 +92,7 @@ custom_edit_url: null
 
 ### batchPromises
 
-• `Private` **batchPromises**: `Record`<`string` \| `number`, `Promise`<[`ResponseBody`](../namespaces/RPC.JRPC.md#responsebody)[]\>\> = `{}`
+• `Private` **batchPromises**: `Record`\<`string` \| `number`, `Promise`\<[`ResponseBody`](../namespaces/RPC.JRPC.md#responsebody)[]\>\> = `{}`
 
 #### Defined in
 
@@ -112,7 +112,7 @@ custom_edit_url: null
 
 ### delayPromise
 
-• `Private` `Optional` **delayPromise**: `Promise`<`void`\>
+• `Private` `Optional` **delayPromise**: `Promise`\<`void`\>
 
 #### Defined in
 
@@ -140,11 +140,11 @@ custom_edit_url: null
 
 ### baseFetch
 
-• `Private` **baseFetch**: (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`<`Response`\>
+• `Private` **baseFetch**: (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`\<`Response`\>
 
 #### Type declaration
 
-▸ (`input`, `init?`): `Promise`<`Response`\>
+▸ (`input`, `init?`): `Promise`\<`Response`\>
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/fetch)
 
@@ -157,7 +157,7 @@ custom_edit_url: null
 
 ##### Returns
 
-`Promise`<`Response`\>
+`Promise`\<`Response`\>
 
 #### Defined in
 
@@ -177,11 +177,11 @@ custom_edit_url: null
 
 ### wait
 
-▸ **wait**(): `Promise`<`void`\>
+▸ **wait**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
@@ -191,7 +191,7 @@ custom_edit_url: null
 
 ### addPendingRequest
 
-▸ **addPendingRequest**<`M`\>(`method`, `params?`, `id?`): `string` \| `number`
+▸ **addPendingRequest**\<`M`\>(`method`, `params?`, `id?`): `string` \| `number`
 
 #### Type parameters
 
@@ -219,7 +219,7 @@ custom_edit_url: null
 
 ### sendBatch
 
-▸ **sendBatch**(`requests`): `Promise`<`any`\>
+▸ **sendBatch**(`requests`): `Promise`\<`any`\>
 
 #### Parameters
 
@@ -229,7 +229,7 @@ custom_edit_url: null
 
 #### Returns
 
-`Promise`<`any`\>
+`Promise`\<`any`\>
 
 #### Defined in
 
@@ -239,7 +239,7 @@ custom_edit_url: null
 
 ### fetch
 
-▸ **fetch**<`M`, `TResponse`\>(`method`, `params?`, `id?`): `Promise`<`TResponse`\>
+▸ **fetch**\<`M`, `TResponse`\>(`method`, `params?`, `id?`): `Promise`\<`TResponse`\>
 
 Automatically batches and fetches JSON-RPC calls in a single request.
 
@@ -260,7 +260,7 @@ Automatically batches and fetches JSON-RPC calls in a single request.
 
 #### Returns
 
-`Promise`<`TResponse`\>
+`Promise`\<`TResponse`\>
 
 JSON-RPC Response
 

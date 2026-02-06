@@ -197,7 +197,7 @@ const contractEvents = getEmittedEvents(receipt, contractAddress);
 
 ### filterEventsByAddress
 
-▸ **filterEventsByAddress**<`T`\>(`events`, `contractAddress`): `T`[]
+▸ **filterEventsByAddress**`<T>(events`, `contractAddress`): `T`[]
 
 Filter events by contract address
 

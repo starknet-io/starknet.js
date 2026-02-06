@@ -167,7 +167,7 @@ Hexadecimal-string array
 
 ### AllowArray
 
-Ƭ **AllowArray**<`T`\>: `T` \| `T`[]
+Ƭ **AllowArray**\<`T`\>: `T` \| `T`[]
 
 #### Type parameters
 
@@ -183,7 +183,7 @@ Hexadecimal-string array
 
 ### OptionalPayload
 
-Ƭ **OptionalPayload**<`T`\>: \{ `payload`: `T` } \| `T`
+Ƭ **OptionalPayload**\<`T`\>: \{ `payload`: `T` } \| `T`
 
 #### Type parameters
 
@@ -281,7 +281,7 @@ Hexadecimal-string array
 
 ### DeployAccountContractTransaction
 
-Ƭ **DeployAccountContractTransaction**: `Omit`<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload), `"contractAddress"`\> & \{ `signature?`: [`Signature`](types.md#signature) }
+Ƭ **DeployAccountContractTransaction**: `Omit`\<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload), `"contractAddress"`\> & \{ `signature?`: [`Signature`](types.md#signature) }
 
 #### Defined in
 
@@ -341,7 +341,7 @@ DeclareContractPayload with classHash or contract defined
 
 ### DeclareAndDeployContractPayload
 
-Ƭ **DeclareAndDeployContractPayload**: `Omit`<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload), `"classHash"`\> & [`DeclareContractPayload`](types.md#declarecontractpayload)
+Ƭ **DeclareAndDeployContractPayload**: `Omit`\<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload), `"classHash"`\> & [`DeclareContractPayload`](types.md#declarecontractpayload)
 
 #### Defined in
 
@@ -428,7 +428,7 @@ DeclareContractPayload with classHash or contract defined
 
 ### InvocationsDetails
 
-Ƭ **InvocationsDetails**: \{ `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `maxFee?`: [`BigNumberish`](types.md#bignumberish) ; `version?`: [`BigNumberish`](types.md#bignumberish) } & `Partial`<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
+Ƭ **InvocationsDetails**: \{ `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `maxFee?`: [`BigNumberish`](types.md#bignumberish) ; `version?`: [`BigNumberish`](types.md#bignumberish) } & `Partial`\<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
 
 #### Defined in
 
@@ -492,7 +492,7 @@ Contain all additional details params
 
 ### TransactionType
 
-Ƭ **TransactionType**: `ValuesType`<typeof [`TransactionType`](types.md#transactiontype-1)\>
+Ƭ **TransactionType**: `ValuesType`\<typeof [`TransactionType`](types.md#transactiontype-1)\>
 
 #### Defined in
 
@@ -504,7 +504,7 @@ Contain all additional details params
 
 ### TransactionFinalityStatus
 
-Ƭ **TransactionFinalityStatus**: `ValuesType`<typeof [`TransactionFinalityStatus`](types.md#transactionfinalitystatus-1)\>
+Ƭ **TransactionFinalityStatus**: `ValuesType`\<typeof [`TransactionFinalityStatus`](types.md#transactionfinalitystatus-1)\>
 
 #### Defined in
 
@@ -516,7 +516,7 @@ Contain all additional details params
 
 ### TransactionExecutionStatus
 
-Ƭ **TransactionExecutionStatus**: `ValuesType`<typeof [`TransactionExecutionStatus`](types.md#transactionexecutionstatus-1)\>
+Ƭ **TransactionExecutionStatus**: `ValuesType`\<typeof [`TransactionExecutionStatus`](types.md#transactionexecutionstatus-1)\>
 
 #### Defined in
 
@@ -528,7 +528,7 @@ Contain all additional details params
 
 ### BlockStatus
 
-Ƭ **BlockStatus**: `ValuesType`<typeof [`BlockStatus`](types.md#blockstatus-1)\>
+Ƭ **BlockStatus**: `ValuesType`\<typeof [`BlockStatus`](types.md#blockstatus-1)\>
 
 #### Defined in
 
@@ -540,7 +540,7 @@ Contain all additional details params
 
 ### BlockTag
 
-Ƭ **BlockTag**: `ValuesType`<typeof [`BlockTag`](types.md#blocktag-1)\>
+Ƭ **BlockTag**: `ValuesType`\<typeof [`BlockTag`](types.md#blocktag-1)\>
 
 #### Defined in
 
@@ -614,7 +614,7 @@ Complete invocations array with account details (internal type from account -> p
 
 ### Invocations
 
-Ƭ **Invocations**: (\{ `type`: typeof [`DECLARE`](types.md#declare) } & [`OptionalPayload`](types.md#optionalpayload)<[`DeclareContractPayload`](types.md#declarecontractpayload)\> \| \{ `type`: typeof [`DEPLOY`](types.md#deploy) } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload)\>\> \| \{ `type`: typeof [`DEPLOY_ACCOUNT`](types.md#deploy_account) } & [`OptionalPayload`](types.md#optionalpayload)<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> \| \{ `type`: typeof [`INVOKE`](types.md#invoke) } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`Call`](types.md#call)\>\>)[]
+Ƭ **Invocations**: (\{ `type`: typeof [`DECLARE`](types.md#declare) } & [`OptionalPayload`](types.md#optionalpayload)\<[`DeclareContractPayload`](types.md#declarecontractpayload)\> \| \{ `type`: typeof [`DEPLOY`](types.md#deploy) } & [`OptionalPayload`](types.md#optionalpayload)\<[`AllowArray`](types.md#allowarray)\<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload)\>\> \| \{ `type`: typeof [`DEPLOY_ACCOUNT`](types.md#deploy_account) } & [`OptionalPayload`](types.md#optionalpayload)\<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> \| \{ `type`: typeof [`INVOKE`](types.md#invoke) } & [`OptionalPayload`](types.md#optionalpayload)\<[`AllowArray`](types.md#allowarray)\<[`Call`](types.md#call)\>\>)[]
 
 Invocations array user provide to bulk method (simulate)
 
@@ -799,7 +799,7 @@ Compressed or decompressed Cairo0 or Cairo1 Contract
 
 ### EntryPointType
 
-Ƭ **EntryPointType**: `ValuesType`<typeof [`EntryPointType`](types.md#entrypointtype-1)\>
+Ƭ **EntryPointType**: `ValuesType`\<typeof [`EntryPointType`](types.md#entrypointtype-1)\>
 
 #### Defined in
 
@@ -811,7 +811,7 @@ Compressed or decompressed Cairo0 or Cairo1 Contract
 
 ### Abi
 
-Ƭ **Abi**: `ReadonlyArray`<[`FunctionAbi`](types.md#functionabi) \| [`AbiEvent`](types.md#abievent) \| [`AbiStruct`](types.md#abistruct) \| [`InterfaceAbi`](types.md#interfaceabi) \| `any`\>
+Ƭ **Abi**: `ReadonlyArray`\<[`FunctionAbi`](types.md#functionabi) \| [`AbiEvent`](types.md#abievent) \| [`AbiStruct`](types.md#abistruct) \| [`InterfaceAbi`](types.md#interfaceabi) \| `any`\>
 
 ABI
 
@@ -1070,7 +1070,7 @@ format produced after compressing 'program' property
 
 ### LegacyCompiledContract
 
-Ƭ **LegacyCompiledContract**: `Omit`<[`LegacyContractClass`](types.md#legacycontractclass), `"program"`\> & \{ `program`: [`Program`](../interfaces/types.Program.md) }
+Ƭ **LegacyCompiledContract**: `Omit`\<[`LegacyContractClass`](types.md#legacycontractclass), `"program"`\> & \{ `program`: [`Program`](../interfaces/types.Program.md) }
 
 format produced after compiling .cairo to .json
 
@@ -1104,7 +1104,7 @@ SUBTYPES
 
 ### Hint
 
-Ƭ **Hint**: `Record`<`string`, `unknown`\>
+Ƭ **Hint**: `Record`\<`string`, `unknown`\>
 
 #### Defined in
 
@@ -1198,7 +1198,7 @@ sierra_program is hex array
 
 ### SierraContractClass
 
-Ƭ **SierraContractClass**: `Omit`<[`CompiledSierra`](types.md#compiledsierra), `"abi"` \| `"sierra_program_debug_info"`\> & \{ `sierra_program`: `string` ; `abi`: `string` }
+Ƭ **SierraContractClass**: `Omit`\<[`CompiledSierra`](types.md#compiledsierra), `"abi"` \| `"sierra_program_debug_info"`\> & \{ `sierra_program`: `string` ; `abi`: `string` }
 
 format produced after compressing 'sierra_program', stringifies 'abi' property and omit sierra_program_debug_info
 
@@ -1341,7 +1341,7 @@ SUBTYPES
 
 ### Block
 
-Ƭ **Block**: [`Simplify`](types.md#simplify)<[`BLOCK_WITH_TX_HASHES`](types.RPC.RPCSPEC08.API.md#block_with_tx_hashes)\>
+Ƭ **Block**: [`Simplify`](types.md#simplify)\<[`BLOCK_WITH_TX_HASHES`](types.RPC.RPCSPEC08.API.md#block_with_tx_hashes)\>
 
 #### Defined in
 
@@ -1351,7 +1351,7 @@ SUBTYPES
 
 ### PendingBlock
 
-Ƭ **PendingBlock**: [`Simplify`](types.md#simplify)<[`PENDING_BLOCK_WITH_TX_HASHES`](types.RPC.RPCSPEC08.API.md#pending_block_with_tx_hashes)\>
+Ƭ **PendingBlock**: [`Simplify`](types.md#simplify)\<[`PENDING_BLOCK_WITH_TX_HASHES`](types.RPC.RPCSPEC08.API.md#pending_block_with_tx_hashes)\>
 
 #### Defined in
 
@@ -1361,7 +1361,7 @@ SUBTYPES
 
 ### GetBlockResponse
 
-Ƭ **GetBlockResponse**: [`Simplify`](types.md#simplify)<[`BlockWithTxHashes`](types.RPC.RPCSPEC08.API.md#blockwithtxhashes)\>
+Ƭ **GetBlockResponse**: [`Simplify`](types.md#simplify)\<[`BlockWithTxHashes`](types.RPC.RPCSPEC08.API.md#blockwithtxhashes)\>
 
 #### Defined in
 
@@ -1381,7 +1381,7 @@ SUBTYPES
 
 ### SuccessfulTransactionReceiptResponse
 
-Ƭ **SuccessfulTransactionReceiptResponse**: [`IsSucceeded`](types.RPC.RPCSPEC08.API.md#issucceeded)<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt)\>
+Ƭ **SuccessfulTransactionReceiptResponse**: [`IsSucceeded`](types.RPC.RPCSPEC08.API.md#issucceeded)\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt)\>
 
 #### Defined in
 
@@ -1391,7 +1391,7 @@ SUBTYPES
 
 ### RevertedTransactionReceiptResponse
 
-Ƭ **RevertedTransactionReceiptResponse**: [`IsReverted`](types.RPC.RPCSPEC08.API.md#isreverted)<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt)\>
+Ƭ **RevertedTransactionReceiptResponse**: [`IsReverted`](types.RPC.RPCSPEC08.API.md#isreverted)\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt)\>
 
 #### Defined in
 
@@ -1401,7 +1401,7 @@ SUBTYPES
 
 ### InvokeTransactionReceiptResponse
 
-Ƭ **InvokeTransactionReceiptResponse**: [`IsType`](types.RPC.RPCSPEC08.API.md#istype)<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"INVOKE"`\>
+Ƭ **InvokeTransactionReceiptResponse**: [`IsType`](types.RPC.RPCSPEC08.API.md#istype)\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"INVOKE"`\>
 
 #### Defined in
 
@@ -1421,7 +1421,7 @@ SUBTYPES
 
 ### DeclareTransactionReceiptResponse
 
-Ƭ **DeclareTransactionReceiptResponse**: [`IsType`](types.RPC.RPCSPEC08.API.md#istype)<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"DECLARE"`\>
+Ƭ **DeclareTransactionReceiptResponse**: [`IsType`](types.RPC.RPCSPEC08.API.md#istype)\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"DECLARE"`\>
 
 #### Defined in
 
@@ -1431,7 +1431,7 @@ SUBTYPES
 
 ### DeployAccountTransactionReceiptResponse
 
-Ƭ **DeployAccountTransactionReceiptResponse**: [`IsType`](types.RPC.RPCSPEC08.API.md#istype)<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"DEPLOY_ACCOUNT"`\>
+Ƭ **DeployAccountTransactionReceiptResponse**: [`IsType`](types.RPC.RPCSPEC08.API.md#istype)\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"DEPLOY_ACCOUNT"`\>
 
 #### Defined in
 
@@ -1441,7 +1441,7 @@ SUBTYPES
 
 ### L1HandlerTransactionReceiptResponse
 
-Ƭ **L1HandlerTransactionReceiptResponse**: [`IsType`](types.RPC.RPCSPEC08.API.md#istype)<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"L1_HANDLER"`\>
+Ƭ **L1HandlerTransactionReceiptResponse**: [`IsType`](types.RPC.RPCSPEC08.API.md#istype)\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"L1_HANDLER"`\>
 
 #### Defined in
 
@@ -1606,7 +1606,7 @@ SUBTYPES
 
 ### ContractClassResponse
 
-Ƭ **ContractClassResponse**: [`LegacyContractClass`](types.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](types.md#compiledsierra), `"sierra_program_debug_info"`\>
+Ƭ **ContractClassResponse**: [`LegacyContractClass`](types.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](types.md#compiledsierra), `"sierra_program_debug_info"`\>
 
 Standardized type
 
@@ -1624,7 +1624,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### Simplify
 
-Ƭ **Simplify**<`T`\>: \{ [K in keyof T]: T[K] } & {}
+Ƭ **Simplify**\<`T`\>: \{ [K in keyof T]: T[K] } & {}
 
 #### Type parameters
 
@@ -1640,7 +1640,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### RequiredKeysOf
 
-Ƭ **RequiredKeysOf**<`T`\>: `Exclude`<\{ [K in keyof T]: T extends Record<K, T[K]\> ? K : never }[keyof `T`], `undefined`\>
+Ƭ **RequiredKeysOf**\<`T`\>: `Exclude`\<\{ [K in keyof T]: T extends Record\<K, T[K]\> ? K : never }[keyof `T`], `undefined`\>
 
 #### Type parameters
 
@@ -1692,7 +1692,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### BLOCK_HASH
 
-Ƭ **BLOCK_HASH**: `Merge`<[`BLOCK_HASH`](types.RPC.RPCSPEC08.API.md#block_hash), [`BLOCK_HASH`](types.RPC.RPCSPEC07.API.SPEC.md#block_hash)\>
+Ƭ **BLOCK_HASH**: `Merge`\<[`BLOCK_HASH`](types.RPC.RPCSPEC08.API.md#block_hash), [`BLOCK_HASH`](types.RPC.RPCSPEC07.API.SPEC.md#block_hash)\>
 
 #### Defined in
 
@@ -1702,7 +1702,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### BLOCK_NUMBER
 
-Ƭ **BLOCK_NUMBER**: `Merge`<[`BLOCK_NUMBER`](types.RPC.RPCSPEC08.API.md#block_number), [`BLOCK_NUMBER`](types.RPC.RPCSPEC07.API.SPEC.md#block_number)\>
+Ƭ **BLOCK_NUMBER**: `Merge`\<[`BLOCK_NUMBER`](types.RPC.RPCSPEC08.API.md#block_number), [`BLOCK_NUMBER`](types.RPC.RPCSPEC07.API.SPEC.md#block_number)\>
 
 #### Defined in
 
@@ -1712,7 +1712,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### FELT
 
-Ƭ **FELT**: `Merge`<[`FELT`](types.RPC.RPCSPEC08.API.md#felt), [`FELT`](types.RPC.RPCSPEC07.API.SPEC.md#felt)\>
+Ƭ **FELT**: `Merge`\<[`FELT`](types.RPC.RPCSPEC08.API.md#felt), [`FELT`](types.RPC.RPCSPEC07.API.SPEC.md#felt)\>
 
 #### Defined in
 
@@ -1722,7 +1722,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### TXN_HASH
 
-Ƭ **TXN_HASH**: `Merge`<[`TXN_HASH`](types.RPC.RPCSPEC08.API.md#txn_hash), [`TXN_HASH`](types.RPC.RPCSPEC07.API.SPEC.md#txn_hash)\>
+Ƭ **TXN_HASH**: `Merge`\<[`TXN_HASH`](types.RPC.RPCSPEC08.API.md#txn_hash), [`TXN_HASH`](types.RPC.RPCSPEC07.API.SPEC.md#txn_hash)\>
 
 #### Defined in
 
@@ -1732,7 +1732,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### PRICE_UNIT
 
-Ƭ **PRICE_UNIT**: `Merge`<[`PRICE_UNIT`](types.RPC.RPCSPEC08.API.md#price_unit), [`PRICE_UNIT`](types.RPC.RPCSPEC07.API.SPEC.md#price_unit)\>
+Ƭ **PRICE_UNIT**: `Merge`\<[`PRICE_UNIT`](types.RPC.RPCSPEC08.API.md#price_unit), [`PRICE_UNIT`](types.RPC.RPCSPEC07.API.SPEC.md#price_unit)\>
 
 #### Defined in
 
@@ -1742,7 +1742,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### RESOURCE_PRICE
 
-Ƭ **RESOURCE_PRICE**: `Merge`<[`RESOURCE_PRICE`](types.RPC.RPCSPEC08.API.md#resource_price), [`RESOURCE_PRICE`](types.RPC.RPCSPEC07.API.SPEC.md#resource_price)\>
+Ƭ **RESOURCE_PRICE**: `Merge`\<[`RESOURCE_PRICE`](types.RPC.RPCSPEC08.API.md#resource_price), [`RESOURCE_PRICE`](types.RPC.RPCSPEC07.API.SPEC.md#resource_price)\>
 
 #### Defined in
 
@@ -1752,7 +1752,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### SIMULATION_FLAG
 
-Ƭ **SIMULATION_FLAG**: `Merge`<[`SIMULATION_FLAG`](types.RPC.RPCSPEC08.API.md#simulation_flag), [`SIMULATION_FLAG`](types.RPC.RPCSPEC07.API.SPEC.md#simulation_flag)\>
+Ƭ **SIMULATION_FLAG**: `Merge`\<[`SIMULATION_FLAG`](types.RPC.RPCSPEC08.API.md#simulation_flag), [`SIMULATION_FLAG`](types.RPC.RPCSPEC07.API.SPEC.md#simulation_flag)\>
 
 #### Defined in
 
@@ -1762,7 +1762,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### STATE_UPDATE
 
-Ƭ **STATE_UPDATE**: `Merge`<[`STATE_UPDATE`](types.RPC.RPCSPEC08.API.md#state_update), [`STATE_UPDATE`](types.RPC.RPCSPEC07.API.SPEC.md#state_update)\>
+Ƭ **STATE_UPDATE**: `Merge`\<[`STATE_UPDATE`](types.RPC.RPCSPEC08.API.md#state_update), [`STATE_UPDATE`](types.RPC.RPCSPEC07.API.SPEC.md#state_update)\>
 
 #### Defined in
 
@@ -1772,7 +1772,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### PENDING_STATE_UPDATE
 
-Ƭ **PENDING_STATE_UPDATE**: `Merge`<[`PENDING_STATE_UPDATE`](types.RPC.RPCSPEC08.API.md#pending_state_update), [`PENDING_STATE_UPDATE`](types.RPC.RPCSPEC07.API.SPEC.md#pending_state_update)\>
+Ƭ **PENDING_STATE_UPDATE**: `Merge`\<[`PENDING_STATE_UPDATE`](types.RPC.RPCSPEC08.API.md#pending_state_update), [`PENDING_STATE_UPDATE`](types.RPC.RPCSPEC07.API.SPEC.md#pending_state_update)\>
 
 #### Defined in
 
@@ -1782,7 +1782,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### PENDING_INVOKE_TXN_RECEIPT
 
-Ƭ **PENDING_INVOKE_TXN_RECEIPT**: [`IsPending`](types.RPC.RPCSPEC08.API.md#ispending)<[`IsType`](types.RPC.RPCSPEC08.API.md#istype)<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"INVOKE"`\>\>
+Ƭ **PENDING_INVOKE_TXN_RECEIPT**: [`IsPending`](types.RPC.RPCSPEC08.API.md#ispending)\<[`IsType`](types.RPC.RPCSPEC08.API.md#istype)\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"INVOKE"`\>\>
 
 #### Defined in
 
@@ -1792,7 +1792,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### PENDING_DECLARE_TXN_RECEIPT
 
-Ƭ **PENDING_DECLARE_TXN_RECEIPT**: [`IsPending`](types.RPC.RPCSPEC08.API.md#ispending)<[`IsType`](types.RPC.RPCSPEC08.API.md#istype)<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"DECLARE"`\>\>
+Ƭ **PENDING_DECLARE_TXN_RECEIPT**: [`IsPending`](types.RPC.RPCSPEC08.API.md#ispending)\<[`IsType`](types.RPC.RPCSPEC08.API.md#istype)\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"DECLARE"`\>\>
 
 #### Defined in
 
@@ -1802,7 +1802,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT
 
-Ƭ **PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT**: [`IsPending`](types.RPC.RPCSPEC08.API.md#ispending)<[`IsType`](types.RPC.RPCSPEC08.API.md#istype)<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"DEPLOY_ACCOUNT"`\>\>
+Ƭ **PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT**: [`IsPending`](types.RPC.RPCSPEC08.API.md#ispending)\<[`IsType`](types.RPC.RPCSPEC08.API.md#istype)\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"DEPLOY_ACCOUNT"`\>\>
 
 #### Defined in
 
@@ -1812,7 +1812,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### PENDING_L1_HANDLER_TXN_RECEIPT
 
-Ƭ **PENDING_L1_HANDLER_TXN_RECEIPT**: [`IsPending`](types.RPC.RPCSPEC08.API.md#ispending)<[`IsType`](types.RPC.RPCSPEC08.API.md#istype)<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"L1_HANDLER"`\>\>
+Ƭ **PENDING_L1_HANDLER_TXN_RECEIPT**: [`IsPending`](types.RPC.RPCSPEC08.API.md#ispending)\<[`IsType`](types.RPC.RPCSPEC08.API.md#istype)\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), `"L1_HANDLER"`\>\>
 
 #### Defined in
 
@@ -1822,7 +1822,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### BlockWithTxHashes
 
-Ƭ **BlockWithTxHashes**: `Merge`<[`BlockWithTxHashes`](types.RPC.RPCSPEC08.API.md#blockwithtxhashes), [`BlockWithTxHashes`](types.RPC.RPCSPEC07.API.md#blockwithtxhashes)\>
+Ƭ **BlockWithTxHashes**: `Merge`\<[`BlockWithTxHashes`](types.RPC.RPCSPEC08.API.md#blockwithtxhashes), [`BlockWithTxHashes`](types.RPC.RPCSPEC07.API.md#blockwithtxhashes)\>
 
 #### Defined in
 
@@ -1832,7 +1832,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### ContractClassPayload
 
-Ƭ **ContractClassPayload**: `Merge`<[`ContractClass`](types.RPC.RPCSPEC08.API.md#contractclass), [`ContractClass`](types.RPC.RPCSPEC07.API.md#contractclass)\>
+Ƭ **ContractClassPayload**: `Merge`\<[`ContractClass`](types.RPC.RPCSPEC08.API.md#contractclass), [`ContractClass`](types.RPC.RPCSPEC07.API.md#contractclass)\>
 
 #### Defined in
 
@@ -1842,7 +1842,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### DeclaredTransaction
 
-Ƭ **DeclaredTransaction**: `Merge`<[`DeclaredTransaction`](types.RPC.RPCSPEC08.API.md#declaredtransaction), [`DeclaredTransaction`](types.RPC.RPCSPEC07.API.md#declaredtransaction)\>
+Ƭ **DeclaredTransaction**: `Merge`\<[`DeclaredTransaction`](types.RPC.RPCSPEC08.API.md#declaredtransaction), [`DeclaredTransaction`](types.RPC.RPCSPEC07.API.md#declaredtransaction)\>
 
 #### Defined in
 
@@ -1852,7 +1852,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### InvokedTransaction
 
-Ƭ **InvokedTransaction**: `Merge`<[`InvokedTransaction`](types.RPC.RPCSPEC08.API.md#invokedtransaction), [`InvokedTransaction`](types.RPC.RPCSPEC07.API.md#invokedtransaction)\>
+Ƭ **InvokedTransaction**: `Merge`\<[`InvokedTransaction`](types.RPC.RPCSPEC08.API.md#invokedtransaction), [`InvokedTransaction`](types.RPC.RPCSPEC07.API.md#invokedtransaction)\>
 
 #### Defined in
 
@@ -1862,7 +1862,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### DeployedAccountTransaction
 
-Ƭ **DeployedAccountTransaction**: `Merge`<[`DeployedAccountTransaction`](types.RPC.RPCSPEC08.API.md#deployedaccounttransaction), [`DeployedAccountTransaction`](types.RPC.RPCSPEC07.API.md#deployedaccounttransaction)\>
+Ƭ **DeployedAccountTransaction**: `Merge`\<[`DeployedAccountTransaction`](types.RPC.RPCSPEC08.API.md#deployedaccounttransaction), [`DeployedAccountTransaction`](types.RPC.RPCSPEC07.API.md#deployedaccounttransaction)\>
 
 #### Defined in
 
@@ -1872,7 +1872,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### L1Message
 
-Ƭ **L1Message**: `Merge`<[`L1Message`](types.RPC.RPCSPEC08.API.md#l1message), [`L1Message`](types.RPC.RPCSPEC07.API.md#l1message)\>
+Ƭ **L1Message**: `Merge`\<[`L1Message`](types.RPC.RPCSPEC08.API.md#l1message), [`L1Message`](types.RPC.RPCSPEC07.API.md#l1message)\>
 
 #### Defined in
 
@@ -1926,7 +1926,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### EmittedEvent
 
-Ƭ **EmittedEvent**: `Merge`<[`EmittedEvent`](types.RPC.RPCSPEC08.API.md#emittedevent), [`EmittedEvent`](types.RPC.RPCSPEC07.API.md#emittedevent)\>
+Ƭ **EmittedEvent**: `Merge`\<[`EmittedEvent`](types.RPC.RPCSPEC08.API.md#emittedevent), [`EmittedEvent`](types.RPC.RPCSPEC07.API.md#emittedevent)\>
 
 #### Defined in
 
@@ -1936,7 +1936,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### Event
 
-Ƭ **Event**: `Merge`<[`Event`](types.RPC.RPCSPEC08.API.md#event-1), [`Event`](types.RPC.RPCSPEC07.API.md#event-1)\>
+Ƭ **Event**: `Merge`\<[`Event`](types.RPC.RPCSPEC08.API.md#event-1), [`Event`](types.RPC.RPCSPEC07.API.md#event-1)\>
 
 #### Defined in
 
@@ -1946,7 +1946,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### PendingReceipt
 
-Ƭ **PendingReceipt**: `Merge`<[`TransactionReceiptPendingBlock`](types.RPC.RPCSPEC08.API.md#transactionreceiptpendingblock), [`PendingReceipt`](types.RPC.RPCSPEC07.API.md#pendingreceipt)\>
+Ƭ **PendingReceipt**: `Merge`\<[`TransactionReceiptPendingBlock`](types.RPC.RPCSPEC08.API.md#transactionreceiptpendingblock), [`PendingReceipt`](types.RPC.RPCSPEC07.API.md#pendingreceipt)\>
 
 #### Defined in
 
@@ -1956,7 +1956,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### Receipt
 
-Ƭ **Receipt**: `Merge`<[`TransactionReceiptProductionBlock`](types.RPC.RPCSPEC08.API.md#transactionreceiptproductionblock), [`Receipt`](types.RPC.RPCSPEC07.API.md#receipt)\>
+Ƭ **Receipt**: `Merge`\<[`TransactionReceiptProductionBlock`](types.RPC.RPCSPEC08.API.md#transactionreceiptproductionblock), [`Receipt`](types.RPC.RPCSPEC07.API.md#receipt)\>
 
 #### Defined in
 
@@ -1966,7 +1966,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### FeeEstimate
 
-Ƭ **FeeEstimate**: `SimpleOneOf`<[`FEE_ESTIMATE`](types.RPC.RPCSPEC08.API.md#fee_estimate), [`FEE_ESTIMATE`](types.RPC.RPCSPEC07.API.SPEC.md#fee_estimate)\>
+Ƭ **FeeEstimate**: `SimpleOneOf`\<[`FEE_ESTIMATE`](types.RPC.RPCSPEC08.API.md#fee_estimate), [`FEE_ESTIMATE`](types.RPC.RPCSPEC07.API.SPEC.md#fee_estimate)\>
 
 #### Defined in
 
@@ -1976,7 +1976,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 ### ResourceBounds
 
-Ƭ **ResourceBounds**: [`Simplify`](types.md#simplify)<`SimpleOneOf`<[`ResourceBounds`](types.RPC.RPCSPEC08.API.md#resourcebounds), [`ResourceBounds`](types.RPC.RPCSPEC07.API.md#resourcebounds)\>\>
+Ƭ **ResourceBounds**: [`Simplify`](types.md#simplify)\<`SimpleOneOf`\<[`ResourceBounds`](types.RPC.RPCSPEC08.API.md#resourcebounds), [`ResourceBounds`](types.RPC.RPCSPEC07.API.md#resourcebounds)\>\>
 
 #### Defined in
 
@@ -2052,7 +2052,7 @@ percentage overhead on estimated fee
 
 ### TransactionWithHash
 
-Ƭ **TransactionWithHash**: `Merge`<[`TransactionWithHash`](types.RPC.RPCSPEC08.API.md#transactionwithhash), [`TransactionWithHash`](types.RPC.RPCSPEC07.API.md#transactionwithhash)\>
+Ƭ **TransactionWithHash**: `Merge`\<[`TransactionWithHash`](types.RPC.RPCSPEC08.API.md#transactionwithhash), [`TransactionWithHash`](types.RPC.RPCSPEC07.API.md#transactionwithhash)\>
 
 #### Defined in
 
@@ -2062,7 +2062,7 @@ percentage overhead on estimated fee
 
 ### TransactionReceipt
 
-Ƭ **TransactionReceipt**: `Merge`<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), [`TransactionReceipt`](types.RPC.RPCSPEC07.API.md#transactionreceipt)\>
+Ƭ **TransactionReceipt**: `Merge`\<[`TransactionReceipt`](types.RPC.RPCSPEC08.API.md#transactionreceipt), [`TransactionReceipt`](types.RPC.RPCSPEC07.API.md#transactionreceipt)\>
 
 #### Defined in
 
@@ -2082,7 +2082,7 @@ percentage overhead on estimated fee
 
 ### TXN_STATUS
 
-Ƭ **TXN_STATUS**: `Merge`<[`TXN_STATUS`](types.RPC.RPCSPEC08.API.md#txn_status), [`TXN_STATUS`](types.RPC.RPCSPEC07.API.SPEC.md#txn_status)\>
+Ƭ **TXN_STATUS**: `Merge`\<[`TXN_STATUS`](types.RPC.RPCSPEC08.API.md#txn_status), [`TXN_STATUS`](types.RPC.RPCSPEC07.API.SPEC.md#txn_status)\>
 
 #### Defined in
 
@@ -2092,7 +2092,7 @@ percentage overhead on estimated fee
 
 ### TXN_EXECUTION_STATUS
 
-Ƭ **TXN_EXECUTION_STATUS**: `Merge`<[`TXN_EXECUTION_STATUS`](types.RPC.RPCSPEC08.API.md#txn_execution_status), [`TXN_EXECUTION_STATUS`](types.RPC.RPCSPEC07.API.SPEC.md#txn_execution_status)\>
+Ƭ **TXN_EXECUTION_STATUS**: `Merge`\<[`TXN_EXECUTION_STATUS`](types.RPC.RPCSPEC08.API.md#txn_execution_status), [`TXN_EXECUTION_STATUS`](types.RPC.RPCSPEC07.API.SPEC.md#txn_execution_status)\>
 
 #### Defined in
 
@@ -2102,7 +2102,7 @@ percentage overhead on estimated fee
 
 ### TransactionStatus
 
-Ƭ **TransactionStatus**: `Merge`<[`TransactionStatus`](types.RPC.RPCSPEC08.API.md#transactionstatus), [`TransactionStatus`](types.RPC.RPCSPEC07.API.md#transactionstatus)\>
+Ƭ **TransactionStatus**: `Merge`\<[`TransactionStatus`](types.RPC.RPCSPEC08.API.md#transactionstatus), [`TransactionStatus`](types.RPC.RPCSPEC07.API.md#transactionstatus)\>
 
 #### Defined in
 
@@ -2136,7 +2136,7 @@ percentage overhead on estimated fee
 
 ### TRANSACTION_TRACE
 
-Ƭ **TRANSACTION_TRACE**: `Merge`<[`TRANSACTION_TRACE`](types.RPC.RPCSPEC08.API.md#transaction_trace), [`TRANSACTION_TRACE`](types.RPC.RPCSPEC07.API.SPEC.md#transaction_trace)\>
+Ƭ **TRANSACTION_TRACE**: `Merge`\<[`TRANSACTION_TRACE`](types.RPC.RPCSPEC08.API.md#transaction_trace), [`TRANSACTION_TRACE`](types.RPC.RPCSPEC07.API.SPEC.md#transaction_trace)\>
 
 #### Defined in
 
@@ -2146,7 +2146,7 @@ percentage overhead on estimated fee
 
 ### FEE_ESTIMATE
 
-Ƭ **FEE_ESTIMATE**: `Merge`<[`FEE_ESTIMATE`](types.RPC.RPCSPEC08.API.md#fee_estimate), [`FEE_ESTIMATE`](types.RPC.RPCSPEC07.API.SPEC.md#fee_estimate)\>
+Ƭ **FEE_ESTIMATE**: `Merge`\<[`FEE_ESTIMATE`](types.RPC.RPCSPEC08.API.md#fee_estimate), [`FEE_ESTIMATE`](types.RPC.RPCSPEC07.API.SPEC.md#fee_estimate)\>
 
 #### Defined in
 
@@ -2156,7 +2156,7 @@ percentage overhead on estimated fee
 
 ### EVENTS_CHUNK
 
-Ƭ **EVENTS_CHUNK**: `Merge`<[`EVENTS_CHUNK`](types.RPC.RPCSPEC08.API.md#events_chunk), [`EVENTS_CHUNK`](types.RPC.RPCSPEC07.API.SPEC.md#events_chunk)\>
+Ƭ **EVENTS_CHUNK**: `Merge`\<[`EVENTS_CHUNK`](types.RPC.RPCSPEC08.API.md#events_chunk), [`EVENTS_CHUNK`](types.RPC.RPCSPEC07.API.SPEC.md#events_chunk)\>
 
 #### Defined in
 
@@ -2193,7 +2193,7 @@ percentage overhead on estimated fee
 
 ### AccountInvocationsFactoryDetails
 
-Ƭ **AccountInvocationsFactoryDetails**: \{ `versions`: \`$\{ETransactionVersion}\`[] ; `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate?`: `boolean` } & `Partial`<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
+Ƭ **AccountInvocationsFactoryDetails**: \{ `versions`: \`$\{ETransactionVersion}\`[] ; `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate?`: `boolean` } & `Partial`\<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
 
 #### Defined in
 
@@ -2248,10 +2248,10 @@ percentage overhead on estimated fee
 
 #### Type declaration
 
-| Name      | Type                                                                                                                                                       |
-| :-------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `declare` | \{ `class_hash`: [`BigNumberish`](types.md#bignumberish) } & `Partial`<[`DeclareTransactionReceiptResponse`](types.md#declaretransactionreceiptresponse)\> |
-| `deploy`  | [`DeployContractUDCResponse`](types.md#deploycontractudcresponse)                                                                                          |
+| Name      | Type                                                                                                                                                        |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `declare` | \{ `class_hash`: [`BigNumberish`](types.md#bignumberish) } & `Partial`\<[`DeclareTransactionReceiptResponse`](types.md#declaretransactionreceiptresponse)\> |
+| `deploy`  | [`DeployContractUDCResponse`](types.md#deploycontractudcresponse)                                                                                           |
 
 #### Defined in
 
@@ -2261,7 +2261,7 @@ percentage overhead on estimated fee
 
 ### SimulateTransactionDetails
 
-Ƭ **SimulateTransactionDetails**: \{ `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate?`: `boolean` ; `skipExecute?`: `boolean` } & `Partial`<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
+Ƭ **SimulateTransactionDetails**: \{ `nonce?`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate?`: `boolean` ; `skipExecute?`: `boolean` } & `Partial`\<[`V3TransactionDetails`](types.md#v3transactiondetails)\>
 
 #### Defined in
 
@@ -2271,7 +2271,7 @@ percentage overhead on estimated fee
 
 ### EstimateFeeAction
 
-Ƭ **EstimateFeeAction**: \{ `type`: typeof [`INVOKE`](types.md#invoke) ; `payload`: [`AllowArray`](types.md#allowarray)<[`Call`](types.md#call)\> } \| \{ `type`: typeof [`DECLARE`](types.md#declare) ; `payload`: [`DeclareContractPayload`](types.md#declarecontractpayload) } \| \{ `type`: typeof [`DEPLOY_ACCOUNT`](types.md#deploy_account) ; `payload`: [`DeployAccountContractPayload`](types.md#deployaccountcontractpayload) } \| \{ `type`: typeof [`DEPLOY`](types.md#deploy) ; `payload`: [`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload) }
+Ƭ **EstimateFeeAction**: \{ `type`: typeof [`INVOKE`](types.md#invoke) ; `payload`: [`AllowArray`](types.md#allowarray)\<[`Call`](types.md#call)\> } \| \{ `type`: typeof [`DECLARE`](types.md#declare) ; `payload`: [`DeclareContractPayload`](types.md#declarecontractpayload) } \| \{ `type`: typeof [`DEPLOY_ACCOUNT`](types.md#deploy_account) ; `payload`: [`DeployAccountContractPayload`](types.md#deployaccountcontractpayload) } \| \{ `type`: typeof [`DEPLOY`](types.md#deploy) ; `payload`: [`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload) }
 
 #### Defined in
 
@@ -2302,7 +2302,7 @@ percentage overhead on estimated fee
 
 ### CairoEnum
 
-Ƭ **CairoEnum**: [`CairoCustomEnum`](../classes/CairoCustomEnum.md) \| [`CairoOption`](../classes/CairoOption.md)<`any`\> \| [`CairoResult`](../classes/CairoResult.md)<`any`, `any`\>
+Ƭ **CairoEnum**: [`CairoCustomEnum`](../classes/CairoCustomEnum.md) \| [`CairoOption`](../classes/CairoOption.md)\<`any`\> \| [`CairoResult`](../classes/CairoResult.md)\<`any`, `any`\>
 
 #### Defined in
 
@@ -2312,7 +2312,7 @@ percentage overhead on estimated fee
 
 ### ValidateType
 
-Ƭ **ValidateType**: `ValuesType`<typeof [`ValidateType`](types.md#validatetype-1)\>
+Ƭ **ValidateType**: `ValuesType`\<typeof [`ValidateType`](types.md#validatetype-1)\>
 
 #### Defined in
 
@@ -2324,7 +2324,7 @@ percentage overhead on estimated fee
 
 ### Uint
 
-Ƭ **Uint**: `ValuesType`<typeof [`Uint`](types.md#uint-1)\>
+Ƭ **Uint**: `ValuesType`\<typeof [`Uint`](types.md#uint-1)\>
 
 #### Defined in
 
@@ -2336,7 +2336,7 @@ percentage overhead on estimated fee
 
 ### Literal
 
-Ƭ **Literal**: `ValuesType`<typeof [`Literal`](types.md#literal-1)\>
+Ƭ **Literal**: `ValuesType`\<typeof [`Literal`](types.md#literal-1)\>
 
 #### Defined in
 
@@ -2348,7 +2348,7 @@ percentage overhead on estimated fee
 
 ### AsyncContractFunction
 
-Ƭ **AsyncContractFunction**<`T`\>: (...`args`: [`ArgsOrCalldataWithOptions`](types.md#argsorcalldatawithoptions)) => `Promise`<`T`\>
+Ƭ **AsyncContractFunction**\<`T`\>: (...`args`: [`ArgsOrCalldataWithOptions`](types.md#argsorcalldatawithoptions)) => `Promise`\<`T`\>
 
 #### Type parameters
 
@@ -2358,7 +2358,7 @@ percentage overhead on estimated fee
 
 #### Type declaration
 
-▸ (`...args`): `Promise`<`T`\>
+▸ (`...args`): `Promise`\<`T`\>
 
 ##### Parameters
 
@@ -2368,7 +2368,7 @@ percentage overhead on estimated fee
 
 ##### Returns
 
-`Promise`<`T`\>
+`Promise`\<`T`\>
 
 #### Defined in
 
@@ -2432,7 +2432,7 @@ percentage overhead on estimated fee
 
 ### ContractOptions
 
-Ƭ **ContractOptions**: \{ `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) ; `parseRequest?`: `boolean` ; `parseResponse?`: `boolean` ; `formatResponse?`: \{ `[key: string]`: `any`; } ; `signature?`: [`Signature`](types.md#signature) ; `addressSalt?`: `string` } & `Partial`<[`UniversalDetails`](../interfaces/types.UniversalDetails.md)\>
+Ƭ **ContractOptions**: \{ `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) ; `parseRequest?`: `boolean` ; `parseResponse?`: `boolean` ; `formatResponse?`: \{ `[key: string]`: `any`; } ; `signature?`: [`Signature`](types.md#signature) ; `addressSalt?`: `string` } & `Partial`\<[`UniversalDetails`](../interfaces/types.UniversalDetails.md)\>
 
 #### Defined in
 
@@ -2442,7 +2442,7 @@ percentage overhead on estimated fee
 
 ### CallOptions
 
-Ƭ **CallOptions**: `Pick`<[`ContractOptions`](types.md#contractoptions), `"blockIdentifier"` \| `"parseRequest"` \| `"parseResponse"` \| `"formatResponse"`\>
+Ƭ **CallOptions**: `Pick`\<[`ContractOptions`](types.md#contractoptions), `"blockIdentifier"` \| `"parseRequest"` \| `"parseResponse"` \| `"formatResponse"`\>
 
 #### Defined in
 
@@ -2550,7 +2550,7 @@ percentage overhead on estimated fee
 
 ### OutsideExecutionVersion
 
-Ƭ **OutsideExecutionVersion**: `ValuesType`<typeof [`OutsideExecutionVersion`](types.md#outsideexecutionversion-1)\>
+Ƭ **OutsideExecutionVersion**: `ValuesType`\<typeof [`OutsideExecutionVersion`](types.md#outsideexecutionversion-1)\>
 
 #### Defined in
 
@@ -2613,7 +2613,7 @@ percentage overhead on estimated fee
 
 ### V2DeclareSignerDetails
 
-Ƭ **V2DeclareSignerDetails**: `Required`<[`InvocationsDetails`](types.md#invocationsdetails)\> & \{ `classHash`: `string` ; `compiledClassHash?`: `string` ; `senderAddress`: `string` ; `chainId`: [`StarknetChainId`](constants.md#starknetchainid-1) ; `version`: \`$\{ETransactionVersion2}\` }
+Ƭ **V2DeclareSignerDetails**: `Required`\<[`InvocationsDetails`](types.md#invocationsdetails)\> & \{ `classHash`: `string` ; `compiledClassHash?`: `string` ; `senderAddress`: `string` ; `chainId`: [`StarknetChainId`](constants.md#starknetchainid-1) ; `version`: \`$\{ETransactionVersion2}\` }
 
 #### Defined in
 
@@ -2643,7 +2643,7 @@ percentage overhead on estimated fee
 
 ### V2DeployAccountSignerDetails
 
-Ƭ **V2DeployAccountSignerDetails**: `Required`<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> & `Required`<[`InvocationsDetails`](types.md#invocationsdetails)\> & \{ `contractAddress`: [`BigNumberish`](types.md#bignumberish) ; `chainId`: [`StarknetChainId`](constants.md#starknetchainid-1) ; `version`: \`$\{ETransactionVersion2}\` }
+Ƭ **V2DeployAccountSignerDetails**: `Required`\<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> & `Required`\<[`InvocationsDetails`](types.md#invocationsdetails)\> & \{ `contractAddress`: [`BigNumberish`](types.md#bignumberish) ; `chainId`: [`StarknetChainId`](constants.md#starknetchainid-1) ; `version`: \`$\{ETransactionVersion2}\` }
 
 #### Defined in
 
@@ -2653,7 +2653,7 @@ percentage overhead on estimated fee
 
 ### V3DeployAccountSignerDetails
 
-Ƭ **V3DeployAccountSignerDetails**: `Required`<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> & [`V3TransactionDetails`](types.md#v3transactiondetails) & \{ `contractAddress`: [`BigNumberish`](types.md#bignumberish) ; `chainId`: [`StarknetChainId`](constants.md#starknetchainid-1) ; `version`: \`$\{ETransactionVersion3}\` }
+Ƭ **V3DeployAccountSignerDetails**: `Required`\<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> & [`V3TransactionDetails`](types.md#v3transactiondetails) & \{ `contractAddress`: [`BigNumberish`](types.md#bignumberish) ; `chainId`: [`StarknetChainId`](constants.md#starknetchainid-1) ; `version`: \`$\{ETransactionVersion3}\` }
 
 #### Defined in
 
@@ -2736,7 +2736,7 @@ percentage overhead on estimated fee
 
 ### TransactionReceiptCallbacksDefault
 
-Ƭ **TransactionReceiptCallbacksDefault**: `Partial`<[`TransactionReceiptCallbacksDefined`](types.md#transactionreceiptcallbacksdefined)\> & \{ `_`: () => `void` }
+Ƭ **TransactionReceiptCallbacksDefault**: `Partial`\<[`TransactionReceiptCallbacksDefined`](types.md#transactionreceiptcallbacksdefined)\> & \{ `_`: () => `void` }
 
 #### Defined in
 
@@ -2756,7 +2756,7 @@ percentage overhead on estimated fee
 
 ### GetTransactionReceiptResponse
 
-Ƭ **GetTransactionReceiptResponse**<`T`\>: \{ `statusReceipt`: `T` ; `value`: [`TransactionStatusReceiptSets`](types.md#transactionstatusreceiptsets)[`T`] ; `match`: (`callbacks`: [`TransactionReceiptCallbacks`](types.md#transactionreceiptcallbacks)) => `void` } & \{ [key in \`is$\{Capitalize<TransactionReceiptStatus\>}\`]: Function }
+Ƭ **GetTransactionReceiptResponse**\<`T`\>: \{ `statusReceipt`: `T` ; `value`: [`TransactionStatusReceiptSets`](types.md#transactionstatusreceiptsets)[`T`] ; `match`: (`callbacks`: [`TransactionReceiptCallbacks`](types.md#transactionreceiptcallbacks)) => `void` } & \{ [key in \`is$\{Capitalize\<TransactionReceiptStatus\>}\`]: Function }
 
 #### Type parameters
 
@@ -3384,12 +3384,12 @@ to be #deprecated
 
 #### Type declaration
 
-| Name              | Type                                                                            |
-| :---------------- | :------------------------------------------------------------------------------ |
-| `ClassHash`       | `"core::starknet::class_hash::ClassHash"`                                       |
-| `ContractAddress` | `"core::starknet::contract_address::ContractAddress"`                           |
-| `Secp256k1Point`  | `"core::starknet::secp256k1::Secp256k1Point"`                                   |
-| `U96`             | `"core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>"` |
+| Name              | Type                                                                             |
+| :---------------- | :------------------------------------------------------------------------------- |
+| `ClassHash`       | `"core::starknet::class_hash::ClassHash"`                                        |
+| `ContractAddress` | `"core::starknet::contract_address::ContractAddress"`                            |
+| `Secp256k1Point`  | `"core::starknet::secp256k1::Secp256k1Point"`                                    |
+| `U96`             | `"core::internal::bounded_int::BoundedInt::\<0, 79228162514264337593543950335>"` |
 
 #### Defined in
 

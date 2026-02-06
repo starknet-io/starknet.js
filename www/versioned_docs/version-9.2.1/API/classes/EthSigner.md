@@ -46,13 +46,13 @@ Signer for accounts using Ethereum signature
 
 ### getPubKey
 
-▸ **getPubKey**(): `Promise`<`string`\>
+▸ **getPubKey**(): `Promise`\<`string`\>
 
 provides the Ethereum full public key (without parity prefix)
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 an hex string : 64 first characters are Point X coordinate. 64 last characters are Point Y coordinate.
 
@@ -68,7 +68,7 @@ an hex string : 64 first characters are Point X coordinate. 64 last characters a
 
 ### signMessage
 
-▸ **signMessage**(`typedData`, `accountAddress`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signMessage**(`typedData`, `accountAddress`): `Promise`\<[`Signature`](../modules.md#signature)\>
 
 Signs a JSON object for off-chain usage with the private key and returns the signature.
 This adds a message prefix so it can't be interchanged with transactions
@@ -82,7 +82,7 @@ This adds a message prefix so it can't be interchanged with transactions
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`\<[`Signature`](../modules.md#signature)\>
 
 the signature of the message
 
@@ -127,7 +127,7 @@ const result = await mySigner.signMessage(
 
 ### signTransaction
 
-▸ **signTransaction**(`transactions`, `details`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signTransaction**(`transactions`, `details`): `Promise`\<[`Signature`](../modules.md#signature)\>
 
 Signs INVOKE transactions with the private key and returns the signature
 
@@ -140,7 +140,7 @@ Signs INVOKE transactions with the private key and returns the signature
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`\<[`Signature`](../modules.md#signature)\>
 
 the signature of the transaction
 
@@ -193,7 +193,7 @@ const result = await mySigner.signTransaction(calls, transactionsDetail);
 
 ### signDeployAccountTransaction
 
-▸ **signDeployAccountTransaction**(`details`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signDeployAccountTransaction**(`details`): `Promise`\<[`Signature`](../modules.md#signature)\>
 
 Signs a DEPLOY_ACCOUNT transaction with the private key and returns the signature
 
@@ -205,7 +205,7 @@ Signs a DEPLOY_ACCOUNT transaction with the private key and returns the signatur
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`\<[`Signature`](../modules.md#signature)\>
 
 the signature of the transaction to deploy an account
 
@@ -253,7 +253,7 @@ const result = await mySigner.signDeployAccountTransaction(myDeployAcc);
 
 ### signDeclareTransaction
 
-▸ **signDeclareTransaction**(`details`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signDeclareTransaction**(`details`): `Promise`\<[`Signature`](../modules.md#signature)\>
 
 Signs a DECLARE transaction with the private key and returns the signature
 
@@ -265,7 +265,7 @@ Signs a DECLARE transaction with the private key and returns the signature
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`\<[`Signature`](../modules.md#signature)\>
 
 the signature of the transaction to declare a class
 

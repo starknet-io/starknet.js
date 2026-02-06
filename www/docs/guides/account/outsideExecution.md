@@ -2,271 +2,296 @@
 sidebar_position: 7
 ---
 
-# Outside Execution
+# Outside Execution (SNIP-9)
 
-## Introduction
+Outside Execution, also known as meta-transactions, allows a protocol to submit transactions on behalf of a user account, as long as they have the relevant signatures. This feature is implemented according to [SNIP-9](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-9.md).
 
-Outside execution refers to the ability to execute transactions on behalf of an account without having access to its private key. This is useful in scenarios where you want to:
+## Why Use Outside Execution?
 
-1. Execute transactions for users who have delegated permission
-2. Implement meta-transactions
-3. Build automation systems that can operate on behalf of users
+Outside Execution provides several benefits:
 
-## Prerequisites
+1. **Delayed Orders**: Protocols can have more atomic control over transaction execution, useful for scenarios like matching limit orders.
+2. **Fee Subsidy**: The sender of the transaction pays gas fees, allowing accounts without gas tokens to still execute transactions.
 
-To enable outside execution, the account contract must implement the necessary validation logic to verify external signatures or permissions.
+## Using Outside Execution
 
-## Basic concept
+### Check SNIP-9 Support
 
-Instead of using the account's private key, outside execution uses:
+The account that will sign the outside transaction has to be compatible with SNIP-9 (V1 or V2).  
+At early-2025:
 
-1. A separate signer for transaction authorization
-2. Custom validation logic in the account contract
-3. Additional parameters to prove execution permission
+|       account       | compatibility |
+| :-----------------: | :-----------: |
+|   ArgentX v0.3.0    |      v1       |
+|   ArgentX v0.4.0    |      v2       |
+|   Braavos v1.1.0    |      v2       |
+| OpenZeppelin v1.0.0 |    v2 (\*)    |
 
-## Implementation
+> (\*): only OpenZeppelin accounts including the `src9` component. Examples for v0.17.0:  
+> Starknet account: class = [0x540d7f5ec7ecf317e68d48564934cb99259781b1ee3cedbbc37ec5337f8e688](https://voyager.online/class/0x0540d7f5ec7ecf317e68d48564934cb99259781b1ee3cedbbc37ec5337f8e688)  
+> ETH account: class = [0x3940bc18abf1df6bc540cabadb1cad9486c6803b95801e57b6153ae21abfe06](https://voyager.online/class/0x3940bc18abf1df6bc540cabadb1cad9486c6803b95801e57b6153ae21abfe06)
 
-### 1. Create a signer
-
-First, create a signer that will authorize the execution:
-
-```typescript
-import { Signer } from 'starknet';
-
-const externalSigner = new Signer(externalPrivateKey);
-```
-
-### 2. Prepare execution parameters
-
-Include the necessary parameters for validation:
+Before using Outside Execution, check if the account that will sign the transaction supports SNIP-9:
 
 ```typescript
-const executionParams = {
-  signature: await externalSigner.signMessage({
-    message: messageHash,
-    domain: {
-      name: 'External Execution',
-      chainId: constants.StarknetChainId.SN_SEPOLIA,
-    },
-  }),
-  nonce: await myAccount.getNonce(),
-  // Other validation parameters
-};
-```
-
-### 3. Execute the transaction
-
-Use the execution parameters when calling the contract:
-
-```typescript
-const result = await myAccount.execute({
-  contractAddress: targetContract,
-  entrypoint: 'externalExecute',
-  calldata: [
-    ...executionParams.signature,
-    executionParams.nonce,
-    // Transaction parameters
-  ],
-});
-```
-
-## Example: Delegated execution
-
-Here's a complete example of implementing delegated execution:
-
-```typescript
-import { Account, Contract, RpcProvider, Signer, constants } from 'starknet';
-
-async function executeDelegated(chosenAccount: Account, delegateSigner: Signer, transaction: any) {
-  // Get current nonce
-  const nonce = await chosenAccount.getNonce();
-
-  // Create message hash
-  const messageHash = hash.computeHashOnElements([
-    transaction.contractAddress,
-    transaction.entrypoint,
-    ...transaction.calldata,
-    nonce,
-  ]);
-
-  // Sign with delegate key
-  const signature = await delegateSigner.signMessage({
-    message: messageHash,
-    domain: {
-      name: 'Delegate Execution',
-      chainId: constants.StarknetChainId.SN_SEPOLIA,
-    },
-  });
-
-  // Execute with signature
-  const result = await chosenAccount.execute({
-    contractAddress: transaction.contractAddress,
-    entrypoint: 'executeFromDelegate',
-    calldata: [
-      ...signature,
-      nonce,
-      transaction.contractAddress,
-      transaction.entrypoint,
-      ...transaction.calldata,
-    ],
-  });
-
-  return result;
+const signerAccount = new Account(myProvider, accountAddress, privateKey);
+const version = await signerAccount.getSnip9Version();
+if (version === OutsideExecutionVersion.UNSUPPORTED) {
+  throw new Error('This account is not SNIP-9 compatible.');
 }
+```
 
-// Usage
-const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-const myAccount = new Account({
-  provider: myProvider,
-  address: accountAddress,
-  signer: accountPrivateKey,
-});
-const delegateSigner = new Signer(delegatePrivateKey);
+:::info
+The account that will sign the transaction needs to be compatible with SNIP-9.  
+Nevertheless, the account that will execute the transaction do not needs to be SNIP-9 compatible ; it just needs to have enough fees to pay the transaction.
+:::
 
-const transaction = {
-  contractAddress: '0x...',
+### Create an `OutsideTransaction` Object
+
+To create an OutsideExecution object, you need first to prepare the call:
+
+```typescript
+const call1: Call = {
+  contractAddress: erc20Address,
   entrypoint: 'transfer',
-  calldata: ['0x...', '1000'],
+  calldata: {
+    recipient: recipientAddress,
+    amount: cairo.uint256(3n * 10n ** 16n),
+  },
 };
-
-const result = await executeDelegated(myAccount, delegateSigner, transaction);
-console.log('Transaction hash:', result.transaction_hash);
 ```
 
-## Example: Meta-transactions
+Then, you have to initialize some parameters :
 
-Implement meta-transactions where a relayer executes transactions:
+- The `caller` is the address of the account that will execute the outside transaction.
+- The transaction can be executed in a time frame that is defined in `execute_after` and `execute_before`, using Unix timestamp.
 
 ```typescript
-import { Account, RpcProvider, Signer, constants, hash } from 'starknet';
+const callOptions: OutsideExecutionOptions = {
+  caller: executorAccount.address,
+  execute_after: Math.floor(Date.now() / 1000) - 3600, // 1 hour ago
+  execute_before: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
+};
+```
 
-class MetaTransaction {
-  constructor(
-    public readonly sender: string,
-    public readonly target: string,
-    public readonly entrypoint: string,
-    public readonly calldata: string[],
-    public readonly nonce: string,
-    public readonly signature: string[]
-  ) {}
+:::warning
+You can use the string `"ANY_CALLER"` as content of the `caller` property. To use with care, as anybody that get your `OutsideTransaction` object and execute it.
+:::
 
-  static async create(
-    sender: string,
-    target: string,
-    entrypoint: string,
-    calldata: string[],
-    nonce: string,
-    signer: Signer
-  ): Promise<MetaTransaction> {
-    const messageHash = hash.computeHashOnElements([
-      sender,
-      target,
-      entrypoint,
-      ...calldata,
-      nonce,
-    ]);
+To create the `OutsideTransaction` object, you just have to use:
 
-    const signature = await signer.signMessage({
-      message: messageHash,
-      domain: {
-        name: 'Meta Transaction',
-        chainId: constants.StarknetChainId.SN_SEPOLIA,
-      },
-    });
+```typescript
+const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTransaction(
+  callOptions,
+  call1
+);
+```
 
-    return new MetaTransaction(sender, target, entrypoint, calldata, nonce, signature);
-  }
-}
+:::note
+In the same `OutsideTransaction` object, you can include several transactions. So, with only one signature of the signer Account, you can generate an `OutsideTransaction` object that performs many things:
 
-class Relayer {
-  constructor(
-    private readonly account: Account,
-    private readonly provider: RpcProvider
-  ) {}
+```typescript
+const callOptions: OutsideExecutionOptions = {
+  caller: executorAccount.address,
+  execute_after: 100,
+  execute_before: 200,
+};
+const call1 = {
+  contractAddress: ethAddress,
+  entrypoint: 'approve',
+  calldata: {
+    spender: account2.address,
+    amount: cairo.uint256(2n * 10n ** 16n),
+  },
+};
+const call2 = {
+  contractAddress: ethAddress,
+  entrypoint: 'transfer',
+  calldata: {
+    recipient: account1.address,
+    amount: cairo.uint256(1n * 10n ** 16n),
+  },
+};
+const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTransaction(
+  callOptions,
+  [call1, call2]
+);
+```
 
-  async relay(metaTx: MetaTransaction) {
-    const result = await this.account.execute({
-      contractAddress: metaTx.target,
-      entrypoint: 'executeMetaTransaction',
-      calldata: [
-        metaTx.sender,
-        metaTx.target,
-        metaTx.entrypoint,
-        ...metaTx.calldata,
-        metaTx.nonce,
-        ...metaTx.signature,
-      ],
-    });
+:::
 
-    return result;
-  }
-}
+### Process the Outside Execution
 
-// Usage
-const myProvider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-const relayerAccount = new Account({
-  provider: myProvider,
-  address: relayerAddress,
-  signer: relayerPrivateKey,
-});
-const userSigner = new Signer(userPrivateKey);
+Finally, if you are in the time frame, you can perform the Outside Execution, using the executor Account :
 
-const relayer = new Relayer(relayerAccount, myProvider);
+```typescript
+const executorAccount = new Account(provider, executorAddress, executorPrivateKey);
+const response = await executorAccount.executeFromOutside(outsideTransaction1);
+await provider.waitForTransaction(response.transaction_hash);
+```
 
-// Create meta-transaction
-const metaTx = await MetaTransaction.create(
-  userAddress,
-  targetContract,
-  'transfer',
-  ['0x...', '1000'],
-  await myProvider.getNonceForAddress(userAddress),
-  userSigner
+:::info
+If you have created several `OutsideTransaction` objects using the same signer account, you can execute them in any order (no nonce problems).
+:::
+
+:::note
+In the same command, you can use several `OutsideTransaction` objects created by several signer accounts, even if they are not compatible with the same version of SNIP-9 (V1 or V2):
+
+```typescript
+const outsideTransaction1: OutsideTransaction = await accountAX3.getOutsideTransaction(
+  callOptions,
+  call1
+); // V1 compatible
+const outsideTransaction2: OutsideTransaction = await accountAX4.getOutsideTransaction(
+  callOptions,
+  call2
+); // V2 compatible
+const res = await executorAccount.executeFromOutside([outsideTransaction1, outsideTransaction2]);
+```
+
+:::
+
+## Example of Outside Execution using a Ledger Nano
+
+In this example, we want to sign, with a Ledger Nano X, several transactions at 6PM. Then a code is automatically launched each hour until the next day at 8AM, verifying if some conditions are reached. The code will then trigger the execution of some of the transactions signed earlier with the Ledger Nano.
+By this way, you can pre-sign some transactions with the Ledger, and if during the night something occurs, a backend can execute automatically some of these transactions, **in any order**.  
+In this process, **the private key of the Ledger account is never exposed**.
+
+First, create a Ledger account in Devnet. You will find some documentation [here](./signature.md#signing-with-a-ledger-hardware-wallet), and an example [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/4.deployLedgerAccount.ts).
+
+The initial balances are:
+
+|                 account | ETH balance |
+| ----------------------: | ----------- |
+|          Ledger Account | 20.0        |
+| Backend executorAccount | 999.9902013 |
+|                Account1 | 1000.0      |
+|                Account2 | 1000.0      |
+
+Now, we can ask the user to sign on its Ledger some outside transactions:
+
+```typescript
+const callOptions: OutsideExecutionOptions = {
+  caller: executorAccount.address,
+  execute_after: Math.floor(Date.now() / 1000) - 3600, // 1 hour ago
+  execute_before: Math.floor(Date.now() / 1000) + 3600 * 14, // 14 hours from now
+};
+const call1 = {
+  contractAddress: ethAddress,
+  entrypoint: 'transfer',
+  calldata: {
+    recipient: account1.address,
+    amount: cairo.uint256(1n * 10n ** 18n),
+  },
+};
+const call2 = {
+  contractAddress: ethAddress,
+  entrypoint: 'transfer',
+  calldata: {
+    recipient: account2.address,
+    amount: cairo.uint256(2n * 10n ** 18n),
+  },
+};
+const call3 = {
+  contractAddress: ethAddress,
+  entrypoint: 'transfer',
+  calldata: {
+    recipient: account1.address,
+    amount: cairo.uint256(3n * 10n ** 18n),
+  },
+};
+const call4 = {
+  contractAddress: ethAddress,
+  entrypoint: 'transfer',
+  calldata: {
+    recipient: account2.address,
+    amount: cairo.uint256(4n * 10n ** 18n),
+  },
+};
+console.log("It's 6PM. Before night, we will now pre-sign 3 outside transactions:");
+console.log(
+  'Sign now on the Ledger Nano for :\n- Transfer 1 ETH to account1.\n- Transfer 2 ETH to account2.'
+);
+const outsideTransaction1: OutsideTransaction = await ledgerAccount.getOutsideTransaction(
+  callOptions,
+  [call1, call2]
 );
 
-// Relay transaction
-const result = await relayer.relay(metaTx);
-console.log('Transaction hash:', result.transaction_hash);
+console.log('Sign now on the Ledger Nano for :\n- Transfer 3 ETH to account1.');
+const outsideTransaction2: OutsideTransaction = await ledgerAccount.getOutsideTransaction(
+  callOptions,
+  call3
+);
+
+console.log('Sign now on the Ledger Nano for :\n- Transfer 4 ETH to account1.');
+const outsideTransaction3: OutsideTransaction = await ledgerAccount.getOutsideTransaction(
+  callOptions,
+  call4
+);
 ```
 
-## Security considerations
+Transfer these 3 `OutsideTransaction` objects to the backend.
 
-When implementing outside execution:
-
-1. Validate all signatures and permissions thoroughly
-2. Use nonces to prevent replay attacks
-3. Implement proper access control in contracts
-4. Consider gas costs and limitations
-5. Monitor for suspicious activity
-
-## Error handling
-
-Handle common outside execution errors:
+Imagine we are 5 hours later, the backend has decided to execute a transaction:
 
 ```typescript
-try {
-  const result = await executeDelegated(myAccount, delegateSigner, transaction);
-} catch (error) {
-  if (error.message.includes('Invalid delegate signature')) {
-    console.error('Delegate signature verification failed');
-  } else if (error.message.includes('Invalid nonce')) {
-    console.error('Nonce mismatch');
-  } else if (error.message.includes('Unauthorized delegate')) {
-    console.error('Delegate not authorized');
-  } else {
-    console.error('Transaction failed:', error);
-  }
-}
+console.log('The backend has detected a situation that execute Transaction 2.');
+const res0 = await executorAccount.executeFromOutside(outsideTransaction2);
+await myProvider.waitForTransaction(res0.transaction_hash);
 ```
 
-## Best practices
+The balances are now :
 
-1. Always verify signatures before execution
-2. Use unique nonces for each transaction
-3. Implement proper error handling
-4. Test thoroughly with different scenarios
-5. Monitor gas costs and optimize when needed
-6. Keep private keys secure
-7. Implement proper logging and monitoring
-8. Consider rate limiting for security
-9. Document the validation requirements
-10. Regular security audits
+|                 account | ETH balance |
+| ----------------------: | ----------- |
+|          Ledger Account | 17.0        |
+| Backend executorAccount | 999.9901592 |
+|                Account1 | 1003.0      |
+|                Account2 | 1000.0      |
+
+2 hours later, the backend has decided to execute several transactions:
+
+```typescript
+console.log('The backend has detected a situation that execute simultaneously Transactions 1 & 3.');
+const res1 = await executorAccount.executeFromOutside([outsideTransaction1, outsideTransaction3]);
+await myProvider.waitForTransaction(res1.transaction_hash);
+```
+
+The balances are finally :
+
+|                 account | ETH balance |
+| ----------------------: | ----------- |
+|          Ledger Account | 10.0        |
+| Backend executorAccount | 999.9901005 |
+|                Account1 | 1004.0      |
+|                Account2 | 1006.0      |
+
+:::info
+The complete code of this example is available [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/Starknet131/Starknet131-devnet/17.outsideExecuteLedger.ts).
+:::
+
+## Estimate fees for an outside execution:
+
+On executor side, if you want to estimate how many fees you will pay:
+
+```typescript
+const outsideExecutionCall: Call[] =
+  outsideExecution.buildExecuteFromOutsideCall(outsideTransaction1);
+const estimateFee = await executorAccount.estimateFee(outsideExecutionCall);
+```
+
+## Simulate an outside execution:
+
+On executor side, if you want to simulate the transaction:
+
+```typescript
+const outsideExecutionCall: Call[] =
+  outsideExecution.buildExecuteFromOutsideCall(outsideTransaction1);
+const invocations: Invocations = [
+  {
+    type: TransactionType.INVOKE,
+    payload: outsideExecutionCall,
+  },
+];
+const responseSimulate = await executorAccount.simulateTransaction(invocations);
+```

@@ -12,9 +12,9 @@ The Ledger has to be connected, unlocked and the Starknet APP has to be selected
 
 ## Type parameters
 
-| Name        | Type                                    |
-| :---------- | :-------------------------------------- |
-| `Transport` | extends `Record`<`any`, `any`\> = `any` |
+| Name        | Type                                     |
+| :---------- | :--------------------------------------- |
+| `Transport` | extends `Record`\<`any`, `any`\> = `any` |
 
 ## Hierarchy
 
@@ -32,15 +32,15 @@ The Ledger has to be connected, unlocked and the Starknet APP has to be selected
 
 ### constructor
 
-• **new LedgerSigner221**<`Transport`\>(`transport`, `accountID`, `eip2645application?`, `pathFunction?`): [`LedgerSigner221`](LedgerSigner221.md)<`Transport`\>
+• **new LedgerSigner221**\<`Transport`\>(`transport`, `accountID`, `eip2645application?`, `pathFunction?`): [`LedgerSigner221`](LedgerSigner221.md)\<`Transport`\>
 
 constructor of the LedgerSigner class.
 
 #### Type parameters
 
-| Name        | Type                                    |
-| :---------- | :-------------------------------------- |
-| `Transport` | extends `Record`<`any`, `any`\> = `any` |
+| Name        | Type                                     |
+| :---------- | :--------------------------------------- |
+| `Transport` | extends `Record`\<`any`, `any`\> = `any` |
 
 #### Parameters
 
@@ -53,7 +53,7 @@ constructor of the LedgerSigner class.
 
 #### Returns
 
-[`LedgerSigner221`](LedgerSigner221.md)<`Transport`\>
+[`LedgerSigner221`](LedgerSigner221.md)\<`Transport`\>
 
 **`Example`**
 
@@ -187,7 +187,7 @@ const myLedgerSigner = new LedgerSigner211(myNodeTransport, 0);
 
 ### signTransaction
 
-▸ **signTransaction**(`transactions`, `transactionsDetail`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signTransaction**(`transactions`, `transactionsDetail`): `Promise`\<[`Signature`](../modules.md#signature)\>
 
 Sign in a Ledger a V1 or a V3 transaction. The details are displayed on the Ledger screen.
 
@@ -200,7 +200,7 @@ Sign in a Ledger a V1 or a V3 transaction. The details are displayed on the Ledg
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`\<[`Signature`](../modules.md#signature)\>
 
 The signed transaction.
 
@@ -251,7 +251,7 @@ const result = myLedgerSigner.signTransaction([call0, call1], txDetailsV3);
 
 ### signDeployAccountTransaction
 
-▸ **signDeployAccountTransaction**(`details`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signDeployAccountTransaction**(`details`): `Promise`\<[`Signature`](../modules.md#signature)\>
 
 Sign in a Ledger the deployment of a new account. The details are displayed on the Ledger screen.
 
@@ -263,7 +263,7 @@ Sign in a Ledger the deployment of a new account. The details are displayed on t
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`\<[`Signature`](../modules.md#signature)\>
 
 The deploy account signature.
 
@@ -369,7 +369,7 @@ Call encoded in an array of Uint8Array (each containing 7 u256).
 
 ### signTxV3
 
-▸ **signTxV3**(`txDetails`, `calls`): `Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../modules.md#signature) }\>
+▸ **signTxV3**(`txDetails`, `calls`): `Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../modules.md#signature) }\>
 
 Ask to the Ledger Nano to display and sign a Starknet V3 transaction.
 
@@ -382,7 +382,7 @@ Ask to the Ledger Nano to display and sign a Starknet V3 transaction.
 
 #### Returns
 
-`Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../modules.md#signature) }\>
+`Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../modules.md#signature) }\>
 
 an object including the transaction Hash and the signature
 
@@ -430,7 +430,7 @@ const res = await myLedgerSigner.signTxV3(txDetailsV3, calls);
 
 ### signDeployAccountV3
 
-▸ **signDeployAccountV3**(`deployAccountDetail`): `Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../modules.md#signature) }\>
+▸ **signDeployAccountV3**(`deployAccountDetail`): `Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../modules.md#signature) }\>
 
 Ask the Ledger Nano to display and sign a Starknet V3 account deployment.
 
@@ -442,7 +442,7 @@ Ask the Ledger Nano to display and sign a Starknet V3 account deployment.
 
 #### Returns
 
-`Promise`<\{ `hash`: `bigint` ; `signature`: [`Signature`](../modules.md#signature) }\>
+`Promise`\<\{ `hash`: `bigint` ; `signature`: [`Signature`](../modules.md#signature) }\>
 
 an object including the transaction Hash and the signature
 
@@ -484,13 +484,13 @@ const res = await myLedgerSigner.signDeployAccountV3(deployData);
 
 ### getPubKey
 
-▸ **getPubKey**(): `Promise`<`string`\>
+▸ **getPubKey**(): `Promise`\<`string`\>
 
 provides the Starknet public key
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 an hex string : 64 characters are Point X coordinate.
 
@@ -517,13 +517,13 @@ const result = await myLedgerSigner.getPubKey();
 
 ### getFullPubKey
 
-▸ **getFullPubKey**(): `Promise`<`string`\>
+▸ **getFullPubKey**(): `Promise`\<`string`\>
 
 provides the full public key (with parity prefix)
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 an hex string : 2 first characters are the parity, the 64 following characters are Point X coordinate. 64 last characters are Point Y coordinate.
 
@@ -546,13 +546,13 @@ const result = await myLedgerSigner.getFullPubKey();
 
 ### getAppVersion
 
-▸ **getAppVersion**(): `Promise`<`string`\>
+▸ **getAppVersion**(): `Promise`\<`string`\>
 
 Returns the version of the Starknet APP implemented in the Ledger.
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 version.
 
@@ -575,7 +575,7 @@ const result = await myLedgerSigner.getAppVersion();
 
 ### signMessage
 
-▸ **signMessage**(`typedDataToHash`, `accountAddress`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signMessage**(`typedDataToHash`, `accountAddress`): `Promise`\<[`Signature`](../modules.md#signature)\>
 
 Sign a TypedData message (SNIP-12) in a Ledger.
 
@@ -588,7 +588,7 @@ Sign a TypedData message (SNIP-12) in a Ledger.
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`\<[`Signature`](../modules.md#signature)\>
 
 The signed message.
 
@@ -617,7 +617,7 @@ const result = myLedgerSigner.signMessage(snip12Message, account0.address);
 
 ### signDeclareTransaction
 
-▸ **signDeclareTransaction**(`details`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signDeclareTransaction**(`details`): `Promise`\<[`Signature`](../modules.md#signature)\>
 
 Sign in a Ledger the declaration of a new class. This is a blind sign on the Ledger screen.
 
@@ -629,7 +629,7 @@ Sign in a Ledger the declaration of a new class. This is a blind sign on the Led
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`\<[`Signature`](../modules.md#signature)\>
 
 The declare Signature.
 
@@ -658,7 +658,7 @@ const result = myLedgerSigner.signDeclareTransaction(details);
 
 ### signRaw
 
-▸ **signRaw**(`msgHash`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signRaw**(`msgHash`): `Promise`\<[`Signature`](../modules.md#signature)\>
 
 Internal function to sign a hash in a Ledger Nano.
 This is a blind sign in the Ledger ; no display of what you are signing.
@@ -671,7 +671,7 @@ This is a blind sign in the Ledger ; no display of what you are signing.
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`\<[`Signature`](../modules.md#signature)\>
 
 #### Inherited from
 
@@ -685,13 +685,13 @@ This is a blind sign in the Ledger ; no display of what you are signing.
 
 ### getPublicKeys
 
-▸ **getPublicKeys**(): `Promise`<`void`\>
+▸ **getPublicKeys**(): `Promise`\<`void`\>
 
 internal function to get both the Starknet public key and the full public key
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Inherited from
 

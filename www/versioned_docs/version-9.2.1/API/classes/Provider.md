@@ -8,7 +8,7 @@ custom_edit_url: null
 
 ## Hierarchy
 
-- `RpcProvider`<`this`\> & `StarknetId`<`this`\> & `BrotherId`<`this`\>
+- `RpcProvider`\<`this`\> & `StarknetId`\<`this`\> & `BrotherId`\<`this`\>
 
   ↳ **`Provider`**
 
@@ -80,17 +80,17 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).channel
 
 ### getStateUpdate
 
-• **getStateUpdate**: () => `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>(`blockIdentifier`: `"pre_confirmed"`) => `Promise`<\{ `block_hash`: `never` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } ; `old_root`: `undefined` \| `string` }\>(`blockIdentifier`: `"latest"`) => `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>(`blockIdentifier?`: [`BlockIdentifier`](../modules.md#blockidentifier)) => `Promise`<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
+• **getStateUpdate**: () => `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>(`blockIdentifier`: `"pre_confirmed"`) => `Promise`\<\{ `block_hash`: `never` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } ; `old_root`: `undefined` \| `string` }\>(`blockIdentifier`: `"latest"`) => `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>(`blockIdentifier?`: [`BlockIdentifier`](../modules.md#blockidentifier)) => `Promise`\<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
 
 #### Type declaration
 
-▸ (): `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
+▸ (): `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
 
 ##### Returns
 
-`Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
+`Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
 
-▸ (`blockIdentifier`): `Promise`<\{ `block_hash`: `never` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } ; `old_root`: `undefined` \| `string` }\>
+▸ (`blockIdentifier`): `Promise`\<\{ `block_hash`: `never` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } ; `old_root`: `undefined` \| `string` }\>
 
 ##### Parameters
 
@@ -100,9 +100,9 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).channel
 
 ##### Returns
 
-`Promise`<\{ `block_hash`: `never` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } ; `old_root`: `undefined` \| `string` }\>
+`Promise`\<\{ `block_hash`: `never` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } ; `old_root`: `undefined` \| `string` }\>
 
-▸ (`blockIdentifier`): `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
+▸ (`blockIdentifier`): `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
 
 ##### Parameters
 
@@ -112,9 +112,9 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).channel
 
 ##### Returns
 
-`Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
+`Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
 
-▸ (`blockIdentifier?`): `Promise`<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
+▸ (`blockIdentifier?`): `Promise`\<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
 
 ##### Parameters
 
@@ -124,7 +124,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).channel
 
 ##### Returns
 
-`Promise`<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
+`Promise`\<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
 
 #### Inherited from
 
@@ -138,7 +138,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStateUpdate
 
 ### create
 
-▸ **create**<`T`\>(`this`, `optionsOrProvider?`): `Promise`<`T`\>
+▸ **create**\<`T`\>(`this`, `optionsOrProvider?`): `Promise`\<`T`\>
 
 auto configure channel based on provided node
 leave space for other async before constructor
@@ -158,7 +158,7 @@ leave space for other async before constructor
 
 #### Returns
 
-`Promise`<`T`\>
+`Promise`\<`T`\>
 
 #### Inherited from
 
@@ -172,7 +172,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).create
 
 ### getStarkName
 
-▸ **getStarkName**(`provider`, `address`, `StarknetIdContract?`): `Promise`<`string`\>
+▸ **getStarkName**(`provider`, `address`, `StarknetIdContract?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -184,7 +184,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).create
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -198,7 +198,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStarkName
 
 ### getAddressFromStarkName
 
-▸ **getAddressFromStarkName**(`provider`, `name`, `StarknetIdContract?`): `Promise`<`string`\>
+▸ **getAddressFromStarkName**(`provider`, `name`, `StarknetIdContract?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -210,7 +210,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStarkName
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -224,7 +224,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getAddressFromStarkName
 
 ### getStarkProfile
 
-▸ **getStarkProfile**(`provider`, `address`, `StarknetIdContract?`, `StarknetIdIdentityContract?`, `StarknetIdVerifierContract?`, `StarknetIdPfpContract?`, `StarknetIdPopContract?`, `StarknetIdMulticallContract?`): `Promise`<[`StarkProfile`](../modules.md#starkprofile)\>
+▸ **getStarkProfile**(`provider`, `address`, `StarknetIdContract?`, `StarknetIdIdentityContract?`, `StarknetIdVerifierContract?`, `StarknetIdPfpContract?`, `StarknetIdPopContract?`, `StarknetIdMulticallContract?`): `Promise`\<[`StarkProfile`](../modules.md#starkprofile)\>
 
 #### Parameters
 
@@ -241,7 +241,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getAddressFromStarkName
 
 #### Returns
 
-`Promise`<[`StarkProfile`](../modules.md#starkprofile)\>
+`Promise`\<[`StarkProfile`](../modules.md#starkprofile)\>
 
 #### Inherited from
 
@@ -255,7 +255,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStarkProfile
 
 ### getBrotherName
 
-▸ **getBrotherName**(`provider`, `address`, `BrotherIdContract?`): `Promise`<`string`\>
+▸ **getBrotherName**(`provider`, `address`, `BrotherIdContract?`): `Promise`\<`string`\>
 
 Static implementation of getBrotherName
 
@@ -269,7 +269,7 @@ Static implementation of getBrotherName
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The domain name with .brother suffix
 
@@ -285,7 +285,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBrotherName
 
 ### getAddressFromBrotherName
 
-▸ **getAddressFromBrotherName**(`provider`, `name`, `BrotherIdContract?`): `Promise`<`string`\>
+▸ **getAddressFromBrotherName**(`provider`, `name`, `BrotherIdContract?`): `Promise`\<`string`\>
 
 Static implementation of getAddressFromBrotherName
 
@@ -299,7 +299,7 @@ Static implementation of getAddressFromBrotherName
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The resolver address
 
@@ -315,7 +315,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getAddressFromBrotherName
 
 ### getBrotherProfile
 
-▸ **getBrotherProfile**(`provider`, `address`, `BrotherIdContract?`): `Promise`<`BrotherProfile`\>
+▸ **getBrotherProfile**(`provider`, `address`, `BrotherIdContract?`): `Promise`\<`BrotherProfile`\>
 
 Static implementation of getBrotherProfile
 
@@ -329,7 +329,7 @@ Static implementation of getBrotherProfile
 
 #### Returns
 
-`Promise`<`BrotherProfile`\>
+`Promise`\<`BrotherProfile`\>
 
 The complete Brother profile
 
@@ -345,7 +345,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBrotherProfile
 
 ### fetch
 
-▸ **fetch**(`method`, `params?`, `id?`): `Promise`<`Response`\>
+▸ **fetch**(`method`, `params?`, `id?`): `Promise`\<`Response`\>
 
 #### Parameters
 
@@ -357,7 +357,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBrotherProfile
 
 #### Returns
 
-`Promise`<`Response`\>
+`Promise`\<`Response`\>
 
 #### Inherited from
 
@@ -371,11 +371,11 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).fetch
 
 ### getChainId
 
-▸ **getChainId**(): `Promise`<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
+▸ **getChainId**(): `Promise`\<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
 
 #### Returns
 
-`Promise`<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
+`Promise`\<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
 
 #### Inherited from
 
@@ -407,11 +407,11 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).readSpecVersion
 
 ### getSpecVersion
 
-▸ **getSpecVersion**(): `Promise`<`string`\>
+▸ **getSpecVersion**(): `Promise`\<`string`\>
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -425,11 +425,11 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getSpecVersion
 
 ### setUpSpecVersion
 
-▸ **setUpSpecVersion**(): `Promise`<`"0.9.0"` \| `"0.10.0"`\>
+▸ **setUpSpecVersion**(): `Promise`\<`"0.9.0"` \| `"0.10.0"`\>
 
 #### Returns
 
-`Promise`<`"0.9.0"` \| `"0.10.0"`\>
+`Promise`\<`"0.9.0"` \| `"0.10.0"`\>
 
 #### Inherited from
 
@@ -443,7 +443,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).setUpSpecVersion
 
 ### getStarknetVersion
 
-▸ **getStarknetVersion**(`blockIdentifier?`): `Promise`<`string`\>
+▸ **getStarknetVersion**(`blockIdentifier?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -453,7 +453,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).setUpSpecVersion
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -467,7 +467,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStarknetVersion
 
 ### getNonceForAddress
 
-▸ **getNonceForAddress**(`contractAddress`, `blockIdentifier?`): `Promise`<`string`\>
+▸ **getNonceForAddress**(`contractAddress`, `blockIdentifier?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -478,7 +478,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStarknetVersion
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -492,11 +492,11 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getNonceForAddress
 
 ### getBlock
 
-▸ **getBlock**(): `Promise`<\{ `transactions`: `string`[] ; `block_number`: `number` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
+▸ **getBlock**(): `Promise`\<\{ `transactions`: `string`[] ; `block_number`: `number` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
 
 #### Returns
 
-`Promise`<\{ `transactions`: `string`[] ; `block_number`: `number` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
+`Promise`\<\{ `transactions`: `string`[] ; `block_number`: `number` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
 
 #### Inherited from
 
@@ -506,7 +506,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlock
 
 [src/provider/rpc.ts:159](https://github.com/starknet-io/starknet.js/blob/v9.2.1/src/provider/rpc.ts#L159)
 
-▸ **getBlock**(`blockIdentifier`): `Promise`<\{ `transactions`: `string`[] ; `block_number`: `number` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
+▸ **getBlock**(`blockIdentifier`): `Promise`\<\{ `transactions`: `string`[] ; `block_number`: `number` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
 
 #### Parameters
 
@@ -516,7 +516,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlock
 
 #### Returns
 
-`Promise`<\{ `transactions`: `string`[] ; `block_number`: `number` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
+`Promise`\<\{ `transactions`: `string`[] ; `block_number`: `number` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
 
 #### Inherited from
 
@@ -526,7 +526,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlock
 
 [src/provider/rpc.ts:160](https://github.com/starknet-io/starknet.js/blob/v9.2.1/src/provider/rpc.ts#L160)
 
-▸ **getBlock**(`blockIdentifier`): `Promise`<\{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC010.API.md#eblockstatus) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` ; `event_commitment`: `string` ; `transaction_commitment`: `string` ; `receipt_commitment`: `string` ; `state_diff_commitment`: `string` ; `event_count`: `number` ; `transaction_count`: `number` ; `state_diff_length`: `number` ; `transactions`: `string`[] }\>
+▸ **getBlock**(`blockIdentifier`): `Promise`\<\{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC010.API.md#eblockstatus) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` ; `event_commitment`: `string` ; `transaction_commitment`: `string` ; `receipt_commitment`: `string` ; `state_diff_commitment`: `string` ; `event_count`: `number` ; `transaction_count`: `number` ; `state_diff_length`: `number` ; `transactions`: `string`[] }\>
 
 #### Parameters
 
@@ -536,7 +536,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlock
 
 #### Returns
 
-`Promise`<\{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC010.API.md#eblockstatus) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` ; `event_commitment`: `string` ; `transaction_commitment`: `string` ; `receipt_commitment`: `string` ; `state_diff_commitment`: `string` ; `event_count`: `number` ; `transaction_count`: `number` ; `state_diff_length`: `number` ; `transactions`: `string`[] }\>
+`Promise`\<\{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC010.API.md#eblockstatus) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC010.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC010.API.md#l1_da_mode) ; `starknet_version`: `string` ; `event_commitment`: `string` ; `transaction_commitment`: `string` ; `receipt_commitment`: `string` ; `state_diff_commitment`: `string` ; `event_count`: `number` ; `transaction_count`: `number` ; `state_diff_length`: `number` ; `transactions`: `string`[] }\>
 
 #### Inherited from
 
@@ -546,7 +546,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlock
 
 [src/provider/rpc.ts:161](https://github.com/starknet-io/starknet.js/blob/v9.2.1/src/provider/rpc.ts#L161)
 
-▸ **getBlock**(`blockIdentifier`): `Promise`<[`GetBlockResponse`](../modules.md#getblockresponse)\>
+▸ **getBlock**(`blockIdentifier`): `Promise`\<[`GetBlockResponse`](../modules.md#getblockresponse)\>
 
 #### Parameters
 
@@ -556,7 +556,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlock
 
 #### Returns
 
-`Promise`<[`GetBlockResponse`](../modules.md#getblockresponse)\>
+`Promise`\<[`GetBlockResponse`](../modules.md#getblockresponse)\>
 
 #### Inherited from
 
@@ -570,11 +570,11 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlock
 
 ### getBlockLatestAccepted
 
-▸ **getBlockLatestAccepted**(): `Promise`<[`BlockHashAndNumber`](../namespaces/RPC.RPCSPEC09.API.md#blockhashandnumber)\>
+▸ **getBlockLatestAccepted**(): `Promise`\<[`BlockHashAndNumber`](../namespaces/RPC.RPCSPEC09.API.md#blockhashandnumber)\>
 
 #### Returns
 
-`Promise`<[`BlockHashAndNumber`](../namespaces/RPC.RPCSPEC09.API.md#blockhashandnumber)\>
+`Promise`\<[`BlockHashAndNumber`](../namespaces/RPC.RPCSPEC09.API.md#blockhashandnumber)\>
 
 #### Inherited from
 
@@ -588,11 +588,11 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockLatestAccepted
 
 ### getBlockNumber
 
-▸ **getBlockNumber**(): `Promise`<`number`\>
+▸ **getBlockNumber**(): `Promise`\<`number`\>
 
 #### Returns
 
-`Promise`<`number`\>
+`Promise`\<`number`\>
 
 #### Inherited from
 
@@ -606,7 +606,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockNumber
 
 ### getBlockWithTxHashes
 
-▸ **getBlockWithTxHashes**(`blockIdentifier?`): `Promise`<`OnlyFirst`<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+▸ **getBlockWithTxHashes**(`blockIdentifier?`): `Promise`\<`OnlyFirst`\<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 #### Parameters
 
@@ -616,7 +616,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockNumber
 
 #### Returns
 
-`Promise`<`OnlyFirst`<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+`Promise`\<`OnlyFirst`\<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 #### Inherited from
 
@@ -630,7 +630,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockWithTxHashes
 
 ### getBlockWithTxs
 
-▸ **getBlockWithTxs**(`blockIdentifier?`): `Promise`<`OnlyFirst`<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+▸ **getBlockWithTxs**(`blockIdentifier?`): `Promise`\<`OnlyFirst`\<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 #### Parameters
 
@@ -640,7 +640,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockWithTxHashes
 
 #### Returns
 
-`Promise`<`OnlyFirst`<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+`Promise`\<`OnlyFirst`\<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 #### Inherited from
 
@@ -654,7 +654,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockWithTxs
 
 ### waitForBlock
 
-▸ **waitForBlock**(`blockIdentifier?`, `retryInterval?`): `Promise`<`void`\>
+▸ **waitForBlock**(`blockIdentifier?`, `retryInterval?`): `Promise`\<`void`\>
 
 #### Parameters
 
@@ -665,7 +665,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockWithTxs
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -679,7 +679,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).waitForBlock
 
 ### getL1GasPrice
 
-▸ **getL1GasPrice**(`blockIdentifier?`): `Promise`<`string`\>
+▸ **getL1GasPrice**(`blockIdentifier?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -689,7 +689,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).waitForBlock
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -703,7 +703,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getL1GasPrice
 
 ### getGasPrices
 
-▸ **getGasPrices**(`blockIdentifier?`): `Promise`<[`GasPrices`](../modules.md#gasprices)\>
+▸ **getGasPrices**(`blockIdentifier?`): `Promise`\<[`GasPrices`](../modules.md#gasprices)\>
 
 Get the gas prices related to a block.
 
@@ -715,7 +715,7 @@ Get the gas prices related to a block.
 
 #### Returns
 
-`Promise`<[`GasPrices`](../modules.md#gasprices)\>
+`Promise`\<[`GasPrices`](../modules.md#gasprices)\>
 
 an object with l1DataGasPrice, l1GasPrice, l2GasPrice properties (all bigint type).
 
@@ -738,7 +738,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getGasPrices
 
 ### getL1MessageHash
 
-▸ **getL1MessageHash**(`l2TxHash`): `Promise`<`string`\>
+▸ **getL1MessageHash**(`l2TxHash`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -748,7 +748,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getGasPrices
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -762,7 +762,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getL1MessageHash
 
 ### getBlockWithReceipts
 
-▸ **getBlockWithReceipts**(`blockIdentifier?`): `Promise`<`OnlyFirst`<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+▸ **getBlockWithReceipts**(`blockIdentifier?`): `Promise`\<`OnlyFirst`\<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 #### Parameters
 
@@ -772,7 +772,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getL1MessageHash
 
 #### Returns
 
-`Promise`<`OnlyFirst`<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+`Promise`\<`OnlyFirst`\<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 #### Inherited from
 
@@ -786,11 +786,11 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockWithReceipts
 
 ### getBlockStateUpdate
 
-▸ **getBlockStateUpdate**(): `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
+▸ **getBlockStateUpdate**(): `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
 
 #### Returns
 
-`Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
+`Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
 
 #### Inherited from
 
@@ -800,7 +800,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockStateUpdate
 
 [src/provider/rpc.ts:259](https://github.com/starknet-io/starknet.js/blob/v9.2.1/src/provider/rpc.ts#L259)
 
-▸ **getBlockStateUpdate**(`blockIdentifier`): `Promise`<\{ `block_hash`: `never` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } ; `old_root`: `undefined` \| `string` }\>
+▸ **getBlockStateUpdate**(`blockIdentifier`): `Promise`\<\{ `block_hash`: `never` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } ; `old_root`: `undefined` \| `string` }\>
 
 #### Parameters
 
@@ -810,7 +810,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockStateUpdate
 
 #### Returns
 
-`Promise`<\{ `block_hash`: `never` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } ; `old_root`: `undefined` \| `string` }\>
+`Promise`\<\{ `block_hash`: `never` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } ; `old_root`: `undefined` \| `string` }\>
 
 #### Inherited from
 
@@ -820,7 +820,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockStateUpdate
 
 [src/provider/rpc.ts:260](https://github.com/starknet-io/starknet.js/blob/v9.2.1/src/provider/rpc.ts#L260)
 
-▸ **getBlockStateUpdate**(`blockIdentifier`): `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
+▸ **getBlockStateUpdate**(`blockIdentifier`): `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
 
 #### Parameters
 
@@ -830,7 +830,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockStateUpdate
 
 #### Returns
 
-`Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
+`Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] ; `migrated_compiled_classes`: `undefined` \| \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] } }\>
 
 #### Inherited from
 
@@ -840,7 +840,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockStateUpdate
 
 [src/provider/rpc.ts:263](https://github.com/starknet-io/starknet.js/blob/v9.2.1/src/provider/rpc.ts#L263)
 
-▸ **getBlockStateUpdate**(`blockIdentifier?`): `Promise`<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
+▸ **getBlockStateUpdate**(`blockIdentifier?`): `Promise`\<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
 
 #### Parameters
 
@@ -850,7 +850,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockStateUpdate
 
 #### Returns
 
-`Promise`<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
+`Promise`\<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
 
 #### Inherited from
 
@@ -864,7 +864,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockStateUpdate
 
 ### getBlockTransactionsTraces
 
-▸ **getBlockTransactionsTraces**(`blockIdentifier?`): `Promise`<[`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC09.API.md#blocktransactionstraces) \| [`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC010.API.md#blocktransactionstraces)\>
+▸ **getBlockTransactionsTraces**(`blockIdentifier?`): `Promise`\<[`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC09.API.md#blocktransactionstraces) \| [`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC010.API.md#blocktransactionstraces)\>
 
 #### Parameters
 
@@ -874,7 +874,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockStateUpdate
 
 #### Returns
 
-`Promise`<[`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC09.API.md#blocktransactionstraces) \| [`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC010.API.md#blocktransactionstraces)\>
+`Promise`\<[`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC09.API.md#blocktransactionstraces) \| [`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC010.API.md#blocktransactionstraces)\>
 
 #### Inherited from
 
@@ -888,7 +888,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockTransactionsTraces
 
 ### getBlockTransactionCount
 
-▸ **getBlockTransactionCount**(`blockIdentifier?`): `Promise`<`number`\>
+▸ **getBlockTransactionCount**(`blockIdentifier?`): `Promise`\<`number`\>
 
 #### Parameters
 
@@ -898,7 +898,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockTransactionsTraces
 
 #### Returns
 
-`Promise`<`number`\>
+`Promise`\<`number`\>
 
 #### Inherited from
 
@@ -912,7 +912,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockTransactionCount
 
 ### getTransaction
 
-▸ **getTransaction**(`txHash`): `Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
+▸ **getTransaction**(`txHash`): `Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
 
 #### Parameters
 
@@ -922,7 +922,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBlockTransactionCount
 
 #### Returns
 
-`Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
+`Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
 
 #### Inherited from
 
@@ -936,7 +936,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransaction
 
 ### getTransactionByHash
 
-▸ **getTransactionByHash**(`txHash`): `Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
+▸ **getTransactionByHash**(`txHash`): `Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
 
 #### Parameters
 
@@ -946,7 +946,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransaction
 
 #### Returns
 
-`Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
+`Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
 
 #### Inherited from
 
@@ -960,7 +960,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransactionByHash
 
 ### getTransactionByBlockIdAndIndex
 
-▸ **getTransactionByBlockIdAndIndex**(`blockIdentifier`, `index`): `Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
+▸ **getTransactionByBlockIdAndIndex**(`blockIdentifier`, `index`): `Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
 
 #### Parameters
 
@@ -971,7 +971,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransactionByHash
 
 #### Returns
 
-`Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
+`Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC09.API.md#txn_with_hash)\>
 
 #### Inherited from
 
@@ -985,7 +985,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransactionByBlockIdAndIndex
 
 ### getTransactionReceipt
 
-▸ **getTransactionReceipt**(`txHash`): `Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+▸ **getTransactionReceipt**(`txHash`): `Promise`\<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
 
 #### Parameters
 
@@ -995,7 +995,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransactionByBlockIdAndIndex
 
 #### Returns
 
-`Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+`Promise`\<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
 
 #### Inherited from
 
@@ -1009,7 +1009,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransactionReceipt
 
 ### getTransactionTrace
 
-▸ **getTransactionTrace**(`txHash`): `Promise`<[`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC09.API.md#transaction_trace) \| [`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC010.API.md#transaction_trace)\>
+▸ **getTransactionTrace**(`txHash`): `Promise`\<[`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC09.API.md#transaction_trace) \| [`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC010.API.md#transaction_trace)\>
 
 #### Parameters
 
@@ -1019,7 +1019,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransactionReceipt
 
 #### Returns
 
-`Promise`<[`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC09.API.md#transaction_trace) \| [`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC010.API.md#transaction_trace)\>
+`Promise`\<[`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC09.API.md#transaction_trace) \| [`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC010.API.md#transaction_trace)\>
 
 #### Inherited from
 
@@ -1033,7 +1033,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransactionTrace
 
 ### getTransactionStatus
 
-▸ **getTransactionStatus**(`transactionHash`): `Promise`<[`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC09.API.md#txn_status_result)\>
+▸ **getTransactionStatus**(`transactionHash`): `Promise`\<[`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC09.API.md#txn_status_result)\>
 
 #### Parameters
 
@@ -1043,7 +1043,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransactionTrace
 
 #### Returns
 
-`Promise`<[`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC09.API.md#txn_status_result)\>
+`Promise`\<[`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC09.API.md#txn_status_result)\>
 
 #### Inherited from
 
@@ -1057,7 +1057,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransactionStatus
 
 ### getSimulateTransaction
 
-▸ **getSimulateTransaction**(`invocations`, `options?`): `Promise`<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
+▸ **getSimulateTransaction**(`invocations`, `options?`): `Promise`\<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
 
 #### Parameters
 
@@ -1068,7 +1068,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getTransactionStatus
 
 #### Returns
 
-`Promise`<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
+`Promise`\<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
 
 #### Inherited from
 
@@ -1082,7 +1082,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getSimulateTransaction
 
 ### waitForTransaction
 
-▸ **waitForTransaction**(`txHash`, `options?`): `Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+▸ **waitForTransaction**(`txHash`, `options?`): `Promise`\<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
 
 #### Parameters
 
@@ -1093,7 +1093,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getSimulateTransaction
 
 #### Returns
 
-`Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+`Promise`\<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
 
 #### Inherited from
 
@@ -1107,7 +1107,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).waitForTransaction
 
 ### fastWaitForTransaction
 
-▸ **fastWaitForTransaction**(`txHash`, `address`, `initNonce`, `options?`): `Promise`<`boolean`\>
+▸ **fastWaitForTransaction**(`txHash`, `address`, `initNonce`, `options?`): `Promise`\<`boolean`\>
 
 Wait up until a new transaction is possible with same the account.
 This method is fast, but Events and transaction report are not yet
@@ -1126,7 +1126,7 @@ available. Useful for gaming activity.
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 Returns true if the next transaction is possible,
 false if the timeout has been reached,
@@ -1144,7 +1144,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).fastWaitForTransaction
 
 ### getStorageAt
 
-▸ **getStorageAt**(`contractAddress`, `key`, `blockIdentifier?`): `Promise`<`string`\>
+▸ **getStorageAt**(`contractAddress`, `key`, `blockIdentifier?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -1156,7 +1156,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).fastWaitForTransaction
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -1170,7 +1170,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStorageAt
 
 ### getClassHashAt
 
-▸ **getClassHashAt**(`contractAddress`, `blockIdentifier?`): `Promise`<`string`\>
+▸ **getClassHashAt**(`contractAddress`, `blockIdentifier?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -1181,7 +1181,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStorageAt
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -1195,7 +1195,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getClassHashAt
 
 ### getClassByHash
 
-▸ **getClassByHash**(`classHash`): `Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+▸ **getClassByHash**(`classHash`): `Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 #### Parameters
 
@@ -1205,7 +1205,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getClassHashAt
 
 #### Returns
 
-`Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+`Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 #### Inherited from
 
@@ -1219,7 +1219,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getClassByHash
 
 ### getClass
 
-▸ **getClass**(`classHash`, `blockIdentifier?`): `Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+▸ **getClass**(`classHash`, `blockIdentifier?`): `Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 #### Parameters
 
@@ -1230,7 +1230,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getClassByHash
 
 #### Returns
 
-`Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+`Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 #### Inherited from
 
@@ -1244,7 +1244,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getClass
 
 ### getClassAt
 
-▸ **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+▸ **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 #### Parameters
 
@@ -1255,7 +1255,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getClass
 
 #### Returns
 
-`Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+`Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 #### Inherited from
 
@@ -1269,7 +1269,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getClassAt
 
 ### getContractVersion
 
-▸ **getContractVersion**(`contractAddress`, `classHash?`, `options?`): `Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+▸ **getContractVersion**(`contractAddress`, `classHash?`, `options?`): `Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 #### Parameters
 
@@ -1281,7 +1281,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getClassAt
 
 #### Returns
 
-`Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+`Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 #### Inherited from
 
@@ -1291,7 +1291,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getContractVersion
 
 [src/provider/rpc.ts:384](https://github.com/starknet-io/starknet.js/blob/v9.2.1/src/provider/rpc.ts#L384)
 
-▸ **getContractVersion**(`contractAddress`, `classHash`, `options?`): `Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+▸ **getContractVersion**(`contractAddress`, `classHash`, `options?`): `Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 #### Parameters
 
@@ -1303,7 +1303,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getContractVersion
 
 #### Returns
 
-`Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+`Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 #### Inherited from
 
@@ -1317,7 +1317,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getContractVersion
 
 ### getInvokeEstimateFee
 
-▸ **getInvokeEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **getInvokeEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 #### Parameters
 
@@ -1330,7 +1330,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getContractVersion
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 #### Inherited from
 
@@ -1344,7 +1344,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getInvokeEstimateFee
 
 ### getDeclareEstimateFee
 
-▸ **getDeclareEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **getDeclareEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 #### Parameters
 
@@ -1357,7 +1357,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getInvokeEstimateFee
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 #### Inherited from
 
@@ -1371,7 +1371,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getDeclareEstimateFee
 
 ### getDeployAccountEstimateFee
 
-▸ **getDeployAccountEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **getDeployAccountEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 #### Parameters
 
@@ -1384,7 +1384,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getDeclareEstimateFee
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 #### Inherited from
 
@@ -1398,7 +1398,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getDeployAccountEstimateFee
 
 ### getEstimateFeeBulk
 
-▸ **getEstimateFeeBulk**(`invocations`, `options?`): `Promise`<[`EstimateFeeResponseBulkOverhead`](../modules.md#estimatefeeresponsebulkoverhead)\>
+▸ **getEstimateFeeBulk**(`invocations`, `options?`): `Promise`\<[`EstimateFeeResponseBulkOverhead`](../modules.md#estimatefeeresponsebulkoverhead)\>
 
 #### Parameters
 
@@ -1409,7 +1409,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getDeployAccountEstimateFee
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseBulkOverhead`](../modules.md#estimatefeeresponsebulkoverhead)\>
+`Promise`\<[`EstimateFeeResponseBulkOverhead`](../modules.md#estimatefeeresponsebulkoverhead)\>
 
 #### Inherited from
 
@@ -1423,7 +1423,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getEstimateFeeBulk
 
 ### invokeFunction
 
-▸ **invokeFunction**(`functionInvocation`, `details`): `Promise`<\{ `transaction_hash`: `string` }\>
+▸ **invokeFunction**(`functionInvocation`, `details`): `Promise`\<\{ `transaction_hash`: `string` }\>
 
 #### Parameters
 
@@ -1434,7 +1434,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getEstimateFeeBulk
 
 #### Returns
 
-`Promise`<\{ `transaction_hash`: `string` }\>
+`Promise`\<\{ `transaction_hash`: `string` }\>
 
 #### Inherited from
 
@@ -1448,7 +1448,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).invokeFunction
 
 ### declareContract
 
-▸ **declareContract**(`transaction`, `details`): `Promise`<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
+▸ **declareContract**(`transaction`, `details`): `Promise`\<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
 
 #### Parameters
 
@@ -1459,7 +1459,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).invokeFunction
 
 #### Returns
 
-`Promise`<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
+`Promise`\<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
 
 #### Inherited from
 
@@ -1473,7 +1473,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).declareContract
 
 ### deployAccountContract
 
-▸ **deployAccountContract**(`transaction`, `details`): `Promise`<\{ `contract_address`: `string` ; `transaction_hash`: `string` }\>
+▸ **deployAccountContract**(`transaction`, `details`): `Promise`\<\{ `contract_address`: `string` ; `transaction_hash`: `string` }\>
 
 #### Parameters
 
@@ -1484,7 +1484,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).declareContract
 
 #### Returns
 
-`Promise`<\{ `contract_address`: `string` ; `transaction_hash`: `string` }\>
+`Promise`\<\{ `contract_address`: `string` ; `transaction_hash`: `string` }\>
 
 #### Inherited from
 
@@ -1498,7 +1498,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).deployAccountContract
 
 ### callContract
 
-▸ **callContract**(`call`, `blockIdentifier?`): `Promise`<`string`[]\>
+▸ **callContract**(`call`, `blockIdentifier?`): `Promise`\<`string`[]\>
 
 #### Parameters
 
@@ -1509,7 +1509,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).deployAccountContract
 
 #### Returns
 
-`Promise`<`string`[]\>
+`Promise`\<`string`[]\>
 
 #### Inherited from
 
@@ -1523,7 +1523,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).callContract
 
 ### estimateMessageFee
 
-▸ **estimateMessageFee**(`message`, `blockIdentifier?`): `Promise`<[`MESSAGE_FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC09.API.md#message_fee_estimate) \| [`FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC010.API.md#fee_estimate)\>
+▸ **estimateMessageFee**(`message`, `blockIdentifier?`): `Promise`\<[`MESSAGE_FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC09.API.md#message_fee_estimate) \| [`FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC010.API.md#fee_estimate)\>
 
 #### Parameters
 
@@ -1534,7 +1534,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).callContract
 
 #### Returns
 
-`Promise`<[`MESSAGE_FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC09.API.md#message_fee_estimate) \| [`FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC010.API.md#fee_estimate)\>
+`Promise`\<[`MESSAGE_FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC09.API.md#message_fee_estimate) \| [`FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC010.API.md#fee_estimate)\>
 
 #### Inherited from
 
@@ -1548,11 +1548,11 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).estimateMessageFee
 
 ### getSyncingStats
 
-▸ **getSyncingStats**(): `Promise`<[`Syncing`](../namespaces/RPC.RPCSPEC09.API.md#syncing)\>
+▸ **getSyncingStats**(): `Promise`\<[`Syncing`](../namespaces/RPC.RPCSPEC09.API.md#syncing)\>
 
 #### Returns
 
-`Promise`<[`Syncing`](../namespaces/RPC.RPCSPEC09.API.md#syncing)\>
+`Promise`\<[`Syncing`](../namespaces/RPC.RPCSPEC09.API.md#syncing)\>
 
 #### Inherited from
 
@@ -1566,7 +1566,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getSyncingStats
 
 ### getEvents
 
-▸ **getEvents**(`eventFilter`): `Promise`<[`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC09.API.md#events_chunk) \| [`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC010.API.md#events_chunk)\>
+▸ **getEvents**(`eventFilter`): `Promise`\<[`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC09.API.md#events_chunk) \| [`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC010.API.md#events_chunk)\>
 
 #### Parameters
 
@@ -1576,7 +1576,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getSyncingStats
 
 #### Returns
 
-`Promise`<[`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC09.API.md#events_chunk) \| [`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC010.API.md#events_chunk)\>
+`Promise`\<[`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC09.API.md#events_chunk) \| [`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC010.API.md#events_chunk)\>
 
 #### Inherited from
 
@@ -1590,7 +1590,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getEvents
 
 ### verifyMessageInStarknet
 
-▸ **verifyMessageInStarknet**(`message`, `signature`, `accountAddress`, `signatureVerificationFunctionName?`, `signatureVerificationResponse?`): `Promise`<`boolean`\>
+▸ **verifyMessageInStarknet**(`message`, `signature`, `accountAddress`, `signatureVerificationFunctionName?`, `signatureVerificationResponse?`): `Promise`\<`boolean`\>
 
 #### Parameters
 
@@ -1607,7 +1607,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getEvents
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 #### Inherited from
 
@@ -1621,7 +1621,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).verifyMessageInStarknet
 
 ### isClassDeclared
 
-▸ **isClassDeclared**(`contractClassIdentifier`, `blockIdentifier?`): `Promise`<`boolean`\>
+▸ **isClassDeclared**(`contractClassIdentifier`, `blockIdentifier?`): `Promise`\<`boolean`\>
 
 #### Parameters
 
@@ -1632,7 +1632,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).verifyMessageInStarknet
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 #### Inherited from
 
@@ -1646,7 +1646,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).isClassDeclared
 
 ### prepareInvocations
 
-▸ **prepareInvocations**(`invocations`): `Promise`<[`Invocations`](../modules.md#invocations)\>
+▸ **prepareInvocations**(`invocations`): `Promise`\<[`Invocations`](../modules.md#invocations)\>
 
 #### Parameters
 
@@ -1656,7 +1656,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).isClassDeclared
 
 #### Returns
 
-`Promise`<[`Invocations`](../modules.md#invocations)\>
+`Promise`\<[`Invocations`](../modules.md#invocations)\>
 
 #### Inherited from
 
@@ -1670,7 +1670,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).prepareInvocations
 
 ### getL1MessagesStatus
 
-▸ **getL1MessagesStatus**(`transactionHash`): `Promise`<[`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC09.API.md#l1l2messagesstatus) \| [`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC010.API.md#l1l2messagesstatus)\>
+▸ **getL1MessagesStatus**(`transactionHash`): `Promise`\<[`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC09.API.md#l1l2messagesstatus) \| [`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC010.API.md#l1l2messagesstatus)\>
 
 #### Parameters
 
@@ -1680,7 +1680,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).prepareInvocations
 
 #### Returns
 
-`Promise`<[`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC09.API.md#l1l2messagesstatus) \| [`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC010.API.md#l1l2messagesstatus)\>
+`Promise`\<[`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC09.API.md#l1l2messagesstatus) \| [`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC010.API.md#l1l2messagesstatus)\>
 
 #### Inherited from
 
@@ -1694,7 +1694,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getL1MessagesStatus
 
 ### getStorageProof
 
-▸ **getStorageProof**(`classHashes`, `contractAddresses`, `contractsStorageKeys`, `blockIdentifier?`): `Promise`<[`StorageProof`](../namespaces/RPC.RPCSPEC010.API.md#storageproof)\>
+▸ **getStorageProof**(`classHashes`, `contractAddresses`, `contractsStorageKeys`, `blockIdentifier?`): `Promise`\<[`StorageProof`](../namespaces/RPC.RPCSPEC010.API.md#storageproof)\>
 
 #### Parameters
 
@@ -1707,7 +1707,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getL1MessagesStatus
 
 #### Returns
 
-`Promise`<[`StorageProof`](../namespaces/RPC.RPCSPEC010.API.md#storageproof)\>
+`Promise`\<[`StorageProof`](../namespaces/RPC.RPCSPEC010.API.md#storageproof)\>
 
 #### Inherited from
 
@@ -1721,7 +1721,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStorageProof
 
 ### getCompiledCasm
 
-▸ **getCompiledCasm**(`classHash`): `Promise`<[`CASM_COMPILED_CONTRACT_CLASS`](../namespaces/RPC.RPCSPEC010.API.md#casm_compiled_contract_class)\>
+▸ **getCompiledCasm**(`classHash`): `Promise`\<[`CASM_COMPILED_CONTRACT_CLASS`](../namespaces/RPC.RPCSPEC010.API.md#casm_compiled_contract_class)\>
 
 #### Parameters
 
@@ -1731,7 +1731,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStorageProof
 
 #### Returns
 
-`Promise`<[`CASM_COMPILED_CONTRACT_CLASS`](../namespaces/RPC.RPCSPEC010.API.md#casm_compiled_contract_class)\>
+`Promise`\<[`CASM_COMPILED_CONTRACT_CLASS`](../namespaces/RPC.RPCSPEC010.API.md#casm_compiled_contract_class)\>
 
 #### Inherited from
 
@@ -1745,7 +1745,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getCompiledCasm
 
 ### getEstimateTip
 
-▸ **getEstimateTip**(`blockIdentifier?`, `options?`): `Promise`<[`TipEstimate`](../modules.md#tipestimate)\>
+▸ **getEstimateTip**(`blockIdentifier?`, `options?`): `Promise`\<[`TipEstimate`](../modules.md#tipestimate)\>
 
 #### Parameters
 
@@ -1756,7 +1756,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getCompiledCasm
 
 #### Returns
 
-`Promise`<[`TipEstimate`](../modules.md#tipestimate)\>
+`Promise`\<[`TipEstimate`](../modules.md#tipestimate)\>
 
 #### Inherited from
 
@@ -1770,7 +1770,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getEstimateTip
 
 ### getStarkName
 
-▸ **getStarkName**(`address`, `StarknetIdContract?`): `Promise`<`string`\>
+▸ **getStarkName**(`address`, `StarknetIdContract?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -1781,7 +1781,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getEstimateTip
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -1795,7 +1795,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStarkName
 
 ### getAddressFromStarkName
 
-▸ **getAddressFromStarkName**(`name`, `StarknetIdContract?`): `Promise`<`string`\>
+▸ **getAddressFromStarkName**(`name`, `StarknetIdContract?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -1806,7 +1806,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStarkName
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -1820,7 +1820,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getAddressFromStarkName
 
 ### getStarkProfile
 
-▸ **getStarkProfile**(`address`, `StarknetIdContract?`, `StarknetIdIdentityContract?`, `StarknetIdVerifierContract?`, `StarknetIdPfpContract?`, `StarknetIdPopContract?`, `StarknetIdMulticallContract?`): `Promise`<[`StarkProfile`](../modules.md#starkprofile)\>
+▸ **getStarkProfile**(`address`, `StarknetIdContract?`, `StarknetIdIdentityContract?`, `StarknetIdVerifierContract?`, `StarknetIdPfpContract?`, `StarknetIdPopContract?`, `StarknetIdMulticallContract?`): `Promise`\<[`StarkProfile`](../modules.md#starkprofile)\>
 
 #### Parameters
 
@@ -1836,7 +1836,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getAddressFromStarkName
 
 #### Returns
 
-`Promise`<[`StarkProfile`](../modules.md#starkprofile)\>
+`Promise`\<[`StarkProfile`](../modules.md#starkprofile)\>
 
 #### Inherited from
 
@@ -1850,7 +1850,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getStarkProfile
 
 ### getBrotherName
 
-▸ **getBrotherName**(`address`, `BrotherIdContract?`): `Promise`<`string`\>
+▸ **getBrotherName**(`address`, `BrotherIdContract?`): `Promise`\<`string`\>
 
 Gets the primary Brother domain name for an address
 
@@ -1863,7 +1863,7 @@ Gets the primary Brother domain name for an address
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The domain name with .brother suffix
 
@@ -1879,7 +1879,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getBrotherName
 
 ### getAddressFromBrotherName
 
-▸ **getAddressFromBrotherName**(`name`, `BrotherIdContract?`): `Promise`<`string`\>
+▸ **getAddressFromBrotherName**(`name`, `BrotherIdContract?`): `Promise`\<`string`\>
 
 Gets the address associated with a Brother domain name
 
@@ -1892,7 +1892,7 @@ Gets the address associated with a Brother domain name
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The resolver address for the domain
 
@@ -1908,7 +1908,7 @@ Mixin(BaseRpcProvider, StarknetId, BrotherId).getAddressFromBrotherName
 
 ### getBrotherProfile
 
-▸ **getBrotherProfile**(`address`, `BrotherIdContract?`): `Promise`<`BrotherProfile`\>
+▸ **getBrotherProfile**(`address`, `BrotherIdContract?`): `Promise`\<`BrotherProfile`\>
 
 Gets the complete profile information for a Brother domain
 
@@ -1921,7 +1921,7 @@ Gets the complete profile information for a Brother domain
 
 #### Returns
 
-`Promise`<`BrotherProfile`\>
+`Promise`\<`BrotherProfile`\>
 
 The complete Brother profile information
 

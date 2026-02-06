@@ -1,6 +1,6 @@
 ---
 id: 'CairoResult'
-title: 'Class: CairoResult<T, U>'
+title: 'Class: CairoResult\<T, U>'
 sidebar_label: 'CairoResult'
 sidebar_position: 0
 custom_edit_url: null
@@ -19,7 +19,7 @@ value of type T or U.
 **`Example`**
 
 ```typescript
-const myOption = new CairoResult<BigNumberish, CustomError>(CairoResultVariant.Ok, '0x54dda8');
+const myOption = new CairoResult\<BigNumberish, CustomError>(CairoResultVariant.Ok, '0x54dda8');
 ```
 
 ## Type parameters
@@ -33,7 +33,7 @@ const myOption = new CairoResult<BigNumberish, CustomError>(CairoResultVariant.O
 
 ### constructor
 
-• **new CairoResult**<`T`, `U`\>(`variant`, `resultContent`): [`CairoResult`](CairoResult.md)<`T`, `U`\>
+• **new CairoResult**\<`T`, `U`\>(`variant`, `resultContent`): [`CairoResult`](CairoResult.md)\<`T`, `U`\>
 
 #### Type parameters
 
@@ -51,7 +51,7 @@ const myOption = new CairoResult<BigNumberish, CustomError>(CairoResultVariant.O
 
 #### Returns
 
-[`CairoResult`](CairoResult.md)<`T`, `U`\>
+[`CairoResult`](CairoResult.md)\<`T`, `U`\>
 
 #### Defined in
 

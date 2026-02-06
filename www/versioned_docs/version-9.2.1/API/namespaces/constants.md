@@ -12,7 +12,7 @@ Utils
 
 ### BaseUrl
 
-Ƭ **BaseUrl**: `ValuesType`<typeof [`BaseUrl`](constants.md#baseurl-1)\>
+Ƭ **BaseUrl**: `ValuesType`\<typeof [`BaseUrl`](constants.md#baseurl-1)\>
 
 #### Defined in
 
@@ -24,7 +24,7 @@ Utils
 
 ### NetworkName
 
-Ƭ **NetworkName**: `ValuesType`<typeof [`NetworkName`](constants.md#networkname-1)\>
+Ƭ **NetworkName**: `ValuesType`\<typeof [`NetworkName`](constants.md#networkname-1)\>
 
 #### Defined in
 
@@ -36,7 +36,7 @@ Utils
 
 ### StarknetChainId
 
-Ƭ **StarknetChainId**: `ValuesType`<typeof [`StarknetChainId`](constants.md#starknetchainid-1)\>
+Ƭ **StarknetChainId**: `ValuesType`\<typeof [`StarknetChainId`](constants.md#starknetchainid-1)\>
 
 #### Defined in
 
@@ -48,7 +48,7 @@ Utils
 
 ### TransactionHashPrefix
 
-Ƭ **TransactionHashPrefix**: `ValuesType`<typeof [`TransactionHashPrefix`](constants.md#transactionhashprefix-1)\>
+Ƭ **TransactionHashPrefix**: `ValuesType`\<typeof [`TransactionHashPrefix`](constants.md#transactionhashprefix-1)\>
 
 #### Defined in
 
@@ -60,7 +60,7 @@ Utils
 
 ### SupportedRpcVersion
 
-Ƭ **SupportedRpcVersion**: `ValuesType`<typeof [`SupportedRpcVersion`](constants.md#supportedrpcversion-1)\>
+Ƭ **SupportedRpcVersion**: `ValuesType`\<typeof [`SupportedRpcVersion`](constants.md#supportedrpcversion-1)\>
 
 #### Defined in
 
@@ -98,10 +98,10 @@ Channel method-specific options
 
 #### Type declaration
 
-| Name                  | Type                                                                                                         |
-| :-------------------- | :----------------------------------------------------------------------------------------------------------- |
-| `simulateTransaction` | `Omit`<[`getSimulateTransactionOptions`](../modules.md#getsimulatetransactionoptions), `"blockIdentifier"`\> |
-| `getEstimateFee`      | `Omit`<[`getEstimateFeeBulkOptions`](../modules.md#getestimatefeebulkoptions), `"blockIdentifier"`\>         |
+| Name                  | Type                                                                                                          |
+| :-------------------- | :------------------------------------------------------------------------------------------------------------ |
+| `simulateTransaction` | `Omit`\<[`getSimulateTransactionOptions`](../modules.md#getsimulatetransactionoptions), `"blockIdentifier"`\> |
+| `getEstimateFee`      | `Omit`\<[`getEstimateFeeBulkOptions`](../modules.md#getestimatefeebulkoptions), `"blockIdentifier"`\>         |
 
 #### Defined in
 
@@ -119,7 +119,7 @@ Channel default options
 
 | Name              | Type                                 |
 | :---------------- | :----------------------------------- |
-| `headers`         | `Record`<`string`, `string`\>        |
+| `headers`         | `Record`\<`string`, `string`\>       |
 | `blockIdentifier` | [`BlockTag`](../modules.md#blocktag) |
 | `retries`         | `number`                             |
 

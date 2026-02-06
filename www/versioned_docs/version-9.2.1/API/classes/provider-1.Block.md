@@ -9,9 +9,9 @@ custom_edit_url: null
 
 This class is formatting the identifier of a block.
 
-hex string and BigInt are detected as block hashes. identifier return { block_hash: hash }
+hex string and BigInt are detected as block hashes. identifier return `{ block_hash: hash }`
 
-decimal string and number are detected as block numbers. identifier return { block_number: number }
+decimal string and number are detected as block numbers. identifier return `{ block_number: number }`
 
 text string are detected as block tag. identifier return tag
 
@@ -127,7 +127,7 @@ the identifier as an object
 
 ```typescript
 const result = new provider.Block(56789).identifier;
-// result = { block_number: 56789 }
+// result = `{ block_number: 56789 }`
 ```
 
 #### Defined in
@@ -154,7 +154,7 @@ change the identifier of an existing Block instance
 const myBlock = new provider.Block('latest');
 myBlock.identifier = '0x3456789abc';
 const result = myBlock.identifier;
-// result = { block_hash: '0x3456789abc' }
+// result = `{ block_hash: '0x3456789abc' }`
 ```
 
 #### Defined in

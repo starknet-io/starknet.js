@@ -81,7 +81,7 @@ node_modules/@starknet-io/starknet-types-08/dist/types/api/contract.d.ts:33
 
 ### EVENT
 
-Ƭ **EVENT**: \{ `type`: [`EVENT_ABI_TYPE`](types.RPC.RPCSPEC08.API.md#event_abi_type-1) ; `name`: `string` } & `SimpleOneOf`<[`ENUM_EVENT`](types.RPC.RPCSPEC08.API.CONTRACT.md#enum_event), [`STRUCT_EVENT`](types.RPC.RPCSPEC08.API.CONTRACT.md#struct_event)\>
+Ƭ **EVENT**: \{ `type`: [`EVENT_ABI_TYPE`](types.RPC.RPCSPEC08.API.md#event_abi_type-1) ; `name`: `string` } & `SimpleOneOf`\<[`ENUM_EVENT`](types.RPC.RPCSPEC08.API.CONTRACT.md#enum_event), [`STRUCT_EVENT`](types.RPC.RPCSPEC08.API.CONTRACT.md#struct_event)\>
 
 #### Defined in
 

@@ -136,9 +136,9 @@ Check if provided abi type is this data type
 
 #### Parameters
 
-| Name               | Type                                      |
-| :----------------- | :---------------------------------------- |
-| `responseIterator` | `Iterator`<`string`, `any`, `undefined`\> |
+| Name               | Type                                       |
+| :----------------- | :----------------------------------------- |
+| `responseIterator` | `Iterator`\<`string`, `any`, `undefined`\> |
 
 #### Returns
 

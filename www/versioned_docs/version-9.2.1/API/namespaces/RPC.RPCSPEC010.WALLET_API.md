@@ -264,11 +264,11 @@ node_modules/@starknet-io/starknet-types-010/dist/types/wallet-api/events.d.ts:8
 
 ### WalletEventListener
 
-Ƭ **WalletEventListener**: <E\>(`event`: `E`, `handleEvent`: [`WalletEventHandlers`](../interfaces/RPC.RPCSPEC010.WALLET_API.WalletEventHandlers.md)[`E`]) => `void`
+Ƭ **WalletEventListener**: \<E\>(`event`: `E`, `handleEvent`: [`WalletEventHandlers`](../interfaces/RPC.RPCSPEC010.WALLET_API.WalletEventHandlers.md)[`E`]) => `void`
 
 #### Type declaration
 
-▸ <`E`\>(`event`, `handleEvent`): `void`
+▸ \<`E`\>(`event`, `handleEvent`): `void`
 
 ##### Type parameters
 
@@ -305,7 +305,7 @@ node_modules/@starknet-io/starknet-types-010/dist/types/wallet-api/methods.d.ts:
 
 ### IsParamsOptional
 
-Ƭ **IsParamsOptional**<`T`\>: `undefined` extends [`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"params"``] ? `true` : `false`
+Ƭ **IsParamsOptional**\<`T`\>: `undefined` extends [`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"params"``] ? `true` : `false`
 
 #### Type parameters
 
@@ -321,7 +321,7 @@ node_modules/@starknet-io/starknet-types-010/dist/types/wallet-api/methods.d.ts:
 
 ### RequestFnCall
 
-Ƭ **RequestFnCall**<`T`\>: \{ `type`: `T` } & [`IsParamsOptional`](RPC.RPCSPEC010.WALLET_API.md#isparamsoptional)<`T`\> extends `true` ? \{ `params?`: [`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"params"``] } : \{ `params`: [`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"params"``] }
+Ƭ **RequestFnCall**\<`T`\>: \{ `type`: `T` } & [`IsParamsOptional`](RPC.RPCSPEC010.WALLET_API.md#isparamsoptional)\<`T`\> extends `true` ? \{ `params?`: [`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"params"``] } : \{ `params`: [`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"params"``] }
 
 #### Type parameters
 
@@ -337,11 +337,11 @@ node_modules/@starknet-io/starknet-types-010/dist/types/wallet-api/methods.d.ts:
 
 ### RequestFn
 
-Ƭ **RequestFn**: <T\>(`call`: [`RequestFnCall`](RPC.RPCSPEC010.WALLET_API.md#requestfncall)<`T`\>) => `Promise`<[`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"result"``]\>
+Ƭ **RequestFn**: \<T\>(`call`: [`RequestFnCall`](RPC.RPCSPEC010.WALLET_API.md#requestfncall)\<`T`\>) => `Promise`\<[`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"result"``]\>
 
 #### Type declaration
 
-▸ <`T`\>(`call`): `Promise`<[`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"result"``]\>
+▸ \<`T`\>(`call`): `Promise`\<[`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"result"``]\>
 
 ##### Type parameters
 
@@ -351,13 +351,13 @@ node_modules/@starknet-io/starknet-types-010/dist/types/wallet-api/methods.d.ts:
 
 ##### Parameters
 
-| Name   | Type                                                                |
-| :----- | :------------------------------------------------------------------ |
-| `call` | [`RequestFnCall`](RPC.RPCSPEC010.WALLET_API.md#requestfncall)<`T`\> |
+| Name   | Type                                                                 |
+| :----- | :------------------------------------------------------------------- |
+| `call` | [`RequestFnCall`](RPC.RPCSPEC010.WALLET_API.md#requestfncall)\<`T`\> |
 
 ##### Returns
 
-`Promise`<[`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"result"``]\>
+`Promise`\<[`RpcTypeToMessageMap`](../interfaces/RPC.RPCSPEC010.WALLET_API.RpcTypeToMessageMap.md)[`T`][``"result"``]\>
 
 #### Defined in
 
@@ -477,7 +477,7 @@ node_modules/@starknet-io/starknet-types-010/dist/types/wallet-api/typedData.d.t
 
 | Name          | Type                                                                                  |
 | :------------ | :------------------------------------------------------------------------------------ |
-| `types`       | `Record`<`string`, [`StarknetType`](RPC.RPCSPEC010.WALLET_API.md#starknettype)[]\>    |
+| `types`       | `Record`\<`string`, [`StarknetType`](RPC.RPCSPEC010.WALLET_API.md#starknettype)[]\>   |
 | `primaryType` | `string`                                                                              |
 | `domain`      | [`StarknetDomain`](../interfaces/RPC.RPCSPEC010.WALLET_API.StarknetDomain.md)         |
 | `message`     | [`OutsideExecutionMessageV1`](RPC.RPCSPEC010.WALLET_API.md#outsideexecutionmessagev1) |
@@ -496,7 +496,7 @@ node_modules/@starknet-io/starknet-types-010/dist/types/wallet-api/typedData.d.t
 
 | Name          | Type                                                                                  |
 | :------------ | :------------------------------------------------------------------------------------ |
-| `types`       | `Record`<`string`, [`StarknetType`](RPC.RPCSPEC010.WALLET_API.md#starknettype)[]\>    |
+| `types`       | `Record`\<`string`, [`StarknetType`](RPC.RPCSPEC010.WALLET_API.md#starknettype)[]\>   |
 | `primaryType` | `string`                                                                              |
 | `domain`      | [`StarknetDomain`](../interfaces/RPC.RPCSPEC010.WALLET_API.StarknetDomain.md)         |
 | `message`     | [`OutsideExecutionMessageV2`](RPC.RPCSPEC010.WALLET_API.md#outsideexecutionmessagev2) |

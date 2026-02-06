@@ -116,7 +116,7 @@ The underlying WebSocket instance.
 
 ### activeSubscriptions
 
-• `Private` **activeSubscriptions**: `Map`<`string`, [`Subscription`](Subscription.md)<`any`\>\>
+• `Private` **activeSubscriptions**: `Map`\<`string`, [`Subscription`](Subscription.md)\<`any`\>\>
 
 #### Defined in
 
@@ -146,7 +146,7 @@ The underlying WebSocket instance.
 
 ### reconnectOptions
 
-• `Private` `Readonly` **reconnectOptions**: `Required`<`ReconnectOptions`\>
+• `Private` `Readonly` **reconnectOptions**: `Required`\<`ReconnectOptions`\>
 
 #### Defined in
 
@@ -216,7 +216,7 @@ The underlying WebSocket instance.
 
 ### events
 
-• `Private` **events**: `EventEmitter`<`WebSocketChannelEvents`\>
+• `Private` **events**: `EventEmitter`\<`WebSocketChannelEvents`\>
 
 #### Defined in
 
@@ -250,7 +250,7 @@ The underlying WebSocket instance.
 
 ### messageListener
 
-• `Private` **messageListener**: (`event`: `MessageEvent`<`any`\>) => `void`
+• `Private` **messageListener**: (`event`: `MessageEvent`\<`any`\>) => `void`
 
 #### Type declaration
 
@@ -258,9 +258,9 @@ The underlying WebSocket instance.
 
 ##### Parameters
 
-| Name    | Type                   |
-| :------ | :--------------------- |
-| `event` | `MessageEvent`<`any`\> |
+| Name    | Type                    |
+| :------ | :---------------------- |
+| `event` | `MessageEvent`\<`any`\> |
 
 ##### Returns
 
@@ -378,7 +378,7 @@ If the WebSocket is not connected.
 
 ### sendReceive
 
-▸ **sendReceive**<`T`\>(`method`, `params?`): `Promise`<`T`\>
+▸ **sendReceive**\<`T`\>(`method`, `params?`): `Promise`\<`T`\>
 
 Sends a JSON-RPC request and returns a Promise that resolves with the result.
 This method abstracts the request/response cycle over WebSockets.
@@ -399,7 +399,7 @@ If the connection is lost, it will queue the request and send it upon reconnecti
 
 #### Returns
 
-`Promise`<`T`\>
+`Promise`\<`T`\>
 
 A Promise that resolves with the RPC response result.
 
@@ -437,14 +437,14 @@ Checks if the WebSocket connection is currently open.
 
 ### waitForConnection
 
-▸ **waitForConnection**(): `Promise`<`number`\>
+▸ **waitForConnection**(): `Promise`\<`number`\>
 
 Returns a Promise that resolves when the WebSocket connection is open.
 Can be used to block execution until the connection is established.
 
 #### Returns
 
-`Promise`<`number`\>
+`Promise`\<`number`\>
 
 A Promise that resolves with the WebSocket's `readyState` when connected.
 
@@ -488,13 +488,13 @@ This method is user-initiated and will prevent automatic reconnection for this c
 
 ### waitForDisconnection
 
-▸ **waitForDisconnection**(): `Promise`<`number` \| `Event`\>
+▸ **waitForDisconnection**(): `Promise`\<`number` \| `Event`\>
 
 Returns a Promise that resolves when the WebSocket connection is closed.
 
 #### Returns
 
-`Promise`<`number` \| `Event`\>
+`Promise`\<`number` \| `Event`\>
 
 A Promise that resolves with the WebSocket's `readyState` or a `CloseEvent` when disconnected.
 
@@ -506,7 +506,7 @@ A Promise that resolves with the WebSocket's `readyState` or a `CloseEvent` when
 
 ### unsubscribe
 
-▸ **unsubscribe**(`subscriptionId`): `Promise`<`boolean`\>
+▸ **unsubscribe**(`subscriptionId`): `Promise`\<`boolean`\>
 
 Unsubscribes from a Starknet subscription.
 It is recommended to use the `unsubscribe()` method on the `Subscription` object instead.
@@ -519,7 +519,7 @@ It is recommended to use the `unsubscribe()` method on the `Subscription` object
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 A Promise that resolves with `true` if the unsubscription was successful.
 
@@ -531,7 +531,7 @@ A Promise that resolves with `true` if the unsubscription was successful.
 
 ### waitForUnsubscription
 
-▸ **waitForUnsubscription**(`targetId`): `Promise`<`void`\>
+▸ **waitForUnsubscription**(`targetId`): `Promise`\<`void`\>
 
 Returns a Promise that resolves when a specific subscription is successfully unsubscribed.
 
@@ -543,7 +543,7 @@ Returns a Promise that resolves when a specific subscription is successfully uns
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 **`Example`**
 
@@ -591,11 +591,11 @@ This creates a new WebSocket instance and re-establishes listeners.
 
 ### \_restoreSubscriptions
 
-▸ **\_restoreSubscriptions**(): `Promise`<`void`\>
+▸ **\_restoreSubscriptions**(): `Promise`\<`void`\>
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
@@ -643,9 +643,9 @@ This creates a new WebSocket instance and re-establishes listeners.
 
 #### Parameters
 
-| Name    | Type                   |
-| :------ | :--------------------- |
-| `event` | `MessageEvent`<`any`\> |
+| Name    | Type                    |
+| :------ | :---------------------- |
+| `event` | `MessageEvent`\<`any`\> |
 
 #### Returns
 
@@ -659,7 +659,7 @@ This creates a new WebSocket instance and re-establishes listeners.
 
 ### subscribeNewHeads
 
-▸ **subscribeNewHeads**(`blockIdentifier?`): `Promise`<[`Subscription`](Subscription.md)<[`BLOCK_HEADER`](../namespaces/types.RPC.RPCSPEC08.API.md#block_header)\>\>
+▸ **subscribeNewHeads**(`blockIdentifier?`): `Promise`\<[`Subscription`](Subscription.md)\<[`BLOCK_HEADER`](../namespaces/types.RPC.RPCSPEC08.API.md#block_header)\>\>
 
 Subscribes to new block headers.
 
@@ -671,7 +671,7 @@ Subscribes to new block headers.
 
 #### Returns
 
-`Promise`<[`Subscription`](Subscription.md)<[`BLOCK_HEADER`](../namespaces/types.RPC.RPCSPEC08.API.md#block_header)\>\>
+`Promise`\<[`Subscription`](Subscription.md)\<[`BLOCK_HEADER`](../namespaces/types.RPC.RPCSPEC08.API.md#block_header)\>\>
 
 A Promise that resolves with a `Subscription` object for new block headers.
 
@@ -683,7 +683,7 @@ A Promise that resolves with a `Subscription` object for new block headers.
 
 ### subscribeEvents
 
-▸ **subscribeEvents**(`fromAddress?`, `keys?`, `blockIdentifier?`): `Promise`<[`Subscription`](Subscription.md)<[`EMITTED_EVENT`](../namespaces/types.RPC.RPCSPEC08.API.md#emitted_event)\>\>
+▸ **subscribeEvents**(`fromAddress?`, `keys?`, `blockIdentifier?`): `Promise`\<[`Subscription`](Subscription.md)\<[`EMITTED_EVENT`](../namespaces/types.RPC.RPCSPEC08.API.md#emitted_event)\>\>
 
 Subscribes to events matching a given filter.
 
@@ -697,7 +697,7 @@ Subscribes to events matching a given filter.
 
 #### Returns
 
-`Promise`<[`Subscription`](Subscription.md)<[`EMITTED_EVENT`](../namespaces/types.RPC.RPCSPEC08.API.md#emitted_event)\>\>
+`Promise`\<[`Subscription`](Subscription.md)\<[`EMITTED_EVENT`](../namespaces/types.RPC.RPCSPEC08.API.md#emitted_event)\>\>
 
 A Promise that resolves with a `Subscription` object for the specified events.
 
@@ -709,7 +709,7 @@ A Promise that resolves with a `Subscription` object for the specified events.
 
 ### subscribeTransactionStatus
 
-▸ **subscribeTransactionStatus**(`transactionHash`, `blockIdentifier?`): `Promise`<[`Subscription`](Subscription.md)<[`NEW_TXN_STATUS`](../namespaces/types.RPC.RPCSPEC08.API.md#new_txn_status)\>\>
+▸ **subscribeTransactionStatus**(`transactionHash`, `blockIdentifier?`): `Promise`\<[`Subscription`](Subscription.md)\<[`NEW_TXN_STATUS`](../namespaces/types.RPC.RPCSPEC08.API.md#new_txn_status)\>\>
 
 Subscribes to status updates for a specific transaction.
 
@@ -722,7 +722,7 @@ Subscribes to status updates for a specific transaction.
 
 #### Returns
 
-`Promise`<[`Subscription`](Subscription.md)<[`NEW_TXN_STATUS`](../namespaces/types.RPC.RPCSPEC08.API.md#new_txn_status)\>\>
+`Promise`\<[`Subscription`](Subscription.md)\<[`NEW_TXN_STATUS`](../namespaces/types.RPC.RPCSPEC08.API.md#new_txn_status)\>\>
 
 A Promise that resolves with a `Subscription` object for the transaction's status.
 
@@ -734,7 +734,7 @@ A Promise that resolves with a `Subscription` object for the transaction's statu
 
 ### subscribePendingTransaction
 
-▸ **subscribePendingTransaction**(`transactionDetails?`, `senderAddress?`): `Promise`<[`Subscription`](Subscription.md)<`string` \| [`TXN_WITH_HASH`](../namespaces/types.RPC.RPCSPEC08.API.md#txn_with_hash)\>\>
+▸ **subscribePendingTransaction**(`transactionDetails?`, `senderAddress?`): `Promise`\<[`Subscription`](Subscription.md)\<`string` \| [`TXN_WITH_HASH`](../namespaces/types.RPC.RPCSPEC08.API.md#txn_with_hash)\>\>
 
 Subscribes to pending transactions.
 
@@ -747,7 +747,7 @@ Subscribes to pending transactions.
 
 #### Returns
 
-`Promise`<[`Subscription`](Subscription.md)<`string` \| [`TXN_WITH_HASH`](../namespaces/types.RPC.RPCSPEC08.API.md#txn_with_hash)\>\>
+`Promise`\<[`Subscription`](Subscription.md)\<`string` \| [`TXN_WITH_HASH`](../namespaces/types.RPC.RPCSPEC08.API.md#txn_with_hash)\>\>
 
 A Promise that resolves with a `Subscription` object for pending transactions.
 
@@ -781,7 +781,7 @@ Internal method to remove subscription from active map.
 
 ### on
 
-▸ **on**<`K`\>(`event`, `listener`): `void`
+▸ **on**\<`K`\>(`event`, `listener`): `void`
 
 Adds a listener for a given event.
 
@@ -810,7 +810,7 @@ Adds a listener for a given event.
 
 ### off
 
-▸ **off**<`K`\>(`event`, `listener`): `void`
+▸ **off**\<`K`\>(`event`, `listener`): `void`
 
 Removes a listener for a given event.
 

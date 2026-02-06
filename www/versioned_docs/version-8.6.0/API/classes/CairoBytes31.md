@@ -104,9 +104,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name   | Type                                                     |
-| :----- | :------------------------------------------------------- |
-| `data` | `string` \| `Uint8Array` \| `Buffer`<`ArrayBufferLike`\> |
+| Name   | Type                                                      |
+| :----- | :-------------------------------------------------------- |
+| `data` | `string` \| `Uint8Array` \| `Buffer`\<`ArrayBufferLike`\> |
 
 #### Returns
 
@@ -146,9 +146,9 @@ Check if provided abi type is this data type
 
 #### Parameters
 
-| Name               | Type                                      |
-| :----------------- | :---------------------------------------- |
-| `responseIterator` | `Iterator`<`string`, `any`, `undefined`\> |
+| Name               | Type                                       |
+| :----------------- | :----------------------------------------- |
+| `responseIterator` | `Iterator`\<`string`, `any`, `undefined`\> |
 
 #### Returns
 

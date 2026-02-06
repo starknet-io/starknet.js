@@ -90,7 +90,7 @@ custom_edit_url: null
 
 ### WebSocketEvent
 
-Ƭ **WebSocketEvent**: `Omit`<[`RequestBody`](RPC.JRPC.md#requestbody), `"id"`\> & \{ `params`: {} }
+Ƭ **WebSocketEvent**: `Omit`\<[`RequestBody`](RPC.JRPC.md#requestbody), `"id"`\> & \{ `params`: {} }
 
 #### Defined in
 

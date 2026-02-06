@@ -10,7 +10,7 @@ custom_edit_url: null
 
 ### requestAccounts
 
-▸ **requestAccounts**(`walletWSF`, `silent_mode?`): `Promise`<[`Address`](RPC.RPCSPEC010.WALLET_API.md#address)[]\>
+▸ **requestAccounts**(`walletWSF`, `silent_mode?`): `Promise`\<[`Address`](RPC.RPCSPEC010.WALLET_API.md#address)[]\>
 
 Request Permission for wallet account, return addresses that are allowed by user
 
@@ -23,7 +23,7 @@ Request Permission for wallet account, return addresses that are allowed by user
 
 #### Returns
 
-`Promise`<[`Address`](RPC.RPCSPEC010.WALLET_API.md#address)[]\>
+`Promise<[Address]`(RPC.RPCSPEC010.WALLET_API.md#address)[]\>
 
 allowed accounts addresses
 
@@ -35,7 +35,7 @@ allowed accounts addresses
 
 ### getPermissions
 
-▸ **getPermissions**(`walletWSF`): `Promise`<[`Permission`](RPC.RPCSPEC010.WALLET_API.md#permission)[]\>
+▸ **getPermissions**(`walletWSF`): `Promise<[Permission]`(RPC.RPCSPEC010.WALLET_API.md#permission)[]\>
 
 Request if DAPP is connected to wallet.
 
@@ -47,7 +47,7 @@ Request if DAPP is connected to wallet.
 
 #### Returns
 
-`Promise`<[`Permission`](RPC.RPCSPEC010.WALLET_API.md#permission)[]\>
+`Promise<[Permission`](RPC.RPCSPEC010.WALLET_API.md#permission)[]\>
 
 "accounts" if permission granted
 
@@ -59,7 +59,7 @@ Request if DAPP is connected to wallet.
 
 ### watchAsset
 
-▸ **watchAsset**(`walletWSF`, `asset`): `Promise`<`boolean`\>
+▸ **watchAsset**(`walletWSF`, `asset`): `Promise<boolean`\>
 
 Request adding an ERC20 Token to the Wallet List
 
@@ -72,7 +72,7 @@ Request adding an ERC20 Token to the Wallet List
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise<boolean`\>
 
 true if the token was added successfully
 
@@ -84,7 +84,7 @@ true if the token was added successfully
 
 ### addStarknetChain
 
-▸ **addStarknetChain**(`walletWSF`, `chain`): `Promise`<`boolean`\>
+▸ **addStarknetChain**(`walletWSF`, `chain`): `Promise<boolean`\>
 
 Request adding custom Starknet chain
 
@@ -97,7 +97,7 @@ Request adding custom Starknet chain
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise<boolean`\>
 
 true if the chain was added successfully
 
@@ -109,7 +109,7 @@ true if the chain was added successfully
 
 ### switchStarknetChain
 
-▸ **switchStarknetChain**(`walletWSF`, `chainId`): `Promise`<`boolean`\>
+▸ **switchStarknetChain**(`walletWSF`, `chainId`): `Promise<boolean`\>
 
 Request Wallet Network change
 
@@ -122,7 +122,7 @@ Request Wallet Network change
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise<boolean`\>
 
 true if the chain was changed successfully
 
@@ -134,7 +134,7 @@ true if the chain was changed successfully
 
 ### requestChainId
 
-▸ **requestChainId**(`walletWSF`): `Promise`<[`ChainId`](RPC.RPCSPEC010.API.md#chainid)\>
+▸ **requestChainId**(`walletWSF`): `Promise<[ChainId`](RPC.RPCSPEC010.API.md#chainid)\>
 
 Request the current chain ID from the wallet.
 
@@ -146,7 +146,7 @@ Request the current chain ID from the wallet.
 
 #### Returns
 
-`Promise`<[`ChainId`](RPC.RPCSPEC010.API.md#chainid)\>
+`Promise<[ChainId`](RPC.RPCSPEC010.API.md#chainid)\>
 
 The current Starknet chain ID.
 
@@ -158,7 +158,7 @@ The current Starknet chain ID.
 
 ### deploymentData
 
-▸ **deploymentData**(`walletWSF`): `Promise`<[`AccountDeploymentData`](../interfaces/RPC.RPCSPEC010.WALLET_API.AccountDeploymentData.md)\>
+▸ **deploymentData**(`walletWSF`): `Promise<[AccountDeploymentData`](../interfaces/RPC.RPCSPEC010.WALLET_API.AccountDeploymentData.md)\>
 
 Get deployment data for a contract.
 
@@ -170,7 +170,7 @@ Get deployment data for a contract.
 
 #### Returns
 
-`Promise`<[`AccountDeploymentData`](../interfaces/RPC.RPCSPEC010.WALLET_API.AccountDeploymentData.md)\>
+`Promise<[AccountDeploymentData`](../interfaces/RPC.RPCSPEC010.WALLET_API.AccountDeploymentData.md)\>
 
 The deployment data result.
 
@@ -182,7 +182,7 @@ The deployment data result.
 
 ### addInvokeTransaction
 
-▸ **addInvokeTransaction**(`walletWSF`, `params`): `Promise`<[`AddInvokeTransactionResult`](../interfaces/RPC.RPCSPEC010.WALLET_API.AddInvokeTransactionResult.md)\>
+▸ **addInvokeTransaction**(`walletWSF`, `params`): `Promise<[AddInvokeTransactionResult`](../interfaces/RPC.RPCSPEC010.WALLET_API.AddInvokeTransactionResult.md)\>
 
 Add an invoke transaction to the wallet.
 
@@ -195,7 +195,7 @@ Add an invoke transaction to the wallet.
 
 #### Returns
 
-`Promise`<[`AddInvokeTransactionResult`](../interfaces/RPC.RPCSPEC010.WALLET_API.AddInvokeTransactionResult.md)\>
+`Promise<[AddInvokeTransactionResult`](../interfaces/RPC.RPCSPEC010.WALLET_API.AddInvokeTransactionResult.md)\>
 
 The result of adding the invoke transaction.
 
@@ -207,7 +207,7 @@ The result of adding the invoke transaction.
 
 ### addDeclareTransaction
 
-▸ **addDeclareTransaction**(`walletWSF`, `params`): `Promise`<[`AddDeclareTransactionResult`](../interfaces/RPC.RPCSPEC010.WALLET_API.AddDeclareTransactionResult.md)\>
+▸ **addDeclareTransaction**(`walletWSF`, `params`): `Promise<[AddDeclareTransactionResult`](../interfaces/RPC.RPCSPEC010.WALLET_API.AddDeclareTransactionResult.md)\>
 
 Add a declare transaction to the wallet.
 
@@ -220,7 +220,7 @@ Add a declare transaction to the wallet.
 
 #### Returns
 
-`Promise`<[`AddDeclareTransactionResult`](../interfaces/RPC.RPCSPEC010.WALLET_API.AddDeclareTransactionResult.md)\>
+`Promise<[AddDeclareTransactionResult`](../interfaces/RPC.RPCSPEC010.WALLET_API.AddDeclareTransactionResult.md)\>
 
 The result of adding the declare transaction.
 
@@ -232,7 +232,7 @@ The result of adding the declare transaction.
 
 ### signMessage
 
-▸ **signMessage**(`walletWSF`, `typedData`): `Promise`<[`Signature`](RPC.RPCSPEC010.WALLET_API.md#signature)\>
+▸ **signMessage**(`walletWSF`, `typedData`): `Promise<[Signature`](RPC.RPCSPEC010.WALLET_API.md#signature)\>
 
 Sign typed data using the wallet.
 
@@ -245,7 +245,7 @@ Sign typed data using the wallet.
 
 #### Returns
 
-`Promise`<[`Signature`](RPC.RPCSPEC010.WALLET_API.md#signature)\>
+`Promise<[Signature`](RPC.RPCSPEC010.WALLET_API.md#signature)\>
 
 An array of signatures as strings.
 
@@ -257,7 +257,7 @@ An array of signatures as strings.
 
 ### supportedSpecs
 
-▸ **supportedSpecs**(`walletWSF`): `Promise`<[`SpecVersion`](RPC.RPCSPEC010.WALLET_API.md#specversion)[]\>
+▸ **supportedSpecs**(`walletWSF`): `Promise<[SpecVersion`](RPC.RPCSPEC010.WALLET_API.md#specversion)[]\>
 
 Get the list of supported Wallet API specifications.
 
@@ -269,7 +269,7 @@ Get the list of supported Wallet API specifications.
 
 #### Returns
 
-`Promise`<[`SpecVersion`](RPC.RPCSPEC010.WALLET_API.md#specversion)[]\>
+`Promise<[SpecVersion`](RPC.RPCSPEC010.WALLET_API.md#specversion)[]\>
 
 An array of wallet API supported specification strings.
 

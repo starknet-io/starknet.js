@@ -164,11 +164,11 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 ### deploySelf
 
-• **deploySelf**: (`__namedParameters`: [`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload), `details`: [`UniversalDetails`](../interfaces/UniversalDetails.md)) => `Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+• **deploySelf**: (`__namedParameters`: [`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload), `details`: [`UniversalDetails`](../interfaces/UniversalDetails.md)) => `Promise`\<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
 
 #### Type declaration
 
-▸ (`«destructured»`, `details?`): `Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+▸ (`«destructured»`, `details?`): `Promise`\<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
 
 ##### Parameters
 
@@ -179,7 +179,7 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 ##### Returns
 
-`Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+`Promise`\<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
 
 #### Defined in
 
@@ -225,17 +225,17 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 ### getStateUpdate
 
-• **getStateUpdate**: () => `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>(`blockIdentifier`: `"pre_confirmed"`) => `Promise`<[`PRE_CONFIRMED_STATE_UPDATE`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>(`blockIdentifier`: `"latest"`) => `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>(`blockIdentifier?`: [`BlockIdentifier`](../modules.md#blockidentifier)) => `Promise`<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
+• **getStateUpdate**: () => `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>(`blockIdentifier`: `"pre_confirmed"`) => `Promise`\<[`PRE_CONFIRMED_STATE_UPDATE`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>(`blockIdentifier`: `"latest"`) => `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>(`blockIdentifier?`: [`BlockIdentifier`](../modules.md#blockidentifier)) => `Promise`\<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
 
 #### Type declaration
 
-▸ (): `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
+▸ (): `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
 
 ##### Returns
 
-`Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
+`Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
 
-▸ (`blockIdentifier`): `Promise`<[`PRE_CONFIRMED_STATE_UPDATE`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>
+▸ (`blockIdentifier`): `Promise`\<[`PRE_CONFIRMED_STATE_UPDATE`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>
 
 ##### Parameters
 
@@ -245,9 +245,9 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 ##### Returns
 
-`Promise`<[`PRE_CONFIRMED_STATE_UPDATE`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>
+`Promise`\<[`PRE_CONFIRMED_STATE_UPDATE`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>
 
-▸ (`blockIdentifier`): `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
+▸ (`blockIdentifier`): `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
 
 ##### Parameters
 
@@ -257,9 +257,9 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 ##### Returns
 
-`Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
+`Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
 
-▸ (`blockIdentifier?`): `Promise`<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
+▸ (`blockIdentifier?`): `Promise`\<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
 
 ##### Parameters
 
@@ -269,7 +269,7 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 ##### Returns
 
-`Promise`<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
+`Promise`\<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
 
 #### Implementation of
 
@@ -287,7 +287,7 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 ### getStarkName
 
-▸ **getStarkName**(`provider`, `address`, `StarknetIdContract?`): `Promise`<`string`\>
+▸ **getStarkName**(`provider`, `address`, `StarknetIdContract?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -299,7 +299,7 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -313,7 +313,7 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 ### getAddressFromStarkName
 
-▸ **getAddressFromStarkName**(`provider`, `name`, `StarknetIdContract?`): `Promise`<`string`\>
+▸ **getAddressFromStarkName**(`provider`, `name`, `StarknetIdContract?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -325,7 +325,7 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -339,7 +339,7 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 ### getStarkProfile
 
-▸ **getStarkProfile**(`provider`, `address`, `StarknetIdContract?`, `StarknetIdIdentityContract?`, `StarknetIdVerifierContract?`, `StarknetIdPfpContract?`, `StarknetIdPopContract?`, `StarknetIdMulticallContract?`): `Promise`<[`StarkProfile`](../modules.md#starkprofile)\>
+▸ **getStarkProfile**(`provider`, `address`, `StarknetIdContract?`, `StarknetIdIdentityContract?`, `StarknetIdVerifierContract?`, `StarknetIdPfpContract?`, `StarknetIdPopContract?`, `StarknetIdMulticallContract?`): `Promise`\<[`StarkProfile`](../modules.md#starkprofile)\>
 
 #### Parameters
 
@@ -356,7 +356,7 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 #### Returns
 
-`Promise`<[`StarkProfile`](../modules.md#starkprofile)\>
+`Promise`\<[`StarkProfile`](../modules.md#starkprofile)\>
 
 #### Inherited from
 
@@ -370,7 +370,7 @@ Uses default UDC (Universal Deployer Contract) if not specified
 
 ### getBrotherName
 
-▸ **getBrotherName**(`provider`, `address`, `BrotherIdContract?`): `Promise`<`string`\>
+▸ **getBrotherName**(`provider`, `address`, `BrotherIdContract?`): `Promise`\<`string`\>
 
 Static implementation of getBrotherName
 
@@ -384,7 +384,7 @@ Static implementation of getBrotherName
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The domain name with .brother suffix
 
@@ -400,7 +400,7 @@ The domain name with .brother suffix
 
 ### getAddressFromBrotherName
 
-▸ **getAddressFromBrotherName**(`provider`, `name`, `BrotherIdContract?`): `Promise`<`string`\>
+▸ **getAddressFromBrotherName**(`provider`, `name`, `BrotherIdContract?`): `Promise`\<`string`\>
 
 Static implementation of getAddressFromBrotherName
 
@@ -414,7 +414,7 @@ Static implementation of getAddressFromBrotherName
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The resolver address
 
@@ -430,7 +430,7 @@ The resolver address
 
 ### getBrotherProfile
 
-▸ **getBrotherProfile**(`provider`, `address`, `BrotherIdContract?`): `Promise`<`BrotherProfile`\>
+▸ **getBrotherProfile**(`provider`, `address`, `BrotherIdContract?`): `Promise`\<`BrotherProfile`\>
 
 Static implementation of getBrotherProfile
 
@@ -444,7 +444,7 @@ Static implementation of getBrotherProfile
 
 #### Returns
 
-`Promise`<`BrotherProfile`\>
+`Promise`\<`BrotherProfile`\>
 
 The complete Brother profile
 
@@ -460,7 +460,7 @@ The complete Brother profile
 
 ### getNonce
 
-▸ **getNonce**(`blockIdentifier?`): `Promise`<`string`\>
+▸ **getNonce**(`blockIdentifier?`): `Promise`\<`string`\>
 
 Get the current nonce of the account
 
@@ -472,7 +472,7 @@ Get the current nonce of the account
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 Account nonce as hex string
 
@@ -495,7 +495,7 @@ const historicalNonce = await account.getNonce('latest');
 
 ### getNonceSafe
 
-▸ **getNonceSafe**(`nonce?`): `Promise`<`bigint`\>
+▸ **getNonceSafe**(`nonce?`): `Promise`\<`bigint`\>
 
 #### Parameters
 
@@ -505,7 +505,7 @@ const historicalNonce = await account.getNonce('latest');
 
 #### Returns
 
-`Promise`<`bigint`\>
+`Promise`\<`bigint`\>
 
 #### Defined in
 
@@ -515,7 +515,7 @@ const historicalNonce = await account.getNonce('latest');
 
 ### getCairoVersion
 
-▸ **getCairoVersion**(`classHash?`): `Promise`<[`CairoVersion`](../modules.md#cairoversion)\>
+▸ **getCairoVersion**(`classHash?`): `Promise`\<[`CairoVersion`](../modules.md#cairoversion)\>
 
 Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor.
 
@@ -527,7 +527,7 @@ Retrieves the Cairo version from the network and sets `cairoVersion` if not alre
 
 #### Returns
 
-`Promise`<[`CairoVersion`](../modules.md#cairoversion)\>
+`Promise`\<[`CairoVersion`](../modules.md#cairoversion)\>
 
 #### Defined in
 
@@ -537,20 +537,20 @@ Retrieves the Cairo version from the network and sets `cairoVersion` if not alre
 
 ### estimateInvokeFee
 
-▸ **estimateInvokeFee**(`calls`, `details?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **estimateInvokeFee**(`calls`, `details?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Estimate fee for executing an INVOKE transaction on Starknet
 
 #### Parameters
 
-| Name      | Type                                                                    | Description                                        |
-| :-------- | :---------------------------------------------------------------------- | :------------------------------------------------- |
-| `calls`   | [`AllowArray`](../modules.md#allowarray)<[`Call`](../modules.md#call)\> | Single call or array of calls to estimate fees for |
-| `details` | [`UniversalDetails`](../interfaces/UniversalDetails.md)                 | Optional details for fee estimation                |
+| Name      | Type                                                                     | Description                                        |
+| :-------- | :----------------------------------------------------------------------- | :------------------------------------------------- |
+| `calls`   | [`AllowArray`](../modules.md#allowarray)\<[`Call`](../modules.md#call)\> | Single call or array of calls to estimate fees for |
+| `details` | [`UniversalDetails`](../interfaces/UniversalDetails.md)                  | Optional details for fee estimation                |
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Fee estimation including overall_fee and resourceBounds
 
@@ -576,7 +576,7 @@ const fee = await account.estimateInvokeFee({
 
 ### estimateDeclareFee
 
-▸ **estimateDeclareFee**(`payload`, `details?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **estimateDeclareFee**(`payload`, `details?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Estimate fee for executing a DECLARE transaction on Starknet
 
@@ -589,7 +589,7 @@ Estimate fee for executing a DECLARE transaction on Starknet
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Fee estimation including overall_fee and resourceBounds
 
@@ -614,7 +614,7 @@ const fee = await account.estimateDeclareFee({
 
 ### estimateAccountDeployFee
 
-▸ **estimateAccountDeployFee**(`«destructured»`, `details?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **estimateAccountDeployFee**(`«destructured»`, `details?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Estimate fee for executing an INVOKE transaction on Starknet
 
@@ -627,7 +627,7 @@ Estimate fee for executing an INVOKE transaction on Starknet
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Fee estimation including overall_fee and resourceBounds
 
@@ -655,7 +655,7 @@ const fee = await account.estimateAccountDeployFee({
 
 ### estimateDeployFee
 
-▸ **estimateDeployFee**(`payload`, `details?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **estimateDeployFee**(`payload`, `details?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Estimate fee for executing an INVOKE transaction on Starknet
 
@@ -668,7 +668,7 @@ Estimate fee for executing an INVOKE transaction on Starknet
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Fee estimation for the deployment transaction
 
@@ -696,7 +696,7 @@ const fee = await account.estimateDeployFee({
 
 ### estimateFeeBulk
 
-▸ **estimateFeeBulk**(`invocations`, `details?`): `Promise`<[`EstimateFeeBulk`](../modules.md#estimatefeebulk)\>
+▸ **estimateFeeBulk**(`invocations`, `details?`): `Promise`\<[`EstimateFeeBulk`](../modules.md#estimatefeebulk)\>
 
 Estimate fee for executing an INVOKE transaction on Starknet
 
@@ -709,7 +709,7 @@ Estimate fee for executing an INVOKE transaction on Starknet
 
 #### Returns
 
-`Promise`<[`EstimateFeeBulk`](../modules.md#estimatefeebulk)\>
+`Promise`\<[`EstimateFeeBulk`](../modules.md#estimatefeebulk)\>
 
 Array of fee estimations for each transaction
 
@@ -736,7 +736,7 @@ const fees = await account.estimateFeeBulk([
 
 ### simulateTransaction
 
-▸ **simulateTransaction**(`invocations`, `details?`): `Promise`<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
+▸ **simulateTransaction**(`invocations`, `details?`): `Promise`\<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
 
 #### Parameters
 
@@ -747,7 +747,7 @@ const fees = await account.estimateFeeBulk([
 
 #### Returns
 
-`Promise`<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
+`Promise`\<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
 
 #### Defined in
 
@@ -757,20 +757,20 @@ const fees = await account.estimateFeeBulk([
 
 ### execute
 
-▸ **execute**(`transactions`, `transactionsDetail?`): `Promise`<\{ `transaction_hash`: `string` }\>
+▸ **execute**(`transactions`, `transactionsDetail?`): `Promise`\<\{ `transaction_hash`: `string` }\>
 
 Execute one or multiple calls through the account contract
 
 #### Parameters
 
-| Name                 | Type                                                                    | Description                              |
-| :------------------- | :---------------------------------------------------------------------- | :--------------------------------------- |
-| `transactions`       | [`AllowArray`](../modules.md#allowarray)<[`Call`](../modules.md#call)\> | Single call or array of calls to execute |
-| `transactionsDetail` | [`UniversalDetails`](../interfaces/UniversalDetails.md)                 | Transaction execution options            |
+| Name                 | Type                                                                     | Description                              |
+| :------------------- | :----------------------------------------------------------------------- | :--------------------------------------- |
+| `transactions`       | [`AllowArray`](../modules.md#allowarray)\<[`Call`](../modules.md#call)\> | Single call or array of calls to execute |
+| `transactionsDetail` | [`UniversalDetails`](../interfaces/UniversalDetails.md)                  | Transaction execution options            |
 
 #### Returns
 
-`Promise`<\{ `transaction_hash`: `string` }\>
+`Promise`\<\{ `transaction_hash`: `string` }\>
 
 Transaction hash and response
 
@@ -795,7 +795,7 @@ const result = await account.execute([
 
 ### fastExecute
 
-▸ **fastExecute**(`transactions`, `transactionsDetail?`, `waitDetail?`): `Promise`<[`fastExecuteResponse`](../modules.md#fastexecuteresponse)\>
+▸ **fastExecute**(`transactions`, `transactionsDetail?`, `waitDetail?`): `Promise`\<[`fastExecuteResponse`](../modules.md#fastexecuteresponse)\>
 
 Execute one or multiple calls through the account contract,
 responding as soon as a new transaction is possible with the same account.
@@ -810,13 +810,13 @@ Useful for gaming usage.
 
 | Name                  | Type                                                                           | Description                                                                                                                                                  |
 | :-------------------- | :----------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `transactions`        | [`AllowArray`](../modules.md#allowarray)<[`Call`](../modules.md#call)\>        | Single call or array of calls to execute                                                                                                                     |
+| `transactions`        | [`AllowArray`](../modules.md#allowarray)\<[`Call`](../modules.md#call)\>       | Single call or array of calls to execute                                                                                                                     |
 | `transactionsDetail?` | [`UniversalDetails`](../interfaces/UniversalDetails.md)                        | Transaction execution options                                                                                                                                |
 | `waitDetail?`         | [`fastWaitForTransactionOptions`](../modules.md#fastwaitfortransactionoptions) | options to scan the network for the next possible transaction. `retries` is the number of times to retry, `retryInterval` is the time in ms between retries. |
 
 #### Returns
 
-`Promise`<[`fastExecuteResponse`](../modules.md#fastexecuteresponse)\>
+`Promise`\<[`fastExecuteResponse`](../modules.md#fastexecuteresponse)\>
 
 Response containing the transaction result and status for the next transaction. If `isReady` is true, you can execute the next transaction. If false, timeout has been reached before the next transaction was possible.
 
@@ -845,7 +845,7 @@ const resp = await myAccount.fastExecute(
 
 ### declareIfNot
 
-▸ **declareIfNot**(`payload`, `transactionsDetail?`): `Promise`<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
+▸ **declareIfNot**(`payload`, `transactionsDetail?`): `Promise`\<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
 
 First check if contract is already declared, if not declare it
 If contract already declared returned transaction_hash is ''.
@@ -860,7 +860,7 @@ Method will pass even if contract is already declared
 
 #### Returns
 
-`Promise`<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
+`Promise`\<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
 
 #### Implementation of
 
@@ -874,7 +874,7 @@ Method will pass even if contract is already declared
 
 ### declare
 
-▸ **declare**(`payload`, `details?`): `Promise`<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
+▸ **declare**(`payload`, `details?`): `Promise`\<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
 
 Execute one or multiple calls through the account contract
 
@@ -887,7 +887,7 @@ Execute one or multiple calls through the account contract
 
 #### Returns
 
-`Promise`<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
+`Promise`\<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
 
 Declaration transaction hash and class hash
 
@@ -914,7 +914,7 @@ const declareResult = await account.declare({
 
 ### deploy
 
-▸ **deploy**(`payload`, `details?`): `Promise`<[`MultiDeployContractResponse`](../modules.md#multideploycontractresponse)\>
+▸ **deploy**(`payload`, `details?`): `Promise`\<[`MultiDeployContractResponse`](../modules.md#multideploycontractresponse)\>
 
 Execute one or multiple calls through the account contract
 
@@ -927,7 +927,7 @@ Execute one or multiple calls through the account contract
 
 #### Returns
 
-`Promise`<[`MultiDeployContractResponse`](../modules.md#multideploycontractresponse)\>
+`Promise`\<[`MultiDeployContractResponse`](../modules.md#multideploycontractresponse)\>
 
 Deployed contract addresses and transaction hash
 
@@ -954,7 +954,7 @@ const deployment = await account.deploy([
 
 ### deployContract
 
-▸ **deployContract**(`payload`, `details?`): `Promise`<[`DeployContractUDCResponse`](../modules.md#deploycontractudcresponse)\>
+▸ **deployContract**(`payload`, `details?`): `Promise`\<[`DeployContractUDCResponse`](../modules.md#deploycontractudcresponse)\>
 
 Execute one or multiple calls through the account contract
 
@@ -967,7 +967,7 @@ Execute one or multiple calls through the account contract
 
 #### Returns
 
-`Promise`<[`DeployContractUDCResponse`](../modules.md#deploycontractudcresponse)\>
+`Promise`\<[`DeployContractUDCResponse`](../modules.md#deploycontractudcresponse)\>
 
 Deployment result with contract address and UDC event details
 
@@ -999,7 +999,7 @@ console.log('Deployed at:', result.address);
 
 ### declareAndDeploy
 
-▸ **declareAndDeploy**(`payload`, `details?`): `Promise`<[`DeclareDeployUDCResponse`](../modules.md#declaredeployudcresponse)\>
+▸ **declareAndDeploy**(`payload`, `details?`): `Promise`\<[`DeclareDeployUDCResponse`](../modules.md#declaredeployudcresponse)\>
 
 Execute one or multiple calls through the account contract
 
@@ -1012,7 +1012,7 @@ Execute one or multiple calls through the account contract
 
 #### Returns
 
-`Promise`<[`DeclareDeployUDCResponse`](../modules.md#declaredeployudcresponse)\>
+`Promise`\<[`DeclareDeployUDCResponse`](../modules.md#declaredeployudcresponse)\>
 
 Declaration and deployment results
 
@@ -1046,7 +1046,7 @@ const result = await account.declareAndDeploy({
 
 ### deployAccount
 
-▸ **deployAccount**(`«destructured»`, `details?`): `Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+▸ **deployAccount**(`«destructured»`, `details?`): `Promise`\<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
 
 Execute one or multiple calls through the account contract
 
@@ -1059,7 +1059,7 @@ Execute one or multiple calls through the account contract
 
 #### Returns
 
-`Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+`Promise`\<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
 
 Deployment transaction hash and contract address
 
@@ -1091,7 +1091,7 @@ const deployment = await account.deployAccount({
 
 ### signMessage
 
-▸ **signMessage**(`typedData`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signMessage**(`typedData`): `Promise`\<[`Signature`](../modules.md#signature)\>
 
 Sign a typed data message for off-chain verification
 
@@ -1103,7 +1103,7 @@ Sign a typed data message for off-chain verification
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`\<[`Signature`](../modules.md#signature)\>
 
 Signature array [r, s]
 
@@ -1136,7 +1136,7 @@ const signature = await account.signMessage({
 
 ### hashMessage
 
-▸ **hashMessage**(`typedData`): `Promise`<`string`\>
+▸ **hashMessage**(`typedData`): `Promise`\<`string`\>
 
 Hash a typed data message using Pedersen hash
 
@@ -1148,7 +1148,7 @@ Hash a typed data message using Pedersen hash
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 Message hash as hex string
 
@@ -1176,13 +1176,13 @@ const messageHash = await account.hashMessage(typedData);
 
 ### getSnip9Version
 
-▸ **getSnip9Version**(): `Promise`<`"0"` \| `"1"` \| `"2"`\>
+▸ **getSnip9Version**(): `Promise`\<`"0"` \| `"1"` \| `"2"`\>
 
 Verify if an account is compatible with SNIP-9 outside execution, and with which version of this standard.
 
 #### Returns
 
-`Promise`<`"0"` \| `"1"` \| `"2"`\>
+`Promise`\<`"0"` \| `"1"` \| `"2"`\>
 
 Not compatible, V1, V2.
 
@@ -1201,7 +1201,7 @@ const result = myAccount.getSnip9Version();
 
 ### isValidSnip9Nonce
 
-▸ **isValidSnip9Nonce**(`nonce`): `Promise`<`boolean`\>
+▸ **isValidSnip9Nonce**(`nonce`): `Promise`\<`boolean`\>
 
 Verify if a SNIP-9 nonce has not yet been used by the account.
 
@@ -1213,7 +1213,7 @@ Verify if a SNIP-9 nonce has not yet been used by the account.
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 true if SNIP-9 nonce not yet used.
 
@@ -1232,14 +1232,14 @@ const result = myAccount.isValidSnip9Nonce(1234);
 
 ### getSnip9Nonce
 
-▸ **getSnip9Nonce**(): `Promise`<`string`\>
+▸ **getSnip9Nonce**(): `Promise`\<`string`\>
 
 Outside transaction needs a specific SNIP-9 nonce, that we get in this function.
 A SNIP-9 nonce can be any number not yet used ; no ordering is needed.
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 an Hex string of a SNIP-9 nonce.
 
@@ -1258,22 +1258,22 @@ const result = myAccount.getSnip9Nonce();
 
 ### getOutsideTransaction
 
-▸ **getOutsideTransaction**(`options`, `calls`, `version?`, `nonce?`): `Promise`<[`OutsideTransaction`](../interfaces/OutsideTransaction.md)\>
+▸ **getOutsideTransaction**(`options`, `calls`, `version?`, `nonce?`): `Promise`\<[`OutsideTransaction`](../interfaces/OutsideTransaction.md)\>
 
 Creates an object containing transaction(s) that can be executed by an other account with` Account.executeFromOutside()`, called Outside Transaction.
 
 #### Parameters
 
-| Name       | Type                                                                    | Description                                                         |
-| :--------- | :---------------------------------------------------------------------- | :------------------------------------------------------------------ |
-| `options`  | [`OutsideExecutionOptions`](../interfaces/OutsideExecutionOptions.md)   | Parameters of the transaction(s).                                   |
-| `calls`    | [`AllowArray`](../modules.md#allowarray)<[`Call`](../modules.md#call)\> | Transaction(s) to execute.                                          |
-| `version?` | `"0"` \| `"1"` \| `"2"`                                                 | SNIP-9 version of the Account that creates the outside transaction. |
-| `nonce?`   | [`BigNumberish`](../modules.md#bignumberish)                            | Outside Nonce.                                                      |
+| Name       | Type                                                                     | Description                                                         |
+| :--------- | :----------------------------------------------------------------------- | :------------------------------------------------------------------ |
+| `options`  | [`OutsideExecutionOptions`](../interfaces/OutsideExecutionOptions.md)    | Parameters of the transaction(s).                                   |
+| `calls`    | [`AllowArray`](../modules.md#allowarray)\<[`Call`](../modules.md#call)\> | Transaction(s) to execute.                                          |
+| `version?` | `"0"` \| `"1"` \| `"2"`                                                  | SNIP-9 version of the Account that creates the outside transaction. |
+| `nonce?`   | [`BigNumberish`](../modules.md#bignumberish)                             | Outside Nonce.                                                      |
 
 #### Returns
 
-`Promise`<[`OutsideTransaction`](../interfaces/OutsideTransaction.md)\>
+`Promise`\<[`OutsideTransaction`](../interfaces/OutsideTransaction.md)\>
 
 and object that can be used in `Account.executeFromOutside()`
 
@@ -1319,21 +1319,21 @@ const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTr
 
 ### executeFromOutside
 
-▸ **executeFromOutside**(`outsideTransaction`, `opts?`): `Promise`<\{ `transaction_hash`: `string` }\>
+▸ **executeFromOutside**(`outsideTransaction`, `opts?`): `Promise`\<\{ `transaction_hash`: `string` }\>
 
 An account B executes a transaction that has been signed by an account A.
 Fees are paid by B.
 
 #### Parameters
 
-| Name                 | Type                                                                                                   | Description                                                            |
-| :------------------- | :----------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------- |
-| `outsideTransaction` | [`AllowArray`](../modules.md#allowarray)<[`OutsideTransaction`](../interfaces/OutsideTransaction.md)\> | the signed transaction generated by `Account.getOutsideTransaction()`. |
-| `opts?`              | [`UniversalDetails`](../interfaces/UniversalDetails.md)                                                | same options than `Account.execute()`.                                 |
+| Name                 | Type                                                                                                    | Description                                                            |
+| :------------------- | :------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------- |
+| `outsideTransaction` | [`AllowArray`](../modules.md#allowarray)\<[`OutsideTransaction`](../interfaces/OutsideTransaction.md)\> | the signed transaction generated by `Account.getOutsideTransaction()`. |
+| `opts?`              | [`UniversalDetails`](../interfaces/UniversalDetails.md)                                                 | same options than `Account.execute()`.                                 |
 
 #### Returns
 
-`Promise`<\{ `transaction_hash`: `string` }\>
+`Promise`\<\{ `transaction_hash`: `string` }\>
 
 same response than `Account.execute()`.
 
@@ -1360,7 +1360,7 @@ const result = await myAccount.executeFromOutside([outsideTransaction1, outsideT
 
 ### resolveDetailsWithTip
 
-▸ **resolveDetailsWithTip**(`details`): `Promise`<[`UniversalDetails`](../interfaces/UniversalDetails.md) & \{ `tip`: [`BigNumberish`](../modules.md#bignumberish) }\>
+▸ **resolveDetailsWithTip**(`details`): `Promise`\<[`UniversalDetails`](../interfaces/UniversalDetails.md) & \{ `tip`: [`BigNumberish`](../modules.md#bignumberish) }\>
 
 Helper method to resolve details with tip estimation
 
@@ -1372,7 +1372,7 @@ Helper method to resolve details with tip estimation
 
 #### Returns
 
-`Promise`<[`UniversalDetails`](../interfaces/UniversalDetails.md) & \{ `tip`: [`BigNumberish`](../modules.md#bignumberish) }\>
+`Promise`\<[`UniversalDetails`](../interfaces/UniversalDetails.md) & \{ `tip`: [`BigNumberish`](../modules.md#bignumberish) }\>
 
 #### Defined in
 
@@ -1404,7 +1404,7 @@ Helper method to resolve transaction version
 
 ### buildInvocation
 
-▸ **buildInvocation**(`call`, `details`): `Promise`<[`Invocation`](../modules.md#invocation)\>
+▸ **buildInvocation**(`call`, `details`): `Promise`\<[`Invocation`](../modules.md#invocation)\>
 
 #### Parameters
 
@@ -1415,7 +1415,7 @@ Helper method to resolve transaction version
 
 #### Returns
 
-`Promise`<[`Invocation`](../modules.md#invocation)\>
+`Promise`\<[`Invocation`](../modules.md#invocation)\>
 
 #### Defined in
 
@@ -1425,7 +1425,7 @@ Helper method to resolve transaction version
 
 ### buildDeclarePayload
 
-▸ **buildDeclarePayload**(`payload`, `details`): `Promise`<[`DeclareContractTransaction`](../modules.md#declarecontracttransaction)\>
+▸ **buildDeclarePayload**(`payload`, `details`): `Promise`\<[`DeclareContractTransaction`](../modules.md#declarecontracttransaction)\>
 
 #### Parameters
 
@@ -1436,7 +1436,7 @@ Helper method to resolve transaction version
 
 #### Returns
 
-`Promise`<[`DeclareContractTransaction`](../modules.md#declarecontracttransaction)\>
+`Promise`\<[`DeclareContractTransaction`](../modules.md#declarecontracttransaction)\>
 
 #### Defined in
 
@@ -1446,7 +1446,7 @@ Helper method to resolve transaction version
 
 ### buildAccountDeployPayload
 
-▸ **buildAccountDeployPayload**(`«destructured»`, `details`): `Promise`<[`DeployAccountContractTransaction`](../modules.md#deployaccountcontracttransaction)\>
+▸ **buildAccountDeployPayload**(`«destructured»`, `details`): `Promise`\<[`DeployAccountContractTransaction`](../modules.md#deployaccountcontracttransaction)\>
 
 #### Parameters
 
@@ -1457,7 +1457,7 @@ Helper method to resolve transaction version
 
 #### Returns
 
-`Promise`<[`DeployAccountContractTransaction`](../modules.md#deployaccountcontracttransaction)\>
+`Promise`\<[`DeployAccountContractTransaction`](../modules.md#deployaccountcontracttransaction)\>
 
 #### Defined in
 
@@ -1467,26 +1467,26 @@ Helper method to resolve transaction version
 
 ### accountInvocationsFactory
 
-▸ **accountInvocationsFactory**(`invocations`, `details`): `Promise`<[\{ `type`: `"INVOKE"` } & [`CallDetails`](../modules.md#calldetails) & \{ signature?: Signature \| undefined; } & InvocationsDetailsWithNonce]\>
+▸ **accountInvocationsFactory**(`invocations`, `details`): `Promise`\<[\{ `type`: `"INVOKE"` } & [`CallDetails`](../modules.md#calldetails) & \{ signature?: Signature \| undefined; } & InvocationsDetailsWithNonce]\>
 
 Build account invocations with proper typing based on transaction type
 
 #### Parameters
 
-| Name          | Type                                                                                                           |
-| :------------ | :------------------------------------------------------------------------------------------------------------- |
-| `invocations` | [\{ `type`: `"INVOKE"` ; `payload`: [`AllowArray`](../modules.md#allowarray)<[`Call`](../modules.md#call)\> }] |
-| `details`     | [`AccountInvocationsFactoryDetails`](../modules.md#accountinvocationsfactorydetails)                           |
+| Name          | Type                                                                                                            |
+| :------------ | :-------------------------------------------------------------------------------------------------------------- |
+| `invocations` | [\{ `type`: `"INVOKE"` ; `payload`: [`AllowArray`](../modules.md#allowarray)\<[`Call`](../modules.md#call)\> }] |
+| `details`     | [`AccountInvocationsFactoryDetails`](../modules.md#accountinvocationsfactorydetails)                            |
 
 #### Returns
 
-`Promise`<[\{ `type`: `"INVOKE"` } & [`CallDetails`](../modules.md#calldetails) & \{ signature?: Signature \| undefined; } & InvocationsDetailsWithNonce]\>
+`Promise`\<[\{ `type`: `"INVOKE"` } & [`CallDetails`](../modules.md#calldetails) & \{ signature?: Signature \| undefined; } & InvocationsDetailsWithNonce]\>
 
 #### Defined in
 
 [src/account/default.ts:861](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/account/default.ts#L861)
 
-▸ **accountInvocationsFactory**(`invocations`, `details`): `Promise`<[\{ `type`: `"DECLARE"` } & [`DeclareContractTransaction`](../modules.md#declarecontracttransaction) & [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce)]\>
+▸ **accountInvocationsFactory**(`invocations`, `details`): `Promise`\<[\{ `type`: `"DECLARE"` } & [`DeclareContractTransaction`](../modules.md#declarecontracttransaction) & [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce)]\>
 
 #### Parameters
 
@@ -1497,13 +1497,13 @@ Build account invocations with proper typing based on transaction type
 
 #### Returns
 
-`Promise`<[\{ `type`: `"DECLARE"` } & [`DeclareContractTransaction`](../modules.md#declarecontracttransaction) & [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce)]\>
+`Promise`\<[\{ `type`: `"DECLARE"` } & [`DeclareContractTransaction`](../modules.md#declarecontracttransaction) & [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce)]\>
 
 #### Defined in
 
 [src/account/default.ts:867](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/account/default.ts#L867)
 
-▸ **accountInvocationsFactory**(`invocations`, `details`): `Promise`<[\{ `type`: `"DEPLOY_ACCOUNT"` } & `Omit`<[`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload), `"contractAddress"`\> & \{ signature?: Signature \| undefined; } & InvocationsDetailsWithNonce]\>
+▸ **accountInvocationsFactory**(`invocations`, `details`): `Promise`\<[\{ `type`: `"DEPLOY_ACCOUNT"` } & `Omit`\<[`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload), `"contractAddress"`\> & \{ signature?: Signature \| undefined; } & InvocationsDetailsWithNonce]\>
 
 #### Parameters
 
@@ -1514,13 +1514,13 @@ Build account invocations with proper typing based on transaction type
 
 #### Returns
 
-`Promise`<[\{ `type`: `"DEPLOY_ACCOUNT"` } & `Omit`<[`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload), `"contractAddress"`\> & \{ signature?: Signature \| undefined; } & InvocationsDetailsWithNonce]\>
+`Promise`\<[\{ `type`: `"DEPLOY_ACCOUNT"` } & `Omit`\<[`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload), `"contractAddress"`\> & \{ signature?: Signature \| undefined; } & InvocationsDetailsWithNonce]\>
 
 #### Defined in
 
 [src/account/default.ts:876](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/account/default.ts#L876)
 
-▸ **accountInvocationsFactory**(`invocations`, `details`): `Promise`<[`AccountInvocations`](../modules.md#accountinvocations)\>
+▸ **accountInvocationsFactory**(`invocations`, `details`): `Promise`\<[`AccountInvocations`](../modules.md#accountinvocations)\>
 
 #### Parameters
 
@@ -1531,7 +1531,7 @@ Build account invocations with proper typing based on transaction type
 
 #### Returns
 
-`Promise`<[`AccountInvocations`](../modules.md#accountinvocations)\>
+`Promise`\<[`AccountInvocations`](../modules.md#accountinvocations)\>
 
 #### Defined in
 
@@ -1541,7 +1541,7 @@ Build account invocations with proper typing based on transaction type
 
 ### buildPaymasterTransaction
 
-▸ **buildPaymasterTransaction**(`calls`, `paymasterDetails`): `Promise`<[`PreparedTransaction`](../modules.md#preparedtransaction)\>
+▸ **buildPaymasterTransaction**(`calls`, `paymasterDetails`): `Promise`\<[`PreparedTransaction`](../modules.md#preparedtransaction)\>
 
 Estimate fees for a paymaster-sponsored transaction
 
@@ -1554,7 +1554,7 @@ Estimate fees for a paymaster-sponsored transaction
 
 #### Returns
 
-`Promise`<[`PreparedTransaction`](../modules.md#preparedtransaction)\>
+`Promise`\<[`PreparedTransaction`](../modules.md#preparedtransaction)\>
 
 Prepared transaction with typed data for signing
 
@@ -1580,7 +1580,7 @@ const prepared = await account.buildPaymasterTransaction(calls, {
 
 ### estimatePaymasterTransactionFee
 
-▸ **estimatePaymasterTransactionFee**(`calls`, `paymasterDetails`): `Promise`<[`PaymasterFeeEstimate`](../modules.md#paymasterfeeestimate)\>
+▸ **estimatePaymasterTransactionFee**(`calls`, `paymasterDetails`): `Promise`\<[`PaymasterFeeEstimate`](../modules.md#paymasterfeeestimate)\>
 
 Estimate fees for a paymaster-sponsored transaction
 
@@ -1593,7 +1593,7 @@ Estimate fees for a paymaster-sponsored transaction
 
 #### Returns
 
-`Promise`<[`PaymasterFeeEstimate`](../modules.md#paymasterfeeestimate)\>
+`Promise`\<[`PaymasterFeeEstimate`](../modules.md#paymasterfeeestimate)\>
 
 Fee estimates in both STRK and gas token
 
@@ -1618,7 +1618,7 @@ const fees = await account.estimatePaymasterTransactionFee(
 
 ### preparePaymasterTransaction
 
-▸ **preparePaymasterTransaction**(`preparedTransaction`): `Promise`<[`ExecutableUserTransaction`](../modules.md#executableusertransaction)\>
+▸ **preparePaymasterTransaction**(`preparedTransaction`): `Promise`\<[`ExecutableUserTransaction`](../modules.md#executableusertransaction)\>
 
 #### Parameters
 
@@ -1628,7 +1628,7 @@ const fees = await account.estimatePaymasterTransactionFee(
 
 #### Returns
 
-`Promise`<[`ExecutableUserTransaction`](../modules.md#executableusertransaction)\>
+`Promise`\<[`ExecutableUserTransaction`](../modules.md#executableusertransaction)\>
 
 #### Defined in
 
@@ -1638,7 +1638,7 @@ const fees = await account.estimatePaymasterTransactionFee(
 
 ### executePaymasterTransaction
 
-▸ **executePaymasterTransaction**(`calls`, `paymasterDetails`, `maxFeeInGasToken?`): `Promise`<\{ `transaction_hash`: `string` }\>
+▸ **executePaymasterTransaction**(`calls`, `paymasterDetails`, `maxFeeInGasToken?`): `Promise`\<\{ `transaction_hash`: `string` }\>
 
 Execute a paymaster-sponsored transaction
 
@@ -1652,7 +1652,7 @@ Execute a paymaster-sponsored transaction
 
 #### Returns
 
-`Promise`<\{ `transaction_hash`: `string` }\>
+`Promise`\<\{ `transaction_hash`: `string` }\>
 
 Transaction hash if successful
 
@@ -1686,7 +1686,7 @@ const txHash = await account.executePaymasterTransaction(
 
 ### getStarkName
 
-▸ **getStarkName**(`address?`, `StarknetIdContract?`): `Promise`<`string`\>
+▸ **getStarkName**(`address?`, `StarknetIdContract?`): `Promise`\<`string`\>
 
 Get the Starknet ID for an address
 
@@ -1699,7 +1699,7 @@ Get the Starknet ID for an address
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The Starknet ID for the address
 
@@ -1715,7 +1715,7 @@ The Starknet ID for the address
 
 ### fetch
 
-▸ **fetch**(`method`, `params?`, `id?`): `Promise`<`Response`\>
+▸ **fetch**(`method`, `params?`, `id?`): `Promise`\<`Response`\>
 
 Direct RPC method call
 
@@ -1729,7 +1729,7 @@ Direct RPC method call
 
 #### Returns
 
-`Promise`<`Response`\>
+`Promise`\<`Response`\>
 
 RPC response
 
@@ -1749,13 +1749,13 @@ RPC response
 
 ### getChainId
 
-▸ **getChainId**(): `Promise`<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
+▸ **getChainId**(): `Promise`\<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
 
 Gets the Starknet chain Id
 
 #### Returns
 
-`Promise`<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
+`Promise`\<`"0x534e5f4d41494e"` \| `"0x534e5f5345504f4c4941"`\>
 
 the chain Id
 
@@ -1801,13 +1801,13 @@ Spec version string or undefined if not set
 
 ### getSpecVersion
 
-▸ **getSpecVersion**(): `Promise`<`string`\>
+▸ **getSpecVersion**(): `Promise`\<`string`\>
 
 Get channel spec version
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 Promise resolving to spec version
 
@@ -1827,13 +1827,13 @@ Promise resolving to spec version
 
 ### setUpSpecVersion
 
-▸ **setUpSpecVersion**(): `Promise`<`"0.8.1"` \| `"0.9.0"`\>
+▸ **setUpSpecVersion**(): `Promise`\<`"0.8.1"` \| `"0.9.0"`\>
 
 Setup channel spec version and return it
 
 #### Returns
 
-`Promise`<`"0.8.1"` \| `"0.9.0"`\>
+`Promise`\<`"0.8.1"` \| `"0.9.0"`\>
 
 Promise resolving to spec version
 
@@ -1853,7 +1853,7 @@ Promise resolving to spec version
 
 ### getNonceForAddress
 
-▸ **getNonceForAddress**(`contractAddress`, `blockIdentifier?`): `Promise`<`string`\>
+▸ **getNonceForAddress**(`contractAddress`, `blockIdentifier?`): `Promise`\<`string`\>
 
 Returns the nonce associated with the given address in the given block
 
@@ -1866,7 +1866,7 @@ Returns the nonce associated with the given address in the given block
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 the hex nonce
 
@@ -1886,13 +1886,13 @@ the hex nonce
 
 ### getBlock
 
-▸ **getBlock**(): `Promise`<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC08.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
+▸ **getBlock**(): `Promise`\<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC08.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
 
 Gets the block information
 
 #### Returns
 
-`Promise`<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC08.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
+`Promise`\<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC08.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
 
 the block object
 
@@ -1908,7 +1908,7 @@ the block object
 
 [src/provider/rpc.ts:155](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/provider/rpc.ts#L155)
 
-▸ **getBlock**(`blockIdentifier`): `Promise`<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC08.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
+▸ **getBlock**(`blockIdentifier`): `Promise`\<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC08.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
 
 #### Parameters
 
@@ -1918,7 +1918,7 @@ the block object
 
 #### Returns
 
-`Promise`<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC08.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
+`Promise`\<\{ `transactions`: `string`[] ; `parent_hash`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC08.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC08.API.md#l1_da_mode) ; `starknet_version`: `string` }\>
 
 #### Implementation of
 
@@ -1932,7 +1932,7 @@ the block object
 
 [src/provider/rpc.ts:156](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/provider/rpc.ts#L156)
 
-▸ **getBlock**(`blockIdentifier`): `Promise`<\{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC09.API.md#l1_da_mode) ; `starknet_version`: `string` ; `transactions`: `string`[] }\>
+▸ **getBlock**(`blockIdentifier`): `Promise`\<\{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC09.API.md#l1_da_mode) ; `starknet_version`: `string` ; `transactions`: `string`[] }\>
 
 #### Parameters
 
@@ -1942,7 +1942,7 @@ the block object
 
 #### Returns
 
-`Promise`<\{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC09.API.md#l1_da_mode) ; `starknet_version`: `string` ; `transactions`: `string`[] }\>
+`Promise`\<\{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) ; `block_hash`: `string` ; `parent_hash`: `string` ; `block_number`: `number` ; `new_root`: `string` ; `timestamp`: `number` ; `sequencer_address`: `string` ; `l1_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l2_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l1_data_gas_price`: [`RESOURCE_PRICE`](../namespaces/RPC.RPCSPEC09.API.md#resource_price) ; `l1_da_mode`: [`L1_DA_MODE`](../namespaces/RPC.RPCSPEC09.API.md#l1_da_mode) ; `starknet_version`: `string` ; `transactions`: `string`[] }\>
 
 #### Implementation of
 
@@ -1956,7 +1956,7 @@ the block object
 
 [src/provider/rpc.ts:157](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/provider/rpc.ts#L157)
 
-▸ **getBlock**(`blockIdentifier`): `Promise`<[`GetBlockResponse`](../modules.md#getblockresponse)\>
+▸ **getBlock**(`blockIdentifier`): `Promise`\<[`GetBlockResponse`](../modules.md#getblockresponse)\>
 
 #### Parameters
 
@@ -1966,7 +1966,7 @@ the block object
 
 #### Returns
 
-`Promise`<[`GetBlockResponse`](../modules.md#getblockresponse)\>
+`Promise`\<[`GetBlockResponse`](../modules.md#getblockresponse)\>
 
 #### Implementation of
 
@@ -1984,13 +1984,13 @@ the block object
 
 ### getBlockLatestAccepted
 
-▸ **getBlockLatestAccepted**(): `Promise`<[`BlockHashAndNumber`](../namespaces/RPC.RPCSPEC08.API.md#blockhashandnumber)\>
+▸ **getBlockLatestAccepted**(): `Promise`\<[`BlockHashAndNumber`](../namespaces/RPC.RPCSPEC08.API.md#blockhashandnumber)\>
 
 Get the most recent accepted block hash and number
 
 #### Returns
 
-`Promise`<[`BlockHashAndNumber`](../namespaces/RPC.RPCSPEC08.API.md#blockhashandnumber)\>
+`Promise`\<[`BlockHashAndNumber`](../namespaces/RPC.RPCSPEC08.API.md#blockhashandnumber)\>
 
 Object containing block hash and number
 
@@ -2010,13 +2010,13 @@ Object containing block hash and number
 
 ### getBlockNumber
 
-▸ **getBlockNumber**(): `Promise`<`number`\>
+▸ **getBlockNumber**(): `Promise`\<`number`\>
 
 Get the most recent accepted block number
 
 #### Returns
 
-`Promise`<`number`\>
+`Promise`\<`number`\>
 
 Number of the latest block
 
@@ -2036,7 +2036,7 @@ Number of the latest block
 
 ### getBlockWithTxHashes
 
-▸ **getBlockWithTxHashes**(`blockIdentifier?`): `Promise`<`OnlyFirst`<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_with_tx_hashes), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_tx_hashes) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`PENDING_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_tx_hashes), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_tx_hashes) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+▸ **getBlockWithTxHashes**(`blockIdentifier?`): `Promise`\<`OnlyFirst`\<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_with_tx_hashes), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_tx_hashes) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`PENDING_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_tx_hashes), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_tx_hashes) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 Get block information with transaction hashes
 
@@ -2048,7 +2048,7 @@ Get block information with transaction hashes
 
 #### Returns
 
-`Promise`<`OnlyFirst`<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_with_tx_hashes), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_tx_hashes) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`PENDING_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_tx_hashes), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_tx_hashes) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+`Promise`\<`OnlyFirst`\<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_with_tx_hashes), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_tx_hashes) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`PENDING_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_tx_hashes), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_tx_hashes) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_tx_hashes), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TX_HASHES`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_tx_hashes) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 Block with transaction hashes
 
@@ -2068,7 +2068,7 @@ Block with transaction hashes
 
 ### getBlockWithTxs
 
-▸ **getBlockWithTxs**(`blockIdentifier?`): `Promise`<`OnlyFirst`<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_with_txs), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_txs) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`PENDING_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_txs), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_txs) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+▸ **getBlockWithTxs**(`blockIdentifier?`): `Promise`\<`OnlyFirst`\<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_with_txs), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_txs) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`PENDING_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_txs), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_txs) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 Get block information with full transactions
 
@@ -2080,7 +2080,7 @@ Get block information with full transactions
 
 #### Returns
 
-`Promise`<`OnlyFirst`<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_with_txs), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_txs) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`PENDING_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_txs), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_txs) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+`Promise`\<`OnlyFirst`\<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_with_txs), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_txs) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`PENDING_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_txs), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_txs) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_txs), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_TXS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_txs) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 Block with full transactions
 
@@ -2100,7 +2100,7 @@ Block with full transactions
 
 ### waitForBlock
 
-▸ **waitForBlock**(`blockIdentifier?`, `retryInterval?`): `Promise`<`void`\>
+▸ **waitForBlock**(`blockIdentifier?`, `retryInterval?`): `Promise`\<`void`\>
 
 Pause execution until a specified block is created
 
@@ -2113,7 +2113,7 @@ Pause execution until a specified block is created
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 **`Example`**
 
@@ -2138,7 +2138,7 @@ await provider.waitForBlock('latest');
 
 ### getL1GasPrice
 
-▸ **getL1GasPrice**(`blockIdentifier?`): `Promise`<`string`\>
+▸ **getL1GasPrice**(`blockIdentifier?`): `Promise`\<`string`\>
 
 Gets the price of l1 gas in the block
 
@@ -2150,7 +2150,7 @@ Gets the price of l1 gas in the block
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 gas price of the block
 
@@ -2170,7 +2170,7 @@ gas price of the block
 
 ### getGasPrices
 
-▸ **getGasPrices**(`blockIdentifier?`): `Promise`<[`GasPrices`](../modules.md#gasprices)\>
+▸ **getGasPrices**(`blockIdentifier?`): `Promise`\<[`GasPrices`](../modules.md#gasprices)\>
 
 Get the gas prices related to a block.
 
@@ -2182,7 +2182,7 @@ Get the gas prices related to a block.
 
 #### Returns
 
-`Promise`<[`GasPrices`](../modules.md#gasprices)\>
+`Promise`\<[`GasPrices`](../modules.md#gasprices)\>
 
 an object with l1DataGasPrice, l1GasPrice, l2GasPrice properties (all bigint type).
 
@@ -2205,7 +2205,7 @@ const result = await myProvider.getGasPrices();
 
 ### getL1MessageHash
 
-▸ **getL1MessageHash**(`l2TxHash`): `Promise`<`string`\>
+▸ **getL1MessageHash**(`l2TxHash`): `Promise`\<`string`\>
 
 Get L1 message hash from L2 transaction hash
 
@@ -2217,7 +2217,7 @@ Get L1 message hash from L2 transaction hash
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 Hex string of L1 message hash
 
@@ -2248,7 +2248,7 @@ const result = provider.getL1MessageHash(
 
 ### getBlockWithReceipts
 
-▸ **getBlockWithReceipts**(`blockIdentifier?`): `Promise`<`OnlyFirst`<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_with_receipts), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_receipts) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`PENDING_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_receipts), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_receipts) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+▸ **getBlockWithReceipts**(`blockIdentifier?`): `Promise`\<`OnlyFirst`\<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_with_receipts), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_receipts) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`PENDING_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_receipts), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_receipts) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 Get block information with transaction receipts
 
@@ -2260,7 +2260,7 @@ Get block information with transaction receipts
 
 #### Returns
 
-`Promise`<`OnlyFirst`<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_with_receipts), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_receipts) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`PENDING_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_receipts), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_receipts) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`<[`PRE_CONFIRMED_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
+`Promise`\<`OnlyFirst`\<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_with_receipts), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_receipts) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`PENDING_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_with_receipts), \{ `status`: [`BLOCK_STATUS`](../namespaces/RPC.RPCSPEC08.API.md#block_status) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC08.API.md#block_body_with_receipts) & [`PENDING_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC08.API.md#pending_block_header)\> \| `OnlyFirst`\<[`BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\> \| `OnlyFirst`\<[`PRE_CONFIRMED_BLOCK_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_with_receipts), \{ `status`: [`EBlockStatus`](../namespaces/RPC.RPCSPEC09.API.md#eblockstatus) } & [`BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#block_header) & [`BLOCK_BODY_WITH_RECEIPTS`](../namespaces/RPC.RPCSPEC09.API.md#block_body_with_receipts) & [`PRE_CONFIRMED_BLOCK_HEADER`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_block_header)\>\>
 
 Block with transaction receipts
 
@@ -2280,14 +2280,14 @@ Block with transaction receipts
 
 ### getBlockStateUpdate
 
-▸ **getBlockStateUpdate**(): `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
+▸ **getBlockStateUpdate**(): `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
 
 Gets the state changes in a specific block (result of executing the requested block)
 Alternative method name for getStateUpdate with specific overloads
 
 #### Returns
 
-`Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
+`Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
 
 StateUpdateResponse
 
@@ -2303,7 +2303,7 @@ StateUpdateResponse
 
 [src/provider/rpc.ts:258](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/provider/rpc.ts#L258)
 
-▸ **getBlockStateUpdate**(`blockIdentifier`): `Promise`<[`PRE_CONFIRMED_STATE_UPDATE`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>
+▸ **getBlockStateUpdate**(`blockIdentifier`): `Promise`\<[`PRE_CONFIRMED_STATE_UPDATE`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>
 
 #### Parameters
 
@@ -2313,7 +2313,7 @@ StateUpdateResponse
 
 #### Returns
 
-`Promise`<[`PRE_CONFIRMED_STATE_UPDATE`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>
+`Promise`\<[`PRE_CONFIRMED_STATE_UPDATE`](../namespaces/RPC.RPCSPEC09.API.md#pre_confirmed_state_update)\>
 
 #### Implementation of
 
@@ -2327,7 +2327,7 @@ StateUpdateResponse
 
 [src/provider/rpc.ts:259](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/provider/rpc.ts#L259)
 
-▸ **getBlockStateUpdate**(`blockIdentifier`): `Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
+▸ **getBlockStateUpdate**(`blockIdentifier`): `Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
 
 #### Parameters
 
@@ -2337,7 +2337,7 @@ StateUpdateResponse
 
 #### Returns
 
-`Promise`<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
+`Promise`\<\{ `block_hash`: `string` ; `new_root`: `string` ; `old_root`: `string` ; `state_diff`: \{ `storage_diffs`: \{ `address`: `string` ; `storage_entries`: \{ `key`: `string` ; `value`: `string` }[] }[] ; `deprecated_declared_classes`: `string`[] ; `declared_classes`: \{ `class_hash`: `string` ; `compiled_class_hash`: `string` }[] ; `deployed_contracts`: \{ `address`: `string` ; `class_hash`: `string` }[] ; `replaced_classes`: \{ `contract_address`: `string` ; `class_hash`: `string` }[] ; `nonces`: \{ `nonce`: `string` ; `contract_address`: `string` }[] } }\>
 
 #### Implementation of
 
@@ -2351,7 +2351,7 @@ StateUpdateResponse
 
 [src/provider/rpc.ts:262](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/provider/rpc.ts#L262)
 
-▸ **getBlockStateUpdate**(`blockIdentifier?`): `Promise`<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
+▸ **getBlockStateUpdate**(`blockIdentifier?`): `Promise`\<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
 
 #### Parameters
 
@@ -2361,7 +2361,7 @@ StateUpdateResponse
 
 #### Returns
 
-`Promise`<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
+`Promise`\<[`StateUpdateResponse`](../modules.md#stateupdateresponse)\>
 
 #### Implementation of
 
@@ -2379,7 +2379,7 @@ StateUpdateResponse
 
 ### getBlockTransactionsTraces
 
-▸ **getBlockTransactionsTraces**(`blockIdentifier?`): `Promise`<[`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC08.API.md#blocktransactionstraces) \| [`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC09.API.md#blocktransactionstraces)\>
+▸ **getBlockTransactionsTraces**(`blockIdentifier?`): `Promise`\<[`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC08.API.md#blocktransactionstraces) \| [`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC09.API.md#blocktransactionstraces)\>
 
 Get transaction traces for all transactions in a block
 
@@ -2391,7 +2391,7 @@ Get transaction traces for all transactions in a block
 
 #### Returns
 
-`Promise`<[`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC08.API.md#blocktransactionstraces) \| [`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC09.API.md#blocktransactionstraces)\>
+`Promise`\<[`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC08.API.md#blocktransactionstraces) \| [`BlockTransactionsTraces`](../namespaces/RPC.RPCSPEC09.API.md#blocktransactionstraces)\>
 
 Array of transaction traces
 
@@ -2411,7 +2411,7 @@ Array of transaction traces
 
 ### getBlockTransactionCount
 
-▸ **getBlockTransactionCount**(`blockIdentifier?`): `Promise`<`number`\>
+▸ **getBlockTransactionCount**(`blockIdentifier?`): `Promise`\<`number`\>
 
 Get the number of transactions in a block
 
@@ -2423,7 +2423,7 @@ Get the number of transactions in a block
 
 #### Returns
 
-`Promise`<`number`\>
+`Promise`\<`number`\>
 
 Transaction count
 
@@ -2443,7 +2443,7 @@ Transaction count
 
 ### getTransaction
 
-▸ **getTransaction**(`txHash`): `Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
+▸ **getTransaction**(`txHash`): `Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
 
 Gets the transaction information from a tx id.
 
@@ -2455,9 +2455,9 @@ Gets the transaction information from a tx id.
 
 #### Returns
 
-`Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
+`Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
 
-the transaction object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
+the transaction object `{ transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }`
 
 #### Implementation of
 
@@ -2475,7 +2475,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 ### getTransactionByHash
 
-▸ **getTransactionByHash**(`txHash`): `Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
+▸ **getTransactionByHash**(`txHash`): `Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
 
 Gets the transaction information from a tx hash (alias for getTransaction)
 
@@ -2487,7 +2487,7 @@ Gets the transaction information from a tx hash (alias for getTransaction)
 
 #### Returns
 
-`Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
+`Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
 
 Transaction information
 
@@ -2507,7 +2507,7 @@ Transaction information
 
 ### getTransactionByBlockIdAndIndex
 
-▸ **getTransactionByBlockIdAndIndex**(`blockIdentifier`, `index`): `Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
+▸ **getTransactionByBlockIdAndIndex**(`blockIdentifier`, `index`): `Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
 
 Gets transaction by block identifier and index
 
@@ -2520,7 +2520,7 @@ Gets transaction by block identifier and index
 
 #### Returns
 
-`Promise`<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
+`Promise`\<[`TXN_WITH_HASH`](../namespaces/RPC.RPCSPEC08.API.md#txn_with_hash)\>
 
 Transaction information
 
@@ -2540,7 +2540,7 @@ Transaction information
 
 ### getTransactionReceipt
 
-▸ **getTransactionReceipt**(`txHash`): `Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+▸ **getTransactionReceipt**(`txHash`): `Promise`\<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
 
 Gets the transaction receipt from a tx hash.
 
@@ -2552,7 +2552,7 @@ Gets the transaction receipt from a tx hash.
 
 #### Returns
 
-`Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+`Promise`\<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
 
 the transaction receipt object
 
@@ -2572,7 +2572,7 @@ the transaction receipt object
 
 ### getTransactionTrace
 
-▸ **getTransactionTrace**(`txHash`): `Promise`<[`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC08.API.md#transaction_trace) \| [`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC09.API.md#transaction_trace)\>
+▸ **getTransactionTrace**(`txHash`): `Promise`\<[`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC08.API.md#transaction_trace) \| [`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC09.API.md#transaction_trace)\>
 
 Gets the transaction trace
 
@@ -2584,7 +2584,7 @@ Gets the transaction trace
 
 #### Returns
 
-`Promise`<[`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC08.API.md#transaction_trace) \| [`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC09.API.md#transaction_trace)\>
+`Promise`\<[`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC08.API.md#transaction_trace) \| [`TRANSACTION_TRACE`](../namespaces/RPC.RPCSPEC09.API.md#transaction_trace)\>
 
 Transaction trace
 
@@ -2604,7 +2604,7 @@ Transaction trace
 
 ### getTransactionStatus
 
-▸ **getTransactionStatus**(`transactionHash`): `Promise`<[`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC08.API.md#txn_status_result) \| [`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC09.API.md#txn_status_result)\>
+▸ **getTransactionStatus**(`transactionHash`): `Promise`\<[`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC08.API.md#txn_status_result) \| [`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC09.API.md#txn_status_result)\>
 
 Get the status of a transaction
 
@@ -2616,7 +2616,7 @@ Get the status of a transaction
 
 #### Returns
 
-`Promise`<[`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC08.API.md#txn_status_result) \| [`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC09.API.md#txn_status_result)\>
+`Promise`\<[`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC08.API.md#txn_status_result) \| [`TXN_STATUS_RESULT`](../namespaces/RPC.RPCSPEC09.API.md#txn_status_result)\>
 
 Transaction status
 
@@ -2636,7 +2636,7 @@ Transaction status
 
 ### getSimulateTransaction
 
-▸ **getSimulateTransaction**(`invocations`, `options?`): `Promise`<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
+▸ **getSimulateTransaction**(`invocations`, `options?`): `Promise`\<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
 
 Simulates the transaction and returns the transaction trace and estimated fee.
 
@@ -2649,7 +2649,7 @@ Simulates the transaction and returns the transaction trace and estimated fee.
 
 #### Returns
 
-`Promise`<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
+`Promise`\<[`SimulateTransactionOverheadResponse`](../modules.md#simulatetransactionoverheadresponse)\>
 
 an array of transaction trace and estimated fee
 
@@ -2669,7 +2669,7 @@ an array of transaction trace and estimated fee
 
 ### waitForTransaction
 
-▸ **waitForTransaction**(`txHash`, `options?`): `Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+▸ **waitForTransaction**(`txHash`, `options?`): `Promise`\<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
 
 Wait for the transaction to be accepted
 
@@ -2682,7 +2682,7 @@ Wait for the transaction to be accepted
 
 #### Returns
 
-`Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+`Promise`\<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
 
 GetTransactionReceiptResponse
 
@@ -2702,7 +2702,7 @@ GetTransactionReceiptResponse
 
 ### fastWaitForTransaction
 
-▸ **fastWaitForTransaction**(`txHash`, `address`, `initNonce`, `options?`): `Promise`<`boolean`\>
+▸ **fastWaitForTransaction**(`txHash`, `address`, `initNonce`, `options?`): `Promise`\<`boolean`\>
 
 Wait up until a new transaction is possible with same the account.
 This method is fast, but Events and transaction report are not yet
@@ -2721,7 +2721,7 @@ available. Useful for gaming activity.
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 Returns true if the next transaction is possible,
 false if the timeout has been reached,
@@ -2739,21 +2739,21 @@ throw an error in case of provider communication.
 
 ### getStorageAt
 
-▸ **getStorageAt**(`contractAddress`, `key`, `blockIdentifier?`): `Promise`<`string`\>
+▸ **getStorageAt**(`contractAddress`, `key`, `blockIdentifier?`): `Promise`\<`string`\>
 
 Get the value of the storage (contract's variable) at the given address and key
 
 #### Parameters
 
-| Name               | Type                                               | Description                                                |
-| :----------------- | :------------------------------------------------- | :--------------------------------------------------------- |
-| `contractAddress`  | [`BigNumberish`](../modules.md#bignumberish)       |                                                            |
-| `key`              | [`BigNumberish`](../modules.md#bignumberish)       | from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP) |
-| `blockIdentifier?` | [`BlockIdentifier`](../modules.md#blockidentifier) | block identifier                                           |
+| Name               | Type                                               | Description                                                 |
+| :----------------- | :------------------------------------------------- | :---------------------------------------------------------- |
+| `contractAddress`  | [`BigNumberish`](../modules.md#bignumberish)       |                                                             |
+| `key`              | [`BigNumberish`](../modules.md#bignumberish)       | from getStorageVarAddress('\<STORAGE_VARIABLE_NAME>') (WIP) |
+| `blockIdentifier?` | [`BlockIdentifier`](../modules.md#blockidentifier) | block identifier                                            |
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 the value of the storage variable
 
@@ -2773,7 +2773,7 @@ the value of the storage variable
 
 ### getClassHashAt
 
-▸ **getClassHashAt**(`contractAddress`, `blockIdentifier?`): `Promise`<`string`\>
+▸ **getClassHashAt**(`contractAddress`, `blockIdentifier?`): `Promise`\<`string`\>
 
 Returns the contract class hash in the given block for the contract deployed at the given address
 
@@ -2786,7 +2786,7 @@ Returns the contract class hash in the given block for the contract deployed at 
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 Class hash
 
@@ -2806,7 +2806,7 @@ Class hash
 
 ### getClassByHash
 
-▸ **getClassByHash**(`classHash`): `Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+▸ **getClassByHash**(`classHash`): `Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 Returns the contract class deployed under the given class hash.
 
@@ -2818,7 +2818,7 @@ Returns the contract class deployed under the given class hash.
 
 #### Returns
 
-`Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+`Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 Contract class of compiled contract
 
@@ -2838,7 +2838,7 @@ Contract class of compiled contract
 
 ### getClass
 
-▸ **getClass**(`classHash`, `blockIdentifier?`): `Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+▸ **getClass**(`classHash`, `blockIdentifier?`): `Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 Get contract class by hash with optional block identifier
 
@@ -2851,7 +2851,7 @@ Get contract class by hash with optional block identifier
 
 #### Returns
 
-`Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+`Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 Contract class
 
@@ -2871,7 +2871,7 @@ Contract class
 
 ### getClassAt
 
-▸ **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+▸ **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 Gets the contract class of the deployed contract.
 
@@ -2884,7 +2884,7 @@ Gets the contract class of the deployed contract.
 
 #### Returns
 
-`Promise`<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
+`Promise`\<[`LegacyContractClass`](../modules.md#legacycontractclass) \| `Omit`\<[`CompiledSierra`](../modules.md#compiledsierra), `"sierra_program_debug_info"`\>\>
 
 Contract class of compiled contract
 
@@ -2904,7 +2904,7 @@ Contract class of compiled contract
 
 ### getContractVersion
 
-▸ **getContractVersion**(`contractAddress`, `classHash?`, `options?`): `Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+▸ **getContractVersion**(`contractAddress`, `classHash?`, `options?`): `Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 Gets the contract version from the provided address
 
@@ -2918,7 +2918,7 @@ Gets the contract version from the provided address
 
 #### Returns
 
-`Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+`Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 #### Implementation of
 
@@ -2932,7 +2932,7 @@ Gets the contract version from the provided address
 
 [src/provider/rpc.ts:386](https://github.com/starknet-io/starknet.js/blob/v8.6.0/src/provider/rpc.ts#L386)
 
-▸ **getContractVersion**(`contractAddress`, `classHash`, `options?`): `Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+▸ **getContractVersion**(`contractAddress`, `classHash`, `options?`): `Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 Gets the contract version from the provided address
 
@@ -2946,7 +2946,7 @@ Gets the contract version from the provided address
 
 #### Returns
 
-`Promise`<[`ContractVersion`](../modules.md#contractversion)\>
+`Promise`\<[`ContractVersion`](../modules.md#contractversion)\>
 
 #### Implementation of
 
@@ -2964,7 +2964,7 @@ Gets the contract version from the provided address
 
 ### getInvokeEstimateFee
 
-▸ **getInvokeEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **getInvokeEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Estimates the fee for a given INVOKE transaction
 
@@ -2979,7 +2979,7 @@ Estimates the fee for a given INVOKE transaction
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 the estimated fee
 
@@ -3018,7 +3018,7 @@ getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with 
 
 ### getDeclareEstimateFee
 
-▸ **getDeclareEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **getDeclareEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Estimates the fee for a given DECLARE transaction
 
@@ -3033,7 +3033,7 @@ Estimates the fee for a given DECLARE transaction
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 the estimated fee
 
@@ -3072,7 +3072,7 @@ getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with 
 
 ### getDeployAccountEstimateFee
 
-▸ **getDeployAccountEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+▸ **getDeployAccountEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 Estimates the fee for a given DEPLOY_ACCOUNT transaction
 
@@ -3087,7 +3087,7 @@ Estimates the fee for a given DEPLOY_ACCOUNT transaction
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
+`Promise`\<[`EstimateFeeResponseOverhead`](../modules.md#estimatefeeresponseoverhead)\>
 
 the estimated fee
 
@@ -3126,7 +3126,7 @@ getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with 
 
 ### getEstimateFeeBulk
 
-▸ **getEstimateFeeBulk**(`invocations`, `options?`): `Promise`<[`EstimateFeeResponseBulkOverhead`](../modules.md#estimatefeeresponsebulkoverhead)\>
+▸ **getEstimateFeeBulk**(`invocations`, `options?`): `Promise`\<[`EstimateFeeResponseBulkOverhead`](../modules.md#estimatefeeresponsebulkoverhead)\>
 
 Estimates the fee for a list of INVOKE transaction
 
@@ -3139,7 +3139,7 @@ Estimates the fee for a list of INVOKE transaction
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseBulkOverhead`](../modules.md#estimatefeeresponsebulkoverhead)\>
+`Promise`\<[`EstimateFeeResponseBulkOverhead`](../modules.md#estimatefeeresponsebulkoverhead)\>
 
 the estimated fee
 
@@ -3159,7 +3159,7 @@ the estimated fee
 
 ### invokeFunction
 
-▸ **invokeFunction**(`functionInvocation`, `details`): `Promise`<\{ `transaction_hash`: `string` }\>
+▸ **invokeFunction**(`functionInvocation`, `details`): `Promise`\<\{ `transaction_hash`: `string` }\>
 
 Invokes a function on starknet
 
@@ -3172,7 +3172,7 @@ Invokes a function on starknet
 
 #### Returns
 
-`Promise`<\{ `transaction_hash`: `string` }\>
+`Promise`\<\{ `transaction_hash`: `string` }\>
 
 response from addTransaction
 
@@ -3192,7 +3192,7 @@ response from addTransaction
 
 ### declareContract
 
-▸ **declareContract**(`transaction`, `details`): `Promise`<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
+▸ **declareContract**(`transaction`, `details`): `Promise`\<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
 
 Declares a given compiled contract (json) to starknet
 
@@ -3205,7 +3205,7 @@ Declares a given compiled contract (json) to starknet
 
 #### Returns
 
-`Promise`<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
+`Promise`\<\{ `class_hash`: `string` ; `transaction_hash`: `string` }\>
 
 a confirmation of sending a transaction on the starknet contract
 
@@ -3225,7 +3225,7 @@ a confirmation of sending a transaction on the starknet contract
 
 ### deployAccountContract
 
-▸ **deployAccountContract**(`transaction`, `details`): `Promise`<\{ `contract_address`: `string` ; `transaction_hash`: `string` }\>
+▸ **deployAccountContract**(`transaction`, `details`): `Promise`\<\{ `contract_address`: `string` ; `transaction_hash`: `string` }\>
 
 Deploys a given compiled Account contract (json) to starknet
 
@@ -3238,7 +3238,7 @@ Deploys a given compiled Account contract (json) to starknet
 
 #### Returns
 
-`Promise`<\{ `contract_address`: `string` ; `transaction_hash`: `string` }\>
+`Promise`\<\{ `contract_address`: `string` ; `transaction_hash`: `string` }\>
 
 a confirmation of sending a transaction on the starknet contract
 
@@ -3258,7 +3258,7 @@ a confirmation of sending a transaction on the starknet contract
 
 ### callContract
 
-▸ **callContract**(`call`, `blockIdentifier?`): `Promise`<`string`[]\>
+▸ **callContract**(`call`, `blockIdentifier?`): `Promise`\<`string`[]\>
 
 Calls a function on the Starknet contract.
 
@@ -3271,7 +3271,7 @@ Calls a function on the Starknet contract.
 
 #### Returns
 
-`Promise`<`string`[]\>
+`Promise`\<`string`[]\>
 
 the result of the function on the smart contract.
 
@@ -3291,7 +3291,7 @@ the result of the function on the smart contract.
 
 ### estimateMessageFee
 
-▸ **estimateMessageFee**(`message`, `blockIdentifier?`): `Promise`<[`FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC08.API.md#fee_estimate) \| [`MESSAGE_FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC09.API.md#message_fee_estimate)\>
+▸ **estimateMessageFee**(`message`, `blockIdentifier?`): `Promise`\<[`FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC08.API.md#fee_estimate) \| [`MESSAGE_FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC09.API.md#message_fee_estimate)\>
 
 Estimate the fee for a message from L1
 
@@ -3304,7 +3304,7 @@ Estimate the fee for a message from L1
 
 #### Returns
 
-`Promise`<[`FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC08.API.md#fee_estimate) \| [`MESSAGE_FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC09.API.md#message_fee_estimate)\>
+`Promise`\<[`FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC08.API.md#fee_estimate) \| [`MESSAGE_FEE_ESTIMATE`](../namespaces/RPC.RPCSPEC09.API.md#message_fee_estimate)\>
 
 Fee estimate
 
@@ -3324,13 +3324,13 @@ Fee estimate
 
 ### getSyncingStats
 
-▸ **getSyncingStats**(): `Promise`<[`Syncing`](../namespaces/RPC.RPCSPEC08.API.md#syncing)\>
+▸ **getSyncingStats**(): `Promise`\<[`Syncing`](../namespaces/RPC.RPCSPEC08.API.md#syncing)\>
 
 Get node synchronization status
 
 #### Returns
 
-`Promise`<[`Syncing`](../namespaces/RPC.RPCSPEC08.API.md#syncing)\>
+`Promise`\<[`Syncing`](../namespaces/RPC.RPCSPEC08.API.md#syncing)\>
 
 Sync status or false if not syncing
 
@@ -3350,7 +3350,7 @@ Sync status or false if not syncing
 
 ### getEvents
 
-▸ **getEvents**(`eventFilter`): `Promise`<[`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC08.API.md#events_chunk) \| [`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC09.API.md#events_chunk)\>
+▸ **getEvents**(`eventFilter`): `Promise`\<[`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC08.API.md#events_chunk) \| [`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC09.API.md#events_chunk)\>
 
 Get events matching the given filter
 
@@ -3362,7 +3362,7 @@ Get events matching the given filter
 
 #### Returns
 
-`Promise`<[`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC08.API.md#events_chunk) \| [`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC09.API.md#events_chunk)\>
+`Promise`\<[`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC08.API.md#events_chunk) \| [`EVENTS_CHUNK`](../namespaces/RPC.RPCSPEC09.API.md#events_chunk)\>
 
 Events and pagination info
 
@@ -3382,7 +3382,7 @@ Events and pagination info
 
 ### verifyMessageInStarknet
 
-▸ **verifyMessageInStarknet**(`message`, `signature`, `accountAddress`, `signatureVerificationFunctionName?`, `signatureVerificationResponse?`): `Promise`<`boolean`\>
+▸ **verifyMessageInStarknet**(`message`, `signature`, `accountAddress`, `signatureVerificationFunctionName?`, `signatureVerificationResponse?`): `Promise`\<`boolean`\>
 
 Verify in Starknet a signature of a TypedData object or of a given hash.
 
@@ -3401,7 +3401,7 @@ Verify in Starknet a signature of a TypedData object or of a given hash.
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 ```typescript
 const myTypedMessage: TypedMessage = .... ;
@@ -3429,7 +3429,7 @@ const result2 = await myRpcProvider.verifyMessageInStarknet(messageHash, sign, a
 
 ### isClassDeclared
 
-▸ **isClassDeclared**(`contractClassIdentifier`, `blockIdentifier?`): `Promise`<`boolean`\>
+▸ **isClassDeclared**(`contractClassIdentifier`, `blockIdentifier?`): `Promise`\<`boolean`\>
 
 Test if class is already declared
 
@@ -3442,7 +3442,7 @@ Test if class is already declared
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 true if class is declared
 
@@ -3462,7 +3462,7 @@ true if class is declared
 
 ### prepareInvocations
 
-▸ **prepareInvocations**(`invocations`): `Promise`<[`Invocations`](../modules.md#invocations)\>
+▸ **prepareInvocations**(`invocations`): `Promise`\<[`Invocations`](../modules.md#invocations)\>
 
 Build bulk invocations with auto-detect declared class
 
@@ -3474,7 +3474,7 @@ Build bulk invocations with auto-detect declared class
 
 #### Returns
 
-`Promise`<[`Invocations`](../modules.md#invocations)\>
+`Promise`\<[`Invocations`](../modules.md#invocations)\>
 
 Prepared invocations
 
@@ -3494,7 +3494,7 @@ Prepared invocations
 
 ### getL1MessagesStatus
 
-▸ **getL1MessagesStatus**(`transactionHash`): `Promise`<[`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC08.API.md#l1l2messagesstatus) \| [`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC09.API.md#l1l2messagesstatus)\>
+▸ **getL1MessagesStatus**(`transactionHash`): `Promise`\<[`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC08.API.md#l1l2messagesstatus) \| [`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC09.API.md#l1l2messagesstatus)\>
 
 Get L1 messages status for a transaction
 
@@ -3506,7 +3506,7 @@ Get L1 messages status for a transaction
 
 #### Returns
 
-`Promise`<[`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC08.API.md#l1l2messagesstatus) \| [`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC09.API.md#l1l2messagesstatus)\>
+`Promise`\<[`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC08.API.md#l1l2messagesstatus) \| [`L1L2MessagesStatus`](../namespaces/RPC.RPCSPEC09.API.md#l1l2messagesstatus)\>
 
 L1 message status
 
@@ -3526,7 +3526,7 @@ L1 message status
 
 ### getStorageProof
 
-▸ **getStorageProof**(`classHashes`, `contractAddresses`, `contractsStorageKeys`, `blockIdentifier?`): `Promise`<[`StorageProof`](../namespaces/RPC.RPCSPEC09.API.md#storageproof)\>
+▸ **getStorageProof**(`classHashes`, `contractAddresses`, `contractsStorageKeys`, `blockIdentifier?`): `Promise`\<[`StorageProof`](../namespaces/RPC.RPCSPEC09.API.md#storageproof)\>
 
 Get Merkle paths in state tries
 
@@ -3541,7 +3541,7 @@ Get Merkle paths in state tries
 
 #### Returns
 
-`Promise`<[`StorageProof`](../namespaces/RPC.RPCSPEC09.API.md#storageproof)\>
+`Promise`\<[`StorageProof`](../namespaces/RPC.RPCSPEC09.API.md#storageproof)\>
 
 Storage proof
 
@@ -3561,7 +3561,7 @@ Storage proof
 
 ### getCompiledCasm
 
-▸ **getCompiledCasm**(`classHash`): `Promise`<[`CASM_COMPILED_CONTRACT_CLASS`](../namespaces/RPC.RPCSPEC09.API.md#casm_compiled_contract_class)\>
+▸ **getCompiledCasm**(`classHash`): `Promise`\<[`CASM_COMPILED_CONTRACT_CLASS`](../namespaces/RPC.RPCSPEC09.API.md#casm_compiled_contract_class)\>
 
 Get compiled CASM contract class
 
@@ -3573,7 +3573,7 @@ Get compiled CASM contract class
 
 #### Returns
 
-`Promise`<[`CASM_COMPILED_CONTRACT_CLASS`](../namespaces/RPC.RPCSPEC09.API.md#casm_compiled_contract_class)\>
+`Promise`\<[`CASM_COMPILED_CONTRACT_CLASS`](../namespaces/RPC.RPCSPEC09.API.md#casm_compiled_contract_class)\>
 
 Compiled CASM contract class
 
@@ -3593,7 +3593,7 @@ Compiled CASM contract class
 
 ### getEstimateTip
 
-▸ **getEstimateTip**(`blockIdentifier?`, `options?`): `Promise`<[`TipEstimate`](../modules.md#tipestimate)\>
+▸ **getEstimateTip**(`blockIdentifier?`, `options?`): `Promise`\<[`TipEstimate`](../modules.md#tipestimate)\>
 
 Get transaction tip estimation based on network analysis
 
@@ -3606,7 +3606,7 @@ Get transaction tip estimation based on network analysis
 
 #### Returns
 
-`Promise`<[`TipEstimate`](../modules.md#tipestimate)\>
+`Promise`\<[`TipEstimate`](../modules.md#tipestimate)\>
 
 Tip estimation with statistics
 
@@ -3636,7 +3636,7 @@ console.log('Recommended tip:', tipEstimate.recommendedTip);
 
 ### getAddressFromStarkName
 
-▸ **getAddressFromStarkName**(`name`, `StarknetIdContract?`): `Promise`<`string`\>
+▸ **getAddressFromStarkName**(`name`, `StarknetIdContract?`): `Promise`\<`string`\>
 
 #### Parameters
 
@@ -3647,7 +3647,7 @@ console.log('Recommended tip:', tipEstimate.recommendedTip);
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -3661,7 +3661,7 @@ console.log('Recommended tip:', tipEstimate.recommendedTip);
 
 ### getStarkProfile
 
-▸ **getStarkProfile**(`address`, `StarknetIdContract?`, `StarknetIdIdentityContract?`, `StarknetIdVerifierContract?`, `StarknetIdPfpContract?`, `StarknetIdPopContract?`, `StarknetIdMulticallContract?`): `Promise`<[`StarkProfile`](../modules.md#starkprofile)\>
+▸ **getStarkProfile**(`address`, `StarknetIdContract?`, `StarknetIdIdentityContract?`, `StarknetIdVerifierContract?`, `StarknetIdPfpContract?`, `StarknetIdPopContract?`, `StarknetIdMulticallContract?`): `Promise`\<[`StarkProfile`](../modules.md#starkprofile)\>
 
 #### Parameters
 
@@ -3677,7 +3677,7 @@ console.log('Recommended tip:', tipEstimate.recommendedTip);
 
 #### Returns
 
-`Promise`<[`StarkProfile`](../modules.md#starkprofile)\>
+`Promise`\<[`StarkProfile`](../modules.md#starkprofile)\>
 
 #### Inherited from
 
@@ -3691,7 +3691,7 @@ console.log('Recommended tip:', tipEstimate.recommendedTip);
 
 ### getBrotherName
 
-▸ **getBrotherName**(`address`, `BrotherIdContract?`): `Promise`<`string`\>
+▸ **getBrotherName**(`address`, `BrotherIdContract?`): `Promise`\<`string`\>
 
 Gets the primary Brother domain name for an address
 
@@ -3704,7 +3704,7 @@ Gets the primary Brother domain name for an address
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The domain name with .brother suffix
 
@@ -3720,7 +3720,7 @@ The domain name with .brother suffix
 
 ### getAddressFromBrotherName
 
-▸ **getAddressFromBrotherName**(`name`, `BrotherIdContract?`): `Promise`<`string`\>
+▸ **getAddressFromBrotherName**(`name`, `BrotherIdContract?`): `Promise`\<`string`\>
 
 Gets the address associated with a Brother domain name
 
@@ -3733,7 +3733,7 @@ Gets the address associated with a Brother domain name
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The resolver address for the domain
 
@@ -3749,7 +3749,7 @@ The resolver address for the domain
 
 ### getBrotherProfile
 
-▸ **getBrotherProfile**(`address`, `BrotherIdContract?`): `Promise`<`BrotherProfile`\>
+▸ **getBrotherProfile**(`address`, `BrotherIdContract?`): `Promise`\<`BrotherProfile`\>
 
 Gets the complete profile information for a Brother domain
 
@@ -3762,7 +3762,7 @@ Gets the complete profile information for a Brother domain
 
 #### Returns
 
-`Promise`<`BrotherProfile`\>
+`Promise`\<`BrotherProfile`\>
 
 The complete Brother profile information
 

@@ -1,6 +1,6 @@
 ---
 id: 'CairoOption'
-title: 'Class: CairoOption<T>'
+title: 'Class: CairoOption\<T>'
 sidebar_label: 'CairoOption'
 sidebar_position: 0
 custom_edit_url: null
@@ -19,7 +19,7 @@ value of type T.
 **`Example`**
 
 ```typescript
-const myOption = new CairoOption<BigNumberish>(CairoOptionVariant.Some, '0x54dda8');
+const myOption = new CairoOption\<BigNumberish>(CairoOptionVariant.Some, '0x54dda8');
 ```
 
 ## Type parameters
@@ -32,7 +32,7 @@ const myOption = new CairoOption<BigNumberish>(CairoOptionVariant.Some, '0x54dda
 
 ### constructor
 
-• **new CairoOption**<`T`\>(`variant`, `content?`): [`CairoOption`](CairoOption.md)<`T`\>
+• **new CairoOption**\<`T`\>(`variant`, `content?`): [`CairoOption`](CairoOption.md)\<`T`\>
 
 #### Type parameters
 
@@ -49,7 +49,7 @@ const myOption = new CairoOption<BigNumberish>(CairoOptionVariant.Some, '0x54dda
 
 #### Returns
 
-[`CairoOption`](CairoOption.md)<`T`\>
+[`CairoOption`](CairoOption.md)\<`T`\>
 
 #### Defined in
 
