@@ -23,18 +23,15 @@ import {
 } from '../../provider/types/spec.type';
 // import { TransactionReceipt } from '../../types/api/merge';
 
-export class RPCResponseParser
-  implements
-    Omit<
-      ResponseParser,
-      | 'parseDeclareContractResponse'
-      | 'parseDeployContractResponse'
-      | 'parseInvokeFunctionResponse'
-      | 'parseGetTransactionReceiptResponse'
-      | 'parseGetTransactionResponse'
-      | 'parseCallContractResponse'
-    >
-{
+export class RPCResponseParser implements Omit<
+  ResponseParser,
+  | 'parseDeclareContractResponse'
+  | 'parseDeployContractResponse'
+  | 'parseInvokeFunctionResponse'
+  | 'parseGetTransactionReceiptResponse'
+  | 'parseGetTransactionResponse'
+  | 'parseCallContractResponse'
+> {
   private resourceBoundsOverhead: RpcProviderOptions['resourceBoundsOverhead'];
 
   constructor(resourceBoundsOverhead?: RpcProviderOptions['resourceBoundsOverhead']) {

@@ -10,6 +10,7 @@ import {
   ArraySignatureType,
 } from '../../src';
 import sampleContract from '../../__mocks__/cairo/helloCairo2/C1v2.sierra.json';
+import { isHex } from '../../src/utils/num';
 
 const { toBigInt, toHex } = num;
 
@@ -197,6 +198,23 @@ describe('stark', () => {
           '0x9876543210fedcba9876543210fedcba9876543210fedcba9876543210fedcba',
         ]);
       });
+    });
+  });
+
+  describe('getSharedSecret', () => {
+    test('derives shared secret from private key and public key', () => {
+      const userAPrivK = stark.randomAddress();
+      const userAFullPubK = stark.getFullPublicKey(userAPrivK);
+      const userBPrivK = stark.randomAddress();
+      const userBFullPubK = stark.getFullPublicKey(userBPrivK);
+      // User B is sending its pubK to user A.
+      // user A is calculating the secret
+      const sharedSecretA = stark.getSharedSecret(userAPrivK, userBFullPubK);
+      // User A is sending its pubK to user B.
+      // user B is calculating the secret
+      const sharedSecretB = stark.getSharedSecret(userBPrivK, userAFullPubK);
+      expect(isHex(sharedSecretA)).toBe(true);
+      expect(sharedSecretA).toBe(sharedSecretB);
     });
   });
 
