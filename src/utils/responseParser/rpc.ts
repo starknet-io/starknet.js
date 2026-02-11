@@ -23,18 +23,15 @@ import {
 } from '../../provider/types/spec.type';
 // import { TransactionReceipt } from '../../types/api/merge';
 
-export class RPCResponseParser
-  implements
-    Omit<
-      ResponseParser,
-      | 'parseDeclareContractResponse'
-      | 'parseDeployContractResponse'
-      | 'parseInvokeFunctionResponse'
-      | 'parseGetTransactionReceiptResponse'
-      | 'parseGetTransactionResponse'
-      | 'parseCallContractResponse'
-    >
-{
+export class RPCResponseParser implements Omit<
+  ResponseParser,
+  | 'parseDeclareContractResponse'
+  | 'parseDeployContractResponse'
+  | 'parseInvokeFunctionResponse'
+  | 'parseGetTransactionReceiptResponse'
+  | 'parseGetTransactionResponse'
+  | 'parseCallContractResponse'
+> {
   private resourceBoundsOverhead: RpcProviderOptions['resourceBoundsOverhead'];
 
   constructor(resourceBoundsOverhead?: RpcProviderOptions['resourceBoundsOverhead']) {
@@ -62,14 +59,19 @@ export class RPCResponseParser
   public parseSimulateTransactionResponse(
     res: SimulateTransactionResponse
   ): SimulateTransactionOverheadResponse {
-    return res.map((it: SimulateTransaction) => {
-      return {
+    const mapTransactions = (transactions: SimulateTransaction[]) =>
+      transactions.map((it) => ({
         transaction_trace: it.transaction_trace,
         resourceBounds: toOverheadResourceBounds(it.fee_estimation, this.resourceBoundsOverhead),
         overall_fee: toOverheadOverallFee(it.fee_estimation, this.resourceBoundsOverhead),
         unit: it.fee_estimation.unit,
-      };
-    });
+      }));
+
+    const isArray = Array.isArray(res);
+    return {
+      simulated_transactions: mapTransactions(isArray ? res : res.simulated_transactions),
+      ...(!isArray && { initial_reads: res.initial_reads }),
+    };
   }
 
   public parseContractClassResponse(res: ContractClassPayload): ContractClassResponse {

@@ -178,10 +178,11 @@ export type SimulateTransaction = SimpleOneOf<
   RPCSPEC09.SimulateTransaction,
   RPCSPEC010.SimulateTransaction
 >;
-export type SimulateTransactionResponse = SimpleOneOf<
-  RPCSPEC09.SimulateTransactionResponse,
-  RPCSPEC010.SimulateTransactionResponse
->;
+export type SimulateTransactionResponse =
+  | RPCSPEC09.SimulateTransactionResponse
+  | RPCSPEC010.SimulateTransactionResponse;
+
+export type INITIAL_READS = RPCSPEC010.INITIAL_READS;
 
 export type TransactionTrace = SimpleOneOf<
   RPCSPEC09.TRANSACTION_TRACE,
