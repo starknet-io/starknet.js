@@ -166,44 +166,62 @@
     "SimulateTransactionResponse": {
       "name": "simulated_transactions",
       "description": "The execution trace and consumed resources of the required transactions",
-      "type": "array",
-      "items": {
-        "schema": {
-          "type": "object",
-          "properties": {
-            "transaction_trace": {
-              "title": "the transaction's trace",
-              "$ref": "starknet_trace_api_openrpc#/components/schemas/TRANSACTION_TRACE"
-            },
-            "fee_estimation": {
-              "title": "the transaction's resources and fee",
-              "$ref": "accountSchemas#/definitions/EstimateFee"
+      "type": "object",
+      "properties": {
+        "simulated_transactions": {
+          "type": "array",
+          "items": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "transaction_trace": {
+                  "title": "the transaction's trace",
+                  "$ref": "starknet_trace_api_openrpc#/components/schemas/TRANSACTION_TRACE"
+                },
+                "fee_estimation": {
+                  "title": "the transaction's resources and fee",
+                  "$ref": "accountSchemas#/definitions/EstimateFee"
+                }
+              },
+              "required": ["fee_estimation", "transaction_trace"]
             }
-          },
-          "required": ["fee_estimation", "transaction_trace"]
+          }
+        },
+        "initial_reads": {
+          "type": "object"
         }
-      }
+      },
+      "required": ["simulated_transactions"]
     },
     "SimulateTransactionOverheadResponse": {
       "name": "simulated_transactions_overhead",
       "description": "The execution trace and consumed resources of the required transactions with overhead fee estimation",
-      "type": "array",
-      "items": {
-        "schema": {
-          "type": "object",
-          "properties": {
-            "transaction_trace": {
-              "title": "the transaction's trace",
-              "$ref": "starknet_trace_api_openrpc#/components/schemas/TRANSACTION_TRACE"
-            },
-            "fee_estimation": {
-              "title": "the transaction's resources and fee with overhead",
-              "$ref": "accountSchemas#/definitions/EstimateFeeResponseOverhead"
+      "type": "object",
+      "properties": {
+        "simulated_transactions": {
+          "type": "array",
+          "items": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "transaction_trace": {
+                  "title": "the transaction's trace",
+                  "$ref": "starknet_trace_api_openrpc#/components/schemas/TRANSACTION_TRACE"
+                },
+                "fee_estimation": {
+                  "title": "the transaction's resources and fee with overhead",
+                  "$ref": "accountSchemas#/definitions/EstimateFeeResponseOverhead"
+                }
+              },
+              "required": ["fee_estimation", "transaction_trace"]
             }
-          },
-          "required": ["fee_estimation", "transaction_trace"]
+          }
+        },
+        "initial_reads": {
+          "type": "object"
         }
-      }
+      },
+      "required": ["simulated_transactions"]
     }
   }
 }

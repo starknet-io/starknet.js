@@ -178,7 +178,13 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockWithTxHashes(blockIdentifier);
   }
 
-  public async getBlockWithTxs(blockIdentifier?: BlockIdentifier) {
+  public async getBlockWithTxs(
+    blockIdentifier?: BlockIdentifier,
+    options?: { includeProofFacts?: boolean }
+  ) {
+    if (this.channel instanceof RPC010.RpcChannel) {
+      return this.channel.getBlockWithTxs(blockIdentifier, options);
+    }
     return this.channel.getBlockWithTxs(blockIdentifier);
   }
 
@@ -250,7 +256,13 @@ export class RpcProvider implements ProviderInterface {
     return solidityUint256PackedKeccak256(params);
   }
 
-  public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
+  public async getBlockWithReceipts(
+    blockIdentifier?: BlockIdentifier,
+    options?: { includeProofFacts?: boolean }
+  ) {
+    if (this.channel instanceof RPC010.RpcChannel) {
+      return this.channel.getBlockWithReceipts(blockIdentifier, options);
+    }
     return this.channel.getBlockWithReceipts(blockIdentifier);
   }
 
@@ -266,7 +278,13 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockStateUpdate(blockIdentifier);
   }
 
-  public async getBlockTransactionsTraces(blockIdentifier?: BlockIdentifier) {
+  public async getBlockTransactionsTraces(
+    blockIdentifier?: BlockIdentifier,
+    options?: { returnInitialReads?: boolean }
+  ) {
+    if (this.channel instanceof RPC010.RpcChannel) {
+      return this.channel.getBlockTransactionsTraces(blockIdentifier, options);
+    }
     return this.channel.getBlockTransactionsTraces(blockIdentifier);
   }
 
@@ -274,15 +292,28 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockTransactionCount(blockIdentifier);
   }
 
-  public async getTransaction(txHash: BigNumberish) {
+  public async getTransaction(txHash: BigNumberish, options?: { includeProofFacts?: boolean }) {
+    return this.getTransactionByHash(txHash, options);
+  }
+
+  public async getTransactionByHash(
+    txHash: BigNumberish,
+    options?: { includeProofFacts?: boolean }
+  ) {
+    if (this.channel instanceof RPC010.RpcChannel) {
+      return this.channel.getTransactionByHash(txHash, options);
+    }
     return this.channel.getTransactionByHash(txHash);
   }
 
-  public async getTransactionByHash(txHash: BigNumberish) {
-    return this.channel.getTransactionByHash(txHash);
-  }
-
-  public async getTransactionByBlockIdAndIndex(blockIdentifier: BlockIdentifier, index: number) {
+  public async getTransactionByBlockIdAndIndex(
+    blockIdentifier: BlockIdentifier,
+    index: number,
+    options?: { includeProofFacts?: boolean }
+  ) {
+    if (this.channel instanceof RPC010.RpcChannel) {
+      return this.channel.getTransactionByBlockIdAndIndex(blockIdentifier, index, options);
+    }
     return this.channel.getTransactionByBlockIdAndIndex(blockIdentifier, index);
   }
 

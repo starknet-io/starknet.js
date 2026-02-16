@@ -15,6 +15,7 @@ import {
 import { CompiledSierra, LegacyContractClass } from '../../types/lib';
 import {
   FELT,
+  INITIAL_READS,
   PRICE_UNIT,
   SIMULATION_FLAG,
   STATE_UPDATE,
@@ -72,7 +73,10 @@ export type SimulateTransactionOverhead = {
   transaction_trace: TransactionTrace;
 } & EstimateFeeResponseOverhead;
 
-export type SimulateTransactionOverheadResponse = SimulateTransactionOverhead[];
+export type SimulateTransactionOverheadResponse = {
+  simulated_transactions: SimulateTransactionOverhead[];
+  initial_reads?: INITIAL_READS;
+};
 
 export type PreConfirmedStateUpdate = PRE_CONFIRMED_STATE_UPDATE;
 export type StateUpdate = STATE_UPDATE;

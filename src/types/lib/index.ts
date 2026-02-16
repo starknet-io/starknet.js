@@ -176,7 +176,11 @@ export type CallDetails = {
   calldata?: RawArgs | Calldata;
 };
 
-export type Invocation = CallDetails & { signature?: Signature };
+export type Invocation = CallDetails & {
+  signature?: Signature;
+  /** Proof facts to include in the transaction (RPC 0.10.1+) */
+  proofFacts?: BigNumberish[];
+};
 
 export type Call = CallDetails & { entrypoint: string };
 
@@ -346,6 +350,17 @@ export type getSimulateTransactionOptions = {
   skipValidate?: boolean;
   skipExecute?: boolean;
   skipFeeCharge?: boolean;
+  /** Include initial storage reads in the trace response (RPC 0.10.1+) */
+  returnInitialReads?: boolean;
+};
+
+/**
+ * Options for getBlockTransactionsTraces
+ */
+export type getBlockTransactionsTracesOptions = {
+  blockIdentifier?: BlockIdentifier;
+  /** Include initial storage reads in the trace response (RPC 0.10.1+) */
+  returnInitialReads?: boolean;
 };
 
 export type getContractVersionOptions = {
