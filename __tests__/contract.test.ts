@@ -16,6 +16,7 @@ import {
   RpcError,
   ReceiptTx,
   RpcProvider,
+  contractLoader,
 } from '../src';
 
 import { CONTRACTS, createTestProvider, getTestAccount, initializeMatcher } from './config';
@@ -244,10 +245,13 @@ describe('contract module', () => {
     });
 
     test('factory deployment of new contract with constructor arguments as already compiled calldata', async () => {
+      const loadedContract = contractLoader('./__mocks__/cairo/cairo294');
+      // Ensure casm is loaded
+      expect(loadedContract.casm).toBeDefined();
+
       const erc20 = await Contract.factory({
-        contract: CONTRACTS.Erc20Oz100.sierra,
-        casm: CONTRACTS.Erc20Oz100.casm,
-        classHash: erc20ClassHash,
+        contract: loadedContract.sierra,
+        casm: loadedContract.casm!,
         account,
         constructorCalldata: erc20Constructor,
       });
