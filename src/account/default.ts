@@ -330,6 +330,7 @@ export class Account extends Provider implements AccountInterface {
         calldata: invocation.calldata,
         signature: invocation.signature,
         ...(transactionsDetail.proofFacts && { proofFacts: transactionsDetail.proofFacts }),
+        ...(transactionsDetail.proof && { proof: transactionsDetail.proof }),
       },
       {
         ...v3Details(detailsWithTip),

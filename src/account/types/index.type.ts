@@ -73,6 +73,8 @@ export interface UniversalDetails {
   skipValidate?: boolean; // ignored on non-estimate
   /** Proof facts to include in the transaction (RPC 0.10.1+) */
   proofFacts?: BigNumberish[];
+  /** Proof for the transaction (RPC 0.10.1+) */
+  proof?: number[];
 }
 
 export interface PaymasterDetails {

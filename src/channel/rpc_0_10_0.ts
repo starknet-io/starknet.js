@@ -819,7 +819,7 @@ export class RpcChannel {
     invocation: T,
     versionType?: 'fee' | 'transaction'
   ): T extends { type: typeof ETransactionType.INVOKE }
-    ? RPC.INVOKE_TXN_V3
+    ? RPC.BROADCASTED_INVOKE_TXN
     : T extends { type: typeof ETransactionType.DECLARE }
       ? RPC.BROADCASTED_DECLARE_TXN_V3
       : T extends { type: typeof ETransactionType.DEPLOY_ACCOUNT }
@@ -849,7 +849,7 @@ export class RpcChannel {
     };
 
     if (invocation.type === ETransactionType.INVOKE) {
-      const btx: RPC.INVOKE_TXN_V3 = {
+      const btx: RPC.BROADCASTED_INVOKE_TXN = {
         type: RPC.ETransactionType.INVOKE,
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
@@ -857,6 +857,7 @@ export class RpcChannel {
         ...(invocation.proofFacts && {
           proof_facts: invocation.proofFacts.map((it) => toHex(it)),
         }),
+        ...(invocation.proof && { proof: invocation.proof }),
       };
       return btx as any; // This 'as any' is internal to the generic function - the external API is type-safe
     }
