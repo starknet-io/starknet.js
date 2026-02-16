@@ -71,6 +71,8 @@ export interface UniversalDetails {
   version?: BigNumberish;
   resourceBounds?: ResourceBoundsBN; // ignored on estimate
   skipValidate?: boolean; // ignored on non-estimate
+  /** Proof facts to include in the transaction (RPC 0.10.1+) */
+  proofFacts?: BigNumberish[];
 }
 
 export interface PaymasterDetails {
@@ -101,6 +103,8 @@ export type SimulateTransactionDetails = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
   skipExecute?: boolean;
+  /** Include initial storage reads in the trace response (RPC 0.10.1+) */
+  returnInitialReads?: boolean;
 } & Partial<V3TransactionDetails>;
 
 export type StarkProfile = {

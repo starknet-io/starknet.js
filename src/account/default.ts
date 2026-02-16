@@ -276,6 +276,7 @@ export class Account extends Provider implements AccountInterface {
       blockIdentifier,
       skipValidate = true,
       skipExecute,
+      returnInitialReads,
       version: providedVersion,
     } = details;
     const detailsWithTip = await this.resolveDetailsWithTip(details);
@@ -291,6 +292,7 @@ export class Account extends Provider implements AccountInterface {
       blockIdentifier,
       skipValidate,
       skipExecute,
+      returnInitialReads,
     });
   }
 
@@ -327,6 +329,7 @@ export class Account extends Provider implements AccountInterface {
         contractAddress: invocation.contractAddress,
         calldata: invocation.calldata,
         signature: invocation.signature,
+        ...(transactionsDetail.proofFacts && { proofFacts: transactionsDetail.proofFacts }),
       },
       {
         ...v3Details(detailsWithTip),
