@@ -1,3 +1,15 @@
+# [9.5.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v9.4.1-beta.1...v9.5.0-beta.1) (2026-02-16)
+
+### Bug Fixes
+
+- updated rest of the outdated packages ([37ee66d](https://github.com/starknet-io/starknet.js/commit/37ee66d03983520472da47203beb95c922aaeae2))
+
+### Features
+
+- getSimulateTransaction response breaking change now using new response schema ([8b3a117](https://github.com/starknet-io/starknet.js/commit/8b3a117ec5ba5fa1a6096ba002c4d1e1accc87fa))
+- include optional flags in provider, channel and ws ([1ba87ad](https://github.com/starknet-io/starknet.js/commit/1ba87adf46d62b49aa27cc9e425d8e0eff8d1793))
+- replace types-010 with types-0101 ([e7060e9](https://github.com/starknet-io/starknet.js/commit/e7060e98bc0fd87c0fcc6bae9ec279771310d34b))
+
 ## [9.4.1-beta.1](https://github.com/starknet-io/starknet.js/compare/v9.4.0...v9.4.1-beta.1) (2026-02-16)
 
 ### Bug Fixes
