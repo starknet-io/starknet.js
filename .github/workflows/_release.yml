@@ -11,14 +11,14 @@ on:
 
 jobs:
   release:
-    name: Run release
-    runs-on: ubuntu-latest
     permissions:
       packages: write
       pull-requests: write
       contents: write
       issues: write
       id-token: write
+    name: Run release
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,5 +30,4 @@ jobs:
       - run: npm ci --ignore-scripts ${{ inputs.dry-run }}
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
         run: npx semantic-release --debug ${{ inputs.debug }} --dry-run ${{ inputs.dry-run }}
