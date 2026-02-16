@@ -322,14 +322,44 @@ export class RpcChannel {
     return this.fetchEndpoint('starknet_getBlockWithTxHashes', { block_id });
   }
 
-  public getBlockWithTxs(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+  /**
+   * Get block information with full transactions
+   * @param blockIdentifier - block identifier
+   * @param options - optional flags
+   *  - includeProofFacts - include proof facts in the response (RPC 0.10.1+)
+   */
+  public getBlockWithTxs(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    options?: { includeProofFacts?: boolean }
+  ) {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getBlockWithTxs', { block_id });
+    const response_flags = options?.includeProofFacts
+      ? [RPC.ETxnResponseFlag.INCLUDE_PROOF_FACTS]
+      : undefined;
+    return this.fetchEndpoint('starknet_getBlockWithTxs', {
+      block_id,
+      ...(response_flags && { response_flags }),
+    });
   }
 
-  public getBlockWithReceipts(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+  /**
+   * Get block information with transaction receipts
+   * @param blockIdentifier - block identifier
+   * @param options - optional flags
+   *  - includeProofFacts - include proof facts in the response (RPC 0.10.1+)
+   */
+  public getBlockWithReceipts(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    options?: { includeProofFacts?: boolean }
+  ) {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getBlockWithReceipts', { block_id });
+    const response_flags = options?.includeProofFacts
+      ? [RPC.ETxnResponseFlag.INCLUDE_PROOF_FACTS]
+      : undefined;
+    return this.fetchEndpoint('starknet_getBlockWithReceipts', {
+      block_id,
+      ...(response_flags && { response_flags }),
+    });
   }
 
   public getBlockStateUpdate(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
@@ -337,9 +367,24 @@ export class RpcChannel {
     return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
   }
 
-  public getBlockTransactionsTraces(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+  /**
+   * Get transaction traces for all transactions in a block
+   * @param blockIdentifier - block identifier
+   * @param options - optional flags
+   *  - returnInitialReads - include initial storage reads in traces (RPC 0.10.1+)
+   */
+  public getBlockTransactionsTraces(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    options?: { returnInitialReads?: boolean }
+  ) {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_traceBlockTransactions', { block_id });
+    const trace_flags = options?.returnInitialReads
+      ? [RPC.ETraceFlag.RETURN_INITIAL_READS]
+      : undefined;
+    return this.fetchEndpoint('starknet_traceBlockTransactions', {
+      block_id,
+      ...(trace_flags && { trace_flags }),
+    });
   }
 
   public getBlockTransactionCount(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
@@ -347,16 +392,44 @@ export class RpcChannel {
     return this.fetchEndpoint('starknet_getBlockTransactionCount', { block_id });
   }
 
-  public getTransactionByHash(txHash: BigNumberish) {
+  /**
+   * Get transaction by hash
+   * @param txHash - transaction hash
+   * @param options - optional flags
+   *  - includeProofFacts - include proof facts in the response (RPC 0.10.1+)
+   */
+  public getTransactionByHash(txHash: BigNumberish, options?: { includeProofFacts?: boolean }) {
     const transaction_hash = toHex(txHash);
+    const response_flags = options?.includeProofFacts
+      ? [RPC.ETxnResponseFlag.INCLUDE_PROOF_FACTS]
+      : undefined;
     return this.fetchEndpoint('starknet_getTransactionByHash', {
       transaction_hash,
+      ...(response_flags && { response_flags }),
     });
   }
 
-  public getTransactionByBlockIdAndIndex(blockIdentifier: BlockIdentifier, index: number) {
+  /**
+   * Get transaction by block identifier and index
+   * @param blockIdentifier - block identifier
+   * @param index - transaction index in the block
+   * @param options - optional flags
+   *  - includeProofFacts - include proof facts in the response (RPC 0.10.1+)
+   */
+  public getTransactionByBlockIdAndIndex(
+    blockIdentifier: BlockIdentifier,
+    index: number,
+    options?: { includeProofFacts?: boolean }
+  ) {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getTransactionByBlockIdAndIndex', { block_id, index });
+    const response_flags = options?.includeProofFacts
+      ? [RPC.ETxnResponseFlag.INCLUDE_PROOF_FACTS]
+      : undefined;
+    return this.fetchEndpoint('starknet_getTransactionByBlockIdAndIndex', {
+      block_id,
+      index,
+      ...(response_flags && { response_flags }),
+    });
   }
 
   public getTransactionReceipt(txHash: BigNumberish) {
@@ -383,6 +456,7 @@ export class RpcChannel {
    * - blockIdentifier<br/>
    * - skipValidate (default true)<br/>
    * - skipFeeCharge (default true)<br/>
+   * - returnInitialReads (default false) - include initial storage reads in trace (RPC 0.10.1+)<br/>
    */
   public simulateTransaction(
     invocations: AccountInvocations,
@@ -394,16 +468,20 @@ export class RpcChannel {
       blockIdentifier = this.blockIdentifier,
       skipValidate = methodDefaults.skipValidate,
       skipFeeCharge = methodDefaults.skipFeeCharge,
+      returnInitialReads,
     } = simulateTransactionOptions;
     const block_id = new Block(blockIdentifier).identifier;
     const simulationFlags: RPC.ESimulationFlag[] = [];
     if (skipValidate) simulationFlags.push(RPC.ESimulationFlag.SKIP_VALIDATE);
     if (skipFeeCharge) simulationFlags.push(RPC.ESimulationFlag.SKIP_FEE_CHARGE);
 
+    const trace_flags = returnInitialReads ? [RPC.ETraceFlag.RETURN_INITIAL_READS] : undefined;
+
     return this.fetchEndpoint('starknet_simulateTransactions', {
       block_id,
       transactions: invocations.map((it) => this.buildTransaction(it)),
       simulation_flags: simulationFlags,
+      ...(trace_flags && { trace_flags }),
     });
   }
 
@@ -776,6 +854,9 @@ export class RpcChannel {
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
         ...details,
+        ...(invocation.proofFacts && {
+          proof_facts: invocation.proofFacts.map((it) => toHex(it)),
+        }),
       };
       return btx as any; // This 'as any' is internal to the generic function - the external API is type-safe
     }

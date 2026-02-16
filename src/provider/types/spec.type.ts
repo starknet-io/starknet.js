@@ -184,6 +184,24 @@ export type SimulateTransactionResponse =
 
 export type INITIAL_READS = RPCSPEC010.INITIAL_READS;
 
+/** Flags to request additional fields in transaction responses (RPC 0.10.1+) */
+export type ETxnResponseFlag = RPCSPEC010.ETxnResponseFlag;
+export const { ETxnResponseFlag } = RPCSPEC010;
+
+/** Flags to request additional fields in trace responses (RPC 0.10.1+) */
+export type ETraceFlag = RPCSPEC010.ETraceFlag;
+export const { ETraceFlag } = RPCSPEC010;
+
+/** Tags for WebSocket transaction subscriptions (RPC 0.10.1+) */
+export type ESubscriptionTag = RPCSPEC010.ESubscriptionTag;
+export const { ESubscriptionTag } = RPCSPEC010;
+
+/** A single transaction trace within a block */
+export type BlockTransactionTrace = RPCSPEC010.BlockTransactionTrace;
+/** Block transaction traces with optional initial storage reads (RPC 0.10.1+) */
+export type BlockTransactionsTracesWithInitialReads =
+  RPCSPEC010.BlockTransactionsTracesWithInitialReads;
+
 export type TransactionTrace = SimpleOneOf<
   RPCSPEC09.TRANSACTION_TRACE,
   RPCSPEC010.TRANSACTION_TRACE

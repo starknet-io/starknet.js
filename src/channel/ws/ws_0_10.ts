@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import {
   JRPC,
+  RPCSPEC010,
   StarknetEventsEvent,
   NewHeadsEvent,
   TransactionsStatusEvent,
@@ -31,9 +32,13 @@ export interface SubscribeNewHeadsParams {
 }
 
 export interface SubscribeEventsParams {
-  fromAddress?: BigNumberish;
+  /** Contract address(es) to filter events from. Accepts single or array of addresses (RPC 0.10.1+). */
+  fromAddress?: BigNumberish | BigNumberish[];
+  /** Event key filters */
   keys?: string[][];
+  /** Block to start subscribing from */
   blockIdentifier?: SubscriptionBlockIdentifier;
+  /** Finality status filter */
   finalityStatus?: Exclude<TXN_FINALITY_STATUS, STATUS_ACCEPTED_ON_L1>;
 }
 
@@ -48,8 +53,12 @@ export interface SubscribeNewTransactionReceiptsParams {
 }
 
 export interface SubscribeNewTransactionsParams {
+  /** Finality status filter */
   finalityStatus?: TXN_STATUS_WITHOUT_L1[];
+  /** Filter by sender addresses */
   senderAddress?: BigNumberish[];
+  /** Subscription tags for additional data (RPC 0.10.1+) */
+  tags?: RPCSPEC010.SUBSCRIPTION_TAG[];
 }
 
 // Subscription Result types
@@ -622,8 +631,14 @@ export class WebSocketChannel {
     params: SubscribeEventsParams = {}
   ): Promise<SubscriptionStarknetEventsEvent> {
     const method = 'starknet_subscribeEvents';
+    let from_address: string | string[] | undefined;
+    if (params.fromAddress !== undefined) {
+      from_address = Array.isArray(params.fromAddress)
+        ? bigNumberishArrayToHexadecimalStringArray(params.fromAddress)
+        : toHex(params.fromAddress);
+    }
     const rpcParams = {
-      from_address: params.fromAddress !== undefined ? toHex(params.fromAddress) : undefined,
+      from_address,
       keys: params.keys,
       block_id: params.blockIdentifier ? new Block(params.blockIdentifier).identifier : undefined,
       finality_status: params.finalityStatus,
@@ -704,6 +719,7 @@ export class WebSocketChannel {
       finality_status: params.finalityStatus,
       sender_address:
         params.senderAddress && bigNumberishArrayToHexadecimalStringArray(params.senderAddress),
+      tags: params.tags,
     };
     const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
     const subscription = new Subscription({
