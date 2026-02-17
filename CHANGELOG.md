@@ -1,3 +1,10 @@
+# [9.5.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v9.5.0-beta.1...v9.5.0-beta.2) (2026-02-17)
+
+### Features
+
+- proof & proof facts ([3b157ee](https://github.com/starknet-io/starknet.js/commit/3b157ee7e5a2d10bbfd78969d61f5136d9d89ec4))
+- update account class execute with proofFacts and simulate with initial reads ([c42b787](https://github.com/starknet-io/starknet.js/commit/c42b7876edf254e9f843bdcb496ebe171d01308d))
+
 # [9.5.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v9.4.1-beta.1...v9.5.0-beta.1) (2026-02-16)
 
 ### Bug Fixes
