@@ -535,7 +535,7 @@ export class Contract implements ContractInterface {
         account: AccountInterface;
         parseRequest?: boolean;
       };
-      const contract = parseContract(declareParams.contract);
+      const contract = await parseContract(declareParams.contract);
       abi = declareParams.abi ? declareParams.abi : extractAbi(contract);
 
       const {

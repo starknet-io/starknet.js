@@ -834,7 +834,7 @@ export class Account implements AccountInterface {
       payload,
       await this.provider.channel.getStarknetVersion()
     );
-    const compressedCompiledContract = parseContract(contract);
+    const compressedCompiledContract = await parseContract(contract);
 
     assert(
       !isUndefined(compiledClassHash) &&

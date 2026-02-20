@@ -54,7 +54,7 @@ describe('stark', () => {
   });
 
   describe('compressProgram and decompressProgram', () => {
-    test('compresses and decompresses a string program', () => {
+    test('compresses and decompresses a string program', async () => {
       const programString = JSON.stringify({
         abi: [],
         program: {
@@ -65,28 +65,28 @@ describe('stark', () => {
         },
       });
 
-      const compressed = stark.compressProgram(programString);
+      const compressed = await stark.compressProgram(programString);
       expect(typeof compressed).toBe('string');
       expect(compressed.length).toBeGreaterThan(0);
 
-      const decompressed = stark.decompressProgram(compressed);
+      const decompressed = (await stark.decompressProgram(compressed)) as any;
       expect(typeof decompressed).toBe('object');
       expect(decompressed.abi).toEqual([]);
     });
 
-    test('compresses a large sierra program', () => {
+    test('compresses a large sierra program', async () => {
       const contractString = JSON.stringify(sampleContract);
-      const compressed = stark.compressProgram(contractString);
+      const compressed = await stark.compressProgram(contractString);
       expect(typeof compressed).toBe('string');
       expect(compressed.length).toBeGreaterThan(0);
 
-      const decompressed = stark.decompressProgram(compressed);
+      const decompressed = await stark.decompressProgram(compressed);
       expect(decompressed).toEqual(sampleContract);
     });
 
-    test('returns array unchanged when decompressing array input', () => {
+    test('returns array unchanged when decompressing array input', async () => {
       const arrayInput = [{ test: 'data' }];
-      const result = stark.decompressProgram(arrayInput as any);
+      const result = await stark.decompressProgram(arrayInput as any);
       expect(result).toBe(arrayInput);
     });
   });

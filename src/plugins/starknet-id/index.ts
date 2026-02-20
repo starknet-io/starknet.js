@@ -341,17 +341,9 @@ export function starknetId(): StarknetPlugin<StarknetIdProviderMethods, Starknet
     accountExtend(account: AccountInterface): StarknetIdAccountMethods {
       return {
         getStarkName: (address?: BigNumberish, contract?: string) =>
-          StarknetIdImpl.getStarkName(
-            account as unknown as ProviderInterface,
-            address ?? account.address,
-            contract
-          ),
+          StarknetIdImpl.getStarkName(account.provider, address ?? account.address, contract),
         getAddressFromStarkName: (name: string, contract?: string) =>
-          StarknetIdImpl.getAddressFromStarkName(
-            account as unknown as ProviderInterface,
-            name,
-            contract
-          ),
+          StarknetIdImpl.getAddressFromStarkName(account.provider, name, contract),
         getStarkProfile: (
           address: BigNumberish,
           contract?: string,
@@ -362,7 +354,7 @@ export function starknetId(): StarknetPlugin<StarknetIdProviderMethods, Starknet
           multicallContract?: string
         ) =>
           StarknetIdImpl.getStarkProfile(
-            account as unknown as ProviderInterface,
+            account.provider,
             address,
             contract,
             identityContract,

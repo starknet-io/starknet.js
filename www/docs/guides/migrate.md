@@ -15,14 +15,16 @@ If you encounter any missing changes, please let us know and we will update this
 1. **Account Composition** - Account no longer extends Provider, uses composition instead
 2. **Plugin Class Names** - `StarknetId` → `StarknetIdImpl`, `BrotherId` → `BrotherIdImpl`
 3. **Plugin Import Paths** - `provider/extensions/` → `plugins/`
-4. **Provider fetch() Method** - Now `async` (low impact)
-5. **ts-mixer Removed** - No longer a dependency
+4. **Compression Functions** - `compressProgram()` and `decompressProgram()` are now async
+5. **Provider fetch() Method** - Now `async` (low impact)
+6. **ts-mixer Removed** - No longer a dependency
 
 ### Breaking Changes Summary
 
 | Change                                                           | Severity   | Impact                                               |
 | ---------------------------------------------------------------- | ---------- | ---------------------------------------------------- |
 | Account composition (`account.xyz()` → `account.provider.xyz()`) | **High**   | All provider method calls on Account must be updated |
+| Compression functions now async (`await compressProgram()`)      | **Medium** | Only if using compress/decompress functions directly |
 | Plugin class renames (`StarknetId` → `StarknetIdImpl`)           | **Medium** | Only affects direct imports of these classes         |
 | Plugin import paths (`extensions/` → `plugins/`)                 | **Medium** | Only affects direct imports                          |
 | `fetch()` is now `async`                                         | **Low**    | Already returned Promise, minimal impact             |
@@ -264,7 +266,65 @@ const result = await provider.fetch('starknet_getBlockWithTxHashes', { block_id:
 provider.fetch('starknet_chainId').then((result) => console.log(result));
 ```
 
-## Breaking Change 4: ts-mixer Removed
+## Breaking Change 4: Compression Functions Now Async
+
+### What Changed
+
+The `compressProgram()` and `decompressProgram()` functions are now async. This change was made to replace the `pako` dependency with native Compression Streams API (available in Node 17+ and modern browsers), saving ~45KB in bundle size.
+
+**❌ v9:**
+
+```typescript
+import { stark } from 'starknet';
+
+// Synchronous
+const compressed = stark.compressProgram(program);
+const decompressed = stark.decompressProgram(compressed);
+```
+
+**✅ v10:**
+
+```typescript
+import { stark } from 'starknet';
+
+// Now async - must use await
+const compressed = await stark.compressProgram(program);
+const decompressed = await stark.decompressProgram(compressed);
+```
+
+### Impact
+
+**Medium impact** - Only affects code that directly uses these compression utilities.
+
+**Who is affected:**
+
+- Users manually compressing/decompressing Cairo 0 programs
+- Users calling `parseContract()` directly (also now async)
+- Advanced use cases involving manual contract compilation
+
+**Who is NOT affected:**
+
+- Users only using `account.declare()` and `account.deploy()` - these already handle compression internally and are already async
+
+### Migration
+
+Add `await` to all compression function calls:
+
+```typescript
+// Before (v9)
+function processContract(program) {
+  const compressed = stark.compressProgram(program);
+  return compressed;
+}
+
+// After (v10)
+async function processContract(program) {
+  const compressed = await stark.compressProgram(program);
+  return compressed;
+}
+```
+
+## Breaking Change 5: ts-mixer Removed
 
 ### What Changed
 
@@ -303,6 +363,11 @@ When upgrading from v9 to v10:
   - [ ] Update import paths: `starknet/provider/extensions/` → `starknet/plugins/`
   - [ ] Test that plugin methods still work: `getStarkName()`, `getAddressFromStarkName()`, etc.
   - [ ] If using `plugins: false`, verify this is intentional (disables StarknetId/BrotherId)
+- [ ] **Compression Functions:**
+  - [ ] Search for `compressProgram()` calls and add `await`
+  - [ ] Search for `decompressProgram()` calls and add `await`
+  - [ ] Search for `parseContract()` calls and add `await` (if used directly)
+  - [ ] Make calling functions `async` if they weren't already
 - [ ] **Provider Changes:**
   - [ ] Review any code using `provider.fetch()` with `.then()` chains
   - [ ] Verify error handling still works correctly

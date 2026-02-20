@@ -458,7 +458,7 @@ export class RpcChannel {
    * - skipFeeCharge (default true)<br/>
    * - returnInitialReads (default false) - include initial storage reads in trace (RPC 0.10.1+)<br/>
    */
-  public simulateTransaction(
+  public async simulateTransaction(
     invocations: AccountInvocations,
     simulateTransactionOptions: getSimulateTransactionOptions = {}
   ) {
@@ -479,7 +479,7 @@ export class RpcChannel {
 
     return this.fetchEndpoint('starknet_simulateTransactions', {
       block_id,
-      transactions: invocations.map((it) => this.buildTransaction(it)),
+      transactions: await Promise.all(invocations.map((it) => this.buildTransaction(it))),
       simulation_flags: simulationFlags,
       ...(trace_flags && { trace_flags }),
     });
@@ -700,14 +700,14 @@ export class RpcChannel {
     };
 
     return this.fetchEndpoint('starknet_estimateFee', {
-      request: invocations.map((it) => this.buildTransaction(it, 'fee')),
+      request: await Promise.all(invocations.map((it) => this.buildTransaction(it, 'fee'))),
       block_id,
       ...flags,
     });
   }
 
   public async invoke(functionInvocation: Invocation, details: InvocationsDetailsWithNonce) {
-    const transaction = this.buildTransaction(
+    const transaction = await this.buildTransaction(
       {
         type: ETransactionType.INVOKE,
         ...functionInvocation,
@@ -727,7 +727,7 @@ export class RpcChannel {
     declareTransaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    const transaction = this.buildTransaction(
+    const transaction = await this.buildTransaction(
       {
         type: ETransactionType.DECLARE,
         ...declareTransaction,
@@ -747,7 +747,7 @@ export class RpcChannel {
     deployAccountTransaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    const transaction = this.buildTransaction(
+    const transaction = await this.buildTransaction(
       {
         type: ETransactionType.DEPLOY_ACCOUNT,
         ...deployAccountTransaction,
@@ -815,16 +815,18 @@ export class RpcChannel {
   }
 
   // Generic buildTransaction that automatically narrows return type based on input
-  public buildTransaction<T extends AccountInvocationItem>(
+  public async buildTransaction<T extends AccountInvocationItem>(
     invocation: T,
     versionType?: 'fee' | 'transaction'
-  ): T extends { type: typeof ETransactionType.INVOKE }
-    ? RPC.BROADCASTED_INVOKE_TXN
-    : T extends { type: typeof ETransactionType.DECLARE }
-      ? RPC.BROADCASTED_DECLARE_TXN_V3
-      : T extends { type: typeof ETransactionType.DEPLOY_ACCOUNT }
-        ? RPC.DEPLOY_ACCOUNT_TXN_V3
-        : never {
+  ): Promise<
+    T extends { type: typeof ETransactionType.INVOKE }
+      ? RPC.BROADCASTED_INVOKE_TXN
+      : T extends { type: typeof ETransactionType.DECLARE }
+        ? RPC.BROADCASTED_DECLARE_TXN_V3
+        : T extends { type: typeof ETransactionType.DEPLOY_ACCOUNT }
+          ? RPC.DEPLOY_ACCOUNT_TXN_V3
+          : never
+  > {
     const defaultVersions = getVersionsByType(versionType);
 
     // V0,V1,V2 not supported on RPC 0.9
@@ -869,7 +871,7 @@ export class RpcChannel {
         type: invocation.type,
         contract_class: {
           ...invocation.contract,
-          sierra_program: decompressProgram(invocation.contract.sierra_program),
+          sierra_program: (await decompressProgram(invocation.contract.sierra_program)) as string[],
         },
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,

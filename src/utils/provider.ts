@@ -60,12 +60,14 @@ export function wait(delay: number): Promise<unknown> {
  * // result = {sierra_program: 'H4sIAAAAAAAAA6x9WZbsrI7uVGqd53qgb8ZynwzYY7jDv5JAAmxHZuQ+96yq/L0jIzEINZ8axP/5j/q/+j//+z/wH9f/o/p/zPbh+Iot49+u9v8G3//rTdDhDDF4Z0MKPthQ+m+S2v6n1S//638VvdXW2PQ6RvxuDG+jiybCXKJ7Hef6ZRi9E+Q89WmKLilfqbrsL6PUCf8...}
  * ```
  */
-export function createSierraContractClass(contract: CompiledSierra): SierraContractClass {
+export async function createSierraContractClass(
+  contract: CompiledSierra
+): Promise<SierraContractClass> {
   const result = { ...contract } as any;
   delete result.sierra_program_debug_info;
   result.abi = formatSpaces(stringify(contract.abi));
   result.sierra_program = formatSpaces(stringify(contract.sierra_program));
-  result.sierra_program = compressProgram(result.sierra_program);
+  result.sierra_program = await compressProgram(result.sierra_program);
   return result;
 }
 
@@ -91,17 +93,19 @@ export function createSierraContractClass(contract: CompiledSierra): SierraContr
  * // result = {sierra_program: 'H4sIAAAAAAAAA6x9WZbsrI7uVGqd53qgb8ZynwzYY7jDv5JAAmxHZuQ+96yq/L0jIzEINZ8axP/5j/q/+j//+z/wH9f/o/p/zPbh+Iot49+u9v8G3//rTdDhDDF4Z0MKPthQ+m+S2v6n1S//638VvdXW2PQ6RvxuDG+jiybCXKJ7Hef6ZRi9E+Q89WmKLilfqbrsL6PUCf8...}
  * ```
  */
-export function parseContract(contract: CompiledContract | string): ContractClass {
+export async function parseContract(contract: CompiledContract | string): Promise<ContractClass> {
   const parsedContract = isString(contract) ? (parse(contract) as CompiledContract) : contract;
 
   if (!isSierra(contract)) {
     return {
       ...parsedContract,
-      ...('program' in parsedContract && { program: compressProgram(parsedContract.program) }),
+      ...('program' in parsedContract && {
+        program: await compressProgram(parsedContract.program),
+      }),
     } as LegacyContractClass;
   }
 
-  return createSierraContractClass(parsedContract as CompiledSierra) as SierraContractClass;
+  return (await createSierraContractClass(parsedContract as CompiledSierra)) as SierraContractClass;
 }
 
 // TODO: Check if something like this exist
