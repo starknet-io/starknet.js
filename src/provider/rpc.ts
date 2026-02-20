@@ -57,19 +57,35 @@ import type {
 } from './types/spec.type';
 import { verifyMessageInStarknet } from './modules/verifyMessageInStarknet';
 import { getGasPrices } from './modules';
+import { PluginManager } from '../plugins/manager';
+import { defaultPlugins } from '../plugins/defaults';
+import type { StarknetPlugin } from '../plugins/types';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
 
   public channel: RPC09.RpcChannel | RPC010.RpcChannel;
 
+  /** @internal Plugin management infrastructure */
+  public readonly pluginManager: PluginManager;
+
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
+    this.pluginManager = new PluginManager();
+
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
       this.channel = optionsOrProvider.channel;
       this.responseParser =
         'responseParser' in optionsOrProvider
           ? optionsOrProvider.responseParser
           : new RPCResponseParser();
+
+      // When constructing from an existing provider, re-install its plugins
+      if ('pluginManager' in optionsOrProvider) {
+        const sourceManager = (optionsOrProvider as RpcProvider).pluginManager;
+        Array.from(sourceManager.plugins.values()).forEach((plugin) => {
+          this.pluginManager.installOnProvider(plugin, this);
+        });
+      }
     } else {
       const options = optionsOrProvider as RpcProviderOptions | undefined;
       if (options && options.specVersion) {
@@ -87,6 +103,12 @@ export class RpcProvider implements ProviderInterface {
       } else throw new Error('unable to define spec version for channel');
 
       this.responseParser = new RPCResponseParser(options?.resourceBoundsOverhead);
+
+      // Install plugins
+      const plugins = options?.plugins === false ? [] : (options?.plugins ?? defaultPlugins);
+      plugins.forEach((plugin) => {
+        this.pluginManager.installOnProvider(plugin, this);
+      });
     }
   }
 
@@ -125,8 +147,37 @@ export class RpcProvider implements ProviderInterface {
     );
   }
 
-  public fetch(method: string, params?: object, id: string | number = 0) {
-    return this.channel.fetch(method, params, id);
+  /**
+   * Install a plugin at runtime. Returns the instance typed with plugin methods.
+   *
+   * @example
+   * ```typescript
+   * const provider = new RpcProvider({ nodeUrl: '...' })
+   *   .use(myPlugin());
+   * provider.myMethod(); // typed
+   * ```
+   */
+  public use<T extends Record<string, any>>(plugin: StarknetPlugin<T, any>): this & T {
+    this.pluginManager.installOnProvider(plugin, this);
+    return this as this & T;
+  }
+
+  public async fetch(method: string, params?: object, id: string | number = 0) {
+    // Run beforeRequest hooks
+    const hookResult = this.pluginManager.runProviderHook('beforeRequest', { method, params });
+    const finalMethod = hookResult?.method ?? method;
+    const finalParams = hookResult?.params ?? params;
+
+    const result = await this.channel.fetch(finalMethod, finalParams, id);
+
+    // Run afterRequest hooks
+    const afterResult = this.pluginManager.runProviderHook('afterRequest', {
+      method: finalMethod,
+      params: finalParams,
+      result,
+    });
+
+    return afterResult ?? result;
   }
 
   public async getChainId() {

@@ -64,7 +64,9 @@ export class WalletAccountV5 extends Account implements AccountInterface {
         if (!change.accounts?.length) return;
         if (change.accounts[0].address) this.address = change.accounts[0].address;
         if (change.accounts[0].chains)
-          this.channel.setChainId(change.accounts[0].chains[0].slice(9) as StarknetChainId);
+          this.provider.channel.setChainId(
+            change.accounts[0].chains[0].slice(9) as StarknetChainId
+          );
       }
     );
   }

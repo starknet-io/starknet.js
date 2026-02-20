@@ -1,5 +1,4 @@
 import { getStarkKey, Signature, utils } from '@scure/starknet';
-import { hasMixin } from 'ts-mixer';
 import {
   CONTRACTS,
   createBlockForDevnet,
@@ -40,8 +39,6 @@ import {
 import { StarknetChainId } from '../src/global/constants';
 import { isBoolean } from '../src/utils/typed';
 import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
-import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
-import { StarknetId } from '../src/provider/extensions/starknetId';
 
 /**
  * Helper function to create expected zero tip estimate for tests
@@ -81,13 +78,18 @@ describeIfRpc('RPCProvider', () => {
     await createBlockForDevnet();
   });
 
-  test('create should be usable by the base and extended RpcProvider, but not Account', async () => {
+  test('create should be usable by RpcProvider, but not Account', async () => {
     const nodeUrl = process.env.TEST_RPC_URL;
-    const base = await BaseRpcProvider.create({ nodeUrl });
-    const extended = await ExtendedRpcProvider.create({ nodeUrl });
+    const testProvider = await BaseRpcProvider.create({ nodeUrl });
 
-    expect(hasMixin(base, StarknetId)).toBe(false);
-    expect(hasMixin(extended, StarknetId)).toBe(true);
+    // Default plugins install StarknetId methods
+    expect(testProvider.pluginManager.hasPlugin('starknet-id')).toBe(true);
+    expect(typeof (testProvider as any).getStarkName).toBe('function');
+
+    // Provider with no plugins should not have StarknetId methods
+    const bare = await BaseRpcProvider.create({ nodeUrl, plugins: false } as any);
+    expect(bare.pluginManager.hasPlugin('starknet-id')).toBe(false);
+
     await expect(Account.create()).rejects.toThrow(LibraryError);
   });
 
@@ -390,7 +392,7 @@ describeIfRpc('RPCProvider', () => {
           amount: cairo.uint256(1n * 10n ** 4n),
         },
       });
-      await account.waitForTransaction(transaction_hash);
+      await account.provider.waitForTransaction(transaction_hash);
       latestBlock = await provider.getBlock('latest');
     });
 
@@ -676,7 +678,7 @@ describeIfRpc('RPCProvider', () => {
             },
           });
 
-          await account.waitForTransaction(transaction_hash);
+          await account.provider.waitForTransaction(transaction_hash);
           await createBlockForDevnet(); // Ensure transaction is in a block
 
           try {
@@ -716,7 +718,7 @@ describeIfRpc('RPCProvider', () => {
               },
             });
             // eslint-disable-next-line no-await-in-loop
-            await account.waitForTransaction(transaction_hash);
+            await account.provider.waitForTransaction(transaction_hash);
             // eslint-disable-next-line no-await-in-loop
             await createBlockForDevnet();
           }

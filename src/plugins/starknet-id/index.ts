@@ -1,4 +1,4 @@
-import { BigNumberish, RawArgsArray, StarkProfile } from '../../types';
+import type { BigNumberish, RawArgsArray, StarkProfile } from '../../types';
 import { CallData } from '../../utils/calldata';
 import { getSelectorFromName } from '../../utils/hash';
 import { decodeShortString, encodeShortString } from '../../utils/shortString';
@@ -16,28 +16,16 @@ import {
   useDecoded,
   useEncoded,
 } from '../../utils/starknetId';
-import type { ProviderInterface } from '..';
+import type { ProviderInterface } from '../../provider/interface';
+import type { AccountInterface } from '../../account/interface';
+import type { StarknetPlugin } from '../types';
 
-export class StarknetId {
-  async getStarkName(address: BigNumberish, StarknetIdContract?: string) {
-    return StarknetId.getStarkName(
-      // After Mixin, this is ProviderInterface
-      (<unknown>this) as ProviderInterface,
-      address,
-      StarknetIdContract
-    );
-  }
+// --- Plugin method types ---
 
-  public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
-    return StarknetId.getAddressFromStarkName(
-      // After Mixin, this is ProviderInterface
-      (<unknown>this) as ProviderInterface,
-      name,
-      StarknetIdContract
-    );
-  }
-
-  async getStarkProfile(
+export interface StarknetIdProviderMethods {
+  getStarkName(address: BigNumberish, StarknetIdContract?: string): Promise<string>;
+  getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string>;
+  getStarkProfile(
     address: BigNumberish,
     StarknetIdContract?: string,
     StarknetIdIdentityContract?: string,
@@ -45,20 +33,26 @@ export class StarknetId {
     StarknetIdPfpContract?: string,
     StarknetIdPopContract?: string,
     StarknetIdMulticallContract?: string
-  ) {
-    return StarknetId.getStarkProfile(
-      // After Mixin, this is ProviderInterface
-      (<unknown>this) as ProviderInterface,
-      address,
-      StarknetIdContract,
-      StarknetIdIdentityContract,
-      StarknetIdVerifierContract,
-      StarknetIdPfpContract,
-      StarknetIdPopContract,
-      StarknetIdMulticallContract
-    );
-  }
+  ): Promise<StarkProfile>;
+}
 
+export interface StarknetIdAccountMethods {
+  getStarkName(address?: BigNumberish, StarknetIdContract?: string): Promise<string>;
+  getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string>;
+  getStarkProfile(
+    address: BigNumberish,
+    StarknetIdContract?: string,
+    StarknetIdIdentityContract?: string,
+    StarknetIdVerifierContract?: string,
+    StarknetIdPfpContract?: string,
+    StarknetIdPopContract?: string,
+    StarknetIdMulticallContract?: string
+  ): Promise<StarkProfile>;
+}
+
+// --- Static implementation ---
+
+export class StarknetIdImpl {
   static async getStarkName(
     provider: ProviderInterface,
     address: BigNumberish,
@@ -298,4 +292,86 @@ export class StarknetId {
       throw Error('Could not get user stark profile data from address');
     }
   }
+}
+
+// --- Plugin factory ---
+
+/**
+ * StarknetId plugin - adds domain name resolution methods.
+ *
+ * @example
+ * ```typescript
+ * import { RpcProvider, starknetId } from 'starknet';
+ * const provider = new RpcProvider({ plugins: [starknetId()] });
+ * const name = await provider.getStarkName('0x123...');
+ * ```
+ */
+export function starknetId(): StarknetPlugin<StarknetIdProviderMethods, StarknetIdAccountMethods> {
+  return {
+    name: 'starknet-id',
+
+    extend(provider: ProviderInterface): StarknetIdProviderMethods {
+      return {
+        getStarkName: (address: BigNumberish, contract?: string) =>
+          StarknetIdImpl.getStarkName(provider, address, contract),
+        getAddressFromStarkName: (name: string, contract?: string) =>
+          StarknetIdImpl.getAddressFromStarkName(provider, name, contract),
+        getStarkProfile: (
+          address: BigNumberish,
+          contract?: string,
+          identityContract?: string,
+          verifierContract?: string,
+          pfpContract?: string,
+          popContract?: string,
+          multicallContract?: string
+        ) =>
+          StarknetIdImpl.getStarkProfile(
+            provider,
+            address,
+            contract,
+            identityContract,
+            verifierContract,
+            pfpContract,
+            popContract,
+            multicallContract
+          ),
+      };
+    },
+
+    accountExtend(account: AccountInterface): StarknetIdAccountMethods {
+      return {
+        getStarkName: (address?: BigNumberish, contract?: string) =>
+          StarknetIdImpl.getStarkName(
+            account as unknown as ProviderInterface,
+            address ?? account.address,
+            contract
+          ),
+        getAddressFromStarkName: (name: string, contract?: string) =>
+          StarknetIdImpl.getAddressFromStarkName(
+            account as unknown as ProviderInterface,
+            name,
+            contract
+          ),
+        getStarkProfile: (
+          address: BigNumberish,
+          contract?: string,
+          identityContract?: string,
+          verifierContract?: string,
+          pfpContract?: string,
+          popContract?: string,
+          multicallContract?: string
+        ) =>
+          StarknetIdImpl.getStarkProfile(
+            account as unknown as ProviderInterface,
+            address,
+            contract,
+            identityContract,
+            verifierContract,
+            pfpContract,
+            popContract,
+            multicallContract
+          ),
+      };
+    },
+  };
 }

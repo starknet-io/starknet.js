@@ -129,7 +129,7 @@ describe('deploy and test Account', () => {
           amount: cairo.uint256(5n * 10n ** 16n),
         },
       });
-      await account.waitForTransaction(transaction_hash);
+      await account.provider.waitForTransaction(transaction_hash);
 
       // deploy account
       const accountOZ = adaptAccountIfDevnet(
@@ -145,7 +145,7 @@ describe('deploy and test Account', () => {
         constructorCalldata: calldata,
         addressSalt: pubKey,
       });
-      const receipt = await account.waitForTransaction(deployed.transaction_hash);
+      const receipt = await account.provider.waitForTransaction(deployed.transaction_hash);
       expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
     });
 
@@ -438,7 +438,7 @@ describe('deploy and test Account', () => {
       const signature2 = new Signature(toBigInt(r2.toString()), toBigInt(s));
       if (!signature2) return;
 
-      const verifyMessageResponse: boolean = await account.verifyMessageInStarknet(
+      const verifyMessageResponse: boolean = await account.provider.verifyMessageInStarknet(
         typedDataExample,
         signature2,
         account.address
@@ -452,13 +452,17 @@ describe('deploy and test Account', () => {
         transactionVersion: TEST_TX_VERSION,
       }); // non existing account
       await expect(
-        wrongAccount.verifyMessageInStarknet(typedDataExample, signature2, wrongAccount.address)
+        wrongAccount.provider.verifyMessageInStarknet(
+          typedDataExample,
+          signature2,
+          wrongAccount.address
+        )
       ).rejects.toThrow();
     });
 
     test('sign and verify message', async () => {
       const signature = await account.signMessage(typedDataExample);
-      const verifMessageResponse: boolean = await account.verifyMessageInStarknet(
+      const verifMessageResponse: boolean = await account.provider.verifyMessageInStarknet(
         typedDataExample,
         signature,
         account.address
@@ -702,7 +706,7 @@ describe('deploy and test Account', () => {
          * as soo We first need to test is class is already declared
          */
 
-        const isDeclaredCairo1 = await account.isClassDeclared({
+        const isDeclaredCairo1 = await account.provider.isClassDeclared({
           classHash: hash.computeContractClassHash(CONTRACTS.Hello260.sierra),
         });
 

@@ -25,7 +25,7 @@ export async function InitDevnetHistory() {
           },
           { tip: i * 10n ** 6n }
         );
-        await account.waitForTransaction(transaction_hash);
+        await account.provider.waitForTransaction(transaction_hash);
       } catch (error: any) {
         // eslint-disable-next-line no-console
         console.error('Error in Devnet initialization.', error);
