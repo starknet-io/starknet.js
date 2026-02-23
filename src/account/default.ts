@@ -7,7 +7,7 @@ import {
   ZERO,
 } from '../global/constants';
 import { logger } from '../global/logger';
-import { LibraryError, Provider } from '../provider';
+import { Provider } from '../provider';
 import { BlockTag, ETransactionVersion, ETransactionVersion3 } from '../provider/types/spec.type';
 import { Signer, type SignerInterface } from '../signer';
 import {
@@ -147,13 +147,6 @@ export class Account implements AccountInterface {
       cairoVersion: this.cairoVersion,
       channel: this.provider.channel.id,
     });
-  }
-
-  /** @deprecated @hidden */
-  // The deprecation tag is meant to discourage use, not to signal future removal
-  // it should only be removed if the relationship with the corresponding Provider.create(...) method changes
-  static async create(): Promise<never> {
-    throw new LibraryError('Not supported');
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
