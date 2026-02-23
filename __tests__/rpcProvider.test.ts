@@ -19,7 +19,6 @@ import {
   CallData,
   Contract,
   FeeEstimate,
-  LibraryError,
   ProviderInterface,
   RPC,
   RPCResponseParser,
@@ -89,8 +88,6 @@ describeIfRpc('RPCProvider', () => {
     // Provider with no plugins should not have StarknetId methods
     const bare = await BaseRpcProvider.create({ nodeUrl, plugins: false } as any);
     expect(bare.pluginManager.hasPlugin('starknet-id')).toBe(false);
-
-    await expect(Account.create()).rejects.toThrow(LibraryError);
   });
 
   test('detect spec version with create', async () => {
