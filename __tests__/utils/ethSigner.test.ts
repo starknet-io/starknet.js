@@ -155,7 +155,7 @@ describe('Ethereum signer', () => {
           amount: cairo.uint256(1n * 10n ** 18n), // 1 STRK of fees
         },
       });
-      await account.waitForTransaction(transaction_hash);
+      await account.provider.waitForTransaction(transaction_hash);
       const { transaction_hash: txH2, contract_address } = await ethAccount.deployAccount(
         {
           classHash: decClassHash,

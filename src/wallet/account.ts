@@ -56,7 +56,7 @@ export class WalletAccount extends Account implements AccountInterface {
       if (!res) return;
       // Determine is it better to set chainId or replace channel with new one
       // At the moment channel is stateless but it could change
-      this.channel.setChainId(res as StarknetChainId);
+      this.provider.channel.setChainId(res as StarknetChainId);
     });
   }
 
@@ -117,7 +117,7 @@ export class WalletAccount extends Account implements AccountInterface {
   override async declare(payload: DeclareContractPayload) {
     const declareContractPayload = extractContractHashes(
       payload,
-      await this.channel.getStarknetVersion()
+      await this.provider.channel.getStarknetVersion()
     );
 
     // DISCUSS: HOTFIX: Adapt Abi format

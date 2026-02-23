@@ -24,6 +24,7 @@ import type { ProviderInterface } from '../../provider/interface';
 import type { DeployerInterface } from '../../deployer';
 import type { TipType } from '../../provider/modules/tip';
 import type { DeployContractUDCResponse } from '../../deployer/types/index.type';
+import type { PluginConfig } from '../../plugins/types';
 
 /**
  * Configuration options for creating an Account instance
@@ -48,7 +49,7 @@ export type AccountOptions = {
    * @default 'recommendedTip'
    */
   defaultTipType?: TipType;
-};
+} & PluginConfig;
 
 export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;
 

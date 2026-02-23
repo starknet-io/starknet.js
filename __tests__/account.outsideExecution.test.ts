@@ -91,7 +91,7 @@ describe('Account and OutsideExecution', () => {
       owner: axSigner,
       guardian: axGuardian,
     });
-    const snVersion = await executorAccount.getStarknetVersion();
+    const snVersion = await executorAccount.provider.channel.getStarknetVersion();
     const compiledClassHash =
       compareVersions(snVersion, '0.14.1') === -1
         ? '0x7a663375245780bd307f56fde688e33e5c260ab02b76741a57711c5b60d47f6'

@@ -98,8 +98,8 @@ describe('Cairo 1', () => {
     });
 
     xtest('validate TS for redeclare - skip testing', async () => {
-      const cc0 = await account.getClassAt(dd.deploy.address);
-      const cc0_1 = await account.getClassByHash(toHex(dd.declare.class_hash));
+      const cc0 = await account.provider.getClassAt(dd.deploy.address);
+      const cc0_1 = await account.provider.getClassByHash(toHex(dd.declare.class_hash));
 
       await account.declare({
         contract: cc0 as CompiledSierra,
@@ -142,7 +142,7 @@ describe('Cairo 1', () => {
           amount: 100,
         })
       );
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
 
       const balance = await cairo1Contract
         .withOptions({
@@ -156,14 +156,14 @@ describe('Cairo 1', () => {
 
     test('Cairo 1 Contract Interaction - felt252', async () => {
       const tx = await cairo1Contract.increase_balance(100);
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance();
       expect(balance).toBe(200n);
     });
 
     test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128, litterals', async () => {
       const tx = await cairo1Contract.increase_balance_u8(20n);
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();
       expect(balance).toBe(20n);
 
@@ -215,19 +215,19 @@ describe('Cairo 1', () => {
       expect(cdata).toEqual(['0', '1']);
 
       let tx = await cairo1Contract.set_status(true);
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       let status = await cairo1Contract.get_status();
 
       expect(status).toBe(true);
 
       tx = await cairo1Contract.set_status(false);
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       status = await cairo1Contract.get_status();
 
       expect(status).toBe(false);
 
       tx = await cairo1Contract.set_status(true);
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       status = await cairo1Contract.get_status();
 
       expect(status).toBe(true);
@@ -235,7 +235,7 @@ describe('Cairo 1', () => {
 
     test('Cairo 1 Contract Interaction - ContractAddress, ClassHash, EthAddress', async () => {
       const tx = await cairo1Contract.set_ca('123');
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       const status = await cairo1Contract.get_ca();
       expect(status).toBe(123n);
 
@@ -270,26 +270,26 @@ describe('Cairo 1', () => {
     test('Cairo1 simple getStorageAt variables retrieval', async () => {
       // u8
       let tx = await cairo1Contract.increase_balance(100);
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance();
       let key = starknetKeccak('balance');
-      let storage = await account.getStorageAt(cairo1Contract.address, key);
+      let storage = await account.provider.getStorageAt(cairo1Contract.address, key);
       expect(BigInt(storage)).toBe(balance);
 
       // felt
       tx = await cairo1Contract.set_ca('123');
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       const ca = await cairo1Contract.get_ca();
       key = starknetKeccak('ca');
-      storage = await account.getStorageAt(cairo1Contract.address, key);
+      storage = await account.provider.getStorageAt(cairo1Contract.address, key);
       expect(BigInt(storage)).toBe(ca);
 
       // bool
       tx = await cairo1Contract.set_status(true);
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       const status = await cairo1Contract.get_status();
       key = starknetKeccak('status');
-      storage = await account.getStorageAt(cairo1Contract.address, key);
+      storage = await account.provider.getStorageAt(cairo1Contract.address, key);
       expect(Boolean(BigInt(storage))).toBe(status);
 
       // simple struct
@@ -297,11 +297,11 @@ describe('Cairo 1', () => {
         address: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
         is_claimed: true,
       });
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       const user = await cairo1Contract.get_user1();
       key = starknetKeccak('user1');
-      const storage1 = await account.getStorageAt(cairo1Contract.address, key);
-      const storage2 = await account.getStorageAt(cairo1Contract.address, key + 1n);
+      const storage1 = await account.provider.getStorageAt(cairo1Contract.address, key);
+      const storage2 = await account.provider.getStorageAt(cairo1Contract.address, key + 1n);
       expect(BigInt(storage1)).toBe(user.address);
       expect(Boolean(BigInt(storage2))).toBe(user.is_claimed);
 
@@ -350,7 +350,7 @@ describe('Cairo 1', () => {
 
     test('Cairo 1 more complex structs', async () => {
       const tx = await cairo1Contract.set_bet();
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       const status = await cairo1Contract
         .withOptions({
           formatResponse: { name: 'string', description: 'string' },
@@ -392,9 +392,9 @@ describe('Cairo 1', () => {
         [1, 2],
         [3, 4],
       ]);
-      await account.waitForTransaction(tx.transaction_hash);
+      await account.provider.waitForTransaction(tx.transaction_hash);
       const tx1 = await cairo1Contract.array2d_ex(cd);
-      await account.waitForTransaction(tx1.transaction_hash);
+      await account.provider.waitForTransaction(tx1.transaction_hash);
 
       const result0 = await cairo1Contract.array2d_felt([
         [1, 2],
@@ -721,7 +721,7 @@ describe('Cairo 1', () => {
         casm: CONTRACTS.AccountOz080.casm,
       });
       if (declareAccount.transaction_hash) {
-        await account.waitForTransaction(declareAccount.transaction_hash);
+        await account.provider.waitForTransaction(declareAccount.transaction_hash);
       }
       const accountClassHash = declareAccount.class_hash;
 
@@ -741,7 +741,7 @@ describe('Cairo 1', () => {
           amount: uint256(5n * 10n ** 16n),
         },
       });
-      await account.waitForTransaction(transaction_hash);
+      await account.provider.waitForTransaction(transaction_hash);
 
       // deploy account
       accountC1 = adaptAccountIfDevnet(
@@ -757,7 +757,7 @@ describe('Cairo 1', () => {
         constructorCalldata: calldata,
         addressSalt: pubKey,
       });
-      const receipt = await account.waitForTransaction(deployed.transaction_hash);
+      const receipt = await account.provider.waitForTransaction(deployed.transaction_hash);
       expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
     });
 

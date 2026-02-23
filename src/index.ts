@@ -9,6 +9,7 @@ export * from './paymaster';
 export * from './provider';
 export * from './signer';
 export * from './channel';
+export * from './plugins';
 export * from './types';
 
 /**

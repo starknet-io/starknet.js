@@ -255,7 +255,7 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
   });
 
   describe('buildTransaction with proofFacts', () => {
-    test('INVOKE transaction includes proof_facts when provided', () => {
+    test('INVOKE transaction includes proof_facts when provided', async () => {
       const invocation = {
         type: 'INVOKE' as const,
         contractAddress: '0x123',
@@ -276,13 +276,13 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
         proofFacts: ['0xabc', '0xdef'],
       };
 
-      const result = channel.buildTransaction(invocation);
+      const result = await channel.buildTransaction(invocation);
 
       expect(result).toHaveProperty('proof_facts');
       expect(result.proof_facts).toEqual(['0xabc', '0xdef']);
     });
 
-    test('INVOKE transaction omits proof_facts when not provided', () => {
+    test('INVOKE transaction omits proof_facts when not provided', async () => {
       const invocation = {
         type: 'INVOKE' as const,
         contractAddress: '0x123',
@@ -302,7 +302,7 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
         feeDataAvailabilityMode: 'L1' as const,
       };
 
-      const result = channel.buildTransaction(invocation);
+      const result = await channel.buildTransaction(invocation);
 
       expect(result).not.toHaveProperty('proof_facts');
     });
