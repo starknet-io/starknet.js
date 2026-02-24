@@ -25,13 +25,13 @@ import {
   atobUniversal,
   btoaUniversal,
   buf2hex,
+  removeHexPrefix,
 } from '../encode';
 import { parse, stringify } from '../json';
 import {
   addPercent,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
-  toBigInt,
   toHex,
 } from '../num';
 import { isBigInt, isObject, isString } from '../typed';
@@ -191,8 +191,13 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
  */
 export function getSharedSecret(privateKey: BigNumberish, fullPublicKey: BigNumberish): string {
   const privK = toHex(privateKey);
-  const fullPubK = toBigInt(fullPublicKey).toString(16).padStart(130, '0');
-  const sharedSecret = buf2hex(starkCurve.getSharedSecret(privK, fullPubK));
+  const fullPubKHex = removeHexPrefix(toHex(fullPublicKey)).padStart(130, '0');
+  if (fullPubKHex.length !== 130 || !fullPubKHex.startsWith('04')) {
+    throw new Error(
+      'fullPublicKey must be an uncompressed public key (starting with 04, 65 bytes total)'
+    );
+  }
+  const sharedSecret = buf2hex(starkCurve.getSharedSecret(privK, fullPubKHex));
   return addHexPrefix(sharedSecret);
 }
 

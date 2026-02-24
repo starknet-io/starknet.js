@@ -10,7 +10,6 @@ import {
   ArraySignatureType,
 } from '../../src';
 import sampleContract from '../../__mocks__/cairo/helloCairo2/C1v2.sierra.json';
-import { isHex } from '../../src/utils/num';
 
 const { toBigInt, toHex } = num;
 
@@ -213,8 +212,17 @@ describe('stark', () => {
       // User A is sending its pubK to user B.
       // user B is calculating the secret
       const sharedSecretB = stark.getSharedSecret(userBPrivK, userAFullPubK);
-      expect(isHex(sharedSecretA)).toBe(true);
+      expect(num.isHex(sharedSecretA)).toBe(true);
       expect(sharedSecretA).toBe(sharedSecretB);
+    });
+    test('wrong cases', () => {
+      expect(() => stark.getSharedSecret('0x123', '0x456')).toThrow();
+      expect(() =>
+        stark.getSharedSecret(
+          '0x123',
+          '0x0302d6b3ff569186d67a2ff0b8548328798d3500c16191f6c021f929134d48a15405f9fc5a11467b96a59b8fce3c0c919c337f11337c815bb9d0dc42bac7ac42a9'
+        )
+      ).toThrow();
     });
   });
 
