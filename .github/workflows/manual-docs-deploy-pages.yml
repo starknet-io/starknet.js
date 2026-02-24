@@ -64,7 +64,6 @@ jobs:
             --out versioned_docs/version-beta/API \
             --name "Starknet.js API (beta)" \
             --includeVersion true \
-            --includeExtension true \
             --sourceLinkTemplate "https://github.com/starknet-io/starknet.js/blob/beta/{path}#L{line}"
 
           # Cleanup
