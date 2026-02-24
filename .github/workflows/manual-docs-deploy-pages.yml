@@ -16,6 +16,9 @@ jobs:
     environment: github-pages
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
@@ -25,24 +28,47 @@ jobs:
           npm ci --ignore-scripts
           cd www/
           npm ci --ignore-scripts
-      - name: Snapshot beta branch docs
-        run: |
-          # Fetch beta branch docs into versioned_docs/version-beta
-          git fetch origin beta
-          rm -rf www/versioned_docs/version-beta
-          mkdir -p www/versioned_docs/version-beta
-          git archive origin/beta -- www/docs/ | tar -x --strip-components=2 -C www/versioned_docs/version-beta
-          # Ensure beta is listed in versions.json
-          cd www
-          if ! grep -q '"beta"' versions.json; then
-            node -e "const v=require('./versions.json'); v.unshift('beta'); require('fs').writeFileSync('versions.json', JSON.stringify(v, null, 2)+'\n')"
-          fi
-      - name: Build
+      - name: Build from develop
         run: |
           rm -rf www/docs/API/
           npm run docs:build
         env:
           DOCS_BASE_URL: ${{ vars.DOCS_BASE_URL || '/starknet.js/' }}
+      - name: Snapshot beta branch guides
+        run: |
+          # Extract beta branch docs to temporary location
+          mkdir -p /tmp/beta-docs
+          git archive origin/beta -- www/docs/ | tar -x --strip-components=2 -C /tmp/beta-docs
+
+          # Copy guides to versioned docs
+          rm -rf www/versioned_docs/version-beta
+          mkdir -p www/versioned_docs/version-beta
+          cp -r /tmp/beta-docs/* www/versioned_docs/version-beta/
+
+          # Ensure beta is in versions.json
+          cd www
+          if ! grep -q '"beta"' versions.json; then
+            node -e "const v=require('./versions.json'); v.unshift('beta'); require('fs').writeFileSync('versions.json', JSON.stringify(v, null, 2)+'\n')"
+          fi
+      - name: Generate API docs for beta version
+        run: |
+          # Checkout beta source code temporarily to generate API docs for that version
+          cd www
+          rm -rf ../src-beta
+          git archive origin/beta -- src | tar -x -C .. -f - --transform 's,^src,src-beta,'
+
+          # Generate TypeDoc for beta version
+          npx typedoc \
+            --entryPoints ../src-beta/index.ts \
+            --tsconfig ../tsconfig.json \
+            --out versioned_docs/version-beta/API \
+            --name "Starknet.js API (beta)" \
+            --includeVersion true \
+            --includeExtension true \
+            --sourceLinkTemplate "https://github.com/starknet-io/starknet.js/blob/beta/{path}#L{line}"
+
+          # Cleanup
+          rm -rf ../src-beta
       - name: Upload
         uses: actions/upload-pages-artifact@v3
         with:
