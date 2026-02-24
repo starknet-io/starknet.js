@@ -1,3 +1,26 @@
+# [10.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v9.5.0-beta.2...v10.0.0-beta.1) (2026-02-24)
+
+- feat!: refactor Account to use composition pattern, plugin system, docs\ \ BREAKING CHANGE: Account no longer extends Provider. Provider methods must now be accessed via account.provider property. \ Changes: - Account uses composition instead of inheritance - Add plugin system to replace ts-mixer - Update all tests to use account.provider.xyz() - Create migration guide and plugin documentation ([31d9458](https://github.com/starknet-io/starknet.js/commit/31d94587676a543c71dbd64b92d0e65d0ee3aa38))
+
+### Bug Fixes
+
+- node runtime array bufgfer fix ([5b95106](https://github.com/starknet-io/starknet.js/commit/5b95106d60389a5a12e170c9dda93e2a6bc9824b))
+
+### Features
+
+- remove pako package and replace with native and faster CompressionStream, update TS 5.9 ([75b8226](https://github.com/starknet-io/starknet.js/commit/75b8226ff70fa243d06f7530fb9053d26a9740ad))
+
+### BREAKING CHANGES
+
+- Account no longer extends Provider. Provider methods must now be accessed via account.provider property.
+  \
+  Changes:
+
+* Account uses composition instead of inheritance
+* Add plugin system to replace ts-mixer
+* Update all tests to use account.provider.xyz()
+* Create migration guide and plugin documentation
+
 # [9.5.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v9.5.0-beta.1...v9.5.0-beta.2) (2026-02-17)
 
 ### Features
