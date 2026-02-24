@@ -52,22 +52,23 @@ jobs:
           fi
       - name: Generate API docs for beta version
         run: |
-          # Checkout beta source code temporarily to generate API docs for that version
-          cd www
-          rm -rf ../src-beta
-          git archive origin/beta -- src | tar -x -C .. -f - --transform 's,^src,src-beta,'
+          # Create temporary directory for beta source
+          mkdir -p /tmp/starknet-beta
+          cd /tmp/starknet-beta
+          git clone --depth 1 --branch beta https://github.com/starknet-io/starknet.js.git .
 
           # Generate TypeDoc for beta version
+          cd ${{ github.workspace }}/www
           npx typedoc \
-            --entryPoints ../src-beta/index.ts \
-            --tsconfig ../tsconfig.json \
+            --entryPoints /tmp/starknet-beta/src/index.ts \
+            --tsconfig /tmp/starknet-beta/tsconfig.json \
             --out versioned_docs/version-beta/API \
             --name "Starknet.js API (beta)" \
             --includeVersion true \
             --sourceLinkTemplate "https://github.com/starknet-io/starknet.js/blob/beta/{path}#L{line}"
 
           # Cleanup
-          rm -rf ../src-beta
+          rm -rf /tmp/starknet-beta
       - name: Upload
         uses: actions/upload-pages-artifact@v3
         with:
