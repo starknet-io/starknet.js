@@ -28,47 +28,12 @@ jobs:
           npm ci --ignore-scripts
           cd www/
           npm ci --ignore-scripts
-      - name: Build from develop
+      - name: Build
         run: |
           rm -rf www/docs/API/
           npm run docs:build
         env:
           DOCS_BASE_URL: ${{ vars.DOCS_BASE_URL || '/starknet.js/' }}
-      - name: Snapshot beta branch guides
-        run: |
-          # Extract beta branch docs to temporary location
-          mkdir -p /tmp/beta-docs
-          git archive origin/beta -- www/docs/ | tar -x --strip-components=2 -C /tmp/beta-docs
-
-          # Copy guides to versioned docs
-          rm -rf www/versioned_docs/version-beta
-          mkdir -p www/versioned_docs/version-beta
-          cp -r /tmp/beta-docs/* www/versioned_docs/version-beta/
-
-          # Ensure beta is in versions.json
-          cd www
-          if ! grep -q '"beta"' versions.json; then
-            node -e "const v=require('./versions.json'); v.unshift('beta'); require('fs').writeFileSync('versions.json', JSON.stringify(v, null, 2)+'\n')"
-          fi
-      - name: Generate API docs for beta version
-        run: |
-          # Create temporary directory for beta source
-          mkdir -p /tmp/starknet-beta
-          cd /tmp/starknet-beta
-          git clone --depth 1 --branch beta https://github.com/starknet-io/starknet.js.git .
-
-          # Generate TypeDoc for beta version
-          cd ${{ github.workspace }}/www
-          npx typedoc \
-            --entryPoints /tmp/starknet-beta/src/index.ts \
-            --tsconfig /tmp/starknet-beta/tsconfig.json \
-            --out versioned_docs/version-beta/API \
-            --name "Starknet.js API (beta)" \
-            --includeVersion true \
-            --sourceLinkTemplate "https://github.com/starknet-io/starknet.js/blob/beta/{path}#L{line}"
-
-          # Cleanup
-          rm -rf /tmp/starknet-beta
       - name: Upload
         uses: actions/upload-pages-artifact@v3
         with:
