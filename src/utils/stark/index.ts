@@ -103,7 +103,7 @@ export async function decompressProgram(
   const compressed = atobUniversal(base64);
   const stream = new DecompressionStream('gzip');
   const writer = stream.writable.getWriter();
-  writer.write(compressed.slice().buffer);
+  writer.write(new Uint8Array(compressed));
   writer.close();
 
   const decompressed = await new Response(stream.readable).text();
