@@ -16,8 +16,9 @@ If you encounter any missing changes, please let us know and we will update this
 2. **Plugin Class Names** - `StarknetId` → `StarknetIdImpl`, `BrotherId` → `BrotherIdImpl`
 3. **Plugin Import Paths** - `provider/extensions/` → `plugins/`
 4. **Compression Functions** - `compressProgram()` and `decompressProgram()` are now async
-5. **Provider fetch() Method** - Now `async` (low impact)
-6. **ts-mixer Removed** - No longer a dependency
+5. **SimulateTransaction Response** - `SimulateTransactionOverheadResponse` changed from array to object
+6. **Provider fetch() Method** - Now `async` (low impact)
+7. **ts-mixer Removed** - No longer a dependency
 
 ### Breaking Changes Summary
 
@@ -27,6 +28,7 @@ If you encounter any missing changes, please let us know and we will update this
 | Compression functions now async (`await compressProgram()`)      | **Medium** | Only if using compress/decompress functions directly |
 | Plugin class renames (`StarknetId` → `StarknetIdImpl`)           | **Medium** | Only affects direct imports of these classes         |
 | Plugin import paths (`extensions/` → `plugins/`)                 | **Medium** | Only affects direct imports                          |
+| `SimulateTransactionOverheadResponse` is now an object           | **Medium** | Must access `.simulated_transactions` for the array  |
 | `fetch()` is now `async`                                         | **Low**    | Already returned Promise, minimal impact             |
 | `ts-mixer` removed                                               | **Low**    | Only affects if you used it as transitive dependency |
 | `plugins: false` disables defaults                               | **Info**   | Behavioral change, intentional opt-out               |
@@ -324,7 +326,68 @@ async function processContract(program) {
 }
 ```
 
-## Breaking Change 5: ts-mixer Removed
+## Breaking Change 5: SimulateTransaction Response Structure
+
+### What Changed
+
+`SimulateTransactionOverheadResponse` changed from an array to an object. The array is now nested under a `simulated_transactions` property, and a new optional `initial_reads` field is available (RPC 0.10.1+).
+
+**❌ v9:**
+
+```typescript
+const result = await provider.getSimulateTransaction(invocations, options);
+
+// result was an array
+result.forEach((tx) => {
+  console.log(tx.transaction_trace);
+  console.log(tx.overall_fee);
+});
+
+const first = result[0];
+const count = result.length;
+```
+
+**✅ v10:**
+
+```typescript
+const result = await provider.getSimulateTransaction(invocations, options);
+
+// result is now an object with simulated_transactions array
+result.simulated_transactions.forEach((tx) => {
+  console.log(tx.transaction_trace);
+  console.log(tx.overall_fee);
+});
+
+const first = result.simulated_transactions[0];
+const count = result.simulated_transactions.length;
+
+// New: optional initial storage reads (when using returnInitialReads option)
+if (result.initial_reads) {
+  console.log(result.initial_reads);
+}
+```
+
+### Impact
+
+**Medium impact** - Affects all code that uses `getSimulateTransaction()` and iterates over or indexes into the result directly.
+
+### Migration
+
+Replace direct array access with `.simulated_transactions`:
+
+```typescript
+// Before (v9)
+const simResult = await provider.getSimulateTransaction(invocations, options);
+const fee = simResult[0].overall_fee;
+const traces = simResult.map((s) => s.transaction_trace);
+
+// After (v10)
+const simResult = await provider.getSimulateTransaction(invocations, options);
+const fee = simResult.simulated_transactions[0].overall_fee;
+const traces = simResult.simulated_transactions.map((s) => s.transaction_trace);
+```
+
+## Breaking Change 6: ts-mixer Removed
 
 ### What Changed
 
@@ -371,6 +434,10 @@ When upgrading from v9 to v10:
 - [ ] **Provider Changes:**
   - [ ] Review any code using `provider.fetch()` with `.then()` chains
   - [ ] Verify error handling still works correctly
+- [ ] **SimulateTransaction Response:**
+  - [ ] Find all `getSimulateTransaction()` calls
+  - [ ] Replace direct array access (e.g., `result[0]`, `result.map()`) with `result.simulated_transactions[0]`, `result.simulated_transactions.map()`
+  - [ ] Optionally use `result.initial_reads` if using `returnInitialReads` option
 - [ ] **Dependencies:**
   - [ ] Remove any references to `ts-mixer` if you were using it
   - [ ] If you depended on `ts-mixer` transitively, add it to your `package.json`
