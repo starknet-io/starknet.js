@@ -85,7 +85,7 @@ import { getExecuteCalldata } from '../utils/transaction/transaction';
 import { isString, isUndefined } from '../utils/typed';
 import { getMessageHash } from '../utils/typedData';
 import { type AccountInterface } from './interface';
-import { defaultPaymaster, type PaymasterInterface, PaymasterRpc } from '../paymaster';
+import { type PaymasterInterface, PaymasterRpc } from '../paymaster';
 import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
 import { defaultDeployer, Deployer } from '../deployer';
@@ -131,7 +131,7 @@ export class Account implements AccountInterface {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
-    this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
+    this.paymaster = paymaster ? new PaymasterRpc(paymaster) : new PaymasterRpc();
     this.deployer = options.deployer ?? defaultDeployer;
     this.defaultTipType = defaultTipType ?? config.get('defaultTipType');
 

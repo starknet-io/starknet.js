@@ -110,6 +110,20 @@ const myProvider = new RpcProvider(); // Sepolia
 
 > When using this syntax, a random public node will be selected.
 
+:::info
+
+For automatic node version detection, use `RpcProvider.create()` instead of the constructor:
+
+```typescript
+// Automatically detects RPC version and configures the correct channel
+const defaultProvider = await RpcProvider.create();
+const defaultProvider = await RpcProvider.create({ nodeUrl: constants.NetworkName.SN_MAIN });
+```
+
+This approach queries the node to determine its RPC specification version and applies the appropriate configuration automatically. Note that this is slightly slower due to the additional network request.
+
+:::
+
 Using a specific `nodeUrl` is the better approach, as such nodes will have fewer limitations, their software will be more up to date, and they will be less congested.
 
 Some examples of `RpcProvider` instantiation to connect to RPC node providers:

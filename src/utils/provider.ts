@@ -121,23 +121,19 @@ export function extractAbi(contract: ContractClass): Abi {
 /**
  * Return randomly select available public node
  * @param {NetworkName} networkName NetworkName
- * @param {boolean} mute mute public node warning
  * @returns {string} default node url
  * @example
  * ```typescript
- * const result= provider.getDefaultNodeUrl(constants.NetworkName.SN_MAIN,false);
+ * const result= provider.getDefaultNodeUrl(constants.NetworkName.SN_MAIN);
  * // console : "Using default public node url, please provide nodeUrl in provider options!"
  * // result = "https://starknet-mainnet.public.blastapi.io/rpc/v0_9"
  * ```
  */
 export const getDefaultNodeUrl = (
   networkName?: NetworkName,
-  mute: boolean = false,
   rpcVersion?: SupportedRpcVersion
 ): string => {
-  if (!mute) {
-    logger.info('Using default public node url, please provide nodeUrl in provider options!');
-  }
+  logger.info('Using default public node url, please provide nodeUrl in provider options!');
   const rpcNodes = getDefaultNodes(rpcVersion ?? config.get('rpcVersion'));
 
   const nodes = rpcNodes[networkName ?? NetworkName.SN_SEPOLIA];

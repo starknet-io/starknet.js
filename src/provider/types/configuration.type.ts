@@ -22,7 +22,6 @@ export type RpcProviderOptions = {
   blockIdentifier?: BlockIdentifier;
   chainId?: StarknetChainId;
   specVersion?: SupportedRpcVersion;
-  default?: boolean;
   waitMode?: boolean;
   baseFetch?: WindowOrWorkerGlobalScope['fetch'];
   resourceBoundsOverhead?: ResourceBoundsOverhead | false;

@@ -18,20 +18,23 @@ If you encounter any missing changes, please let us know and we will update this
 4. **Compression Functions** - `compressProgram()` and `decompressProgram()` are now async
 5. **SimulateTransaction Response** - `SimulateTransactionOverheadResponse` changed from array to object
 6. **Provider fetch() Method** - Now `async` (low impact)
-7. **ts-mixer Removed** - No longer a dependency
+7. **Removed Global Singletons** - `defaultProvider` and `defaultPaymaster` removed, use `RpcProvider.create()` instead
+8. **ts-mixer Removed** - No longer a dependency
 
 ### Breaking Changes Summary
 
-| Change                                                           | Severity   | Impact                                               |
-| ---------------------------------------------------------------- | ---------- | ---------------------------------------------------- |
-| Account composition (`account.xyz()` → `account.provider.xyz()`) | **High**   | All provider method calls on Account must be updated |
-| Compression functions now async (`await compressProgram()`)      | **Medium** | Only if using compress/decompress functions directly |
-| Plugin class renames (`StarknetId` → `StarknetIdImpl`)           | **Medium** | Only affects direct imports of these classes         |
-| Plugin import paths (`extensions/` → `plugins/`)                 | **Medium** | Only affects direct imports                          |
-| `SimulateTransactionOverheadResponse` is now an object           | **Medium** | Must access `.simulated_transactions` for the array  |
-| `fetch()` is now `async`                                         | **Low**    | Already returned Promise, minimal impact             |
-| `ts-mixer` removed                                               | **Low**    | Only affects if you used it as transitive dependency |
-| `plugins: false` disables defaults                               | **Info**   | Behavioral change, intentional opt-out               |
+| Change                                                           | Severity   | Impact                                                   |
+| ---------------------------------------------------------------- | ---------- | -------------------------------------------------------- |
+| Account composition (`account.xyz()` → `account.provider.xyz()`) | **High**   | All provider method calls on Account must be updated     |
+| Removed `defaultProvider` and `defaultPaymaster` singletons      | **Medium** | Use `await RpcProvider.create()` or `new PaymasterRpc()` |
+| Removed `default` parameter from RPC options                     | **Low**    | Parameter was only used by removed singletons            |
+| Compression functions now async (`await compressProgram()`)      | **Medium** | Only if using compress/decompress functions directly     |
+| Plugin class renames (`StarknetId` → `StarknetIdImpl`)           | **Medium** | Only affects direct imports of these classes             |
+| Plugin import paths (`extensions/` → `plugins/`)                 | **Medium** | Only affects direct imports                              |
+| `SimulateTransactionOverheadResponse` is now an object           | **Medium** | Must access `.simulated_transactions` for the array      |
+| `fetch()` is now `async`                                         | **Low**    | Already returned Promise, minimal impact                 |
+| `ts-mixer` removed                                               | **Low**    | Only affects if you used it as transitive dependency     |
+| `plugins: false` disables defaults                               | **Info**   | Behavioral change, intentional opt-out                   |
 
 **Quick migration steps:**
 
@@ -143,7 +146,70 @@ account.getStarkName();
 account.getAddressFromStarkName('name.stark');
 ```
 
-## Breaking Change 2: Plugin System
+## Breaking Change 2: Removed Global Singletons
+
+### What Changed
+
+In v10, the global singleton exports `defaultProvider` and `defaultPaymaster` have been removed to promote explicit initialization and better resource management.
+
+**❌ v9 (no longer works):**
+
+```typescript
+import { defaultProvider, defaultPaymaster } from 'starknet';
+
+// These no longer exist
+const result = await defaultProvider.getBlock('latest');
+const tokens = await defaultPaymaster.getSupportedTokens();
+```
+
+**✅ v10:**
+
+```typescript
+// For Provider: Use RpcProvider.create() for automatic node version detection
+const myProvider = await RpcProvider.create();
+const myProvider = await RpcProvider.create({ nodeUrl: constants.NetworkName.SN_MAIN });
+
+// Or create manually if you know the RPC version
+const myProvider = new RpcProvider({ nodeUrl: '...' });
+
+// For Paymaster: Create a new instance
+const myPaymaster = new PaymasterRpc();
+const myPaymaster = new PaymasterRpc({ nodeUrl: 'https://sepolia.paymaster.avnu.fi' });
+
+// Usage
+const result = await myProvider.getBlock('latest');
+const tokens = await myPaymaster.getSupportedTokens();
+```
+
+### Why This Change?
+
+**Benefits:**
+
+- **No implicit global state** - Clearer resource management and easier testing
+- **Auto node detection** - `RpcProvider.create()` automatically detects the node's RPC version
+- **Explicit initialization** - Your code is more transparent about which provider instance you're using
+- **Better contracts** - No hidden provider creation for contracts that don't provide one
+
+### Contract Class Changes
+
+Contracts now auto-initialize a provider on first async method call if none is provided:
+
+```typescript
+// v9 - Used global defaultProvider implicitly
+const contract = new Contract({ abi, address });
+const result = await contract.call('balanceOf', [address]); // Used defaultProvider
+
+// v10 - Still works, but creates provider on first use
+const contract = new Contract({ abi, address });
+const result = await contract.call('balanceOf', [address]); // Creates provider via RpcProvider.create()
+
+// Better: Provide explicit provider
+const provider = await RpcProvider.create({ nodeUrl });
+const contract = new Contract({ abi, address, providerOrAccount: provider });
+const result = await contract.call('balanceOf', [address]);
+```
+
+## Breaking Change 4: Plugin System
 
 ### What Changed
 
@@ -228,7 +294,7 @@ const provider = new RpcProvider({
 
 For more details on creating and using plugins, see the [Plugin System Guide](./plugins.md).
 
-## Breaking Change 3: Provider fetch() Method
+## Breaking Change 5: Provider fetch() Method
 
 ### What Changed
 
@@ -268,7 +334,7 @@ const result = await provider.fetch('starknet_getBlockWithTxHashes', { block_id:
 provider.fetch('starknet_chainId').then((result) => console.log(result));
 ```
 
-## Breaking Change 4: Compression Functions Now Async
+## Breaking Change 6: Compression Functions Now Async
 
 ### What Changed
 
@@ -326,7 +392,7 @@ async function processContract(program) {
 }
 ```
 
-## Breaking Change 5: SimulateTransaction Response Structure
+## Breaking Change 7: SimulateTransaction Response Structure
 
 ### What Changed
 
@@ -387,7 +453,7 @@ const fee = simResult.simulated_transactions[0].overall_fee;
 const traces = simResult.simulated_transactions.map((s) => s.transaction_trace);
 ```
 
-## Breaking Change 6: ts-mixer Removed
+## Breaking Change 8: ts-mixer Removed
 
 ### What Changed
 
