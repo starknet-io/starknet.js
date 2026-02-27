@@ -80,3 +80,8 @@ export function contractClassResponseToLegacyCompiledContract(ccr: ContractClass
   const contract = ccr as LegacyContractClass;
   return { ...contract, program: decompressProgram(contract.program) } as LegacyCompiledContract;
 }
+
+// Re-export LoadedContract type and contractLoader function with runtime detection
+// Works in both Node.js (filesystem) and browsers (File API)
+export type { LoadedContract } from './contractLoader';
+export { contractLoader, isFileSystemAvailable } from './contractLoader';

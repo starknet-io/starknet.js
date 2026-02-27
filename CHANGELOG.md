@@ -1,3 +1,30 @@
+# [9.4.0](https://github.com/starknet-io/starknet.js/compare/v9.3.0...v9.4.0) (2026-02-06)
+
+### Bug Fixes
+
+- add ci release permissions to the top calling workflow not just \_release ([1e9376c](https://github.com/starknet-io/starknet.js/commit/1e9376cff1c79b8403b2b37f7205635689928a8c))
+- audit package fix ([e34813e](https://github.com/starknet-io/starknet.js/commit/e34813ea466ac0efd08fff8810af2cdab75c89c5))
+- fix to trigger release ([87dc498](https://github.com/starknet-io/starknet.js/commit/87dc498e846ce4a3711d152501f68fb3a3d8beb6))
+- iffe shim plugin skip packing fs and path ([8dcb136](https://github.com/starknet-io/starknet.js/commit/8dcb136fcb2c1216ed4cb643a388812d6b2bdf22))
+- is file system available log ([23524ec](https://github.com/starknet-io/starknet.js/commit/23524ec7a9717be69bacd021ff60e26c8bf0d1a4))
+- resolve relative and absolute path ([9b69257](https://github.com/starknet-io/starknet.js/commit/9b69257c96e166726e5e4243690262fe7d5ceec7))
+
+### Features
+
+- contractLoader ([e4e837e](https://github.com/starknet-io/starknet.js/commit/e4e837e3393d6fb5db1eb20e699bde80efee57c4))
+
+# [9.3.0](https://github.com/starknet-io/starknet.js/compare/v9.2.2...v9.3.0) (2025-12-19)
+
+### Features
+
+- add transactionRetryIntervalFallback to the global config ([9014c3c](https://github.com/starknet-io/starknet.js/commit/9014c3c6725d7c0b12d2d369f7c57cb73b9e45af))
+
+## [9.2.2](https://github.com/starknet-io/starknet.js/compare/v9.2.1...v9.2.2) (2025-12-17)
+
+### Bug Fixes
+
+- optional type narrow: getEvents, getTransactionTrace, estimateMessageFee, getL1MessagesStatus ([a3b8115](https://github.com/starknet-io/starknet.js/commit/a3b8115391be2efbebcd074ac2f64aba7a6a5f81))
+
 ## [9.2.1](https://github.com/starknet-io/starknet.js/compare/v9.2.0...v9.2.1) (2025-12-11)
 
 ### Bug Fixes

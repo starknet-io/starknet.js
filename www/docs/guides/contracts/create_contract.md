@@ -140,22 +140,6 @@ const myContract = await Contract.factory({
 });
 ```
 
-The factory method supports all deployment parameters:
-
-```typescript
-const myContract = await Contract.factory({
-  classHash: '0x1234...',
-  abi: contractAbi, // Optional: will fetch from network if not provided
-  account: myAccount,
-  constructorCalldata: {
-    // Your constructor parameters
-  },
-  salt: '0xabcd...', // Optional: custom salt for address generation
-  unique: false, // Optional: set to false for predictable addresses
-  parseRequest: true, // Optional: enable/disable request parsing (default: true)
-});
-```
-
 ### Error Handling
 
 ```typescript

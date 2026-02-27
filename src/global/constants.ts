@@ -127,6 +127,7 @@ export type ChannelDefaultOptions = {
   headers: Record<string, string>;
   blockIdentifier: BlockTag;
   retries: number;
+  transactionRetryIntervalFallback: number;
 };
 
 /**
@@ -184,6 +185,7 @@ export const DEFAULT_GLOBAL_CONFIG: {
       headers: { 'Content-Type': 'application/json' },
       blockIdentifier: BlockTag.LATEST,
       retries: 200,
+      transactionRetryIntervalFallback: 5000,
     },
     methods: {
       simulateTransaction: {

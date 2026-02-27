@@ -30,15 +30,15 @@ import {
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { isString } from '../src/utils/typed';
-import { contracts } from './config/fixtures';
 import {
+  adaptAccountIfDevnet,
+  CONTRACTS,
   createTestProvider,
   getTestAccount,
+  initializeMatcher,
   STRKtokenAddress,
-  adaptAccountIfDevnet,
   TEST_TX_VERSION,
-} from './config/fixturesInit';
-import { initializeMatcher } from './config/schema';
+} from './config';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
@@ -62,21 +62,21 @@ describe('Cairo 1', () => {
 
     beforeAll(async () => {
       dd = await account.declareAndDeploy({
-        contract: contracts.C1v2.sierra,
-        casm: contracts.C1v2.casm,
+        contract: CONTRACTS.C1v2.sierra,
+        casm: CONTRACTS.C1v2.casm,
       });
       cairo1Contract = new Contract({
-        abi: contracts.C1v2.sierra.abi,
+        abi: CONTRACTS.C1v2.sierra.abi,
         address: dd.deploy.contract_address,
         providerOrAccount: account,
       }).typedv2(tAbi);
 
       dd2 = await account.declareAndDeploy({
-        contract: contracts.C210.sierra,
-        casm: contracts.C210.casm,
+        contract: CONTRACTS.Cairo210.sierra,
+        casm: CONTRACTS.Cairo210.casm,
       });
       cairo210Contract = new Contract({
-        abi: contracts.C210.sierra.abi,
+        abi: CONTRACTS.Cairo210.sierra.abi,
         address: dd2.deploy.contract_address,
         providerOrAccount: account,
       }).typedv2(tAbi);
@@ -103,12 +103,12 @@ describe('Cairo 1', () => {
 
       await account.declare({
         contract: cc0 as CompiledSierra,
-        casm: contracts.C1v2.casm,
+        casm: CONTRACTS.C1v2.casm,
       });
 
       await account.declare({
         contract: cc0_1 as CompiledSierra,
-        casm: contracts.C1v2.casm,
+        casm: CONTRACTS.C1v2.casm,
       });
     });
 
@@ -248,7 +248,7 @@ describe('Cairo 1', () => {
       const result = await cairo1Contract.call('new_types', compiled.calldata as Calldata);
       expect(result).toStrictEqual({ '0': 123456789n, '1': 987654321n, '2': 657563474357n });
 
-      const myCalldata = new CallData(contracts.C1v2.sierra.abi); // test arrays
+      const myCalldata = new CallData(CONTRACTS.C1v2.sierra.abi); // test arrays
       const compiled2 = myCalldata.compile('array_new_types', {
         tup: cairo.tuple(256, '0x1234567890', '0xe3456'),
         tupa: cairo.tuple(
@@ -629,7 +629,7 @@ describe('Cairo 1', () => {
         ],
       ];
 
-      const contractCallData: CallData = new CallData(contracts.ComplexSierra.abi);
+      const contractCallData: CallData = new CallData(CONTRACTS.ComplexSierra.sierra.abi);
       const callDataFromObject: Calldata = contractCallData.compile('constructor', myRawArgsObject);
       const callDataFromArray: Calldata = contractCallData.compile('constructor', myRawArgsArray);
       const expectedResult = [
@@ -717,8 +717,8 @@ describe('Cairo 1', () => {
 
       // declare account
       const declareAccount = await account.declareIfNot({
-        contract: contracts.C1Account.sierra,
-        casm: contracts.C1Account.casm,
+        contract: CONTRACTS.AccountOz080.sierra,
+        casm: CONTRACTS.AccountOz080.casm,
       });
       if (declareAccount.transaction_hash) {
         await account.waitForTransaction(declareAccount.transaction_hash);
@@ -796,12 +796,12 @@ describe('Cairo 1', () => {
     };
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: contracts.C1v2.sierra,
-        casm: contracts.C1v2.casm,
+        contract: CONTRACTS.C1v2.sierra,
+        casm: CONTRACTS.C1v2.casm,
       });
 
       eventContract = new Contract({
-        abi: contracts.C1v2.sierra.abi,
+        abi: CONTRACTS.C1v2.sierra.abi,
         address: deploy.contract_address,
         providerOrAccount: account,
       }).typedv2(tAbi);
@@ -941,12 +941,12 @@ describe('Cairo 1', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: contracts.C240.sierra,
-        casm: contracts.C240.casm,
+        contract: CONTRACTS.String.sierra,
+        casm: CONTRACTS.String.casm,
       });
 
       stringContract = new Contract({
-        abi: contracts.C240.sierra.abi,
+        abi: CONTRACTS.String.sierra.abi,
         address: deploy.contract_address,
         providerOrAccount: account,
       }).typedv2(StringABI);
@@ -962,7 +962,7 @@ describe('Cairo 1', () => {
       expect(callD1).toEqual([hexToDecimalString(encodeShortString(str))]);
       const callD2 = CallData.compile({ str });
       expect(callD2).toEqual([hexToDecimalString(encodeShortString(str))]);
-      const myCallData = new CallData(contracts.C240.sierra.abi);
+      const myCallData = new CallData(CONTRACTS.String.sierra.abi);
       const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
       expect(myCalldata1).toEqual([encodeShortString(str)]);
       const myCalldata2 = myCallData.compile('proceed_bytes31', { str });

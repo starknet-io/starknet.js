@@ -1,7 +1,7 @@
 import * as starkCurve from '@scure/starknet';
 
 import { constants, ec, hash, num, units } from '../../src';
-import { ETHtokenAddress } from '../config/fixturesInit';
+import { ETHtokenAddress } from '../config';
 
 const { IS_BROWSER } = constants;
 
