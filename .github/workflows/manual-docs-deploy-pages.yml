@@ -16,6 +16,9 @@ jobs:
     environment: github-pages
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
