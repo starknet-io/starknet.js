@@ -1,3 +1,9 @@
+## [9.4.1](https://github.com/starknet-io/starknet.js/compare/v9.4.0...v9.4.1) (2026-03-02)
+
+### Bug Fixes
+
+- implement requested modifications ([d1e4a19](https://github.com/starknet-io/starknet.js/commit/d1e4a1900886d27e41855f22e320ce174129bb1b))
+
 # [9.4.0](https://github.com/starknet-io/starknet.js/compare/v9.3.0...v9.4.0) (2026-02-06)
 
 ### Bug Fixes
