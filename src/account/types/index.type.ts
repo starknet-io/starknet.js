@@ -8,7 +8,6 @@ import type {
 import type {
   DeclareTransactionReceiptResponse,
   EstimateFeeResponseOverhead,
-  InvokeFunctionResponse,
   ProviderOptions,
 } from '../../provider/types/index.type';
 import type { ResourceBoundsBN } from '../../provider/types/spec.type';
@@ -117,9 +116,4 @@ export type StarkProfile = {
   twitter?: string;
   github?: string;
   proofOfPersonhood?: boolean;
-};
-
-export type fastExecuteResponse = {
-  txResult: InvokeFunctionResponse;
-  isReady: boolean;
 };

@@ -17,6 +17,13 @@ export {
   type BrotherIdProviderMethods,
   type BrotherProfile,
 } from './brother-id';
+export {
+  fastExecute,
+  type FastWaitForTransactionOptions,
+  type FastExecuteResponse,
+  type FastExecuteProviderMethods,
+  type FastExecuteAccountMethods,
+} from './fast-execute';
 
 // Default plugins and augmentations
 export { defaultPlugins } from './defaults';
