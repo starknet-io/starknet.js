@@ -25,6 +25,7 @@ import {
   atobUniversal,
   btoaUniversal,
   buf2hex,
+  removeHexPrefix,
 } from '../encode';
 import { parse, stringify } from '../json';
 import {
@@ -34,6 +35,7 @@ import {
   toHex,
 } from '../num';
 import { isBigInt, isObject, isString } from '../typed';
+import { starkCurve } from '../ec';
 
 type V3Details = Required<
   Pick<
@@ -172,6 +174,31 @@ export function signatureToDecimalArray(sig?: Signature): ArraySignatureType {
  */
 export function signatureToHexArray(sig?: Signature): ArraySignatureType {
   return bigNumberishArrayToHexadecimalStringArray(formatSignature(sig));
+}
+
+/**
+ * Calculate the shared secret using ECDH key agreement protocol with a given private key and a full public key.
+ * @param {BigNumberish} privateKey - a Starknet 252 bits private key.
+ * @param {BigNumberish} fullPublicKey - a 520 bit number, representing the full public key related to `privateKey`, which can be obtained by `getFullPublicKey` function. This number needs to start with '0x04' to indicate that it's a full public key, and the remaining 128 bytes represent the x and y coordinates of the public key point on the elliptic curve (64 bytes for x and 64 bytes for y).
+ * @returns {string} an hex string of a 256 bit number, representing the shared secret calculated by ECDH key agreement protocol using `privateKey` and `fullPublicKey`.
+ * @example
+ * ```typescript
+ * const myPrivateKey = "0x67d0bd238e266b6defbb1ad4de4cf1dde2dc55b3518596e0bae29e439165596";
+ * const bobFullPublicKey = "0x0402d6b3ff569186d67a2ff0b8548328798d3500c16191f6c021f929134d48a15405f9fc5a11467b96a59b8fce3c0c919c337f11337c815bb9d0dc42bac7ac42a9";
+ * const result = stark.getSharedSecret(myPrivateKey, bobFullPublicKey);
+ * // result = "0x020619d1a277a5bc51aac6ab0c22d97e414d4bee9711a2d0aa421997f5efd68bab"
+ * ```
+ */
+export function getSharedSecret(privateKey: BigNumberish, fullPublicKey: BigNumberish): string {
+  const privK = toHex(privateKey);
+  const fullPubKHex = removeHexPrefix(toHex(fullPublicKey)).padStart(130, '0');
+  if (fullPubKHex.length !== 130 || !fullPubKHex.startsWith('04')) {
+    throw new Error(
+      'fullPublicKey must be an uncompressed public key (starting with 04, 65 bytes total)'
+    );
+  }
+  const sharedSecret = buf2hex(starkCurve.getSharedSecret(privK, fullPubKHex));
+  return addHexPrefix(sharedSecret);
 }
 
 /**
