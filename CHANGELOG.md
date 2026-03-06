@@ -1,3 +1,9 @@
+## [9.4.2](https://github.com/starknet-io/starknet.js/compare/v9.4.1...v9.4.2) (2026-03-06)
+
+### Bug Fixes
+
+- bump version from 9.4.2 to 9.4.3 ([bffc6b4](https://github.com/starknet-io/starknet.js/commit/bffc6b48210268d7bb34cc819969261321daa159))
+
 ## [9.4.1](https://github.com/starknet-io/starknet.js/compare/v9.4.0...v9.4.1) (2026-03-02)
 
 ### Bug Fixes
