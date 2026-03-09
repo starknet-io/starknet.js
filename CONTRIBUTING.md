@@ -4,29 +4,35 @@ We love pull requests. And following these guidelines will make your pull reques
 
 If you want to contribute but don’t know what to do, take a look at these two labels: [help wanted](https://github.com/starknet-io/starknet.js/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [good first issue](https://github.com/starknet-io/starknet.js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 
-_[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) for simple documentation changes, otherwise follow the steps below._
+_[Use the GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) for simple documentation changes, otherwise follow the steps below._
 
 > :warning: IMPORTANT NOTE :warning:
 >
 > All contributions are expected to be of the highest possible quality! That means the PR is thoroughly tested and documented, without relying on blindly generated AI code and documentation. We will not consider or merge PRs that do not comply with these rules!
 > A single typo PR would be automatically closed, except for major refactoring for the latest or next versions.
 
-## Prerequisites
-
-- If it’s your first pull request, watch [this amazing course](http://makeapullrequest.com/) by [Kent C. Dodds](https://twitter.com/kentcdodds).
-- Fork the repository and clone your fork.
-- Checkout to the `develop` branch.
-- Install dependencies: `npm install`.
-
 ## Development workflow
 
-Start from the `develop` branch (or `next-version` if latest).
+- If it’s your first pull request, watch [this amazing course](http://makeapullrequest.com/) by [Kent C. Dodds](https://twitter.com/kentcdodds)
+- Fork the repository and clone your fork
+- Checkout the `develop` branch (or `next-version` if it was more recently updated)
+- To install dependencies, run:
 
-To build your changes, run:
+  ```bash
+  npm install
+  ```
 
-```bash
-npm run build
-```
+- To build your changes, run:
+
+  ```bash
+  npm run build
+  ```
+
+- **Don’t forget to add tests and [update the documentation](./www/README.md) for your changes.**
+
+- **Please update the npm lock file (`package-lock.json`) if you add or update dependencies.**
+
+### Running tests
 
 Run linters and tests:
 
@@ -40,7 +46,7 @@ Or run tests in watch mode:
 npm test --watch
 ```
 
-By default, the tests are executed in your local Devnet, and everything should run automatically.
+By default, the tests are executed in your local [Devnet](https://github.com/0xSpaceShard/starknet-devnet), and everything should run automatically.
 
 If you want to use a specific RPC node, you have to set some global variables before executing the tests:
 
@@ -56,15 +62,9 @@ The recommended and more straightforward approach is to use Docker.
 Do the following steps:
 
 - Install [Docker](https://docs.docker.com/engine/install/) (it can also be installed via a package manager, e.g., `brew` for Mac)
-- Run `Docker` on your machine (open the application).
-- Go to the [starknet-devnet-rs](https://hub.docker.com/r/shardlabs/starknet-devnet-rs/tags) and copy the `docker pull` command from the latest tag
-- Run `docker pull shardlabs/starknet-devnet-rs:latest` in your terminal
-- Run tests locally with `npm run test`
-
-**Don’t forget to add tests and [update documentation](./www/README.md) for your changes.**
-Documentation can be archived by using JSDoc.
-
-**Please update the npm lock file (`package-lock.json`) if you add or update dependencies.**
+- Run `Docker` on your machine (open the application)
+- Run `docker pull shardlabs/starknet-devnet-rs:latest` in your terminal, or go to [starknet-devnet-rs](https://hub.docker.com/r/shardlabs/starknet-devnet-rs/tags), copy and run the `docker pull` command from the appropriate tag
+- Run the tests
 
 ### Commit messages
 
@@ -92,11 +92,14 @@ chore: add comments
 fix: repair some other bug
 ```
 
-### Pull request targets
+### Branches and pull request targets
 
-For the most common pull requests, such as bug fixes, feature additions, documentation changes, etc., target the `develop` branch.
-
-For major changes that markedly transform the existing API or significantly alter the behavior of some functionality, ensure that the corresponding commits contain appropriate `Conventional Commits` breaking change notations, and as the pull request target, select the `beta` branch.
+|                   Branch                   |    NPM Tag    | PR Target                                                                                                                                                                                                                                                                                                                |
+| :----------------------------------------: | :-----------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|                 `develop`                  |    `next`     | For the most common pull requests, such as bug fixes, feature additions, documentation changes, etc., target the `develop` branch.                                                                                                                                                                                       |
+|                   `beta`                   |    `beta`     | For major changes that markedly transform the existing API or significantly alter the behavior of some functionality, ensure that the corresponding commits contain appropriate `Conventional Commits` breaking change notations, and as the pull request target, select the `beta` branch.                              |
+|                   `main`                   |   `latest`    | Should only be used by maintainers.<br><br> After a `develop`/`next` version has proven to be stable, it is promoted to `latest` by merging into `main`.                                                                                                                                                                 |
+| `maintenance/x.y` <br> `maintenance/x.y.z` | `maintenance` | Should only be used by maintainers.<br><br> Branches with the `maintenance` prefix are used for applying adjustments to versions that have been merged into `main` but are no longer the `latest` release. They should be created from the corresponding Git tag and can have either minor or patch version specificity. |
 
 ## Other notes
 
