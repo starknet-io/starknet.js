@@ -125,30 +125,33 @@ For detailed multicall examples, see the [Multicall guide](./multiCall.md).
 
 ## Fast consecutive transactions
 
-In some cases, it's important to be able to process as fast as possible consecutive transactions. Gaming is fond of this feature.  
-A normal transaction (with `myProvider.waitForTransaction(txH)`) needs more than 10 seconds. To be able to process a transaction each 2-3 seconds, use:
+In some cases, it's important to be able to process as fast as possible consecutive transactions. Gaming is particularly fond of this feature.
+A normal transaction (with `myProvider.waitForTransaction(txH)`) needs more than 10 seconds. To process transactions every 2-3 seconds, use the **FastExecute plugin** (included by default):
 
 ```ts
 const myProvider = new RpcProvider({
   nodeUrl: url,
   specVersion: '0.9.0',
-  blockIdentifier: BlockTag.PRE_CONFIRMED,
+  blockIdentifier: BlockTag.PRE_CONFIRMED, // Use pre-confirmed block state
 });
 const myAccount = new Account({
   provider: myProvider,
   address: accountAddress0,
   signer: privateKey0,
 });
+
+// fastExecute() is automatically available via the FastExecute plugin
 const call1 = gameContract.populate('decrease_qty_weapons', { qty: 5 });
 const tipStats = await myProvider.getEstimateTip();
 const resp = await myAccount.fastExecute(
   call1,
-  { tip: recommendedTip },
+  { tip: tipStats.recommendedTip },
   { retries: 30, retryInterval: 500 }
 );
+
 if (resp.isReady) {
   const call2 = gameContract.populate('increase_qty_weapons', { qty: 10 });
-  const resp = await myAccount.fastExecute(
+  const resp2 = await myAccount.fastExecute(
     call2,
     { tip: tipStats.recommendedTip },
     { retries: 30, retryInterval: 500 }
@@ -156,13 +159,19 @@ if (resp.isReady) {
 }
 ```
 
-:::warning Warning
+:::info FastExecute Plugin
 
-- This method requires the provider to be initialized with `pre_confirmed` blockIdentifier option.
-- Rpc 0.9 minimum.
-- In a normal `myAccount.execute()` call, followed by `myProvider.waitForTransaction()`, you have an immediate access to the events and to the transaction report. Here, we are processing consecutive transactions faster ; then events & transaction reports are not available immediately.
-- As a consequence of the previous point, do not use contract/account deployment with this method. Use the normal way.
-- `fastExecute()` is generating a significant amount of communication with the node. To use sparingly, especially with a public node.
+The `fastExecute()` method is provided by the **FastExecute plugin**, which is included by default in Starknet.js. For more details, configuration options, and best practices, see the [Plugin System guide](../plugins.md#fastexecute-plugin).
+
+:::
+
+:::warning Important Limitations
+
+- Requires provider initialized with `blockIdentifier: BlockTag.PRE_CONFIRMED` (a RPC 0.9+ feature)
+- Works with RPC 0.9 and later
+- Events and transaction reports are **not available immediately**
+- **Do not use** for contract/account deployment - use regular `execute()` instead
+- Generates significant node communication - use sparingly, especially with public nodes
 
 :::
 

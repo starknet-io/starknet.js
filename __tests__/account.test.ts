@@ -16,9 +16,6 @@ import {
   type InvokeTransactionReceiptResponse,
   Deployer,
   RPC,
-  RpcProvider,
-  BlockTag,
-  type Call,
 } from '../src';
 import {
   C1v2ClassHash,
@@ -26,13 +23,11 @@ import {
   describeIfDevnet,
   describeIfNotDevnet,
   erc20ClassHash,
-  getTestProvider,
   createTestProvider,
   getTestAccount,
   devnetFeeTokenAddress,
   adaptAccountIfDevnet,
   TEST_TX_VERSION,
-  STRKtokenAddress,
   initializeMatcher,
 } from './config';
 
@@ -386,44 +381,6 @@ describe('deploy and test Account', () => {
 
     const after = await dapp.get_balance();
     expect(after - before).toStrictEqual(57n);
-  });
-
-  describe('fastExecute()', () => {
-    test('Only provider with PRE_CONFIRMED blockIdentifier', async () => {
-      const providerLatest = new RpcProvider({
-        nodeUrl: 'dummy',
-        blockIdentifier: BlockTag.LATEST,
-        specVersion: '0.9.0',
-      });
-      const testAccount = new Account({
-        provider: providerLatest,
-        address: '0x123',
-        signer: '0x456',
-      });
-      const myCall: Call = { contractAddress: '0x036', entrypoint: 'withdraw', calldata: [] };
-      await expect(testAccount.fastExecute(myCall)).rejects.toThrow(
-        'Provider needs to be initialized with `pre_confirmed` blockIdentifier option.'
-      );
-    });
-
-    test('fast consecutive txs', async () => {
-      const testProvider = getTestProvider(false, {
-        blockIdentifier: BlockTag.PRE_CONFIRMED,
-      });
-      const testAccount = getTestAccount(testProvider);
-      const myCall: Call = {
-        contractAddress: STRKtokenAddress,
-        entrypoint: 'transfer',
-        calldata: [testAccount.address, cairo.uint256(100)],
-      };
-      const tx1 = await testAccount.fastExecute(myCall);
-      expect(tx1.isReady).toBe(true);
-      expect(tx1.txResult.transaction_hash).toMatch(/^0x/);
-      const tx2 = await testAccount.fastExecute(myCall);
-      await provider.waitForTransaction(tx2.txResult.transaction_hash); // to be sure to have the right nonce in `provider`, that is set with BlockTag.LATEST (otherwise next tests will fail)
-      expect(tx2.isReady).toBe(true);
-      expect(tx2.txResult.transaction_hash).toMatch(/^0x/);
-    });
   });
 
   describe('EIP712 verification', () => {

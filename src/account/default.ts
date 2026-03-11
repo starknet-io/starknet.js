@@ -8,7 +8,7 @@ import {
 } from '../global/constants';
 import { logger } from '../global/logger';
 import { Provider } from '../provider';
-import { BlockTag, ETransactionVersion, ETransactionVersion3 } from '../provider/types/spec.type';
+import { ETransactionVersion, ETransactionVersion3 } from '../provider/types/spec.type';
 import { Signer, type SignerInterface } from '../signer';
 import {
   // Runtime values
@@ -58,8 +58,6 @@ import type {
   UniversalDetails,
   UserTransaction,
   waitForTransactionOptions,
-  fastWaitForTransactionOptions,
-  fastExecuteResponse,
 } from '../types';
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
@@ -362,52 +360,6 @@ export class Account implements AccountInterface {
     });
 
     return result;
-  }
-
-  /**
-   * Execute one or multiple calls through the account contract,
-   * responding as soon as a new transaction is possible with the same account.
-   * Useful for gaming usage.
-   * - This method requires the provider to be initialized with `pre_confirmed` blockIdentifier option.
-   * - Rpc 0.9 minimum.
-   * - In a normal myAccount.execute() call, followed by myProvider.waitForTransaction(), you have an immediate access to the events and to the transaction report. Here, we are processing consecutive transactions faster, but events & transaction reports are not available immediately.
-   * - As a consequence of the previous point, do not use contract/account deployment with this method.
-   * @param {AllowArray<Call>} transactions - Single call or array of calls to execute
-   * @param {UniversalDetails} [transactionsDetail] - Transaction execution options
-   * @param {fastWaitForTransactionOptions} [waitDetail={retries: 50, retryInterval: 500}] - options to scan the network for the next possible transaction. `retries` is the number of times to retry, `retryInterval` is the time in ms between retries.
-   * @returns {Promise<fastExecuteResponse>} Response containing the transaction result and status for the next transaction. If `isReady` is true, you can execute the next transaction. If false, timeout has been reached before the next transaction was possible.
-   * @example
-   * ```typescript
-   * const myProvider = new RpcProvider({ nodeUrl: url, blockIdentifier: BlockTag.PRE_CONFIRMED });
-   * const myAccount = new Account({ provider: myProvider, address: accountAddress0, signer: privateKey0 });
-   * const resp = await myAccount.fastExecute(
-   *     call, { tip: recommendedTip},
-   *     { retries: 30, retryInterval: 500 });
-   * // if resp.isReady is true, you can launch immediately a new tx.
-   * ```
-   */
-  public async fastExecute(
-    transactions: AllowArray<Call>,
-    transactionsDetail: UniversalDetails = {},
-    waitDetail: fastWaitForTransactionOptions = {}
-  ): Promise<fastExecuteResponse> {
-    assert(
-      this.provider.channel.blockIdentifier === BlockTag.PRE_CONFIRMED,
-      'Provider needs to be initialized with `pre_confirmed` blockIdentifier option.'
-    );
-    const initNonce = BigInt(
-      transactionsDetail.nonce ??
-        (await this.provider.getNonceForAddress(this.address, BlockTag.PRE_CONFIRMED))
-    );
-    const details = { ...transactionsDetail, nonce: initNonce };
-    const resultTx: InvokeFunctionResponse = await this.execute(transactions, details);
-    const resultWait = await this.provider.fastWaitForTransaction(
-      resultTx.transaction_hash,
-      this.address,
-      initNonce,
-      waitDetail
-    );
-    return { txResult: resultTx, isReady: resultWait } as fastExecuteResponse;
   }
 
   /**

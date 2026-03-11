@@ -12,23 +12,36 @@ The plugin system replaces the previous mixin-based approach (using `ts-mixer`),
 
 ## Default Plugins
 
-By default, Starknet.js comes with two plugins pre-installed:
+By default, Starknet.js comes with three plugins pre-installed:
 
 - **StarknetId** - Starknet Name Service integration
 - **BrotherId** - Brother.id naming service integration
+- **FastExecute** - Gaming-optimized rapid transaction execution
 
 These plugins are automatically available on both `RpcProvider` and `Account` instances:
 
 ```typescript
-import { RpcProvider, Account } from 'starknet';
+import { RpcProvider, Account, BlockTag } from 'starknet';
 
-const provider = new RpcProvider({ nodeUrl });
-const account = new Account(provider, address, privateKey);
+const provider = new RpcProvider({
+  nodeUrl,
+  blockIdentifier: BlockTag.PRE_CONFIRMED, // Required for fastExecute plugin to work
+});
+const account = new Account({ provider, address, signer: privateKey });
 
 // StarknetId plugin methods (automatically available)
 const name = await provider.getStarkName(address);
 const addr = await provider.getAddressFromStarkName('example.stark');
 const profile = await provider.getStarkProfile(address);
+
+// BrotherId plugin methods (automatically available)
+const brotherName = await provider.getBrotherName(address);
+
+// FastExecute plugin methods (automatically available)
+const resp = await account.fastExecute(call, { tip: estimatedTip });
+if (resp.isReady) {
+  // Next transaction can be sent immediately
+}
 
 // On Account, some methods default to using account.address
 const myName = await account.getStarkName(); // Uses account.address by default
@@ -335,6 +348,118 @@ interface AccountHooks extends ProviderHooks {
 ```
 
 ## Built-in Plugins
+
+### FastExecute Plugin
+
+Provides gaming-optimized rapid transaction execution with minimal confirmation latency:
+
+```typescript
+import { RpcProvider, Account, BlockTag, fastExecute } from 'starknet';
+
+// Plugin is included by default, no need to explicitly add it
+const provider = new RpcProvider({
+  nodeUrl,
+  blockIdentifier: BlockTag.PRE_CONFIRMED, // Required for fastExecute to work
+});
+
+const account = new Account({ provider, address, signer });
+
+// Fast execute is available immediately
+const resp = await account.fastExecute(
+  call,
+  { tip: recommendedTip },
+  { retries: 30, retryInterval: 500 }
+);
+
+if (resp.isReady) {
+  // Next transaction can be sent immediately
+  await account.fastExecute(nextCall);
+}
+```
+
+**Requirements:**
+
+- RPC 0.9 or later
+- Provider initialized with `blockIdentifier: BlockTag.PRE_CONFIRMED`
+
+**Limitations:**
+
+- Events and transaction reports are not available immediately
+- Not suitable for contract/account deployment
+- Best used sparingly to avoid overwhelming the node
+
+**Methods added to Provider:**
+
+- `fastWaitForTransaction(txHash, address, initNonce, options?)` - Wait for transaction with fast polling
+  - Returns `Promise<boolean>` - true if next nonce increment detected, false on timeout
+  - Polls at PRE_CONFIRMED finality level instead of waiting for full confirmation
+
+**Methods added to Account:**
+
+- `fastExecute(transactions, details?, waitDetail?)` - Execute and wait for next transaction readiness
+  - Returns `Promise<FastExecuteResponse>` with `txResult` and `isReady` boolean
+  - Useful for rapid consecutive transactions (gaming, high-frequency operations)
+
+**Options:**
+
+```typescript
+type FastWaitForTransactionOptions = {
+  retries?: number; // Number of retry attempts (default: 50)
+  retryInterval?: number; // Time between retries in ms (default: 500)
+};
+
+type FastExecuteResponse = {
+  txResult: InvokeFunctionResponse;
+  isReady: boolean; // Ready to execute next transaction immediately
+};
+```
+
+**Example - Rapid Fire Gaming Transactions:**
+
+```typescript
+const calls = [
+  { contractAddress: gameAddress, entrypoint: 'move', calldata: [...] },
+  { contractAddress: gameAddress, entrypoint: 'attack', calldata: [...] },
+  { contractAddress: gameAddress, entrypoint: 'defend', calldata: [...] },
+];
+
+// Execute transactions as fast as possible
+for (const call of calls) {
+  const resp = await account.fastExecute(call, { tip: estimatedTip });
+
+  if (!resp.isReady) {
+    // Fallback to regular wait if fast mode times out
+    await provider.waitForTransaction(resp.txResult.transaction_hash);
+  }
+
+  console.log(`Transaction ${resp.txResult.transaction_hash} confirmed`);
+}
+```
+
+**Disabling Fast Execute:**
+
+If you don't need fast execute, you can start without the plugin:
+
+```typescript
+const provider = new RpcProvider({
+  nodeUrl,
+  plugins: false, // No plugins
+});
+
+// fastExecute not available
+// account.fastExecute() ❌ Error
+```
+
+Or customize to use only specific plugins:
+
+```typescript
+import { starknetId } from 'starknet';
+
+const provider = new RpcProvider({
+  nodeUrl,
+  plugins: [starknetId()], // Only StarknetId, no fastExecute
+});
+```
 
 ### StarknetId Plugin
 
