@@ -128,7 +128,11 @@ describeIfRpc('RPCProvider', () => {
     const chainId2 = await rpcProvider.getChainId();
     expect(fetchSpy.mock.calls.length).toBe(1);
     expect(chainId1).toBe(chainId2);
-    expect(Object.values(StarknetChainId)).toContain(chainId1);
+    expect(
+      (Object.values(StarknetChainId) as string[]).push(
+        '0x534e5f494e544547524154494f4e5f5345504f4c4941' // integration-sepolia
+      )
+    ).toContain(chainId1);
     fetchSpy.mockRestore();
   });
 
