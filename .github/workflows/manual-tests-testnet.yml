@@ -32,12 +32,12 @@ on:
         description: 'Protocol: WS'
         type: boolean
         default: true
-      matrix-version-v0_8:
-        description: 'RPC version: 0.8'
-        type: boolean
-        default: true
       matrix-version-v0_9:
         description: 'RPC version: 0.9'
+        type: boolean
+        default: true
+      matrix-version-v0_10:
+        description: 'RPC version: 0.10'
         type: boolean
         default: true
 
