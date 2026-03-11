@@ -182,7 +182,8 @@ export function calculateInvokeTransactionHash(
   feeDataAvailabilityMode: EDAMode,
   resourceBounds: ResourceBoundsBN,
   tip: BigNumberish,
-  paymasterData: BigNumberish[]
+  paymasterData: BigNumberish[],
+  proofFacts?: BigNumberish[]
 ): string {
   return calculateTransactionHashCommon(
     TransactionHashPrefix.INVOKE,
@@ -195,6 +196,10 @@ export function calculateInvokeTransactionHash(
     nonceDataAvailabilityMode,
     feeDataAvailabilityMode,
     resourceBounds,
-    [poseidonHashMany(AToBI(accountDeploymentData)), poseidonHashMany(AToBI(compiledCalldata))]
+    [
+      poseidonHashMany(AToBI(accountDeploymentData)),
+      poseidonHashMany(AToBI(compiledCalldata)),
+      ...(proofFacts ? AToBI(proofFacts) : []),
+    ]
   );
 }

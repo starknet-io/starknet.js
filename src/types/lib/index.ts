@@ -204,6 +204,10 @@ export type V3TransactionDetails = {
   accountDeploymentData: BigNumberish[];
   nonceDataAvailabilityMode: EDataAvailabilityMode;
   feeDataAvailabilityMode: EDataAvailabilityMode;
+  /** Proof facts to include in the transaction (RPC 0.10.1+) */
+  proofFacts?: BigNumberish[];
+  /** Proof for the transaction (RPC 0.10.1+) - base64 encoded string */
+  proof?: string;
 };
 
 /**

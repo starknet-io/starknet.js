@@ -1,4 +1,6 @@
-import { constants, v2hash } from '../../src';
+import { constants, hash, v2hash, v3hash } from '../../src';
+import { EDAMode } from '../../src/types/api';
+import { toHex } from '../../src/utils/num';
 
 describe('TxV2 Hash Tests', () => {
   describe('calculateTransactionHashCommon()', () => {
@@ -14,6 +16,85 @@ describe('TxV2 Hash Tests', () => {
       );
       expect(result).toBe('0x63ba2bc7f3a3912597e221d5fad8eb0783e0684a428b47fa4737faf66f46dfb');
     });
+  });
+});
+
+describe('TxV3 Invoke proofFacts Hash Tests', () => {
+  const baseArgs = {
+    senderAddress: '0x12fd538',
+    version: '0x3' as const,
+    compiledCalldata: ['0x11', '0x26'],
+    chainId: constants.StarknetChainId.SN_SEPOLIA,
+    nonce: 9,
+    accountDeploymentData: [],
+    nonceDataAvailabilityMode: EDAMode.L1,
+    feeDataAvailabilityMode: EDAMode.L1,
+    resourceBounds: {
+      l2_gas: { max_amount: 0n, max_price_per_unit: 0n },
+      l1_gas: { max_amount: 0x7c9n, max_price_per_unit: 1n },
+      l1_data_gas: { max_amount: 0n, max_price_per_unit: 0n },
+    },
+    tip: 0n,
+    paymasterData: [],
+  };
+
+  test('empty proofFacts produces the same hash as omitted proofFacts', () => {
+    const hashWithoutProof = hash.calculateInvokeTransactionHash(baseArgs);
+    const hashWithEmptyProof = hash.calculateInvokeTransactionHash({
+      ...baseArgs,
+      proofFacts: [],
+    });
+    expect(hashWithEmptyProof).toBe(hashWithoutProof);
+  });
+
+  test('non-empty proofFacts changes the hash', () => {
+    const hashWithoutProof = hash.calculateInvokeTransactionHash(baseArgs);
+    const hashWithProof = hash.calculateInvokeTransactionHash({
+      ...baseArgs,
+      proofFacts: ['0x1', '0x2'],
+    });
+    expect(hashWithProof).not.toBe(hashWithoutProof);
+  });
+
+  test('proofFacts order matters for the hash', () => {
+    const hashWithProof1 = hash.calculateInvokeTransactionHash({
+      ...baseArgs,
+      proofFacts: ['0x1', '0x2'],
+    });
+    const hashWithProof2 = hash.calculateInvokeTransactionHash({
+      ...baseArgs,
+      proofFacts: ['0x2', '0x1'],
+    });
+    expect(hashWithProof2).not.toBe(hashWithProof1);
+  });
+});
+
+describe('TxV3 hashFeeFieldV3B3 — blockifier test vectors', () => {
+  test('should throw error when l1_data_gas is not provided', () => {
+    expect(() => {
+      v3hash.hashFeeFieldV3B3(0n, {
+        l1_gas: { max_amount: 0x1000n, max_price_per_unit: 0x2000n },
+        l2_gas: { max_amount: 0n, max_price_per_unit: 0n },
+      } as any);
+    }).toThrow();
+  });
+
+  test('should match blockifier test vector 2 (AllResources Variant)', () => {
+    const result = v3hash.hashFeeFieldV3B3(0n, {
+      l1_gas: { max_amount: 0x1000n, max_price_per_unit: 0x2000n },
+      l2_gas: { max_amount: 0x3000n, max_price_per_unit: 0x4000n },
+      l1_data_gas: { max_amount: 0x5000n, max_price_per_unit: 0x6000n },
+    });
+    expect(toHex(result)).toBe('0x3d848944220686a0d567e2a3895f3651ad616d4eccb473a03a93150c40b5e13');
+  });
+
+  test('should match blockifier test vector 3 (AllResources with Zero l1_data_gas)', () => {
+    const result = v3hash.hashFeeFieldV3B3(0n, {
+      l1_gas: { max_amount: 0x1000n, max_price_per_unit: 0x2000n },
+      l2_gas: { max_amount: 0x3000n, max_price_per_unit: 0x4000n },
+      l1_data_gas: { max_amount: 0n, max_price_per_unit: 0n },
+    });
+    expect(toHex(result)).toBe('0x6916420cf10b91926a408900e0e8f5548bbd3baccb11b2e0ad1a58246b0ffe0');
   });
 });
 
