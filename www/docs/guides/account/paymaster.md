@@ -217,7 +217,7 @@ const resp = await MyWalletAccount.executePaymasterTransaction(
   feesDetails,
   estimatedFees.suggested_max_fee_in_gas_token
 );
-const txR = await newAccount.waitForTransaction(resp.transaction_hash);
+const txR = await newAccount.provider.waitForTransaction(resp.transaction_hash);
 ```
 
 ## PaymasterRpc Functions
