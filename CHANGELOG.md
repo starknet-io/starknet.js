@@ -1,3 +1,9 @@
+# [10.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v10.0.0-beta.1...v10.0.0-beta.2) (2026-02-27)
+
+### Features
+
+- remove default providers - resolve unintended side effect initializations ([ea581a8](https://github.com/starknet-io/starknet.js/commit/ea581a821a517362886e16075068b8ce4104e7a7))
+
 # [10.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v9.5.0-beta.2...v10.0.0-beta.1) (2026-02-24)
 
 - feat!: refactor Account to use composition pattern, plugin system, docs\ \ BREAKING CHANGE: Account no longer extends Provider. Provider methods must now be accessed via account.provider property. \ Changes: - Account uses composition instead of inheritance - Add plugin system to replace ts-mixer - Update all tests to use account.provider.xyz() - Create migration guide and plugin documentation ([31d9458](https://github.com/starknet-io/starknet.js/commit/31d94587676a543c71dbd64b92d0e65d0ee3aa38))
@@ -52,6 +58,12 @@
 ### Bug Fixes
 
 - semantic version, audit fix, ci permissions ([3c5dea3](https://github.com/starknet-io/starknet.js/commit/3c5dea301733c85cbd5a2785358e92f808874902))
+
+## [9.4.1](https://github.com/starknet-io/starknet.js/compare/v9.4.0...v9.4.1) (2026-03-02)
+
+### Bug Fixes
+
+- implement requested modifications ([d1e4a19](https://github.com/starknet-io/starknet.js/commit/d1e4a1900886d27e41855f22e320ce174129bb1b))
 
 # [9.4.0](https://github.com/starknet-io/starknet.js/compare/v9.3.0...v9.4.0) (2026-02-06)
 

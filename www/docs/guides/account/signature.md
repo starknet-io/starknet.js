@@ -24,6 +24,19 @@ const msgHash = hash.computeHashOnElements(message);
 const signature: WeierstrassSignatureType = ec.starkCurve.sign(msgHash, privateKey);
 ```
 
+:::info
+
+- The full public key is a hex number, where the first byte is `04`, followed by a 64 characters number representing the X coordinate, and finally a 64 characters number representing the Y coordinate.
+
+ex: `0x0400b730bd22358612b5a67f8ad52ce80f9e8e893639ade263537e6ef35852e5d3057795f6b090f7c6985ee143f798608a53b3659222c06693c630857a10a92acf`,
+
+> where `04` is indicating that it's a non compressed public key, `00b730bd22358612b5a67f8ad52ce80f9e8e893639ade263537e6ef35852e5d3` is the X coordinate, `057795f6b090f7c6985ee143f798608a53b3659222c06693c630857a10a92acf`
+> is the Y coordinate.
+
+- the Starknet public key stored in an account contract is including only the X coordinate. It's a felt252.
+
+:::
+
 Then you can send, by any means, to the recipient of the message:
 
 - the message.

@@ -200,6 +200,32 @@ describe('stark', () => {
     });
   });
 
+  describe('getSharedSecret', () => {
+    test('derives shared secret from private key and public key', () => {
+      const userAPrivK = stark.randomAddress();
+      const userAFullPubK = stark.getFullPublicKey(userAPrivK);
+      const userBPrivK = stark.randomAddress();
+      const userBFullPubK = stark.getFullPublicKey(userBPrivK);
+      // User B is sending its pubK to user A.
+      // user A is calculating the secret
+      const sharedSecretA = stark.getSharedSecret(userAPrivK, userBFullPubK);
+      // User A is sending its pubK to user B.
+      // user B is calculating the secret
+      const sharedSecretB = stark.getSharedSecret(userBPrivK, userAFullPubK);
+      expect(num.isHex(sharedSecretA)).toBe(true);
+      expect(sharedSecretA).toBe(sharedSecretB);
+    });
+    test('wrong cases', () => {
+      expect(() => stark.getSharedSecret('0x123', '0x456')).toThrow();
+      expect(() =>
+        stark.getSharedSecret(
+          '0x123',
+          '0x0302d6b3ff569186d67a2ff0b8548328798d3500c16191f6c021f929134d48a15405f9fc5a11467b96a59b8fce3c0c919c337f11337c815bb9d0dc42bac7ac42a9'
+        )
+      ).toThrow();
+    });
+  });
+
   describe('toOverheadResourceBounds', () => {
     test('calculates resource bounds with default overhead', () => {
       const estimate: FeeEstimate = {
