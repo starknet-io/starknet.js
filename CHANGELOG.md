@@ -1,3 +1,13 @@
+# [10.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v10.0.0-beta.2...v10.0.0-beta.3) (2026-03-11)
+
+### Bug Fixes
+
+- implement requested modifications ([d1e4a19](https://github.com/starknet-io/starknet.js/commit/d1e4a1900886d27e41855f22e320ce174129bb1b))
+
+### Features
+
+- fast-execuite as plugin ([d011417](https://github.com/starknet-io/starknet.js/commit/d0114177075b04b24b314812d16c0eb32ea9abe9))
+
 # [10.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v10.0.0-beta.1...v10.0.0-beta.2) (2026-02-27)
 
 ### Features
