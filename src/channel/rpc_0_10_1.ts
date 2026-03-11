@@ -22,7 +22,7 @@ import {
   waitForTransactionOptions,
 } from '../types';
 import assert from '../utils/assert';
-import { ETransactionType, JRPC, RPCSPEC010 as RPC } from '../types/api';
+import { ETransactionType, JRPC, RPCSPEC0101 as RPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -51,12 +51,12 @@ import { logger } from '../global/logger';
 import { config } from '../global/config';
 
 export class RpcChannel {
-  readonly id = 'RPC0.10.0';
+  readonly id = 'RPC0.10.1';
 
   /**
    * RPC specification version this Channel class implements
    */
-  readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_10_0;
+  readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_10_1;
 
   public nodeUrl: string;
 
@@ -214,7 +214,7 @@ export class RpcChannel {
       const unknownSpecVersion = await this.fetchEndpoint('starknet_specVersion');
 
       // check if the channel is compatible with the node
-      if (!isVersion(this.channelSpecVersion, unknownSpecVersion)) {
+      if (!isVersion('0.10', unknownSpecVersion)) {
         logger.error(SYSTEM_MESSAGES.channelVersionMismatch, {
           channelId: this.id,
           channelSpecVersion: this.channelSpecVersion,
@@ -352,9 +352,17 @@ export class RpcChannel {
     });
   }
 
-  public getBlockStateUpdate(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+  public getBlockStateUpdate(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    contractAddresses?: BigNumberish[]
+  ) {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
+    return this.fetchEndpoint('starknet_getStateUpdate', {
+      block_id,
+      ...(contractAddresses && {
+        contract_addresses: contractAddresses.map((addr) => toHex(addr)),
+      }),
+    });
   }
 
   /**
@@ -572,7 +580,8 @@ export class RpcChannel {
   public getStorageAt(
     contractAddress: BigNumberish,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    responseFlags?: RPC.STORAGE_RESPONSE_FLAG[]
   ) {
     const contract_address = toHex(contractAddress);
     const parsedKey = toStorageKey(key);
@@ -581,6 +590,7 @@ export class RpcChannel {
       contract_address,
       key: parsedKey,
       block_id,
+      ...(responseFlags && { response_flags: responseFlags }),
     });
   }
 
@@ -795,7 +805,9 @@ export class RpcChannel {
         ...(invocation.proofFacts && {
           proof_facts: invocation.proofFacts.map((it) => toHex(it)),
         }),
-        ...(invocation.proof && { proof: invocation.proof }),
+        ...(invocation.proof && {
+          proof: invocation.proof,
+        }),
       };
       return btx as any; // This 'as any' is internal to the generic function - the external API is type-safe
     }

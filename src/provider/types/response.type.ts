@@ -9,12 +9,12 @@ import {
   IsSucceeded,
   IsType,
   PRE_CONFIRMED_BLOCK_WITH_TX_HASHES,
+  RPCSPEC0101,
   TransactionReceipt,
 } from '../../types/api';
 
 import { CompiledSierra, LegacyContractClass } from '../../types/lib';
 import {
-  FELT,
   INITIAL_READS,
   PRICE_UNIT,
   SIMULATION_FLAG,
@@ -62,7 +62,7 @@ export type DeclareContractResponse = DeclaredTransaction;
 
 export type CallContractResponse = string[];
 
-export type Storage = FELT;
+export type StorageResponse = RPCSPEC0101.STORAGE_RESULT;
 
 export type Nonce = string;
 

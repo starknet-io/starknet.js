@@ -126,6 +126,38 @@ export function randomAddress(): string {
 }
 
 /**
+ * Encode proof array to base64 string for RPC 0.10.1+
+ * @param {number[]} proof Array of proof integers
+ * @returns {string} Base64 encoded proof
+ * @example
+ * ```typescript
+ * const proofArray = [1, 2, 3, 4, 5];
+ * const result = stark.encodeProof(proofArray);
+ * // result = "AQAAAAIAAAADAAAABAAAAAUAAAAv"
+ * ```
+ */
+export function encodeProof(proof: number[]): string {
+  return btoaUniversal(new Uint32Array(proof).buffer);
+}
+
+/**
+ * Decode base64 proof string to proof array for RPC 0.10.1+
+ * @param {string} proofBase64 Base64 encoded proof string
+ * @returns {number[]} Array of proof integers
+ * @example
+ * ```typescript
+ * const proofBase64 = "AQAAAAIAAAADAAAABAAAAAUAAAAv";
+ * const result = stark.decodeProof(proofBase64);
+ * // result = [1, 2, 3, 4, 5]
+ * ```
+ */
+export function decodeProof(proofBase64: string): number[] {
+  const decoded = atobUniversal(proofBase64);
+  const uint32Array = new Uint32Array(decoded.buffer);
+  return Array.from(uint32Array);
+}
+
+/**
  * Format Signature to standard type (hex array)
  * @param {Signature} [sig]
  * @returns {ArraySignatureType} Custom hex string array

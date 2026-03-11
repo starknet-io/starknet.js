@@ -9,7 +9,7 @@ import type {
   StandardEventsChangeProperties,
 } from '@starknet-io/get-starknet-wallet-standard/features';
 
-import { Account, AccountInterface } from '../account';
+import { Account } from '../account';
 import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
 import {
@@ -44,7 +44,7 @@ import { defaultDeployer } from '../deployer';
  * WalletAccountV5 class.
  * This class is used to create a wallet account that can be used to interact with a Starknet wallet browser extension, using get-starknet v5.
  */
-export class WalletAccountV5 extends Account implements AccountInterface {
+export class WalletAccountV5 extends Account {
   public walletProvider: WalletWithStarknetFeatures;
 
   /**
