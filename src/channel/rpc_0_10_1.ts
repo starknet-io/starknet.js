@@ -802,9 +802,10 @@ export class RpcChannel {
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
         ...details,
-        ...(invocation.proofFacts && {
-          proof_facts: invocation.proofFacts.map((it) => toHex(it)),
-        }),
+        ...(invocation.proofFacts &&
+          invocation.proofFacts.length > 0 && {
+            proof_facts: invocation.proofFacts.map((it) => toHex(it)),
+          }),
         ...(invocation.proof && {
           proof: invocation.proof,
         }),
