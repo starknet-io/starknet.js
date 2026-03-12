@@ -34,6 +34,7 @@ import {
   BlockTag,
   logger,
   type GasPrices,
+  CairoBytes31,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { isBoolean } from '../src/utils/typed';
@@ -128,11 +129,11 @@ describeIfRpc('RPCProvider', () => {
     const chainId2 = await rpcProvider.getChainId();
     expect(fetchSpy.mock.calls.length).toBe(1);
     expect(chainId1).toBe(chainId2);
-    expect(
-      (Object.values(StarknetChainId) as string[]).push(
-        '0x534e5f494e544547524154494f4e5f5345504f4c4941' // integration-sepolia
-      )
-    ).toContain(chainId1);
+    const chainIds = [
+      ...Object.values(StarknetChainId),
+      new CairoBytes31('SN_INTEGRATION_SEPOLIA').toHexString(),
+    ] as const;
+    expect(chainIds).toContain(chainId1);
     fetchSpy.mockRestore();
   });
 
