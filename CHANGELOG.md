@@ -1,3 +1,14 @@
+# [10.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v10.0.0-beta.3...v10.0.0-beta.4) (2026-03-13)
+
+### Bug Fixes
+
+- proof/facts optional ([c0f4aaf](https://github.com/starknet-io/starknet.js/commit/c0f4aaf786bec9873d0dfb4152686dbe398ae7f1))
+
+### Features
+
+- new v3 transaction hash with proofFacts when defined ([3c8e5cb](https://github.com/starknet-io/starknet.js/commit/3c8e5cb0eed0457f43b02e277a31fbafbb3b6b55))
+- spec 0.10.1-rc3, resposeParser to provider, channel 0.10.1 support 0.10.0 and 0.10.1, docs ([8387a1e](https://github.com/starknet-io/starknet.js/commit/8387a1e8602239edee1d78f0ca4167544270527f))
+
 # [10.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v10.0.0-beta.2...v10.0.0-beta.3) (2026-03-11)
 
 ### Bug Fixes
