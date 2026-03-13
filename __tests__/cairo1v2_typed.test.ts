@@ -738,7 +738,7 @@ describe('Cairo 1', () => {
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
-          amount: uint256(5n * 10n ** 16n),
+          amount: uint256(5n * 10n ** 17n),
         },
       });
       await account.provider.waitForTransaction(transaction_hash);
