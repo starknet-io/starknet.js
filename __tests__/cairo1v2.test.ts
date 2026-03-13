@@ -247,7 +247,7 @@ describe('Cairo 1', () => {
       const balance = await cairo1Contract.get_balance();
       let key = starknetKeccak('balance');
       let storage = await account.provider.getStorageAt(cairo1Contract.address, key);
-      expect(BigInt(storage)).toBe(balance);
+      expect(BigInt(storage.value)).toBe(balance);
 
       // felt
       tx = await cairo1Contract.set_ca('123');
@@ -255,7 +255,7 @@ describe('Cairo 1', () => {
       const ca = await cairo1Contract.get_ca();
       key = starknetKeccak('ca');
       storage = await account.provider.getStorageAt(cairo1Contract.address, key);
-      expect(BigInt(storage)).toBe(ca);
+      expect(BigInt(storage.value)).toBe(ca);
 
       // bool
       tx = await cairo1Contract.set_status(true);
@@ -263,7 +263,7 @@ describe('Cairo 1', () => {
       const status = await cairo1Contract.get_status();
       key = starknetKeccak('status');
       storage = await account.provider.getStorageAt(cairo1Contract.address, key);
-      expect(Boolean(BigInt(storage))).toBe(status);
+      expect(Boolean(BigInt(storage.value))).toBe(status);
 
       // simple struct
       tx = await cairo1Contract.set_user1({
@@ -275,8 +275,8 @@ describe('Cairo 1', () => {
       key = starknetKeccak('user1');
       const storage1 = await account.provider.getStorageAt(cairo1Contract.address, key);
       const storage2 = await account.provider.getStorageAt(cairo1Contract.address, key + 1n);
-      expect(BigInt(storage1)).toBe(user.address);
-      expect(Boolean(BigInt(storage2))).toBe(user.is_claimed);
+      expect(BigInt(storage1.value)).toBe(user.address);
+      expect(Boolean(BigInt(storage2.value))).toBe(user.is_claimed);
 
       // TODO: Complex mapping - https://docs.starknet.io/documentation/architecture_and_concepts/Contracts/contract-storage/
     });

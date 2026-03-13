@@ -20,6 +20,8 @@ If you encounter any missing changes, please let us know and we will update this
 6. **Provider fetch() Method** - Now `async` (low impact)
 7. **Removed Global Singletons** - `defaultProvider` and `defaultPaymaster` removed, use `RpcProvider.create()` instead
 8. **ts-mixer Removed** - No longer a dependency
+9. **getStorageAt() Return Type** - Now returns `STORAGE_RESULT` object instead of `string`
+10. **Transaction proof Field** - Now `string` (base64) instead of `number[]`
 
 ### Breaking Changes Summary
 
@@ -27,11 +29,13 @@ If you encounter any missing changes, please let us know and we will update this
 | ---------------------------------------------------------------- | ---------- | -------------------------------------------------------- |
 | Account composition (`account.xyz()` → `account.provider.xyz()`) | **High**   | All provider method calls on Account must be updated     |
 | Removed `defaultProvider` and `defaultPaymaster` singletons      | **Medium** | Use `await RpcProvider.create()` or `new PaymasterRpc()` |
-| Removed `default` parameter from RPC options                     | **Low**    | Parameter was only used by removed singletons            |
+| `getStorageAt()` returns object instead of string                | **Medium** | Must use `.value` property to access FELT value          |
+| Transaction `proof` field is base64 string instead of array      | **Medium** | Encode `number[]` to base64 string when constructing tx  |
 | Compression functions now async (`await compressProgram()`)      | **Medium** | Only if using compress/decompress functions directly     |
 | Plugin class renames (`StarknetId` → `StarknetIdImpl`)           | **Medium** | Only affects direct imports of these classes             |
 | Plugin import paths (`extensions/` → `plugins/`)                 | **Medium** | Only affects direct imports                              |
 | `SimulateTransactionOverheadResponse` is now an object           | **Medium** | Must access `.simulated_transactions` for the array      |
+| Removed `default` parameter from RPC options                     | **Low**    | Parameter was only used by removed singletons            |
 | `fetch()` is now `async`                                         | **Low**    | Already returned Promise, minimal impact                 |
 | `ts-mixer` removed                                               | **Low**    | Only affects if you used it as transitive dependency     |
 | `plugins: false` disables defaults                               | **Info**   | Behavioral change, intentional opt-out                   |
@@ -477,6 +481,113 @@ If your code didn't directly use `ts-mixer`, no changes are needed. If you were 
 2. Access provider methods via `account.provider`
 3. If you depended on `ts-mixer` as a transitive dependency, add it directly to your `package.json`
 
+## Breaking Change 9: getStorageAt() Return Type
+
+### What Changed
+
+The `getStorageAt()` method now returns a `STORAGE_RESULT` object instead of a plain string.
+
+**❌ v10.0.0:**
+
+```typescript
+const value = await provider.getStorageAt(address, key);
+const felt = BigInt(value); // ✗ Error: value is now an object
+```
+
+**✅ v10.0.1+:**
+
+```typescript
+const result = await provider.getStorageAt(address, key);
+const felt = BigInt(result.value); // ✓ Access .value property
+
+// Result structure:
+// {
+//   value: string (FELT),
+//   last_update_block: number
+// }
+```
+
+### Why This Change?
+
+The RPC spec 0.10.1 now supports optional metadata with storage responses, allowing you to get the block number when the storage was last modified.
+
+### Migration Guide
+
+Replace direct usage with `.value` property access:
+
+```typescript
+// Before:
+const storage = await provider.getStorageAt(addr, key);
+const felt = BigInt(storage);
+
+// After:
+const storage = await provider.getStorageAt(addr, key);
+const felt = BigInt(storage.value);
+
+// Or destructure if you need the metadata:
+const { value, last_update_block } = await provider.getStorageAt(addr, key);
+const felt = BigInt(value);
+```
+
+## Breaking Change 10: Transaction proof Field Type
+
+**⚠️ REQUIRED CHANGE** - Proof must be base64 encoded string. TypeScript will error if you pass number[].
+
+### What Changed
+
+The `proof` field in transactions changed from `number[]` (array of numbers) to `string` (base64-encoded).
+
+**❌ v9.x (No longer works)**
+
+```typescript
+const invocation = {
+  type: 'INVOKE',
+  proof: [1, 2, 3, 4], // ✗ Type Error: number[] not assignable to string
+};
+```
+
+**✅ v10.0.1+ (Required approach)**
+
+```typescript
+import { stark } from 'starknet';
+
+// Step 1: MUST encode array to base64 before any method call
+const proofBase64 = stark.encodeProof([1, 2, 3, 4]);
+// result = "AQAAAAIAAAADAAAABAAAAAUAAAAv"
+
+// Step 2: Pass encoded string
+await account.execute(calls, {
+  proof: proofBase64, // ✓ Must be base64 string
+});
+```
+
+### Why This Change?
+
+The RPC specification now requires proofs to be encoded as base64 strings of big-endian packed u32 values for consistency with the network.
+
+### Migration Guide
+
+**Required:** Use `stark.encodeProof()` to convert number arrays to base64 before calling any Account method:
+
+```typescript
+import { stark } from 'starknet';
+
+// REQUIRED: Convert to base64
+const proofBase64 = stark.encodeProof(proofArray);
+
+// Then pass to Account methods
+await account.execute(calls, { proof: proofBase64 });
+await account.estimateInvokeFee(calls, { proof: proofBase64 });
+await account.simulateTransaction(invocations, { proof: proofBase64 });
+```
+
+**Optional:** Decode if you need to convert back
+
+```typescript
+// If needed, decode base64 back to number array
+const proofArray = stark.decodeProof(proofBase64);
+```
+
 ## Migration Checklist
 
 When upgrading from v9 to v10:
@@ -500,6 +611,15 @@ When upgrading from v9 to v10:
 - [ ] **Provider Changes:**
   - [ ] Review any code using `provider.fetch()` with `.then()` chains
   - [ ] Verify error handling still works correctly
+- [ ] **Storage Queries:**
+  - [ ] Find all `getStorageAt()` calls
+  - [ ] Update usage from `BigInt(result)` to `BigInt(result.value)`
+  - [ ] Optionally use `result.last_update_block` if you need metadata
+- [ ] **Transaction Proofs:** ⚠️ REQUIRED
+  - [ ] Find all places where `proof` is used in Account methods
+  - [ ] Convert `number[]` to base64 string using `stark.encodeProof(proofArray)`
+  - [ ] Pass the encoded string: `Account.execute({ ..., proof: encodedProofString })`
+  - [ ] TypeScript will error if proof is still a number[] array
 - [ ] **SimulateTransaction Response:**
   - [ ] Find all `getSimulateTransaction()` calls
   - [ ] Replace direct array access (e.g., `result[0]`, `result.map()`) with `result.simulated_transactions[0]`, `result.simulated_transactions.map()`

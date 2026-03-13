@@ -1,7 +1,7 @@
 export * as JRPC from './jsonrpc';
 
 export * as RPCSPEC09 from '@starknet-io/starknet-types-09';
-export * as RPCSPEC010 from '@starknet-io/starknet-types-0101';
+export * as RPCSPEC0101 from '@starknet-io/starknet-types-0101';
 
 export { PAYMASTER_API } from '@starknet-io/starknet-types-0101';
 

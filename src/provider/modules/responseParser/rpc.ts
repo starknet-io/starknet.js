@@ -12,15 +12,16 @@ import type {
   BlockWithTxHashes,
   SimulateTransactionOverheadResponse,
   EstimateFeeResponseBulkOverhead,
-} from '../../provider/types/index.type';
-import { isString } from '../typed';
-import { toOverheadOverallFee, toOverheadResourceBounds } from '../stark';
+} from '../../types/index.type';
+import { RPCSPEC0101 } from '../../../types/api';
+import { isString } from '../../../utils/typed';
+import { toOverheadOverallFee, toOverheadResourceBounds } from '../../../utils/stark';
 import { ResponseParser } from './interface';
 import {
   ApiEstimateFeeResponse,
   SimulateTransaction,
   TransactionReceipt,
-} from '../../provider/types/spec.type';
+} from '../../types/spec.type';
 // import { TransactionReceipt } from '../../types/api/merge';
 
 export class RPCResponseParser implements Omit<
@@ -83,5 +84,15 @@ export class RPCResponseParser implements Omit<
 
   public parseL1GasPriceResponse(res: BlockWithTxHashes): string {
     return res.l1_gas_price.price_in_wei;
+  }
+
+  public parseStorageResponse(
+    res: RPCSPEC0101.FELT | RPCSPEC0101.STORAGE_RESULT
+  ): RPCSPEC0101.STORAGE_RESULT {
+    // Normalize response: wrap FELT (string) in STORAGE_RESULT if needed
+    if (typeof res === 'string') {
+      return { value: res, last_update_block: 0 };
+    }
+    return res;
   }
 }

@@ -1,4 +1,4 @@
-import { RPC09, RPC010 } from '../channel';
+import { RPC09, RPC0101 } from '../channel';
 import { config } from '../global/config';
 import { SupportedRpcVersion } from '../global/constants';
 import { logger } from '../global/logger';
@@ -34,7 +34,7 @@ import {
   type TypedData,
   waitForTransactionOptions,
 } from '../types';
-import { ETransactionType, RPCSPEC010, RPCSPEC09 } from '../types/api';
+import { ETransactionType, RPCSPEC0101, RPCSPEC09 } from '../types/api';
 import assert from '../utils/assert';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { extractContractHashes, isSierra } from '../utils/contract';
@@ -43,7 +43,7 @@ import { solidityUint256PackedKeccak256 } from '../utils/hash';
 import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
-import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { RPCResponseParser } from './modules/responseParser';
 import { getTipStatsFromBlocks, TipAnalysisOptions, TipEstimate } from './modules/tip';
 import { createTransactionReceipt } from '../utils/transactionReceipt/transactionReceipt';
 import { ProviderInterface } from './interface';
@@ -63,7 +63,7 @@ import type { StarknetPlugin } from '../plugins/types';
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
 
-  public channel: RPC09.RpcChannel | RPC010.RpcChannel;
+  public channel: RPC09.RpcChannel | RPC0101.RpcChannel;
 
   /** @internal Plugin management infrastructure */
   public readonly pluginManager: PluginManager;
@@ -91,14 +91,14 @@ export class RpcProvider implements ProviderInterface {
         if (isVersion('0.9', options.specVersion)) {
           this.channel = new RPC09.RpcChannel({ ...options, waitMode: false });
         } else if (isVersion('0.10', options.specVersion)) {
-          this.channel = new RPC010.RpcChannel({ ...options, waitMode: false });
+          this.channel = new RPC0101.RpcChannel({ ...options, waitMode: false });
         } else throw new Error(`unsupported channel for spec version: ${options.specVersion}`);
       } else if (isVersion('0.9', config.get('rpcVersion'))) {
         // default channel when unspecified
         this.channel = new RPC09.RpcChannel({ ...options, waitMode: false });
       } else if (isVersion('0.10', config.get('rpcVersion'))) {
         // default channel when unspecified
-        this.channel = new RPC010.RpcChannel({ ...options, waitMode: false });
+        this.channel = new RPC0101.RpcChannel({ ...options, waitMode: false });
       } else throw new Error('unable to define spec version for channel');
 
       this.responseParser = new RPCResponseParser(options?.resourceBoundsOverhead);
@@ -137,7 +137,7 @@ export class RpcProvider implements ProviderInterface {
     if (isVersion('0.10', spec)) {
       return new this({
         ...optionsOrProvider,
-        specVersion: SupportedRpcVersion.v0_10_0,
+        specVersion: SupportedRpcVersion.v0_10_1,
       }) as T;
     }
 
@@ -232,7 +232,7 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     options?: { includeProofFacts?: boolean }
   ) {
-    if (this.channel instanceof RPC010.RpcChannel) {
+    if (this.channel instanceof RPC0101.RpcChannel) {
       return this.channel.getBlockWithTxs(blockIdentifier, options);
     }
     return this.channel.getBlockWithTxs(blockIdentifier);
@@ -310,7 +310,7 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier,
     options?: { includeProofFacts?: boolean }
   ) {
-    if (this.channel instanceof RPC010.RpcChannel) {
+    if (this.channel instanceof RPC0101.RpcChannel) {
       return this.channel.getBlockWithReceipts(blockIdentifier, options);
     }
     return this.channel.getBlockWithReceipts(blockIdentifier);
@@ -323,16 +323,22 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: 'pre_confirmed'
   ): Promise<PreConfirmedStateUpdate>;
   public async getBlockStateUpdate(blockIdentifier: 'latest'): Promise<StateUpdate>;
-  public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
-  public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier) {
-    return this.channel.getBlockStateUpdate(blockIdentifier);
+  public async getBlockStateUpdate(
+    blockIdentifier?: BlockIdentifier,
+    contractAddresses?: BigNumberish[]
+  ): Promise<StateUpdateResponse>;
+  public async getBlockStateUpdate(
+    blockIdentifier?: BlockIdentifier,
+    contractAddresses?: BigNumberish[]
+  ) {
+    return this.channel.getBlockStateUpdate(blockIdentifier, contractAddresses);
   }
 
   public async getBlockTransactionsTraces(
     blockIdentifier?: BlockIdentifier,
     options?: { returnInitialReads?: boolean }
   ) {
-    if (this.channel instanceof RPC010.RpcChannel) {
+    if (this.channel instanceof RPC0101.RpcChannel) {
       return this.channel.getBlockTransactionsTraces(blockIdentifier, options);
     }
     return this.channel.getBlockTransactionsTraces(blockIdentifier);
@@ -350,7 +356,7 @@ export class RpcProvider implements ProviderInterface {
     txHash: BigNumberish,
     options?: { includeProofFacts?: boolean }
   ) {
-    if (this.channel instanceof RPC010.RpcChannel) {
+    if (this.channel instanceof RPC0101.RpcChannel) {
       return this.channel.getTransactionByHash(txHash, options);
     }
     return this.channel.getTransactionByHash(txHash);
@@ -361,7 +367,7 @@ export class RpcProvider implements ProviderInterface {
     index: number,
     options?: { includeProofFacts?: boolean }
   ) {
-    if (this.channel instanceof RPC010.RpcChannel) {
+    if (this.channel instanceof RPC0101.RpcChannel) {
       return this.channel.getTransactionByBlockIdAndIndex(blockIdentifier, index, options);
     }
     return this.channel.getTransactionByBlockIdAndIndex(blockIdentifier, index);
@@ -376,13 +382,15 @@ export class RpcProvider implements ProviderInterface {
 
   public async getTransactionTrace<V extends SupportedRpcVersion = SupportedRpcVersion>(
     txHash: BigNumberish
-  ): Promise<V extends '0.10.0' ? RPCSPEC010.TRANSACTION_TRACE : RPCSPEC09.TRANSACTION_TRACE>;
+  ): Promise<
+    V extends '0.10.0' | '0.10.1' ? RPCSPEC0101.TRANSACTION_TRACE : RPCSPEC09.TRANSACTION_TRACE
+  >;
   public async getTransactionTrace(
     txHash: BigNumberish
-  ): Promise<RPCSPEC010.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
+  ): Promise<RPCSPEC0101.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
   public async getTransactionTrace(
     txHash: BigNumberish
-  ): Promise<RPCSPEC010.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE> {
+  ): Promise<RPCSPEC0101.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE> {
     return this.channel.getTransactionTrace(txHash);
   }
 
@@ -415,9 +423,16 @@ export class RpcProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: BigNumberish,
     key: BigNumberish,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    responseFlags?: RPCSPEC0101.STORAGE_RESPONSE_FLAG[]
   ) {
-    return this.channel.getStorageAt(contractAddress, key, blockIdentifier);
+    const result = await this.channel.getStorageAt(
+      contractAddress,
+      key,
+      blockIdentifier,
+      responseFlags
+    );
+    return this.responseParser.parseStorageResponse(result);
   }
 
   public async getClassHashAt(contractAddress: BigNumberish, blockIdentifier?: BlockIdentifier) {
@@ -557,15 +572,17 @@ export class RpcProvider implements ProviderInterface {
   public async estimateMessageFee<V extends SupportedRpcVersion = SupportedRpcVersion>(
     message: RPCSPEC09.L1Message,
     blockIdentifier?: BlockIdentifier
-  ): Promise<V extends '0.10.0' ? RPCSPEC010.FEE_ESTIMATE : RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
+  ): Promise<
+    V extends '0.10.0' | '0.10.1' ? RPCSPEC0101.FEE_ESTIMATE : RPCSPEC09.MESSAGE_FEE_ESTIMATE
+  >;
   public async estimateMessageFee(
     message: RPCSPEC09.L1Message,
     blockIdentifier?: BlockIdentifier
-  ): Promise<RPCSPEC010.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
+  ): Promise<RPCSPEC0101.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
   public async estimateMessageFee(
     message: RPCSPEC09.L1Message, // same as spec08.L1Message
     blockIdentifier?: BlockIdentifier
-  ): Promise<RPCSPEC010.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE> {
+  ): Promise<RPCSPEC0101.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE> {
     return this.channel.estimateMessageFee(message, blockIdentifier);
   }
 
@@ -574,16 +591,16 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getEvents<V extends SupportedRpcVersion = SupportedRpcVersion>(
-    eventFilter: V extends '0.10.0' ? RPCSPEC010.EventFilter : RPCSPEC09.EventFilter
-  ): Promise<V extends '0.10.0' ? RPCSPEC010.EVENTS_CHUNK : RPCSPEC09.EVENTS_CHUNK>;
+    eventFilter: V extends '0.10.0' | '0.10.1' ? RPCSPEC0101.EventFilter : RPCSPEC09.EventFilter
+  ): Promise<V extends '0.10.0' | '0.10.1' ? RPCSPEC0101.EVENTS_CHUNK : RPCSPEC09.EVENTS_CHUNK>;
   public async getEvents(
-    eventFilter: RPCSPEC010.EventFilter | RPCSPEC09.EventFilter
-  ): Promise<RPCSPEC010.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
+    eventFilter: RPCSPEC0101.EventFilter | RPCSPEC09.EventFilter
+  ): Promise<RPCSPEC0101.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
   public async getEvents(
-    eventFilter: RPCSPEC010.EventFilter | RPCSPEC09.EventFilter
-  ): Promise<RPCSPEC010.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK> {
-    if (this.channel instanceof RPC010.RpcChannel) {
-      return this.channel.getEvents(eventFilter as RPCSPEC010.EventFilter);
+    eventFilter: RPCSPEC0101.EventFilter | RPCSPEC09.EventFilter
+  ): Promise<RPCSPEC0101.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK> {
+    if (this.channel instanceof RPC0101.RpcChannel) {
+      return this.channel.getEvents(eventFilter as RPCSPEC0101.EventFilter);
     }
     if (this.channel instanceof RPC09.RpcChannel) {
       return this.channel.getEvents(eventFilter as RPCSPEC09.EventFilter);
@@ -660,14 +677,16 @@ export class RpcProvider implements ProviderInterface {
   public async getL1MessagesStatus<V extends SupportedRpcVersion = SupportedRpcVersion>(
     transactionHash: BigNumberish
   ): Promise<
-    V extends '0.10.0' ? RPC.RPCSPEC010.L1L2MessagesStatus : RPC.RPCSPEC09.L1L2MessagesStatus
+    V extends '0.10.0' | '0.10.1'
+      ? RPC.RPCSPEC0101.L1L2MessagesStatus
+      : RPC.RPCSPEC09.L1L2MessagesStatus
   >;
   public async getL1MessagesStatus(
     transactionHash: BigNumberish
-  ): Promise<RPC.RPCSPEC010.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
+  ): Promise<RPC.RPCSPEC0101.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
   public async getL1MessagesStatus(
     transactionHash: BigNumberish
-  ): Promise<RPC.RPCSPEC010.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus> {
+  ): Promise<RPC.RPCSPEC0101.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus> {
     return this.channel.getMessagesStatus(transactionHash);
   }
 

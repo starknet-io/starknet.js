@@ -180,8 +180,8 @@ export type Invocation = CallDetails & {
   signature?: Signature;
   /** Proof facts to include in the transaction (RPC 0.10.1+) */
   proofFacts?: BigNumberish[];
-  /** Proof for the transaction (RPC 0.10.1+) */
-  proof?: number[];
+  /** Proof for the transaction (RPC 0.10.1+) - base64 encoded string */
+  proof?: string;
 };
 
 export type Call = CallDetails & { entrypoint: string };
@@ -204,6 +204,10 @@ export type V3TransactionDetails = {
   accountDeploymentData: BigNumberish[];
   nonceDataAvailabilityMode: EDataAvailabilityMode;
   feeDataAvailabilityMode: EDataAvailabilityMode;
+  /** Proof facts to include in the transaction (RPC 0.10.1+) */
+  proofFacts?: BigNumberish[];
+  /** Proof for the transaction (RPC 0.10.1+) - base64 encoded string */
+  proof?: string;
 };
 
 /**
