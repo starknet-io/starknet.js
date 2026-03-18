@@ -58,6 +58,7 @@ import type {
   UniversalDetails,
   UserTransaction,
   waitForTransactionOptions,
+  RPC,
 } from '../types';
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
@@ -359,6 +360,61 @@ export class Account implements AccountInterface {
       result,
     });
 
+    return result;
+  }
+
+  public async buildExecute(
+    transactions: AllowArray<Call>,
+    transactionsDetail: UniversalDetails = {}
+  ): Promise<RPC.INVOKE_TXN_V3> {
+    // Run beforeExecute hooks
+    const hookResult = this.accountPluginManager.runAccountHook('beforeExecute', {
+      calls: transactions,
+      details: transactionsDetail,
+    });
+    const hookedTransactions: AllowArray<Call> = hookResult?.calls ?? transactions;
+    const hookedDetails: UniversalDetails = hookResult?.details ?? transactionsDetail;
+
+    const calls = [hookedTransactions].flat();
+    const detailsWithTip = await this.resolveDetailsWithTip(hookedDetails);
+
+    // Estimate resource bounds if not provided
+    const { resourceBounds: providedResourceBounds } = hookedDetails;
+    let resourceBounds = providedResourceBounds;
+    if (!resourceBounds) {
+      const estimateResponse = await this.estimateInvokeFee(calls, detailsWithTip);
+      resourceBounds = estimateResponse.resourceBounds;
+    }
+
+    const accountInvocations = await this.accountInvocationsFactory(
+      [{ type: ETransactionType.INVOKE, payload: calls }],
+      {
+        ...v3Details(detailsWithTip),
+        resourceBounds,
+        versions: [this.resolveTransactionVersion(hookedDetails.version)],
+        nonce: hookedDetails.nonce,
+        skipValidate: false,
+      }
+    );
+
+    const invocation = accountInvocations[0];
+
+    const result: RPC.INVOKE_TXN_V3 = await this.provider.channel.buildTransaction(
+      {
+        type: ETransactionType.INVOKE,
+        contractAddress: invocation.contractAddress,
+        calldata: invocation.calldata,
+        signature: invocation.signature,
+        ...(hookedDetails.proofFacts && { proofFacts: hookedDetails.proofFacts }),
+        ...(hookedDetails.proof && { proof: hookedDetails.proof }),
+
+        ...v3Details(detailsWithTip),
+        resourceBounds: invocation.resourceBounds,
+        nonce: invocation.nonce,
+        version: invocation.version,
+      },
+      'transaction'
+    );
     return result;
   }
 
