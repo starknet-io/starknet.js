@@ -1,3 +1,9 @@
+# [10.0.0-beta.5](https://github.com/starknet-io/starknet.js/compare/v10.0.0-beta.4...v10.0.0-beta.5) (2026-03-31)
+
+### Bug Fixes
+
+- types-js ([e001d7f](https://github.com/starknet-io/starknet.js/commit/e001d7f8558ebf6fdc13ef572d47dfc251191220))
+
 # [10.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v10.0.0-beta.3...v10.0.0-beta.4) (2026-03-13)
 
 ### Bug Fixes
