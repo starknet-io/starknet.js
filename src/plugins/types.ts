@@ -1,7 +1,13 @@
 import type { ProviderInterface } from '../provider/interface';
 import type { AccountInterface } from '../account/interface';
+import type { ContractInterface } from '../contract/interface';
 import type { AllowArray, Call, InvokeFunctionResponse, Signature, TypedData } from '../types';
 import type { UniversalDetails } from '../account/types/index.type';
+
+// --- Plugin overrides for default plugins ---
+
+import type { PaymasterOptions } from './paymaster/types/configuration.type';
+import type { PaymasterInterface } from './paymaster/interface';
 
 // --- Provider-level lifecycle hooks ---
 
@@ -67,6 +73,7 @@ export interface AccountHooks extends ProviderHooks {
 export interface StarknetPlugin<
   TProviderMethods extends Record<string, any> = Record<string, never>,
   TAccountMethods extends Record<string, any> = TProviderMethods,
+  TContractMethods extends Record<string, any> = Record<string, never>,
 > {
   /** Unique plugin name, used for deduplication */
   readonly name: string;
@@ -84,6 +91,13 @@ export interface StarknetPlugin<
    */
   accountExtend?(account: AccountInterface): TAccountMethods;
 
+  /**
+   * Called when the plugin is installed on a Contract connected to an Account.
+   * Returns methods to add to the contract instance.
+   * Receives both the Contract and the Account so the plugin can call account-level methods.
+   */
+  contractExtend?(contract: ContractInterface, account: AccountInterface): TContractMethods;
+
   /** Provider-level lifecycle hooks */
   hooks?: ProviderHooks;
 
@@ -91,14 +105,20 @@ export interface StarknetPlugin<
   accountHooks?: AccountHooks;
 }
 
+export interface PluginOverrides {
+  paymaster?: PaymasterOptions | PaymasterInterface | false;
+  // future configurable defaults can be added here
+}
+
 // --- Plugin configuration for constructors ---
 
 export interface PluginConfig {
   /**
    * Plugins to install.
-   * - `undefined` (default): install defaultPlugins (starknetId, brotherId)
+   * - `undefined` (default): install defaultPlugins (starknetId, brotherId, fastExecute, paymaster)
    * - explicit array: install exactly these plugins
    * - `false`: no plugins
+   * - object (PluginOverrides): start with defaultPlugins, then override specific plugins
    */
-  plugins?: StarknetPlugin<any, any>[] | false;
+  plugins?: StarknetPlugin<any, any, any>[] | false | PluginOverrides;
 }

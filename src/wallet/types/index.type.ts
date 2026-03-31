@@ -1,7 +1,6 @@
 import type { WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard/features';
-import type { PaymasterInterface } from '../../paymaster';
 import type { ProviderInterface } from '../../provider';
-import type { CairoVersion, PaymasterOptions, ProviderOptions } from '../../types';
+import type { CairoVersion, ProviderOptions } from '../../types';
 import type { RpcMessage, StarknetWindowObject } from '../../types/api';
 
 // ---- TT Request Handler
@@ -15,7 +14,6 @@ export type WalletAccountV4Options = {
   walletProvider: StarknetWalletProvider;
   address: string;
   cairoVersion?: CairoVersion;
-  paymaster?: PaymasterOptions | PaymasterInterface;
 };
 
 export type WalletAccountV5Options = {
@@ -23,5 +21,4 @@ export type WalletAccountV5Options = {
   walletProvider: WalletWithStarknetFeatures;
   address: string;
   cairoVersion?: CairoVersion;
-  paymaster?: PaymasterOptions | PaymasterInterface;
 };

@@ -1,15 +1,12 @@
 import type { OutsideCallV2, OutsideExecutionTypedDataV2 } from '../src/types/api';
-import {
-  Account,
-  OutsideExecutionVersion,
-  logger,
-  hash,
-  type Call,
-  type PaymasterDetails,
-  type Signature,
-} from '../src';
+import { Account, logger, hash, type Call, type Signature } from '../src';
+import type { PaymasterDetails } from '../src/plugins/paymaster';
 
-jest.mock('../src/paymaster/rpc');
+import { supportsInterface } from '../src/utils/src5';
+
+jest.mock('../src/utils/src5', () => ({
+  supportsInterface: jest.fn().mockResolvedValue(true),
+}));
 logger.setLogLevel('ERROR');
 
 describe('Account - Paymaster integration', () => {
@@ -19,7 +16,6 @@ describe('Account - Paymaster integration', () => {
   const mockMaliciousBuildTransactionChangeFees = jest.fn();
   const mockMaliciousBuildTransactionAddedCalls = jest.fn();
   const mockExecuteTransaction = jest.fn();
-  const mockGetSnip9Version = jest.fn();
   const mockSignMessage = jest.fn();
 
   const fakeSignature: Signature = ['0x1', '0x2'];
@@ -141,16 +137,18 @@ describe('Account - Paymaster integration', () => {
         address: '0xabc',
         signer: { signMessage: mockSignMessage.mockResolvedValue(fakeSignature) } as any,
       });
-      // account object is instanciate in the constructor, we need to mock the paymaster methods after paymaster object is instanciate
-      account.paymaster.buildTransaction = mockBuildTransaction;
-      account.paymaster.executeTransaction = mockExecuteTransaction;
+      // The paymaster is a plugin; access it via account.paymaster property
+      const pm = account.paymaster;
+      pm.buildTransaction = mockBuildTransaction;
+      pm.executeTransaction = mockExecuteTransaction;
     }
     return account;
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(getAccount(), 'getSnip9Version').mockImplementation(mockGetSnip9Version);
+    // Re-mock supportsInterface after clearAllMocks
+    (supportsInterface as jest.Mock).mockResolvedValue(true);
     mockBuildTransaction.mockResolvedValue(paymasterResponse);
     mockMaliciousBuildTransactionChangeToken.mockResolvedValue(
       maliciousPaymasterResponseChangeToken
@@ -158,7 +156,6 @@ describe('Account - Paymaster integration', () => {
     mockMaliciousBuildTransactionChangeFees.mockResolvedValue(maliciousPaymasterResponseChangeFees);
     mockMaliciousBuildTransactionAddedCalls.mockResolvedValue(maliciousPaymasterResponseAddedCalls);
     mockExecuteTransaction.mockResolvedValue({ transaction_hash: '0x123' });
-    mockGetSnip9Version.mockResolvedValue(OutsideExecutionVersion.V2);
   });
 
   describe('estimatePaymasterTransactionFee', () => {

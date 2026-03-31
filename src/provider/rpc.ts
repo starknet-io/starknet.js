@@ -57,7 +57,7 @@ import type {
 import { verifyMessageInStarknet } from './modules/verifyMessageInStarknet';
 import { getGasPrices } from './modules';
 import { PluginManager } from '../plugins/manager';
-import { defaultPlugins } from '../plugins/defaults';
+import { resolvePlugins } from '../plugins/defaults';
 import type { StarknetPlugin } from '../plugins/types';
 
 export class RpcProvider implements ProviderInterface {
@@ -104,7 +104,7 @@ export class RpcProvider implements ProviderInterface {
       this.responseParser = new RPCResponseParser(options?.resourceBoundsOverhead);
 
       // Install plugins
-      const plugins = options?.plugins === false ? [] : (options?.plugins ?? defaultPlugins);
+      const plugins = resolvePlugins(options?.plugins);
       plugins.forEach((plugin) => {
         this.pluginManager.installOnProvider(plugin, this);
       });

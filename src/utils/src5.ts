@@ -1,11 +1,11 @@
-import { RpcProvider } from '../provider';
+import type { ProviderInterface } from '../provider/interface';
 import type { BigNumberish } from '../types';
 import { toHex } from './num';
 
 /**
  * Implementation of ERC165 introspection.
  * Verify if a contract has implemented some standard functionalities.
- * @param {RpcProvider} provider the provider to access to Starknet.
+ * @param {ProviderInterface} provider the provider to access to Starknet.
  * @param {BigNumberish} contractAddress the address of the contract to check.
  * @param {BigNumberish} interfaceId the hash of the functionality to check.
  * @returns {boolean} true if the interfaceId is implemented in this contract.
@@ -17,7 +17,7 @@ import { toHex } from './num';
  * ```
  */
 export async function supportsInterface(
-  provider: RpcProvider,
+  provider: ProviderInterface,
   contractAddress: BigNumberish,
   interfaceId: BigNumberish
 ): Promise<boolean> {

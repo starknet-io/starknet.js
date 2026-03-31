@@ -27,8 +27,6 @@ import {
   watchAsset,
 } from './connect';
 import type { StarknetWalletProvider, WalletAccountV4Options } from './types/index.type';
-import type { PaymasterOptions } from '../paymaster/types/index.type';
-import type { PaymasterInterface } from '../paymaster';
 import {
   AccountChangeEventHandler,
   NetworkChangeEventHandler,
@@ -160,7 +158,6 @@ export class WalletAccount extends Account {
     provider: ProviderOptions | ProviderInterface,
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion,
-    paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
@@ -169,17 +166,15 @@ export class WalletAccount extends Account {
       walletProvider,
       address: accountAddress,
       cairoVersion,
-      paymaster,
     });
   }
 
   static async connectSilent(
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion,
-    paymaster?: PaymasterOptions | PaymasterInterface
+    cairoVersion?: CairoVersion
   ) {
-    return WalletAccount.connect(provider, walletProvider, cairoVersion, paymaster, true);
+    return WalletAccount.connect(provider, walletProvider, cairoVersion, true);
   }
 
   // TODO: MISSING ESTIMATES

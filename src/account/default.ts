@@ -35,8 +35,6 @@ import type {
   DeployTransactionReceiptResponse,
   EstimateFeeResponseOverhead,
   EstimateFeeBulk,
-  ExecutableUserTransaction,
-  ExecutionParameters,
   Invocation,
   Invocations,
   InvocationsDetailsWithNonce,
@@ -47,16 +45,12 @@ import type {
   OutsideExecution,
   OutsideExecutionOptions,
   OutsideTransaction,
-  PaymasterDetails,
-  PaymasterFeeEstimate,
-  PreparedTransaction,
   Signature,
   SimulateTransactionDetails,
   SimulateTransactionOverheadResponse,
   TypedData,
   UniversalDeployerContractPayload,
   UniversalDetails,
-  UserTransaction,
   waitForTransactionOptions,
 } from '../types';
 import { ETransactionType } from '../types/api';
@@ -74,7 +68,6 @@ import { supportsInterface } from '../utils/src5';
 import {
   randomAddress,
   resourceBoundsToEstimateFeeResponse,
-  signatureToHexArray,
   toFeeVersion,
   toTransactionVersion,
   v3Details,
@@ -83,13 +76,11 @@ import { getExecuteCalldata } from '../utils/transaction/transaction';
 import { isString, isUndefined } from '../utils/typed';
 import { getMessageHash } from '../utils/typedData';
 import { type AccountInterface } from './interface';
-import { type PaymasterInterface, PaymasterRpc } from '../paymaster';
-import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
 import { defaultDeployer, Deployer } from '../deployer';
 import type { TipType } from '../provider/modules/tip';
 import { PluginManager } from '../plugins/manager';
-import { defaultPlugins } from '../plugins/defaults';
+import { resolvePlugins } from '../plugins/defaults';
 
 export class Account implements AccountInterface {
   public provider: Provider;
@@ -102,8 +93,6 @@ export class Account implements AccountInterface {
 
   readonly transactionVersion: typeof ETransactionVersion.V3;
 
-  public paymaster: PaymasterInterface;
-
   public deployer: Deployer;
 
   public defaultTipType: TipType;
@@ -112,15 +101,7 @@ export class Account implements AccountInterface {
   public readonly accountPluginManager: PluginManager;
 
   constructor(options: AccountOptions) {
-    const {
-      provider,
-      address,
-      signer,
-      cairoVersion,
-      transactionVersion,
-      paymaster,
-      defaultTipType,
-    } = options;
+    const { provider, address, signer, cairoVersion, transactionVersion, defaultTipType } = options;
     this.provider = provider instanceof Provider ? provider : new Provider(provider);
     this.address = address.toLowerCase();
     this.signer = isString(signer) || signer instanceof Uint8Array ? new Signer(signer) : signer;
@@ -129,13 +110,12 @@ export class Account implements AccountInterface {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
-    this.paymaster = paymaster ? new PaymasterRpc(paymaster) : new PaymasterRpc();
     this.deployer = options.deployer ?? defaultDeployer;
     this.defaultTipType = defaultTipType ?? config.get('defaultTipType');
 
     // Initialize account-level plugin manager and install plugins
     this.accountPluginManager = new PluginManager();
-    const plugins = options.plugins === false ? [] : (options.plugins ?? defaultPlugins);
+    const plugins = resolvePlugins(options.plugins);
     plugins.forEach((plugin) => {
       this.accountPluginManager.installOnAccount(plugin, this);
     });
@@ -953,127 +933,5 @@ export class Account implements AccountInterface {
         throw Error(`accountInvocationsFactory: unsupported transaction type: ${transaction}`);
       })
     ) as Promise<AccountInvocations>;
-  }
-
-  /*
-   * SNIP-29 Paymaster
-   */
-
-  public async buildPaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails
-  ): Promise<PreparedTransaction> {
-    // If the account isn't deployed, we can't call the supportsInterface function to know if the account is compatible with SNIP-9
-    if (!paymasterDetails.deploymentData) {
-      const snip9Version = await this.getSnip9Version();
-      if (snip9Version === OutsideExecutionVersion.UNSUPPORTED) {
-        throw Error('Account is not compatible with SNIP-9');
-      }
-    }
-    const parameters: ExecutionParameters = {
-      version: '0x1',
-      feeMode: paymasterDetails.feeMode,
-      timeBounds: paymasterDetails.timeBounds,
-    };
-    let transaction: UserTransaction;
-    if (paymasterDetails.deploymentData) {
-      if (calls.length > 0) {
-        transaction = {
-          type: 'deploy_and_invoke',
-          invoke: { userAddress: this.address, calls },
-          deployment: paymasterDetails.deploymentData,
-        };
-      } else {
-        transaction = {
-          type: 'deploy',
-          deployment: paymasterDetails.deploymentData,
-        };
-      }
-    } else {
-      transaction = {
-        type: 'invoke',
-        invoke: { userAddress: this.address, calls },
-      };
-    }
-    return this.paymaster.buildTransaction(transaction, parameters);
-  }
-
-  public async estimatePaymasterTransactionFee(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails
-  ): Promise<PaymasterFeeEstimate> {
-    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
-    return preparedTransaction.fee;
-  }
-
-  public async preparePaymasterTransaction(
-    preparedTransaction: PreparedTransaction
-  ): Promise<ExecutableUserTransaction> {
-    let transaction: ExecutableUserTransaction;
-    switch (preparedTransaction.type) {
-      case 'deploy_and_invoke': {
-        const signature = await this.signMessage(preparedTransaction.typed_data);
-        transaction = {
-          type: 'deploy_and_invoke',
-          invoke: {
-            userAddress: this.address,
-            typedData: preparedTransaction.typed_data,
-            signature: signatureToHexArray(signature),
-          },
-          deployment: preparedTransaction.deployment,
-        };
-        break;
-      }
-      case 'invoke': {
-        const signature = await this.signMessage(preparedTransaction.typed_data);
-        transaction = {
-          type: 'invoke',
-          invoke: {
-            userAddress: this.address,
-            typedData: preparedTransaction.typed_data,
-            signature: signatureToHexArray(signature),
-          },
-        };
-        break;
-      }
-      case 'deploy': {
-        transaction = {
-          type: 'deploy',
-          deployment: preparedTransaction.deployment,
-        };
-        break;
-      }
-      default:
-        throw Error('Invalid transaction type');
-    }
-    return transaction;
-  }
-
-  public async executePaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails,
-    maxFeeInGasToken?: BigNumberish
-  ): Promise<InvokeFunctionResponse> {
-    // Build the transaction
-    const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
-
-    // Check the transaction is safe
-    // Check gas fee value & gas token address
-    // Check that provided calls and builded calls are strictly equal
-    assertPaymasterTransactionSafety(
-      preparedTransaction,
-      calls,
-      paymasterDetails,
-      maxFeeInGasToken
-    );
-
-    // Prepare the transaction, tx is safe here
-    const transaction: ExecutableUserTransaction =
-      await this.preparePaymasterTransaction(preparedTransaction);
-
-    // Execute the transaction
-    return this.paymaster
-      .executeTransaction(transaction, preparedTransaction.parameters)
-      .then((response) => ({ transaction_hash: response.transaction_hash }));
   }
 }

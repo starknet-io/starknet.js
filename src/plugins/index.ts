@@ -1,7 +1,13 @@
 // Core plugin framework
 import './augmentations';
 
-export type { StarknetPlugin, ProviderHooks, AccountHooks, PluginConfig } from './types';
+export type {
+  StarknetPlugin,
+  ProviderHooks,
+  AccountHooks,
+  PluginConfig,
+  PluginOverrides,
+} from './types';
 export { PluginManager } from './manager';
 
 // Plugin implementations
@@ -24,6 +30,14 @@ export {
   type FastExecuteProviderMethods,
   type FastExecuteAccountMethods,
 } from './fast-execute';
+export {
+  paymaster as paymasterPlugin,
+  PaymasterInterface,
+  PaymasterRpc,
+  type PaymasterAccountMethods,
+  type PaymasterContractMethods,
+} from './paymaster';
+export * as paymasterUtils from './paymaster/utils';
 
-// Default plugins and augmentations
-export { defaultPlugins } from './defaults';
+// Default plugins and resolution
+export { defaultPlugins, resolvePlugins } from './defaults';
