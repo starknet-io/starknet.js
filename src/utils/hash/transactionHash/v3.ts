@@ -185,6 +185,8 @@ export function calculateInvokeTransactionHash(
   paymasterData: BigNumberish[],
   proofFacts?: BigNumberish[]
 ): string {
+  const proofFactsAdditionalData = proofFacts?.length ? [poseidonHashMany(AToBI(proofFacts))] : [];
+
   return calculateTransactionHashCommon(
     TransactionHashPrefix.INVOKE,
     version,
@@ -199,7 +201,7 @@ export function calculateInvokeTransactionHash(
     [
       poseidonHashMany(AToBI(accountDeploymentData)),
       poseidonHashMany(AToBI(compiledCalldata)),
-      ...(proofFacts ? AToBI(proofFacts) : []),
+      ...proofFactsAdditionalData,
     ]
   );
 }
