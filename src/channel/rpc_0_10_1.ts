@@ -669,6 +669,13 @@ export class RpcChannel {
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
 
+  public async invokeSignedTx(transaction: RPC.INVOKE_TXN_V3) {
+    const promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
+      invoke_transaction: transaction,
+    });
+    return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
+  }
+
   public async declare(
     declareTransaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce

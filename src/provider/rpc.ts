@@ -551,6 +551,35 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.invoke(functionInvocation, details) as Promise<InvokedTransaction>;
   }
 
+  /**
+   * Submit a pre-signed INVOKE_TXN_V3 transaction to the network.
+   *
+   * Broadcasts a transaction previously built and signed by `Account.getSignedTransaction()`.
+   * Fees are already included in the signed transaction and will not be re-estimated.
+   *
+   * @param transaction - A fully signed `RPC.INVOKE_TXN_V3` object, as returned by `Account.getSignedTransaction()`
+   *
+   * @returns The transaction hash if `waitMode` is disabled (default), or the transaction receipt if `waitMode` is enabled.
+   *
+   * @remarks
+   * - The transaction must be signed before calling this method ; use `Account.getSignedTransaction()` to produce it.
+   * - Resubmitting the same signed transaction (same nonce) will be rejected by the network.
+   * - If `waitMode` is enabled on the provider, this method waits for the transaction to be included in a block before returning.
+   *
+   * @example
+   * ```typescript
+   * const signedTx = await account.getSignedTransaction([
+   *   { contractAddress: erc20Address, entrypoint: 'transfer', calldata: [recipient, amount, 0] }
+   * ]);
+   * // inspect or store signedTx, then submit when ready:
+   * const { transaction_hash } = await provider.invokeSignedTx(signedTx);
+   * await provider.waitForTransaction(transaction_hash);
+   * ```
+   */
+  public async invokeSignedTx(transaction: RPC.INVOKE_TXN_V3) {
+    return this.channel.invokeSignedTx(transaction) as Promise<InvokedTransaction>;
+  }
+
   public async declareContract(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
