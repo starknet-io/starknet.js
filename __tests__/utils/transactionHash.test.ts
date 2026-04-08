@@ -1,3 +1,5 @@
+import { poseidonHashMany } from '@scure/starknet';
+
 import { constants, hash, v2hash, v3hash } from '../../src';
 import { EDAMode } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
@@ -66,6 +68,29 @@ describe('TxV3 Invoke proofFacts Hash Tests', () => {
       proofFacts: ['0x2', '0x1'],
     });
     expect(hashWithProof2).not.toBe(hashWithProof1);
+  });
+
+  test('proofFacts are hashed as one additional poseidon element', () => {
+    const result = hash.calculateInvokeTransactionHash({
+      ...baseArgs,
+      proofFacts: ['0x1', '0x2'],
+    });
+
+    const expected = v3hash.calculateTransactionHashCommon(
+      constants.TransactionHashPrefix.INVOKE,
+      baseArgs.version,
+      baseArgs.senderAddress,
+      baseArgs.chainId,
+      baseArgs.nonce,
+      baseArgs.tip,
+      baseArgs.paymasterData,
+      baseArgs.nonceDataAvailabilityMode,
+      baseArgs.feeDataAvailabilityMode,
+      baseArgs.resourceBounds,
+      [poseidonHashMany([]), poseidonHashMany([0x11n, 0x26n]), poseidonHashMany([0x1n, 0x2n])]
+    );
+
+    expect(result).toBe(expected);
   });
 });
 
