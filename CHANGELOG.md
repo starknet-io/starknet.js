@@ -1,3 +1,15 @@
+# [10.0.0-beta.6](https://github.com/starknet-io/starknet.js/compare/v10.0.0-beta.5...v10.0.0-beta.6) (2026-04-08)
+
+### Bug Fixes
+
+- **hash:** fold invoke proofFacts into one poseidon element ([bd79872](https://github.com/starknet-io/starknet.js/commit/bd798723fa0dc06ffbdec27c26550c01f30b5634))
+
+# [10.0.0-beta.5](https://github.com/starknet-io/starknet.js/compare/v10.0.0-beta.4...v10.0.0-beta.5) (2026-03-31)
+
+### Bug Fixes
+
+- types-js ([e001d7f](https://github.com/starknet-io/starknet.js/commit/e001d7f8558ebf6fdc13ef572d47dfc251191220))
+
 # [10.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v10.0.0-beta.3...v10.0.0-beta.4) (2026-03-13)
 
 ### Bug Fixes
