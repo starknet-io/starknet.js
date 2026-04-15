@@ -51,12 +51,12 @@ import { logger } from '../global/logger';
 import { config } from '../global/config';
 
 export class RpcChannel {
-  readonly id = 'RPC0.10.1';
+  readonly id = 'RPC0.10.2';
 
   /**
    * RPC specification version this Channel class implements
    */
-  readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_10_1;
+  readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_10_2;
 
   public nodeUrl: string;
 
