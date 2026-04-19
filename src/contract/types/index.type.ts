@@ -85,7 +85,7 @@ export type ContractOptions = {
   /**
    * Connect account to read and write methods
    * Connect provider to read methods
-   * @default defaultProvider
+   * @default creates a new RpcProvider if not provided
    */
   providerOrAccount?: ProviderOrAccount;
 

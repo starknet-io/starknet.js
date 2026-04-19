@@ -1,4 +1,4 @@
-import { Account, AccountInterface } from '../account';
+import { Account } from '../account';
 import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
 import type {
@@ -38,7 +38,7 @@ import {
 } from '../types/api';
 
 // Represent 'Selected Active' Account inside Connected Wallet
-export class WalletAccount extends Account implements AccountInterface {
+export class WalletAccount extends Account {
   public walletProvider: StarknetWalletProvider;
 
   constructor(options: WalletAccountV4Options) {
@@ -56,7 +56,7 @@ export class WalletAccount extends Account implements AccountInterface {
       if (!res) return;
       // Determine is it better to set chainId or replace channel with new one
       // At the moment channel is stateless but it could change
-      this.channel.setChainId(res as StarknetChainId);
+      this.provider.channel.setChainId(res as StarknetChainId);
     });
   }
 
@@ -117,7 +117,7 @@ export class WalletAccount extends Account implements AccountInterface {
   override async declare(payload: DeclareContractPayload) {
     const declareContractPayload = extractContractHashes(
       payload,
-      await this.channel.getStarknetVersion()
+      await this.provider.channel.getStarknetVersion()
     );
 
     // DISCUSS: HOTFIX: Adapt Abi format

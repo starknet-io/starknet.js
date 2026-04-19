@@ -1,4 +1,4 @@
-import { RPC09, RPC010 } from '../channel';
+import { RPC09, RPC0101 } from '../channel';
 import { StarknetChainId } from '../global/constants';
 import type {
   AccountInvocations,
@@ -27,7 +27,6 @@ import type {
   PreConfirmedStateUpdate,
   StateUpdate,
   StateUpdateResponse,
-  Storage,
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
@@ -38,13 +37,14 @@ import type {
   Invocations,
   Signature,
   TypedData,
+  StorageResponse,
 } from '../types';
 import { TipAnalysisOptions, TipEstimate } from './modules/tip';
-import { RPCSPEC09, RPCSPEC010 } from '../types/api';
-import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { RPCSPEC09, RPCSPEC0101 } from '../types/api';
+import { RPCResponseParser } from './modules/responseParser';
 
 export abstract class ProviderInterface {
-  public abstract channel: RPC09.RpcChannel | RPC010.RpcChannel;
+  public abstract channel: RPC09.RpcChannel | RPC0101.RpcChannel;
 
   public abstract responseParser: RPCResponseParser;
 
@@ -152,16 +152,22 @@ export abstract class ProviderInterface {
   public abstract getStorageAt(
     contractAddress: BigNumberish,
     key: BigNumberish,
-    blockIdentifier?: BlockIdentifier
-  ): Promise<Storage>;
+    blockIdentifier?: BlockIdentifier,
+    responseFlags?: RPCSPEC0101.STORAGE_RESPONSE_FLAG[]
+  ): Promise<StorageResponse>;
 
   /**
    * Gets the transaction information from a tx id.
    *
    * @param transactionHash
+   * @param options - (optional) additional request options
+   *  - includeProofFacts - include proof facts in the transaction response (RPC 0.10.1+)
    * @returns the transaction object \{ transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? \}
    */
-  public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
+  public abstract getTransaction(
+    transactionHash: BigNumberish,
+    options?: { includeProofFacts?: boolean }
+  ): Promise<GetTransactionResponse>;
 
   /**
    * Gets the transaction receipt from a tx hash.
@@ -348,6 +354,7 @@ export abstract class ProviderInterface {
    *  - (optional) blockIdentifier - block identifier
    *  - (optional) skipValidate - skip cairo __validate__ method
    *  - (optional) skipExecute - skip cairo __execute__ method
+   *  - (optional) returnInitialReads - include initial storage reads in the trace response (RPC 0.10.1+)
    * @returns an array of transaction trace and estimated fee
    */
   public abstract getSimulateTransaction(
@@ -361,7 +368,10 @@ export abstract class ProviderInterface {
    * @param blockIdentifier - block identifier
    * @returns StateUpdateResponse
    */
-  public abstract getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
+  public abstract getStateUpdate(
+    blockIdentifier?: BlockIdentifier,
+    contractAddresses?: BigNumberish[]
+  ): Promise<StateUpdateResponse>;
 
   /**
    * Gets the state changes in a specific block (result of executing the requested block)
@@ -429,23 +439,38 @@ export abstract class ProviderInterface {
   /**
    * Get block information with full transactions
    * @param blockIdentifier - block identifier
+   * @param options - (optional) additional request options
+   *  - includeProofFacts - include proof facts in the transaction response (RPC 0.10.1+)
    * @returns Block with full transactions
    */
-  public abstract getBlockWithTxs(blockIdentifier?: BlockIdentifier): Promise<any>;
+  public abstract getBlockWithTxs(
+    blockIdentifier?: BlockIdentifier,
+    options?: { includeProofFacts?: boolean }
+  ): Promise<any>;
 
   /**
    * Get block information with transaction receipts
    * @param blockIdentifier - block identifier
+   * @param options - (optional) additional request options
+   *  - includeProofFacts - include proof facts in the transaction response (RPC 0.10.1+)
    * @returns Block with transaction receipts
    */
-  public abstract getBlockWithReceipts(blockIdentifier?: BlockIdentifier): Promise<any>;
+  public abstract getBlockWithReceipts(
+    blockIdentifier?: BlockIdentifier,
+    options?: { includeProofFacts?: boolean }
+  ): Promise<any>;
 
   /**
    * Get transaction traces for all transactions in a block
    * @param blockIdentifier - block identifier
+   * @param options - (optional) additional request options
+   *  - returnInitialReads - include initial storage reads in the trace response (RPC 0.10.1+)
    * @returns Array of transaction traces
    */
-  public abstract getBlockTransactionsTraces(blockIdentifier?: BlockIdentifier): Promise<any>;
+  public abstract getBlockTransactionsTraces(
+    blockIdentifier?: BlockIdentifier,
+    options?: { returnInitialReads?: boolean }
+  ): Promise<any>;
 
   /**
    * Get the number of transactions in a block
@@ -473,19 +498,27 @@ export abstract class ProviderInterface {
   /**
    * Gets the transaction information from a tx hash (alias for getTransaction)
    * @param txHash - transaction hash
+   * @param options - (optional) additional request options
+   *  - includeProofFacts - include proof facts in the transaction response (RPC 0.10.1+)
    * @returns Transaction information
    */
-  public abstract getTransactionByHash(txHash: BigNumberish): Promise<GetTransactionResponse>;
+  public abstract getTransactionByHash(
+    txHash: BigNumberish,
+    options?: { includeProofFacts?: boolean }
+  ): Promise<GetTransactionResponse>;
 
   /**
    * Gets transaction by block identifier and index
    * @param blockIdentifier - block identifier
    * @param index - transaction index in the block
+   * @param options - (optional) additional request options
+   *  - includeProofFacts - include proof facts in the transaction response (RPC 0.10.1+)
    * @returns Transaction information
    */
   public abstract getTransactionByBlockIdAndIndex(
     blockIdentifier: BlockIdentifier,
-    index: number
+    index: number,
+    options?: { includeProofFacts?: boolean }
   ): Promise<GetTransactionResponse>;
 
   /**
@@ -495,7 +528,7 @@ export abstract class ProviderInterface {
    */
   public abstract getTransactionTrace(
     txHash: BigNumberish
-  ): Promise<RPCSPEC010.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
+  ): Promise<RPCSPEC0101.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
 
   /**
    * Get the status of a transaction
@@ -553,7 +586,7 @@ export abstract class ProviderInterface {
   public abstract estimateMessageFee(
     message: RPCSPEC09.L1Message,
     blockIdentifier?: BlockIdentifier
-  ): Promise<RPCSPEC010.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
+  ): Promise<RPCSPEC0101.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
 
   /**
    * Get node synchronization status
@@ -567,8 +600,8 @@ export abstract class ProviderInterface {
    * @returns Events and pagination info
    */
   public abstract getEvents(
-    eventFilter: RPCSPEC010.EventFilter | RPCSPEC09.EventFilter
-  ): Promise<RPCSPEC010.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
+    eventFilter: RPCSPEC0101.EventFilter | RPCSPEC09.EventFilter
+  ): Promise<RPCSPEC0101.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
 
   /**
    * Verify in Starknet a signature of a TypedData object or of a given hash.
@@ -625,7 +658,7 @@ export abstract class ProviderInterface {
    */
   public abstract getL1MessagesStatus(
     transactionHash: BigNumberish
-  ): Promise<RPC.RPCSPEC010.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
+  ): Promise<RPC.RPCSPEC0101.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
 
   /**
    * Get Merkle paths in state tries

@@ -9,12 +9,13 @@ import {
   IsSucceeded,
   IsType,
   PRE_CONFIRMED_BLOCK_WITH_TX_HASHES,
+  RPCSPEC0101,
   TransactionReceipt,
 } from '../../types/api';
 
 import { CompiledSierra, LegacyContractClass } from '../../types/lib';
 import {
-  FELT,
+  INITIAL_READS,
   PRICE_UNIT,
   SIMULATION_FLAG,
   STATE_UPDATE,
@@ -61,7 +62,7 @@ export type DeclareContractResponse = DeclaredTransaction;
 
 export type CallContractResponse = string[];
 
-export type Storage = FELT;
+export type StorageResponse = RPCSPEC0101.STORAGE_RESULT;
 
 export type Nonce = string;
 
@@ -72,7 +73,10 @@ export type SimulateTransactionOverhead = {
   transaction_trace: TransactionTrace;
 } & EstimateFeeResponseOverhead;
 
-export type SimulateTransactionOverheadResponse = SimulateTransactionOverhead[];
+export type SimulateTransactionOverheadResponse = {
+  simulated_transactions: SimulateTransactionOverhead[];
+  initial_reads?: INITIAL_READS;
+};
 
 export type PreConfirmedStateUpdate = PRE_CONFIRMED_STATE_UPDATE;
 export type StateUpdate = STATE_UPDATE;

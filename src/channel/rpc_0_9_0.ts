@@ -9,7 +9,6 @@ import {
   AccountInvocations,
   BigNumberish,
   BlockIdentifier,
-  BlockTag,
   Call,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -21,7 +20,6 @@ import {
   RPC_ERROR,
   RpcProviderOptions,
   waitForTransactionOptions,
-  type fastWaitForTransactionOptions,
 } from '../types';
 import assert from '../utils/assert';
 import { ETransactionType, JRPC, RPCSPEC09 as RPC } from '../types/api';
@@ -100,19 +98,11 @@ export class RpcChannel {
       waitMode,
     } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
-      this.nodeUrl = getDefaultNodeUrl(
-        nodeUrl as NetworkName,
-        optionsOrProvider?.default,
-        this.channelSpecVersion
-      );
+      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, this.channelSpecVersion);
     } else if (nodeUrl) {
       this.nodeUrl = nodeUrl;
     } else {
-      this.nodeUrl = getDefaultNodeUrl(
-        undefined,
-        optionsOrProvider?.default,
-        this.channelSpecVersion
-      );
+      this.nodeUrl = getDefaultNodeUrl(undefined, this.channelSpecVersion);
     }
     const channelDefaults = config.get('channelDefaults');
     this.baseFetch = baseFetch || config.get('fetch') || fetch;
@@ -386,7 +376,7 @@ export class RpcChannel {
    * - skipValidate (default true)<br/>
    * - skipFeeCharge (default true)<br/>
    */
-  public simulateTransaction(
+  public async simulateTransaction(
     invocations: AccountInvocations,
     simulateTransactionOptions: getSimulateTransactionOptions = {}
   ) {
@@ -404,7 +394,7 @@ export class RpcChannel {
 
     return this.fetchEndpoint('starknet_simulateTransactions', {
       block_id,
-      transactions: invocations.map((it) => this.buildTransaction(it)),
+      transactions: await Promise.all(invocations.map((it) => this.buildTransaction(it))),
       simulation_flags: simulationFlags,
     });
   }
@@ -503,60 +493,6 @@ export class RpcChannel {
     return txReceipt as RPC.TXN_RECEIPT;
   }
 
-  public async fastWaitForTransaction(
-    txHash: BigNumberish,
-    address: string,
-    initNonceBN: BigNumberish,
-    options?: fastWaitForTransactionOptions
-  ): Promise<boolean> {
-    const initNonce = BigInt(initNonceBN);
-    let retries = options?.retries ?? 50;
-    const retryInterval = options?.retryInterval ?? 500; // 0.5s
-    const errorStates: string[] = [RPC.ETransactionExecutionStatus.REVERTED];
-    const successStates: string[] = [
-      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
-      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
-      RPC.ETransactionFinalityStatus.PRE_CONFIRMED,
-    ];
-    let txStatus: RPC.TransactionStatus;
-    const start = new Date().getTime();
-    while (retries > 0) {
-      // eslint-disable-next-line no-await-in-loop
-      await wait(retryInterval);
-
-      // eslint-disable-next-line no-await-in-loop
-      txStatus = await this.getTransactionStatus(txHash);
-      logger.info(
-        `${retries} ${JSON.stringify(txStatus)} ${(new Date().getTime() - start) / 1000}s.`
-      );
-      const executionStatus = txStatus.execution_status ?? '';
-      const finalityStatus = txStatus.finality_status;
-      if (errorStates.includes(executionStatus)) {
-        const message = `${executionStatus}: ${finalityStatus}`;
-        const error = new Error(message) as Error & { response: RPC.TransactionStatus };
-        error.response = txStatus;
-        throw error;
-      } else if (successStates.includes(finalityStatus)) {
-        let currentNonce = initNonce;
-        while (currentNonce === initNonce && retries > 0) {
-          // eslint-disable-next-line no-await-in-loop
-          currentNonce = BigInt(await this.getNonceForAddress(address, BlockTag.PRE_CONFIRMED));
-          logger.info(
-            `${retries} Checking new nonce ${currentNonce} ${(new Date().getTime() - start) / 1000}s.`
-          );
-          if (currentNonce !== initNonce) return true;
-          // eslint-disable-next-line no-await-in-loop
-          await wait(retryInterval);
-          retries -= 1;
-        }
-        return false;
-      }
-
-      retries -= 1;
-    }
-    return false;
-  }
-
   public getStorageAt(
     contractAddress: BigNumberish,
     key: BigNumberish,
@@ -624,14 +560,14 @@ export class RpcChannel {
     };
 
     return this.fetchEndpoint('starknet_estimateFee', {
-      request: invocations.map((it) => this.buildTransaction(it, 'fee')),
+      request: await Promise.all(invocations.map((it) => this.buildTransaction(it, 'fee'))),
       block_id,
       ...flags,
     });
   }
 
   public async invoke(functionInvocation: Invocation, details: InvocationsDetailsWithNonce) {
-    const transaction = this.buildTransaction(
+    const transaction = await this.buildTransaction(
       {
         type: ETransactionType.INVOKE,
         ...functionInvocation,
@@ -651,7 +587,7 @@ export class RpcChannel {
     declareTransaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    const transaction = this.buildTransaction(
+    const transaction = await this.buildTransaction(
       {
         type: ETransactionType.DECLARE,
         ...declareTransaction,
@@ -671,7 +607,7 @@ export class RpcChannel {
     deployAccountTransaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    const transaction = this.buildTransaction(
+    const transaction = await this.buildTransaction(
       {
         type: ETransactionType.DEPLOY_ACCOUNT,
         ...deployAccountTransaction,
@@ -739,16 +675,18 @@ export class RpcChannel {
   }
 
   // Generic buildTransaction that automatically narrows return type based on input
-  public buildTransaction<T extends AccountInvocationItem>(
+  public async buildTransaction<T extends AccountInvocationItem>(
     invocation: T,
     versionType?: 'fee' | 'transaction'
-  ): T extends { type: typeof ETransactionType.INVOKE }
-    ? RPC.INVOKE_TXN_V3
-    : T extends { type: typeof ETransactionType.DECLARE }
-      ? RPC.BROADCASTED_DECLARE_TXN_V3
-      : T extends { type: typeof ETransactionType.DEPLOY_ACCOUNT }
-        ? RPC.DEPLOY_ACCOUNT_TXN_V3
-        : never {
+  ): Promise<
+    T extends { type: typeof ETransactionType.INVOKE }
+      ? RPC.INVOKE_TXN_V3
+      : T extends { type: typeof ETransactionType.DECLARE }
+        ? RPC.BROADCASTED_DECLARE_TXN_V3
+        : T extends { type: typeof ETransactionType.DEPLOY_ACCOUNT }
+          ? RPC.DEPLOY_ACCOUNT_TXN_V3
+          : never
+  > {
     const defaultVersions = getVersionsByType(versionType);
 
     // V0,V1,V2 not supported on RPC 0.9
@@ -789,7 +727,7 @@ export class RpcChannel {
         type: invocation.type,
         contract_class: {
           ...invocation.contract,
-          sierra_program: decompressProgram(invocation.contract.sierra_program),
+          sierra_program: (await decompressProgram(invocation.contract.sierra_program)) as string[],
         },
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,

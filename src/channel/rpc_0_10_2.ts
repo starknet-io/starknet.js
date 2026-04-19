@@ -9,7 +9,6 @@ import {
   AccountInvocations,
   BigNumberish,
   BlockIdentifier,
-  BlockTag,
   Call,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -21,10 +20,9 @@ import {
   RPC_ERROR,
   RpcProviderOptions,
   waitForTransactionOptions,
-  type fastWaitForTransactionOptions,
 } from '../types';
 import assert from '../utils/assert';
-import { ETransactionType, JRPC, RPCSPEC010 as RPC } from '../types/api';
+import { ETransactionType, JRPC, RPCSPEC0101 as RPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -53,12 +51,12 @@ import { logger } from '../global/logger';
 import { config } from '../global/config';
 
 export class RpcChannel {
-  readonly id = 'RPC0.10.0';
+  readonly id = 'RPC0.10.2';
 
   /**
    * RPC specification version this Channel class implements
    */
-  readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_10_0;
+  readonly channelSpecVersion: SupportedRpcVersion = SupportedRpcVersion.v0_10_2;
 
   public nodeUrl: string;
 
@@ -99,19 +97,11 @@ export class RpcChannel {
       waitMode,
     } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
-      this.nodeUrl = getDefaultNodeUrl(
-        nodeUrl as NetworkName,
-        optionsOrProvider?.default,
-        this.channelSpecVersion
-      );
+      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, this.channelSpecVersion);
     } else if (nodeUrl) {
       this.nodeUrl = nodeUrl;
     } else {
-      this.nodeUrl = getDefaultNodeUrl(
-        undefined,
-        optionsOrProvider?.default,
-        this.channelSpecVersion
-      );
+      this.nodeUrl = getDefaultNodeUrl(undefined, this.channelSpecVersion);
     }
     const channelDefaults = config.get('channelDefaults');
     this.baseFetch = baseFetch || config.get('fetch') || fetch;
@@ -224,7 +214,7 @@ export class RpcChannel {
       const unknownSpecVersion = await this.fetchEndpoint('starknet_specVersion');
 
       // check if the channel is compatible with the node
-      if (!isVersion(this.channelSpecVersion, unknownSpecVersion)) {
+      if (!isVersion('0.10', unknownSpecVersion)) {
         logger.error(SYSTEM_MESSAGES.channelVersionMismatch, {
           channelId: this.id,
           channelSpecVersion: this.channelSpecVersion,
@@ -322,24 +312,77 @@ export class RpcChannel {
     return this.fetchEndpoint('starknet_getBlockWithTxHashes', { block_id });
   }
 
-  public getBlockWithTxs(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+  /**
+   * Get block information with full transactions
+   * @param blockIdentifier - block identifier
+   * @param options - optional flags
+   *  - includeProofFacts - include proof facts in the response (RPC 0.10.1+)
+   */
+  public getBlockWithTxs(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    options?: { includeProofFacts?: boolean }
+  ) {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getBlockWithTxs', { block_id });
+    const response_flags = options?.includeProofFacts
+      ? [RPC.ETxnResponseFlag.INCLUDE_PROOF_FACTS]
+      : undefined;
+    return this.fetchEndpoint('starknet_getBlockWithTxs', {
+      block_id,
+      ...(response_flags && { response_flags }),
+    });
   }
 
-  public getBlockWithReceipts(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+  /**
+   * Get block information with transaction receipts
+   * @param blockIdentifier - block identifier
+   * @param options - optional flags
+   *  - includeProofFacts - include proof facts in the response (RPC 0.10.1+)
+   */
+  public getBlockWithReceipts(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    options?: { includeProofFacts?: boolean }
+  ) {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getBlockWithReceipts', { block_id });
+    const response_flags = options?.includeProofFacts
+      ? [RPC.ETxnResponseFlag.INCLUDE_PROOF_FACTS]
+      : undefined;
+    return this.fetchEndpoint('starknet_getBlockWithReceipts', {
+      block_id,
+      ...(response_flags && { response_flags }),
+    });
   }
 
-  public getBlockStateUpdate(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+  public getBlockStateUpdate(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    contractAddresses?: BigNumberish[]
+  ) {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
+    return this.fetchEndpoint('starknet_getStateUpdate', {
+      block_id,
+      ...(contractAddresses && {
+        contract_addresses: contractAddresses.map((addr) => toHex(addr)),
+      }),
+    });
   }
 
-  public getBlockTransactionsTraces(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+  /**
+   * Get transaction traces for all transactions in a block
+   * @param blockIdentifier - block identifier
+   * @param options - optional flags
+   *  - returnInitialReads - include initial storage reads in traces (RPC 0.10.1+)
+   */
+  public getBlockTransactionsTraces(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    options?: { returnInitialReads?: boolean }
+  ) {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_traceBlockTransactions', { block_id });
+    const trace_flags = options?.returnInitialReads
+      ? [RPC.ETraceFlag.RETURN_INITIAL_READS]
+      : undefined;
+    return this.fetchEndpoint('starknet_traceBlockTransactions', {
+      block_id,
+      ...(trace_flags && { trace_flags }),
+    });
   }
 
   public getBlockTransactionCount(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
@@ -347,16 +390,44 @@ export class RpcChannel {
     return this.fetchEndpoint('starknet_getBlockTransactionCount', { block_id });
   }
 
-  public getTransactionByHash(txHash: BigNumberish) {
+  /**
+   * Get transaction by hash
+   * @param txHash - transaction hash
+   * @param options - optional flags
+   *  - includeProofFacts - include proof facts in the response (RPC 0.10.1+)
+   */
+  public getTransactionByHash(txHash: BigNumberish, options?: { includeProofFacts?: boolean }) {
     const transaction_hash = toHex(txHash);
+    const response_flags = options?.includeProofFacts
+      ? [RPC.ETxnResponseFlag.INCLUDE_PROOF_FACTS]
+      : undefined;
     return this.fetchEndpoint('starknet_getTransactionByHash', {
       transaction_hash,
+      ...(response_flags && { response_flags }),
     });
   }
 
-  public getTransactionByBlockIdAndIndex(blockIdentifier: BlockIdentifier, index: number) {
+  /**
+   * Get transaction by block identifier and index
+   * @param blockIdentifier - block identifier
+   * @param index - transaction index in the block
+   * @param options - optional flags
+   *  - includeProofFacts - include proof facts in the response (RPC 0.10.1+)
+   */
+  public getTransactionByBlockIdAndIndex(
+    blockIdentifier: BlockIdentifier,
+    index: number,
+    options?: { includeProofFacts?: boolean }
+  ) {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getTransactionByBlockIdAndIndex', { block_id, index });
+    const response_flags = options?.includeProofFacts
+      ? [RPC.ETxnResponseFlag.INCLUDE_PROOF_FACTS]
+      : undefined;
+    return this.fetchEndpoint('starknet_getTransactionByBlockIdAndIndex', {
+      block_id,
+      index,
+      ...(response_flags && { response_flags }),
+    });
   }
 
   public getTransactionReceipt(txHash: BigNumberish) {
@@ -383,8 +454,9 @@ export class RpcChannel {
    * - blockIdentifier<br/>
    * - skipValidate (default true)<br/>
    * - skipFeeCharge (default true)<br/>
+   * - returnInitialReads (default false) - include initial storage reads in trace (RPC 0.10.1+)<br/>
    */
-  public simulateTransaction(
+  public async simulateTransaction(
     invocations: AccountInvocations,
     simulateTransactionOptions: getSimulateTransactionOptions = {}
   ) {
@@ -394,16 +466,20 @@ export class RpcChannel {
       blockIdentifier = this.blockIdentifier,
       skipValidate = methodDefaults.skipValidate,
       skipFeeCharge = methodDefaults.skipFeeCharge,
+      returnInitialReads,
     } = simulateTransactionOptions;
     const block_id = new Block(blockIdentifier).identifier;
     const simulationFlags: RPC.ESimulationFlag[] = [];
     if (skipValidate) simulationFlags.push(RPC.ESimulationFlag.SKIP_VALIDATE);
     if (skipFeeCharge) simulationFlags.push(RPC.ESimulationFlag.SKIP_FEE_CHARGE);
 
+    const trace_flags = returnInitialReads ? [RPC.ETraceFlag.RETURN_INITIAL_READS] : undefined;
+
     return this.fetchEndpoint('starknet_simulateTransactions', {
       block_id,
-      transactions: invocations.map((it) => this.buildTransaction(it)),
+      transactions: await Promise.all(invocations.map((it) => this.buildTransaction(it))),
       simulation_flags: simulationFlags,
+      ...(trace_flags && { trace_flags }),
     });
   }
 
@@ -501,64 +577,11 @@ export class RpcChannel {
     return txReceipt as RPC.TXN_RECEIPT;
   }
 
-  public async fastWaitForTransaction(
-    txHash: BigNumberish,
-    address: string,
-    initNonceBN: BigNumberish,
-    options?: fastWaitForTransactionOptions
-  ): Promise<boolean> {
-    const initNonce = BigInt(initNonceBN);
-    let retries = options?.retries ?? 50;
-    const retryInterval = options?.retryInterval ?? 500; // 0.5s
-    const errorStates: string[] = [RPC.ETransactionExecutionStatus.REVERTED];
-    const successStates: string[] = [
-      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
-      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
-      RPC.ETransactionFinalityStatus.PRE_CONFIRMED,
-    ];
-    let txStatus: RPC.TransactionStatus;
-    const start = new Date().getTime();
-    while (retries > 0) {
-      // eslint-disable-next-line no-await-in-loop
-      await wait(retryInterval);
-
-      // eslint-disable-next-line no-await-in-loop
-      txStatus = await this.getTransactionStatus(txHash);
-      logger.info(
-        `${retries} ${JSON.stringify(txStatus)} ${(new Date().getTime() - start) / 1000}s.`
-      );
-      const executionStatus = txStatus.execution_status ?? '';
-      const finalityStatus = txStatus.finality_status;
-      if (errorStates.includes(executionStatus)) {
-        const message = `${executionStatus}: ${finalityStatus}`;
-        const error = new Error(message) as Error & { response: RPC.TransactionStatus };
-        error.response = txStatus;
-        throw error;
-      } else if (successStates.includes(finalityStatus)) {
-        let currentNonce = initNonce;
-        while (currentNonce === initNonce && retries > 0) {
-          // eslint-disable-next-line no-await-in-loop
-          currentNonce = BigInt(await this.getNonceForAddress(address, BlockTag.PRE_CONFIRMED));
-          logger.info(
-            `${retries} Checking new nonce ${currentNonce} ${(new Date().getTime() - start) / 1000}s.`
-          );
-          if (currentNonce !== initNonce) return true;
-          // eslint-disable-next-line no-await-in-loop
-          await wait(retryInterval);
-          retries -= 1;
-        }
-        return false;
-      }
-
-      retries -= 1;
-    }
-    return false;
-  }
-
   public getStorageAt(
     contractAddress: BigNumberish,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    responseFlags?: RPC.STORAGE_RESPONSE_FLAG[]
   ) {
     const contract_address = toHex(contractAddress);
     const parsedKey = toStorageKey(key);
@@ -567,6 +590,7 @@ export class RpcChannel {
       contract_address,
       key: parsedKey,
       block_id,
+      ...(responseFlags && { response_flags: responseFlags }),
     });
   }
 
@@ -622,14 +646,14 @@ export class RpcChannel {
     };
 
     return this.fetchEndpoint('starknet_estimateFee', {
-      request: invocations.map((it) => this.buildTransaction(it, 'fee')),
+      request: await Promise.all(invocations.map((it) => this.buildTransaction(it, 'fee'))),
       block_id,
       ...flags,
     });
   }
 
   public async invoke(functionInvocation: Invocation, details: InvocationsDetailsWithNonce) {
-    const transaction = this.buildTransaction(
+    const transaction = await this.buildTransaction(
       {
         type: ETransactionType.INVOKE,
         ...functionInvocation,
@@ -649,7 +673,7 @@ export class RpcChannel {
     declareTransaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    const transaction = this.buildTransaction(
+    const transaction = await this.buildTransaction(
       {
         type: ETransactionType.DECLARE,
         ...declareTransaction,
@@ -669,7 +693,7 @@ export class RpcChannel {
     deployAccountTransaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    const transaction = this.buildTransaction(
+    const transaction = await this.buildTransaction(
       {
         type: ETransactionType.DEPLOY_ACCOUNT,
         ...deployAccountTransaction,
@@ -737,16 +761,18 @@ export class RpcChannel {
   }
 
   // Generic buildTransaction that automatically narrows return type based on input
-  public buildTransaction<T extends AccountInvocationItem>(
+  public async buildTransaction<T extends AccountInvocationItem>(
     invocation: T,
     versionType?: 'fee' | 'transaction'
-  ): T extends { type: typeof ETransactionType.INVOKE }
-    ? RPC.INVOKE_TXN_V3
-    : T extends { type: typeof ETransactionType.DECLARE }
-      ? RPC.BROADCASTED_DECLARE_TXN_V3
-      : T extends { type: typeof ETransactionType.DEPLOY_ACCOUNT }
-        ? RPC.DEPLOY_ACCOUNT_TXN_V3
-        : never {
+  ): Promise<
+    T extends { type: typeof ETransactionType.INVOKE }
+      ? RPC.BROADCASTED_INVOKE_TXN
+      : T extends { type: typeof ETransactionType.DECLARE }
+        ? RPC.BROADCASTED_DECLARE_TXN_V3
+        : T extends { type: typeof ETransactionType.DEPLOY_ACCOUNT }
+          ? RPC.DEPLOY_ACCOUNT_TXN_V3
+          : never
+  > {
     const defaultVersions = getVersionsByType(versionType);
 
     // V0,V1,V2 not supported on RPC 0.9
@@ -771,11 +797,18 @@ export class RpcChannel {
     };
 
     if (invocation.type === ETransactionType.INVOKE) {
-      const btx: RPC.INVOKE_TXN_V3 = {
+      const btx: RPC.BROADCASTED_INVOKE_TXN = {
         type: RPC.ETransactionType.INVOKE,
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
         ...details,
+        ...(invocation.proofFacts &&
+          invocation.proofFacts.length > 0 && {
+            proof_facts: invocation.proofFacts.map((it) => toHex(it)),
+          }),
+        ...(invocation.proof && {
+          proof: invocation.proof,
+        }),
       };
       return btx as any; // This 'as any' is internal to the generic function - the external API is type-safe
     }
@@ -787,7 +820,7 @@ export class RpcChannel {
         type: invocation.type,
         contract_class: {
           ...invocation.contract,
-          sierra_program: decompressProgram(invocation.contract.sierra_program),
+          sierra_program: (await decompressProgram(invocation.contract.sierra_program)) as string[],
         },
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,

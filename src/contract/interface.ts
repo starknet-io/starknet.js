@@ -74,8 +74,9 @@ export abstract class ContractInterface {
 
   /**
    * Provider for read operations or Account for write operations
+   * Optional - a default RpcProvider will be created on first async operation if not provided
    */
-  public abstract providerOrAccount: ProviderOrAccount;
+  public abstract providerOrAccount?: ProviderOrAccount;
 
   /**
    * Optional contract class hash for optimization

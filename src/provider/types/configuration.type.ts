@@ -1,5 +1,6 @@
 import { NetworkName, StarknetChainId, SupportedRpcVersion } from '../../global/constants';
 import { BlockIdentifier, waitForTransactionOptions } from '../../types/lib';
+import type { PluginConfig } from '../../plugins/types';
 import { ResourceBoundsOverhead } from './spec.type';
 
 export interface ProviderOptions extends RpcProviderOptions {}
@@ -21,9 +22,8 @@ export type RpcProviderOptions = {
   blockIdentifier?: BlockIdentifier;
   chainId?: StarknetChainId;
   specVersion?: SupportedRpcVersion;
-  default?: boolean;
   waitMode?: boolean;
   baseFetch?: WindowOrWorkerGlobalScope['fetch'];
   resourceBoundsOverhead?: ResourceBoundsOverhead | false;
   batch?: false | number;
-};
+} & PluginConfig;

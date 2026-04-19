@@ -36,7 +36,7 @@ import type { DeployContractUDCResponse } from '../deployer/types/index.type';
 /**
  * Interface for interacting with Starknet account contracts
  *
- * Extends ProviderInterface to provide account-specific functionality including:
+ * Provides account-specific functionality including:
  * - Transaction execution and signing
  * - Fee estimation for various transaction types
  * - Contract deployment through UDC (Universal Deployer Contract)
@@ -49,7 +49,12 @@ import type { DeployContractUDCResponse } from '../deployer/types/index.type';
  * - Transaction signing with the account's private key
  * - Interaction with the account contract's __execute__ entrypoint
  */
-export abstract class AccountInterface extends ProviderInterface {
+export abstract class AccountInterface {
+  /**
+   * Provider instance for blockchain interaction
+   */
+  public abstract provider: ProviderInterface;
+
   /**
    * The address of the account contract on Starknet
    */

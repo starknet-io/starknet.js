@@ -66,7 +66,7 @@ describeIfTestnet('Paymaster with Contract, in Testnet', () => {
     expect(txR1.isSuccess()).toBe(true);
     const res2 = await strkContract.invoke('transfer', ['0x010101', cairo.uint256(101)], {
       paymasterDetails: feesDetails,
-      maxFeeInGasToken: 2n * 10n ** 17n,
+      maxFeeInGasToken: 1n * 10n ** 18n,
     });
     const txR2 = await provider.waitForTransaction(res2.transaction_hash);
     expect(txR2.isSuccess()).toBe(true);
@@ -83,7 +83,7 @@ describeIfTestnet('Paymaster with Contract, in Testnet', () => {
     const res2 = await strkContract
       .withOptions({
         paymasterDetails: feesDetails,
-        maxFeeInGasToken: 2n * 10n ** 17n,
+        maxFeeInGasToken: 1n * 10n ** 18n,
       })
       .transfer('0x010101', cairo.uint256(103));
     const txR2 = await provider.waitForTransaction(res2.transaction_hash);

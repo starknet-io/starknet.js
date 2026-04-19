@@ -35,6 +35,7 @@ type CalcV3InvokeTxHashArgs = {
   resourceBounds: ResourceBoundsBN;
   tip: BigNumberish;
   paymasterData: BigNumberish[];
+  proofFacts?: BigNumberish[];
 };
 
 type CalcInvokeTxHashArgs = CalcV3InvokeTxHashArgs;
@@ -52,7 +53,8 @@ export function calculateInvokeTransactionHash(args: CalcInvokeTxHashArgs) {
       args.feeDataAvailabilityMode,
       args.resourceBounds,
       args.tip,
-      args.paymasterData
+      args.paymasterData,
+      args.proofFacts
     );
   }
 
