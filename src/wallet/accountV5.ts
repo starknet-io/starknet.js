@@ -21,7 +21,6 @@ import {
   MultiDeployContractResponse,
   TypedData,
   UniversalDeployerContractPayload,
-  type PaymasterOptions,
 } from '../types';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
@@ -37,7 +36,6 @@ import {
   watchAsset,
 } from './connectV5';
 import type { WalletAccountV5Options } from './types/index.type';
-import type { PaymasterInterface } from '../paymaster';
 import { defaultDeployer } from '../deployer';
 
 /**
@@ -162,7 +160,6 @@ export class WalletAccountV5 extends Account {
     provider: ProviderInterface,
     walletProvider: WalletWithStarknetFeatures,
     cairoVersion?: CairoVersion,
-    paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
@@ -171,17 +168,15 @@ export class WalletAccountV5 extends Account {
       walletProvider,
       address: accountAddress,
       cairoVersion,
-      paymaster,
     });
   }
 
   static async connectSilent(
     provider: ProviderInterface,
     walletProvider: WalletWithStarknetFeatures,
-    cairoVersion?: CairoVersion,
-    paymaster?: PaymasterOptions | PaymasterInterface
+    cairoVersion?: CairoVersion
   ) {
-    return WalletAccountV5.connect(provider, walletProvider, cairoVersion, paymaster, true);
+    return WalletAccountV5.connect(provider, walletProvider, cairoVersion, true);
   }
 
   // TODO: MISSING ESTIMATES

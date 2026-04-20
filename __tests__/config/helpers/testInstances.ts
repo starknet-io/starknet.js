@@ -96,7 +96,7 @@ export const getTestAccount = (
       address: toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
       signer: process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
       transactionVersion: txVersion ?? TEST_TX_VERSION,
-      paymaster: paymasterSnip29,
+      ...(paymasterSnip29 ? { plugins: { paymaster: paymasterSnip29 } } : {}),
     })
   );
 };

@@ -1,12 +1,18 @@
-import { NetworkName, PAYMASTER_RPC_NODES } from '../global/constants';
-import { logger } from '../global/logger';
-import { BigNumberish, PaymasterDetails, PreparedTransaction, Call } from '../types';
-import assert from './assert';
-import { CallData } from './calldata';
-import { toOutsideCallV2 } from './outsideExecution';
-import { getSelectorFromName } from './hash';
-import { toBigInt } from './num';
-import type { OutsideCallV1, OutsideCallV2 } from '../types/api';
+import { NetworkName } from '../../global/constants';
+import { logger } from '../../global/logger';
+import type { BigNumberish, Call } from '../../types';
+import type { PreparedTransaction, PaymasterDetails } from './types/response.type';
+import assert from '../../utils/assert';
+import { CallData } from '../../utils/calldata';
+import { toOutsideCallV2 } from '../../utils/outsideExecution';
+import { getSelectorFromName } from '../../utils/hash';
+import { toBigInt } from '../../utils/num';
+import type { OutsideCallV1, OutsideCallV2 } from '../../types/api';
+
+const PAYMASTER_RPC_NODES = {
+  SN_MAIN: [`https://starknet.paymaster.avnu.fi`],
+  SN_SEPOLIA: [`https://sepolia.paymaster.avnu.fi`],
+} as const;
 
 /**
  * Return randomly select available public paymaster node url

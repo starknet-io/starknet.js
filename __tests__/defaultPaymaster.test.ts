@@ -1,11 +1,9 @@
-import {
-  PaymasterRpc,
-  RpcError,
-  RPC,
-  type ExecutableUserTransaction,
-  type ExecutionParameters,
-  type UserTransaction,
-} from '../src';
+import { PaymasterRpc, RpcError, RPC } from '../src';
+import type {
+  ExecutableUserTransaction,
+  ExecutionParameters,
+  UserTransaction,
+} from '../src/plugins/paymaster';
 
 import fetchMock from '../src/utils/connect/fetch';
 import { signatureToHexArray } from '../src/utils/stark';
@@ -14,8 +12,10 @@ jest.mock('../src/utils/connect/fetch');
 jest.mock('../src/utils/stark', () => ({
   signatureToHexArray: jest.fn(() => ['0x1', '0x2']),
 }));
-jest.mock('../src/utils/paymaster', () => ({
+jest.mock('../src/plugins/paymaster/utils', () => ({
   getDefaultPaymasterNodeUrl: jest.fn(() => 'https://mock-node-url'),
+  assertCallsAreStrictlyEqual: jest.fn(),
+  assertPaymasterTransactionSafety: jest.fn(),
 }));
 
 describe('PaymasterRpc', () => {

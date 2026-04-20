@@ -3,7 +3,6 @@ import type { SignerInterface } from '../signer';
 import type { DeployerInterface } from '../deployer/index';
 import type {
   AllowArray,
-  BigNumberish,
   BlockIdentifier,
   CairoVersion,
   Call,
@@ -23,14 +22,12 @@ import type {
 import type {
   DeclareDeployUDCResponse,
   MultiDeployContractResponse,
-  PaymasterDetails,
   UniversalDetails,
 } from './types/index.type';
 import type {
   EstimateFeeResponseBulkOverhead,
   EstimateFeeResponseOverhead,
 } from '../provider/types/index.type';
-import type { PaymasterFeeEstimate, PreparedTransaction } from '../paymaster/types/index.type';
 import type { DeployContractUDCResponse } from '../deployer/types/index.type';
 
 /**
@@ -40,7 +37,6 @@ import type { DeployContractUDCResponse } from '../deployer/types/index.type';
  * - Transaction execution and signing
  * - Fee estimation for various transaction types
  * - Contract deployment through UDC (Universal Deployer Contract)
- * - Paymaster support for sponsored transactions
  * - EIP-712 message signing
  *
  * @remarks
@@ -247,83 +243,6 @@ export abstract class AccountInterface {
   public abstract execute(
     transactions: AllowArray<Call>,
     transactionsDetail?: InvocationsDetails
-  ): Promise<InvokeFunctionResponse>;
-
-  /**
-   * Estimate fees for a paymaster-sponsored transaction
-   *
-   * @param calls - Array of calls to be sponsored
-   * - .contractAddress - Target contract address
-   * - .entrypoint - Function to invoke
-   * - .calldata - Function parameters
-   *
-   * @param paymasterDetails - Paymaster configuration
-   * - .feeMode - Sponsorship mode: 'sponsored' or gas token
-   * - .deploymentData - Account deployment data if needed
-   * - .timeBounds - Valid execution time window
-   *
-   * @returns Fee estimates in both STRK and gas token
-   * @example
-   * ```typescript
-   * const fees = await account.estimatePaymasterTransactionFee(
-   *   [{ contractAddress, entrypoint, calldata }],
-   *   { feeMode: { mode: 'sponsored' } }
-   * );
-   * ```
-   */
-  public abstract estimatePaymasterTransactionFee(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails
-  ): Promise<PaymasterFeeEstimate>;
-
-  /**
-   * Build a transaction for paymaster execution
-   *
-   * @param calls - Array of calls to be sponsored
-   * @param paymasterDetails - Paymaster configuration
-   * @inheritdoc estimatePaymasterTransactionFee
-   *
-   * @returns Prepared transaction with typed data for signing
-   * @example
-   * ```typescript
-   * const prepared = await account.buildPaymasterTransaction(
-   *   calls,
-   *   { feeMode: { mode: 'default', gasToken: ETH_ADDRESS } }
-   * );
-   * ```
-   */
-  public abstract buildPaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails
-  ): Promise<PreparedTransaction>;
-
-  /**
-   * Execute a paymaster-sponsored transaction
-   *
-   * @param calls - Array of calls to execute
-   * @param paymasterDetails - Paymaster configuration
-   * - .feeMode - 'sponsored' or gas token payment
-   * - .deploymentData - Deploy account if needed
-   * - .timeBounds - Execution validity window (UNIX timestamps)
-   *
-   * @param maxFeeInGasToken - Maximum acceptable fee in gas token
-   *
-   * @returns Transaction hash if successful
-   * @throws {Error} If gas token price exceeds maxFeeInGasToken
-   * @throws {Error} If transaction parameters are modified by paymaster
-   * @example
-   * ```typescript
-   * const txHash = await account.executePaymasterTransaction(
-   *   calls,
-   *   { feeMode: { mode: 'sponsored' }, timeBounds: { executeBefore: Date.now()/1000 + 3600 } },
-   *   maxFeeETH
-   * );
-   * ```
-   */
-  public abstract executePaymasterTransaction(
-    calls: Call[],
-    paymasterDetails: PaymasterDetails,
-    maxFeeInGasToken?: BigNumberish
   ): Promise<InvokeFunctionResponse>;
 
   /**

@@ -1,3 +1,4 @@
+import type { AccountInterface } from '../account/interface';
 import type { StarknetPlugin, ProviderHooks, AccountHooks } from './types';
 
 /**
@@ -7,13 +8,13 @@ import type { StarknetPlugin, ProviderHooks, AccountHooks } from './types';
  * plugins are scoped to the instance rather than shared globally.
  */
 export class PluginManager {
-  private registeredPlugins: Map<string, StarknetPlugin<any, any>> = new Map();
+  private registeredPlugins: Map<string, StarknetPlugin<any, any, any>> = new Map();
 
   private providerHooksList: ProviderHooks[] = [];
 
   private accountHooksList: AccountHooks[] = [];
 
-  get plugins(): ReadonlyMap<string, StarknetPlugin<any, any>> {
+  get plugins(): ReadonlyMap<string, StarknetPlugin<any, any, any>> {
     return this.registeredPlugins;
   }
 
@@ -22,7 +23,7 @@ export class PluginManager {
    * Calls `plugin.extend()` and assigns returned methods to the target.
    * Registers provider-level hooks.
    */
-  installOnProvider(plugin: StarknetPlugin<any, any>, target: any): void {
+  installOnProvider(plugin: StarknetPlugin<any, any, any>, target: any): void {
     if (this.registeredPlugins.has(plugin.name)) {
       return; // deduplicate by name
     }
@@ -45,7 +46,7 @@ export class PluginManager {
    * Calls `plugin.accountExtend()` if available, otherwise falls back to `plugin.extend()`.
    * Registers both provider-level and account-level hooks.
    */
-  installOnAccount(plugin: StarknetPlugin<any, any>, target: any): void {
+  installOnAccount(plugin: StarknetPlugin<any, any, any>, target: any): void {
     if (this.registeredPlugins.has(plugin.name)) {
       return; // deduplicate by name
     }
@@ -64,6 +65,23 @@ export class PluginManager {
     }
     if (plugin.accountHooks) {
       this.accountHooksList.push(plugin.accountHooks);
+    }
+  }
+
+  /**
+   * Install contract extensions from a plugin onto a Contract instance.
+   * No deduplication — contracts don't own a plugin manager.
+   */
+  installOnContract(
+    plugin: StarknetPlugin<any, any, any>,
+    contract: any,
+    account: AccountInterface
+  ): void {
+    if (plugin.contractExtend) {
+      const methods = plugin.contractExtend(contract, account);
+      if (methods) {
+        Object.assign(contract, methods);
+      }
     }
   }
 

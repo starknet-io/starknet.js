@@ -25,7 +25,6 @@ import {
   FactoryParams,
   UniversalDetails,
   DeclareAndDeployContractPayload,
-  type PaymasterFeeEstimate,
   SuccessfulTransactionReceiptResponseHelper,
 } from '../types';
 import type { AccountInterface } from '../account/interface';
@@ -42,6 +41,7 @@ import {
 import { ContractInterface } from './interface';
 import { logger } from '../global/logger';
 import { RpcProvider } from '../provider/rpc';
+import { PluginManager } from '../plugins/manager';
 import { getCompiledCalldata } from '../utils/transaction';
 import { extractAbi, parseContract } from '../utils/provider';
 
@@ -254,6 +254,17 @@ export class Contract implements ContractInterface {
         });
       }
     });
+
+    // Install contract extensions from Account's plugins
+    if (this.providerOrAccount && isAccount(this.providerOrAccount)) {
+      const account = this.providerOrAccount;
+      if ('accountPluginManager' in account) {
+        const manager = (account as any).accountPluginManager as PluginManager;
+        manager.plugins.forEach((plugin) => {
+          manager.installOnContract(plugin, this, account);
+        });
+      }
+    }
   }
 
   public withOptions(options: WithOptions): this {
@@ -368,18 +379,6 @@ export class Contract implements ContractInterface {
     await this.ensureProvider();
 
     if (isAccount(this.providerOrAccount!)) {
-      if (restInvokeOptions.paymasterDetails) {
-        const myCall: Call = {
-          contractAddress: this.address,
-          entrypoint: method,
-          calldata: args,
-        };
-        return this.providerOrAccount.executePaymasterTransaction(
-          [myCall],
-          restInvokeOptions.paymasterDetails,
-          restInvokeOptions.maxFeeInGasToken
-        );
-      }
       const result: InvokeFunctionResponse = await this.providerOrAccount.execute(invocation, {
         ...restInvokeOptions,
       });
@@ -417,7 +416,7 @@ export class Contract implements ContractInterface {
     method: string,
     args: ArgsOrCalldata = [],
     estimateDetails: ExecuteOptions = {}
-  ): Promise<EstimateFeeResponseOverhead | PaymasterFeeEstimate> {
+  ): Promise<EstimateFeeResponseOverhead> {
     assert(this.address !== null, 'contract is not connected to an address');
 
     if (!getCompiledCalldata(args, () => false)) {
@@ -428,17 +427,6 @@ export class Contract implements ContractInterface {
     await this.ensureProvider();
 
     if (isAccount(this.providerOrAccount!)) {
-      if (estimateDetails.paymasterDetails) {
-        const myCall: Call = {
-          contractAddress: this.address,
-          entrypoint: method,
-          calldata: args,
-        };
-        return this.providerOrAccount.estimatePaymasterTransactionFee(
-          [myCall],
-          estimateDetails.paymasterDetails
-        );
-      }
       return this.providerOrAccount.estimateInvokeFee(invocation, estimateDetails);
     }
     throw Error('Contract must be connected to the account contract to estimate');

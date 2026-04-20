@@ -1,4 +1,4 @@
-import type { EDataAvailabilityMode, ETransactionVersion3, PAYMASTER_API } from '../../types/api';
+import type { EDataAvailabilityMode, ETransactionVersion3 } from '../../types/api';
 import type {
   BigNumberish,
   BlockIdentifier,
@@ -11,14 +11,8 @@ import type {
   ProviderOptions,
 } from '../../provider/types/index.type';
 import type { ResourceBoundsBN } from '../../provider/types/spec.type';
-import type {
-  FeeMode,
-  PaymasterOptions,
-  PaymasterTimeBounds,
-} from '../../paymaster/types/index.type';
 import type { SignerInterface } from '../../signer';
 import type { SupportedTransactionVersion } from '../../global/constants';
-import type { PaymasterInterface } from '../../paymaster';
 import type { ProviderInterface } from '../../provider/interface';
 import type { DeployerInterface } from '../../deployer';
 import type { TipType } from '../../provider/modules/tip';
@@ -39,8 +33,6 @@ export type AccountOptions = {
   cairoVersion?: CairoVersion;
   /** Transaction version to use for sending transactions (optional) */
   transactionVersion?: SupportedTransactionVersion;
-  /** Paymaster configuration for sponsored transactions (optional) */
-  paymaster?: PaymasterOptions | PaymasterInterface;
   /** Use of a custom account deployer contract (optional) */
   deployer?: DeployerInterface;
   /**
@@ -75,12 +67,6 @@ export interface UniversalDetails {
   proofFacts?: BigNumberish[];
   /** Proof for the transaction (RPC 0.10.1+) - base64 encoded string */
   proof?: string;
-}
-
-export interface PaymasterDetails {
-  feeMode: FeeMode;
-  deploymentData?: PAYMASTER_API.AccountDeploymentData;
-  timeBounds?: PaymasterTimeBounds;
 }
 
 export interface DeployContractResponse {

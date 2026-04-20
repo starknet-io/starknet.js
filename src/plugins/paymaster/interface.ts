@@ -1,12 +1,11 @@
-import {
+import type { RpcProviderOptions, RPC } from '../../types';
+import type {
   PreparedTransaction,
-  RpcProviderOptions,
   TokenData,
   UserTransaction,
   ExecutableUserTransaction,
   ExecutionParameters,
-  RPC,
-} from '../types';
+} from './types/response.type';
 
 export abstract class PaymasterInterface {
   public abstract nodeUrl: string;

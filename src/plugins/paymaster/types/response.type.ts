@@ -3,8 +3,8 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import type { BigNumberish, Call } from '../../types/lib';
-import type { OutsideExecutionTypedData, PAYMASTER_API } from '../../types/api';
+import type { BigNumberish, Call } from '../../../types/lib';
+import type { OutsideExecutionTypedData, PAYMASTER_API } from '../../../types/api';
 
 export type PaymasterFeeEstimate = {
   gas_token_price_in_strk: BigNumberish;
@@ -97,4 +97,10 @@ export type ExecutionParameters = {
 export interface PaymasterTimeBounds {
   executeAfter?: number; // executeAfter is optional, if not provided, it will be set to 1, meaning the transaction can be executed immediately
   executeBefore: number; // executeBefore is mandatory if timeBounds is provided
+}
+
+export interface PaymasterDetails {
+  feeMode: FeeMode;
+  deploymentData?: PAYMASTER_API.AccountDeploymentData;
+  timeBounds?: PaymasterTimeBounds;
 }
