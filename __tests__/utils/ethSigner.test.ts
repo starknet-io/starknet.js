@@ -152,7 +152,7 @@ describe('Ethereum signer', () => {
         entrypoint: 'transfer',
         calldata: {
           recipient: contractETHAccountAddress,
-          amount: cairo.uint256(1n * 10n ** 18n), // 1 STRK of fees
+          amount: cairo.uint256(2n * 10n ** 18n), // 2 STRK of fees
         },
       });
       await account.provider.waitForTransaction(transaction_hash);

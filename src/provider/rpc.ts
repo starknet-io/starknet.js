@@ -1,6 +1,6 @@
 import { RPC09, RPC0101 } from '../channel';
 import { config } from '../global/config';
-import { SupportedRpcVersion } from '../global/constants';
+import { SupportedRpcVersion, type SupportedRpcVersion0_10 } from '../global/constants';
 import { logger } from '../global/logger';
 import {
   AccountInvocations,
@@ -137,7 +137,7 @@ export class RpcProvider implements ProviderInterface {
     if (isVersion('0.10', spec)) {
       return new this({
         ...optionsOrProvider,
-        specVersion: SupportedRpcVersion.v0_10_1,
+        specVersion: SupportedRpcVersion.v0_10_2,
       }) as T;
     }
 
@@ -383,7 +383,7 @@ export class RpcProvider implements ProviderInterface {
   public async getTransactionTrace<V extends SupportedRpcVersion = SupportedRpcVersion>(
     txHash: BigNumberish
   ): Promise<
-    V extends '0.10.0' | '0.10.1' ? RPCSPEC0101.TRANSACTION_TRACE : RPCSPEC09.TRANSACTION_TRACE
+    V extends SupportedRpcVersion0_10 ? RPCSPEC0101.TRANSACTION_TRACE : RPCSPEC09.TRANSACTION_TRACE
   >;
   public async getTransactionTrace(
     txHash: BigNumberish
@@ -602,7 +602,7 @@ export class RpcProvider implements ProviderInterface {
     message: RPCSPEC09.L1Message,
     blockIdentifier?: BlockIdentifier
   ): Promise<
-    V extends '0.10.0' | '0.10.1' ? RPCSPEC0101.FEE_ESTIMATE : RPCSPEC09.MESSAGE_FEE_ESTIMATE
+    V extends SupportedRpcVersion0_10 ? RPCSPEC0101.FEE_ESTIMATE : RPCSPEC09.MESSAGE_FEE_ESTIMATE
   >;
   public async estimateMessageFee(
     message: RPCSPEC09.L1Message,
@@ -620,8 +620,8 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getEvents<V extends SupportedRpcVersion = SupportedRpcVersion>(
-    eventFilter: V extends '0.10.0' | '0.10.1' ? RPCSPEC0101.EventFilter : RPCSPEC09.EventFilter
-  ): Promise<V extends '0.10.0' | '0.10.1' ? RPCSPEC0101.EVENTS_CHUNK : RPCSPEC09.EVENTS_CHUNK>;
+    eventFilter: V extends SupportedRpcVersion0_10 ? RPCSPEC0101.EventFilter : RPCSPEC09.EventFilter
+  ): Promise<V extends SupportedRpcVersion0_10 ? RPCSPEC0101.EVENTS_CHUNK : RPCSPEC09.EVENTS_CHUNK>;
   public async getEvents(
     eventFilter: RPCSPEC0101.EventFilter | RPCSPEC09.EventFilter
   ): Promise<RPCSPEC0101.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
@@ -706,7 +706,7 @@ export class RpcProvider implements ProviderInterface {
   public async getL1MessagesStatus<V extends SupportedRpcVersion = SupportedRpcVersion>(
     transactionHash: BigNumberish
   ): Promise<
-    V extends '0.10.0' | '0.10.1'
+    V extends SupportedRpcVersion0_10
       ? RPC.RPCSPEC0101.L1L2MessagesStatus
       : RPC.RPCSPEC09.L1L2MessagesStatus
   >;
