@@ -42,4 +42,4 @@ jobs:
           title: 'CI documentation version'
           body: ''
           delete-branch: true
-          reviewers: penovicp, ${{ github.triggering_actor }}
+          reviewers: ${{ github.triggering_actor }}
