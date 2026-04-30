@@ -1,3 +1,9 @@
+## [10.0.1](https://github.com/starknet-io/starknet.js/compare/v10.0.0...v10.0.1) (2026-04-30)
+
+### Bug Fixes
+
+- unexpected INFO message when create an Account without Paymaster ([3852a2c](https://github.com/starknet-io/starknet.js/commit/3852a2ce0e1717d59858617d43da6e63f2e11f87))
+
 # [10.0.0](https://github.com/starknet-io/starknet.js/compare/v9.4.1...v10.0.0) (2026-04-19)
 
 - feat!: refactor Account to use composition pattern, plugin system, docs\ \ BREAKING CHANGE: Account no longer extends Provider. Provider methods must now be accessed via account.provider property. \ Changes: - Account uses composition instead of inheritance - Add plugin system to replace ts-mixer - Update all tests to use account.provider.xyz() - Create migration guide and plugin documentation ([31d9458](https://github.com/starknet-io/starknet.js/commit/31d94587676a543c71dbd64b92d0e65d0ee3aa38))
