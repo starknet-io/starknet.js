@@ -71,7 +71,7 @@ export function adaptAccountIfDevnet(account: Account): Account {
   const isDevnet = process.env.IS_DEVNET === 'true';
   if (isDevnet) {
     // eslint-disable-next-line no-param-reassign
-    account.getEstimateTip = function async(
+    account.provider.getEstimateTip = function async(
       blockIdentifier?: BlockIdentifier,
       options: TipAnalysisOptions = {}
     ) {

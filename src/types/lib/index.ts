@@ -176,7 +176,13 @@ export type CallDetails = {
   calldata?: RawArgs | Calldata;
 };
 
-export type Invocation = CallDetails & { signature?: Signature };
+export type Invocation = CallDetails & {
+  signature?: Signature;
+  /** Proof facts to include in the transaction (RPC 0.10.1+) */
+  proofFacts?: BigNumberish[];
+  /** Proof for the transaction (RPC 0.10.1+) - base64 encoded string */
+  proof?: string;
+};
 
 export type Call = CallDetails & { entrypoint: string };
 
@@ -198,6 +204,10 @@ export type V3TransactionDetails = {
   accountDeploymentData: BigNumberish[];
   nonceDataAvailabilityMode: EDataAvailabilityMode;
   feeDataAvailabilityMode: EDataAvailabilityMode;
+  /** Proof facts to include in the transaction (RPC 0.10.1+) */
+  proofFacts?: BigNumberish[];
+  /** Proof for the transaction (RPC 0.10.1+) - base64 encoded string */
+  proof?: string;
 };
 
 /**
@@ -336,16 +346,22 @@ export type waitForTransactionOptions = {
   errorStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
 };
 
-export type fastWaitForTransactionOptions = {
-  retries?: number;
-  retryInterval?: number;
-};
-
 export type getSimulateTransactionOptions = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
   skipExecute?: boolean;
   skipFeeCharge?: boolean;
+  /** Include initial storage reads in the trace response (RPC 0.10.1+) */
+  returnInitialReads?: boolean;
+};
+
+/**
+ * Options for getBlockTransactionsTraces
+ */
+export type getBlockTransactionsTracesOptions = {
+  blockIdentifier?: BlockIdentifier;
+  /** Include initial storage reads in the trace response (RPC 0.10.1+) */
+  returnInitialReads?: boolean;
 };
 
 export type getContractVersionOptions = {

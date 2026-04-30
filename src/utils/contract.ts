@@ -73,12 +73,17 @@ export function extractContractHashes(
 /**
  * Helper to redeclare response Cairo0 contract
  */
-export function contractClassResponseToLegacyCompiledContract(ccr: ContractClassResponse) {
+export async function contractClassResponseToLegacyCompiledContract(
+  ccr: ContractClassResponse
+): Promise<LegacyCompiledContract> {
   if (isSierra(ccr)) {
     throw Error('ContractClassResponse need to be LegacyContractClass (cairo0 response class)');
   }
   const contract = ccr as LegacyContractClass;
-  return { ...contract, program: decompressProgram(contract.program) } as LegacyCompiledContract;
+  return {
+    ...contract,
+    program: await decompressProgram(contract.program),
+  } as LegacyCompiledContract;
 }
 
 // Re-export LoadedContract type and contractLoader function with runtime detection

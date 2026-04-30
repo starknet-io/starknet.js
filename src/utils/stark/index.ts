@@ -1,5 +1,4 @@
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
-import { gzip, ungzip } from 'pako';
 import { config } from '../../global/config';
 import { EstimateFeeResponseOverhead, FeeEstimate } from '../../provider/types/index.type';
 import {
@@ -19,14 +18,7 @@ import {
   Signature,
   UniversalDetails,
 } from '../../types';
-import {
-  addHexPrefix,
-  arrayBufferToString,
-  atobUniversal,
-  btoaUniversal,
-  buf2hex,
-  removeHexPrefix,
-} from '../encode';
+import { addHexPrefix, atobUniversal, btoaUniversal, buf2hex, removeHexPrefix } from '../encode';
 import { parse, stringify } from '../json';
 import {
   addPercent,
@@ -47,7 +39,8 @@ type V3Details = Required<
     | 'feeDataAvailabilityMode'
     | 'resourceBounds'
   >
->;
+> &
+  Partial<Pick<UniversalDetails, 'proofFacts' | 'proof'>>;
 
 /**
  * Compress compiled Cairo 0 program
@@ -62,9 +55,16 @@ type V3Details = Required<
  * // result = "H4sIAAAAAAAAA+1dC4/bOJL+K4aBu01me7r5EEUyixzQk/TuB..."
  * ```
  */
-export function compressProgram(jsonProgram: Program | string): CompressedProgram {
+export async function compressProgram(jsonProgram: Program | string): Promise<CompressedProgram> {
   const stringified = isString(jsonProgram) ? jsonProgram : stringify(jsonProgram);
-  const compressedProgram = gzip(stringified);
+
+  // Use native CompressionStream API (Node 17+, modern browsers)
+  const stream = new CompressionStream('gzip');
+  const writer = stream.writable.getWriter();
+  writer.write(new TextEncoder().encode(stringified));
+  writer.close();
+
+  const compressedProgram = await new Response(stream.readable).arrayBuffer();
   return btoaUniversal(compressedProgram);
 }
 
@@ -96,9 +96,19 @@ export function compressProgram(jsonProgram: Program | string): CompressedProgra
  * // ...
  * ```
  */
-export function decompressProgram(base64: CompressedProgram | CompressedProgram[]) {
+export async function decompressProgram(
+  base64: CompressedProgram | CompressedProgram[]
+): Promise<Program | CompressedProgram[]> {
   if (Array.isArray(base64)) return base64;
-  const decompressed = arrayBufferToString(ungzip(atobUniversal(base64)));
+
+  // Use native DecompressionStream API (Node 17+, modern browsers)
+  const compressed = atobUniversal(base64);
+  const stream = new DecompressionStream('gzip');
+  const writer = stream.writable.getWriter();
+  writer.write(new Uint8Array(compressed));
+  writer.close();
+
+  const decompressed = await new Response(stream.readable).text();
   return parse(decompressed);
 }
 
@@ -114,6 +124,38 @@ export function decompressProgram(base64: CompressedProgram | CompressedProgram[
 export function randomAddress(): string {
   const randomKeyPair = utils.randomPrivateKey();
   return getStarkKey(randomKeyPair);
+}
+
+/**
+ * Encode proof array to base64 string for RPC 0.10.1+
+ * @param {number[]} proof Array of proof integers
+ * @returns {string} Base64 encoded proof
+ * @example
+ * ```typescript
+ * const proofArray = [1, 2, 3, 4, 5];
+ * const result = stark.encodeProof(proofArray);
+ * // result = "AQAAAAIAAAADAAAABAAAAAUAAAAv"
+ * ```
+ */
+export function encodeProof(proof: number[]): string {
+  return btoaUniversal(new Uint32Array(proof).buffer);
+}
+
+/**
+ * Decode base64 proof string to proof array for RPC 0.10.1+
+ * @param {string} proofBase64 Base64 encoded proof string
+ * @returns {number[]} Array of proof integers
+ * @example
+ * ```typescript
+ * const proofBase64 = "AQAAAAIAAAADAAAABAAAAAUAAAAv";
+ * const result = stark.decodeProof(proofBase64);
+ * // result = [1, 2, 3, 4, 5]
+ * ```
+ */
+export function decodeProof(proofBase64: string): number[] {
+  const decoded = atobUniversal(proofBase64);
+  const uint32Array = new Uint32Array(decoded.buffer);
+  return Array.from(uint32Array);
 }
 
 /**
@@ -449,6 +491,8 @@ export function v3Details(details: UniversalDetails): V3Details {
     nonceDataAvailabilityMode: details.nonceDataAvailabilityMode || EDataAvailabilityMode.L1,
     feeDataAvailabilityMode: details.feeDataAvailabilityMode || EDataAvailabilityMode.L1,
     resourceBounds: details.resourceBounds ?? zeroResourceBounds(),
+    proofFacts: details.proofFacts,
+    proof: details.proof,
   };
 }
 

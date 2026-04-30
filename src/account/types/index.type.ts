@@ -8,7 +8,6 @@ import type {
 import type {
   DeclareTransactionReceiptResponse,
   EstimateFeeResponseOverhead,
-  InvokeFunctionResponse,
   ProviderOptions,
 } from '../../provider/types/index.type';
 import type { ResourceBoundsBN } from '../../provider/types/spec.type';
@@ -24,6 +23,7 @@ import type { ProviderInterface } from '../../provider/interface';
 import type { DeployerInterface } from '../../deployer';
 import type { TipType } from '../../provider/modules/tip';
 import type { DeployContractUDCResponse } from '../../deployer/types/index.type';
+import type { PluginConfig } from '../../plugins/types';
 
 /**
  * Configuration options for creating an Account instance
@@ -48,7 +48,7 @@ export type AccountOptions = {
    * @default 'recommendedTip'
    */
   defaultTipType?: TipType;
-};
+} & PluginConfig;
 
 export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;
 
@@ -71,6 +71,10 @@ export interface UniversalDetails {
   version?: BigNumberish;
   resourceBounds?: ResourceBoundsBN; // ignored on estimate
   skipValidate?: boolean; // ignored on non-estimate
+  /** Proof facts to include in the transaction (RPC 0.10.1+) */
+  proofFacts?: BigNumberish[];
+  /** Proof for the transaction (RPC 0.10.1+) - base64 encoded string */
+  proof?: string;
 }
 
 export interface PaymasterDetails {
@@ -101,6 +105,8 @@ export type SimulateTransactionDetails = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
   skipExecute?: boolean;
+  /** Include initial storage reads in the trace response (RPC 0.10.1+) */
+  returnInitialReads?: boolean;
 } & Partial<V3TransactionDetails>;
 
 export type StarkProfile = {
@@ -110,9 +116,4 @@ export type StarkProfile = {
   twitter?: string;
   github?: string;
   proofOfPersonhood?: boolean;
-};
-
-export type fastExecuteResponse = {
-  txResult: InvokeFunctionResponse;
-  isReady: boolean;
 };

@@ -7,8 +7,8 @@ import {
   ZERO,
 } from '../global/constants';
 import { logger } from '../global/logger';
-import { LibraryError, Provider } from '../provider';
-import { BlockTag, ETransactionVersion, ETransactionVersion3 } from '../provider/types/spec.type';
+import { Provider } from '../provider';
+import { ETransactionVersion, ETransactionVersion3 } from '../provider/types/spec.type';
 import { Signer, type SignerInterface } from '../signer';
 import {
   // Runtime values
@@ -58,8 +58,6 @@ import type {
   UniversalDetails,
   UserTransaction,
   waitForTransactionOptions,
-  fastWaitForTransactionOptions,
-  fastExecuteResponse,
 } from '../types';
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
@@ -85,13 +83,17 @@ import { getExecuteCalldata } from '../utils/transaction/transaction';
 import { isString, isUndefined } from '../utils/typed';
 import { getMessageHash } from '../utils/typedData';
 import { type AccountInterface } from './interface';
-import { defaultPaymaster, type PaymasterInterface, PaymasterRpc } from '../paymaster';
+import { type PaymasterInterface, PaymasterRpc } from '../paymaster';
 import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
 import { defaultDeployer, Deployer } from '../deployer';
 import type { TipType } from '../provider/modules/tip';
+import { PluginManager } from '../plugins/manager';
+import { defaultPlugins } from '../plugins/defaults';
 
-export class Account extends Provider implements AccountInterface {
+export class Account implements AccountInterface {
+  public provider: Provider;
+
   public signer: SignerInterface;
 
   public address: string;
@@ -106,6 +108,9 @@ export class Account extends Provider implements AccountInterface {
 
   public defaultTipType: TipType;
 
+  /** @internal Account-level plugin management */
+  public readonly accountPluginManager: PluginManager;
+
   constructor(options: AccountOptions) {
     const {
       provider,
@@ -116,7 +121,7 @@ export class Account extends Provider implements AccountInterface {
       paymaster,
       defaultTipType,
     } = options;
-    super(provider);
+    this.provider = provider instanceof Provider ? provider : new Provider(provider);
     this.address = address.toLowerCase();
     this.signer = isString(signer) || signer instanceof Uint8Array ? new Signer(signer) : signer;
 
@@ -124,26 +129,26 @@ export class Account extends Provider implements AccountInterface {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
-    this.paymaster = paymaster ? new PaymasterRpc(paymaster) : defaultPaymaster;
+    this.paymaster = paymaster ? new PaymasterRpc(paymaster) : new PaymasterRpc({ mute: true });
     this.deployer = options.deployer ?? defaultDeployer;
     this.defaultTipType = defaultTipType ?? config.get('defaultTipType');
+
+    // Initialize account-level plugin manager and install plugins
+    this.accountPluginManager = new PluginManager();
+    const plugins = options.plugins === false ? [] : (options.plugins ?? defaultPlugins);
+    plugins.forEach((plugin) => {
+      this.accountPluginManager.installOnAccount(plugin, this);
+    });
 
     logger.debug('Account setup', {
       transactionVersion: this.transactionVersion,
       cairoVersion: this.cairoVersion,
-      channel: this.channel.id,
+      channel: this.provider.channel.id,
     });
   }
 
-  /** @deprecated @hidden */
-  // The deprecation tag is meant to discourage use, not to signal future removal
-  // it should only be removed if the relationship with the corresponding Provider.create(...) method changes
-  static async create(): Promise<never> {
-    throw new LibraryError('Not supported');
-  }
-
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
-    return super.getNonceForAddress(this.address, blockIdentifier);
+    return this.provider.getNonceForAddress(this.address, blockIdentifier);
   }
 
   protected async getNonceSafe(nonce?: BigNumberish) {
@@ -162,8 +167,8 @@ export class Account extends Provider implements AccountInterface {
   public async getCairoVersion(classHash?: string) {
     if (!this.cairoVersion) {
       const { cairo } = classHash
-        ? await super.getContractVersion(undefined, classHash)
-        : await super.getContractVersion(this.address);
+        ? await this.provider.getContractVersion(undefined, classHash)
+        : await this.provider.getContractVersion(this.address);
       this.cairoVersion = cairo;
     }
     return this.cairoVersion;
@@ -191,7 +196,7 @@ export class Account extends Provider implements AccountInterface {
     const invocations = [
       {
         type: ETransactionType.DECLARE,
-        payload: extractContractHashes(payload, await this.channel.getStarknetVersion()),
+        payload: extractContractHashes(payload, await this.provider.channel.getStarknetVersion()),
       },
     ];
     const estimateBulk = await this.estimateFeeBulk(invocations, details);
@@ -260,7 +265,7 @@ export class Account extends Provider implements AccountInterface {
       skipValidate,
     });
 
-    return super.getEstimateFeeBulk(accountInvocations, {
+    return this.provider.getEstimateFeeBulk(accountInvocations, {
       blockIdentifier,
       skipValidate,
     });
@@ -276,6 +281,7 @@ export class Account extends Provider implements AccountInterface {
       blockIdentifier,
       skipValidate = true,
       skipExecute,
+      returnInitialReads,
       version: providedVersion,
     } = details;
     const detailsWithTip = await this.resolveDetailsWithTip(details);
@@ -287,10 +293,11 @@ export class Account extends Provider implements AccountInterface {
       skipValidate,
     });
 
-    return super.getSimulateTransaction(accountInvocations, {
+    return this.provider.getSimulateTransaction(accountInvocations, {
       blockIdentifier,
       skipValidate,
       skipExecute,
+      returnInitialReads,
     });
   }
 
@@ -298,11 +305,19 @@ export class Account extends Provider implements AccountInterface {
     transactions: AllowArray<Call>,
     transactionsDetail: UniversalDetails = {}
   ): Promise<InvokeFunctionResponse> {
-    const calls = [transactions].flat();
-    const detailsWithTip = await this.resolveDetailsWithTip(transactionsDetail);
+    // Run beforeExecute hooks
+    const hookResult = this.accountPluginManager.runAccountHook('beforeExecute', {
+      calls: transactions,
+      details: transactionsDetail,
+    });
+    const hookedTransactions: AllowArray<Call> = hookResult?.calls ?? transactions;
+    const hookedDetails: UniversalDetails = hookResult?.details ?? transactionsDetail;
+
+    const calls = [hookedTransactions].flat();
+    const detailsWithTip = await this.resolveDetailsWithTip(hookedDetails);
 
     // Estimate resource bounds if not provided
-    const { resourceBounds: providedResourceBounds } = transactionsDetail;
+    const { resourceBounds: providedResourceBounds } = hookedDetails;
     let resourceBounds = providedResourceBounds;
     if (!resourceBounds) {
       const estimateResponse = await this.estimateInvokeFee(calls, detailsWithTip);
@@ -314,19 +329,21 @@ export class Account extends Provider implements AccountInterface {
       {
         ...v3Details(detailsWithTip),
         resourceBounds,
-        versions: [this.resolveTransactionVersion(transactionsDetail.version)],
-        nonce: transactionsDetail.nonce,
+        versions: [this.resolveTransactionVersion(hookedDetails.version)],
+        nonce: hookedDetails.nonce,
         skipValidate: false,
       }
     );
 
     const invocation = accountInvocations[0];
 
-    return this.invokeFunction(
+    const result = await this.provider.invokeFunction(
       {
         contractAddress: invocation.contractAddress,
         calldata: invocation.calldata,
         signature: invocation.signature,
+        ...(hookedDetails.proofFacts && { proofFacts: hookedDetails.proofFacts }),
+        ...(hookedDetails.proof && { proof: hookedDetails.proof }),
       },
       {
         ...v3Details(detailsWithTip),
@@ -335,52 +352,14 @@ export class Account extends Provider implements AccountInterface {
         version: invocation.version,
       }
     );
-  }
 
-  /**
-   * Execute one or multiple calls through the account contract,
-   * responding as soon as a new transaction is possible with the same account.
-   * Useful for gaming usage.
-   * - This method requires the provider to be initialized with `pre_confirmed` blockIdentifier option.
-   * - Rpc 0.9 minimum.
-   * - In a normal myAccount.execute() call, followed by myProvider.waitForTransaction(), you have an immediate access to the events and to the transaction report. Here, we are processing consecutive transactions faster, but events & transaction reports are not available immediately.
-   * - As a consequence of the previous point, do not use contract/account deployment with this method.
-   * @param {AllowArray<Call>} transactions - Single call or array of calls to execute
-   * @param {UniversalDetails} [transactionsDetail] - Transaction execution options
-   * @param {fastWaitForTransactionOptions} [waitDetail={retries: 50, retryInterval: 500}] - options to scan the network for the next possible transaction. `retries` is the number of times to retry, `retryInterval` is the time in ms between retries.
-   * @returns {Promise<fastExecuteResponse>} Response containing the transaction result and status for the next transaction. If `isReady` is true, you can execute the next transaction. If false, timeout has been reached before the next transaction was possible.
-   * @example
-   * ```typescript
-   * const myProvider = new RpcProvider({ nodeUrl: url, blockIdentifier: BlockTag.PRE_CONFIRMED });
-   * const myAccount = new Account({ provider: myProvider, address: accountAddress0, signer: privateKey0 });
-   * const resp = await myAccount.fastExecute(
-   *     call, { tip: recommendedTip},
-   *     { retries: 30, retryInterval: 500 });
-   * // if resp.isReady is true, you can launch immediately a new tx.
-   * ```
-   */
-  public async fastExecute(
-    transactions: AllowArray<Call>,
-    transactionsDetail: UniversalDetails = {},
-    waitDetail: fastWaitForTransactionOptions = {}
-  ): Promise<fastExecuteResponse> {
-    assert(
-      this.channel.blockIdentifier === BlockTag.PRE_CONFIRMED,
-      'Provider needs to be initialized with `pre_confirmed` blockIdentifier option.'
-    );
-    const initNonce = BigInt(
-      transactionsDetail.nonce ??
-        (await this.getNonceForAddress(this.address, BlockTag.PRE_CONFIRMED))
-    );
-    const details = { ...transactionsDetail, nonce: initNonce };
-    const resultTx: InvokeFunctionResponse = await this.execute(transactions, details);
-    const resultWait = await this.fastWaitForTransaction(
-      resultTx.transaction_hash,
-      this.address,
-      initNonce,
-      waitDetail
-    );
-    return { txResult: resultTx, isReady: resultWait } as fastExecuteResponse;
+    // Run afterExecute hooks
+    this.accountPluginManager.runAccountHook('afterExecute', {
+      calls: hookedTransactions,
+      result,
+    });
+
+    return result;
   }
 
   /**
@@ -395,10 +374,10 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeclareContractResponse> {
     const declareContractPayload = extractContractHashes(
       payload,
-      await this.channel.getStarknetVersion()
+      await this.provider.channel.getStarknetVersion()
     );
     try {
-      await this.getClassByHash(declareContractPayload.classHash);
+      await this.provider.getClassByHash(declareContractPayload.classHash);
     } catch (error) {
       return this.declare(payload, transactionsDetail);
     }
@@ -416,7 +395,7 @@ export class Account extends Provider implements AccountInterface {
 
     const declareContractPayload = extractContractHashes(
       payload,
-      await this.channel.getStarknetVersion()
+      await this.provider.channel.getStarknetVersion()
     );
     const detailsWithTip = await this.resolveDetailsWithTip(details);
 
@@ -441,7 +420,7 @@ export class Account extends Provider implements AccountInterface {
 
     const declaration = accountInvocations[0];
 
-    return super.declareContract(
+    return this.provider.declareContract(
       {
         senderAddress: declaration.senderAddress,
         signature: declaration.signature,
@@ -475,7 +454,7 @@ export class Account extends Provider implements AccountInterface {
     details: UniversalDetails & waitForTransactionOptions = {}
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
-    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, details);
+    const txReceipt = await this.provider.waitForTransaction(deployTx.transaction_hash, details);
     return this.deployer.parseDeployerEvent(
       txReceipt as unknown as DeployTransactionReceiptResponse
     );
@@ -487,7 +466,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeclareDeployUDCResponse> {
     let declare = await this.declareIfNot(payload, details);
     if (declare.transaction_hash !== '') {
-      const tx = await this.waitForTransaction(declare.transaction_hash, details);
+      const tx = await this.provider.waitForTransaction(declare.transaction_hash, details);
       declare = { ...declare, ...tx };
     }
     const deploy = await this.deployContract(
@@ -554,7 +533,7 @@ export class Account extends Provider implements AccountInterface {
 
     const deployment = accountInvocations[0];
 
-    return super.deployAccountContract(
+    return this.provider.deployAccountContract(
       {
         classHash: deployment.classHash,
         addressSalt: deployment.addressSalt,
@@ -571,7 +550,19 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async signMessage(typedData: TypedData): Promise<Signature> {
-    return this.signer.signMessage(typedData, this.address);
+    // Run beforeSign hooks
+    const hookResult = this.accountPluginManager.runAccountHook('beforeSign', { typedData });
+    const finalTypedData: TypedData = hookResult?.typedData ?? typedData;
+
+    const signature = await this.signer.signMessage(finalTypedData, this.address);
+
+    // Run afterSign hooks
+    this.accountPluginManager.runAccountHook('afterSign', {
+      typedData: finalTypedData,
+      signature,
+    });
+
+    return signature;
   }
 
   public async hashMessage(typedData: TypedData): Promise<string> {
@@ -588,10 +579,10 @@ export class Account extends Provider implements AccountInterface {
    * ```
    */
   public async getSnip9Version(): Promise<OutsideExecutionVersion> {
-    if (await supportsInterface(this, this.address, SNIP9_V2_INTERFACE_ID)) {
+    if (await supportsInterface(this.provider, this.address, SNIP9_V2_INTERFACE_ID)) {
       return OutsideExecutionVersion.V2;
     }
-    if (await supportsInterface(this, this.address, SNIP9_V1_INTERFACE_ID)) {
+    if (await supportsInterface(this.provider, this.address, SNIP9_V1_INTERFACE_ID)) {
       return OutsideExecutionVersion.V1;
     }
     // Account does not support either version 2 or version 1
@@ -615,7 +606,7 @@ export class Account extends Provider implements AccountInterface {
         entrypoint: 'is_valid_outside_execution_nonce',
         calldata: [toHex(nonce)],
       };
-      const resp = await this.callContract(call);
+      const resp = await this.provider.callContract(call);
       return BigInt(resp[0]) !== 0n;
     } catch (error) {
       throw new Error(`Failed to check if nonce is valid: ${error}`);
@@ -686,7 +677,7 @@ export class Account extends Provider implements AccountInterface {
     }
     const myNonce = nonce ? toHex(nonce) : await this.getSnip9Nonce();
     const message = getTypedData(
-      await this.getChainId(),
+      await this.provider.getChainId(),
       {
         caller: codedCaller,
         execute_after: options.execute_after,
@@ -750,7 +741,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<UniversalDetails & { tip: BigNumberish }> {
     return {
       ...details,
-      tip: details.tip ?? (await this.getEstimateTip())[this.defaultTipType],
+      tip: details.tip ?? (await this.provider.getEstimateTip())[this.defaultTipType],
     };
   }
 
@@ -786,9 +777,9 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeclareContractTransaction> {
     const { classHash, contract, compiledClassHash } = extractContractHashes(
       payload,
-      await this.channel.getStarknetVersion()
+      await this.provider.channel.getStarknetVersion()
     );
-    const compressedCompiledContract = parseContract(contract);
+    const compressedCompiledContract = await parseContract(contract);
 
     assert(
       !isUndefined(compiledClassHash) &&
@@ -889,7 +880,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<AccountInvocations> {
     const { nonce, blockIdentifier, skipValidate = true } = details;
     const safeNonce = await this.getNonceSafe(nonce);
-    const chainId = await this.getChainId();
+    const chainId = await this.provider.getChainId();
     const versions = details.versions.map((it) => toTransactionVersion(it));
 
     // BULK ACTION FROM NEW ACCOUNT START WITH DEPLOY_ACCOUNT
@@ -1084,22 +1075,5 @@ export class Account extends Provider implements AccountInterface {
     return this.paymaster
       .executeTransaction(transaction, preparedTransaction.parameters)
       .then((response) => ({ transaction_hash: response.transaction_hash }));
-  }
-
-  /*
-   * External methods
-   */
-
-  /**
-   * Get the Starknet ID for an address
-   * @param address - The address to get the Starknet ID for
-   * @param StarknetIdContract - The Starknet ID contract address (optional)
-   * @returns The Starknet ID for the address
-   */
-  public async getStarkName(
-    address: BigNumberish = this.address, // default to the wallet address
-    StarknetIdContract?: string
-  ): Promise<string> {
-    return super.getStarkName(address, StarknetIdContract);
   }
 }

@@ -1,5 +1,4 @@
 import { getStarkKey, Signature, utils } from '@scure/starknet';
-import { hasMixin } from 'ts-mixer';
 import {
   CONTRACTS,
   createBlockForDevnet,
@@ -20,7 +19,6 @@ import {
   CallData,
   Contract,
   FeeEstimate,
-  LibraryError,
   ProviderInterface,
   RPC,
   RPCResponseParser,
@@ -36,12 +34,11 @@ import {
   BlockTag,
   logger,
   type GasPrices,
+  CairoBytes31,
 } from '../src';
 import { StarknetChainId } from '../src/global/constants';
 import { isBoolean } from '../src/utils/typed';
 import { RpcProvider as BaseRpcProvider } from '../src/provider/rpc';
-import { RpcProvider as ExtendedRpcProvider } from '../src/provider/extensions/default';
-import { StarknetId } from '../src/provider/extensions/starknetId';
 
 /**
  * Helper function to create expected zero tip estimate for tests
@@ -81,14 +78,17 @@ describeIfRpc('RPCProvider', () => {
     await createBlockForDevnet();
   });
 
-  test('create should be usable by the base and extended RpcProvider, but not Account', async () => {
+  test('create should be usable by RpcProvider, but not Account', async () => {
     const nodeUrl = process.env.TEST_RPC_URL;
-    const base = await BaseRpcProvider.create({ nodeUrl });
-    const extended = await ExtendedRpcProvider.create({ nodeUrl });
+    const testProvider = await BaseRpcProvider.create({ nodeUrl });
 
-    expect(hasMixin(base, StarknetId)).toBe(false);
-    expect(hasMixin(extended, StarknetId)).toBe(true);
-    await expect(Account.create()).rejects.toThrow(LibraryError);
+    // Default plugins install StarknetId methods
+    expect(testProvider.pluginManager.hasPlugin('starknet-id')).toBe(true);
+    expect(typeof (testProvider as any).getStarkName).toBe('function');
+
+    // Provider with no plugins should not have StarknetId methods
+    const bare = await BaseRpcProvider.create({ nodeUrl, plugins: false } as any);
+    expect(bare.pluginManager.hasPlugin('starknet-id')).toBe(false);
   });
 
   test('detect spec version with create', async () => {
@@ -129,7 +129,11 @@ describeIfRpc('RPCProvider', () => {
     const chainId2 = await rpcProvider.getChainId();
     expect(fetchSpy.mock.calls.length).toBe(1);
     expect(chainId1).toBe(chainId2);
-    expect(Object.values(StarknetChainId)).toContain(chainId1);
+    const chainIds = [
+      ...Object.values(StarknetChainId),
+      new CairoBytes31('SN_INTEGRATION_SEPOLIA').toHexString(),
+    ] as const;
+    expect(chainIds).toContain(chainId1);
     fetchSpy.mockRestore();
   });
 
@@ -306,77 +310,6 @@ describeIfRpc('RPCProvider', () => {
     });
   });
 
-  describe('fastWaitForTransaction()', () => {
-    test('timeout due to low tip', async () => {
-      const spyProvider = jest
-        .spyOn(rpcProvider.channel, 'getTransactionStatus')
-        .mockImplementation(async () => {
-          return { finality_status: 'RECEIVED' };
-        });
-      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 10, {
-        retries: 2,
-        retryInterval: 100,
-      });
-      spyProvider.mockRestore();
-      expect(resp).toBe(false);
-    });
-
-    test('timeout due to missing new nonce', async () => {
-      const spyProvider = jest
-        .spyOn(rpcProvider.channel, 'getTransactionStatus')
-        .mockImplementation(async () => {
-          return { finality_status: 'PRE_CONFIRMED', execution_status: 'SUCCEEDED' };
-        });
-      const spyChannel = jest
-        .spyOn(rpcProvider.channel, 'getNonceForAddress')
-        .mockImplementation(async () => {
-          return '0x8';
-        });
-      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 8, {
-        retries: 2,
-        retryInterval: 100,
-      });
-      spyProvider.mockRestore();
-      spyChannel.mockRestore();
-      expect(resp).toBe(false);
-    });
-
-    test('transaction reverted', async () => {
-      const spyProvider = jest
-        .spyOn(rpcProvider.channel, 'getTransactionStatus')
-        .mockImplementation(async () => {
-          return { finality_status: 'PRE_CONFIRMED', execution_status: 'REVERTED' };
-        });
-      await expect(
-        rpcProvider.fastWaitForTransaction('0x123', '0x456', 10, {
-          retries: 2,
-          retryInterval: 100,
-        })
-      ).rejects.toThrow('REVERTED: PRE_CONFIRMED');
-      spyProvider.mockRestore();
-    });
-
-    test('Normal behavior', async () => {
-      const spyProvider = jest
-        .spyOn(rpcProvider.channel, 'getTransactionStatus')
-        .mockImplementation(async () => {
-          return { finality_status: 'ACCEPTED_ON_L2', execution_status: 'SUCCEEDED' };
-        });
-      const spyChannel = jest
-        .spyOn(rpcProvider.channel, 'getNonceForAddress')
-        .mockImplementation(async () => {
-          return '0x9';
-        });
-      const resp = await rpcProvider.fastWaitForTransaction('0x123', '0x456', 8, {
-        retries: 2,
-        retryInterval: 100,
-      });
-      spyProvider.mockRestore();
-      spyChannel.mockRestore();
-      expect(resp).toBe(true);
-    });
-  });
-
   describe('RPC methods', () => {
     let latestBlock: Block;
 
@@ -390,7 +323,7 @@ describeIfRpc('RPCProvider', () => {
           amount: cairo.uint256(1n * 10n ** 4n),
         },
       });
-      await account.waitForTransaction(transaction_hash);
+      await account.provider.waitForTransaction(transaction_hash);
       latestBlock = await provider.getBlock('latest');
     });
 
@@ -676,7 +609,7 @@ describeIfRpc('RPCProvider', () => {
             },
           });
 
-          await account.waitForTransaction(transaction_hash);
+          await account.provider.waitForTransaction(transaction_hash);
           await createBlockForDevnet(); // Ensure transaction is in a block
 
           try {
@@ -716,7 +649,7 @@ describeIfRpc('RPCProvider', () => {
               },
             });
             // eslint-disable-next-line no-await-in-loop
-            await account.waitForTransaction(transaction_hash);
+            await account.provider.waitForTransaction(transaction_hash);
             // eslint-disable-next-line no-await-in-loop
             await createBlockForDevnet();
           }

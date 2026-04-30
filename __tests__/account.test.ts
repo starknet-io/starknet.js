@@ -16,9 +16,6 @@ import {
   type InvokeTransactionReceiptResponse,
   Deployer,
   RPC,
-  RpcProvider,
-  BlockTag,
-  type Call,
 } from '../src';
 import {
   C1v2ClassHash,
@@ -26,13 +23,11 @@ import {
   describeIfDevnet,
   describeIfNotDevnet,
   erc20ClassHash,
-  getTestProvider,
   createTestProvider,
   getTestAccount,
   devnetFeeTokenAddress,
   adaptAccountIfDevnet,
   TEST_TX_VERSION,
-  STRKtokenAddress,
   initializeMatcher,
 } from './config';
 
@@ -129,7 +124,7 @@ describe('deploy and test Account', () => {
           amount: cairo.uint256(5n * 10n ** 16n),
         },
       });
-      await account.waitForTransaction(transaction_hash);
+      await account.provider.waitForTransaction(transaction_hash);
 
       // deploy account
       const accountOZ = adaptAccountIfDevnet(
@@ -145,7 +140,7 @@ describe('deploy and test Account', () => {
         constructorCalldata: calldata,
         addressSalt: pubKey,
       });
-      const receipt = await account.waitForTransaction(deployed.transaction_hash);
+      const receipt = await account.provider.waitForTransaction(deployed.transaction_hash);
       expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
     });
 
@@ -388,44 +383,6 @@ describe('deploy and test Account', () => {
     expect(after - before).toStrictEqual(57n);
   });
 
-  describe('fastExecute()', () => {
-    test('Only provider with PRE_CONFIRMED blockIdentifier', async () => {
-      const providerLatest = new RpcProvider({
-        nodeUrl: 'dummy',
-        blockIdentifier: BlockTag.LATEST,
-        specVersion: '0.9.0',
-      });
-      const testAccount = new Account({
-        provider: providerLatest,
-        address: '0x123',
-        signer: '0x456',
-      });
-      const myCall: Call = { contractAddress: '0x036', entrypoint: 'withdraw', calldata: [] };
-      await expect(testAccount.fastExecute(myCall)).rejects.toThrow(
-        'Provider needs to be initialized with `pre_confirmed` blockIdentifier option.'
-      );
-    });
-
-    test('fast consecutive txs', async () => {
-      const testProvider = getTestProvider(false, {
-        blockIdentifier: BlockTag.PRE_CONFIRMED,
-      });
-      const testAccount = getTestAccount(testProvider);
-      const myCall: Call = {
-        contractAddress: STRKtokenAddress,
-        entrypoint: 'transfer',
-        calldata: [testAccount.address, cairo.uint256(100)],
-      };
-      const tx1 = await testAccount.fastExecute(myCall);
-      expect(tx1.isReady).toBe(true);
-      expect(tx1.txResult.transaction_hash).toMatch(/^0x/);
-      const tx2 = await testAccount.fastExecute(myCall);
-      await provider.waitForTransaction(tx2.txResult.transaction_hash); // to be sure to have the right nonce in `provider`, that is set with BlockTag.LATEST (otherwise next tests will fail)
-      expect(tx2.isReady).toBe(true);
-      expect(tx2.txResult.transaction_hash).toMatch(/^0x/);
-    });
-  });
-
   describe('EIP712 verification', () => {
     // currently only in Starknet-Devnet, because can fail in Sepolia.
     test('sign and verify EIP712 message fail', async () => {
@@ -438,7 +395,7 @@ describe('deploy and test Account', () => {
       const signature2 = new Signature(toBigInt(r2.toString()), toBigInt(s));
       if (!signature2) return;
 
-      const verifyMessageResponse: boolean = await account.verifyMessageInStarknet(
+      const verifyMessageResponse: boolean = await account.provider.verifyMessageInStarknet(
         typedDataExample,
         signature2,
         account.address
@@ -452,13 +409,17 @@ describe('deploy and test Account', () => {
         transactionVersion: TEST_TX_VERSION,
       }); // non existing account
       await expect(
-        wrongAccount.verifyMessageInStarknet(typedDataExample, signature2, wrongAccount.address)
+        wrongAccount.provider.verifyMessageInStarknet(
+          typedDataExample,
+          signature2,
+          wrongAccount.address
+        )
       ).rejects.toThrow();
     });
 
     test('sign and verify message', async () => {
       const signature = await account.signMessage(typedDataExample);
-      const verifMessageResponse: boolean = await account.verifyMessageInStarknet(
+      const verifMessageResponse: boolean = await account.provider.verifyMessageInStarknet(
         typedDataExample,
         signature,
         account.address
@@ -702,7 +663,7 @@ describe('deploy and test Account', () => {
          * as soo We first need to test is class is already declared
          */
 
-        const isDeclaredCairo1 = await account.isClassDeclared({
+        const isDeclaredCairo1 = await account.provider.isClassDeclared({
           classHash: hash.computeContractClassHash(CONTRACTS.Hello260.sierra),
         });
 

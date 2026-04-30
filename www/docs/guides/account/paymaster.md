@@ -34,10 +34,11 @@ See [SNIP-9 compatibility](./outsideExecution.md#check-snip-9-support)
 
 Paymaster service is provided by specific backends compatible with [SNIP-29](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-29.md).
 
-By default, a random service is selected in the list of available services:
+To use a Paymaster service:
 
 ```typescript
-const myPaymasterRpc = new PaymasterRpc({ default: true });
+// Create a new Paymaster instance (uses a random available service)
+const myPaymasterRpc = new PaymasterRpc();
 ```
 
 If you want a specific Paymaster service:
@@ -216,7 +217,7 @@ const resp = await MyWalletAccount.executePaymasterTransaction(
   feesDetails,
   estimatedFees.suggested_max_fee_in_gas_token
 );
-const txR = await newAccount.waitForTransaction(resp.transaction_hash);
+const txR = await newAccount.provider.waitForTransaction(resp.transaction_hash);
 ```
 
 ## PaymasterRpc Functions
@@ -245,7 +246,7 @@ import { FC, useEffect, useState } from 'react';
 import { connect } from 'get-starknet'; // v4 only
 import { Account, PaymasterRpc, TokenData, WalletAccount } from 'starknet'; // v8+
 
-const paymasterRpc = new PaymasterRpc({ default: true });
+const paymasterRpc = new PaymasterRpc();
 
 const App: FC = () => {
   const [account, setAccount] = useState<Account>();

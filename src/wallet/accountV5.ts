@@ -2,14 +2,14 @@ import type {
   AddStarknetChainParameters,
   Signature,
   WatchAssetParameters,
-} from '@starknet-io/starknet-types-010';
+} from '@starknet-io/starknet-types-0101';
 
 import type {
   WalletWithStarknetFeatures,
   StandardEventsChangeProperties,
 } from '@starknet-io/get-starknet-wallet-standard/features';
 
-import { Account, AccountInterface } from '../account';
+import { Account } from '../account';
 import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
 import {
@@ -44,7 +44,7 @@ import { defaultDeployer } from '../deployer';
  * WalletAccountV5 class.
  * This class is used to create a wallet account that can be used to interact with a Starknet wallet browser extension, using get-starknet v5.
  */
-export class WalletAccountV5 extends Account implements AccountInterface {
+export class WalletAccountV5 extends Account {
   public walletProvider: WalletWithStarknetFeatures;
 
   /**
@@ -64,7 +64,9 @@ export class WalletAccountV5 extends Account implements AccountInterface {
         if (!change.accounts?.length) return;
         if (change.accounts[0].address) this.address = change.accounts[0].address;
         if (change.accounts[0].chains)
-          this.channel.setChainId(change.accounts[0].chains[0].slice(9) as StarknetChainId);
+          this.provider.channel.setChainId(
+            change.accounts[0].chains[0].slice(9) as StarknetChainId
+          );
       }
     );
   }

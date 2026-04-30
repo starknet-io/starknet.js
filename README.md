@@ -6,7 +6,7 @@
 <!-- primary badges -->
 <p align="center">
   <a href="https://github.com/starknet-io/starknet.js/actions">
-    <img src="https://github.com/starknet-io/starknet.js/actions/workflows/manual-release.yml/badge.svg">
+    <img src="https://github.com/starknet-io/starknet.js/actions/workflows/release.yml/badge.svg">
   </a>
   <a href="https://www.npmjs.com/package/starknet">
     <img src='https://img.shields.io/npm/v/starknet' />
@@ -82,6 +82,6 @@ This library would not be possible without these rockstars.
 
 ## 📜 License
 
-Copyright (c) 2025 StarkWare
+Copyright (c) 2026 StarkWare
 
 Licensed under the [MIT license](https://github.com/starknet-io/starknet.js/blob/main/LICENSE).

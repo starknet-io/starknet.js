@@ -9,6 +9,7 @@ export * from './paymaster';
 export * from './provider';
 export * from './signer';
 export * from './channel';
+export * from './plugins';
 export * from './types';
 
 /**
@@ -38,7 +39,6 @@ export * as outsideExecution from './utils/outsideExecution';
 export * as src5 from './utils/src5';
 export * from './utils/resolve';
 export * from './utils/batch';
-export * from './utils/responseParser';
 export * from './utils/cairoDataTypes';
 export * from './utils/address';
 export * from './utils/calldata';

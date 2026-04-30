@@ -1,6 +1,6 @@
-import { RPC09, RPC010 } from '../channel';
+import { RPC09, RPC0101 } from '../channel';
 import { config } from '../global/config';
-import { SupportedRpcVersion } from '../global/constants';
+import { SupportedRpcVersion, type SupportedRpcVersion0_10 } from '../global/constants';
 import { logger } from '../global/logger';
 import {
   AccountInvocations,
@@ -14,7 +14,6 @@ import {
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
-  type fastWaitForTransactionOptions,
   type GasPrices,
   GetBlockResponse,
   getContractVersionOptions,
@@ -35,7 +34,7 @@ import {
   type TypedData,
   waitForTransactionOptions,
 } from '../types';
-import { ETransactionType, RPCSPEC010, RPCSPEC09 } from '../types/api';
+import { ETransactionType, RPCSPEC0101, RPCSPEC09 } from '../types/api';
 import assert from '../utils/assert';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { extractContractHashes, isSierra } from '../utils/contract';
@@ -44,7 +43,7 @@ import { solidityUint256PackedKeccak256 } from '../utils/hash';
 import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
-import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { RPCResponseParser } from './modules/responseParser';
 import { getTipStatsFromBlocks, TipAnalysisOptions, TipEstimate } from './modules/tip';
 import { createTransactionReceipt } from '../utils/transactionReceipt/transactionReceipt';
 import { ProviderInterface } from './interface';
@@ -57,36 +56,58 @@ import type {
 } from './types/spec.type';
 import { verifyMessageInStarknet } from './modules/verifyMessageInStarknet';
 import { getGasPrices } from './modules';
+import { PluginManager } from '../plugins/manager';
+import { defaultPlugins } from '../plugins/defaults';
+import type { StarknetPlugin } from '../plugins/types';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
 
-  public channel: RPC09.RpcChannel | RPC010.RpcChannel;
+  public channel: RPC09.RpcChannel | RPC0101.RpcChannel;
+
+  /** @internal Plugin management infrastructure */
+  public readonly pluginManager: PluginManager;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
+    this.pluginManager = new PluginManager();
+
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
       this.channel = optionsOrProvider.channel;
       this.responseParser =
         'responseParser' in optionsOrProvider
           ? optionsOrProvider.responseParser
           : new RPCResponseParser();
+
+      // When constructing from an existing provider, re-install its plugins
+      if ('pluginManager' in optionsOrProvider) {
+        const sourceManager = (optionsOrProvider as RpcProvider).pluginManager;
+        Array.from(sourceManager.plugins.values()).forEach((plugin) => {
+          this.pluginManager.installOnProvider(plugin, this);
+        });
+      }
     } else {
       const options = optionsOrProvider as RpcProviderOptions | undefined;
       if (options && options.specVersion) {
         if (isVersion('0.9', options.specVersion)) {
           this.channel = new RPC09.RpcChannel({ ...options, waitMode: false });
         } else if (isVersion('0.10', options.specVersion)) {
-          this.channel = new RPC010.RpcChannel({ ...options, waitMode: false });
+          this.channel = new RPC0101.RpcChannel({ ...options, waitMode: false });
         } else throw new Error(`unsupported channel for spec version: ${options.specVersion}`);
       } else if (isVersion('0.9', config.get('rpcVersion'))) {
         // default channel when unspecified
         this.channel = new RPC09.RpcChannel({ ...options, waitMode: false });
       } else if (isVersion('0.10', config.get('rpcVersion'))) {
         // default channel when unspecified
-        this.channel = new RPC010.RpcChannel({ ...options, waitMode: false });
+        this.channel = new RPC0101.RpcChannel({ ...options, waitMode: false });
       } else throw new Error('unable to define spec version for channel');
 
       this.responseParser = new RPCResponseParser(options?.resourceBoundsOverhead);
+
+      // Install plugins
+      const plugins = options?.plugins === false ? [] : (options?.plugins ?? defaultPlugins);
+      plugins.forEach((plugin) => {
+        this.pluginManager.installOnProvider(plugin, this);
+      });
     }
   }
 
@@ -116,7 +137,7 @@ export class RpcProvider implements ProviderInterface {
     if (isVersion('0.10', spec)) {
       return new this({
         ...optionsOrProvider,
-        specVersion: SupportedRpcVersion.v0_10_0,
+        specVersion: SupportedRpcVersion.v0_10_2,
       }) as T;
     }
 
@@ -125,8 +146,37 @@ export class RpcProvider implements ProviderInterface {
     );
   }
 
-  public fetch(method: string, params?: object, id: string | number = 0) {
-    return this.channel.fetch(method, params, id);
+  /**
+   * Install a plugin at runtime. Returns the instance typed with plugin methods.
+   *
+   * @example
+   * ```typescript
+   * const provider = new RpcProvider({ nodeUrl: '...' })
+   *   .use(myPlugin());
+   * provider.myMethod(); // typed
+   * ```
+   */
+  public use<T extends Record<string, any>>(plugin: StarknetPlugin<T, any>): this & T {
+    this.pluginManager.installOnProvider(plugin, this);
+    return this as this & T;
+  }
+
+  public async fetch(method: string, params?: object, id: string | number = 0) {
+    // Run beforeRequest hooks
+    const hookResult = this.pluginManager.runProviderHook('beforeRequest', { method, params });
+    const finalMethod = hookResult?.method ?? method;
+    const finalParams = hookResult?.params ?? params;
+
+    const result = await this.channel.fetch(finalMethod, finalParams, id);
+
+    // Run afterRequest hooks
+    const afterResult = this.pluginManager.runProviderHook('afterRequest', {
+      method: finalMethod,
+      params: finalParams,
+      result,
+    });
+
+    return afterResult ?? result;
   }
 
   public async getChainId() {
@@ -178,7 +228,13 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockWithTxHashes(blockIdentifier);
   }
 
-  public async getBlockWithTxs(blockIdentifier?: BlockIdentifier) {
+  public async getBlockWithTxs(
+    blockIdentifier?: BlockIdentifier,
+    options?: { includeProofFacts?: boolean }
+  ) {
+    if (this.channel instanceof RPC0101.RpcChannel) {
+      return this.channel.getBlockWithTxs(blockIdentifier, options);
+    }
     return this.channel.getBlockWithTxs(blockIdentifier);
   }
 
@@ -250,7 +306,13 @@ export class RpcProvider implements ProviderInterface {
     return solidityUint256PackedKeccak256(params);
   }
 
-  public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
+  public async getBlockWithReceipts(
+    blockIdentifier?: BlockIdentifier,
+    options?: { includeProofFacts?: boolean }
+  ) {
+    if (this.channel instanceof RPC0101.RpcChannel) {
+      return this.channel.getBlockWithReceipts(blockIdentifier, options);
+    }
     return this.channel.getBlockWithReceipts(blockIdentifier);
   }
 
@@ -261,12 +323,24 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: 'pre_confirmed'
   ): Promise<PreConfirmedStateUpdate>;
   public async getBlockStateUpdate(blockIdentifier: 'latest'): Promise<StateUpdate>;
-  public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
-  public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier) {
-    return this.channel.getBlockStateUpdate(blockIdentifier);
+  public async getBlockStateUpdate(
+    blockIdentifier?: BlockIdentifier,
+    contractAddresses?: BigNumberish[]
+  ): Promise<StateUpdateResponse>;
+  public async getBlockStateUpdate(
+    blockIdentifier?: BlockIdentifier,
+    contractAddresses?: BigNumberish[]
+  ) {
+    return this.channel.getBlockStateUpdate(blockIdentifier, contractAddresses);
   }
 
-  public async getBlockTransactionsTraces(blockIdentifier?: BlockIdentifier) {
+  public async getBlockTransactionsTraces(
+    blockIdentifier?: BlockIdentifier,
+    options?: { returnInitialReads?: boolean }
+  ) {
+    if (this.channel instanceof RPC0101.RpcChannel) {
+      return this.channel.getBlockTransactionsTraces(blockIdentifier, options);
+    }
     return this.channel.getBlockTransactionsTraces(blockIdentifier);
   }
 
@@ -274,15 +348,28 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockTransactionCount(blockIdentifier);
   }
 
-  public async getTransaction(txHash: BigNumberish) {
+  public async getTransaction(txHash: BigNumberish, options?: { includeProofFacts?: boolean }) {
+    return this.getTransactionByHash(txHash, options);
+  }
+
+  public async getTransactionByHash(
+    txHash: BigNumberish,
+    options?: { includeProofFacts?: boolean }
+  ) {
+    if (this.channel instanceof RPC0101.RpcChannel) {
+      return this.channel.getTransactionByHash(txHash, options);
+    }
     return this.channel.getTransactionByHash(txHash);
   }
 
-  public async getTransactionByHash(txHash: BigNumberish) {
-    return this.channel.getTransactionByHash(txHash);
-  }
-
-  public async getTransactionByBlockIdAndIndex(blockIdentifier: BlockIdentifier, index: number) {
+  public async getTransactionByBlockIdAndIndex(
+    blockIdentifier: BlockIdentifier,
+    index: number,
+    options?: { includeProofFacts?: boolean }
+  ) {
+    if (this.channel instanceof RPC0101.RpcChannel) {
+      return this.channel.getTransactionByBlockIdAndIndex(blockIdentifier, index, options);
+    }
     return this.channel.getTransactionByBlockIdAndIndex(blockIdentifier, index);
   }
 
@@ -295,13 +382,15 @@ export class RpcProvider implements ProviderInterface {
 
   public async getTransactionTrace<V extends SupportedRpcVersion = SupportedRpcVersion>(
     txHash: BigNumberish
-  ): Promise<V extends '0.10.0' ? RPCSPEC010.TRANSACTION_TRACE : RPCSPEC09.TRANSACTION_TRACE>;
+  ): Promise<
+    V extends SupportedRpcVersion0_10 ? RPCSPEC0101.TRANSACTION_TRACE : RPCSPEC09.TRANSACTION_TRACE
+  >;
   public async getTransactionTrace(
     txHash: BigNumberish
-  ): Promise<RPCSPEC010.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
+  ): Promise<RPCSPEC0101.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
   public async getTransactionTrace(
     txHash: BigNumberish
-  ): Promise<RPCSPEC010.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE> {
+  ): Promise<RPCSPEC0101.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE> {
     return this.channel.getTransactionTrace(txHash);
   }
 
@@ -331,40 +420,19 @@ export class RpcProvider implements ProviderInterface {
     return createTransactionReceipt(receiptWoHelper);
   }
 
-  /**
-   * Wait up until a new transaction is possible with same the account.
-   * This method is fast, but Events and transaction report are not yet
-   * available. Useful for gaming activity.
-   * - only rpc 0.9 and onwards.
-   * @param {BigNumberish} txHash - transaction hash
-   * @param {string} address - address of the account
-   * @param {BigNumberish} initNonce - initial nonce of the account (before the transaction).
-   * @param {fastWaitForTransactionOptions} [options={retries: 50, retryInterval: 500}] - options to scan the network for the next possible transaction. `retries` is the number of times to retry.
-   * @returns {Promise<boolean>} Returns true if the next transaction is possible,
-   * false if the timeout has been reached,
-   * throw an error in case of provider communication.
-   */
-  public async fastWaitForTransaction(
-    txHash: BigNumberish,
-    address: string,
-    initNonce: BigNumberish,
-    options?: fastWaitForTransactionOptions
-  ): Promise<boolean> {
-    const isSuccess = await this.channel.fastWaitForTransaction(
-      txHash,
-      address,
-      initNonce,
-      options
-    );
-    return isSuccess;
-  }
-
   public async getStorageAt(
     contractAddress: BigNumberish,
     key: BigNumberish,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    responseFlags?: RPCSPEC0101.STORAGE_RESPONSE_FLAG[]
   ) {
-    return this.channel.getStorageAt(contractAddress, key, blockIdentifier);
+    const result = await this.channel.getStorageAt(
+      contractAddress,
+      key,
+      blockIdentifier,
+      responseFlags
+    );
+    return this.responseParser.parseStorageResponse(result);
   }
 
   public async getClassHashAt(contractAddress: BigNumberish, blockIdentifier?: BlockIdentifier) {
@@ -504,15 +572,17 @@ export class RpcProvider implements ProviderInterface {
   public async estimateMessageFee<V extends SupportedRpcVersion = SupportedRpcVersion>(
     message: RPCSPEC09.L1Message,
     blockIdentifier?: BlockIdentifier
-  ): Promise<V extends '0.10.0' ? RPCSPEC010.FEE_ESTIMATE : RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
+  ): Promise<
+    V extends SupportedRpcVersion0_10 ? RPCSPEC0101.FEE_ESTIMATE : RPCSPEC09.MESSAGE_FEE_ESTIMATE
+  >;
   public async estimateMessageFee(
     message: RPCSPEC09.L1Message,
     blockIdentifier?: BlockIdentifier
-  ): Promise<RPCSPEC010.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
+  ): Promise<RPCSPEC0101.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
   public async estimateMessageFee(
     message: RPCSPEC09.L1Message, // same as spec08.L1Message
     blockIdentifier?: BlockIdentifier
-  ): Promise<RPCSPEC010.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE> {
+  ): Promise<RPCSPEC0101.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE> {
     return this.channel.estimateMessageFee(message, blockIdentifier);
   }
 
@@ -521,16 +591,16 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getEvents<V extends SupportedRpcVersion = SupportedRpcVersion>(
-    eventFilter: V extends '0.10.0' ? RPCSPEC010.EventFilter : RPCSPEC09.EventFilter
-  ): Promise<V extends '0.10.0' ? RPCSPEC010.EVENTS_CHUNK : RPCSPEC09.EVENTS_CHUNK>;
+    eventFilter: V extends SupportedRpcVersion0_10 ? RPCSPEC0101.EventFilter : RPCSPEC09.EventFilter
+  ): Promise<V extends SupportedRpcVersion0_10 ? RPCSPEC0101.EVENTS_CHUNK : RPCSPEC09.EVENTS_CHUNK>;
   public async getEvents(
-    eventFilter: RPCSPEC010.EventFilter | RPCSPEC09.EventFilter
-  ): Promise<RPCSPEC010.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
+    eventFilter: RPCSPEC0101.EventFilter | RPCSPEC09.EventFilter
+  ): Promise<RPCSPEC0101.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
   public async getEvents(
-    eventFilter: RPCSPEC010.EventFilter | RPCSPEC09.EventFilter
-  ): Promise<RPCSPEC010.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK> {
-    if (this.channel instanceof RPC010.RpcChannel) {
-      return this.channel.getEvents(eventFilter as RPCSPEC010.EventFilter);
+    eventFilter: RPCSPEC0101.EventFilter | RPCSPEC09.EventFilter
+  ): Promise<RPCSPEC0101.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK> {
+    if (this.channel instanceof RPC0101.RpcChannel) {
+      return this.channel.getEvents(eventFilter as RPCSPEC0101.EventFilter);
     }
     if (this.channel instanceof RPC09.RpcChannel) {
       return this.channel.getEvents(eventFilter as RPCSPEC09.EventFilter);
@@ -607,14 +677,16 @@ export class RpcProvider implements ProviderInterface {
   public async getL1MessagesStatus<V extends SupportedRpcVersion = SupportedRpcVersion>(
     transactionHash: BigNumberish
   ): Promise<
-    V extends '0.10.0' ? RPC.RPCSPEC010.L1L2MessagesStatus : RPC.RPCSPEC09.L1L2MessagesStatus
+    V extends SupportedRpcVersion0_10
+      ? RPC.RPCSPEC0101.L1L2MessagesStatus
+      : RPC.RPCSPEC09.L1L2MessagesStatus
   >;
   public async getL1MessagesStatus(
     transactionHash: BigNumberish
-  ): Promise<RPC.RPCSPEC010.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
+  ): Promise<RPC.RPCSPEC0101.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
   public async getL1MessagesStatus(
     transactionHash: BigNumberish
-  ): Promise<RPC.RPCSPEC010.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus> {
+  ): Promise<RPC.RPCSPEC0101.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus> {
     return this.channel.getMessagesStatus(transactionHash);
   }
 

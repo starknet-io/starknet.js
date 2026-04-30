@@ -7,8 +7,8 @@ import {
   InvokeFunctionResponse,
   BlockWithTxHashes,
   SimulateTransactionOverheadResponse,
-} from '../../types';
-import type { GetTransactionReceiptResponse } from '../transactionReceipt/transactionReceipt.type';
+} from '../../../types';
+import type { GetTransactionReceiptResponse } from '../../../utils/transactionReceipt/transactionReceipt.type';
 
 export abstract class ResponseParser {
   abstract parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse;
