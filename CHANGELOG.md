@@ -1,3 +1,15 @@
+## [10.0.2](https://github.com/starknet-io/starknet.js/compare/v10.0.1...v10.0.2) (2026-04-30)
+
+### Bug Fixes
+
+- bump version from 9.4.2 to 9.4.3 ([bffc6b4](https://github.com/starknet-io/starknet.js/commit/bffc6b48210268d7bb34cc819969261321daa159))
+
+## [10.0.1](https://github.com/starknet-io/starknet.js/compare/v10.0.0...v10.0.1) (2026-04-30)
+
+### Bug Fixes
+
+- unexpected INFO message when create an Account without Paymaster ([3852a2c](https://github.com/starknet-io/starknet.js/commit/3852a2ce0e1717d59858617d43da6e63f2e11f87))
+
 # [10.0.0](https://github.com/starknet-io/starknet.js/compare/v9.4.1...v10.0.0) (2026-04-19)
 
 - feat!: refactor Account to use composition pattern, plugin system, docs\ \ BREAKING CHANGE: Account no longer extends Provider. Provider methods must now be accessed via account.provider property. \ Changes: - Account uses composition instead of inheritance - Add plugin system to replace ts-mixer - Update all tests to use account.provider.xyz() - Create migration guide and plugin documentation ([31d9458](https://github.com/starknet-io/starknet.js/commit/31d94587676a543c71dbd64b92d0e65d0ee3aa38))
@@ -131,6 +143,12 @@
 ### Bug Fixes
 
 - semantic version, audit fix, ci permissions ([3c5dea3](https://github.com/starknet-io/starknet.js/commit/3c5dea301733c85cbd5a2785358e92f808874902))
+
+## [9.4.2](https://github.com/starknet-io/starknet.js/compare/v9.4.1...v9.4.2) (2026-03-06)
+
+### Bug Fixes
+
+- bump version from 9.4.2 to 9.4.3 ([bffc6b4](https://github.com/starknet-io/starknet.js/commit/bffc6b48210268d7bb34cc819969261321daa159))
 
 ## [9.4.1](https://github.com/starknet-io/starknet.js/compare/v9.4.0...v9.4.1) (2026-03-02)
 

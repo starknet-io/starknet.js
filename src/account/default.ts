@@ -130,7 +130,7 @@ export class Account implements AccountInterface {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
     this.transactionVersion = transactionVersion ?? config.get('transactionVersion');
-    this.paymaster = paymaster ? new PaymasterRpc(paymaster) : new PaymasterRpc();
+    this.paymaster = paymaster ? new PaymasterRpc(paymaster) : new PaymasterRpc({ mute: true });
     this.deployer = options.deployer ?? defaultDeployer;
     this.defaultTipType = defaultTipType ?? config.get('defaultTipType');
 

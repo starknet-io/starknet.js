@@ -1,0 +1,25 @@
+name: '[Manual] npm dist-tag'
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (without v prefix), e.g. 10.0.2'
+        required: true
+      tag:
+        description: 'dist-tag, e.g. latest'
+        required: true
+        default: 'latest'
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          registry-url: 'https://registry.npmjs.org'
+      - env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm dist-tag add starknet@${{ inputs.version }} ${{ inputs.tag }}
+          npm view starknet dist-tags

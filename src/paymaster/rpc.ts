@@ -100,11 +100,11 @@ export class PaymasterRpc implements PaymasterInterface {
 
     const { nodeUrl, headers, baseFetch } = options || {};
     if (nodeUrl && Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
-      this.nodeUrl = getDefaultPaymasterNodeUrl(nodeUrl as NetworkName, options?.default);
+      this.nodeUrl = getDefaultPaymasterNodeUrl(nodeUrl as NetworkName, options?.mute);
     } else if (nodeUrl) {
       this.nodeUrl = nodeUrl;
     } else {
-      this.nodeUrl = getDefaultPaymasterNodeUrl(undefined, options?.default);
+      this.nodeUrl = getDefaultPaymasterNodeUrl(undefined, options?.mute);
     }
     this.baseFetch = baseFetch ?? fetch;
     this.headers = { ...defaultOptions.headers, ...headers };
