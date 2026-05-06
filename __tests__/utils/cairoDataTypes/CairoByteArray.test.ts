@@ -718,6 +718,44 @@ describe('CairoByteArray Unit Tests', () => {
     });
   });
 
+  describe('hash method', () => {
+    test('should hash a short string (pending word only)', () => {
+      const byteArray = new CairoByteArray('Hello');
+      expect(byteArray.hash()).toBe(
+        '0x15d19ad651ffaf8e90a13938db2081fa3ff01de0712e00cbe69891bace66c51'
+      );
+    });
+
+    test('should hash an empty ByteArray', () => {
+      const byteArray = new CairoByteArray('');
+      expect(byteArray.hash()).toBe(
+        '0xba8cc6e828441028f48901de0bdb28a41b043e873062de3e6a44c7f6a93543'
+      );
+    });
+
+    test('should hash a ByteArray of exactly 31 bytes (one full data chunk)', () => {
+      const byteArray = new CairoByteArray('This is exactly 31 bytes long!!');
+      expect(byteArray.hash()).toBe(
+        '0x3cffa4720c41eb3693a668a0cd480953c2fb9deab9081377486ed8056161995'
+      );
+    });
+
+    test('should hash a ByteArray spanning multiple data chunks', () => {
+      const byteArray = new CairoByteArray(
+        'This is a very long string that exceeds 31 bytes limit for testing'
+      );
+      expect(byteArray.hash()).toBe(
+        '0x6867c4e6970706dc2e7a3afed7508e14b6244222a43c0981308304fa6f59b1d'
+      );
+    });
+
+    test('should throw error if not properly initialized', () => {
+      const byteArray = new CairoByteArray('test');
+      (byteArray as any).data = undefined;
+      expect(() => byteArray.hash()).toThrow('CairoByteArray is not properly initialized');
+    });
+  });
+
   describe('toElements method', () => {
     test('should convert empty string to empty array', () => {
       const byteArray = new CairoByteArray('');
