@@ -1,13 +1,13 @@
+import BrowserOnly from '@docusaurus/BrowserOnly';
+import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import Layout from '@theme/Layout';
 import clsx from 'clsx';
 import React from 'react';
-import { Helmet } from 'react-helmet';
 
 import styles from './index.module.css';
-import BrowserOnly from '@docusaurus/BrowserOnly';
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
@@ -40,9 +40,9 @@ function XFeed() {
               href="https://twitter.com/starknetjs?ref_src=twsrc%5Etfw"
               text-align="center"
             >Tweets by Starknetjs</a>
-            <Helmet>
+            <Head>
               <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
-            </Helmet>
+            </Head>
           </div>
         </div>
       }

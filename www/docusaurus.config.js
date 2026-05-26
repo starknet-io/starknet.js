@@ -1,8 +1,10 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const { themes } = require('prism-react-renderer');
+
+const lightCodeTheme = themes.github;
+const darkCodeTheme = themes.dracula;
 
 const generateBaseUrl = (baseUrl = '') => `/${baseUrl.trim()}/`.replace(/\/+/g, '/');
 
@@ -11,6 +13,128 @@ const generateSourceLinkTemplate = (gitRevision) =>
     gitRevision || '{gitRevision}'
   }/{path}#L{line}`;
 
+const enumMemberAnchorGroups = {
+  simulationFlags: ['skip_validate', 'skip_fee_charge'],
+  transactionTypes: ['declare', 'deploy', 'deploy_account', 'invoke'],
+  transactionStatuses: ['rejected', 'reverted'],
+  transactionVersions: ['v0', 'v1', 'v2', 'v3', 'f0', 'f1', 'f2', 'f3'],
+};
+
+const generatedEnumAnchorComment =
+  '<!-- Docusaurus 3 does not create anchors for enum table rows; keep old TypeDoc links valid. -->';
+
+/**
+ * @param {string} value
+ */
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * @param {string} fileContent
+ * @param {string} heading
+ * @param {string[]} anchors
+ * @param {number} [occurrence]
+ */
+const addEnumMemberAnchors = (fileContent, heading, anchors, occurrence = 1) => {
+  const missingAnchors = anchors.filter(
+    (anchor) =>
+      !fileContent.includes(`id="${anchor}"`) && !fileContent.includes(`id='${anchor}'`)
+  );
+
+  if (missingAnchors.length === 0) {
+    return fileContent;
+  }
+
+  let currentOccurrence = 0;
+
+  return fileContent.replace(new RegExp(`${escapeRegExp(heading)}\\n`, 'g'), (match) => {
+    currentOccurrence += 1;
+
+    if (currentOccurrence !== occurrence) {
+      return match;
+    }
+
+    const anchorBlock = [
+      '',
+      generatedEnumAnchorComment,
+      ...missingAnchors.map((anchor) => `###### ${anchor} {#${anchor}}`),
+      '',
+    ].join('\n');
+
+    return `${match}${anchorBlock}`;
+  });
+};
+
+/**
+ * @param {{ fileContent: string; filePath: string }} args
+ */
+const addGeneratedApiCompatibilityAnchors = ({ fileContent, filePath }) => {
+  const normalizedFilePath = filePath.replaceAll('\\', '/');
+  const isApiRpcSpecPage = /\/API\/namespaces\/(?:types\.)?RPC\.RPCSPEC\d+\.API\.md$/.test(
+    normalizedFilePath
+  );
+  const isLegacyTypesPage = normalizedFilePath.endsWith('/API/namespaces/types.md');
+  let processedContent = fileContent;
+
+  if (isApiRpcSpecPage) {
+    processedContent = addEnumMemberAnchors(
+      processedContent,
+      '### ETransactionType',
+      enumMemberAnchorGroups.transactionTypes,
+      2
+    );
+    processedContent = addEnumMemberAnchors(
+      processedContent,
+      '### ESimulationFlag',
+      enumMemberAnchorGroups.simulationFlags,
+      2
+    );
+    processedContent = addEnumMemberAnchors(
+      processedContent,
+      '### ETransactionVersion',
+      enumMemberAnchorGroups.transactionVersions,
+      2
+    );
+  }
+
+  if (isLegacyTypesPage) {
+    processedContent = addEnumMemberAnchors(
+      processedContent,
+      '### TransactionType',
+      enumMemberAnchorGroups.transactionTypes,
+      2
+    );
+    processedContent = addEnumMemberAnchors(
+      processedContent,
+      '### TransactionStatus',
+      enumMemberAnchorGroups.transactionStatuses,
+      2
+    );
+  }
+
+  return processedContent;
+};
+
+const sidebarLabelReplacements = {
+  classes: 'Classes',
+  functions: 'Functions',
+  interfaces: 'Interfaces',
+  namespaces: 'Namespaces',
+  'type-aliases': 'Type Aliases',
+  variables: 'Variables',
+};
+
+const normalizeGeneratedSidebarLabels = (item) => {
+  if (item.type !== 'category') {
+    return item;
+  }
+
+  return {
+    ...item,
+    label: sidebarLabelReplacements[item.label] || item.label,
+    items: item.items.map(normalizeGeneratedSidebarLabels),
+  };
+};
+
 const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/guides/migrate`;
 // const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/next/guides/migrate`;
 
@@ -18,10 +142,16 @@ const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/gu
 const config = {
   title: 'Starknet.js',
   tagline: 'JavaScript library for Starknet',
-  url: 'https://starknetjs.com',
+  url: 'https://starknet-io.github.io',
   baseUrl: generateBaseUrl(process.env.DOCS_BASE_URL),
+  markdown: {
+    format: 'detect',
+    preprocessor: addGeneratedApiCompatibilityAnchors,
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
   onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'starknet-io', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
@@ -30,6 +160,14 @@ const config = {
       'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
+        docs: {
+          sidebarPath: require.resolve('./sidebars.js'),
+          async sidebarItemsGenerator(args) {
+            const sidebarItems = await args.defaultSidebarItemsGenerator(args);
+
+            return sidebarItems.map(normalizeGeneratedSidebarLabels);
+          },
+        },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
@@ -166,10 +304,10 @@ const config = {
       {
         entryPoints: ['../src/index.ts'],
         tsconfig: '../tsconfig.json',
-        out: 'API',
+        out: 'docs/API',
         name: 'Starknet.js API',
         includeVersion: true,
-        includeExtension: true,
+        fileExtension: '.md',
         sourceLinkTemplate: generateSourceLinkTemplate(
           process.env.GIT_REVISION_OVERRIDE || 'develop'
         ),

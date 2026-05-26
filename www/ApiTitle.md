@@ -1,6 +1,8 @@
-## Provider
+# Starknet.js API
 
-The Provider [**API**](./classes/Provider.md) allows you to interact with the Starknet network, without signing transactions or messages.
+## RpcProvider
+
+The RpcProvider [**API**](./classes/RpcProvider.md) allows you to interact with the Starknet network, without signing transactions or messages.
 
 Typically, these are _read_ calls on the blockchain.
 
@@ -8,7 +10,7 @@ Guide is [**here**](../guides/provider_instance.md).
 
 ## Account
 
-Account extends <ins>[`Provider`](./classes/Provider)</ins> and inherits all of its methods.
+Account extends <ins>[`RpcProvider`](./classes/RpcProvider.md)</ins> and inherits all of its methods.
 
 It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](./classes/Signer)</ins>, declare and deploy Contracts and new Accounts.
 
@@ -32,18 +34,18 @@ The Signer [**API**](./classes/Signer.md) allows you to sign transactions and me
 
 Util functions are provided so you can use various low level functions in your application:
 
-### [elliptic curve](./namespaces/ec.md)
+### [elliptic curve](./Starknet.js-API/namespaces/ec/index.md)
 
-### [hash](./namespaces/hash.md)
+### [hash](./Starknet.js-API/namespaces/hash/index.md)
 
-### [num](./namespaces/num.md)
+### [num](./Starknet.js-API/namespaces/num/index.md)
 
-### [encode](./namespaces/encode.md)
+### [encode](./Starknet.js-API/namespaces/encode/index.md)
 
-### [merkle](./namespaces/merkle.md)
+### [merkle](./Starknet.js-API/namespaces/merkle/index.md)
 
-### [shortString](./namespaces/shortString.md)
+### [shortString](./Starknet.js-API/namespaces/shortString/index.md)
 
-### [stark](./namespaces/stark.md)
+### [stark](./Starknet.js-API/namespaces/stark/index.md)
 
-### [uint256](./namespaces/uint256.md)
+### [uint256](./Starknet.js-API/namespaces/uint256/index.md)

@@ -24,7 +24,7 @@ When retrieving information from Starknet, a `WalletAccount` instance will read 
 
 ## With get-starknet v5
 
-When retrieving information from Starknet, a `WalletAccountV5` instance will read directly from the blockchain. That is why at the initialization of a `WalletAccountV5` a [`RpcProvider`](../API/classes/ProviderInterface) instance is a required parameter, it will be used for all reading activities.
+When retrieving information from Starknet, a `WalletAccountV5` instance will read directly from the blockchain. That is why at the initialization of a `WalletAccountV5` a [`RpcProvider`](../../API/classes/ProviderInterface) instance is a required parameter, it will be used for all reading activities.
 
 If you want to write to Starknet the `WalletAccountV5` will ask the wallet to sign and send the transaction using the Starknet Wallet API to communicate.
 
@@ -200,7 +200,7 @@ const resp = await myWalletAccount.execute(claimCall);
 
 ### Use in a Contract instance
 
-You can connect a `WalletAccount` with a [`Contract`](../API/classes/Contract) instance. All reading actions are performed by the provider of the `WalletAccount`, and all writing actions (that need a signature) are performed by the wallet.
+You can connect a `WalletAccount` with a [`Contract`](../../API/classes/Contract) instance. All reading actions are performed by the provider of the `WalletAccount`, and all writing actions (that need a signature) are performed by the wallet.
 
 ```typescript
 const lendContract = new Contract(contract.abi, contractAddress, myWalletAccount);
