@@ -24,7 +24,7 @@ When retrieving information from Starknet, a `WalletAccount` instance will read 
 
 ## With get-starknet v5
 
-When retrieving information from Starknet, a `WalletAccountV5` instance will read directly from the blockchain. That is why at the initialization of a `WalletAccountV5` a [`RpcProvider`](../../API/classes/ProviderInterface) instance is a required parameter, it will be used for all reading activities.
+When retrieving information from Starknet, a `WalletAccountV5` instance will read directly from the blockchain. That is why at the initialization of a `WalletAccountV5` a [`ProviderInterface`](../../API/classes/ProviderInterface) instance is a required parameter, it will be used for all reading activities.
 
 If you want to write to Starknet the `WalletAccountV5` will ask the wallet to sign and send the transaction using the Starknet Wallet API to communicate.
 

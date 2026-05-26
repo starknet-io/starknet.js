@@ -37,7 +37,9 @@ const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const addEnumMemberAnchors = (fileContent, heading, anchors, occurrence = 1) => {
   const missingAnchors = anchors.filter(
     (anchor) =>
-      !fileContent.includes(`id="${anchor}"`) && !fileContent.includes(`id='${anchor}'`)
+      !fileContent.includes(`id="${anchor}"`) &&
+      !fileContent.includes(`id='${anchor}'`) &&
+      !fileContent.includes(`{#${anchor}}`)
   );
 
   if (missingAnchors.length === 0) {
@@ -68,7 +70,7 @@ const addEnumMemberAnchors = (fileContent, heading, anchors, occurrence = 1) => 
  * @param {{ fileContent: string; filePath: string }} args
  */
 const addGeneratedApiCompatibilityAnchors = ({ fileContent, filePath }) => {
-  const normalizedFilePath = filePath.replaceAll('\\', '/');
+  const normalizedFilePath = filePath.replace(/\\/g, '/');
   const isApiRpcSpecPage = /\/API\/namespaces\/(?:types\.)?RPC\.RPCSPEC\d+\.API\.md$/.test(
     normalizedFilePath
   );

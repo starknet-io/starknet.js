@@ -24,39 +24,38 @@ function HomepageHeader() {
       </div>
     </header>
   );
-};
+}
 
 function XFeed() {
   return (
     <BrowserOnly>
-      {() =>
+      {() => (
         <div className={clsx('hero hero--primary', styles.heroBanner, styles.feedSection)}>
           <div className={clsx(styles.feedContainer)}>
             <a
-            className={clsx('twitter-timeline', styles.twitterTarget)}
+              className={clsx('twitter-timeline', styles.twitterTarget)}
               data-width={600}
               data-height={400}
               data-dnt="true"
               href="https://twitter.com/starknetjs?ref_src=twsrc%5Etfw"
-              text-align="center"
-            >Tweets by Starknetjs</a>
+              style={{ textAlign: 'center' }}
+            >
+              Tweets by Starknetjs
+            </a>
             <Head>
               <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
             </Head>
           </div>
         </div>
-      }
+      )}
     </BrowserOnly>
-  )
+  );
 }
 
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout
-      title={``}
-      description="JavaScript library for Starknet"
-    >
+    <Layout title={``} description="JavaScript library for Starknet">
       <HomepageHeader />
       <main>
         <XFeed></XFeed>

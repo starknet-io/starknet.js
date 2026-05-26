@@ -10,7 +10,7 @@ Guide is [**here**](../guides/provider_instance.md).
 
 ## Account
 
-Account extends <ins>[`RpcProvider`](./classes/RpcProvider.md)</ins> and inherits all of its methods.
+Account has a <ins>[`RpcProvider`](./classes/RpcProvider.md)</ins> instance and delegates read methods through that provider.
 
 It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](./classes/Signer)</ins>, declare and deploy Contracts and new Accounts.
 
