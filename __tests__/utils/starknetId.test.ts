@@ -1,5 +1,10 @@
 import { StarknetChainId } from '../../src/global/constants';
-import { getStarknetIdContract, useDecoded, useEncoded } from '../../src/utils/starknetId';
+import {
+  getStarknetIdContract,
+  isStarkDomain,
+  useDecoded,
+  useEncoded,
+} from '../../src/utils/starknetId';
 
 function randomWithSeed(seed: number) {
   const x = Math.sin(seed) * 10000;
@@ -48,5 +53,14 @@ describe('Should test StarknetId utils', () => {
     expect(getStarknetIdContract(StarknetChainId.SN_MAIN)).toBe(
       '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678'
     );
+  });
+
+  test('Should validate StarknetId domains without backtracking', () => {
+    expect(isStarkDomain('example.stark')).toBe(true);
+    expect(isStarkDomain('sub.example.stark')).toBe(true);
+    expect(isStarkDomain('invalid-domain')).toBe(false);
+    expect(isStarkDomain('UPPER.stark')).toBe(false);
+    expect(isStarkDomain(`${'a'.repeat(49)}.stark`)).toBe(false);
+    expect(isStarkDomain(`${'---.'.repeat(10_000)}.stark`)).toBe(false);
   });
 });
