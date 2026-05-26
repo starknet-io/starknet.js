@@ -71,6 +71,9 @@ const injectMissingAnchors = (content, heading, anchors) => {
 
 const addGeneratedApiCompatibilityAnchors = ({ fileContent, filePath }) => {
   const path = filePath.replace(/\\/g, '/');
+  // Belt-and-braces: only patch frozen versioned snapshots, never the freshly
+  // generated docs/API tree (TypeDoc 0.28 emits proper member headings already).
+  if (!path.includes('/versioned_docs/')) return fileContent;
   return COMPAT_ANCHOR_RULES.filter((rule) => rule.test(path))
     .flatMap((rule) => rule.targets)
     .reduce(
