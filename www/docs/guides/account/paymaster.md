@@ -26,7 +26,7 @@ In `starknet.js`, you can interact with a Paymaster in two ways:
 :::warning IMPORTANT
 
 To be able to use the Paymaster, accounts must be compatible with SNIP-9 (Outside execution).  
-See [SNIP-9 compatibility](./outsideExecution.md)
+See [SNIP-9 compatibility](./outsideExecution.md#check-snip-9-support)
 
 :::
 

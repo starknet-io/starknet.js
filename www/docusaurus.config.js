@@ -13,107 +13,70 @@ const generateSourceLinkTemplate = (gitRevision) =>
     gitRevision || '{gitRevision}'
   }/{path}#L{line}`;
 
-const enumMemberAnchorGroups = {
-  simulationFlags: ['skip_validate', 'skip_fee_charge'],
-  transactionTypes: ['declare', 'deploy', 'deploy_account', 'invoke'],
-  transactionStatuses: ['rejected', 'reverted'],
-  transactionVersions: ['v0', 'v1', 'v2', 'v3', 'f0', 'f1', 'f2', 'f3'],
-};
-
-const generatedEnumAnchorComment =
-  '<!-- Docusaurus 3 does not create anchors for enum table rows; keep old TypeDoc links valid. -->';
-
-/**
- * @param {string} value
+/*
+ * Frozen versioned API docs (TypeDoc 0.25 + typedoc-plugin-markdown 3 output) link to
+ * enum-member anchors like `#declare` or `#skip_validate`. Those anchors were generated
+ * from table rows by the old plugin; v4 keeps the same table layout but stops emitting
+ * the per-row anchors, so the in-page links now 404. The new (post-upgrade) API output
+ * uses proper headings per member and does not need this shim — it only patches frozen
+ * versioned files. Delete this block (and `markdown.preprocessor` below) once all
+ * affected versioned snapshots are pruned.
+ *
+ * Each entry: locate the const declaration of the named enum (the second `### Name`
+ * occurrence in the file — the first is the typeof alias) and inject invisible
+ * <a id="..."> anchors right after it so the old in-page links resolve.
  */
+const COMPAT_ANCHOR_RULES = [
+  {
+    test: (path) => /\/API\/namespaces\/(?:types\.)?RPC\.RPCSPEC\d+\.API\.md$/.test(path),
+    targets: [
+      { heading: '### ETransactionType', anchors: ['declare', 'deploy', 'deploy_account', 'invoke'] },
+      { heading: '### ESimulationFlag', anchors: ['skip_validate', 'skip_fee_charge'] },
+      {
+        heading: '### ETransactionVersion',
+        anchors: ['v0', 'v1', 'v2', 'v3', 'f0', 'f1', 'f2', 'f3'],
+      },
+    ],
+  },
+  {
+    test: (path) => path.endsWith('/API/namespaces/types.md'),
+    targets: [
+      { heading: '### TransactionType', anchors: ['declare', 'deploy', 'deploy_account', 'invoke'] },
+      { heading: '### TransactionStatus', anchors: ['rejected', 'reverted'] },
+    ],
+  },
+];
+
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-/**
- * @param {string} fileContent
- * @param {string} heading
- * @param {string[]} anchors
- * @param {number} [occurrence]
- */
-const addEnumMemberAnchors = (fileContent, heading, anchors, occurrence = 1) => {
-  const missingAnchors = anchors.filter(
-    (anchor) =>
-      !fileContent.includes(`id="${anchor}"`) &&
-      !fileContent.includes(`id='${anchor}'`) &&
-      !fileContent.includes(`{#${anchor}}`)
+const injectMissingAnchors = (content, heading, anchors) => {
+  const missing = anchors.filter(
+    (id) =>
+      !content.includes(`id="${id}"`) &&
+      !content.includes(`id='${id}'`) &&
+      !content.includes(`{#${id}}`)
   );
+  if (missing.length === 0) return content;
 
-  if (missingAnchors.length === 0) {
-    return fileContent;
-  }
-
-  let currentOccurrence = 0;
-
-  return fileContent.replace(new RegExp(`${escapeRegExp(heading)}\\n`, 'g'), (match) => {
-    currentOccurrence += 1;
-
-    if (currentOccurrence !== occurrence) {
-      return match;
-    }
-
-    const anchorBlock = [
-      '',
-      generatedEnumAnchorComment,
-      ...missingAnchors.map((anchor) => `###### ${anchor} {#${anchor}}`),
-      '',
-    ].join('\n');
-
-    return `${match}${anchorBlock}`;
+  let occurrence = 0;
+  return content.replace(new RegExp(`${escapeRegExp(heading)}\\n`, 'g'), (match) => {
+    occurrence += 1;
+    // The const declaration (with the type-declaration table) is the second occurrence;
+    // the first is the typeof alias that has no member rows.
+    if (occurrence !== 2) return match;
+    const tags = missing.map((id) => `<a id="${id}"></a>`).join('');
+    return `${match}\n${tags}\n`;
   });
 };
 
-/**
- * @param {{ fileContent: string; filePath: string }} args
- */
 const addGeneratedApiCompatibilityAnchors = ({ fileContent, filePath }) => {
-  const normalizedFilePath = filePath.replace(/\\/g, '/');
-  const isApiRpcSpecPage = /\/API\/namespaces\/(?:types\.)?RPC\.RPCSPEC\d+\.API\.md$/.test(
-    normalizedFilePath
-  );
-  const isLegacyTypesPage = normalizedFilePath.endsWith('/API/namespaces/types.md');
-  let processedContent = fileContent;
-
-  if (isApiRpcSpecPage) {
-    processedContent = addEnumMemberAnchors(
-      processedContent,
-      '### ETransactionType',
-      enumMemberAnchorGroups.transactionTypes,
-      2
+  const path = filePath.replace(/\\/g, '/');
+  return COMPAT_ANCHOR_RULES.filter((rule) => rule.test(path))
+    .flatMap((rule) => rule.targets)
+    .reduce(
+      (content, { heading, anchors }) => injectMissingAnchors(content, heading, anchors),
+      fileContent
     );
-    processedContent = addEnumMemberAnchors(
-      processedContent,
-      '### ESimulationFlag',
-      enumMemberAnchorGroups.simulationFlags,
-      2
-    );
-    processedContent = addEnumMemberAnchors(
-      processedContent,
-      '### ETransactionVersion',
-      enumMemberAnchorGroups.transactionVersions,
-      2
-    );
-  }
-
-  if (isLegacyTypesPage) {
-    processedContent = addEnumMemberAnchors(
-      processedContent,
-      '### TransactionType',
-      enumMemberAnchorGroups.transactionTypes,
-      2
-    );
-    processedContent = addEnumMemberAnchors(
-      processedContent,
-      '### TransactionStatus',
-      enumMemberAnchorGroups.transactionStatuses,
-      2
-    );
-  }
-
-  return processedContent;
 };
 
 const sidebarLabelReplacements = {
@@ -150,10 +113,10 @@ const config = {
     format: 'detect',
     preprocessor: addGeneratedApiCompatibilityAnchors,
     hooks: {
-      onBrokenMarkdownLinks: 'warn',
+      onBrokenMarkdownLinks: 'throw',
     },
   },
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
   favicon: 'img/favicon.ico',
   organizationName: 'starknet-io', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.

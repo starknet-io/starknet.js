@@ -37,6 +37,7 @@
     "typedoc-plugin-markdown": "^4.11.0",
     "typescript": "~5.9.0"
   },
+  "overridesRationale": "Pinned transitive deps to clear `npm audit` findings flagged during the Docusaurus 3 upgrade. Drop these once upstream Docusaurus bumps its own pins.",
   "overrides": {
     "serialize-javascript": "^7.0.5",
     "uuid": "^11.1.1"

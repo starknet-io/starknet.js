@@ -25,6 +25,10 @@ const sidebars = {
           id: 'API/globals',
           label: 'Exports',
         },
+        // typedoc-plugin-markdown v4 nests namespaces one level under the project name
+        // ("Starknet.js API") set in docusaurus.config.js, while other kinds (classes,
+        // functions, …) sit directly under `API/`. Keep these dirName paths in sync
+        // with the TypeDoc `name:` field if it ever changes.
         {
           type: 'category',
           label: 'Namespaces',

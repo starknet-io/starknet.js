@@ -53,30 +53,3 @@ html[class*="docs-version-4"] div[class*="announcementBar"] {
 .hidden {
   display: none;
 }
-
-/* Compatibility anchors injected for old generated API enum-member links. */
-.theme-doc-markdown h6[id='declare'],
-.theme-doc-markdown h6[id='deploy'],
-.theme-doc-markdown h6[id='deploy_account'],
-.theme-doc-markdown h6[id='invoke'],
-.theme-doc-markdown h6[id='rejected'],
-.theme-doc-markdown h6[id='reverted'],
-.theme-doc-markdown h6[id='skip_validate'],
-.theme-doc-markdown h6[id='skip_fee_charge'],
-.theme-doc-markdown h6[id='v0'],
-.theme-doc-markdown h6[id='v1'],
-.theme-doc-markdown h6[id='v2'],
-.theme-doc-markdown h6[id='v3'],
-.theme-doc-markdown h6[id='f0'],
-.theme-doc-markdown h6[id='f1'],
-.theme-doc-markdown h6[id='f2'],
-.theme-doc-markdown h6[id='f3'] {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
