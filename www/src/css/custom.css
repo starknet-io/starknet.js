@@ -45,8 +45,8 @@
 }
 
 /* skip for home page and v4 docs */
-html.plugin-id-default.plugin-pages div[class*="announcementBar"],
-html[class*="docs-version-4"] div[class*="announcementBar"] {
+html.plugin-id-default.plugin-pages div[class*='announcementBar'],
+html[class*='docs-version-4'] div[class*='announcementBar'] {
   display: none;
 }
 
