@@ -1,8 +1,6 @@
-# Starknet.js API
-
 ## RpcProvider
 
-The RpcProvider [**API**](./classes/Provider.md) allows you to interact with the Starknet network, without signing transactions or messages.
+The RpcProvider [**API**](./classes/Provider.md) (`Provider` is a backward-compatibility alias) allows you to interact with the Starknet network, without signing transactions or messages.
 
 Typically, these are _read_ calls on the blockchain.
 

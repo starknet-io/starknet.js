@@ -29,10 +29,10 @@ const version = await myAccount.getSnip9Version();
 if (version === OutsideExecutionVersion.UNSUPPORTED) {
   throw new Error('Account is not SNIP-9 compatible');
 }
-// version is "V1" or "V2"
+// version is OutsideExecutionVersion.V1 ('1') or OutsideExecutionVersion.V2 ('2')
 ```
 
-`getSnip9Version` returns `V2` if the account exposes the SNIP-9 V2 interface, `V1` for V1, or `UNSUPPORTED` otherwise.
+`getSnip9Version` returns `OutsideExecutionVersion.V2`, `OutsideExecutionVersion.V1`, or `OutsideExecutionVersion.UNSUPPORTED`.
 
 ## Basic concept
 
