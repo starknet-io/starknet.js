@@ -19,6 +19,7 @@ import {
   CompiledSierra,
   DeclareContractPayload,
   MultiDeployContractResponse,
+  ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
   type PaymasterOptions,
@@ -159,7 +160,7 @@ export class WalletAccountV5 extends Account {
   }
 
   static async connect(
-    provider: ProviderInterface,
+    provider: ProviderOptions | ProviderInterface,
     walletProvider: WalletWithStarknetFeatures,
     cairoVersion?: CairoVersion,
     paymaster?: PaymasterOptions | PaymasterInterface,
@@ -176,7 +177,7 @@ export class WalletAccountV5 extends Account {
   }
 
   static async connectSilent(
-    provider: ProviderInterface,
+    provider: ProviderOptions | ProviderInterface,
     walletProvider: WalletWithStarknetFeatures,
     cairoVersion?: CairoVersion,
     paymaster?: PaymasterOptions | PaymasterInterface
