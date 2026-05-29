@@ -1,3 +1,10 @@
+## [10.0.3](https://github.com/starknet-io/starknet.js/compare/v10.0.2...v10.0.3) (2026-05-29)
+
+### Bug Fixes
+
+- accept provider options in connectSilent ([754d9e0](https://github.com/starknet-io/starknet.js/commit/754d9e093c11d8cb7e4832aa075353aea5977e7c))
+- **wallet:** accept provider options in WalletAccountV5.connect ([9e78659](https://github.com/starknet-io/starknet.js/commit/9e7865995a12e07edb0f3abbceda84c6dceec9d8))
+
 ## [10.0.2](https://github.com/starknet-io/starknet.js/compare/v10.0.1...v10.0.2) (2026-04-30)
 
 ### Bug Fixes
