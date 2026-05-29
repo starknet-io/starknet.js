@@ -16,6 +16,24 @@ Outside execution refers to the ability to execute transactions on behalf of an 
 
 To enable outside execution, the account contract must implement the necessary validation logic to verify external signatures or permissions.
 
+## Check SNIP-9 support
+
+Before relying on outside execution (e.g. to use a Paymaster), confirm that the account contract implements the SNIP-9 interface. Use [`Account.getSnip9Version`](../../API/classes/Account.md#getsnip9version):
+
+```typescript
+import { Account, OutsideExecutionVersion } from 'starknet';
+
+const myAccount = new Account({ provider, address, signer });
+const version = await myAccount.getSnip9Version();
+
+if (version === OutsideExecutionVersion.UNSUPPORTED) {
+  throw new Error('Account is not SNIP-9 compatible');
+}
+// version is OutsideExecutionVersion.V1 ('1') or OutsideExecutionVersion.V2 ('2')
+```
+
+`getSnip9Version` returns `OutsideExecutionVersion.V2`, `OutsideExecutionVersion.V1`, or `OutsideExecutionVersion.UNSUPPORTED`.
+
 ## Basic concept
 
 Instead of using the account's private key, outside execution uses:

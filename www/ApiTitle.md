@@ -1,6 +1,6 @@
-## Provider
+## RpcProvider
 
-The Provider [**API**](./classes/Provider.md) allows you to interact with the Starknet network, without signing transactions or messages.
+The RpcProvider [**API**](./classes/Provider.md) (`Provider` is a backward-compatibility alias) allows you to interact with the Starknet network, without signing transactions or messages.
 
 Typically, these are _read_ calls on the blockchain.
 
@@ -8,7 +8,7 @@ Guide is [**here**](../guides/provider_instance.md).
 
 ## Account
 
-Account extends <ins>[`Provider`](./classes/Provider)</ins> and inherits all of its methods.
+Account has a <ins>[`RpcProvider`](./classes/Provider.md)</ins> instance and delegates read methods through that provider.
 
 It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](./classes/Signer)</ins>, declare and deploy Contracts and new Accounts.
 
