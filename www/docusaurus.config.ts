@@ -6,6 +6,14 @@ const { github: lightCodeTheme, dracula: darkCodeTheme } = themes;
 
 const generateBaseUrl = (baseUrl = ''): string => `/${baseUrl.trim()}/`.replace(/\/+/g, '/');
 
+const requireEnv = (name: string): string => {
+  const value = process.env[name]?.trim();
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+};
+
 const generateSourceLinkTemplate = (gitRevision?: string): string =>
   `https://github.com/starknet-io/starknet.js/blob/${
     gitRevision || '{gitRevision}'
@@ -162,7 +170,7 @@ const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/gu
 const config: Config = {
   title: 'Starknet.js',
   tagline: 'JavaScript library for Starknet',
-  url: 'https://starknet-io.github.io',
+  url: requireEnv('DOCS_URL'),
   baseUrl: generateBaseUrl(process.env.DOCS_BASE_URL),
   markdown: {
     format: 'detect',
@@ -323,6 +331,8 @@ const config: Config = {
         tsconfig: '../tsconfig.json',
         out: 'docs/API',
         name: 'Starknet.js API',
+        // Keep `docs/API/.gitkeep` (see www/.gitignore) by not wiping the output dir on build.
+        cleanOutputDir: false,
         includeVersion: true,
         fileExtension: '.md',
         sourceLinkTemplate: generateSourceLinkTemplate(
