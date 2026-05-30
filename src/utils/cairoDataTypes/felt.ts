@@ -16,46 +16,6 @@ import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 
 /**
- * @deprecated use the CairoFelt252 class instead, this one is limited to ASCII strings
- * Create felt Cairo type (cairo type helper)
- * @returns format: felt-string
- */
-export function CairoFelt(it: BigNumberish): string {
-  // BN or number
-  if (isBigInt(it) || Number.isInteger(it)) {
-    return it.toString();
-  }
-
-  // Handling strings
-  if (isString(it)) {
-    // Hex strings
-    if (isHex(it)) {
-      return BigInt(it).toString();
-    }
-    // Text strings that must be short
-    if (isText(it)) {
-      if (!isShortString(it)) {
-        throw new Error(
-          `${it} is a long string > 31 chars. Please split it into an array of short strings.`
-        );
-      }
-      // Assuming encodeShortString returns a hex representation of the string
-      return BigInt(encodeShortString(it)).toString();
-    }
-    // Whole numeric strings
-    if (isStringWholeNumber(it)) {
-      return it;
-    }
-  }
-  // bool to felt
-  if (isBoolean(it)) {
-    return `${+it}`;
-  }
-
-  throw new Error(`${it} can't be computed by felt()`);
-}
-
-/**
  * felt252 is the basic field element used in Cairo.
  * It corresponds to an integer in the range 0 ≤ x < P where P is a very large prime number currently equal to 2^251 + 17⋅2^192 + 1.
  * Any operation that uses felt252 will be computed modulo P.
@@ -111,6 +71,10 @@ export class CairoFelt252 {
     return addCompiledFlag([this.toHexString()]);
   }
 
+  static assertRange(val: bigint): void {
+    assert(val >= 0n && val < PRIME, `Value ${val} is out of felt252 range [0, ${PRIME})`);
+  }
+
   static validate(data: BigNumberish | boolean | unknown): void {
     assert(data !== null, 'null value is not allowed for felt252');
     assert(data !== undefined, 'undefined value is not allowed for felt252');
@@ -121,7 +85,7 @@ export class CairoFelt252 {
 
     const value = CairoFelt252.__processData(data as BigNumberish | boolean);
     const bn = uint8ArrayToBigInt(value);
-    assert(bn >= 0n && bn < PRIME, `Value ${value} is out of felt252 range [0, ${PRIME})`);
+    CairoFelt252.assertRange(bn);
   }
 
   static is(data: BigNumberish | boolean | unknown): boolean {
@@ -143,4 +107,50 @@ export class CairoFelt252 {
      */
     return new CairoFelt252(getNext(responseIterator));
   }
+}
+
+/**
+ * @deprecated use the CairoFelt252 class instead, this one is limited to ASCII strings
+ * Create felt Cairo type (cairo type helper)
+ * @returns format: felt-string
+ */
+export function CairoFelt(it: BigNumberish): string {
+  // BN or number
+  if (isBigInt(it) || Number.isInteger(it)) {
+    const val = BigInt(it);
+    CairoFelt252.assertRange(val);
+    return val.toString();
+  }
+
+  // Handling strings
+  if (isString(it)) {
+    // Hex strings
+    if (isHex(it)) {
+      const val = BigInt(it);
+      CairoFelt252.assertRange(val);
+      return val.toString();
+    }
+    // Text strings that must be short
+    if (isText(it)) {
+      if (!isShortString(it)) {
+        throw new Error(
+          `${it} is a long string > 31 chars. Please split it into an array of short strings.`
+        );
+      }
+      // Assuming encodeShortString returns a hex representation of the string
+      return BigInt(encodeShortString(it)).toString();
+    }
+    // Whole numeric strings
+    if (isStringWholeNumber(it)) {
+      const val = BigInt(it);
+      CairoFelt252.assertRange(val);
+      return val.toString();
+    }
+  }
+  // bool to felt
+  if (isBoolean(it)) {
+    return `${+it}`;
+  }
+
+  throw new Error(`${it} can't be computed by felt()`);
 }
