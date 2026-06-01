@@ -6,9 +6,10 @@ const { github: lightCodeTheme, dracula: darkCodeTheme } = themes;
 
 const generateBaseUrl = (baseUrl = ''): string => `/${baseUrl.trim()}/`.replace(/\/+/g, '/');
 
-const requireEnv = (name: string): string => {
+const requireEnv = (name: string, fallback?: string): string => {
   const value = process.env[name]?.trim();
   if (!value) {
+    if (fallback !== undefined) return fallback;
     throw new Error(`Missing required environment variable: ${name}`);
   }
   return value;
@@ -159,7 +160,10 @@ const normalizeGeneratedSidebarLabels = <T extends GeneratedSidebarItem>(item: T
 
   return {
     ...item,
-    label: sidebarLabelReplacements[item.label] || item.label,
+    label:
+      typeof item.label === 'string'
+        ? sidebarLabelReplacements[item.label] || item.label
+        : item.label,
     items: item.items.map(normalizeGeneratedSidebarLabels),
   } as T;
 };
@@ -170,7 +174,7 @@ const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/gu
 const config: Config = {
   title: 'Starknet.js',
   tagline: 'JavaScript library for Starknet',
-  url: requireEnv('DOCS_URL'),
+  url: requireEnv('DOCS_URL', 'http://localhost:3000'),
   baseUrl: generateBaseUrl(process.env.DOCS_BASE_URL),
   markdown: {
     format: 'detect',
