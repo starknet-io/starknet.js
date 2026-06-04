@@ -339,7 +339,7 @@ describe('typedData', () => {
 
     messageHash = getMessageHash(examplePresetTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x185b339d5c566a883561a88fb36da301051e2c0225deb325c91bb7aa2f3473a"`
+      `"0x16e540c07db37a545d639a19511fb28d0886786332a93c1e381d00aa30094f2"`
     );
 
     messageHash = getMessageHash(exampleEnum, exampleAddress);
@@ -356,6 +356,48 @@ describe('typedData', () => {
     expect(spyPoseidon).toHaveBeenCalled();
     spyPedersen.mockRestore();
     spyPoseidon.mockRestore();
+  });
+
+  test('should flatten u256 to match Cairo hash', () => {
+    const u256TypedData = {
+      types: {
+        StarknetDomain: [
+          { name: 'name', type: 'shortstring' },
+          { name: 'version', type: 'shortstring' },
+          { name: 'chainId', type: 'shortstring' },
+          { name: 'revision', type: 'shortstring' },
+        ],
+        SimpleStruct: [{ name: 'some_u256', type: 'u256' }],
+      },
+      primaryType: 'SimpleStruct',
+      domain: {
+        name: 'DappName',
+        version: '1',
+        chainId: 'SN_SEPOLIA',
+        revision: '1',
+      },
+      message: {
+        some_u256: {
+          low: 1000,
+          high: 0,
+        },
+      },
+    };
+
+    const typeHash = getTypeHash(u256TypedData.types, 'SimpleStruct', TypedDataRevision.ACTIVE);
+    expect(typeHash).toMatchInlineSnapshot(
+      `"0x36991bcf00d0c2ac546204827d8a5e9924e5495b1184866fb61407bc92f76d3"`
+    );
+
+    const structHash = getStructHash(
+      u256TypedData.types,
+      'SimpleStruct',
+      u256TypedData.message,
+      TypedDataRevision.ACTIVE
+    );
+    expect(structHash).toMatchInlineSnapshot(
+      `"0x163fd1c083b57a2c46420dad63029329de470d95ddd6738637dcc11bc3a5d7d"`
+    );
   });
 
   describe('should fail validation', () => {
@@ -377,6 +419,56 @@ describe('typedData', () => {
       { type: 'shortstring' },
     ])('out of bounds - $type', ({ type }) => {
       expect(() => getMessageHash(baseTypes(type), exampleAddress)).toThrow(RegExp(type));
+    });
+
+    test('out of bounds - u256 low', () => {
+      const u256TypedData = {
+        types: {
+          StarknetDomain: [
+            { name: 'name', type: 'shortstring' },
+            { name: 'version', type: 'shortstring' },
+            { name: 'chainId', type: 'shortstring' },
+            { name: 'revision', type: 'shortstring' },
+          ],
+          Example: [{ name: 'value', type: 'u256' }],
+        },
+        primaryType: 'Example',
+        domain: {
+          name: 'Test',
+          version: '1',
+          chainId: '1',
+          revision: '1',
+        },
+        message: {
+          value: { low: PRIME, high: 0 },
+        },
+      };
+      expect(() => getMessageHash(u256TypedData, exampleAddress)).toThrow(/u128/);
+    });
+
+    test('out of bounds - u256 high', () => {
+      const u256TypedData = {
+        types: {
+          StarknetDomain: [
+            { name: 'name', type: 'shortstring' },
+            { name: 'version', type: 'shortstring' },
+            { name: 'chainId', type: 'shortstring' },
+            { name: 'revision', type: 'shortstring' },
+          ],
+          Example: [{ name: 'value', type: 'u256' }],
+        },
+        primaryType: 'Example',
+        domain: {
+          name: 'Test',
+          version: '1',
+          chainId: '1',
+          revision: '1',
+        },
+        message: {
+          value: { low: 0, high: PRIME },
+        },
+      };
+      expect(() => getMessageHash(u256TypedData, exampleAddress)).toThrow(/u128/);
     });
   });
 

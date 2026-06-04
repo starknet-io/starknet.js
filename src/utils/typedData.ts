@@ -332,34 +332,50 @@ export function getTypeHash(
  * // result1 = ['felt', '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e']
  * ```
  */
-export function encodeValue(
+function encodeValues(
   types: TypedData['types'],
   type: string,
   data: unknown,
   ctx: Context = {},
   revision: Revision = Revision.LEGACY
-): [string, string] {
+): [string[], string[]] {
+  if (type === 'u256' && revision === Revision.ACTIVE) {
+    const value = data as { low: BigNumberish; high: BigNumberish };
+    assertRange(value.low, 'u128', RANGE_U128);
+    assertRange(value.high, 'u128', RANGE_U128);
+    return [
+      ['u128', 'u128'],
+      [getHex(value.low), getHex(value.high)],
+    ];
+  }
+
   if (types[type]) {
-    return [type, getStructHash(types, type, data as TypedData['message'], revision)];
+    return [[type], [getStructHash(types, type, data as TypedData['message'], revision)]];
   }
 
   if (revisionConfiguration[revision].presetTypes[type]) {
     return [
-      type,
-      getStructHash(
-        revisionConfiguration[revision].presetTypes,
-        type,
-        data as TypedData['message'],
-        revision
-      ),
+      [type],
+      [
+        getStructHash(
+          revisionConfiguration[revision].presetTypes,
+          type,
+          data as TypedData['message'],
+          revision
+        ),
+      ],
     ];
   }
 
   if (type.endsWith('*')) {
-    const hashes: string[] = (data as Array<TypedData['message']>).map(
-      (entry) => encodeValue(types, type.slice(0, -1), entry, undefined, revision)[1]
-    );
-    return [type, revisionConfiguration[revision].hashMethod(hashes)];
+    const hashes: string[] = (data as Array<TypedData['message']>).map((entry) => {
+      const [, values] = encodeValues(types, type.slice(0, -1), entry, undefined, revision);
+      if (values.length > 1) {
+        return revisionConfiguration[revision].hashMethod(values);
+      }
+      return values[0];
+    });
+    return [[type], [revisionConfiguration[revision].hashMethod(hashes)]];
   }
 
   switch (type) {
@@ -372,34 +388,43 @@ export function encodeValue(
         const variantType = enumType.find((t) => t.name === variantKey) as StarknetType;
         const variantIndex = enumType.indexOf(variantType);
 
-        const encodedSubtypes = variantType.type
+        const encodedSubtypes: string[] = [];
+        variantType.type
           .slice(1, -1)
           .split(',')
-          .map((subtype, index) => {
-            if (!subtype) return subtype;
+          .forEach((subtype, index) => {
+            if (!subtype) {
+              encodedSubtypes.push(subtype);
+              return;
+            }
             const subtypeData = (variantData as unknown[])[index];
-            return encodeValue(types, subtype, subtypeData, undefined, revision)[1];
+            const [, values] = encodeValues(types, subtype, subtypeData, undefined, revision);
+            encodedSubtypes.push(...values);
           });
         return [
-          type,
-          revisionConfiguration[revision].hashMethod([variantIndex, ...encodedSubtypes]),
+          [type],
+          [revisionConfiguration[revision].hashMethod([variantIndex, ...encodedSubtypes])],
         ];
       } // else fall through to default
-      return [type, getHex(data as string)];
+      return [[type], [getHex(data as string)]];
     }
     case 'merkletree': {
       const merkleTreeType = getMerkleTreeType(types, ctx);
       const structHashes: string[] = (data as Array<TypedData['message']>).map((struct) => {
-        return encodeValue(types, merkleTreeType, struct, undefined, revision)[1];
+        const [, values] = encodeValues(types, merkleTreeType, struct, undefined, revision);
+        if (values.length > 1) {
+          return revisionConfiguration[revision].hashMethod(values);
+        }
+        return values[0];
       });
       const { root } = new MerkleTree(
         structHashes as string[],
         revisionConfiguration[revision].hashMerkleMethod
       );
-      return ['felt', root];
+      return [['felt'], [root]];
     }
     case 'selector': {
-      return ['felt', prepareSelector(data as string)];
+      return [['felt'], [prepareSelector(data as string)]];
     }
     case 'string': {
       if (revision === Revision.ACTIVE) {
@@ -410,24 +435,24 @@ export function encodeValue(
           byteArray.pending_word,
           byteArray.pending_word_len,
         ];
-        return [type, revisionConfiguration[revision].hashMethod(elements)];
+        return [[type], [revisionConfiguration[revision].hashMethod(elements)]];
       } // else fall through to default
-      return [type, getHex(data as string)];
+      return [[type], [getHex(data as string)]];
     }
     case 'i128': {
       if (revision === Revision.ACTIVE) {
         const value = BigInt(data as string);
         assertRange(value, type, RANGE_I128);
-        return [type, getHex(value < 0n ? PRIME + value : value)];
+        return [[type], [getHex(value < 0n ? PRIME + value : value)]];
       } // else fall through to default
-      return [type, getHex(data as string)];
+      return [[type], [getHex(data as string)]];
     }
     case 'timestamp':
     case 'u128': {
       if (revision === Revision.ACTIVE) {
         assertRange(data, type, RANGE_U128);
       } // else fall through to default
-      return [type, getHex(data as string)];
+      return [[type], [getHex(data as string)]];
     }
     case 'felt':
     case 'shortstring': {
@@ -435,28 +460,42 @@ export function encodeValue(
       if (revision === Revision.ACTIVE) {
         assertRange(getHex(data as string), type, RANGE_FELT);
       } // else fall through to default
-      return [type, getHex(data as string)];
+      return [[type], [getHex(data as string)]];
     }
     case 'ClassHash':
     case 'ContractAddress': {
       if (revision === Revision.ACTIVE) {
         assertRange(data, type, RANGE_FELT);
       } // else fall through to default
-      return [type, getHex(data as string)];
+      return [[type], [getHex(data as string)]];
     }
     case 'bool': {
       if (revision === Revision.ACTIVE) {
         assert(isBoolean(data), `Type mismatch for ${type} ${data}`);
       } // else fall through to default
-      return [type, getHex(data as string)];
+      return [[type], [getHex(data as string)]];
     }
     default: {
       if (revision === Revision.ACTIVE) {
         throw new Error(`Unsupported type: ${type}`);
       }
-      return [type, getHex(data as string)];
+      return [[type], [getHex(data as string)]];
     }
   }
+}
+
+export function encodeValue(
+  types: TypedData['types'],
+  type: string,
+  data: unknown,
+  ctx: Context = {},
+  revision: Revision = Revision.LEGACY
+): [string, string] {
+  const [typesArr, valuesArr] = encodeValues(types, type, data, ctx, revision);
+  if (typesArr.length !== 1 || valuesArr.length !== 1) {
+    throw new Error(`Type '${type}' encodes to multiple values`);
+  }
+  return [typesArr[0], valuesArr[0]];
 }
 
 /**
@@ -488,11 +527,11 @@ export function encodeData<T extends TypedData>(
 
       const value = data[field.name as keyof T['message']];
       const ctx = { parent: type, key: field.name };
-      const [t, encodedValue] = encodeValue(types, field.type, value, ctx, revision);
+      const [fieldTypes, fieldValues] = encodeValues(types, field.type, value, ctx, revision);
 
       return [
-        [...ts, t],
-        [...vs, encodedValue],
+        [...ts, ...fieldTypes],
+        [...vs, ...fieldValues],
       ];
     },
     [['felt'], [getTypeHash(types, type, revision)]]
