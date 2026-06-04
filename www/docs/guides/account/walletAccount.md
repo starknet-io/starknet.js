@@ -94,6 +94,91 @@ useEffect(() => {
 , [selectedWalletAccountV5, addEvent]);
 ```
 
+## With get-starknet v6
+
+`WalletAccountV6` extends `WalletAccountV5` with support for the **STRK20 privacy protocol** — a privacy layer for token operations using zero-knowledge proofs.
+
+When retrieving information from Starknet, a `WalletAccountV6` instance reads directly from the blockchain via its provider. If you want to write to Starknet, `WalletAccountV6` asks the wallet to sign and send the transaction using the Starknet Wallet API v6.
+
+:::note
+`get-starknet v6` is not yet published. This section documents the expected API once it is available.
+:::
+
+### Select a Wallet
+
+The wallet selection follows the same pattern as v5:
+
+```typescript
+import { createStore, type Store } from '@starknet-io/get-starknet/discovery'; // v6.0.0 min
+import { type WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard/features'; // v6
+import { WalletAccountV6, walletV6 } from 'starknet';
+
+const myFrontendProviderUrl = 'https://free-rpc.nethermind.io/sepolia-juno/v0_10';
+const store: Store = createStore();
+const walletsList: WalletWithStarknetFeatures[] = store.getWallets();
+// Create your own component to select one of these wallets.
+// Hereunder, selection of 2nd wallet of the list.
+const selectedWallet: WalletWithStarknetFeatures = walletsList[1];
+const myWalletAccount: WalletAccountV6 = await WalletAccountV6.connect(
+  { nodeUrl: myFrontendProviderUrl },
+  selectedWallet
+);
+```
+
+### STRK20 privacy protocol
+
+`WalletAccountV6` exposes three dedicated methods for STRK20 token operations.
+
+#### Get STRK20 balances
+
+```typescript
+import type { STRK20_BALANCE_ENTRY } from 'starknet';
+
+const balances: STRK20_BALANCE_ENTRY[] = await myWalletAccount.strk20Balances([
+  '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d', // STRK token address
+]);
+console.log('balance =', balances[0].balance);
+```
+
+#### Prepare a STRK20 invoke
+
+Before executing a private transaction, request the wallet to compute the associated ZK proof:
+
+```typescript
+import type { STRK20_ACTION, STRK20_CALL_AND_PROOF } from 'starknet';
+
+const actions: STRK20_ACTION[] = [
+  // ... STRK20 actions
+];
+const prepared: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions);
+// or with simulation:
+const simulated: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions, true);
+```
+
+#### Execute a STRK20 transaction
+
+```typescript
+const result = await myWalletAccount.strk20InvokeTransaction(actions);
+console.log('transaction hash =', result.transaction_hash);
+```
+
+#### Execute with a privacy proof
+
+The `execute()` method accepts an optional `proof` parameter to attach a STRK20 ZK proof to a standard invoke:
+
+```typescript
+import type { STRK20_PROOF } from 'starknet';
+
+const { calls, proof }: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions);
+
+// Execute with the attached proof
+const resp = await myWalletAccount.execute(calls, proof);
+```
+
+### Subscription to events
+
+Subscription works identically to v5 — see the [v5 section](#subscription-to-events) above.
+
 ## With get-starknet v4
 
 The concept of Starknet reading/writing is the same when using `get-starknet v4` and the `WalletAccount` class.
