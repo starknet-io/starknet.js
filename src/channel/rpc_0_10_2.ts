@@ -1,3 +1,4 @@
+import * as RPC from '@starknet-io/starknet-types-0101';
 import {
   NetworkName,
   StarknetChainId,
@@ -22,7 +23,7 @@ import {
   waitForTransactionOptions,
 } from '../types';
 import assert from '../utils/assert';
-import { ETransactionType, JRPC, RPCSPEC0101 as RPC } from '../types/api';
+import { ETransactionType, JRPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -51,7 +52,7 @@ import { logger } from '../global/logger';
 import { config } from '../global/config';
 
 export class RpcChannel {
-  readonly id = 'RPC0.10.2';
+  readonly id: string = 'RPC0.10.2';
 
   /**
    * RPC specification version this Channel class implements

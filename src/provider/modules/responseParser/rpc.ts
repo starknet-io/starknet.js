@@ -13,7 +13,7 @@ import type {
   SimulateTransactionOverheadResponse,
   EstimateFeeResponseBulkOverhead,
 } from '../../types/index.type';
-import { RPCSPEC0101 } from '../../../types/api';
+import { RPCSPEC0103 } from '../../../types/api';
 import { isString } from '../../../utils/typed';
 import { toOverheadOverallFee, toOverheadResourceBounds } from '../../../utils/stark';
 import { ResponseParser } from './interface';
@@ -87,8 +87,8 @@ export class RPCResponseParser implements Omit<
   }
 
   public parseStorageResponse(
-    res: RPCSPEC0101.FELT | RPCSPEC0101.STORAGE_RESULT
-  ): RPCSPEC0101.STORAGE_RESULT {
+    res: RPCSPEC0103.FELT | RPCSPEC0103.STORAGE_RESULT
+  ): RPCSPEC0103.STORAGE_RESULT {
     // Normalize response: wrap FELT (string) in STORAGE_RESULT if needed
     if (typeof res === 'string') {
       return { value: res, last_update_block: 0 };

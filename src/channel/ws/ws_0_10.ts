@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import {
   JRPC,
-  RPCSPEC0101,
+  RPCSPEC0103,
   StarknetEventsEvent,
   NewHeadsEvent,
   TransactionsStatusEvent,
@@ -58,7 +58,7 @@ export interface SubscribeNewTransactionsParams {
   /** Filter by sender addresses */
   senderAddress?: BigNumberish[];
   /** Subscription tags for additional data (RPC 0.10.1+) */
-  tags?: RPCSPEC0101.SUBSCRIPTION_TAG[];
+  tags?: RPCSPEC0103.SUBSCRIPTION_TAG[];
 }
 
 // Subscription Result types
