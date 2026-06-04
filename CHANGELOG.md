@@ -1,3 +1,9 @@
+## [10.0.4](https://github.com/starknet-io/starknet.js/compare/v10.0.3...v10.0.4) (2026-06-04)
+
+### Bug Fixes
+
+- add validation to cairofelt to ensure numbers are valid felt252 numbers ([f056836](https://github.com/starknet-io/starknet.js/commit/f0568369781e602a8a47dee76bb7ac13d152faaf))
+
 ## [10.0.3](https://github.com/starknet-io/starknet.js/compare/v10.0.2...v10.0.3) (2026-05-29)
 
 ### Bug Fixes
