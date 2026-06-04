@@ -30,17 +30,18 @@ From RPC v0.5.0, you can make a request to retrieve the RPC version that a node 
 ```typescript
 const resp = await myProvider.getSpecVersion();
 console.log('RPC version =', resp);
-// result: RPC version = 0.10.0
+// result: RPC version = 0.10.3
 ```
 
 The Starknet.js version must align with the RPC version supported by the chosen node as shown below:
 
-| RPC spec version of your node | Starknet.js version to use    |
-| :---------------------------: | ----------------------------- |
-|            v0.7.x             | Starknet.js v6.24.1 or v7.x.x |
-|            v0.8.x             | Starknet.js v7.x.x or v8.x.x  |
-|            v0.9.x             | Starknet.js v8.x.x or v9.x.x  |
-|            v0.10.x            | Starknet.js v9.x.x            |
+| RPC spec version of your node | Starknet.js version to use            |
+| :---------------------------: | ------------------------------------- |
+|            v0.7.x             | Starknet.js v6.24.1 or v7.x.x         |
+|            v0.8.x             | Starknet.js v7.x.x or v8.x.x          |
+|            v0.9.x             | Starknet.js v8.x.x, v9.x.x or v10.x.x |
+|            v0.10.0            | Starknet.js v9.x.x or v10.x.x         |
+|       v0.10.2 and above       | Starknet.js v10.x.x                   |
 
 :::note
 
@@ -99,7 +100,7 @@ import { RpcProvider } from 'starknet';
 
 ### Default RPC node
 
-If you don't want to use a specific node or to handle an API key, you can use one of the defaults (using RPC spec v0.10.0):
+If you don't want to use a specific node or to handle an API key, you can use one of the defaults (using RPC spec v0.10.3):
 
 ```typescript
 const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_SEPOLIA });
