@@ -55,11 +55,12 @@ export function addStarknetChain(
 
 export function switchStarknetChain(
   walletWSF: WalletWithStarknetFeatures,
-  chainId: ChainId
+  chainId: ChainId,
+  silent_mode: boolean = false
 ): Promise<boolean> {
   return walletWSF.features['starknet:walletApi'].request({
     type: 'wallet_switchStarknetChain',
-    params: { chainId },
+    params: { chainId, silent_mode },
   });
 }
 

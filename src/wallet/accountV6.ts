@@ -16,7 +16,9 @@ import {
   strk20Balances,
   strk20InvokeTransaction,
   strk20PrepareInvoke,
+  switchStarknetChain,
 } from './connectV6';
+import { StarknetChainId } from '../global/constants';
 import type { WalletAccountV6Options } from './types/index.type';
 
 /**
@@ -31,6 +33,10 @@ export class WalletAccountV6 extends WalletAccountV5 {
 
   private get v6Provider(): WalletWithStarknetFeaturesV6 {
     return this.walletProvider as unknown as WalletWithStarknetFeaturesV6;
+  }
+
+  override switchStarknetChain(chainId: StarknetChainId, silent_mode: boolean = false) {
+    return switchStarknetChain(this.v6Provider, chainId, silent_mode);
   }
 
   override execute(calls: AllowArray<Call>, proof?: STRK20_PROOF) {
