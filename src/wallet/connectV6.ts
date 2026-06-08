@@ -1,4 +1,4 @@
-import type { WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard-v6/features';
+import type { WalletWithStarknetFeatures as WalletWithStarknetFeaturesV6 } from '@starknet-io/get-starknet-wallet-standard-v6/features';
 import type { StandardEventsChangeProperties } from '@wallet-standard/features';
 import {
   type WatchAssetParameters,
@@ -17,10 +17,11 @@ import {
   type STRK20_ACTION,
   type STRK20_CALL_AND_PROOF,
   type STRK20_BALANCE_ENTRY,
+  type API_VERSION,
 } from '@starknet-io/starknet-types-0103';
 
 export function requestAccounts(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   silent_mode: boolean = false
 ): Promise<Address[]> {
   return walletWSF.features['starknet:walletApi'].request({
@@ -29,12 +30,12 @@ export function requestAccounts(
   });
 }
 
-export function getPermissions(walletWSF: WalletWithStarknetFeatures): Promise<Permission[]> {
+export function getPermissions(walletWSF: WalletWithStarknetFeaturesV6): Promise<Permission[]> {
   return walletWSF.features['starknet:walletApi'].request({ type: 'wallet_getPermissions' });
 }
 
 export function watchAsset(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   asset: WatchAssetParameters
 ): Promise<boolean> {
   return walletWSF.features['starknet:walletApi'].request({
@@ -44,7 +45,7 @@ export function watchAsset(
 }
 
 export function addStarknetChain(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   chain: AddStarknetChainParameters
 ): Promise<boolean> {
   return walletWSF.features['starknet:walletApi'].request({
@@ -54,7 +55,7 @@ export function addStarknetChain(
 }
 
 export function switchStarknetChain(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   chainId: ChainId,
   silent_mode: boolean = false
 ): Promise<boolean> {
@@ -64,18 +65,18 @@ export function switchStarknetChain(
   });
 }
 
-export function requestChainId(walletWSF: WalletWithStarknetFeatures): Promise<ChainId> {
+export function requestChainId(walletWSF: WalletWithStarknetFeaturesV6): Promise<ChainId> {
   return walletWSF.features['starknet:walletApi'].request({ type: 'wallet_requestChainId' });
 }
 
 export function deploymentData(
-  walletWSF: WalletWithStarknetFeatures
+  walletWSF: WalletWithStarknetFeaturesV6
 ): Promise<AccountDeploymentData> {
   return walletWSF.features['starknet:walletApi'].request({ type: 'wallet_deploymentData' });
 }
 
 export function addInvokeTransaction(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   params: AddInvokeTransactionParameters
 ): Promise<AddInvokeTransactionResult> {
   return walletWSF.features['starknet:walletApi'].request({
@@ -85,7 +86,7 @@ export function addInvokeTransaction(
 }
 
 export function addDeclareTransaction(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   params: AddDeclareTransactionParameters
 ): Promise<AddDeclareTransactionResult> {
   return walletWSF.features['starknet:walletApi'].request({
@@ -95,7 +96,7 @@ export function addDeclareTransaction(
 }
 
 export function signMessage(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   typedData: TypedData
 ): Promise<Signature> {
   return walletWSF.features['starknet:walletApi'].request({
@@ -104,19 +105,25 @@ export function signMessage(
   });
 }
 
-export function supportedSpecs(walletWSF: WalletWithStarknetFeatures): Promise<SpecVersion[]> {
+export function supportedSpecs(walletWSF: WalletWithStarknetFeaturesV6): Promise<SpecVersion[]> {
   return walletWSF.features['starknet:walletApi'].request({ type: 'wallet_supportedSpecs' });
 }
 
+export function supportedWalletApi(
+  walletWSF: WalletWithStarknetFeaturesV6
+): Promise<API_VERSION[]> {
+  return walletWSF.features['starknet:walletApi'].request({ type: 'wallet_supportedWalletApi' });
+}
+
 export function subscribeWalletEvent(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   callback: (change: StandardEventsChangeProperties) => void
 ): () => void {
   return walletWSF.features['standard:events'].on('change', callback);
 }
 
 export function strk20Balances(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   tokens: Address[]
 ): Promise<STRK20_BALANCE_ENTRY[]> {
   return walletWSF.features['starknet:walletApi'].request({
@@ -126,7 +133,7 @@ export function strk20Balances(
 }
 
 export function strk20PrepareInvoke(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   actions: STRK20_ACTION[],
   simulate?: boolean
 ): Promise<STRK20_CALL_AND_PROOF> {
@@ -137,7 +144,7 @@ export function strk20PrepareInvoke(
 }
 
 export function strk20InvokeTransaction(
-  walletWSF: WalletWithStarknetFeatures,
+  walletWSF: WalletWithStarknetFeaturesV6,
   actions: STRK20_ACTION[]
 ): Promise<{ transaction_hash: string }> {
   return walletWSF.features['starknet:walletApi'].request({

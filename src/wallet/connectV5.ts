@@ -14,6 +14,7 @@ import {
   AccountDeploymentData,
   Signature,
   SpecVersion,
+  API_VERSION,
 } from '@starknet-io/starknet-types-0101';
 
 /**
@@ -164,6 +165,15 @@ export function signMessage(
  */
 export function supportedSpecs(walletWSF: WalletWithStarknetFeatures): Promise<SpecVersion[]> {
   return walletWSF.features['starknet:walletApi'].request({ type: 'wallet_supportedSpecs' });
+}
+
+/**
+ * Get the list of supported wallet API versions.
+ * @param {WalletWithStarknetFeatures} walletWSF - The get-starknet V5 wallet object to use.
+ * @returns {API_VERSION[]} An array of supported wallet API version strings.
+ */
+export function supportedWalletApi(walletWSF: WalletWithStarknetFeatures): Promise<API_VERSION[]> {
+  return walletWSF.features['starknet:walletApi'].request({ type: 'wallet_supportedWalletApi' });
 }
 
 /**
