@@ -39,7 +39,7 @@ export class WalletAccountV6 extends WalletAccountV5 {
     return switchStarknetChain(this.v6Provider, chainId, silent_mode);
   }
 
-  override execute(calls: AllowArray<Call>, proof?: STRK20_PROOF) {
+  public executeWithProof(calls: AllowArray<Call>, proof?: STRK20_PROOF) {
     const txCalls = [].concat(calls as any).map((it: any) => ({
       contract_address: it.contractAddress,
       entry_point: it.entrypoint,

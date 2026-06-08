@@ -164,7 +164,7 @@ console.log('transaction hash =', result.transaction_hash);
 
 #### Execute with a privacy proof
 
-The `execute()` method accepts an optional `proof` parameter to attach a STRK20 ZK proof to a standard invoke:
+The `executeWithProof()` method attaches a STRK20 ZK proof to a standard invoke:
 
 ```typescript
 import type { STRK20_PROOF } from 'starknet';
@@ -172,7 +172,7 @@ import type { STRK20_PROOF } from 'starknet';
 const { calls, proof }: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions);
 
 // Execute with the attached proof
-const resp = await myWalletAccount.execute(calls, proof);
+const resp = await myWalletAccount.executeWithProof(calls, proof);
 ```
 
 ### Subscription to events
