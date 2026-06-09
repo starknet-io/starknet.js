@@ -8,6 +8,7 @@ import {
   describeIfRpc,
   describeIfTestnet,
   ETHtokenAddress,
+  STRKtokenAddress,
   getTestAccount,
   initializeMatcher,
   waitNextBlock,
@@ -316,7 +317,7 @@ describeIfRpc('RPCProvider', () => {
     beforeAll(async () => {
       // add a Tx to be sure to have at least one Tx in the last block
       const { transaction_hash } = await account.execute({
-        contractAddress: ETHtokenAddress,
+        contractAddress: STRKtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: account.address,
