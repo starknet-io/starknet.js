@@ -168,14 +168,17 @@ const normalizeGeneratedSidebarLabels = <T extends GeneratedSidebarItem>(item: T
   } as T;
 };
 
-const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/guides/migrate`;
-// const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/next/guides/migrate`;
+const DEFAULT_DOCS_URL = 'https://starknet-io.github.io';
+const DEFAULT_DOCS_BASE_URL = '/starknet.js/';
+const docsBaseUrl = generateBaseUrl(process.env.DOCS_BASE_URL || DEFAULT_DOCS_BASE_URL);
+const migrationGuideLink = `${docsBaseUrl}docs/guides/migrate`;
+// const migrationGuideLink = `${docsBaseUrl}docs/next/guides/migrate`;
 
 const config: Config = {
   title: 'Starknet.js',
   tagline: 'JavaScript library for Starknet',
-  url: requireEnv('DOCS_URL', 'http://localhost:3000'),
-  baseUrl: generateBaseUrl(process.env.DOCS_BASE_URL),
+  url: requireEnv('DOCS_URL', DEFAULT_DOCS_URL),
+  baseUrl: docsBaseUrl,
   markdown: {
     format: 'detect',
     preprocessor: addGeneratedApiCompatibilityAnchors,
