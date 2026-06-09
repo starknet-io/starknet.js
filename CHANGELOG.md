@@ -1,3 +1,9 @@
+# [10.1.0](https://github.com/starknet-io/starknet.js/compare/v10.0.4...v10.1.0) (2026-06-09)
+
+### Features
+
+- add RPC 0.10.3 support (starknet-types-0103, RpcChannel v0_10_3) ([d7792fb](https://github.com/starknet-io/starknet.js/commit/d7792fbb4b0e64907ef0f2bfdbc1adfe60823688))
+
 ## [10.0.4](https://github.com/starknet-io/starknet.js/compare/v10.0.3...v10.0.4) (2026-06-04)
 
 ### Bug Fixes
