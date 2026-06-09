@@ -104,9 +104,11 @@ const _SupportedRpcVersion = {
   '0.9.0': '0.9.0',
   '0.10.0': '0.10.0',
   '0.10.2': '0.10.2',
+  '0.10.3': '0.10.3',
   v0_9_0: '0.9.0',
   v0_10_0: '0.10.0',
   v0_10_2: '0.10.2',
+  v0_10_3: '0.10.3',
 } as const;
 type _SupportedRpcVersion = ValuesType<typeof _SupportedRpcVersion>;
 export { _SupportedRpcVersion as SupportedRpcVersion };
@@ -116,7 +118,8 @@ export { _SupportedRpcVersion as SupportedRpcVersion };
  */
 export type SupportedRpcVersion0_10 =
   | typeof _SupportedRpcVersion.v0_10_0
-  | typeof _SupportedRpcVersion.v0_10_2;
+  | typeof _SupportedRpcVersion.v0_10_2
+  | typeof _SupportedRpcVersion.v0_10_3;
 
 export type SupportedTransactionVersion = typeof ETransactionVersion.V3;
 export type SupportedCairoVersion = '1';

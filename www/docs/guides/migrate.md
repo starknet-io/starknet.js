@@ -634,6 +634,50 @@ When upgrading from v9 to v10:
   - [ ] Verify all provider method calls work with `account.provider.xyz()`
   - [ ] Test plugin functionality (StarknetId, BrotherId)
 
+## RPC 0.10.3 Support (v10.x)
+
+Starknet.js v10.x adds support for RPC spec 0.10.3 as the new default version. Two public exports were renamed to reflect this:
+
+### `RPCSPEC0101` → `RPCSPEC0103`
+
+The namespace re-exporting the current 0.10.x RPC spec types was renamed.
+
+**❌ Before:**
+
+```typescript
+import { RPCSPEC0101 } from 'starknet';
+
+type MyBlock = RPCSPEC0101.BLOCK_WITH_TXS;
+```
+
+**✅ After:**
+
+```typescript
+import { RPCSPEC0103 } from 'starknet';
+
+type MyBlock = RPCSPEC0103.BLOCK_WITH_TXS;
+```
+
+### `RPC0101` → `RPC0102`
+
+The channel namespace for the RPC 0.10.2 implementation was renamed.
+
+**❌ Before:**
+
+```typescript
+import { RPC0101 } from 'starknet';
+```
+
+**✅ After:**
+
+```typescript
+import { RPC0102 } from 'starknet';
+```
+
+:::note
+These changes only affect advanced usage (raw RPC spec types and direct channel imports). Standard usage via `RpcProvider`, `Account`, and high-level methods is unaffected.
+:::
+
 ## Need Help?
 
 - Check the [Plugin System Guide](./plugins.md) for details on how plugins work

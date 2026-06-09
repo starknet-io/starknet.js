@@ -17,7 +17,7 @@ Custom keys can also be used to store and use arbitrary values during runtime.
 import { config } from 'starknet';
 
 // Set existing or custom global property
-config.set('rpcVersion', '0.9.1');
+config.set('rpcVersion', '0.9.0');
 
 // Set WebSocket implementation for Node.js (if using older than Node.js 22)
 import WebSocket from 'ws';
@@ -65,8 +65,8 @@ Here are all the available configuration properties:
 
 ```ts
 {
-  // RPC version to use when communicating with nodes ('0.8.1' or '0.9.1')
-  rpcVersion: '0.9.1',
+  // RPC version to use when communicating with nodes ('0.9.0', '0.10.0', '0.10.2', '0.10.3')
+  rpcVersion: '0.10.0',
 
   // Transaction version to use (only V3 is supported in v8)
   transactionVersion: ETransactionVersion.V3,

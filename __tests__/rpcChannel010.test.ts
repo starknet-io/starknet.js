@@ -1,4 +1,4 @@
-import { LibraryError, RPC0101, RpcError } from '../src';
+import { LibraryError, RPC0102, RpcError } from '../src';
 import {
   createBlockForDevnet,
   createTestProvider,
@@ -8,19 +8,19 @@ import {
 
 testIfRpc010('RpcChannel', () => {
   let nodeUrl: string;
-  let channel08: RPC0101.RpcChannel;
+  let channel08: RPC0102.RpcChannel;
   initializeMatcher(expect);
 
   beforeAll(async () => {
     nodeUrl = (await createTestProvider(false)).channel.nodeUrl;
-    channel08 = new RPC0101.RpcChannel({ nodeUrl });
+    channel08 = new RPC0102.RpcChannel({ nodeUrl });
 
     await createBlockForDevnet();
   });
 
   test('baseFetch override', async () => {
     const baseFetch = jest.fn();
-    const fetchChannel08 = new RPC0101.RpcChannel({ nodeUrl, baseFetch });
+    const fetchChannel08 = new RPC0102.RpcChannel({ nodeUrl, baseFetch });
     (fetchChannel08.fetch as any)();
     expect(baseFetch).toHaveBeenCalledTimes(1);
     baseFetch.mockClear();
@@ -59,7 +59,7 @@ testIfRpc010('RpcChannel', () => {
 });
 
 describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
-  let channel: RPC0101.RpcChannel;
+  let channel: RPC0102.RpcChannel;
   let fetchSpy: jest.SpyInstance;
 
   const mockJsonResponse = (result: any) => ({
@@ -67,7 +67,7 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
   });
 
   beforeAll(() => {
-    channel = new RPC0101.RpcChannel({ nodeUrl: 'http://localhost:5050/rpc' });
+    channel = new RPC0102.RpcChannel({ nodeUrl: 'http://localhost:5050/rpc' });
   });
 
   afterEach(() => {
