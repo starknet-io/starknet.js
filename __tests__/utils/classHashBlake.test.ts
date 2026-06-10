@@ -1,9 +1,6 @@
 import { config, hash } from '../../src';
 import { CONTRACTS } from '../config/fixtures';
 
-// Helper to print without Jest annotations
-const print = (message: string) => process.stdout.write(`${message}\n`);
-
 // Lazy load Blake2s implementations to avoid early native module loading
 // Note: Native modules like @napi-rs/blake-hash will still cause Jest open handle
 // warnings, but this is expected behavior and safe to ignore for this test file
@@ -151,9 +148,6 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     test('Hello Cairo2.6.0 - CompiledClassHash with Blake2s', () => {
       const compiledClassHash = hash.computeCompiledClassHashBlake(CONTRACTS.Hello260.casm);
 
-      // This will initially show the computed value for verification
-      print(`Blake2s hash: ${compiledClassHash}`);
-
       expect(compiledClassHash).toBeTruthy();
       expect(compiledClassHash).toMatch(/^0x[0-9a-f]+$/);
     });
@@ -161,16 +155,12 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     test('Hash Sierra - CompiledClassHash with Blake2s', () => {
       const compiledClassHash = hash.computeCompiledClassHashBlake(CONTRACTS.Hash.casm);
 
-      print(`Hash Sierra Blake2s hash: ${compiledClassHash}`);
-
       expect(compiledClassHash).toBeTruthy();
       expect(compiledClassHash).toMatch(/^0x[0-9a-f]+$/);
     });
 
     test('Complex Sierra - CompiledClassHash with Blake2s', () => {
       const compiledClassHash = hash.computeCompiledClassHashBlake(CONTRACTS.Erc20Oz100.casm);
-
-      print(`Erc20OZ Blake2s hash: ${compiledClassHash}`);
 
       expect(compiledClassHash).toBeTruthy();
       expect(compiledClassHash).toMatch(/^0x[0-9a-f]+$/);
@@ -187,8 +177,6 @@ describe('Blake2s Compiled Class Hash Tests', () => {
 
     test('Contract without constructor (only constructor)', () => {
       const compiledClassHash = hash.computeCompiledClassHashBlake(CONTRACTS.OnlyConstructor.casm);
-
-      print(`OnlyConstructor Blake2s hash: ${compiledClassHash}`);
 
       expect(compiledClassHash).toBeTruthy();
       expect(compiledClassHash).toMatch(/^0x[0-9a-f]+$/);
@@ -211,10 +199,6 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     test('Contract without bytecode segments (older Cairo)', () => {
       const { casm } = CONTRACTS.Hash;
 
-      // Check if it doesn't have bytecode segments
-      const hasSegments = casm.bytecode_segment_lengths !== undefined;
-      print(`HashSierra has bytecode segments: ${hasSegments}`);
-
       const compiledClassHash = hash.computeCompiledClassHashBlake(casm);
 
       expect(compiledClassHash).toBeTruthy();
@@ -226,9 +210,6 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     test('Blake2s hash should differ from Poseidon hash', () => {
       const blake2sHash = hash.computeCompiledClassHashBlake(CONTRACTS.Hello260.casm);
       const poseidonHash = hash.computeCompiledClassHash(CONTRACTS.Hello260.casm, '0.13.1');
-
-      print(`Blake2s: ${blake2sHash}`);
-      print(`Poseidon: ${poseidonHash}`);
 
       // They should be different
       expect(blake2sHash).not.toEqual(poseidonHash);
@@ -249,11 +230,6 @@ describe('Blake2s Compiled Class Hash Tests', () => {
     test('Compare speed: Default vs Custom blakejs vs Napi', () => {
       const { casm } = CONTRACTS.Blake2sVerificationContract;
 
-      print(`\n${'='.repeat(60)}`);
-      print('Blake2s Implementation Performance Comparison');
-      print(`Running ${iterations} iterations on test contract`);
-      print('='.repeat(60));
-
       // Test 1: Default implementation
       config.set('blake', undefined);
       const defaultStart = performance.now();
@@ -287,22 +263,6 @@ describe('Blake2s Compiled Class Hash Tests', () => {
 
       // Reset to default
       config.set('blake', undefined);
-
-      // Calculate statistics
-      const fastest = Math.min(defaultTime, blakejsTime, napiTime);
-      const defaultSpeedup = (defaultTime / fastest).toFixed(2);
-      const blakejsSpeedup = (blakejsTime / fastest).toFixed(2);
-      const napiSpeedup = (napiTime / fastest).toFixed(2);
-
-      print('\nResults:');
-      print(`  Default:       ${defaultTime.toFixed(2)}ms (${defaultSpeedup}x)`);
-      print(`  Custom blakejs: ${blakejsTime.toFixed(2)}ms (${blakejsSpeedup}x)`);
-      print(`  Napi:          ${napiTime.toFixed(2)}ms (${napiSpeedup}x)`);
-      print('\nAverage per iteration:');
-      print(`  Default:       ${(defaultTime / iterations).toFixed(3)}ms`);
-      print(`  Custom blakejs: ${(blakejsTime / iterations).toFixed(3)}ms`);
-      print(`  Napi:          ${(napiTime / iterations).toFixed(3)}ms`);
-      print('='.repeat(60));
 
       // Verify all implementations produce the same result
       config.set('blake', undefined);
@@ -316,15 +276,15 @@ describe('Blake2s Compiled Class Hash Tests', () => {
       expect(defaultHash).toBe(blakejsHash);
       expect(defaultHash).toBe(napiHash);
       expect(defaultHash).toBe('0x5f24011a3e6e287472f502666e474891655b77e333524830412b0d5988e2e81');
+
+      // Suppress unused variable warnings for timing variables
+      expect(defaultTime).toBeGreaterThan(0);
+      expect(blakejsTime).toBeGreaterThan(0);
+      expect(napiTime).toBeGreaterThan(0);
     });
 
     test('Performance on complex contract (ERC20)', () => {
       const { casm } = CONTRACTS.Erc20Oz100;
-
-      print(`\n${'='.repeat(60)}`);
-      print('Complex Contract (ERC20) Performance Comparison');
-      print(`Running ${iterations} iterations on ERC20 contract`);
-      print('='.repeat(60));
 
       // Test 1: Default implementation
       config.set('blake', undefined);
@@ -360,22 +320,6 @@ describe('Blake2s Compiled Class Hash Tests', () => {
       // Reset to default
       config.set('blake', undefined);
 
-      // Calculate statistics
-      const fastest = Math.min(defaultTime, blakejsTime, napiTime);
-      const defaultSpeedup = (defaultTime / fastest).toFixed(2);
-      const blakejsSpeedup = (blakejsTime / fastest).toFixed(2);
-      const napiSpeedup = (napiTime / fastest).toFixed(2);
-
-      print('\nResults:');
-      print(`  Default:       ${defaultTime.toFixed(2)}ms (${defaultSpeedup}x)`);
-      print(`  Custom blakejs: ${blakejsTime.toFixed(2)}ms (${blakejsSpeedup}x)`);
-      print(`  Napi:          ${napiTime.toFixed(2)}ms (${napiSpeedup}x)`);
-      print('\nAverage per iteration:');
-      print(`  Default:       ${(defaultTime / iterations).toFixed(3)}ms`);
-      print(`  Custom blakejs: ${(blakejsTime / iterations).toFixed(3)}ms`);
-      print(`  Napi:          ${(napiTime / iterations).toFixed(3)}ms`);
-      print('='.repeat(60));
-
       // Verify all implementations produce the same result
       config.set('blake', undefined);
       const defaultHash = hash.computeCompiledClassHashBlake(casm);
@@ -387,6 +331,11 @@ describe('Blake2s Compiled Class Hash Tests', () => {
 
       expect(defaultHash).toBe(blakejsHash);
       expect(defaultHash).toBe(napiHash);
+
+      // Suppress unused variable warnings for timing variables
+      expect(defaultTime).toBeGreaterThan(0);
+      expect(blakejsTime).toBeGreaterThan(0);
+      expect(napiTime).toBeGreaterThan(0);
     });
   });
 });
