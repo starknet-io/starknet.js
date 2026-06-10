@@ -1,3 +1,9 @@
+# [10.2.0](https://github.com/starknet-io/starknet.js/compare/v10.1.0...v10.2.0) (2026-06-10)
+
+### Features
+
+- in class CairoByteArray hash added. Solve a code cycling ([1ab4c06](https://github.com/starknet-io/starknet.js/commit/1ab4c06884f1decf0317010c4ae97e8ec40d9fd4))
+
 # [10.1.0](https://github.com/starknet-io/starknet.js/compare/v10.0.4...v10.1.0) (2026-06-09)
 
 ### Features
