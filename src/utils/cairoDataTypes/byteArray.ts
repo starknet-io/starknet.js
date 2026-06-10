@@ -8,6 +8,7 @@ import {
   concatenateArrayBuffer,
   stringToUint8Array,
 } from '../encode';
+import { computeHashOnElements } from '../hash/pedersenCore';
 import { getNext } from '../num';
 import { isBigInt, isBuffer, isInteger, isNumber, isString } from '../typed';
 import { addCompiledFlag } from '../helpers';
@@ -169,6 +170,32 @@ export class CairoByteArray {
   toBuffer() {
     const allBytes = concatenateArrayBuffer(this.toElements());
     return Buffer.from(allBytes);
+  }
+
+  /**
+   * Compute the Pedersen hash of this ByteArray, following OpenZeppelin's `hash_byte_array` algorithm.
+   *
+   * Serializes the ByteArray to its felt252 components (data array length, each data chunk,
+   * pending_word, pending_word_len), then chains Pedersen hash over all elements starting
+   * from 0, and finalizes with the total element count.
+   *
+   * @returns {string} hex-string felt252 Pedersen hash of the ByteArray
+   * @example
+   * ```typescript
+   * const ba = new CairoByteArray('Hello');
+   * const result = ba.hash();
+   * // result = 0x15d19ad651ffaf8e90a13938db2081fa3ff01de0712e00cbe69891bace66c51
+   * ```
+   */
+  hash(): string {
+    this.assertInitialized();
+    const serialized: string[] = [
+      addHexPrefix(this.data.length.toString(16)),
+      ...this.data.flatMap((bytes31) => bytes31.toApiRequest()),
+      ...this.pending_word.toApiRequest(),
+      ...this.pending_word_len.toApiRequest(),
+    ];
+    return computeHashOnElements(serialized);
   }
 
   /**
