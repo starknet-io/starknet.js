@@ -6,8 +6,9 @@ on: workflow_dispatch
 #     ORGANIZATION_NAME
 #     PROJECT_NAME
 #     DEPLOYMENT_BRANCH
-# - custom:
-#     DOCS_BASE_URL
+# - custom (Actions Variables):
+#     DOCS_URL (https://starknet-io.github.io)
+#     DOCS_BASE_URL (/starknet.js/)
 
 jobs:
   build:
@@ -33,6 +34,7 @@ jobs:
           rm -rf www/docs/API/
           npm run docs:build
         env:
+          DOCS_URL: ${{ vars.DOCS_URL || 'https://starknet-io.github.io' }}
           DOCS_BASE_URL: ${{ vars.DOCS_BASE_URL || '/starknet.js/' }}
       - name: Upload
         uses: actions/upload-pages-artifact@v3
