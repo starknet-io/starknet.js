@@ -168,8 +168,8 @@ const normalizeGeneratedSidebarLabels = <T extends GeneratedSidebarItem>(item: T
   } as T;
 };
 
-const DEFAULT_DOCS_URL = 'https://starknet-io.github.io';
-const DEFAULT_DOCS_BASE_URL = '/starknet.js/';
+const DEFAULT_DOCS_URL = 'http://localhost:3000';
+const DEFAULT_DOCS_BASE_URL = '/';
 const docsBaseUrl = generateBaseUrl(process.env.DOCS_BASE_URL || DEFAULT_DOCS_BASE_URL);
 const migrationGuideLink = `${docsBaseUrl}docs/guides/migrate`;
 // const migrationGuideLink = `${docsBaseUrl}docs/next/guides/migrate`;

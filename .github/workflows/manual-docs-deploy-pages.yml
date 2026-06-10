@@ -6,9 +6,9 @@ on: workflow_dispatch
 #     ORGANIZATION_NAME
 #     PROJECT_NAME
 #     DEPLOYMENT_BRANCH
-# - custom:
-#     DOCS_URL (defaults to https://starknet-io.github.io)
-#     DOCS_BASE_URL (defaults to /starknet.js/)
+# - custom (github-pages environment Variables):
+#     DOCS_URL (https://starknet-io.github.io)
+#     DOCS_BASE_URL (/starknet.js/)
 
 jobs:
   build:
