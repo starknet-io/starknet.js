@@ -1,3 +1,9 @@
+# [10.3.0](https://github.com/starknet-io/starknet.js/compare/v10.2.0...v10.3.0) (2026-06-10)
+
+### Features
+
+- creation of getSignedTransaction and invokeSignedTx ([3b85dfc](https://github.com/starknet-io/starknet.js/commit/3b85dfc319c9ebc284a60d4062d5397932331fe6))
+
 # [10.2.0](https://github.com/starknet-io/starknet.js/compare/v10.1.0...v10.2.0) (2026-06-10)
 
 ### Features
