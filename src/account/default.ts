@@ -58,6 +58,7 @@ import type {
   UniversalDetails,
   UserTransaction,
   waitForTransactionOptions,
+  RPC,
 } from '../types';
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
@@ -301,10 +302,21 @@ export class Account implements AccountInterface {
     });
   }
 
-  public async execute(
+  /**
+   * Shared preparation logic for execute() and buildExecute().
+   * Runs hooks, estimates fees, and builds accountInvocations.
+   * @private
+   */
+  private async prepareInvoke(
     transactions: AllowArray<Call>,
     transactionsDetail: UniversalDetails = {}
-  ): Promise<InvokeFunctionResponse> {
+  ): Promise<{
+    invocation: ({ type: typeof ETransactionType.INVOKE } & Invocation) &
+      InvocationsDetailsWithNonce;
+    hookedTransactions: AllowArray<Call>;
+    hookedDetails: UniversalDetails;
+    detailsWithTip: UniversalDetails & { tip: BigNumberish };
+  }> {
     // Run beforeExecute hooks
     const hookResult = this.accountPluginManager.runAccountHook('beforeExecute', {
       calls: transactions,
@@ -312,20 +324,18 @@ export class Account implements AccountInterface {
     });
     const hookedTransactions: AllowArray<Call> = hookResult?.calls ?? transactions;
     const hookedDetails: UniversalDetails = hookResult?.details ?? transactionsDetail;
-
     const calls = [hookedTransactions].flat();
     const detailsWithTip = await this.resolveDetailsWithTip(hookedDetails);
-
-    // Estimate resource bounds if not provided
     const { resourceBounds: providedResourceBounds } = hookedDetails;
     let resourceBounds = providedResourceBounds;
     if (!resourceBounds) {
       const estimateResponse = await this.estimateInvokeFee(calls, detailsWithTip);
       resourceBounds = estimateResponse.resourceBounds;
     }
-
     const accountInvocations = await this.accountInvocationsFactory(
-      [{ type: ETransactionType.INVOKE, payload: calls }],
+      [{ type: ETransactionType.INVOKE, payload: calls }] as [
+        { type: typeof ETransactionType.INVOKE; payload: AllowArray<Call> },
+      ],
       {
         ...v3Details(detailsWithTip),
         resourceBounds,
@@ -334,9 +344,20 @@ export class Account implements AccountInterface {
         skipValidate: false,
       }
     );
+    return {
+      invocation: accountInvocations[0],
+      hookedTransactions,
+      hookedDetails,
+      detailsWithTip,
+    };
+  }
 
-    const invocation = accountInvocations[0];
-
+  public async execute(
+    transactions: AllowArray<Call>,
+    transactionsDetail: UniversalDetails = {}
+  ): Promise<InvokeFunctionResponse> {
+    const { invocation, hookedTransactions, hookedDetails, detailsWithTip } =
+      await this.prepareInvoke(transactions, transactionsDetail);
     const result = await this.provider.invokeFunction(
       {
         contractAddress: invocation.contractAddress,
@@ -360,6 +381,55 @@ export class Account implements AccountInterface {
     });
 
     return result;
+  }
+
+  /**
+   * Build a signed INVOKE_TXN_V3 transaction without submitting it to the network.
+   *
+   * Produces a fully signed transaction object that can be inspected, stored,
+   * or submitted later via `provider.channel.sendTransaction()`.
+   * Main usage is to send a virtual transaction to a proof server.
+   * Fees are estimated automatically if not provided.
+   *
+   * @param transactions - Single call or array of calls to include in the transaction
+   * @param transactionsDetail - Transaction execution options
+   * @returns A fully signed `RPC.INVOKE_TXN_V3` object, ready to broadcast
+   *
+   * @remarks
+   * - Unlike `execute()`, this method does **not** submit the transaction ; the account nonce is unchanged after the call.
+   * - The `afterExecute` plugin hook is intentionally **not** triggered.
+   * - The returned object can be broadcast with `provider.channel.sendTransaction()`.
+   *
+   * @example
+   * ```typescript
+   * const signedTx = await account.getSignedTransaction(
+   *   { contractAddress: erc20Address, entrypoint: 'transfer', calldata: [recipient, amount, 0] }
+   * );
+   * ```
+   */
+  public async getSignedTransaction(
+    transactions: AllowArray<Call>,
+    transactionsDetail: UniversalDetails = {}
+  ): Promise<RPC.INVOKE_TXN_V3> {
+    const { invocation, hookedDetails, detailsWithTip } = await this.prepareInvoke(
+      transactions,
+      transactionsDetail
+    );
+    return this.provider.channel.buildTransaction(
+      {
+        type: ETransactionType.INVOKE,
+        contractAddress: invocation.contractAddress,
+        calldata: invocation.calldata,
+        signature: invocation.signature,
+        ...(hookedDetails.proofFacts && { proofFacts: hookedDetails.proofFacts }),
+        ...(hookedDetails.proof && { proof: hookedDetails.proof }),
+        ...v3Details(detailsWithTip),
+        resourceBounds: invocation.resourceBounds,
+        nonce: invocation.nonce,
+        version: invocation.version,
+      },
+      'transaction'
+    );
   }
 
   /**
