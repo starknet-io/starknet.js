@@ -6,7 +6,7 @@ on: workflow_dispatch
 #     ORGANIZATION_NAME
 #     PROJECT_NAME
 #     DEPLOYMENT_BRANCH
-# - custom (github-pages environment Variables):
+# - custom (Actions Variables):
 #     DOCS_URL (https://starknet-io.github.io)
 #     DOCS_BASE_URL (/starknet.js/)
 
