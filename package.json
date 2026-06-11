@@ -106,15 +106,20 @@
     "@scure/base": "~1.2.1",
     "@scure/starknet": "1.1.0",
     "@starknet-io/get-starknet-wallet-standard": "^5.0.0",
-    "@starknet-io/get-starknet-wallet-standard-v6": "file:packages/get-starknet-wallet-standard-v6",
+    "@starknet-io/get-starknet-wallet-standard-v6": "npm:@starknet-io/get-starknet-wallet-standard@6.0.1",
     "@starknet-io/starknet-types-0101": "npm:@starknet-io/types-js@0.10.2",
-    "@starknet-io/starknet-types-0103": "file:/D/Starknet/types-jsFork/types-js",
+    "@starknet-io/starknet-types-0103": "npm:@starknet-io/types-js@0.10.3-beta.2",
     "@starknet-io/starknet-types-09": "npm:@starknet-io/types-js@~0.9.2",
     "abi-wan-kanabi": "2.2.4",
     "lossless-json": "^4.2.0"
   },
   "engines": {
     "node": ">=22"
+  },
+  "overrides": {
+    "@starknet-io/get-starknet-wallet-standard-v6": {
+      "@starknet-io/types-js": "0.10.3-beta.2"
+    }
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",

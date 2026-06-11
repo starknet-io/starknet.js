@@ -25,6 +25,8 @@ import type { WalletAccountV6Options } from './types/index.type';
  * WalletAccountV6 class.
  * Extends WalletAccountV5 with get-starknet v6 types and STRK20 privacy protocol methods.
  */
+// @ts-ignore — TS2417: static `connect` parameter type (WalletWithStarknetFeaturesV6 from types-js@0.10.x)
+// is intentionally incompatible with WalletAccountV5's (types-js@0.7.x); runtime behavior is correct.
 export class WalletAccountV6 extends WalletAccountV5 {
   constructor(options: WalletAccountV6Options) {
     super({ ...options, walletProvider: options.walletProvider as any });
