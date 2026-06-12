@@ -213,7 +213,7 @@ const contract = new Contract({ abi, address, providerOrAccount: provider });
 const result = await contract.call('balanceOf', [address]);
 ```
 
-## Breaking Change 4: Plugin System
+## Breaking Change 3: Plugin System
 
 ### What Changed
 
@@ -250,10 +250,14 @@ import { StarknetId } from 'starknet/provider/extensions/starknetId';
 **✅ v10:**
 
 ```typescript
-import { starknetId, StarknetIdImpl } from 'starknet';
-// Or
+import { StarknetIdImpl } from 'starknet';
+// Or, for the plugin factory (see "Disabling or Customizing Plugins" below):
 import { starknetId } from 'starknet/plugins/starknet-id';
 ```
+
+:::caution
+`import { starknetId } from 'starknet'` gives the **utility namespace** (same as in v9), not the plugin factory function. Use `'starknet/plugins/starknet-id'` when you need to pass `starknetId()` to the `plugins` option.
+:::
 
 ### Default Behavior
 
@@ -279,8 +283,8 @@ const provider = new RpcProvider({
   plugins: false,
 });
 
-// Use specific plugins only
-import { starknetId } from 'starknet';
+// Use specific plugins only — import the factory from its sub-path
+import { starknetId } from 'starknet/plugins/starknet-id';
 
 const provider = new RpcProvider({
   nodeUrl,
@@ -298,7 +302,7 @@ const provider = new RpcProvider({
 
 For more details on creating and using plugins, see the [Plugin System Guide](./plugins.md).
 
-## Breaking Change 5: Provider fetch() Method
+## Breaking Change 4: Provider fetch() Method
 
 ### What Changed
 
@@ -338,7 +342,7 @@ const result = await provider.fetch('starknet_getBlockWithTxHashes', { block_id:
 provider.fetch('starknet_chainId').then((result) => console.log(result));
 ```
 
-## Breaking Change 6: Compression Functions Now Async
+## Breaking Change 5: Compression Functions Now Async
 
 ### What Changed
 
@@ -396,7 +400,7 @@ async function processContract(program) {
 }
 ```
 
-## Breaking Change 7: SimulateTransaction Response Structure
+## Breaking Change 6: SimulateTransaction Response Structure
 
 ### What Changed
 
@@ -457,7 +461,7 @@ const fee = simResult.simulated_transactions[0].overall_fee;
 const traces = simResult.simulated_transactions.map((s) => s.transaction_trace);
 ```
 
-## Breaking Change 8: ts-mixer Removed
+## Breaking Change 7: ts-mixer Removed
 
 ### What Changed
 
@@ -481,7 +485,7 @@ If your code didn't directly use `ts-mixer`, no changes are needed. If you were 
 2. Access provider methods via `account.provider`
 3. If you depended on `ts-mixer` as a transitive dependency, add it directly to your `package.json`
 
-## Breaking Change 9: getStorageAt() Return Type
+## Breaking Change 8: getStorageAt() Return Type
 
 ### What Changed
 
@@ -529,7 +533,7 @@ const { value, last_update_block } = await provider.getStorageAt(addr, key);
 const felt = BigInt(value);
 ```
 
-## Breaking Change 10: Transaction proof Field Type
+## Breaking Change 9: Transaction proof Field Type
 
 **⚠️ REQUIRED CHANGE** - Proof must be base64 encoded string. TypeScript will error if you pass number[].
 
@@ -588,6 +592,23 @@ await account.simulateTransaction(invocations, { proof: proofBase64 });
 const proofArray = stark.decodeProof(proofBase64);
 ```
 
+### New: `proofFacts` Field
+
+v10 also introduces an optional `proofFacts` field alongside `proof`. When present, it changes the v3 transaction hash computation (the Poseidon of all proof facts is folded into the hash).
+
+```typescript
+// proofFacts is optional — pass only when your SNIP-36 off-chain computation
+// produces facts that must be committed on-chain
+await account.execute(calls, {
+  proof: proofBase64, // base64-encoded proof (see above)
+  proofFacts: [fact1, fact2], // BigNumberish[] — omit if unused
+});
+```
+
+:::note
+`proofFacts` is additive — existing code without it continues to work unchanged. Only set it when your use case requires SNIP-36 fact commitment.
+:::
+
 ## Migration Checklist
 
 When upgrading from v9 to v10:
@@ -634,23 +655,23 @@ When upgrading from v9 to v10:
   - [ ] Verify all provider method calls work with `account.provider.xyz()`
   - [ ] Test plugin functionality (StarknetId, BrotherId)
 
-## RPC 0.10.3 Support (v10.x)
+## RPC Namespace Renames (v9 → v10)
 
-Starknet.js v10.x adds support for RPC spec 0.10.3 as the new default version. Two public exports were renamed to reflect this:
+Two public exports were renamed to track the new default RPC spec version. These only affect advanced usage (raw RPC spec types and direct channel imports).
 
-### `RPCSPEC0101` → `RPCSPEC0103`
+### `RPCSPEC010` → `RPCSPEC0103`
 
-The namespace re-exporting the current 0.10.x RPC spec types was renamed.
+The namespace re-exporting the 0.10.x RPC spec types was renamed.
 
-**❌ Before:**
+**❌ v9:**
 
 ```typescript
-import { RPCSPEC0101 } from 'starknet';
+import { RPCSPEC010 } from 'starknet';
 
-type MyBlock = RPCSPEC0101.BLOCK_WITH_TXS;
+type MyBlock = RPCSPEC010.BLOCK_WITH_TXS;
 ```
 
-**✅ After:**
+**✅ v10:**
 
 ```typescript
 import { RPCSPEC0103 } from 'starknet';
@@ -658,24 +679,25 @@ import { RPCSPEC0103 } from 'starknet';
 type MyBlock = RPCSPEC0103.BLOCK_WITH_TXS;
 ```
 
-### `RPC0101` → `RPC0102`
+### `RPC010` → `RPC0102` / `RPC0103`
 
-The channel namespace for the RPC 0.10.2 implementation was renamed.
+The channel namespace for the 0.10.x RPC implementation was renamed. v10 exposes two channel variants: `RPC0102` (spec 0.10.2) and `RPC0103` (spec 0.10.3, the default).
 
-**❌ Before:**
+**❌ v9:**
 
 ```typescript
-import { RPC0101 } from 'starknet';
+import { RPC010 } from 'starknet';
 ```
 
-**✅ After:**
+**✅ v10:**
 
 ```typescript
-import { RPC0102 } from 'starknet';
+import { RPC0103 } from 'starknet'; // spec 0.10.3 (default)
+import { RPC0102 } from 'starknet'; // spec 0.10.2 (legacy)
 ```
 
 :::note
-These changes only affect advanced usage (raw RPC spec types and direct channel imports). Standard usage via `RpcProvider`, `Account`, and high-level methods is unaffected.
+Standard usage via `RpcProvider`, `Account`, and high-level methods is unaffected by these renames.
 :::
 
 ## Need Help?
