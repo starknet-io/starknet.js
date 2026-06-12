@@ -409,5 +409,23 @@ export function dynamicCallData(
  * ```
  */
 export function isStarkDomain(domain: string): boolean {
-  return /^(?:[a-z0-9-]{1,48}(?:[a-z0-9-]{1,48}[a-z0-9-])?\.)*[a-z0-9-]{1,48}\.stark$/.test(domain);
+  const starkSuffix = '.stark';
+  if (!domain.endsWith(starkSuffix)) {
+    return false;
+  }
+
+  const name = domain.slice(0, -starkSuffix.length);
+  if (name.length === 0) {
+    return false;
+  }
+
+  return name.split('.').every((label) => {
+    return (
+      label.length > 0 &&
+      label.length <= 48 &&
+      [...label].every((char) => {
+        return (char >= 'a' && char <= 'z') || (char >= '0' && char <= '9') || char === '-';
+      })
+    );
+  });
 }
