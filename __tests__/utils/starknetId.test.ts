@@ -63,4 +63,17 @@ describe('Should test StarknetId utils', () => {
     expect(isStarkDomain(`${'a'.repeat(49)}.stark`)).toBe(false);
     expect(isStarkDomain(`${'---.'.repeat(10_000)}.stark`)).toBe(false);
   });
+
+  test('Should validate StarknetId domain label boundaries', () => {
+    // exactly 48 chars — valid
+    expect(isStarkDomain(`${'a'.repeat(48)}.stark`)).toBe(true);
+    // subdomain label exactly 48 chars — valid
+    expect(isStarkDomain(`${'a'.repeat(48)}.example.stark`)).toBe(true);
+    // subdomain label 49 chars — invalid (uniform 48-char limit on all labels)
+    expect(isStarkDomain(`${'a'.repeat(49)}.example.stark`)).toBe(false);
+    // empty label from double dot — invalid
+    expect(isStarkDomain('a..stark')).toBe(false);
+    // no name before .stark — invalid
+    expect(isStarkDomain('.stark')).toBe(false);
+  });
 });

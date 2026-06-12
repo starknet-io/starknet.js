@@ -22,6 +22,8 @@ describe('CairoFixedArray class test', () => {
     expect(CairoFixedArray.getFixedArrayType('[[core::integer::u32; 2]; 8]')).toBe(
       '[core::integer::u32; 2]'
     );
+    expect(CairoFixedArray.isTypeFixedArray('[[core::integer::u32; 2]; 8]')).toBe(true);
+    expect(CairoFixedArray.getFixedArraySize('[[core::integer::u32; 2]; 8]')).toBe(8);
     expect(() => CairoFixedArray.getFixedArrayType('[; 8]')).toThrow();
     expect(CairoFixedArray.isTypeFixedArray('[core::integer::u32; 8]')).toBe(true);
     expect(CairoFixedArray.isTypeFixedArray('[core::integer::u32;8]')).toBe(false);
