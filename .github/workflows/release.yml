@@ -95,11 +95,18 @@ jobs:
   release-auto:
     name: Release
     needs: [skip_check, tests-dev, tests-main]
+    # NOTE: intentionally NOT gated on `skip_check.outputs.should_skip`.
+    # skip-duplicate-actions skips the *test* jobs when an identical file tree was
+    # already validated (e.g. in the PR build). Releasing is a different concern and
+    # must still run on a push to a release branch, otherwise a merge whose tree
+    # matches the PR build silently cancels the publish. `always() && !failure()`
+    # lets the release proceed when tests are skipped, while still blocking it if a
+    # test job actually fails. semantic-release is idempotent (no version bump =
+    # no publish), so running it on a duplicate push is safe.
     if: |
       always()
       && !failure()
       && needs.skip_check.result != 'failure'
-      && needs.skip_check.outputs.should_skip != 'true'
       && github.event_name == 'push'
     uses: ./.github/workflows/_release.yml
     secrets: inherit
