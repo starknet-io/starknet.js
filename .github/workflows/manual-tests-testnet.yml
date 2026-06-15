@@ -49,7 +49,7 @@ jobs:
       matrix: ${{ steps.process-inputs.outputs.result }}
     steps:
       - id: process-inputs
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             // console.log(context)
