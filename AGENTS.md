@@ -99,4 +99,6 @@ pinned `starknet_specs` dev-dependencies define them. Be version-aware when touc
 - The default test suite hard-fails without a reachable devnet (see above). A bare
   `jest <path>` will also hit this — go through `npm run test:unit` for infra-free runs.
 - `.claude/` is git-ignored, so per-user agent config there is local-only. This
-  `AGENTS.md` (and `CLAUDE.md`) are the shared, committed source of truth.
+  `AGENTS.md` is the shared, committed source of truth. Tools that only read a
+  `CLAUDE.md` (e.g. Claude Code) can use a local, git-ignored `CLAUDE.md` that
+  points here.
