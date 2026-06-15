@@ -91,6 +91,16 @@ import { defaultDeployer, Deployer } from '../deployer';
 import type { TipType } from '../provider/modules/tip';
 import { PluginManager } from '../plugins/manager';
 import { defaultPlugins } from '../plugins/defaults';
+import type { StarknetIdAccountMethods } from '../plugins/starknet-id';
+import type { BrotherIdProviderMethods } from '../plugins/brother-id';
+import type { FastExecuteAccountMethods } from '../plugins/fast-execute';
+
+// Same-module declaration merging surfaces the default plugin methods on the
+// Account type. This must live here (next to the class) rather than in a
+// `declare module '../account/default'` block, because cross-module augmentation
+// with relative paths does not survive the bundled `.d.ts` emitted by tsup.
+export interface Account
+  extends StarknetIdAccountMethods, BrotherIdProviderMethods, FastExecuteAccountMethods {}
 
 export class Account implements AccountInterface {
   public provider: Provider;
