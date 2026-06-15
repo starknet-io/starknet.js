@@ -59,6 +59,16 @@ import { getGasPrices } from './modules';
 import { PluginManager } from '../plugins/manager';
 import { defaultPlugins } from '../plugins/defaults';
 import type { StarknetPlugin } from '../plugins/types';
+import type { StarknetIdProviderMethods } from '../plugins/starknet-id';
+import type { BrotherIdProviderMethods } from '../plugins/brother-id';
+import type { FastExecuteProviderMethods } from '../plugins/fast-execute';
+
+// Same-module declaration merging surfaces the default plugin methods on the
+// RpcProvider type. This must live here (next to the class) rather than in a
+// `declare module '../provider/rpc'` block, because cross-module augmentation
+// with relative paths does not survive the bundled `.d.ts` emitted by tsup.
+export interface RpcProvider
+  extends StarknetIdProviderMethods, BrotherIdProviderMethods, FastExecuteProviderMethods {}
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
