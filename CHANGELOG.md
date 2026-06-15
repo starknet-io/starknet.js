@@ -1,3 +1,9 @@
+## [10.3.1](https://github.com/starknet-io/starknet.js/compare/v10.3.0...v10.3.1) (2026-06-15)
+
+### Bug Fixes
+
+- plugins methods in Account not available in dist ([58a150f](https://github.com/starknet-io/starknet.js/commit/58a150fa2910c7498d96ec2a335793c852ab87a9))
+
 # [10.3.0](https://github.com/starknet-io/starknet.js/compare/v10.2.0...v10.3.0) (2026-06-10)
 
 ### Features
