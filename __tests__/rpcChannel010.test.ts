@@ -306,4 +306,31 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
       expect(result).not.toHaveProperty('proof_facts');
     });
   });
+
+  describe('malformed RPC response', () => {
+    test('throws a clear error when response has neither result nor error', async () => {
+      // Reproduces issue #1238: a node (e.g. Alchemy returning 404) replies with a
+      // body that is missing both `result` and `error`. Previously this returned
+      // `undefined` and crashed downstream with `response.flat is not a function`.
+      fetchSpy = jest.spyOn(channel, 'fetch');
+      fetchSpy.mockResolvedValueOnce({
+        json: async () => ({ jsonrpc: '2.0', id: 1 }),
+      } as any);
+
+      await expect((channel as any).fetchEndpoint('starknet_chainId')).rejects.toThrow(
+        LibraryError
+      );
+    });
+
+    test('preserves a falsy but valid result (genesis block number 0)', async () => {
+      // Guards against the naive `if (!result)` check: 0 is a legitimate Starknet
+      // result (e.g. genesis block number) and must be returned, not treated as an error.
+      fetchSpy = jest.spyOn(channel, 'fetch');
+      fetchSpy.mockResolvedValueOnce({
+        json: async () => ({ jsonrpc: '2.0', result: 0, id: 1 }),
+      } as any);
+
+      await expect((channel as any).fetchEndpoint('starknet_blockNumber')).resolves.toBe(0);
+    });
+  });
 });
