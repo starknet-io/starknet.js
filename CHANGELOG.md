@@ -1,3 +1,9 @@
+## [10.3.2](https://github.com/starknet-io/starknet.js/compare/v10.3.1...v10.3.2) (2026-06-16)
+
+### Bug Fixes
+
+- surface clear error instead of crashing on empty node reply ([678ca1d](https://github.com/starknet-io/starknet.js/commit/678ca1db2b0f055708b03363688bddf75858a5e4))
+
 ## [10.3.1](https://github.com/starknet-io/starknet.js/compare/v10.3.0...v10.3.1) (2026-06-15)
 
 ### Bug Fixes
