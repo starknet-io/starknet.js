@@ -188,6 +188,15 @@ const config: Config = {
   },
   onBrokenLinks: 'throw',
   favicon: 'img/favicon.ico',
+  headTags: [
+    {
+      tagName: 'meta',
+      attributes: {
+        name: 'algolia-site-verification',
+        content: '0F4C4F228CB73707',
+      },
+    },
+  ],
   organizationName: 'starknet-io', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
   presets: [
