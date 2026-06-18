@@ -12,7 +12,7 @@ import type { PaymasterInterface } from '../paymaster';
 import { WalletAccountV5 } from './accountV5';
 import {
   addInvokeTransaction,
-  requestAccounts,
+  standardConnect,
   strk20Balances,
   strk20InvokeTransaction,
   strk20PrepareInvoke,
@@ -72,7 +72,12 @@ export class WalletAccountV6 extends WalletAccountV5 {
     paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false
   ): Promise<WalletAccountV6> {
-    const [accountAddress] = await requestAccounts(walletProvider, silentMode);
+    // Use the wallet-standard `standard:connect` feature to authorize accounts AND prime
+    // the wrapper internal state, so that subsequent wallet events propagate (see onChange).
+    // Empty `accounts` (user refusal / silent without session) leaves the address undefined,
+    // matching the previous behavior — no crash.
+    const { accounts } = await standardConnect(walletProvider, silentMode);
+    const accountAddress = accounts[0]?.address;
     return new WalletAccountV6({
       provider,
       walletProvider,

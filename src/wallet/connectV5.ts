@@ -1,5 +1,8 @@
 import type { WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard/features';
-import type { StandardEventsChangeProperties } from '@wallet-standard/features';
+import type {
+  StandardConnectOutput,
+  StandardEventsChangeProperties,
+} from '@wallet-standard/features';
 import {
   type WatchAssetParameters,
   type AddDeclareTransactionParameters,
@@ -16,6 +19,25 @@ import {
   SpecVersion,
   API_VERSION,
 } from '@starknet-io/starknet-types-0101';
+
+/**
+ * Connect the DApp to the wallet through the wallet-standard `standard:connect` feature.
+ *
+ * Besides authorizing the accounts, this primes the wallet-standard wrapper internal
+ * state (its `#account`). This priming is mandatory: the wrapper only bridges the wallet
+ * legacy `accountsChanged` / `networkChanged` events to the `standard:events` "change"
+ * event (consumed by {@link subscribeWalletEvent}) once it has been connected this way.
+ * Without it, account/network change events never reach the DApp.
+ * @param {WalletWithStarknetFeatures} walletWSF - The get-starknet V5 wallet object to use.
+ * @param {boolean} [silent_mode=false] false: request user interaction allowance. true: return only pre-allowed accounts.
+ * @returns {StandardConnectOutput} the wallet-standard accounts the DApp is authorized to use.
+ */
+export function standardConnect(
+  walletWSF: WalletWithStarknetFeatures,
+  silent_mode: boolean = false
+): Promise<StandardConnectOutput> {
+  return walletWSF.features['standard:connect'].connect({ silent: silent_mode });
+}
 
 /**
  * Request Permission for wallet account, return addresses that are allowed by user
