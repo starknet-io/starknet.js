@@ -233,6 +233,12 @@ const config: Config = {
 
       indexName: 'starknetjs',
 
+      // Algolia "Ask AI" conversational assistant (DocSearch v4).
+      // The assistantId is a public value (configured in the Algolia dashboard,
+      // LLM provider: Google Gemini). indexName/apiKey/appId are inherited from
+      // the options above.
+      askAi: 'f949afac-da08-4698-82a3-a22b60af6fd3',
+
       // Optional: see doc section below
       contextualSearch: true,
 
