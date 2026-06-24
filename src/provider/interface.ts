@@ -250,7 +250,7 @@ export abstract class ProviderInterface {
    * // Equivalent to:
    * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.INVOKE, ...invocation, ...details }], options);
    * ```
-   * @alias getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with a single transaction
+   * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
   public abstract getInvokeEstimateFee(
     invocation: Invocation,
@@ -280,7 +280,7 @@ export abstract class ProviderInterface {
    * // Equivalent to:
    * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.DECLARE, ...transaction, ...details }], options);
    * ```
-   * @alias getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with a single transaction
+   * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
   public abstract getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
@@ -311,7 +311,7 @@ export abstract class ProviderInterface {
    * // Equivalent to:
    * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.DEPLOY_ACCOUNT, ...transaction, ...details }], options);
    * ```
-   * @alias getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with a single transaction
+   * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
@@ -609,7 +609,7 @@ export abstract class ProviderInterface {
    * @param {Signature} signature signature of the message.
    * @param {BigNumberish} accountAddress address of the account that has signed the message.
    * @param {string} [signatureVerificationFunctionName] if account contract with non standard account verification function name.
-   * @param { okResponse: string[]; nokResponse: string[]; error: string[] } [signatureVerificationResponse] if account contract with non standard response of verification function.
+   * @param [signatureVerificationResponse] if account contract with non standard response of verification function.
    * @returns
    * ```typescript
    * const myTypedMessage: TypedMessage = .... ;
