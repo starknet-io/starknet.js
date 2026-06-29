@@ -127,7 +127,44 @@ const myWalletAccount: WalletAccountV6 = await WalletAccountV6.connect(
 
 ### STRK20 privacy protocol
 
-`WalletAccountV6` exposes three dedicated methods for STRK20 token operations.
+STRK20 is a **note-based privacy pool** for ERC-20 assets: a single pool contract holds the deposited tokens, but inside the pool funds are encrypted **notes**, so observers can't tell who owns what. Every state change is backed by a zero-knowledge proof verified on-chain. The mental model is: **deposit (shield) → transact privately inside the pool → withdraw (unshield)**. The wallet holds the private state and generates the proof; your DAPP only _describes the actions_ it wants.
+
+:::info
+As of 2026-06, the **Ready** and **Xverse** wallets support the STRK20 wallet API.
+:::
+
+`WalletAccountV6` exposes three dedicated methods for these operations, plus `executeWithProof()`.
+
+#### STRK20 actions
+
+A DAPP describes what it wants with an array of `STRK20_ACTION`. There are exactly four action types:
+
+| Action   | `type`       | Fields                                            | Effect                                                                   |
+| -------- | ------------ | ------------------------------------------------- | ------------------------------------------------------------------------ |
+| Deposit  | `"deposit"`  | `token`, `amount`                                 | Public funds → pool (always to self).                                    |
+| Withdraw | `"withdraw"` | `token`, `amount`, `recipient`                    | Pool → public `recipient` address.                                       |
+| Transfer | `"transfer"` | `token`, `amount` (FELT or `"OPEN"`), `recipient` | Private transfer inside the pool to another registered user.             |
+| Invoke   | `"invoke"`   | `contract`, `calldata`                            | Calls an arbitrary contract entrypoint atomically, executed by the pool. |
+
+`amount` is always expressed in the token's smallest unit.
+
+:::note About `amount: "OPEN"`
+`"OPEN"` is only meaningful inside a **multi-action transaction**. It creates an empty _open note_ whose value is unknown at build time (e.g. the output of an AMM swap) and is filled later in the **same transaction** by a paired `invoke` action. It is never used on its own.
+:::
+
+A simple deposit, for example:
+
+```typescript
+import type { STRK20_ACTION } from 'starknet';
+
+const actions: STRK20_ACTION[] = [
+  {
+    type: 'deposit',
+    token: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d', // STRK
+    amount: '0xde0b6b3a7640000', // 1e18, smallest unit
+  },
+];
+```
 
 #### Get STRK20 balances
 
@@ -145,13 +182,12 @@ console.log('balance =', balances[0].balance);
 Before executing a private transaction, request the wallet to compute the associated ZK proof:
 
 ```typescript
-import type { STRK20_ACTION, STRK20_CALL_AND_PROOF } from 'starknet';
+import type { STRK20_CALL_AND_PROOF } from 'starknet';
 
-const actions: STRK20_ACTION[] = [
-  // ... STRK20 actions
-];
 const prepared: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions);
-// or with simulation:
+// `prepared.call` is the Starknet call to submit, `prepared.proof` the attached ZK proof.
+
+// or in simulation mode (no proof generated, not submittable — useful for fee estimation / previews):
 const simulated: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions, true);
 ```
 
@@ -164,15 +200,17 @@ console.log('transaction hash =', result.transaction_hash);
 
 #### Execute with a privacy proof
 
-The `executeWithProof()` method attaches a STRK20 ZK proof to a standard invoke:
+The `executeWithProof()` method has the same signature as `execute()`, with an extra parameter to attach a STRK20 ZK proof to a standard invoke. The proof comes from `strk20PrepareInvoke()`:
 
 ```typescript
-import type { STRK20_PROOF } from 'starknet';
+// Obtain the privacy proof for the actions:
+const { proof } = await myWalletAccount.strk20PrepareInvoke(actions);
 
-const { calls, proof }: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions);
-
-// Execute with the attached proof
-const resp = await myWalletAccount.executeWithProof(calls, proof);
+// Attach it to a standard invoke of your own call(s):
+const myCall = myContract.populate('my_method', {
+  /* ... */
+});
+const resp = await myWalletAccount.executeWithProof(myCall, proof);
 ```
 
 ### Subscription to events
