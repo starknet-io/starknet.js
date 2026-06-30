@@ -1,3 +1,9 @@
+## [10.3.3](https://github.com/starknet-io/starknet.js/compare/v10.3.2...v10.3.3) (2026-06-30)
+
+### Bug Fixes
+
+- restore consistency of .toApiRequest() output type ([71c5d90](https://github.com/starknet-io/starknet.js/commit/71c5d90b740648bfa57b388938414dc1f50a9a08))
+
 ## [10.3.2](https://github.com/starknet-io/starknet.js/compare/v10.3.1...v10.3.2) (2026-06-16)
 
 ### Bug Fixes
