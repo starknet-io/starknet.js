@@ -279,26 +279,26 @@ describe('CairoInt16 class Unit Tests', () => {
   });
 
   describe('toApiRequest method', () => {
-    test('should return hex string array for zero', () => {
+    test('should return decimal string array for zero', () => {
       const i16 = new CairoInt16(0);
       const result = i16.toApiRequest();
-      expect(result).toEqual(['0x0']);
+      expect(result).toEqual(['0']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return hex string array for positive numbers', () => {
+    test('should return decimal string array for positive numbers', () => {
       const i16 = new CairoInt16(1000);
       const result = i16.toApiRequest();
-      expect(result).toEqual(['0x3e8']);
+      expect(result).toEqual(['1000']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return field element hex representation for negative numbers', () => {
+    test('should return field element decimal representation for negative numbers', () => {
       const i16 = new CairoInt16(-1000);
       const result = i16.toApiRequest();
       // Negative value -1000 becomes PRIME + (-1000) = PRIME - 1000
       const fieldElement = PRIME - 1000n;
-      const expectedValue = `0x${fieldElement.toString(16)}`;
+      const expectedValue = fieldElement.toString();
       expect(result).toEqual([expectedValue]);
       expect(result).toHaveProperty('__compiled__', true);
     });
@@ -307,9 +307,9 @@ describe('CairoInt16 class Unit Tests', () => {
       const minI16 = new CairoInt16(-32768);
       const maxI16 = new CairoInt16(32767);
       const minFieldElement = PRIME - 32768n;
-      const expectedMinValue = `0x${minFieldElement.toString(16)}`;
+      const expectedMinValue = minFieldElement.toString();
       expect(minI16.toApiRequest()).toEqual([expectedMinValue]);
-      expect(maxI16.toApiRequest()).toEqual(['0x7fff']);
+      expect(maxI16.toApiRequest()).toEqual(['32767']);
     });
   });
 
@@ -389,8 +389,8 @@ describe('CairoInt16 class Unit Tests', () => {
         } else {
           expect(hexVal).toBe(`0x${val.toString(16)}`);
         }
-        // apiRequest should equal hexVal
-        expect(apiRequest[0]).toBe(hexVal);
+        // apiRequest should equal the decimal representation of hexVal
+        expect(apiRequest[0]).toBe(BigInt(hexVal).toString());
       });
     });
 
