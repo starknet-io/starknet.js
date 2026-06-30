@@ -21,7 +21,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry('felt')]),
       });
-      expect(parsedField).toEqual('256');
+      expect(parsedField).toEqual(['256']);
     });
 
     test('should return parsed calldata field for Array type', () => {
@@ -60,7 +60,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry(`${NON_ZERO_PREFIX}core::bool`)]),
       });
-      expect(parsedField).toEqual('1');
+      expect(parsedField).toEqual(['1']);
     });
 
     test('should return parsed calldata field for EthAddress type', () => {
@@ -73,7 +73,7 @@ describe('requestParser', () => {
         enums: getAbiEnums(),
         parser: new AbiParser1([getAbiEntry(`${ETH_ADDRESS}felt`)]),
       });
-      expect(parsedField).toEqual('1952805748');
+      expect(parsedField).toEqual(['1952805748']);
     });
 
     test('should return parsed calldata field for Struct type', () => {

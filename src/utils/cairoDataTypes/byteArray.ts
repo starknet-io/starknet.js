@@ -129,7 +129,7 @@ export class CairoByteArray {
     this.assertInitialized();
 
     return addCompiledFlag([
-      addHexPrefix(this.data.length.toString(16)),
+      this.data.length.toString(),
       ...this.data.flatMap((bytes31) => bytes31.toApiRequest()),
       ...this.pending_word.toApiRequest(),
       ...this.pending_word_len.toApiRequest(),

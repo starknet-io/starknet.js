@@ -68,7 +68,7 @@ export class CairoFelt252 {
     /**
      * HexString representation of the felt252
      */
-    return addCompiledFlag([this.toHexString()]);
+    return addCompiledFlag([BigInt(this.toHexString()).toString()]);
   }
 
   static assertRange(val: bigint): void {

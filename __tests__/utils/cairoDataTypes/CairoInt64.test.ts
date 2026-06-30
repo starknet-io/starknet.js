@@ -221,26 +221,26 @@ describe('CairoInt64 class Unit Tests', () => {
   });
 
   describe('toApiRequest method', () => {
-    test('should return hex string array for zero', () => {
+    test('should return decimal string array for zero', () => {
       const i64 = new CairoInt64(0);
       const result = i64.toApiRequest();
-      expect(result).toEqual(['0x0']);
+      expect(result).toEqual(['0']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return hex string array for positive numbers', () => {
+    test('should return decimal string array for positive numbers', () => {
       const i64 = new CairoInt64(1000000000n);
       const result = i64.toApiRequest();
-      expect(result).toEqual(['0x3b9aca00']);
+      expect(result).toEqual(['1000000000']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return field element hex representation for negative numbers', () => {
+    test('should return field element decimal representation for negative numbers', () => {
       const i64 = new CairoInt64(-1000000000n);
       const result = i64.toApiRequest();
       // Negative value -1000000000 becomes PRIME + (-1000000000) = PRIME - 1000000000
       const fieldElement = PRIME - 1000000000n;
-      const expectedValue = `0x${fieldElement.toString(16)}`;
+      const expectedValue = fieldElement.toString();
       expect(result).toEqual([expectedValue]);
       expect(result).toHaveProperty('__compiled__', true);
     });
@@ -249,8 +249,8 @@ describe('CairoInt64 class Unit Tests', () => {
       const minI64 = new CairoInt64(-(2n ** 63n));
       const maxI64 = new CairoInt64(2n ** 63n - 1n);
       const minFieldElement = PRIME - 2n ** 63n;
-      const expectedMinValue = `0x${minFieldElement.toString(16)}`;
-      const expectedMaxValue = `0x${(2n ** 63n - 1n).toString(16)}`;
+      const expectedMinValue = minFieldElement.toString();
+      const expectedMaxValue = (2n ** 63n - 1n).toString();
       expect(minI64.toApiRequest()).toEqual([expectedMinValue]);
       expect(maxI64.toApiRequest()).toEqual([expectedMaxValue]);
     });
