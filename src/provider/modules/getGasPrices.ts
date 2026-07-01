@@ -1,8 +1,8 @@
-import type { RPC09, RPC0101 } from '../../channel';
+import type { RPC09, RPC0102 } from '../../channel';
 import type { BlockIdentifier, BlockWithTxHashes, GasPrices } from '../../types';
 
 export async function getGasPrices(
-  channel: RPC09.RpcChannel | RPC0101.RpcChannel,
+  channel: RPC09.RpcChannel | RPC0102.RpcChannel,
   blockIdentifier: BlockIdentifier = channel.blockIdentifier
 ): Promise<GasPrices> {
   const bl = (await channel.getBlockWithTxHashes(blockIdentifier)) as BlockWithTxHashes;

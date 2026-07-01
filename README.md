@@ -50,11 +50,11 @@ $ npm install starknet@next
 $ npm install starknet@beta
 ```
 
-Import `starknet` and use the [API](https://www.starknetjs.com/docs/API/).
+Import `starknet` and use the [API](https://starknet-io.github.io/starknet.js/docs/API/).
 
 ## 🌐 Documentation
 
-How to [Guides](https://www.starknetjs.com/docs/guides/intro) :book: & [API](https://www.starknetjs.com/docs/API/) 💻
+How to [Guides](https://starknet-io.github.io/starknet.js/docs/guides/intro) :book: & [API](https://starknet-io.github.io/starknet.js/docs/API/) 💻
 
 Play with [Code Examples](https://github.com/PhilippeR26/starknet.js-workshop-typescript) :video_game:
 

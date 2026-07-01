@@ -30,17 +30,20 @@ From RPC v0.5.0, you can make a request to retrieve the RPC version that a node 
 ```typescript
 const resp = await myProvider.getSpecVersion();
 console.log('RPC version =', resp);
-// result: RPC version = 0.10.0
+// result: RPC version = 0.10.3
 ```
 
 The Starknet.js version must align with the RPC version supported by the chosen node as shown below:
 
-| RPC spec version of your node | Starknet.js version to use    |
-| :---------------------------: | ----------------------------- |
-|            v0.7.x             | Starknet.js v6.24.1 or v7.x.x |
-|            v0.8.x             | Starknet.js v7.x.x or v8.x.x  |
-|            v0.9.x             | Starknet.js v8.x.x or v9.x.x  |
-|            v0.10.x            | Starknet.js v9.x.x            |
+| RPC spec version of your node | Starknet.js version to use            |
+| :---------------------------: | ------------------------------------- |
+|            v0.7.x             | Starknet.js v6.24.1 or v7.6.4         |
+|            v0.8.x             | Starknet.js v7.6.4 or v8.9.2          |
+|            v0.9.x             | Starknet.js v8.9.2, v9.4.2 or v10.3.2 |
+|            v0.10.0            | Starknet.js v9.4.2 or v10.3.2         |
+|            v0.10.1            | Starknet.js v10.3.2                   |
+|            v0.10.2            | Starknet.js v10.3.2                   |
+|            v0.10.3            | Starknet.js v10.3.2                   |
 
 :::note
 
@@ -61,25 +64,25 @@ import { RpcProvider } from 'starknet';
 
 **Mainnet network:**
 
-|                     Node | with public url | with API key |
-| -----------------------: | :-------------: | :----------: |
-|                  Alchemy |       No        |  v0_8, v0_9  |
-|                      Zan |   v0_8, v0_9    |  v0_8, v0_9  |
-|                   Infura |       No        |     v0_8     |
-|                     Lava |   v0_8, v0_9    |     v0_8     |
-| Local Pathfinder v0.21.1 |   v0_8, v0_9    |     N/A      |
-|      Local Juno v0.15.11 |   v0_8, v0_9    |     N/A      |
+|                     Node |  with public url  |   with API key    |
+| -----------------------: | :---------------: | :---------------: |
+|                  Alchemy |        No         | v0_8, v0_9, v0_10 |
+|                      Zan | v0_8, v0_9, v0_10 | v0_8, v0_9, v0_10 |
+|                   Infura |        No         |       v0_8        |
+|                     Lava |    v0_8, v0_9     |       v0_8        |
+| Local Pathfinder v0.22.6 | v0_8, v0_9, v0_10 |        N/A        |
+|       Local Juno v0.16.3 | v0_8, v0_9, v0_10 |        N/A        |
 
 **Sepolia Testnet network:**
 
-|                     Node | with public url | with API key |
-| -----------------------: | :-------------: | :----------: |
-|                  Alchemy |       No        |  v0_8, v0_9  |
-|                      Zan |   v0_8, v0_9    |  v0_8, v0_9  |
-|                   Infura |       No        |     v0_8     |
-|                     Lava |   v0_8, v0_9    |      No      |
-| Local Pathfinder v0.21.1 |   v0_8, v0_9    |     N/A      |
-|      Local Juno v0.15.11 |   v0_8, v0_9    |     N/A      |
+|                     Node |  with public url  |   with API key    |
+| -----------------------: | :---------------: | :---------------: |
+|                  Alchemy |        No         | v0_8, v0_9, v0_10 |
+|                      Zan | v0_8, v0_9, v0_10 | v0_8, v0_9, v0_10 |
+|                   Infura |        No         |       v0_8        |
+|                     Lava |   Not available   |   Not available   |
+| Local Pathfinder v0.22.6 | v0_8, v0_9, v0_10 |        N/A        |
+|       Local Juno v0.16.3 | v0_8, v0_9, v0_10 |        N/A        |
 
 **Local Starknet Devnet network:**
 
@@ -88,18 +91,19 @@ import { RpcProvider } from 'starknet';
 | starknet-devnet v0.2.x |      v0_7       |     N/A      |
 | starknet-devnet v0.4.x |      v0_8       |     N/A      |
 | starknet-devnet v0.6.x |      v0_9       |     N/A      |
-| starknet-devnet v0.7.x |      v0_10      |     N/A      |
+| starknet-devnet v0.8.2 |      v0_10      |     N/A      |
 
 :::note
 
-- This status has been verified 02/dec/2025.
+- This status has been verified 22/jun/2026.
 - Zan public node is limited to 15 calls per second, and has also monthly limitation.
+- The Lava Sepolia Testnet public node is no longer available.
 
 :::
 
 ### Default RPC node
 
-If you don't want to use a specific node or to handle an API key, you can use one of the defaults (using RPC spec v0.10.0):
+If you don't want to use a specific node or to handle an API key, you can use one of the defaults (using RPC spec v0.10.x):
 
 ```typescript
 const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_SEPOLIA });
@@ -131,19 +135,19 @@ Some examples of `RpcProvider` instantiation to connect to RPC node providers:
 ### Mainnet
 
 ```typescript
-// Zan node RPC 0.10.0 for Mainnet (0.9 also available):
+// Zan node RPC 0.10.2 for Mainnet (0.9, 0.8 also available):
 const providerZanMainnet = new RpcProvider({
   nodeUrl: 'https://api.zan.top/public/starknet-mainnet/rpc/v0_10',
 });
-// Lava node RPC 0.9.1 for Mainnet:
+// Alchemy node RPC 0.10.3 for Mainnet (0.9, 0.8 also available):
+const providerAlchemyMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_10/' + alchemyKey,
+});
+// Lava node RPC 0.8.1 for Mainnet:
 const providerMainnetLava = new RpcProvider({
   nodeUrl: 'https://g.w.lavanet.xyz:443/gateway/strk/rpc-http/' + lavaMainnetKey,
 });
-// Alchemy node RPC 0.9.1 for Mainnet  (0.10 also available):
-const providerAlchemyMainnet = new RpcProvider({
-  nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/' + alchemyKey,
-});
-// Public Lava node RPC 0.9.1 for Mainnet (0.8 also available):
+// Public Lava node RPC 0.9.0 for Mainnet (0.8 also available):
 const providerLavaMainnet = new RpcProvider({
   nodeUrl: 'https://rpc.starknet.lava.build/rpc/v0_9',
 });
@@ -153,7 +157,7 @@ const providerLavaMainnet = new RpcProvider({
 
 :::tip
 
-If you are not sure about the RPC version (0.9 or 0.10), use:
+If you are not sure about the RPC version (0.8, 0.9 or 0.10), use:
 
 ```typescript
 const myProvider = await RpcProvider.create({ nodeUrl: `${myNodeUrl}` });
@@ -174,17 +178,13 @@ The Goerli Testnet is no longer in service.
 ### Sepolia Testnet
 
 ```typescript
-// Zan node RPC 0.10.0 for Mainnet (0.9 also available):
+// Zan node RPC 0.10.3 for Sepolia Testnet (0.9, 0.8 also available):
 const providerZanSepoliaTestnet = new RpcProvider({
   nodeUrl: 'https://api.zan.top/public/starknet-sepolia/rpc/v0_10',
 });
 // Zan node RPC 0.9.0 for Sepolia Testnet (0.8 also available):
-const providerZanSepoliaTestnet = new RpcProvider({
+const providerZanSepoliaTestnet2 = new RpcProvider({
   nodeUrl: 'https://api.zan.top/public/starknet-sepolia/rpc/v0_9',
-});
-// Public Lava node RPC 0.9.1 for Sepolia Testnet (0.8 also available):
-const providerSepoliaTestnetLavaPublic = new RpcProvider({
-  nodeUrl: 'https://rpc.starknet-testnet.lava.build/rpc/v0_9',
 });
 ```
 
@@ -220,7 +220,7 @@ const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_10' });
 Example of a connection to a local development node, with starknet-devnet:
 
 ```typescript
-// For RPC 0.10.0 (starknet-devnet v0.7.0)
+// For RPC 0.10.x (starknet-devnet v0.8.2)
 const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 
 // For RPC 0.9.1 (starknet-devnet v0.6.1)

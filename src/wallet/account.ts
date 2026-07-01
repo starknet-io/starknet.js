@@ -174,7 +174,7 @@ export class WalletAccount extends Account {
   }
 
   static async connectSilent(
-    provider: ProviderInterface,
+    provider: ProviderOptions | ProviderInterface,
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion,
     paymaster?: PaymasterOptions | PaymasterInterface

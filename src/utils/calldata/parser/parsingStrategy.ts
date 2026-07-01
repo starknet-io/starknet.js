@@ -145,7 +145,7 @@ export const fastParsingStrategy: ParsingStrategy = {
       return new CairoByteArray(val).toApiRequest();
     },
     [CairoFelt252.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
+      return new CairoFelt252(val).toApiRequest();
     },
     [CairoUint256.abiSelector]: (val: unknown) => {
       return new CairoUint256(val).toApiRequest();

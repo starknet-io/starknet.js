@@ -1,4 +1,4 @@
-import { LibraryError, RPC0101, RpcError } from '../src';
+import { LibraryError, RPC0102, RpcError } from '../src';
 import {
   createBlockForDevnet,
   createTestProvider,
@@ -8,19 +8,19 @@ import {
 
 testIfRpc010('RpcChannel', () => {
   let nodeUrl: string;
-  let channel08: RPC0101.RpcChannel;
+  let channel08: RPC0102.RpcChannel;
   initializeMatcher(expect);
 
   beforeAll(async () => {
     nodeUrl = (await createTestProvider(false)).channel.nodeUrl;
-    channel08 = new RPC0101.RpcChannel({ nodeUrl });
+    channel08 = new RPC0102.RpcChannel({ nodeUrl });
 
     await createBlockForDevnet();
   });
 
   test('baseFetch override', async () => {
     const baseFetch = jest.fn();
-    const fetchChannel08 = new RPC0101.RpcChannel({ nodeUrl, baseFetch });
+    const fetchChannel08 = new RPC0102.RpcChannel({ nodeUrl, baseFetch });
     (fetchChannel08.fetch as any)();
     expect(baseFetch).toHaveBeenCalledTimes(1);
     baseFetch.mockClear();
@@ -59,7 +59,7 @@ testIfRpc010('RpcChannel', () => {
 });
 
 describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
-  let channel: RPC0101.RpcChannel;
+  let channel: RPC0102.RpcChannel;
   let fetchSpy: jest.SpyInstance;
 
   const mockJsonResponse = (result: any) => ({
@@ -67,7 +67,7 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
   });
 
   beforeAll(() => {
-    channel = new RPC0101.RpcChannel({ nodeUrl: 'http://localhost:5050/rpc' });
+    channel = new RPC0102.RpcChannel({ nodeUrl: 'http://localhost:5050/rpc' });
   });
 
   afterEach(() => {
@@ -304,6 +304,33 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
       const result = await channel.buildTransaction(invocation);
 
       expect(result).not.toHaveProperty('proof_facts');
+    });
+  });
+
+  describe('malformed RPC response', () => {
+    test('throws a clear error when response has neither result nor error', async () => {
+      // Reproduces issue #1238: a node (e.g. Alchemy returning 404) replies with a
+      // body that is missing both `result` and `error`. Previously this returned
+      // `undefined` and crashed downstream with `response.flat is not a function`.
+      fetchSpy = jest.spyOn(channel, 'fetch');
+      fetchSpy.mockResolvedValueOnce({
+        json: async () => ({ jsonrpc: '2.0', id: 1 }),
+      } as any);
+
+      await expect((channel as any).fetchEndpoint('starknet_chainId')).rejects.toThrow(
+        LibraryError
+      );
+    });
+
+    test('preserves a falsy but valid result (genesis block number 0)', async () => {
+      // Guards against the naive `if (!result)` check: 0 is a legitimate Starknet
+      // result (e.g. genesis block number) and must be returned, not treated as an error.
+      fetchSpy = jest.spyOn(channel, 'fetch');
+      fetchSpy.mockResolvedValueOnce({
+        json: async () => ({ jsonrpc: '2.0', result: 0, id: 1 }),
+      } as any);
+
+      await expect((channel as any).fetchEndpoint('starknet_blockNumber')).resolves.toBe(0);
     });
   });
 });

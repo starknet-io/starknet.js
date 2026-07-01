@@ -1,3 +1,4 @@
+import * as RPC from '@starknet-io/starknet-types-0101';
 import {
   NetworkName,
   StarknetChainId,
@@ -22,7 +23,7 @@ import {
   waitForTransactionOptions,
 } from '../types';
 import assert from '../utils/assert';
-import { ETransactionType, JRPC, RPCSPEC0101 as RPC } from '../types/api';
+import { ETransactionType, JRPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -51,7 +52,7 @@ import { logger } from '../global/logger';
 import { config } from '../global/config';
 
 export class RpcChannel {
-  readonly id = 'RPC0.10.2';
+  readonly id: string = 'RPC0.10.2';
 
   /**
    * RPC specification version this Channel class implements
@@ -172,19 +173,22 @@ export class RpcChannel {
     params?: RPC.Methods[T]['params']
   ): Promise<RPC.Methods[T]['result']> {
     try {
+      let error: JRPC.Error | undefined;
+      let result: RPC.Methods[T]['result'] | undefined;
       if (this.batchClient) {
-        const { error, result } = await this.batchClient.fetch(
-          method,
-          params,
-          (this.requestId += 1)
-        );
-        this.errorHandler(method, params, error);
-        return result as RPC.Methods[T]['result'];
+        ({ error, result } = await this.batchClient.fetch(method, params, (this.requestId += 1)));
+      } else {
+        const rawResult = await this.fetch(method, params, (this.requestId += 1));
+        ({ error, result } = await rawResult.json());
       }
-
-      const rawResult = await this.fetch(method, params, (this.requestId += 1));
-      const { error, result } = await rawResult.json();
       this.errorHandler(method, params, error);
+      if (result === undefined) {
+        // No `error` and no `result`: the node reply is malformed or not a valid
+        // JSON-RPC response (e.g. an HTTP 404 from a misconfigured node URL). See issue #1238.
+        throw new LibraryError(
+          `RPC: '${method}' returned an empty response (no result and no error). The node reply is malformed or not a valid JSON-RPC response.`
+        );
+      }
       return result as RPC.Methods[T]['result'];
     } catch (error: any) {
       this.errorHandler(method, params, error?.response?.data, error);
@@ -666,6 +670,13 @@ export class RpcChannel {
       invoke_transaction: transaction,
     });
 
+    return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
+  }
+
+  public async invokeSignedTx(transaction: RPC.INVOKE_TXN_V3) {
+    const promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
+      invoke_transaction: transaction,
+    });
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
 

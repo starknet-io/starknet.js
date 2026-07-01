@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "10.0.2",
+  "version": "10.4.0",
   "description": "JavaScript library for Starknet",
   "license": "MIT",
   "repository": {
@@ -32,6 +32,7 @@
     "build:dts": "tsup --clean false --dts-only",
     "pretest": "npm run lint && npm run ts:check",
     "test": "jest -i --detectOpenHandles",
+    "test:unit": "jest -i -c jest.unit.config.ts",
     "test:coverage": "jest -i --coverage",
     "posttest": "npm run format -- --log-level warn",
     "test:watch": "jest --watch",
@@ -57,7 +58,6 @@
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
-    "@napi-rs/blake-hash": "^1.3.5",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",
@@ -106,7 +106,9 @@
     "@scure/base": "~1.2.1",
     "@scure/starknet": "1.1.0",
     "@starknet-io/get-starknet-wallet-standard": "^5.0.0",
+    "@starknet-io/get-starknet-wallet-standard-v6": "npm:@starknet-io/get-starknet-wallet-standard@6.0.2",
     "@starknet-io/starknet-types-0101": "npm:@starknet-io/types-js@0.10.2",
+    "@starknet-io/starknet-types-0103": "npm:@starknet-io/types-js@0.10.3",
     "@starknet-io/starknet-types-09": "npm:@starknet-io/types-js@~0.9.2",
     "abi-wan-kanabi": "2.2.4",
     "lossless-json": "^4.2.0"

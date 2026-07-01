@@ -1,4 +1,4 @@
-import { RPC09, RPC0101 } from '../channel';
+import { RPC09, RPC0102, RPC0103 } from '../channel';
 import { StarknetChainId } from '../global/constants';
 import type {
   AccountInvocations,
@@ -40,11 +40,11 @@ import type {
   StorageResponse,
 } from '../types';
 import { TipAnalysisOptions, TipEstimate } from './modules/tip';
-import { RPCSPEC09, RPCSPEC0101 } from '../types/api';
+import { RPCSPEC09, RPCSPEC0103 } from '../types/api';
 import { RPCResponseParser } from './modules/responseParser';
 
 export abstract class ProviderInterface {
-  public abstract channel: RPC09.RpcChannel | RPC0101.RpcChannel;
+  public abstract channel: RPC09.RpcChannel | RPC0102.RpcChannel | RPC0103.RpcChannel;
 
   public abstract responseParser: RPCResponseParser;
 
@@ -153,7 +153,7 @@ export abstract class ProviderInterface {
     contractAddress: BigNumberish,
     key: BigNumberish,
     blockIdentifier?: BlockIdentifier,
-    responseFlags?: RPCSPEC0101.STORAGE_RESPONSE_FLAG[]
+    responseFlags?: RPCSPEC0103.STORAGE_RESPONSE_FLAG[]
   ): Promise<StorageResponse>;
 
   /**
@@ -250,7 +250,7 @@ export abstract class ProviderInterface {
    * // Equivalent to:
    * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.INVOKE, ...invocation, ...details }], options);
    * ```
-   * @alias getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with a single transaction
+   * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
   public abstract getInvokeEstimateFee(
     invocation: Invocation,
@@ -280,7 +280,7 @@ export abstract class ProviderInterface {
    * // Equivalent to:
    * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.DECLARE, ...transaction, ...details }], options);
    * ```
-   * @alias getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with a single transaction
+   * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
   public abstract getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
@@ -311,7 +311,7 @@ export abstract class ProviderInterface {
    * // Equivalent to:
    * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.DEPLOY_ACCOUNT, ...transaction, ...details }], options);
    * ```
-   * @alias getEstimateFeeBulk - This method is an alias that calls getEstimateFeeBulk with a single transaction
+   * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
@@ -528,7 +528,7 @@ export abstract class ProviderInterface {
    */
   public abstract getTransactionTrace(
     txHash: BigNumberish
-  ): Promise<RPCSPEC0101.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
+  ): Promise<RPCSPEC0103.TRANSACTION_TRACE | RPCSPEC09.TRANSACTION_TRACE>;
 
   /**
    * Get the status of a transaction
@@ -586,7 +586,7 @@ export abstract class ProviderInterface {
   public abstract estimateMessageFee(
     message: RPCSPEC09.L1Message,
     blockIdentifier?: BlockIdentifier
-  ): Promise<RPCSPEC0101.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
+  ): Promise<RPCSPEC0103.FEE_ESTIMATE | RPCSPEC09.MESSAGE_FEE_ESTIMATE>;
 
   /**
    * Get node synchronization status
@@ -600,8 +600,8 @@ export abstract class ProviderInterface {
    * @returns Events and pagination info
    */
   public abstract getEvents(
-    eventFilter: RPCSPEC0101.EventFilter | RPCSPEC09.EventFilter
-  ): Promise<RPCSPEC0101.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
+    eventFilter: RPCSPEC0103.EventFilter | RPCSPEC09.EventFilter
+  ): Promise<RPCSPEC0103.EVENTS_CHUNK | RPCSPEC09.EVENTS_CHUNK>;
 
   /**
    * Verify in Starknet a signature of a TypedData object or of a given hash.
@@ -609,7 +609,7 @@ export abstract class ProviderInterface {
    * @param {Signature} signature signature of the message.
    * @param {BigNumberish} accountAddress address of the account that has signed the message.
    * @param {string} [signatureVerificationFunctionName] if account contract with non standard account verification function name.
-   * @param { okResponse: string[]; nokResponse: string[]; error: string[] } [signatureVerificationResponse] if account contract with non standard response of verification function.
+   * @param [signatureVerificationResponse] if account contract with non standard response of verification function.
    * @returns
    * ```typescript
    * const myTypedMessage: TypedMessage = .... ;
@@ -658,7 +658,7 @@ export abstract class ProviderInterface {
    */
   public abstract getL1MessagesStatus(
     transactionHash: BigNumberish
-  ): Promise<RPC.RPCSPEC0101.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
+  ): Promise<RPC.RPCSPEC0103.L1L2MessagesStatus | RPC.RPCSPEC09.L1L2MessagesStatus>;
 
   /**
    * Get Merkle paths in state tries
