@@ -1,0 +1,98 @@
+import type { WalletWithStarknetFeatures as WalletWithStarknetFeaturesV6 } from '@starknet-io/get-starknet-wallet-standard-v6/features';
+import type {
+  STRK20_ACTION,
+  STRK20_CALL_AND_PROOF,
+  STRK20_BALANCE_ENTRY,
+  STRK20_PROOF,
+  Address,
+} from '@starknet-io/starknet-types-0103';
+import type { AllowArray, CairoVersion, Call, ProviderOptions, PaymasterOptions } from '../types';
+import type { ProviderInterface } from '../provider';
+import type { PaymasterInterface } from '../paymaster';
+import { WalletAccountV5 } from './accountV5';
+import {
+  addInvokeTransaction,
+  standardConnect,
+  strk20Balances,
+  strk20InvokeTransaction,
+  strk20PrepareInvoke,
+  switchStarknetChain,
+} from './connectV6';
+import { StarknetChainId } from '../global/constants';
+import type { WalletAccountV6Options } from './types/index.type';
+
+/**
+ * WalletAccountV6 class.
+ * Extends WalletAccountV5 with get-starknet v6 types and STRK20 privacy protocol methods.
+ */
+// @ts-ignore — TS2417: static `connect` parameter type (WalletWithStarknetFeaturesV6 from types-js@0.10.x)
+// is intentionally incompatible with WalletAccountV5's (types-js@0.7.x); runtime behavior is correct.
+export class WalletAccountV6 extends WalletAccountV5 {
+  constructor(options: WalletAccountV6Options) {
+    super({ ...options, walletProvider: options.walletProvider as any });
+    this.walletProvider = options.walletProvider as any;
+  }
+
+  private get v6Provider(): WalletWithStarknetFeaturesV6 {
+    return this.walletProvider as unknown as WalletWithStarknetFeaturesV6;
+  }
+
+  override switchStarknetChain(chainId: StarknetChainId, silent_mode: boolean = false) {
+    return switchStarknetChain(this.v6Provider, chainId, silent_mode);
+  }
+
+  public executeWithProof(calls: AllowArray<Call>, proof?: STRK20_PROOF) {
+    const txCalls = [].concat(calls as any).map((it: any) => ({
+      contract_address: it.contractAddress,
+      entry_point: it.entrypoint,
+      calldata: it.calldata,
+    }));
+    return addInvokeTransaction(this.v6Provider, { calls: txCalls, proof });
+  }
+
+  public strk20Balances(tokens: Address[]): Promise<STRK20_BALANCE_ENTRY[]> {
+    return strk20Balances(this.v6Provider, tokens);
+  }
+
+  public strk20PrepareInvoke(
+    actions: STRK20_ACTION[],
+    simulate?: boolean
+  ): Promise<STRK20_CALL_AND_PROOF> {
+    return strk20PrepareInvoke(this.v6Provider, actions, simulate);
+  }
+
+  public strk20InvokeTransaction(actions: STRK20_ACTION[]): Promise<{ transaction_hash: string }> {
+    return strk20InvokeTransaction(this.v6Provider, actions);
+  }
+
+  static async connect(
+    provider: ProviderOptions | ProviderInterface,
+    walletProvider: WalletWithStarknetFeaturesV6,
+    cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface,
+    silentMode: boolean = false
+  ): Promise<WalletAccountV6> {
+    // Use the wallet-standard `standard:connect` feature to authorize accounts AND prime
+    // the wrapper internal state, so that subsequent wallet events propagate (see onChange).
+    // Empty `accounts` (user refusal / silent without session) leaves the address undefined,
+    // matching the previous behavior — no crash.
+    const { accounts } = await standardConnect(walletProvider, silentMode);
+    const accountAddress = accounts[0]?.address;
+    return new WalletAccountV6({
+      provider,
+      walletProvider,
+      address: accountAddress,
+      cairoVersion,
+      paymaster,
+    });
+  }
+
+  static async connectSilent(
+    provider: ProviderOptions | ProviderInterface,
+    walletProvider: WalletWithStarknetFeaturesV6,
+    cairoVersion?: CairoVersion,
+    paymaster?: PaymasterOptions | PaymasterInterface
+  ): Promise<WalletAccountV6> {
+    return WalletAccountV6.connect(provider, walletProvider, cairoVersion, paymaster, true);
+  }
+}

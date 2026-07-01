@@ -1,4 +1,5 @@
 import type { WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard/features';
+import type { WalletWithStarknetFeatures as WalletWithStarknetFeaturesV6 } from '@starknet-io/get-starknet-wallet-standard-v6/features';
 import type { PaymasterInterface } from '../../paymaster';
 import type { ProviderInterface } from '../../provider';
 import type { CairoVersion, PaymasterOptions, ProviderOptions } from '../../types';
@@ -21,6 +22,14 @@ export type WalletAccountV4Options = {
 export type WalletAccountV5Options = {
   provider: ProviderOptions | ProviderInterface;
   walletProvider: WalletWithStarknetFeatures;
+  address: string;
+  cairoVersion?: CairoVersion;
+  paymaster?: PaymasterOptions | PaymasterInterface;
+};
+
+export type WalletAccountV6Options = {
+  provider: ProviderOptions | ProviderInterface;
+  walletProvider: WalletWithStarknetFeaturesV6;
   address: string;
   cairoVersion?: CairoVersion;
   paymaster?: PaymasterOptions | PaymasterInterface;
