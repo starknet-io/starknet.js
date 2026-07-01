@@ -20,11 +20,11 @@ In your DAPP, you have to use the `get-starknet` library to select and interact 
 
 ![](./pictures/WalletAccountArchitecture.png)
 
-When retrieving information from Starknet, a `WalletAccount` instance will read directly from the blockchain. That is why at the initialization of a `WalletAccount` a provider is a required parameter - either [`ProviderOptions`](../../API/interfaces/ProviderOptions) (e.g. `{ nodeUrl }`) or a [`ProviderInterface`](../../API/classes/ProviderInterface) instance such as `RpcProvider`. It will be used for all reading activities.
+When retrieving information from Starknet, a `WalletAccount` instance will read directly from the blockchain. That is why at the initialization of a `WalletAccount` a provider is a required parameter — either [`ProviderOptions`](../../API/interfaces/ProviderOptions.md) (e.g. `{ nodeUrl }`) or a [`ProviderInterface`](../../API/classes/ProviderInterface.md) instance such as [`RpcProvider`](../../API/classes/RpcProvider.md). It will be used for all reading activities.
 
 ## With get-starknet v5
 
-When retrieving information from Starknet, a `WalletAccountV5` instance will read directly from the blockchain. That is why at the initialization of a `WalletAccountV5` a provider is a required parameter - either [`ProviderOptions`](../../API/interfaces/ProviderOptions) (e.g. `{ nodeUrl }`) or a [`ProviderInterface`](../../API/classes/ProviderInterface) instance such as `RpcProvider`. It will be used for all reading activities.
+When retrieving information from Starknet, a `WalletAccountV5` instance will read directly from the blockchain. That is why at the initialization of a `WalletAccountV5` a provider is a required parameter — either [`ProviderOptions`](../../API/interfaces/ProviderOptions.md) (e.g. `{ nodeUrl }`) or a [`ProviderInterface`](../../API/classes/ProviderInterface.md) instance such as [`RpcProvider`](../../API/classes/RpcProvider.md). It will be used for all reading activities.
 
 If you want to write to Starknet the `WalletAccountV5` will ask the wallet to sign and send the transaction using the Starknet Wallet API to communicate.
 
@@ -323,7 +323,7 @@ const resp = await myWalletAccount.execute(claimCall);
 
 ### Use in a Contract instance
 
-You can connect a `WalletAccount` with a [`Contract`](../API/classes/Contract) instance. All reading actions are performed by the provider of the `WalletAccount`, and all writing actions (that need a signature) are performed by the wallet.
+You can connect a `WalletAccount` with a [`Contract`](../../API/classes/Contract.md) instance. All reading actions are performed by the provider of the `WalletAccount`, and all writing actions (that need a signature) are performed by the wallet.
 
 ```typescript
 const lendContract = new Contract(contract.abi, contractAddress, myWalletAccount);

@@ -44,7 +44,7 @@ If you are using GitHub pages for hosting, this command is a convenient way to b
 
 Documentation for previous versions is located in [/www/versioned_docs](/www/versioned_docs) and normally does not need to be modified.
 Documentation for the future official release of your work is located in [/www/docs](/www/docs) of your branch. There you have the API documentation in [/www/docs/API](/www/docs/API) and the guides in [/www/docs/guides](/www/docs/guides).
-Official documentation is available to users at [www.starknetjs.com](https://www.starknetjs.com/). You can choose the documentation version you need in the top menu bar. NEXT version corresponds to the documentation of the last commit of the `develop` branch.
+Official documentation is available to users at [starknet-io.github.io/starknet.js](https://starknet-io.github.io/starknet.js/). You can choose the documentation version you need in the top menu bar. NEXT version corresponds to the documentation of the last commit of the `develop` branch.
 
 ## Update documentation
 

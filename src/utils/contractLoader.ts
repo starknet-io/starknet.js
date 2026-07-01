@@ -46,7 +46,7 @@ export function isFileSystemAvailable(): boolean {
  * - Can accept a single .sierra.json or .casm file, or multiple files
  * - If compiledClassHash is provided: .casm file is optional
  *
- * @param {string | File | File[]} input - Path (Node.js) or File/File[] (browser)
+ * @param {string | File | File[]} contractPath - Path (Node.js) or File/File[] (browser)
  * @param {string} [compiledClassHash] - Optional compiled class hash. If provided, .casm file becomes optional
  * @return {LoadedContract | Promise<LoadedContract>} - Contract data (sync in Node.js, async in browser)
  * @throws {Error} - If no .sierra.json file is found, or if .casm is missing when compiledClassHash is not provided

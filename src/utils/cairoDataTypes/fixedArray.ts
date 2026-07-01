@@ -11,6 +11,26 @@ export class CairoFixedArray {
    */
   public readonly arrayType: string;
 
+  private static parseFixedArrayType(type: string) {
+    if (!type.startsWith('[') || !type.endsWith(']')) {
+      return undefined;
+    }
+
+    const separator = type.lastIndexOf('; ');
+    const itemType = type.slice(1, separator);
+    const size = type.slice(separator + 2, -1);
+
+    if (
+      separator <= 1 ||
+      size.length === 0 ||
+      ![...size].every((char) => char >= '0' && char <= '9')
+    ) {
+      return undefined;
+    }
+
+    return { itemType, size };
+  }
+
   /**
    * Create an instance representing a Cairo fixed Array.
    * @param {any[]} content JS array representing a Cairo fixed array.
@@ -60,10 +80,10 @@ export class CairoFixedArray {
    * ```
    */
   static getFixedArraySize(type: string) {
-    const matchArray = type.match(/(?<=; )\d+(?=\])/);
-    if (matchArray === null)
+    const fixedArrayType = CairoFixedArray.parseFixedArrayType(type);
+    if (!fixedArrayType)
       throw new Error(`ABI type ${type} do not includes a valid number after ';' character.`);
-    return Number(matchArray[0]);
+    return Number(fixedArrayType.size);
   }
 
   /**
@@ -91,10 +111,9 @@ export class CairoFixedArray {
    * ```
    */
   static getFixedArrayType = (type: string) => {
-    const matchArray = type.match(/(?<=\[).+(?=;)/);
-    if (matchArray === null)
-      throw new Error(`ABI type ${type} do not includes a valid type of data.`);
-    return matchArray[0];
+    const fixedArrayType = CairoFixedArray.parseFixedArrayType(type);
+    if (!fixedArrayType) throw new Error(`ABI type ${type} do not includes a valid type of data.`);
+    return fixedArrayType.itemType;
   };
 
   /**
@@ -156,8 +175,6 @@ export class CairoFixedArray {
    * // result = true
    */
   static isTypeFixedArray(type: string) {
-    return (
-      /^\[.*;\s.*\]$/.test(type) && /(?<=\[).+(?=;)/.test(type) && /(?<=; )\d+(?=\])/.test(type)
-    );
+    return CairoFixedArray.parseFixedArrayType(type) !== undefined;
   }
 }

@@ -64,7 +64,7 @@ describeIfTestnet('Proof in transaction', () => {
         account.execute(myCall2, { proof, proofFacts: wrongProofFacts })
       ).rejects.toMatchObject({
         message: expect.stringContaining(
-          'Expected first field to be 88314448135728 (PROOF_VERSION)'
+          'Expected first field to be 88314448135728 (PROOF0) or 88314448135729 (PROOF1)'
         ),
       });
     });

@@ -37,25 +37,19 @@ on:
       - 'ts*'
       - '!www/**'
 
-jobs:
-  skip_check:
-    name: Skip check
-    if: github.event_name != 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    outputs:
-      should_skip: ${{ steps.skip_duplicate.outputs.should_skip }}
-    steps:
-      - id: skip_duplicate
-        uses: fkirc/skip-duplicate-actions@v5
-        with:
-          cancel_others: 'true'
+# Cancel redundant in-progress runs for the same ref (replaces the
+# `cancel_others` behaviour of the now-unmaintained skip-duplicate-actions).
+# Scoped to pull_request only: a push to a release branch is never cancelled,
+# so an in-flight publish can never be interrupted by a newer push.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+jobs:
   tests-dev:
     name: Run test on ${{ matrix.name }}
-    needs: [skip_check]
     if: |
       github.event_name != 'workflow_dispatch'
-      && needs.skip_check.outputs.should_skip != 'true'
       && contains(fromJSON('["beta","develop","next-version"]'), github.base_ref || github.ref_name)
     strategy:
       fail-fast: false
@@ -72,10 +66,8 @@ jobs:
 
   tests-main:
     name: Run test on ${{ matrix.node }} ${{ matrix.protocol }} ${{ matrix.version }}
-    needs: [skip_check]
     if: |
       github.event_name != 'workflow_dispatch'
-      && needs.skip_check.outputs.should_skip != 'true'
       && (github.base_ref || github.ref_name) == 'main'
     strategy:
       max-parallel: 1
@@ -94,12 +86,14 @@ jobs:
 
   release-auto:
     name: Release
-    needs: [skip_check, tests-dev, tests-main]
+    needs: [tests-dev, tests-main]
+    # `always() && !failure()` lets the release proceed even when a test job is
+    # skipped (e.g. tests-main is skipped on non-`main` branches), while still
+    # blocking it if a test job actually fails. semantic-release is idempotent
+    # (no version bump = no publish), so running it on a duplicate push is safe.
     if: |
       always()
       && !failure()
-      && needs.skip_check.result != 'failure'
-      && needs.skip_check.outputs.should_skip != 'true'
       && github.event_name == 'push'
     uses: ./.github/workflows/_release.yml
     secrets: inherit

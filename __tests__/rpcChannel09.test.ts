@@ -63,6 +63,21 @@ describeIfRpc09ForTesting('UNIT TEST: RPC 0.9.0 Channel', () => {
     fetchSpy.mockRestore();
   });
 
+  test('throws a clear error when response has neither result nor error', async () => {
+    // Issue #1238: a malformed/empty reply (no result, no error) must throw a
+    // LibraryError instead of silently returning undefined.
+    const fetchSpy = jest.spyOn(channel09, 'fetch');
+    fetchSpy.mockResolvedValueOnce({
+      json: async () => ({ jsonrpc: '2.0', id: 1 }),
+    } as any);
+
+    await expect(
+      // @ts-expect-error private method accessed for testing
+      channel09.fetchEndpoint('starknet_chainId')
+    ).rejects.toThrow(LibraryError);
+    fetchSpy.mockRestore();
+  });
+
   describe('RPC 0.9.0 specific methods', () => {
     test('getBlockWithReceipts', async () => {
       const response = await channel09.getBlockWithReceipts('latest');

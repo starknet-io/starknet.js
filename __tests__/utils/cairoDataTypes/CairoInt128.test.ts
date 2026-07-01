@@ -221,26 +221,26 @@ describe('CairoInt128 class Unit Tests', () => {
   });
 
   describe('toApiRequest method', () => {
-    test('should return hex string array for zero', () => {
+    test('should return decimal string array for zero', () => {
       const i128 = new CairoInt128(0);
       const result = i128.toApiRequest();
-      expect(result).toEqual(['0x0']);
+      expect(result).toEqual(['0']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return hex string array for positive numbers', () => {
+    test('should return decimal string array for positive numbers', () => {
       const i128 = new CairoInt128(10000000000000000000n);
       const result = i128.toApiRequest();
-      expect(result).toEqual(['0x8ac7230489e80000']);
+      expect(result).toEqual(['10000000000000000000']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return field element hex representation for negative numbers', () => {
+    test('should return field element decimal representation for negative numbers', () => {
       const i128 = new CairoInt128(-10000000000000000000n);
       const result = i128.toApiRequest();
       // Negative value -10000000000000000000 becomes PRIME + (-10000000000000000000) = PRIME - 10000000000000000000
       const fieldElement = PRIME - 10000000000000000000n;
-      const expectedValue = `0x${fieldElement.toString(16)}`;
+      const expectedValue = fieldElement.toString();
       expect(result).toEqual([expectedValue]);
       expect(result).toHaveProperty('__compiled__', true);
     });
@@ -249,8 +249,8 @@ describe('CairoInt128 class Unit Tests', () => {
       const minI128 = new CairoInt128(-(2n ** 127n));
       const maxI128 = new CairoInt128(2n ** 127n - 1n);
       const minFieldElement = PRIME - 2n ** 127n;
-      const expectedMinValue = `0x${minFieldElement.toString(16)}`;
-      const expectedMaxValue = `0x${(2n ** 127n - 1n).toString(16)}`;
+      const expectedMinValue = minFieldElement.toString();
+      const expectedMaxValue = (2n ** 127n - 1n).toString();
       expect(minI128.toApiRequest()).toEqual([expectedMinValue]);
       expect(maxI128.toApiRequest()).toEqual([expectedMaxValue]);
     });

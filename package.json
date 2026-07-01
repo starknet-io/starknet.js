@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "10.0.3",
+  "version": "10.3.3",
   "description": "JavaScript library for Starknet",
   "license": "MIT",
   "repository": {
@@ -32,6 +32,7 @@
     "build:dts": "tsup --clean false --dts-only",
     "pretest": "npm run lint && npm run ts:check",
     "test": "jest -i --detectOpenHandles",
+    "test:unit": "jest -i -c jest.unit.config.ts",
     "test:coverage": "jest -i --coverage",
     "posttest": "npm run format -- --log-level warn",
     "test:watch": "jest --watch",
@@ -57,7 +58,6 @@
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
-    "@napi-rs/blake-hash": "^1.3.5",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",

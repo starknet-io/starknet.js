@@ -1,3 +1,45 @@
+## [10.3.3](https://github.com/starknet-io/starknet.js/compare/v10.3.2...v10.3.3) (2026-06-30)
+
+### Bug Fixes
+
+- restore consistency of .toApiRequest() output type ([71c5d90](https://github.com/starknet-io/starknet.js/commit/71c5d90b740648bfa57b388938414dc1f50a9a08))
+
+## [10.3.2](https://github.com/starknet-io/starknet.js/compare/v10.3.1...v10.3.2) (2026-06-16)
+
+### Bug Fixes
+
+- surface clear error instead of crashing on empty node reply ([678ca1d](https://github.com/starknet-io/starknet.js/commit/678ca1db2b0f055708b03363688bddf75858a5e4))
+
+## [10.3.1](https://github.com/starknet-io/starknet.js/compare/v10.3.0...v10.3.1) (2026-06-15)
+
+### Bug Fixes
+
+- plugins methods in Account not available in dist ([58a150f](https://github.com/starknet-io/starknet.js/commit/58a150fa2910c7498d96ec2a335793c852ab87a9))
+
+# [10.3.0](https://github.com/starknet-io/starknet.js/compare/v10.2.0...v10.3.0) (2026-06-10)
+
+### Features
+
+- creation of getSignedTransaction and invokeSignedTx ([3b85dfc](https://github.com/starknet-io/starknet.js/commit/3b85dfc319c9ebc284a60d4062d5397932331fe6))
+
+# [10.2.0](https://github.com/starknet-io/starknet.js/compare/v10.1.0...v10.2.0) (2026-06-10)
+
+### Features
+
+- in class CairoByteArray hash added. Solve a code cycling ([1ab4c06](https://github.com/starknet-io/starknet.js/commit/1ab4c06884f1decf0317010c4ae97e8ec40d9fd4))
+
+# [10.1.0](https://github.com/starknet-io/starknet.js/compare/v10.0.4...v10.1.0) (2026-06-09)
+
+### Features
+
+- add RPC 0.10.3 support (starknet-types-0103, RpcChannel v0_10_3) ([d7792fb](https://github.com/starknet-io/starknet.js/commit/d7792fbb4b0e64907ef0f2bfdbc1adfe60823688))
+
+## [10.0.4](https://github.com/starknet-io/starknet.js/compare/v10.0.3...v10.0.4) (2026-06-04)
+
+### Bug Fixes
+
+- add validation to cairofelt to ensure numbers are valid felt252 numbers ([f056836](https://github.com/starknet-io/starknet.js/commit/f0568369781e602a8a47dee76bb7ac13d152faaf))
+
 ## [10.0.3](https://github.com/starknet-io/starknet.js/compare/v10.0.2...v10.0.3) (2026-05-29)
 
 ### Bug Fixes
