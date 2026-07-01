@@ -3,6 +3,14 @@ import * as starkCurve from '@scure/starknet';
 import { constants, ec, hash, num, units } from '../../src';
 import { ETHtokenAddress } from '../config';
 
+// @scure/starknet is ESM-only since v2: its exports are non-configurable getters that
+// jest.spyOn cannot redefine. Replacing the module with a plain (writable) copy restores
+// spy-ability while keeping the real implementations. (@swc/jest hoists jest.mock.)
+jest.mock('@scure/starknet', () => ({
+  __esModule: true,
+  ...jest.requireActual('@scure/starknet'),
+}));
+
 const { IS_BROWSER } = constants;
 
 test('units', () => {

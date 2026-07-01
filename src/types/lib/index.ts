@@ -10,7 +10,7 @@ import {
   TransactionFinalityStatus,
 } from '../../provider/types/spec.type';
 
-export type WeierstrassSignatureType = weierstrass.SignatureType;
+export type WeierstrassSignatureType = weierstrass.ECDSASignature;
 export type ArraySignatureType = string[];
 export type Signature = ArraySignatureType | WeierstrassSignatureType;
 

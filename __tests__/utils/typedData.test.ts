@@ -32,6 +32,14 @@ import {
   isMerkleTreeType,
 } from '../../src/utils/typedData';
 
+// @scure/starknet is ESM-only since v2: its exports are non-configurable getters that
+// jest.spyOn cannot redefine. Replacing the module with a plain (writable) copy restores
+// spy-ability while keeping the real implementations. (@swc/jest hoists jest.mock.)
+jest.mock('@scure/starknet', () => ({
+  __esModule: true,
+  ...jest.requireActual('@scure/starknet'),
+}));
+
 const exampleAddress = '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826';
 
 const copyMock = <T>(o: T) => JSON.parse(JSON.stringify(o)) as T;

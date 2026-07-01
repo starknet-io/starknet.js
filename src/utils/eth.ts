@@ -1,4 +1,4 @@
-import { secp256k1 } from '@noble/curves/secp256k1';
+import { secp256k1 } from '@noble/curves/secp256k1.js';
 
 import { addHexPrefix, buf2hex, removeHexPrefix, sanitizeHex } from './encode';
 import type { BigNumberish } from '../types';
@@ -16,7 +16,7 @@ import assert from './assert';
  * ```
  */
 export function ethRandomPrivateKey(): string {
-  return sanitizeHex(buf2hex(secp256k1.utils.randomPrivateKey()));
+  return sanitizeHex(buf2hex(secp256k1.utils.randomSecretKey()));
 }
 
 /**

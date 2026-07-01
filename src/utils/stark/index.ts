@@ -180,7 +180,7 @@ export function formatSignature(sig?: Signature): ArraySignatureType {
     const { r, s } = sig;
     return [toHex(r), toHex(s)];
   } catch (e) {
-    throw new Error('Signature need to be weierstrass.SignatureType or an array for custom');
+    throw new Error('Signature need to be weierstrass.ECDSASignature or an array for custom');
   }
 }
 

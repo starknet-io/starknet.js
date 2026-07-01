@@ -1,5 +1,6 @@
-import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
-import { sha256 } from '@noble/hashes/sha256';
+import { hexToBytes as hexToBytesNoble } from '@noble/curves/utils.js';
+import { sha256 } from '@noble/hashes/sha2.js';
+import { utf8ToBytes } from '@noble/hashes/utils.js';
 
 import { MASK_31 } from '../global/constants';
 import { BigNumberish } from '../types';
@@ -372,7 +373,7 @@ export function addPercent(number: BigNumberish, percent: number): bigint {
 export function stringToSha256ToArrayBuff4(str: string): Uint8Array {
   // eslint-disable-next-line no-bitwise
   const int31 = (n: bigint) => Number(n & MASK_31);
-  const result: number = int31(BigInt(addHexPrefix(buf2hex(sha256(str)))));
+  const result: number = int31(BigInt(addHexPrefix(buf2hex(sha256(utf8ToBytes(str))))));
   return hexToBytes(toHex(result));
 }
 

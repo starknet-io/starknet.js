@@ -76,5 +76,5 @@ test('verify signed message()', () => {
   const hashMsg = ec.starkCurve.pedersen(account, price);
   const signature = ec.starkCurve.sign(hashMsg, pk);
   const pubKey = ec.starkCurve.getPublicKey(pk);
-  expect(ec.starkCurve.verify(signature.toDERHex(), hashMsg, pubKey)).toBe(true);
+  expect(ec.starkCurve.verify(signature, hashMsg, pubKey)).toBe(true);
 });
