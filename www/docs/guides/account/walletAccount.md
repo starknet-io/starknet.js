@@ -101,7 +101,7 @@ useEffect(() => {
 When retrieving information from Starknet, a `WalletAccountV6` instance reads directly from the blockchain via its provider. If you want to write to Starknet, `WalletAccountV6` asks the wallet to sign and send the transaction using the Starknet Wallet API v6.
 
 :::note
-`get-starknet v6` is not yet published. This section documents the expected API once it is available.
+`WalletAccountV6` requires `get-starknet v6` (v6.0.2 min).
 :::
 
 ### Select a Wallet
@@ -109,7 +109,7 @@ When retrieving information from Starknet, a `WalletAccountV6` instance reads di
 The wallet selection follows the same pattern as v5:
 
 ```typescript
-import { createStore, type Store } from '@starknet-io/get-starknet/discovery'; // v6.0.0 min
+import { createStore, type Store } from '@starknet-io/get-starknet/discovery'; // v6.0.2 min
 import { type WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard/features'; // v6
 import { WalletAccountV6, walletV6 } from 'starknet';
 
