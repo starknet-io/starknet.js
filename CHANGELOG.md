@@ -1,3 +1,9 @@
+# [10.4.0](https://github.com/starknet-io/starknet.js/compare/v10.3.3...v10.4.0) (2026-07-01)
+
+### Features
+
+- add WalletAccountV6 with STRK20 privacy protocol support ([#1642](https://github.com/starknet-io/starknet.js/issues/1642)) ([5d2e672](https://github.com/starknet-io/starknet.js/commit/5d2e672be39d69b69c197568bda1c6cd3b53cfde))
+
 ## [10.3.3](https://github.com/starknet-io/starknet.js/compare/v10.3.2...v10.3.3) (2026-06-30)
 
 ### Bug Fixes
