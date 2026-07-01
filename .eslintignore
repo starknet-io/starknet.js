@@ -1,5 +1,4 @@
 node_modules/
 dist/
 www/
-packages/
 !.releaserc.mjs
