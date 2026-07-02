@@ -39,11 +39,11 @@ The Starknet.js version must align with the RPC version supported by the chosen 
 | :---------------------------: | ------------------------------------- |
 |            v0.7.x             | Starknet.js v6.24.1 or v7.6.4         |
 |            v0.8.x             | Starknet.js v7.6.4 or v8.9.2          |
-|            v0.9.x             | Starknet.js v8.9.2, v9.4.2 or v10.3.2 |
-|            v0.10.0            | Starknet.js v9.4.2 or v10.3.2         |
-|            v0.10.1            | Starknet.js v10.3.2                   |
-|            v0.10.2            | Starknet.js v10.3.2                   |
-|            v0.10.3            | Starknet.js v10.3.2                   |
+|            v0.9.x             | Starknet.js v8.9.2, v9.4.2 or v10.4.0 |
+|            v0.10.0            | Starknet.js v9.4.2 or v10.4.0         |
+|            v0.10.1            | Not supported                         |
+|            v0.10.2            | Starknet.js v10.4.0                   |
+|            v0.10.3            | Starknet.js v10.4.0                   |
 
 :::note
 
@@ -88,10 +88,10 @@ import { RpcProvider } from 'starknet';
 
 |                   Node | with public url | with API key |
 | ---------------------: | :-------------: | :----------: |
-| starknet-devnet v0.2.x |      v0_7       |     N/A      |
-| starknet-devnet v0.4.x |      v0_8       |     N/A      |
-| starknet-devnet v0.6.x |      v0_9       |     N/A      |
-| starknet-devnet v0.8.2 |      v0_10      |     N/A      |
+| starknet-devnet v0.2.4 |      v0_7       |     N/A      |
+| starknet-devnet v0.4.3 |      v0_8       |     N/A      |
+| starknet-devnet v0.6.1 |      v0_9       |     N/A      |
+| starknet-devnet v0.9.0 |      v0_10      |     N/A      |
 
 :::note
 
