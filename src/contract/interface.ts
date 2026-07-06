@@ -212,6 +212,28 @@ export abstract class ContractInterface {
   public abstract populate(method: string, args?: ArgsOrCalldata): Invocation;
 
   /**
+   * Compile the calldata for a contract method, using the contract abi.
+   *
+   * Unlike {@link populate}, this returns only the compiled `Calldata` array, without wrapping it
+   * in an `Invocation` object (no `contractAddress` nor `entrypoint`). It is the contract-bound
+   * equivalent of `myCallData.compile(method, args)`.
+   *
+   * If `args` is already a compiled `Calldata`, it is returned as-is without recompilation.
+   *
+   * @param method - Name of the contract method, as defined in the abi
+   * @param args - Method arguments as array (in abi order) or object (free order), or an already
+   * compiled calldata
+   * @returns The compiled calldata
+   * @example
+   * ```typescript
+   * // 'amount' is a u256: the abi splits it into 2 felts automatically
+   * const calldata = contract.compile('transfer', { recipient: '0x123', amount: 100n });
+   * // calldata = ['0x123', '100', '0']
+   * ```
+   */
+  public abstract compile(method: string, args?: ArgsOrCalldata): Calldata;
+
+  /**
    * Parse events from a transaction receipt using the contract's ABI
    *
    * @param receipt - Transaction receipt from waitForTransaction
