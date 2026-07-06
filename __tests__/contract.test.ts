@@ -1,5 +1,6 @@
 import {
   Account,
+  type Abi,
   Contract,
   ProviderInterface,
   RawArgs,
@@ -52,6 +53,39 @@ describe('contract module', () => {
   });
 
   describe('class Contract {}', () => {
+    describe('reserved method names', () => {
+      // an abi whose entrypoint is named like an internal Contract method
+      const abiWithCompile = [
+        {
+          type: 'function',
+          name: 'compile',
+          inputs: [{ name: 'x', type: 'core::felt252' }],
+          outputs: [],
+          state_mutability: 'external',
+        },
+      ] as Abi;
+
+      test('Contract.compile takes priority over an abi entrypoint named "compile"', () => {
+        const contract = new Contract({ abi: abiWithCompile, address: '0x1' });
+
+        // the snjs method is kept: no own property shadows the prototype method
+        const ownDescriptor = Object.getOwnPropertyDescriptor(contract, 'compile');
+        expect(ownDescriptor).toBeUndefined();
+
+        // and it resolves to the prototype method, not an abi-attached function
+        const isPrototypeMethod = contract.compile === Contract.prototype.compile;
+        expect(isPrototypeMethod).toBe(true);
+
+        // it works as the snjs compile (returns a Calldata synchronously)
+        const calldata = contract.compile('compile', [123]);
+        expect(calldata).toStrictEqual(['123']);
+
+        // the homonym entrypoint stays reachable through the escape hatch
+        const entrypoint = contract.functions.compile;
+        expect(typeof entrypoint).toBe('function');
+      });
+    });
+
     describe('Basic Interaction', () => {
       let erc20Contract: Contract;
 
@@ -930,6 +964,26 @@ describe('Complex interaction', () => {
       ];
       expect(callDataFromObject).toStrictEqual(expectedResult);
       expect(callDataFromArray).toStrictEqual(expectedResult);
+    });
+
+    test('Contract.compile returns the same calldata as myCallData.compile and populate().calldata', () => {
+      const reference = new CallData(echoContract.abi).compile('echo', request);
+
+      // object input, equivalent to the abi-bound myCallData.compile
+      const fromObject = echoContract.compile('echo', request);
+      expect(fromObject).toStrictEqual(reference);
+
+      // array input produces the same result
+      const fromArray = echoContract.compile('echo', Object.values(request));
+      expect(fromArray).toStrictEqual(reference);
+
+      // populate() reuses compile() under the hood
+      const fromPopulate = echoContract.populate('echo', request).calldata;
+      expect(fromPopulate).toStrictEqual(reference);
+
+      // already-compiled calldata is returned as-is (getCompiledCalldata short-circuit)
+      const fromCompiled = echoContract.compile('echo', reference);
+      expect(fromCompiled).toStrictEqual(reference);
     });
 
     test('myCallData.decodeParameters for Cairo 1', async () => {

@@ -444,12 +444,15 @@ export class Contract implements ContractInterface {
     throw Error('Contract must be connected to the account contract to estimate');
   }
 
+  public compile(method: string, args: RawArgs = []): Calldata {
+    return getCompiledCalldata(args, () => this.callData.compile(method, args));
+  }
+
   public populate(method: string, args: RawArgs = []): Call {
-    const calldata: Calldata = getCompiledCalldata(args, () => this.callData.compile(method, args));
     return {
       contractAddress: this.address,
       entrypoint: method,
-      calldata,
+      calldata: this.compile(method, args),
     };
   }
 
