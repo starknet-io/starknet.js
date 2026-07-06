@@ -52,6 +52,30 @@ describe('Default RPC Nodes', () => {
                 try {
                   version = await provider.getSpecVersion();
                 } catch (error) {
+                  // TEMPORARY DIAGNOSTIC: surface the swallowed error so CI logs reveal
+                  // whether the failure is a rate-limit (HTTP 429), a timeout, or a 5xx.
+                  // The channel does not expose the HTTP status (it calls response.json()
+                  // directly), so we log the raw error AND re-probe to read response.status.
+                  const e = error as any;
+                  let probe: string;
+                  try {
+                    const r = await fetch(it, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        id: 1,
+                        jsonrpc: '2.0',
+                        method: 'starknet_specVersion',
+                      }),
+                    });
+                    probe = `status=${r.status} ${r.statusText}; body="${(await r.text()).slice(0, 120)}"`;
+                  } catch (probeErr: any) {
+                    probe = `probe failed: ${probeErr?.name}: ${probeErr?.message}`;
+                  }
+                  // eslint-disable-next-line no-console
+                  console.error(
+                    `[defaultNodes] FAIL ${it} | err=${e?.name}: ${e?.message} (code=${e?.code}) | probe=${probe}`
+                  );
                   version = undefined;
                 }
 
