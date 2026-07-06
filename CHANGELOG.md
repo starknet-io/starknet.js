@@ -1,3 +1,9 @@
+# [10.5.0](https://github.com/starknet-io/starknet.js/compare/v10.4.0...v10.5.0) (2026-07-06)
+
+### Features
+
+- add Contract.compile() to build calldata from the abi ([0cdcaf9](https://github.com/starknet-io/starknet.js/commit/0cdcaf927a75b4537ccc071794ae354f058c320c))
+
 # [10.4.0](https://github.com/starknet-io/starknet.js/compare/v10.3.3...v10.4.0) (2026-07-01)
 
 ### Features
