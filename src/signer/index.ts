@@ -1,6 +1,7 @@
 export * from './interface';
 export * from './default';
 export * from './ethSigner';
+export * from './externalSigner';
 export {
   LedgerSigner111,
   getLedgerPathBuffer111,
