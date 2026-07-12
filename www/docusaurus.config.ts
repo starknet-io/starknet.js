@@ -318,10 +318,6 @@ const config: Config = {
           title: 'Community',
           items: [
             {
-              label: 'Twitter',
-              href: 'https://twitter.com/starknetjs',
-            },
-            {
               label: 'Discord',
               href: 'https://discord.com/channels/793094838509764618/1270119831559078061',
             },

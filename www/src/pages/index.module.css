@@ -22,15 +22,18 @@
   justify-content: center;
 }
 
-.feedSection {
+.skillSection {
   padding: 3rem 0;
   background-color: #303846;
 }
-.feedContainer {
+.skillContainer {
   width: 90%;
-  max-width: 600px;
+  max-width: 800px;
   margin: auto;
+  text-align: left;
 }
-.twitterTarget {
-  color: white;
+.skillNote {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-bottom: 0;
 }
