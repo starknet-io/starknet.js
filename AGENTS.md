@@ -86,6 +86,11 @@ pinned `starknet_specs` dev-dependencies define them. Be version-aware when touc
 - **Do not** commit generated files (`dist/`, coverage). Update `package-lock.json`
   when you change dependencies.
 - Update docs in `www/` and add tests for any behavior change (see CONTRIBUTING.md).
+- [`skills/starknet-js/`](./skills/starknet-js/) is the published agent skill that
+  teaches AI coding agents how to _use_ this library (installable via
+  `npx skills add starknet-io/starknet.js`). If you change the public API surface
+  (signatures, constructor options, calldata handling…), check that the skill files
+  are not made stale, and update them in the same PR if they are.
 
 ## Gotchas
 
