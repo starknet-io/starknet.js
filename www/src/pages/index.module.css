@@ -16,6 +16,13 @@
   }
 }
 
+.heroLogo {
+  /* the image renders at its natural size (854x496); on short/wide screens
+     cap its height so the hero does not fill the whole viewport */
+  max-height: 40vh;
+  width: auto;
+}
+
 .buttons {
   display: flex;
   align-items: center;
