@@ -29,9 +29,6 @@
   <a href="https://starkware.co/">
     <img src="https://img.shields.io/badge/powered_by-StarkWare-navy">
   </a>
-  <a href="https://twitter.com/starknetjs">
-    <img src="https://img.shields.io/badge/follow_us-Twitter-blue">
-  </a>
   <a href="https://www.drips.network/app/projects/github/starknet-io/starknet.js" target="_blank">
     <img src="https://www.drips.network/api/embed/project/https%3A%2F%2Fgithub.com%2Fstarknet-io%2Fstarknet.js/support.png?background=light&style=github&text=project&stat=none" alt="Support starknet.js on drips.network" height="20">
   </a>
@@ -57,6 +54,22 @@ Import `starknet` and use the [API](https://starknet-io.github.io/starknet.js/do
 How to [Guides](https://starknet-io.github.io/starknet.js/docs/guides/intro) :book: & [API](https://starknet-io.github.io/starknet.js/docs/API/) 💻
 
 Play with [Code Examples](https://github.com/PhilippeR26/starknet.js-workshop-typescript) :video_game:
+
+## 🤖 Using AI
+
+AI training data about starknet.js is often outdated. To give your AI coding agent accurate, up-to-date guidance, install the official starknet.js skill ([`skills/starknet-js/`](./skills/starknet-js/)). It works with Claude Code, Codex, Cursor, Gemini CLI, and any other agent supporting the open [Agent Skills](https://agentskills.io/) standard.
+
+```bash
+npx skills add starknet-io/starknet.js
+```
+
+or copy the skill files directly:
+
+```bash
+mkdir -p ~/.claude/skills/starknet-js && curl -s --output-dir ~/.claude/skills/starknet-js --remote-name-all "https://raw.githubusercontent.com/starknet-io/starknet.js/develop/skills/starknet-js/{SKILL.md,calldata.md,interacting.md}"
+```
+
+> This command installs into Claude Code's skills folder — adapt the target directory for other agents.
 
 ## ✏️ Contributing
 
