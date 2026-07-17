@@ -3,10 +3,10 @@ import {
   createBlockForDevnet,
   createTestProvider,
   initializeMatcher,
-  testIfRpc010,
+  describeIfRpc010,
 } from './config';
 
-testIfRpc010('RpcChannel', () => {
+describeIfRpc010('RpcChannel', () => {
   let nodeUrl: string;
   let channel08: RPC0102.RpcChannel;
   initializeMatcher(expect);
