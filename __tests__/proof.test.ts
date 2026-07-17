@@ -5,7 +5,13 @@ import { type BigNumberish, type Call } from '../src';
 import type { Account } from '../src/account';
 import { Contract } from '../src/contract';
 import type { ProviderInterface } from '../src/provider/interface';
-import { CONTRACTS, createTestProvider, describeIfTestnet, getTestAccount } from './config';
+import {
+  CONTRACTS,
+  createTestProvider,
+  describeIfRpc010,
+  describeIfTestnet,
+  getTestAccount,
+} from './config';
 
 describeIfTestnet('Proof in transaction', () => {
   type ProofMessage = {
@@ -50,60 +56,64 @@ describeIfTestnet('Proof in transaction', () => {
     });
   });
 
-  test('tx with wrong calldata', async () => {
-    const myCall3 = { ...myCall2, calldata: [message.user_id, 0] }; // 0 for is_whitelisted instead of 1
-    await expect(account.execute(myCall3, { proof, proofFacts })).rejects.toMatchObject({
-      message: expect.stringContaining('pub message not related to hash'),
-    });
-  });
-
-  describe('tx with wrong proofFacts', () => {
-    test('tx with wrong proofFacts.PROOF0_marker', async () => {
-      const wrongProofFacts = proofFacts.map((item, i) => (i === 0 ? 0n : item));
-      await expect(
-        account.execute(myCall2, { proof, proofFacts: wrongProofFacts })
-      ).rejects.toMatchObject({
-        message: expect.stringContaining(
-          'Expected first field to be 88314448135728 (PROOF0) or 88314448135729 (PROOF1)'
-        ),
+  // SNIP-36 `proof` and `proofFacts` only exist in the RPC 0.10 spec. The 0.9 channel
+  // silently drops them, so the contract would read empty proof facts and panic.
+  describeIfRpc010('proof attached to the transaction', () => {
+    test('tx with wrong calldata', async () => {
+      const myCall3 = { ...myCall2, calldata: [message.user_id, 0] }; // 0 for is_whitelisted instead of 1
+      await expect(account.execute(myCall3, { proof, proofFacts })).rejects.toMatchObject({
+        message: expect.stringContaining('pub message not related to hash'),
       });
     });
 
-    test('tx with wrong proofFacts.VIRTUAL_SNOS_marker', async () => {
-      const wrongProofFacts = proofFacts.map((item, i) => (i === 1 ? 0n : item));
-      await expect(
-        account.execute(myCall2, { proof, proofFacts: wrongProofFacts })
-      ).rejects.toMatchObject({
-        message: expect.stringContaining(
-          'Expected second field to be 26704351219188916681607892819 (VIRTUAL_SNOS)'
-        ),
+    describe('tx with wrong proofFacts', () => {
+      test('tx with wrong proofFacts.PROOF0_marker', async () => {
+        const wrongProofFacts = proofFacts.map((item, i) => (i === 0 ? 0n : item));
+        await expect(
+          account.execute(myCall2, { proof, proofFacts: wrongProofFacts })
+        ).rejects.toMatchObject({
+          message: expect.stringContaining(
+            'Expected first field to be 88314448135728 (PROOF0) or 88314448135729 (PROOF1)'
+          ),
+        });
+      });
+
+      test('tx with wrong proofFacts.VIRTUAL_SNOS_marker', async () => {
+        const wrongProofFacts = proofFacts.map((item, i) => (i === 1 ? 0n : item));
+        await expect(
+          account.execute(myCall2, { proof, proofFacts: wrongProofFacts })
+        ).rejects.toMatchObject({
+          message: expect.stringContaining(
+            'Expected second field to be 26704351219188916681607892819 (VIRTUAL_SNOS)'
+          ),
+        });
+      });
+
+      test('tx with wrong proofFacts.VIRTUAL_SNOS0_marker', async () => {
+        const wrongProofFacts = proofFacts.map((item, i) => (i === 3 ? 0n : item));
+        await expect(
+          account.execute(myCall2, { proof, proofFacts: wrongProofFacts })
+        ).rejects.toMatchObject({
+          message: expect.stringContaining(
+            'Expected SNOS proof facts version to be 6836313912112362670491620561712 (VIRTUAL_OS_OUTPUT_VERSION)'
+          ),
+        });
+      });
+
+      test('tx with wrong proofFacts.l1l2messages length', async () => {
+        const wrongProofFacts = proofFacts.map((item, i) => (i === 7 ? 2n : item));
+        await expect(
+          account.execute(myCall2, { proof, proofFacts: wrongProofFacts })
+        ).rejects.toMatchObject({
+          message: expect.stringContaining('ProofFacts deser failed'),
+        });
       });
     });
 
-    test('tx with wrong proofFacts.VIRTUAL_SNOS0_marker', async () => {
-      const wrongProofFacts = proofFacts.map((item, i) => (i === 3 ? 0n : item));
-      await expect(
-        account.execute(myCall2, { proof, proofFacts: wrongProofFacts })
-      ).rejects.toMatchObject({
-        message: expect.stringContaining(
-          'Expected SNOS proof facts version to be 6836313912112362670491620561712 (VIRTUAL_OS_OUTPUT_VERSION)'
-        ),
-      });
+    test('tx with correct proof', async () => {
+      const res2 = await account.execute(myCall2, { proof, proofFacts });
+      const txR2 = await account.provider.waitForTransaction(res2.transaction_hash);
+      expect(txR2.isSuccess()).toBe(true);
     });
-
-    test('tx with wrong proofFacts.l1l2messages length', async () => {
-      const wrongProofFacts = proofFacts.map((item, i) => (i === 7 ? 2n : item));
-      await expect(
-        account.execute(myCall2, { proof, proofFacts: wrongProofFacts })
-      ).rejects.toMatchObject({
-        message: expect.stringContaining('ProofFacts deser failed'),
-      });
-    });
-  });
-
-  test('tx with correct proof', async () => {
-    const res2 = await account.execute(myCall2, { proof, proofFacts });
-    const txR2 = await account.provider.waitForTransaction(res2.transaction_hash);
-    expect(txR2.isSuccess()).toBe(true);
   });
 });
