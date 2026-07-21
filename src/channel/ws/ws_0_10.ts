@@ -428,8 +428,10 @@ export class WebSocketChannel {
       clearTimeout(this.reconnectStabilityTimeoutId);
       this.reconnectStabilityTimeoutId = null;
     }
-    this.websocket.close(code, reason);
+    // Set the flag before closing so the resulting `close` event does not trigger
+    // an automatic reconnection.
     this.userInitiatedClose = true;
+    this.websocket.close(code, reason);
   }
 
   /**

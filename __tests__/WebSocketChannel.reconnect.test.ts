@@ -49,22 +49,27 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
 
       public onmessage: ((ev: Event) => void) | null = null;
 
+      private timers: NodeJS.Timeout[] = [];
+
       constructor(_url: string) {
         super();
         created += 1;
         current = this;
-        setTimeout(() => {
-          this.readyState = 1;
-          const ev = new Event('open');
-          this.onopen?.(ev);
-          this.dispatchEvent(ev);
-          if (behavior === 'flap') {
-            // Accept the connection then immediately drop it, as a rate-limiting
-            // gateway does. This used to reset the retry counter every cycle and
-            // reconnect forever.
-            setTimeout(() => this.emitClose(), 10);
-          }
-        }, 5);
+        this.timers.push(
+          setTimeout(() => {
+            if (this.readyState === 3) return; // closed before it could open
+            this.readyState = 1;
+            const ev = new Event('open');
+            this.onopen?.(ev);
+            this.dispatchEvent(ev);
+            if (behavior === 'flap') {
+              // Accept the connection then immediately drop it, as a rate-limiting
+              // gateway does. This used to reset the retry counter every cycle and
+              // reconnect forever.
+              this.timers.push(setTimeout(() => this.emitClose(), 10));
+            }
+          }, 5)
+        );
       }
 
       public send() {}
@@ -74,6 +79,8 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
       }
 
       public emitClose() {
+        this.timers.forEach(clearTimeout);
+        this.timers = [];
         if (this.readyState === 3) return;
         this.readyState = 3;
         const ev = new Event('close');
