@@ -1,3 +1,9 @@
+## [10.5.1](https://github.com/starknet-io/starknet.js/compare/v10.5.0...v10.5.1) (2026-07-21)
+
+### Bug Fixes
+
+- ws bound reconnection of a flapping connection ([#1650](https://github.com/starknet-io/starknet.js/issues/1650)) ([241c6c1](https://github.com/starknet-io/starknet.js/commit/241c6c11301a29a22e09a4b8873c236e39326d29))
+
 # [10.5.0](https://github.com/starknet-io/starknet.js/compare/v10.4.0...v10.5.0) (2026-07-06)
 
 ### Features
