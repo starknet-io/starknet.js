@@ -7,6 +7,28 @@ import { getTestAccount, getTestProvider, STRKtokenAddress, TEST_WS_URL } from '
 const describeIfWs = TEST_WS_URL ? describe : describe.skip;
 const NODE_URL = TEST_WS_URL!;
 
+/**
+ * Simulate an abnormal network drop to exercise auto-reconnection.
+ *
+ * A real network drop surfaces to the client as a `close` event (RFC 6455 code
+ * 1006) without a closing handshake; the channel reacts to that event exactly as
+ * it does here and starts reconnecting. We cannot use `socket.close()` for this:
+ * some Starknet gateways (Pathfinder) never complete the closing handshake while a
+ * subscription is active, so the `close` event would never fire and reconnection
+ * would never start. Dispatching the event directly is both reliable and a closer
+ * match to a real drop. The now-orphaned socket is closed best-effort to avoid
+ * leaking the connection.
+ */
+const simulateConnectionDrop = (channel: WebSocketChannel) => {
+  const socket = channel.websocket;
+  socket.dispatchEvent(new Event('close'));
+  try {
+    socket.close();
+  } catch {
+    // ignore: the socket may already be closing/closed
+  }
+};
+
 describeIfWs('E2E WebSocket Tests', () => {
   describe('websocket specific endpoints', () => {
     // Updated for RPC 0.9: removed subscribePendingTransaction (not available in 0.9)
@@ -250,7 +272,16 @@ describeIfWs('E2E WebSocket Tests', () => {
       // Ensure the channel is always disconnected after each test to prevent open handles.
       if (webSocketChannel) {
         webSocketChannel.disconnect();
-        await webSocketChannel.waitForDisconnection();
+        // Some gateways (Pathfinder) never complete the closing handshake while a
+        // subscription is still active, so waitForDisconnection() could hang here.
+        // Bound the wait: the next test always builds a fresh channel, and the node
+        // reclaims the idle socket on its own.
+        await Promise.race([
+          webSocketChannel.waitForDisconnection(),
+          new Promise((resolve) => {
+            setTimeout(resolve, 3000);
+          }),
+        ]);
       }
     });
 
@@ -269,7 +300,7 @@ describeIfWs('E2E WebSocket Tests', () => {
         } else {
           // This is the first connection, now we simulate the drop
           hasReconnected = true;
-          webSocketChannel.websocket.close();
+          simulateConnectionDrop(webSocketChannel);
         }
       });
     });
@@ -307,7 +338,7 @@ describeIfWs('E2E WebSocket Tests', () => {
         } else {
           // 1. First connection, now simulate a drop
           hasReconnected = true;
-          webSocketChannel.websocket.close();
+          simulateConnectionDrop(webSocketChannel);
 
           // 2. Immediately try to send a request. It should be queued.
           webSocketChannel.sendReceive('starknet_chainId').then((result) => {
@@ -320,8 +351,6 @@ describeIfWs('E2E WebSocket Tests', () => {
     });
 
     test('should queue subscribe requests when reconnecting and process them after', (done) => {
-      jest.setTimeout(30000); // Allow time for reconnect and a new block event
-
       webSocketChannel = new WebSocketChannel({
         nodeUrl: NODE_URL,
         reconnectOptions: { retries: 3, delay: 100 },
@@ -334,7 +363,7 @@ describeIfWs('E2E WebSocket Tests', () => {
         } else {
           // 1. First connection, now simulate a drop
           hasReconnected = true;
-          webSocketChannel.websocket.close();
+          simulateConnectionDrop(webSocketChannel);
 
           // 2. Immediately try to subscribe. The request should be queued.
           webSocketChannel.subscribeNewHeads().then((sub) => {
@@ -353,8 +382,6 @@ describeIfWs('E2E WebSocket Tests', () => {
     });
 
     test('should restore active subscriptions after an automatic reconnection', (done) => {
-      jest.setTimeout(30000); // Allow time for reconnect and new block
-
       webSocketChannel = new WebSocketChannel({
         nodeUrl: NODE_URL,
         reconnectOptions: { retries: 3, delay: 100 },
@@ -378,7 +405,7 @@ describeIfWs('E2E WebSocket Tests', () => {
           const sub = await webSocketChannel.subscribeNewHeads();
           sub.on(eventHandler);
           // Now, simulate a drop
-          webSocketChannel.websocket.close();
+          simulateConnectionDrop(webSocketChannel);
         }
         // On the second 'open' event (connectionCount === 2), the test will implicitly
         // be waiting for the eventHandler to be called, which will resolve the test.

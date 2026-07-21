@@ -86,8 +86,13 @@ jobs:
         name: run tests
         run: |
           args=()
-          [[ "${{ inputs.protocol }}" == "WS" ]] && args+=( '__tests__/WebSocket' )
-          npm run test:coverage "${args[@]}"
+          # --forceExit: the WebSocket suite exercises auto-reconnection against a
+          # live gateway that (on Pathfinder) never completes the closing handshake
+          # of a still-subscribed socket, leaving an open handle that would keep
+          # Jest from exiting after the run completes. The `--` lets npm forward the
+          # flag through to Jest.
+          [[ "${{ inputs.protocol }}" == "WS" ]] && args+=( '--forceExit' '__tests__/WebSocket' )
+          npm run test:coverage -- "${args[@]}"
         env:
           TEST_RPC_URL: ${{ steps.node-url.outputs.rpc-url }}
           TEST_WS_URL: ${{ steps.node-url.outputs.ws-url }}
