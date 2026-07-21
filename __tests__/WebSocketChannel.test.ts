@@ -29,6 +29,38 @@ const simulateConnectionDrop = (channel: WebSocketChannel) => {
   }
 };
 
+/**
+ * Open a WebSocket channel, retrying on connection errors.
+ *
+ * The shared gateways rate-limit new connections per IP. Opening several in quick
+ * succession (as this suite does) gets a fresh connection rejected with an error
+ * event, which `waitForConnection()` surfaces as a rejection. The limit replenishes
+ * within ~1s, so retry with a spaced backoff.
+ */
+const openChannel = async (
+  options: ConstructorParameters<typeof WebSocketChannel>[0]
+): Promise<WebSocketChannel> => {
+  const retries = 5;
+  const backoffMs = 1000;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < retries; attempt += 1) {
+    const channel = new WebSocketChannel(options);
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await channel.waitForConnection();
+      return channel;
+    } catch (error) {
+      lastError = error;
+      channel.disconnect();
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => {
+        setTimeout(resolve, backoffMs);
+      });
+    }
+  }
+  throw lastError;
+};
+
 describeIfWs('E2E WebSocket Tests', () => {
   describe('websocket specific endpoints', () => {
     // Updated for RPC 0.9: removed subscribePendingTransaction (not available in 0.9)
@@ -41,8 +73,7 @@ describeIfWs('E2E WebSocket Tests', () => {
     let webSocketChannel: WebSocketChannel;
 
     beforeEach(async () => {
-      webSocketChannel = new WebSocketChannel({ nodeUrl: NODE_URL });
-      await webSocketChannel.waitForConnection();
+      webSocketChannel = await openChannel({ nodeUrl: NODE_URL });
     });
 
     afterEach(async () => {
@@ -54,8 +85,7 @@ describeIfWs('E2E WebSocket Tests', () => {
 
     test('should throw an error when sending on a disconnected socket', async () => {
       // This test uses its own channel to disable auto-reconnect and isolate the error behavior
-      const testChannel = new WebSocketChannel({ nodeUrl: NODE_URL, autoReconnect: false });
-      await testChannel.waitForConnection();
+      const testChannel = await openChannel({ nodeUrl: NODE_URL, autoReconnect: false });
 
       testChannel.disconnect();
       await testChannel.waitForDisconnection();
@@ -247,10 +277,8 @@ describeIfWs('E2E WebSocket Tests', () => {
     let webSocketChannel: WebSocketChannel;
 
     beforeAll(async () => {
-      webSocketChannel = new WebSocketChannel({ nodeUrl: NODE_URL });
-      expect(webSocketChannel.isConnected()).toBe(false);
-      const status = await webSocketChannel.waitForConnection();
-      expect(status).toBe(WebSocket.OPEN);
+      webSocketChannel = await openChannel({ nodeUrl: NODE_URL });
+      expect(webSocketChannel.isConnected()).toBe(true);
     });
 
     afterAll(async () => {
@@ -289,7 +317,7 @@ describeIfWs('E2E WebSocket Tests', () => {
       // Set a very short reconnection delay for faster tests
       webSocketChannel = new WebSocketChannel({
         nodeUrl: NODE_URL,
-        reconnectOptions: { retries: 3, delay: 100 },
+        reconnectOptions: { retries: 5, delay: 1000, exponential: false },
       });
 
       let hasReconnected = false;
@@ -306,11 +334,10 @@ describeIfWs('E2E WebSocket Tests', () => {
     });
 
     test('sendReceive should time out if no response is received', async () => {
-      webSocketChannel = new WebSocketChannel({
+      webSocketChannel = await openChannel({
         nodeUrl: NODE_URL,
         requestTimeout: 100, // Set a short timeout for testing
       });
-      await webSocketChannel.waitForConnection();
 
       // Spy on the 'send' method and prevent it from sending anything.
       // This guarantees that we will never get a response and the timeout will be triggered.
@@ -328,7 +355,7 @@ describeIfWs('E2E WebSocket Tests', () => {
     test('should queue sendReceive requests when reconnecting and process them after', (done) => {
       webSocketChannel = new WebSocketChannel({
         nodeUrl: NODE_URL,
-        reconnectOptions: { retries: 3, delay: 100 },
+        reconnectOptions: { retries: 5, delay: 1000, exponential: false },
       });
 
       let hasReconnected = false;
@@ -353,7 +380,7 @@ describeIfWs('E2E WebSocket Tests', () => {
     test('should queue subscribe requests when reconnecting and process them after', (done) => {
       webSocketChannel = new WebSocketChannel({
         nodeUrl: NODE_URL,
-        reconnectOptions: { retries: 3, delay: 100 },
+        reconnectOptions: { retries: 5, delay: 1000, exponential: false },
       });
 
       let hasReconnected = false;
@@ -384,7 +411,7 @@ describeIfWs('E2E WebSocket Tests', () => {
     test('should restore active subscriptions after an automatic reconnection', (done) => {
       webSocketChannel = new WebSocketChannel({
         nodeUrl: NODE_URL,
-        reconnectOptions: { retries: 3, delay: 100 },
+        reconnectOptions: { retries: 5, delay: 1000, exponential: false },
       });
 
       let connectionCount = 0;
