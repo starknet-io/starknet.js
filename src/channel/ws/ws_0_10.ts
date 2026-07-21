@@ -89,6 +89,14 @@ export type ReconnectOptions = {
    * @default true
    */
   exponential?: number | boolean;
+  /**
+   * The minimum time in milliseconds a reconnected connection must stay open before
+   * it is considered stable and the retry counter is reset. This prevents a gateway
+   * that accepts the connection then immediately drops it (a "flapping" connection)
+   * from resetting the counter on every cycle and reconnecting forever.
+   * @default 5000
+   */
+  stableConnectionThreshold?: number;
 };
 
 /**
@@ -197,6 +205,10 @@ export class WebSocketChannel {
 
   private reconnectTimeoutId: NodeJS.Timeout | null = null;
 
+  // Fires once a (re)connection has stayed open long enough to be considered stable,
+  // resetting the reconnection attempt counter.
+  private reconnectStabilityTimeoutId: NodeJS.Timeout | null = null;
+
   private requestQueue: Array<{
     method: string;
     params?: object;
@@ -206,7 +218,12 @@ export class WebSocketChannel {
 
   private events = new EventEmitter<WebSocketChannelEvents>();
 
-  private openListener = (ev: Event) => this.events.emit('open', ev);
+  private openListener = (ev: Event) => {
+    // A connection is considered stable only after it has stayed open for a while;
+    // resetting the retry counter is deferred until then (see scheduleReconnectAttemptsReset).
+    this.scheduleReconnectAttemptsReset();
+    this.events.emit('open', ev);
+  };
 
   private closeListener = this.onCloseProxy.bind(this);
 
@@ -232,6 +249,7 @@ export class WebSocketChannel {
       retries: options.reconnectOptions?.retries ?? 5,
       delay: options.reconnectOptions?.delay ?? 2000,
       exponential: options.reconnectOptions?.exponential ?? true,
+      stableConnectionThreshold: options.reconnectOptions?.stableConnectionThreshold ?? 5000,
     };
     this.requestTimeout = options.requestTimeout ?? 60000;
 
@@ -406,6 +424,10 @@ export class WebSocketChannel {
       clearTimeout(this.reconnectTimeoutId);
       this.reconnectTimeoutId = null;
     }
+    if (this.reconnectStabilityTimeoutId) {
+      clearTimeout(this.reconnectStabilityTimeoutId);
+      this.reconnectStabilityTimeoutId = null;
+    }
     this.websocket.close(code, reason);
     this.userInitiatedClose = true;
   }
@@ -508,13 +530,34 @@ export class WebSocketChannel {
     await Promise.all(restorePromises);
   }
 
+  /**
+   * Reset the reconnection attempt counter, but only once the current connection has
+   * stayed open for `stableConnectionThreshold` ms. A connection that opens and then
+   * immediately drops (a flapping gateway) never reaches this point, so its attempts
+   * keep accumulating toward the retry cap instead of resetting every cycle.
+   */
+  private scheduleReconnectAttemptsReset() {
+    if (this.reconnectStabilityTimeoutId) {
+      clearTimeout(this.reconnectStabilityTimeoutId);
+    }
+    this.reconnectStabilityTimeoutId = setTimeout(() => {
+      this.reconnectAttempts = 0;
+      this.reconnectStabilityTimeoutId = null;
+    }, this.reconnectOptions.stableConnectionThreshold);
+  }
+
   private _startReconnect() {
     if (this.isReconnecting || !this.autoReconnect) {
       return;
     }
 
+    // The connection that just dropped did not prove stable, so cancel any pending
+    // counter reset and keep the accumulated attempts (bounds a flapping reconnect).
+    if (this.reconnectStabilityTimeoutId) {
+      clearTimeout(this.reconnectStabilityTimeoutId);
+      this.reconnectStabilityTimeoutId = null;
+    }
     this.isReconnecting = true;
-    this.reconnectAttempts = 0;
 
     const tryReconnect = () => {
       if (this.reconnectAttempts >= this.reconnectOptions.retries) {
@@ -533,7 +576,8 @@ export class WebSocketChannel {
       this.websocket.onopen = async () => {
         logger.info('WebSocket: Reconnection successful.');
         this.isReconnecting = false;
-        this.reconnectAttempts = 0;
+        // The attempt counter is reset by the openListener's stability timer, not here:
+        // a reconnection that drops again before proving stable must keep its count.
         await this._restoreSubscriptions();
         this._processRequestQueue();
         // Manually trigger the onOpen listeners as the original 'open' event was consumed.
