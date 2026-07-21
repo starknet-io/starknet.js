@@ -36,6 +36,11 @@ const simulateConnectionDrop = (channel: WebSocketChannel) => {
  * succession (as this suite does) gets a fresh connection rejected with an error
  * event, which `waitForConnection()` surfaces as a rejection. The limit replenishes
  * within ~1s, so retry with a spaced backoff.
+ *
+ * `autoReconnect` is forced off: this helper owns the retry loop, and letting the
+ * channel also auto-reconnect in the background on a failed attempt would spawn
+ * overlapping reconnection loops (each retrying for tens of seconds) that pile up
+ * under rate-limiting.
  */
 const openChannel = async (
   options: ConstructorParameters<typeof WebSocketChannel>[0]
@@ -44,7 +49,7 @@ const openChannel = async (
   const backoffMs = 1000;
   let lastError: unknown;
   for (let attempt = 0; attempt < retries; attempt += 1) {
-    const channel = new WebSocketChannel(options);
+    const channel = new WebSocketChannel({ ...options, autoReconnect: false });
     try {
       // eslint-disable-next-line no-await-in-loop
       await channel.waitForConnection();
@@ -97,11 +102,11 @@ describeIfWs('E2E WebSocket Tests', () => {
     });
 
     test('should allow manual reconnection after a user-initiated disconnect', async () => {
-      // This test uses the default channel from `beforeEach` which has autoReconnect: true
+      // The beforeEach channel is opened with autoReconnect disabled (see openChannel),
+      // so a user-initiated disconnect leaves it closed until reconnect() is called.
       webSocketChannel.disconnect();
       await webSocketChannel.waitForDisconnection();
 
-      // It should not have auto-reconnected because the disconnect was user-initiated
       expect(webSocketChannel.isConnected()).toBe(false);
 
       // Now, manually reconnect
