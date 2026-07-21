@@ -89,7 +89,7 @@ describeIfWs('E2E WebSocket Tests', () => {
       sub.on(async (result) => {
         i += 1;
         expect(result).toBeDefined();
-        expect(result).toHaveProperty('event');
+        expect(result).toHaveProperty('keys');
         if (i === 5) {
           const status = await sub.unsubscribe();
           expect(status).toBe(true);
@@ -109,7 +109,7 @@ describeIfWs('E2E WebSocket Tests', () => {
       sub.on(async (result) => {
         i += 1;
         expect(result).toBeDefined();
-        expect(result).toHaveProperty('event');
+        expect(result).toHaveProperty('keys');
         if (i === 2) {
           const status = await sub.unsubscribe();
           expect(status).toBe(true);
@@ -127,7 +127,7 @@ describeIfWs('E2E WebSocket Tests', () => {
       sub.on(async (result) => {
         i += 1;
         expect(result).toBeDefined();
-        expect(result).toHaveProperty('transaction_receipt');
+        expect(result).toHaveProperty('execution_status');
         if (i === 2) {
           const status = await sub.unsubscribe();
           expect(status).toBe(true);
@@ -147,7 +147,7 @@ describeIfWs('E2E WebSocket Tests', () => {
       sub.on(async (result) => {
         i += 1;
         expect(result).toBeDefined();
-        expect(result).toHaveProperty('transaction_receipt');
+        expect(result).toHaveProperty('execution_status');
         if (i === 1) {
           const status = await sub.unsubscribe();
           expect(status).toBe(true);
@@ -165,7 +165,7 @@ describeIfWs('E2E WebSocket Tests', () => {
       sub.on(async (result) => {
         i += 1;
         expect(result).toBeDefined();
-        expect(result).toHaveProperty('transaction');
+        expect(result).toHaveProperty('nonce');
         if (i === 2) {
           const status = await sub.unsubscribe();
           expect(status).toBe(true);
@@ -185,7 +185,7 @@ describeIfWs('E2E WebSocket Tests', () => {
       sub.on(async (result) => {
         i += 1;
         expect(result).toBeDefined();
-        expect(result).toHaveProperty('transaction');
+        expect(result).toHaveProperty('nonce');
         if (i === 1) {
           const status = await sub.unsubscribe();
           expect(status).toBe(true);
