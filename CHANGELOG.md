@@ -1,3 +1,9 @@
+## [10.5.2](https://github.com/starknet-io/starknet.js/compare/v10.5.1...v10.5.2) (2026-07-22)
+
+### Bug Fixes
+
+- provider: correct getBlock() default return type and add JSDoc ([b161c46](https://github.com/starknet-io/starknet.js/commit/b161c468613133c9325c4fe38d20bb09524afbea))
+
 ## [10.5.1](https://github.com/starknet-io/starknet.js/compare/v10.5.0...v10.5.1) (2026-07-21)
 
 ### Bug Fixes
