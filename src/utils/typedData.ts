@@ -21,7 +21,7 @@ import {
 } from './hash';
 import { MerkleTree } from './merkle';
 import { isBigNumberish, isHex, toHex } from './num';
-import { encodeShortString } from './shortString';
+import { encodeShortString, isShortString } from './shortString';
 import { isBoolean, isString } from './typed';
 
 interface Context {
@@ -122,8 +122,8 @@ export function validateTypedData(data: unknown): data is TypedData {
  * // result2 = '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
  * ```
  */
-export function prepareSelector(selector: string): string {
-  return isHex(selector) ? selector : getSelectorFromName(selector);
+export function prepareSelector(selector: string, revision: Revision = Revision.LEGACY): string {
+  return revision === Revision.LEGACY && isHex(selector) ? selector : getSelectorFromName(selector);
 }
 
 /**
@@ -173,8 +173,8 @@ export function getDependencies(
   if (type[type.length - 1] === '*') {
     dependencyTypes = [type.slice(0, -1)];
   } else if (revision === Revision.ACTIVE) {
-    // enum base
-    if (type === 'enum') {
+    // enum or merkletree base
+    if (type === 'enum' || type === 'merkletree') {
       dependencyTypes = [contains];
     }
     // enum element types
@@ -262,26 +262,22 @@ export function encodeType(
 
   const esc = revisionConfiguration[revision].escapeTypeString;
 
-  return newTypes
-    .map((dependency) => {
-      const dependencyElements = allTypes[dependency].map((t) => {
-        const targetType =
-          t.type === 'enum' && revision === Revision.ACTIVE
-            ? (t as StarknetEnumType).contains
-            : t.type;
-        // parentheses handling for enum variant types
-        const typeString = targetType.match(/^\(.*\)$/)
-          ? `(${targetType
-              .slice(1, -1)
-              .split(',')
-              .map((e) => (e ? esc(e) : e))
-              .join(',')})`
-          : esc(targetType);
-        return `${esc(t.name)}:${typeString}`;
-      });
-      return `${esc(dependency)}(${dependencyElements})`;
-    })
-    .join('');
+  const escapedTypes = newTypes.map((dependency) => {
+    const dependencyElements = allTypes[dependency].map((t) => {
+      const targetType = t.type;
+      // parentheses handling for enum variant types
+      const typeString = targetType.match(/^\(.*\)$/)
+        ? `(${targetType
+            .slice(1, -1)
+            .split(',')
+            .map((e) => (e ? esc(e) : e))
+            .join(',')})`
+        : `:${esc(targetType)}`;
+      return `${esc(t.name)}${typeString}`;
+    });
+    return `${esc(dependency)}(${dependencyElements})`;
+  });
+  return escapedTypes.join('');
 }
 
 /**
@@ -367,22 +363,24 @@ export function encodeValue(
       if (revision === Revision.ACTIVE) {
         const [variantKey, variantData] = Object.entries(data as TypedData['message'])[0];
 
-        const parentType = types[ctx.parent as string].find((t) => t.name === ctx.key);
-        const enumType = types[(parentType as StarknetEnumType).contains];
+        const parentType = types[ctx.parent as string].find((t) => t.name === ctx.key)!;
+        const enumName = (parentType as StarknetEnumType).contains;
+        const enumType = types[enumName];
         const variantType = enumType.find((t) => t.name === variantKey) as StarknetType;
         const variantIndex = enumType.indexOf(variantType);
 
+        const typeHash = getTypeHash(types, enumName, revision);
         const encodedSubtypes = variantType.type
           .slice(1, -1)
           .split(',')
+          .filter((subtype) => !!subtype)
           .map((subtype, index) => {
-            if (!subtype) return subtype;
             const subtypeData = (variantData as unknown[])[index];
             return encodeValue(types, subtype, subtypeData, undefined, revision)[1];
           });
         return [
           type,
-          revisionConfiguration[revision].hashMethod([variantIndex, ...encodedSubtypes]),
+          revisionConfiguration[revision].hashMethod([typeHash, variantIndex, ...encodedSubtypes]),
         ];
       } // else fall through to default
       return [type, getHex(data as string)];
@@ -399,7 +397,7 @@ export function encodeValue(
       return ['felt', root];
     }
     case 'selector': {
-      return ['felt', prepareSelector(data as string)];
+      return ['felt', prepareSelector(data as string, revision)];
     }
     case 'string': {
       if (revision === Revision.ACTIVE) {
@@ -429,11 +427,19 @@ export function encodeValue(
       } // else fall through to default
       return [type, getHex(data as string)];
     }
-    case 'felt':
-    case 'shortstring': {
-      // TODO: should 'shortstring' diverge into directly using encodeShortString()?
+    case 'felt': {
       if (revision === Revision.ACTIVE) {
         assertRange(getHex(data as string), type, RANGE_FELT);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case 'shortstring': {
+      if (revision === Revision.ACTIVE) {
+        if (ctx.parent === revisionConfiguration[revision].domain && ctx.key === 'revision') {
+          return [type, getHex(data as string)];
+        }
+        assert(isString(data) && isShortString(data), `Type mismatch for ${type} ${data}`);
+        return [type, encodeShortString(data)];
       } // else fall through to default
       return [type, getHex(data as string)];
     }
@@ -481,7 +487,7 @@ export function encodeData<T extends TypedData>(
     ([ts, vs], field) => {
       if (
         data[field.name as keyof T['message']] === undefined ||
-        (data[field.name as keyof T['message']] === null && field.type !== 'enum')
+        data[field.name as keyof T['message']] === null
       ) {
         throw new Error(`Cannot encode data: missing data for '${field.name}'`);
       }
