@@ -98,3 +98,7 @@ jobs:
           TEST_WS_URL: ${{ steps.node-url.outputs.ws-url }}
           TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
           TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
+      # TEMPORARY: print the per-test heap curve even when the run OOM-crashes.
+      - name: heap diagnostic
+        if: ${{ always() && inputs.protocol == 'WS' }}
+        run: cat ws-heap.log || echo '(no ws-heap.log produced)'
