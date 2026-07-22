@@ -68,11 +68,50 @@ export abstract class ProviderInterface {
   ): Promise<CallContractResponse>;
 
   /**
-   * Gets the block information
+   * Gets the header and the transaction hashes of a block (RPC `starknet_getBlockWithTxHashes`).
    *
-   * @returns the block object
+   * The response contains the block metadata (hash, number, parent hash, timestamp, status,
+   * gas prices, sequencer address, ...) plus a `transactions` array holding only the **hashes**
+   * of the transactions included in the block — not their content.
+   * To get the full transactions use {@link getBlockWithTxs}, and for their receipts use
+   * {@link getBlockWithReceipts}.
+   *
+   * @param blockIdentifier - which block to fetch. Accepts:
+   * - a block number: `number` or decimal `string` (e.g. `123456`)
+   * - a block hash: hex `string` or `bigint` (e.g. `'0x3a1b...'`)
+   * - a block tag `string`:
+   *   - `'latest'` — the most recent block already accepted on L2
+   *   - `'pre_confirmed'` — the block currently being built, not yet closed (its fields differ:
+   *     no `block_hash`/`status`, hence the dedicated {@link PreConfirmedBlock} return type)
+   * - `null` — resolved as the `'latest'` tag
+   *
+   * When omitted, the provider's default block identifier is used (`'latest'`).
+   *
+   * @returns the block header together with the list of its transaction hashes
+   *
+   * @example
+   * ```typescript
+   * const block = await provider.getBlock('latest');
+   * // {
+   * //   status: 'ACCEPTED_ON_L2',
+   * //   block_hash: '0x3a1b...',
+   * //   block_number: 123456,
+   * //   parent_hash: '0x28f5...',
+   * //   timestamp: 1700000000,
+   * //   sequencer_address: '0x1176a1...',
+   * //   transactions: ['0x1d2c...', '0x5e8f...'],  // transaction hashes only
+   * //   ...
+   * // }
+   *
+   * // By block number or hash:
+   * await provider.getBlock(123456);
+   * await provider.getBlock('0x3a1b...');
+   *
+   * // Block still being built (fields differ from a closed block):
+   * const pending = await provider.getBlock('pre_confirmed');
+   * ```
    */
-  public abstract getBlock(): Promise<PreConfirmedBlock>;
+  public abstract getBlock(): Promise<Block>;
   public abstract getBlock(blockIdentifier: 'pre_confirmed'): Promise<PreConfirmedBlock>;
   public abstract getBlock(blockIdentifier: 'latest'): Promise<Block>;
   public abstract getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
