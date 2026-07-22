@@ -66,6 +66,15 @@ const openChannel = async (
   throw lastError;
 };
 
+// TEMPORARY DIAGNOSTIC: log heap usage after each test so a per-test growth curve
+// pinpoints which WS test leaks memory, even when the run OOMs mid-file. Remove once
+// the leak is found.
+afterEach(() => {
+  const mb = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(0);
+  // eslint-disable-next-line no-console
+  console.log(`[heap] ${mb} MB after "${expect.getState().currentTestName}"`);
+});
+
 describeIfWs('E2E WebSocket Tests', () => {
   describe('websocket specific endpoints', () => {
     // Updated for RPC 0.9: removed subscribePendingTransaction (not available in 0.9)
