@@ -1,33 +1,21 @@
 import { LibraryError, RPC09, RpcError } from '../src';
-import { createBlockForDevnet, createTestProvider, initializeMatcher } from './config';
+import {
+  createBlockForDevnet,
+  createTestProvider,
+  describeIfRpc09,
+  initializeMatcher,
+} from './config';
 
-// Force RPC 0.9.0 for testing purposes (bypasses auto-detection)
-const originalRpcSpecVersion = process.env.RPC_SPEC_VERSION;
-const describeIfRpc09ForTesting =
-  process.env.FORCE_RPC09_TESTS === 'true' ? describe : describe.skip;
-
-describeIfRpc09ForTesting('UNIT TEST: RPC 0.9.0 Channel', () => {
+describeIfRpc09('UNIT TEST: RPC 0.9.0 Channel', () => {
   let nodeUrl: string;
   let channel09: RPC09.RpcChannel;
   initializeMatcher(expect);
 
   beforeAll(async () => {
-    // Temporarily set RPC_SPEC_VERSION to 0.9.0 for these tests
-    process.env.RPC_SPEC_VERSION = '0.9.0';
-
     nodeUrl = (await createTestProvider(false)).channel.nodeUrl;
     channel09 = new RPC09.RpcChannel({ nodeUrl });
 
     await createBlockForDevnet();
-  });
-
-  afterAll(() => {
-    // Restore original RPC_SPEC_VERSION
-    if (originalRpcSpecVersion) {
-      process.env.RPC_SPEC_VERSION = originalRpcSpecVersion;
-    } else {
-      delete process.env.RPC_SPEC_VERSION;
-    }
   });
 
   test('baseFetch override', async () => {
