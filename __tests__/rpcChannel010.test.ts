@@ -74,6 +74,41 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
     fetchSpy?.mockRestore();
   });
 
+  describe('waitForTransaction', () => {
+    test('returns immediately after the receipt is available', async () => {
+      jest.useFakeTimers();
+      const receipt = { transaction_hash: '0x123' };
+      const transactionStatusSpy = jest
+        .spyOn(channel, 'getTransactionStatus')
+        .mockResolvedValueOnce({
+          finality_status: 'ACCEPTED_ON_L2',
+          execution_status: 'SUCCEEDED',
+        });
+      const transactionReceiptSpy = jest
+        .spyOn(channel, 'getTransactionReceipt')
+        .mockResolvedValueOnce(receipt as any);
+
+      const promise = channel.waitForTransaction('0x123', { retryInterval: 1_000 });
+      let settled = false;
+      const settledPromise = promise.then((result) => {
+        settled = true;
+        return result;
+      });
+
+      try {
+        await jest.advanceTimersByTimeAsync(1_000);
+        await Promise.resolve();
+
+        expect(settled).toBe(true);
+        await expect(settledPromise).resolves.toBe(receipt);
+      } finally {
+        transactionStatusSpy.mockRestore();
+        transactionReceiptSpy.mockRestore();
+        jest.useRealTimers();
+      }
+    });
+  });
+
   describe('response_flags (includeProofFacts)', () => {
     test('getBlockWithTxs with includeProofFacts sends response_flags', async () => {
       fetchSpy = jest.spyOn(channel, 'fetch');
