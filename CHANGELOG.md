@@ -1,3 +1,21 @@
+## [10.5.2](https://github.com/starknet-io/starknet.js/compare/v10.5.1...v10.5.2) (2026-07-22)
+
+### Bug Fixes
+
+- provider: correct getBlock() default return type and add JSDoc ([b161c46](https://github.com/starknet-io/starknet.js/commit/b161c468613133c9325c4fe38d20bb09524afbea))
+
+## [10.5.1](https://github.com/starknet-io/starknet.js/compare/v10.5.0...v10.5.1) (2026-07-21)
+
+### Bug Fixes
+
+- ws bound reconnection of a flapping connection ([#1650](https://github.com/starknet-io/starknet.js/issues/1650)) ([241c6c1](https://github.com/starknet-io/starknet.js/commit/241c6c11301a29a22e09a4b8873c236e39326d29))
+
+# [10.5.0](https://github.com/starknet-io/starknet.js/compare/v10.4.0...v10.5.0) (2026-07-06)
+
+### Features
+
+- add Contract.compile() to build calldata from the abi ([0cdcaf9](https://github.com/starknet-io/starknet.js/commit/0cdcaf927a75b4537ccc071794ae354f058c320c))
+
 # [10.4.0](https://github.com/starknet-io/starknet.js/compare/v10.3.3...v10.4.0) (2026-07-01)
 
 ### Features

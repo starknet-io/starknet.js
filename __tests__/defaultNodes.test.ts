@@ -36,6 +36,64 @@ describe('unit tests', () => {
   });
 });
 
+// JSON-RPC error code returned by some public nodes (e.g. ZAN) when we exceed
+// their per-second request quota. It is a transient rate-limit, not a lack of
+// spec-version support, so it must not be counted as a node failure.
+const RATE_LIMIT_ERROR_CODE = -32011;
+
+const sleep = (ms: number) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+/**
+ * A transient error is one worth retrying: a rate-limit, or a network timeout.
+ * A node that genuinely does not support the spec version fails differently.
+ */
+function isTransientError(error: any): boolean {
+  if (error?.code === RATE_LIMIT_ERROR_CODE) return true;
+  const name = String(error?.name ?? '');
+  const message = String(error?.message ?? '').toLowerCase();
+  return name === 'AbortError' || message.includes('timeout') || message.includes('fetch failed');
+}
+
+/**
+ * Resolve the spec version of a node, retrying on transient errors with
+ * exponential backoff. Returns:
+ *  - the version string on success,
+ *  - `'rate-limited'` if every attempt was rejected by a rate-limit,
+ *  - `undefined` for any genuine failure (unsupported spec, malformed response...).
+ */
+async function getSpecVersionWithRetry(
+  provider: InstanceType<typeof Provider>,
+  nodeUrl: string,
+  retries = 3
+): Promise<string | undefined> {
+  let lastError: any;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      return await provider.getSpecVersion();
+    } catch (error) {
+      lastError = error;
+      if (!isTransientError(error) || attempt === retries) break;
+      // eslint-disable-next-line no-await-in-loop
+      await sleep(500 * 2 ** attempt); // 500ms, 1s, 2s
+    }
+  }
+
+  if (lastError?.code === RATE_LIMIT_ERROR_CODE) {
+    // eslint-disable-next-line no-console
+    console.warn(`[defaultNodes] SKIP ${nodeUrl} | rate-limited after ${retries + 1} attempts`);
+    return 'rate-limited';
+  }
+  // eslint-disable-next-line no-console
+  console.error(
+    `[defaultNodes] FAIL ${nodeUrl} | err=${lastError?.name}: ${lastError?.message} (code=${lastError?.code})`
+  );
+  return undefined;
+}
+
 describe('Default RPC Nodes', () => {
   test('All Default RPC Nodes support Spec Versions', async () => {
     const supportedVersions = getSupportedRpcVersions();
@@ -48,12 +106,7 @@ describe('Default RPC Nodes', () => {
             return Promise.all(
               rpcNodes[network as keyof typeof rpcNodes].map(async (it: any) => {
                 const provider = new Provider({ nodeUrl: it });
-                let version;
-                try {
-                  version = await provider.getSpecVersion();
-                } catch (error) {
-                  version = undefined;
-                }
+                const version = await getSpecVersionWithRetry(provider, it);
 
                 return {
                   network,

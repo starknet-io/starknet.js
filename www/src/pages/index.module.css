@@ -16,21 +16,31 @@
   }
 }
 
+.heroLogo {
+  /* the image renders at its natural size (854x496); on short/wide screens
+     cap its height so the hero does not fill the whole viewport */
+  max-height: 40vh;
+  width: auto;
+}
+
 .buttons {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.feedSection {
+.skillSection {
   padding: 3rem 0;
   background-color: #303846;
 }
-.feedContainer {
+.skillContainer {
   width: 90%;
-  max-width: 600px;
+  max-width: 800px;
   margin: auto;
+  text-align: left;
 }
-.twitterTarget {
-  color: white;
+.skillNote {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-bottom: 0;
 }

@@ -216,7 +216,7 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getNonceForAddress(contractAddress, blockIdentifier);
   }
 
-  public async getBlock(): Promise<PreConfirmedBlock>;
+  public async getBlock(): Promise<Block>;
   public async getBlock(blockIdentifier: 'pre_confirmed'): Promise<PreConfirmedBlock>;
   public async getBlock(blockIdentifier: 'latest'): Promise<Block>;
   public async getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;

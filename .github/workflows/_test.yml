@@ -18,9 +18,9 @@ on:
         # vX_Y
         type: string
     secrets:
-      TEST_NODE_URL:
-        required: false
-      TEST_WS_JUNO:
+      # Base domain of the Starknet Foundation nodes (bare host, no scheme or path).
+      # Not needed when use-devnet is set.
+      SNF_NODE_URL:
         required: false
       TEST_ACCOUNT_PRIVATE_KEY:
         required: false
@@ -35,16 +35,17 @@ jobs:
     # TODO - periodically check if conditional services are supported; https://github.com/actions/runner/issues/822
     services:
       devnet:
-        image: ${{ (inputs.use-devnet) && 'shardlabs/starknet-devnet-rs:0.7.0' || '' }}
+        image: ${{ (inputs.use-devnet) && 'shardlabs/starknet-devnet-rs:0.9.0' || '' }}
         ports:
           - 5050:5050
 
     env:
-      PROTOCOL: ${{ inputs.protocol == 'WS' && 'wss' || 'https' }}
+      USE_DEVNET: ${{ inputs.use-devnet }}
+      IS_WS: ${{ inputs.protocol == 'WS' }}
       NODE: ${{ inputs.node == 'Juno' && 'juno' || inputs.node == 'Pathfinder' && 'pathfinder' || '' }}
       VERSION: ${{ inputs.version }}
 
-      NODE_URL: ${{ secrets.TEST_NODE_URL }}
+      SNF_NODE_URL: ${{ secrets.SNF_NODE_URL }}
       TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
       TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
 
@@ -57,21 +58,43 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run pretest && npm run posttest
         if: ${{ !inputs.ignore-scripts }}
-      - id: env-modification
-        name: env modification
+      - id: node-url
+        name: resolve node urls
+        # Against the devnet service started above, the url is fixed. Otherwise the
+        # urls are built from the Starknet Foundation base domain:
+        #   https://sepolia.<domain>/<node>/rpc/<version>
+        #   wss://sepolia.<domain>/<node>/ws/<version>
+        # The WS suites also drive an account, so an rpc url is always needed.
         run: |
-          echo "::add-mask::$FORMATED_URL"
-          echo "NODE_URL=$FORMATED_URL" >> "$GITHUB_OUTPUT"
-        env:
-          FORMATED_URL: ${{ format(env.NODE_URL, env.PROTOCOL, env.NODE, env.VERSION) }}
+          if [ "$USE_DEVNET" = 'true' ]; then
+            rpc_url='http://127.0.0.1:5050/rpc'
+          elif [ -n "$SNF_NODE_URL" ] && [ -n "$NODE" ] && [ -n "$VERSION" ]; then
+            base="sepolia.$SNF_NODE_URL/$NODE"
+            rpc_url="https://$base/rpc/$VERSION"
+            echo "::add-mask::$rpc_url"
+            if [ "$IS_WS" = 'true' ]; then
+              ws_url="wss://$base/ws/$VERSION"
+              echo "::add-mask::$ws_url"
+            fi
+          else
+            echo "::error::No node url available: set use-devnet, or provide the node and version inputs together with the SNF_NODE_URL secret."
+            exit 1
+          fi
+          echo "rpc-url=$rpc_url" >> "$GITHUB_OUTPUT"
+          echo "ws-url=$ws_url" >> "$GITHUB_OUTPUT"
       - id: run-tests
         name: run tests
         run: |
           args=()
-          [[ "${{ inputs.protocol }}" == "WS" ]] && args+=( '__tests__/WebSocket' )
-          npm run test:coverage "${args[@]}"
+          # --forceExit: the WebSocket suite exercises auto-reconnection against a
+          # live gateway that (on Pathfinder) never completes the closing handshake
+          # of a still-subscribed socket, leaving an open handle that would keep
+          # Jest from exiting after the run completes. The `--` lets npm forward the
+          # flag through to Jest.
+          [[ "${{ inputs.protocol }}" == "WS" ]] && args+=( '--forceExit' '__tests__/WebSocket' )
+          npm run test:coverage -- "${args[@]}"
         env:
-          TEST_RPC_URL: ${{ inputs.protocol != 'WS' && steps.env-modification.outputs.NODE_URL || null }}
-          TEST_WS_URL: ${{ inputs.protocol == 'WS' && (env.NODE == 'juno' && secrets.TEST_WS_JUNO || steps.env-modification.outputs.NODE_URL) || null }}
+          TEST_RPC_URL: ${{ steps.node-url.outputs.rpc-url }}
+          TEST_WS_URL: ${{ steps.node-url.outputs.ws-url }}
           TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
           TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
