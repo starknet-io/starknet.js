@@ -49,6 +49,7 @@ export * from './utils/units';
 export * as wallet from './wallet/connect';
 export * as walletV5 from './wallet/connectV5';
 export * as walletV6 from './wallet/connectV6';
+
 export * from './global/config';
 export * from './global/logger';
 export * from './global/logger.type';
