@@ -1,5 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-import { appendFileSync } from 'node:fs';
 import { Provider, Subscription, SubscriptionNewHeadsEvent, WebSocketChannel } from '../src';
 import { logger } from '../src/global/logger';
 import { StarknetChainId } from '../src/global/constants';
@@ -66,21 +65,6 @@ const openChannel = async (
   }
   throw lastError;
 };
-
-// TEMPORARY DIAGNOSTIC: record heap usage after each test so a per-test growth curve
-// pinpoints which WS test leaks memory. Written synchronously to a file because Jest
-// buffers console output per test and the run OOM-crashes before it is flushed, losing
-// it; the file survives the crash and is printed by a dedicated CI step. Remove once
-// the leak is found.
-afterEach(() => {
-  const mb = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(0);
-  const line = `[heap] ${mb} MB after "${expect.getState().currentTestName}"\n`;
-  try {
-    appendFileSync('ws-heap.log', line);
-  } catch {
-    // ignore: diagnostic must never break the test
-  }
-});
 
 describeIfWs('E2E WebSocket Tests', () => {
   describe('websocket specific endpoints', () => {

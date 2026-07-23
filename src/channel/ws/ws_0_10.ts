@@ -505,11 +505,20 @@ export class WebSocketChannel {
   }
 
   private _processRequestQueue(): void {
-    logger.info(`WebSocket: Processing ${this.requestQueue.length} queued requests.`);
-    while (this.requestQueue.length > 0) {
-      const { method, params, resolve, reject } = this.requestQueue.shift()!;
+    // Snapshot and detach the queue before draining it. `sendReceive` re-queues a
+    // request synchronously when the connection is not open (e.g. the socket dropped
+    // again mid-reconnect, so `isReconnecting` is true or `isConnected()` is false).
+    // Iterating `this.requestQueue` directly would let those re-queued items be
+    // re-processed in the same pass — an unbounded synchronous loop that allocates a
+    // Promise per turn until the process runs out of memory. Draining a detached
+    // snapshot bounds the loop to the requests present now; re-queued ones land in the
+    // fresh `this.requestQueue` and wait for the next reconnection cycle.
+    const pending = this.requestQueue;
+    this.requestQueue = [];
+    logger.info(`WebSocket: Processing ${pending.length} queued requests.`);
+    pending.forEach(({ method, params, resolve, reject }) => {
       this.sendReceive(method, params).then(resolve).catch(reject);
-    }
+    });
   }
 
   private async _restoreSubscriptions(): Promise<void> {

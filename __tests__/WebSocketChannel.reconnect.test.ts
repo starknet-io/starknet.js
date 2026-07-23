@@ -150,4 +150,61 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
 
     channel.disconnect();
   });
+
+  test('draining the request queue while still disconnected does not loop forever', () => {
+    // Regression: `_processRequestQueue` used to iterate `this.requestQueue` directly.
+    // When the socket dropped again mid-reconnect, `sendReceive` re-queued each request
+    // synchronously into that same array, so the loop never emptied it — an unbounded
+    // synchronous loop that allocated until the process OOM-crashed. Here the channel is
+    // held in the "reconnecting" state so every `sendReceive` re-queues, and a push
+    // counter proves the loop stays bounded instead of running away.
+    const mock = makeMock('stable');
+    config.set('websocket', mock.MockWS as any);
+
+    const channel = new WebSocketChannel({ nodeUrl: 'wss://mock' });
+    const internal = channel as unknown as {
+      requestQueue: Array<{
+        method: string;
+        params?: object;
+        resolve: (v: any) => void;
+        reject: (r?: any) => void;
+      }>;
+      isReconnecting: boolean;
+      _processRequestQueue: () => void;
+    };
+
+    // Force the re-queue branch of sendReceive for the whole call.
+    internal.isReconnecting = true;
+
+    // Instrument the queue to count re-queues, and stop growing past a cap so a
+    // non-terminating loop fails fast (via the assertion) instead of hanging the test.
+    const queue: any[] = [];
+    let requeueCount = 0;
+    const CAP = 1000;
+    queue.push = function push(...items: any[]) {
+      requeueCount += 1;
+      if (requeueCount > CAP) return queue.length; // stop feeding a runaway loop
+      return Array.prototype.push.apply(this, items);
+    };
+    // Seed a single pending request without tripping the counter.
+    Array.prototype.push.call(queue, {
+      method: 'starknet_chainId',
+      params: undefined,
+      resolve: () => {},
+      reject: () => {},
+    });
+    internal.requestQueue = queue;
+
+    // eslint-disable-next-line no-underscore-dangle
+    internal._processRequestQueue();
+
+    // With the fix the seeded request is re-queued at most once (into the fresh, detached
+    // queue), so the instrumented array sees no re-push. Without it, `requeueCount` blows
+    // past the cap.
+    expect(requeueCount).toBeLessThanOrEqual(1);
+    // The request is deferred to the next reconnection cycle, not dropped.
+    expect(internal.requestQueue.length).toBe(1);
+
+    channel.disconnect();
+  });
 });
