@@ -1,3 +1,9 @@
+## [10.5.3](https://github.com/starknet-io/starknet.js/compare/v10.5.2...v10.5.3) (2026-07-27)
+
+### Bug Fixes
+
+- publish the 10.5.x line to the stable npm latest channel ([6ba35c2](https://github.com/starknet-io/starknet.js/commit/6ba35c293fc2e21cefa65dc8a8f907237c67637b))
+
 ## [10.5.2](https://github.com/starknet-io/starknet.js/compare/v10.5.1...v10.5.2) (2026-07-22)
 
 ### Bug Fixes
