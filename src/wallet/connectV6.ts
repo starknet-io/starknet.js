@@ -20,8 +20,10 @@ import {
   type STRK20_ACTION,
   type STRK20_CALL_AND_PROOF,
   type STRK20_BALANCE_ENTRY,
+  type STRK20_DAPP_NAME,
   type API_VERSION,
-} from '@starknet-io/starknet-types-0103';
+  type FELT,
+} from '@starknet-io/starknet-types-0104';
 
 /**
  * Connect the DApp to the wallet through the wallet-standard `standard:connect` feature.
@@ -172,5 +174,35 @@ export function strk20InvokeTransaction(
   return walletWSF.features['starknet:walletApi'].request({
     type: 'wallet_strk20InvokeTransaction',
     params: { actions },
+  });
+}
+
+/**
+ * Compute the commitment of a DAPP STRK20 sub-account. The commitment is computed locally
+ * by the wallet from the user private state ; no transaction is sent.
+ *
+ * When `nonce` is given, the full commitment of this single sub-account is returned. When
+ * `nonce` is omitted, the partial (nonce independent) commitment is returned instead : it
+ * is shared by every sub-account the user derives for this DAPP, so it can be published
+ * once to let a DAPP recognize all the sub-accounts of a user without learning any
+ * individual nonce.
+ * @param {WalletWithStarknetFeaturesV6} walletWSF - The get-starknet V6 wallet object to use.
+ * @param {STRK20_DAPP_NAME} dapp_name - The DAPP that scopes the sub-account(s).
+ * @param {FELT} [nonce] - The sub-account nonce ; each nonce selects a distinct sub-account for this user + DAPP. Omit it to get the partial commitment.
+ * @returns {Promise<FELT>} The sub-account commitment.
+ * @example
+ * ```typescript
+ * const commitment = await strk20SubaccountCommitment(walletWSF, 'myDapp', '0x0');
+ * // commitment = '0x5f2e...'
+ * ```
+ */
+export function strk20SubaccountCommitment(
+  walletWSF: WalletWithStarknetFeaturesV6,
+  dapp_name: STRK20_DAPP_NAME,
+  nonce?: FELT
+): Promise<FELT> {
+  return walletWSF.features['starknet:walletApi'].request({
+    type: 'wallet_strk20SubaccountCommitment',
+    params: { dapp_name, nonce },
   });
 }

@@ -133,23 +133,24 @@ STRK20 is a **note-based privacy pool** for ERC-20 assets: a single pool contrac
 As of 2026-06, the **Ready** and **Xverse** wallets support the STRK20 wallet API.
 :::
 
-`WalletAccountV6` exposes three dedicated methods for these operations, plus `executeWithProof()`.
+`WalletAccountV6` exposes four dedicated methods for these operations, plus `executeWithProof()`.
 
 #### STRK20 actions
 
-A DAPP describes what it wants with an array of `STRK20_ACTION`. There are exactly four action types:
+A DAPP describes what it wants with an array of `STRK20_ACTION`. There are exactly five action types:
 
-| Action   | `type`       | Fields                                            | Effect                                                                   |
-| -------- | ------------ | ------------------------------------------------- | ------------------------------------------------------------------------ |
-| Deposit  | `"deposit"`  | `token`, `amount`                                 | Public funds → pool (always to self).                                    |
-| Withdraw | `"withdraw"` | `token`, `amount`, `recipient`                    | Pool → public `recipient` address.                                       |
-| Transfer | `"transfer"` | `token`, `amount` (FELT or `"OPEN"`), `recipient` | Private transfer inside the pool to another registered user.             |
-| Invoke   | `"invoke"`   | `contract`, `calldata`                            | Calls an arbitrary contract entrypoint atomically, executed by the pool. |
+| Action             | `type`                | Fields                                            | Effect                                                                   |
+| ------------------ | --------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
+| Deposit            | `"deposit"`           | `token`, `amount`                                 | Public funds → pool (always to self).                                    |
+| Withdraw           | `"withdraw"`          | `token`, `amount`, `recipient`                    | Pool → public `recipient` address.                                       |
+| Transfer           | `"transfer"`          | `token`, `amount` (FELT or `"OPEN"`), `recipient` | Private transfer inside the pool to another registered user.             |
+| Invoke             | `"invoke"`            | `contract`, `calldata`                            | Calls an arbitrary contract entrypoint atomically, executed by the pool. |
+| Sub-account invoke | `"subaccount_invoke"` | `dapp_name`, `nonce`, `calls`, `collect_policy`   | Calls contracts through the user's sub-account for this DAPP.            |
 
 `amount` is always expressed in the token's smallest unit.
 
 :::note About `amount: "OPEN"`
-`"OPEN"` is only meaningful inside a **multi-action transaction**. It creates an empty _open note_ whose value is unknown at build time (e.g. the output of an AMM swap) and is filled later in the **same transaction** by a paired `invoke` action. It is never used on its own.
+`"OPEN"` is only meaningful inside a **multi-action transaction**. It creates an empty _open note_ whose value is unknown at build time (e.g. the output of an AMM swap) and is filled later in the **same transaction** by a paired `invoke` or `subaccount_invoke` action. It is never used on its own.
 :::
 
 A simple deposit, for example:
@@ -179,16 +180,21 @@ console.log('balance =', balances[0].balance);
 
 #### Prepare a STRK20 invoke
 
-Before executing a private transaction, request the wallet to compute the associated ZK proof:
+Before executing a private transaction, request the wallet to compute the associated ZK proof. Contrary to `strk20InvokeTransaction()`, the wallet does **not** submit anything here, and adds no fee action: whoever submits pays, so your DAPP covers the fee (through its own paymaster or a sponsor account).
 
 ```typescript
 import type { STRK20_CALL_AND_PROOF } from 'starknet';
 
-const prepared: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions);
-// `prepared.call` is the Starknet call to submit, `prepared.proof` the attached ZK proof.
+const { call, proof }: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions);
+// `call` is a standard Starknet.js `Call`, so you can submit it with any account:
+const result = await mySponsorAccount.execute(call, {
+  proof: proof.data,
+  proofFacts: proof.proof_facts,
+});
 
 // or in simulation mode (no proof generated, not submittable — useful for fee estimation / previews):
 const simulated: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions, true);
+const fee = await mySponsorAccount.estimateInvokeFee(simulated.call);
 ```
 
 #### Execute a STRK20 transaction
@@ -212,6 +218,65 @@ const myCall = myContract.populate('my_method', {
 });
 const resp = await myWalletAccount.executeWithProof(myCall, proof);
 ```
+
+#### STRK20 sub-accounts
+
+A **sub-account** is a persistent, pseudonymous identity that a user owns for one specific DAPP. It is derived from (user, `dapp_name`, `nonce`), deployed lazily at a deterministic address on first use, and driven exclusively through the pool. Each `nonce` gives the user a distinct sub-account for the same DAPP, so they can compartment their activity.
+
+:::warning
+A sub-account holds **public ERC-20 funds**: its balance and its transactions are visible on-chain like any other address. The privacy it provides is the **unlinkability** between that address and the user's main address — not the shielding of its content. It is also **not** an account contract: it has no keys, and only the sub-account anonymizer can execute through it.
+:::
+
+A sub-account is funded from the shielded balance with a `withdraw` action, and the proceeds of its calls are collected back into an open note, according to `collect_policy`:
+
+| `collect_policy`            | Effect                                                    |
+| --------------------------- | --------------------------------------------------------- |
+| `{ type: 'all' }`           | Collects the entire token balance of the sub-account.     |
+| `{ type: 'diff' }`          | Collects only the balance gained during this interaction. |
+| `{ type: 'exact', amount }` | Collects exactly `amount`.                                |
+
+```typescript
+import type { STRK20_ACTION } from 'starknet';
+
+const actions: STRK20_ACTION[] = [
+  // 1. Fund the sub-account from the shielded balance:
+  {
+    type: 'withdraw',
+    token: strkAddress,
+    amount: '0x4563918244f40000',
+    recipient: subAccountAddress,
+  },
+  // 2. One open note per expected output token:
+  { type: 'transfer', token: strkAddress, amount: 'OPEN', recipient: myAddress },
+  // 3. The calls, executed by the sub-account:
+  {
+    type: 'subaccount_invoke',
+    dapp_name: 'myDapp',
+    nonce: '0x0',
+    calls: [myContract.populate('stake', { amount: 1000n })],
+    collect_policy: { type: 'all' },
+  },
+];
+const result = await myWalletAccount.strk20InvokeTransaction(actions);
+```
+
+Note that `calls` holds standard Starknet.js `Call` objects, exactly as returned by `myContract.populate()`.
+
+#### Sub-account commitment
+
+A DAPP can recognize a returning user through the **commitment** of their sub-accounts. The wallet computes it locally, without sending any transaction:
+
+```typescript
+// Full commitment of one sub-account:
+const commitment = await myWalletAccount.strk20SubaccountCommitment('myDapp', '0x0');
+
+// Partial commitment, shared by every sub-account this user derives for this DAPP:
+const partial = await myWalletAccount.strk20SubaccountCommitment('myDapp');
+```
+
+:::note
+Omitting `nonce` is **not** the same as passing `'0x0'`. Without a nonce, you get the partial commitment, which lets a DAPP recognize all the sub-accounts of a user without learning any individual nonce. With a nonce, you get the commitment of that one sub-account.
+:::
 
 ### Subscription to events
 
