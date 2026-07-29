@@ -130,8 +130,12 @@ const myWalletAccount: WalletAccountV6 = await WalletAccountV6.connect(
 STRK20 is a **note-based privacy pool** for ERC-20 assets: a single pool contract holds the deposited tokens, but inside the pool funds are encrypted **notes**, so observers can't tell who owns what. Every state change is backed by a zero-knowledge proof verified on-chain. The mental model is: **deposit (shield) → transact privately inside the pool → withdraw (unshield)**. The wallet holds the private state and generates the proof; your DAPP only _describes the actions_ it wants.
 
 :::info
-As of 2026-06, the **Ready** and **Xverse** wallets support the STRK20 wallet API.
+As of 2026-08, the **Ready** and **Xverse** wallets support the STRK20 wallet API.
 :::
+
+![STRK20 architecture](./pictures/strk20-architecture.svg)
+
+Reading the diagram: a **solid arrow** is an action your DAPP declares in its `STRK20_ACTION[]`; a **dotted arrow** is infrastructure work the pool and the wallet do for you, and the green box is infrastructure driven by the pool: only the pool can make it execute anything, though your DAPP may freely query its read-only views (see [Address of a sub-account](#address-of-a-sub-account)). **Purple** boxes are shielded — observers see that the pool changed state, not who owns what. **Grey** boxes are ordinary public on-chain activity: a sub-account holds **public** ERC-20 funds, and its privacy comes solely from the fact that its address cannot be linked back to you. The open note is the in-between case: it lives in the pool, but filling it publishes the amount it received.
 
 `WalletAccountV6` exposes four dedicated methods for these operations, plus `executeWithProof()`.
 
@@ -139,13 +143,13 @@ As of 2026-06, the **Ready** and **Xverse** wallets support the STRK20 wallet AP
 
 A DAPP describes what it wants with an array of `STRK20_ACTION`. There are exactly five action types:
 
-| Action             | `type`                | Fields                                            | Effect                                                                   |
-| ------------------ | --------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
-| Deposit            | `"deposit"`           | `token`, `amount`                                 | Public funds → pool (always to self).                                    |
-| Withdraw           | `"withdraw"`          | `token`, `amount`, `recipient`                    | Pool → public `recipient` address.                                       |
-| Transfer           | `"transfer"`          | `token`, `amount` (FELT or `"OPEN"`), `recipient` | Private transfer inside the pool to another registered user.             |
-| Invoke             | `"invoke"`            | `contract`, `calldata`                            | Calls an arbitrary contract entrypoint atomically, executed by the pool. |
-| Sub-account invoke | `"subaccount_invoke"` | `dapp_name`, `nonce`, `calls`, `collect_policy`   | Calls contracts through the user's sub-account for this DAPP.            |
+| Action             | `type`                | Fields                                            | Effect                                                        |
+| ------------------ | --------------------- | ------------------------------------------------- | ------------------------------------------------------------- |
+| Deposit            | `"deposit"`           | `token`, `amount`                                 | Public funds → pool (always to self).                         |
+| Withdraw           | `"withdraw"`          | `token`, `amount`, `recipient`                    | Pool → public `recipient` address.                            |
+| Transfer           | `"transfer"`          | `token`, `amount` (FELT or `"OPEN"`), `recipient` | Private transfer inside the pool to another registered user.  |
+| Invoke             | `"invoke"`            | `contract`, `calldata`                            | Calls an invoke helper contract, executed by the pool.        |
+| Sub-account invoke | `"subaccount_invoke"` | `dapp_name`, `nonce`, `calls`, `collect_policy`   | Calls contracts through the user's sub-account for this DAPP. |
 
 `amount` is always expressed in the token's smallest unit.
 
@@ -167,6 +171,56 @@ const actions: STRK20_ACTION[] = [
 ];
 ```
 
+#### The invoke helper
+
+An `invoke` action does **not** call a protocol directly. Its `contract` field points at an **invoke helper**: a small dedicated contract, written and audited for one single operation of one protocol (an Ekubo swap, a Vesu deposit…). The pool sends the input to the helper, calls it, and collects the proceeds — all inside the same transaction.
+
+A helper follows a fixed convention: it exposes a `privacy_invoke` entry point, the **last felt of its calldata is always the id of the open note to fill**, and it measures its own output as a balance delta before handing it back to the pool. It holds nothing between transactions, and it is shared by every user — so the protocol always sees the same caller address, whoever you are. That is exactly what makes this path anonymous.
+
+Since your DAPP knows neither the pool address nor the id of the open note when it builds the action, the calldata accepts **placeholders**, which the wallet substitutes while assembling the actions:
+
+| Placeholder         | Substituted with                                                                                            |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `${poolAddress}`    | The privacy pool contract address — which is also the caller the helper sees.                               |
+| `${openNoteIds[N]}` | The id of the Nth open note of the transaction, i.e. the Nth `transfer` with `amount: "OPEN"` (zero-based). |
+
+A calldata item is therefore a `STRK20_CALLDATA_ITEM`, that is a felt **or** a `STRK20_CALLDATA_PLACEHOLDER`. Pass placeholders as raw strings, exactly as written above: do not compile or normalize them, or the wallet will not recognize them.
+
+The classic three-action shape — fund the helper, create the note that will receive the output, run the operation:
+
+```typescript
+const actions: STRK20_ACTION[] = [
+  // 1. Send the input token from the shielded balance to the helper:
+  { type: 'withdraw', token: strkAddress, amount: '0x2386f26fc10000', recipient: helperAddress },
+  // 2. Create the open note that will receive the output token:
+  { type: 'transfer', token: usdcAddress, amount: 'OPEN', recipient: myAddress },
+  // 3. Run the operation:
+  {
+    type: 'invoke',
+    contract: helperAddress,
+    calldata: [usdcAddress, minAmountOut, '${poolAddress}', '${openNoteIds[0]}'],
+  },
+];
+```
+
+:::caution
+The number of open notes **created** by `transfer` actions must match the number **filled** by the invoke. Otherwise the wallet rejects the request with `INVALID_REQUEST_PAYLOAD`, before generating any proof.
+:::
+
+#### Helper or sub-account?
+
+Both run calls on your behalf without revealing who you are, but they are not interchangeable:
+
+|                             | `invoke` (helper)                                                | `subaccount_invoke` (sub-account)                                     |
+| --------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Contract                    | One dedicated helper per operation, someone has to write it      | Generic infrastructure, nothing to write                              |
+| Caller seen by the protocol | The shared helper address, identical for every user              | Your own stable pseudonymous address                                  |
+| State                       | None: input consumed and output returned in the same transaction | A public balance that persists across transactions                    |
+| Payload                     | Raw felts and placeholders, following the helper ABI             | Structured `calls`, any contract and entrypoint                       |
+| Best suited to              | Atomic operations: swap, lending round-trip                      | Positions held over time, rewards, DAPPs recognizing a returning user |
+
+A transaction has a single invoke slot, so the two are **mutually exclusive**: one or the other, never both.
+
 #### Get STRK20 balances
 
 ```typescript
@@ -178,45 +232,48 @@ const balances: STRK20_BALANCE_ENTRY[] = await myWalletAccount.strk20Balances([
 console.log('balance =', balances[0].balance);
 ```
 
-#### Prepare a STRK20 invoke
+#### Submitting a STRK20 transaction
 
-Before executing a private transaction, request the wallet to compute the associated ZK proof. Contrary to `strk20InvokeTransaction()`, the wallet does **not** submit anything here, and adds no fee action: whoever submits pays, so your DAPP covers the fee (through its own paymaster or a sponsor account).
+Three methods, but one of them is the answer almost every time. They differ only on **who submits the transaction, and therefore who pays the fee**:
 
-```typescript
-import type { STRK20_CALL_AND_PROOF } from 'starknet';
+| Method                             | Submits and pays                              | Use it                                                         |
+| ---------------------------------- | --------------------------------------------- | -------------------------------------------------------------- |
+| `strk20InvokeTransaction(actions)` | The wallet — it adds the fee action by itself | **Almost always.**                                             |
+| `strk20PrepareInvoke(actions)`     | Your DAPP — the wallet adds no fee action     | To sponsor the fee for your user, or to estimate it beforehand |
+| `executeWithProof(call, proof)`    | The wallet                                    | To submit a prepared call through the wallet after all         |
 
-const { call, proof }: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions);
-// `call` is a standard Starknet.js `Call`, so you can submit it with any account:
-const result = await mySponsorAccount.execute(call, {
-  proof: proof.data,
-  proofFacts: proof.proof_facts,
-});
-
-// or in simulation mode (no proof generated, not submittable — useful for fee estimation / previews):
-const simulated: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions, true);
-const fee = await mySponsorAccount.estimateInvokeFee(simulated.call);
-```
-
-#### Execute a STRK20 transaction
+**The default.** One call, and the wallet does everything: approval UI, proof, fee, submission.
 
 ```typescript
 const result = await myWalletAccount.strk20InvokeTransaction(actions);
 console.log('transaction hash =', result.transaction_hash);
 ```
 
-#### Execute with a privacy proof
+:::note
+Generating the ZK proof makes this call **much slower** than an ordinary invoke, and the user has to approve it. Tell them in your UI, or your DAPP will look frozen.
+:::
 
-The `executeWithProof()` method has the same signature as `execute()`, with an extra parameter to attach a STRK20 ZK proof to a standard invoke. The proof comes from `strk20PrepareInvoke()`:
+**Sponsoring the fee.** `strk20PrepareInvoke()` builds the call and its proof without submitting anything, and without adding a fee action — whoever submits pays. Your DAPP submits it with an account of its own, and the user pays nothing:
 
 ```typescript
-// Obtain the privacy proof for the actions:
-const { proof } = await myWalletAccount.strk20PrepareInvoke(actions);
+import type { STRK20_CALL_AND_PROOF } from 'starknet';
 
-// Attach it to a standard invoke of your own call(s):
-const myCall = myContract.populate('my_method', {
-  /* ... */
+const { call, proof }: STRK20_CALL_AND_PROOF = await myWalletAccount.strk20PrepareInvoke(actions);
+// `call` is a standard Starknet.js `Call`, submittable by any account:
+const result = await mySponsorAccount.execute(call, {
+  proof: proof.data,
+  proofFacts: proof.proof_facts,
 });
-const resp = await myWalletAccount.executeWithProof(myCall, proof);
+
+// ...or hand it back to the wallet instead of paying yourself:
+const resp = await myWalletAccount.executeWithProof(call, proof);
+```
+
+**Estimating first.** With `simulate: true` the wallet skips the expensive proof generation and returns the same call with an empty proof — enough to estimate the fee or preview the operation, but **not submittable**:
+
+```typescript
+const simulated = await myWalletAccount.strk20PrepareInvoke(actions, true);
+const fee = await mySponsorAccount.estimateInvokeFee(simulated.call);
 ```
 
 #### STRK20 sub-accounts
@@ -276,6 +333,56 @@ const partial = await myWalletAccount.strk20SubaccountCommitment('myDapp');
 
 :::note
 Omitting `nonce` is **not** the same as passing `'0x0'`. Without a nonce, you get the partial commitment, which lets a DAPP recognize all the sub-accounts of a user without learning any individual nonce. With a nonce, you get the commitment of that one sub-account.
+:::
+
+#### Address of a sub-account
+
+Most DAPPs never need it: a `subaccount_invoke` action is self-contained — `dapp_name` and `nonce` are enough for the wallet to route the calls. You need the address only when you have to **name** the sub-account from the outside: funding it through the `recipient` of a `withdraw` action, or passing it in the calldata of one of your contracts.
+
+The commitment returned above is exactly the **salt** of the sub-account deterministic deployment. Computing the address also requires the `SubAccount` class hash and the anonymizer address, and **no wallet API method returns either** — your DAPP has to know them.
+
+The **sub-account anonymizer** is the contract that deploys and drives sub-accounts on behalf of the pool:
+
+| Network | Sub-account anonymizer                                               |
+| ------- | -------------------------------------------------------------------- |
+| Mainnet | `0x04f33230dc57855c6e7eabe66dfa0fde82c5458fd0e54827cdb7cb4c474888a7` |
+| Sepolia | `0x010a2285310c107c731d997afc147afb7495daff6397c2d242133d9fe8d9b147` |
+
+The `SubAccount` class hash currently used is `0x00956ddc41ec881359cf100ab14003bdbcaf67155cffa572e203383e59c85d51`.
+
+With those two constants you can derive the address **offline**, from the full commitment, with no RPC call:
+
+```typescript
+import { hash } from 'starknet';
+
+const commitment = await myWalletAccount.strk20SubaccountCommitment('myDapp', '0x0');
+const subAccountAddress = hash.calculateContractAddressFromHash(
+  commitment, // the commitment is the deployment salt
+  SUB_ACCOUNT_CLASS_HASH,
+  [], // the SubAccount constructor takes no argument
+  ANONYMIZER_ADDRESS
+);
+```
+
+The anonymizer also exposes a view that scans a range of nonces, which additionally tells you whether each sub-account is already deployed. It takes the **partial** commitment:
+
+```typescript
+const anonymizer = new Contract({
+  abi,
+  address: ANONYMIZER_ADDRESS,
+  providerOrAccount: myProvider,
+});
+const partial = await myWalletAccount.strk20SubaccountCommitment('myDapp');
+
+// nonces 0 to 4 — the range is limited to 1024 nonces per call:
+const subAccounts = await anonymizer.get_sub_accounts(partial, 0, 5);
+// each entry = { nonce, address, is_deployed }
+```
+
+Both routes return the same address. The offline one costs nothing and works before the sub-account exists; the view is useful to know which nonces the user has already activated.
+
+:::note
+A sub-account is deployed **lazily**, on its first `subaccount_invoke`. Its address is deterministic and therefore known — and fundable — before it exists on-chain.
 :::
 
 ### Subscription to events
