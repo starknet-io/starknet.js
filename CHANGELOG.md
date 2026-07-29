@@ -1,3 +1,9 @@
+# [10.6.0](https://github.com/starknet-io/starknet.js/compare/v10.5.3...v10.6.0) (2026-07-29)
+
+### Features
+
+- sub-account handling ([62ec03c](https://github.com/starknet-io/starknet.js/commit/62ec03c84cfa6f3066b516aa1f4e2d1caaa58444))
+
 ## [10.5.3](https://github.com/starknet-io/starknet.js/compare/v10.5.2...v10.5.3) (2026-07-27)
 
 ### Bug Fixes
