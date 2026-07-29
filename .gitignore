@@ -8,6 +8,7 @@
 .claude
 coverage
 coverage-ts
+dist
 node_modules
 npm-debug.log
 package
