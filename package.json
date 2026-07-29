@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "10.6.0-strk20.0",
+  "version": "10.5.2",
   "description": "JavaScript library for Starknet",
   "license": "MIT",
   "repository": {
@@ -25,6 +25,7 @@
     "dist"
   ],
   "scripts": {
+    "prepare": "npm run build && husky",
     "build": "tsup && npm run build:esm && npm run build:iife && npm run build:dts",
     "build:esm": "tsup --clean false --format esm --platform node",
     "build:iife": "tsup --clean false --format iife --platform browser",
