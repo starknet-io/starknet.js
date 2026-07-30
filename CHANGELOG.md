@@ -1,3 +1,11 @@
+## [10.6.1](https://github.com/starknet-io/starknet.js/compare/v10.6.0...v10.6.1) (2026-07-30)
+
+### Bug Fixes
+
+- memory leak2 ([a23f59f](https://github.com/starknet-io/starknet.js/commit/a23f59f3915847d8bbfab677d1ad711c3630c0f3))
+- ws memory leak ([b7a6ba6](https://github.com/starknet-io/starknet.js/commit/b7a6ba662f1923d5036040b19ea6da302eb3d6ae))
+- ws-bound request-queue draining to prevent OOM on reconnect ([0e6f7c1](https://github.com/starknet-io/starknet.js/commit/0e6f7c14050cda982dd8ed3cb231a9fd55554bdc))
+
 # [10.6.0](https://github.com/starknet-io/starknet.js/compare/v10.5.3...v10.6.0) (2026-07-29)
 
 ### Features
