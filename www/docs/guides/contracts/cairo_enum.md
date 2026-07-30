@@ -281,6 +281,6 @@ const myCustomEnum = new CairoCustomEnum({
   Critical: undefined,
   Empty: undefined,
 });
-const myCalldata = CallData.compile(myCustomEnum);
+const myCalldata = CallData.compile([myCustomEnum]);
 const res = (await myTestContract.call('test2a', myCalldata)) as bigint;
 ```
