@@ -40,13 +40,13 @@ const myName = await account.getStarkName();
 ## Choosing Plugins
 
 ```typescript
-import { RpcProvider, starknetId, brotherId, defaultPlugins } from 'starknet';
+import { RpcProvider, starknetIdPlugin, brotherId, fastExecute, defaultPlugins } from 'starknet';
 
 // No plugins — plugin methods throw
 const bare = new RpcProvider({ nodeUrl, plugins: false });
 
 // Only specific plugins
-const provider = new RpcProvider({ nodeUrl, plugins: [starknetId()] });
+const provider = new RpcProvider({ nodeUrl, plugins: [starknetIdPlugin()] });
 
 // Default plugins + your own
 const custom = new RpcProvider({
@@ -54,6 +54,13 @@ const custom = new RpcProvider({
   plugins: [...defaultPlugins, myCustomPlugin()],
 });
 ```
+
+:::note
+The StarknetId plugin factory is exported as **`starknetIdPlugin`**, not `starknetId`: the
+bare `starknetId` name is already used by the utility namespace (`starknetId.useEncoded`,
+`starknetId.isStarkDomain`, ...). The two other factories keep their plain names,
+`brotherId()` and `fastExecute()`.
+:::
 
 The same `plugins` option is available on `Account`.
 
@@ -64,7 +71,7 @@ Add plugins after construction with `.use()`. TypeScript infers the added method
 ```typescript
 const provider = new RpcProvider({ nodeUrl, plugins: false });
 
-const extended = provider.use(starknetId());
+const extended = provider.use(starknetIdPlugin());
 await extended.getStarkName(address); // ✅ fully typed
 ```
 
