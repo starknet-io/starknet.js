@@ -569,10 +569,10 @@ export class RpcChannel {
         if (retries <= 0) {
           throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
         }
+        retries -= 1;
         // eslint-disable-next-line no-await-in-loop
         await wait(retryInterval);
       }
-      retries -= 1;
     }
     return txReceipt as RPC.TXN_RECEIPT;
   }
