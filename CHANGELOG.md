@@ -1,3 +1,9 @@
+## [10.6.3](https://github.com/starknet-io/starknet.js/compare/v10.6.2...v10.6.3) (2026-07-31)
+
+### Bug Fixes
+
+- **plugins:** export starknetId factory as starknetIdPlugin ([ced6115](https://github.com/starknet-io/starknet.js/commit/ced6115e192905961fc27db3ba1c9d3d17094ea2))
+
 ## [10.6.2](https://github.com/starknet-io/starknet.js/compare/v10.6.1...v10.6.2) (2026-07-31)
 
 ### Bug Fixes
