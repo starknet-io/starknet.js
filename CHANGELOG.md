@@ -1,3 +1,9 @@
+## [10.6.2](https://github.com/starknet-io/starknet.js/compare/v10.6.1...v10.6.2) (2026-07-31)
+
+### Bug Fixes
+
+- avoid extra waitForTransaction receipt delay ([6f21175](https://github.com/starknet-io/starknet.js/commit/6f21175eb4096756e570c9c04010a1b66ae596f1))
+
 ## [10.6.1](https://github.com/starknet-io/starknet.js/compare/v10.6.0...v10.6.1) (2026-07-30)
 
 ### Bug Fixes
