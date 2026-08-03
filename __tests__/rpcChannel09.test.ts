@@ -1,4 +1,4 @@
-import { LibraryError, RPC09, RpcError } from '../src';
+import { constants, LibraryError, RPC09, RpcError } from '../src';
 import {
   createBlockForDevnet,
   createTestProvider,
@@ -278,5 +278,57 @@ describe('UNIT TEST: RPC 0.9.0 Channel waitForTransaction', () => {
       transactionReceiptSpy.mockRestore();
       jest.useRealTimers();
     }
+  });
+});
+
+// No node needed: `buildTransaction` is a pure payload builder, so this suite runs
+// on every RPC version of the CI matrix.
+describe('UNIT TEST: RPC 0.9.0 Channel - SNIP-36 guard', () => {
+  const channel09 = new RPC09.RpcChannel({ nodeUrl: 'http://dummy-node.invalid/rpc' });
+
+  const invocation = {
+    type: 'INVOKE' as const,
+    contractAddress: '0x123',
+    calldata: ['0x1'],
+    signature: [],
+    nonce: '0x1',
+    version: '0x3',
+    resourceBounds: {
+      l1_gas: { max_amount: 1000n, max_price_per_unit: 100n },
+      l2_gas: { max_amount: 2000n, max_price_per_unit: 200n },
+      l1_data_gas: { max_amount: 500n, max_price_per_unit: 50n },
+    },
+    tip: 0n,
+    paymasterData: [],
+    accountDeploymentData: [],
+    nonceDataAvailabilityMode: 'L1' as const,
+    feeDataAvailabilityMode: 'L1' as const,
+  };
+
+  // RPC 0.9 has no `proof_facts` field, but the transaction hash commits to it
+  // anyway. Building the payload silently would produce an invalid signature.
+  test('buildTransaction rejects an INVOKE carrying proofFacts', async () => {
+    await expect(
+      channel09.buildTransaction({ ...invocation, proofFacts: ['0xabc', '0xdef'] })
+    ).rejects.toThrow(constants.SYSTEM_MESSAGES.snip36RequiresRPC010);
+  });
+
+  test('buildTransaction rejects an INVOKE carrying a proof', async () => {
+    await expect(channel09.buildTransaction({ ...invocation, proof: 'AAECAw==' })).rejects.toThrow(
+      constants.SYSTEM_MESSAGES.snip36RequiresRPC010
+    );
+  });
+
+  test('buildTransaction accepts an empty proofFacts array', async () => {
+    const result = await channel09.buildTransaction({ ...invocation, proofFacts: [] });
+
+    expect(result).not.toHaveProperty('proof_facts');
+  });
+
+  test('buildTransaction accepts an INVOKE without any SNIP-36 field', async () => {
+    const result = await channel09.buildTransaction(invocation);
+
+    expect(result).not.toHaveProperty('proof_facts');
+    expect(result).not.toHaveProperty('proof');
   });
 });
