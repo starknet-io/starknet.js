@@ -708,6 +708,14 @@ export class RpcChannel {
       SYSTEM_MESSAGES.SWOldV3
     );
 
+    // SNIP-36 fields only exist in the RPC 0.10.1+ payload, but the transaction hash
+    // commits to `proofFacts` whatever the RPC version. Dropping them silently here
+    // would broadcast a transaction whose signature can never be verified.
+    assert(
+      !invocation.proofFacts?.length && !invocation.proof,
+      SYSTEM_MESSAGES.snip36RequiresRPC010
+    );
+
     const details = {
       signature: signatureToHexArray(invocation.signature),
       nonce: toHex(invocation.nonce),

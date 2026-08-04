@@ -242,6 +242,8 @@ export const SYSTEM_MESSAGES = {
   txEvictedFromMempool: 'Transaction TTL, evicted from the mempool, try to increase the tip',
   consensusFailed: 'Consensus failed to finalize the block proposal',
   txFailsBlockBuildingValidation: 'Transaction fails block building validation',
+  snip36RequiresRPC010:
+    'SNIP-36 `proof` and `proofFacts` are not supported by RPC 0.9, connect to a RPC 0.10.1+ node!',
 };
 
 export const SN_VERSION_IMPLEMENTING_BLAKE_FOR_COMPILED_CLASS = '0.14.1' as const;
