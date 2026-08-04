@@ -1,3 +1,9 @@
+## [10.6.4](https://github.com/starknet-io/starknet.js/compare/v10.6.3...v10.6.4) (2026-08-04)
+
+### Bug Fixes
+
+- **channel:** reject SNIP-36 fields on RPC 0.9 ([a1a7f65](https://github.com/starknet-io/starknet.js/commit/a1a7f654391b44d9ce3ceea7492f5dfbccaa94f8))
+
 ## [10.6.3](https://github.com/starknet-io/starknet.js/compare/v10.6.2...v10.6.3) (2026-07-31)
 
 ### Bug Fixes
