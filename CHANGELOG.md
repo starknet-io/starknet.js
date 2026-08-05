@@ -1,3 +1,9 @@
+## [10.6.5](https://github.com/starknet-io/starknet.js/compare/v10.6.4...v10.6.5) (2026-08-05)
+
+### Bug Fixes
+
+- **ws:** guard malformed frames and honour request id 0 ([cf1f4e2](https://github.com/starknet-io/starknet.js/commit/cf1f4e2c1f58eba5f1d63628959fe2ee47387025))
+
 ## [10.6.4](https://github.com/starknet-io/starknet.js/compare/v10.6.3...v10.6.4) (2026-08-04)
 
 ### Bug Fixes
