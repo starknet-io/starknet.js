@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { WebSocketChannel, config } from '../src';
 
 /**
@@ -206,5 +207,110 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
     expect(internal.requestQueue.length).toBe(1);
 
     channel.disconnect();
+  });
+
+  /**
+   * Mock that keeps its own listener registry and invokes listeners directly, so an
+   * exception escaping a listener propagates out of `emitMessage()` and can be asserted
+   * on synchronously. (A real WebSocket dispatches through `EventTarget`, which turns the
+   * same escape into a process-level `uncaughtException` — unobservable from the caller,
+   * which is exactly what made the original crash impossible to intercept.)
+   */
+  const makeMessageMock = () => {
+    let current: any = null;
+    class MockWS {
+      static OPEN = 1;
+
+      public readyState = 1;
+
+      public onopen: ((ev: Event) => void) | null = null;
+
+      public onclose: ((ev: Event) => void) | null = null;
+
+      public onerror: ((ev: Event) => void) | null = null;
+
+      private listeners: Record<string, ((ev: any) => void)[]> = {};
+
+      constructor(_url: string) {
+        current = this;
+      }
+
+      public addEventListener(type: string, listener: (ev: any) => void) {
+        (this.listeners[type] ??= []).push(listener);
+      }
+
+      public removeEventListener(type: string, listener: (ev: any) => void) {
+        this.listeners[type] = (this.listeners[type] ?? []).filter((l) => l !== listener);
+      }
+
+      public send() {}
+
+      public close() {
+        this.readyState = 3;
+      }
+
+      /** Invokes every registered message listener directly, in registration order. */
+      public emitMessage(data: unknown) {
+        [...(this.listeners.message ?? [])].forEach((l) => l({ data } as MessageEvent));
+      }
+    }
+    return {
+      MockWS,
+      get current() {
+        return current as InstanceType<typeof MockWS>;
+      },
+    };
+  };
+
+  test('a non-JSON frame does not escape the message listener; the request still times out', async () => {
+    // Regression: `sendReceive`'s message listener parsed the frame with an unguarded
+    // `JSON.parse`. A gateway pushing a plain-text body over the open socket made it throw
+    // from inside the WebSocket event dispatch — not the promise chain — so no caller-side
+    // try/catch could intercept it and the host process died on an uncaughtException.
+    const mock = makeMessageMock();
+    config.set('websocket', mock.MockWS as any);
+
+    const channel = new WebSocketChannel({
+      nodeUrl: 'wss://mock',
+      autoReconnect: false,
+      requestTimeout: 200,
+    });
+
+    const pending = channel.sendReceive('starknet_chainId');
+    // Swallow the expected rejection now so the timeout below is never an unhandled one.
+    const settled = pending.catch((e) => e);
+
+    // The exact body an Alchemy gateway sends when its upstream node is unreachable.
+    expect(() =>
+      mock.current.emitMessage(
+        'upstream connect error or disconnect/reset before headers. retried and the latest reset reason: connection timeout'
+      )
+    ).not.toThrow();
+
+    // The malformed frame carries no request id, so it cannot settle the promise:
+    // `requestTimeout` does.
+    const error = await settled;
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).message).toContain('timed out after 200ms');
+  });
+
+  test('a valid response arriving after a malformed frame still resolves the request', async () => {
+    const mock = makeMessageMock();
+    config.set('websocket', mock.MockWS as any);
+
+    const channel = new WebSocketChannel({
+      nodeUrl: 'wss://mock',
+      autoReconnect: false,
+      requestTimeout: 2000,
+    });
+
+    const pending = channel.sendReceive('starknet_chainId');
+
+    mock.current.emitMessage('not json at all');
+    mock.current.emitMessage(
+      JSON.stringify({ jsonrpc: '2.0', id: 0, result: '0x534e5f5345504f4c4941' })
+    );
+
+    await expect(pending).resolves.toBe('0x534e5f5345504f4c4941');
   });
 });

@@ -263,8 +263,9 @@ export class WebSocketChannel {
   }
 
   private idResolver(id?: number) {
-    // An unmanaged, user-set ID.
-    if (id) return id;
+    // An unmanaged, user-set ID. Tested against `undefined` rather than for
+    // truthiness: 0 is a valid JSON-RPC id and must be honoured as passed.
+    if (id !== undefined) return id;
     // Managed ID, intentionally returned old and then incremented.
     // eslint-disable-next-line no-plusplus
     return this.sendId++;
@@ -335,7 +336,22 @@ export class WebSocketChannel {
           logger.warn('WebSocket received non-string message data:', event.data);
           return;
         }
-        const message: JRPC.ResponseBody = JSON.parse(event.data);
+        let message: JRPC.ResponseBody;
+        try {
+          message = JSON.parse(event.data);
+        } catch (error) {
+          // Skip the malformed frame instead of rejecting the pending promise: a non-JSON
+          // frame (e.g. a gateway pushing a plain-text error body over the open socket)
+          // carries no request id, so it cannot be attributed to a specific in-flight
+          // request. Letting the parse throw here would escape the WebSocket event dispatch
+          // rather than the promise chain, so no caller-side try/catch could intercept it
+          // and it would kill the process as an uncaught exception. The pending request is
+          // still ended by `requestTimeout`.
+          logger.error(
+            `WebSocketChannel: Error parsing incoming message: ${event.data}, Error: ${error}`
+          );
+          return;
+        }
         if (message.id === sendId) {
           clearTimeout(timeoutId);
           this.websocket.removeEventListener('message', messageHandler);

@@ -595,3 +595,53 @@ describe('Unit Test: Subscription Class', () => {
     expect(mockChannel.removeSubscription).toHaveBeenCalledWith('sub_123');
   });
 });
+
+describe('Unit Test: WebSocketChannel request id resolution', () => {
+  let webSocketChannel: WebSocketChannel;
+  let sendSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    // No real connection needed: the socket is stubbed out entirely.
+    webSocketChannel = new WebSocketChannel({
+      nodeUrl: 'ws://dummy-url',
+      autoReconnect: false,
+    });
+    jest.spyOn(webSocketChannel, 'isConnected').mockReturnValue(true);
+    sendSpy = jest.spyOn(webSocketChannel.websocket, 'send').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    webSocketChannel.disconnect();
+  });
+
+  test('should honour an explicitly provided id of 0', () => {
+    // Regression: `idResolver` tested the id for truthiness, so an explicit 0 — a valid
+    // JSON-RPC id — was discarded in favour of an auto-generated one. Callers of the
+    // low-level `send()` match responses to requests by id themselves, so the id on the
+    // wire must be the one they asked for.
+    //
+    // The managed counter starts at 0, so its first value is 0 too: one unmanaged send
+    // is issued first to advance it past 0, otherwise both the correct and the buggy
+    // behaviour would produce the same id and the assertion would prove nothing.
+    expect(webSocketChannel.send('starknet_chainId')).toBe(0);
+    sendSpy.mockClear();
+
+    const usedId = webSocketChannel.send('starknet_chainId', undefined, 0);
+
+    expect(usedId).toBe(0);
+    expect(sendSpy).toHaveBeenCalledTimes(1);
+    const payload = sendSpy.mock.calls[0][0] as string;
+    expect(JSON.parse(payload).id).toBe(0);
+    expect(payload).toContain('"id":0');
+  });
+
+  test('should honour other explicitly provided ids and leave the internal counter untouched', () => {
+    expect(webSocketChannel.send('starknet_chainId', undefined, 7)).toBe(7);
+    expect(JSON.parse(sendSpy.mock.calls[0][0] as string).id).toBe(7);
+
+    // The managed counter is independent of user-set ids, and starts at 0.
+    expect(webSocketChannel.send('starknet_chainId')).toBe(0);
+    expect(webSocketChannel.send('starknet_chainId')).toBe(1);
+  });
+});
