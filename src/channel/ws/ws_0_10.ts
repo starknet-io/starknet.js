@@ -447,6 +447,10 @@ export class WebSocketChannel {
     // Set the flag before closing so the resulting `close` event does not trigger
     // an automatic reconnection.
     this.userInitiatedClose = true;
+    // Clear the reconnection state too: left set, it would make every later sendReceive()
+    // queue for a reconnection that is no longer coming.
+    this.isReconnecting = false;
+    this._rejectRequestQueue('the connection was closed by the user');
     this.websocket.close(code, reason);
   }
 
@@ -537,6 +541,26 @@ export class WebSocketChannel {
     });
   }
 
+  /**
+   * Reject every request still waiting in the queue.
+   *
+   * A queued request carries no timeout of its own: the `requestTimeout` timer is only
+   * armed once the request is actually put on the wire. So once the channel reaches a state
+   * where the queue can never be flushed — reconnection gave up, or the user closed the
+   * connection — the queued promises would stay pending forever, and no caller-side timeout
+   * could rescue them. Settling them here is the only way out.
+   */
+  private _rejectRequestQueue(reason: string): void {
+    if (this.requestQueue.length === 0) return;
+    // Detach before iterating, for the same reason as _processRequestQueue.
+    const pending = this.requestQueue;
+    this.requestQueue = [];
+    logger.info(`WebSocket: Rejecting ${pending.length} queued request(s). Reason: ${reason}.`);
+    pending.forEach(({ method, reject }) => {
+      reject(new WebSocketNotConnectedError(`Request ${method} was never sent: ${reason}`));
+    });
+  }
+
   private async _restoreSubscriptions(): Promise<void> {
     const oldSubscriptions = Array.from(this.activeSubscriptions.values());
     this.activeSubscriptions.clear();
@@ -590,6 +614,9 @@ export class WebSocketChannel {
       if (this.reconnectAttempts >= this.reconnectOptions.retries) {
         logger.error('WebSocket: Maximum reconnection retries reached. Giving up.');
         this.isReconnecting = false;
+        this._rejectRequestQueue(
+          `reconnection gave up after ${this.reconnectOptions.retries} attempts`
+        );
         return;
       }
 
