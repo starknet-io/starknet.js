@@ -373,11 +373,18 @@ describeIfWs('E2E WebSocket Tests', () => {
           simulateConnectionDrop(webSocketChannel);
 
           // 2. Immediately try to send a request. It should be queued.
-          webSocketChannel.sendReceive('starknet_chainId').then((result) => {
-            // 3. This assertion runs after reconnection, proving the queue was processed.
-            expect(result).toBe(StarknetChainId.SN_SEPOLIA);
-            done(); // 4. Test is done when the queued request has been successfully processed.
-          });
+          webSocketChannel
+            .sendReceive('starknet_chainId')
+            .then((result) => {
+              // 3. This assertion runs after reconnection, proving the queue was processed.
+              expect(result).toBe(StarknetChainId.SN_SEPOLIA);
+              done(); // 4. Test is done when the queued request has been successfully processed.
+            })
+            // Report the failure instead of leaving `done()` uncalled. A queued request
+            // carries no timeout of its own, and reconnection giving up does not settle it,
+            // so anything other than the happy path would otherwise hang until Jest's
+            // global 5-minute timeout with no indication of what went wrong.
+            .catch(done);
         }
       });
     });
@@ -398,17 +405,22 @@ describeIfWs('E2E WebSocket Tests', () => {
           simulateConnectionDrop(webSocketChannel);
 
           // 2. Immediately try to subscribe. The request should be queued.
-          webSocketChannel.subscribeNewHeads().then((sub) => {
-            // 3. This should only execute after reconnection.
-            expect(sub).toBeInstanceOf(Subscription);
-            expect(webSocketChannel.isConnected()).toBe(true);
+          webSocketChannel
+            .subscribeNewHeads()
+            .then((sub) => {
+              // 3. This should only execute after reconnection.
+              expect(sub).toBeInstanceOf(Subscription);
+              expect(webSocketChannel.isConnected()).toBe(true);
 
-            // 4. To prove it's a real subscription, wait for one event.
-            sub.on((data) => {
-              expect(data).toBeDefined();
-              done();
-            });
-          });
+              // 4. To prove it's a real subscription, wait for one event.
+              sub.on((data) => {
+                expect(data).toBeDefined();
+                done();
+              });
+            })
+            // See the note on the previous test: report the failure rather than leaving
+            // `done()` uncalled and hanging until the global timeout.
+            .catch(done);
         }
       });
     });
@@ -433,11 +445,18 @@ describeIfWs('E2E WebSocket Tests', () => {
       webSocketChannel.on('open', async () => {
         connectionCount += 1;
         if (connectionCount === 1) {
-          // First connection: set up the subscription
-          const sub = await webSocketChannel.subscribeNewHeads();
-          sub.on(eventHandler);
-          // Now, simulate a drop
-          simulateConnectionDrop(webSocketChannel);
+          try {
+            // First connection: set up the subscription
+            const sub = await webSocketChannel.subscribeNewHeads();
+            sub.on(eventHandler);
+            // Now, simulate a drop
+            simulateConnectionDrop(webSocketChannel);
+          } catch (error) {
+            // This handler is `async`, so a rejection here would surface as an unobserved
+            // promise rejection and leave `done()` uncalled — the test would hang until the
+            // global timeout instead of reporting the cause.
+            done(error);
+          }
         }
         // On the second 'open' event (connectionCount === 2), the test will implicitly
         // be waiting for the eventHandler to be called, which will resolve the test.

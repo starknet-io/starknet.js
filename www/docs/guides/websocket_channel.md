@@ -255,6 +255,11 @@ methods.
 A call made while the connection is down is queued and sent once the socket is back. If no answer
 comes within `requestTimeout` (60 s by default), the promise rejects with a `TimeoutError`.
 
+A queued call is never left pending: if the connection never comes back — reconnection gave up, or
+you called `disconnect()` — the promise rejects with a `WebSocketNotConnectedError` instead. Note
+that `requestTimeout` only starts once the request is actually sent, so it is the reconnection
+settings below, not `requestTimeout`, that bound how long a queued call can wait.
+
 :::tip
 `channel.send()` sends a request and returns its id at once, without waiting for the answer. You then
 have to read the incoming messages yourself (`channel.on('message', …)`) and find the one carrying
@@ -287,6 +292,10 @@ const channel = new WebSocketChannel({
 `stableConnectionThreshold` is how long a new connection must stay open before it is considered
 stable and the retry counter is reset. It prevents a node that accepts then immediately drops the
 connection from being retried forever.
+
+Once `retries` attempts have failed, the channel gives up and stops reconnecting on its own. Any
+request still queued at that point is rejected with a `WebSocketNotConnectedError`. Call
+`reconnect()` to start over.
 
 ## Error handling
 
