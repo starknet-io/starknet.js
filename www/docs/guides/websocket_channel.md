@@ -272,6 +272,9 @@ If the connection drops, the channel reconnects with an exponential backoff, re-
 active streams — your existing `Subscription` objects keep working, with nothing to do on your side —
 then flushes the queued requests.
 
+A stream the node refuses to re-subscribe cannot be recovered: its `Subscription` is closed, and
+`isClosed` reports it.
+
 The defaults are usually fine; tune them if needed:
 
 ```typescript
@@ -308,7 +311,7 @@ try {
   if (error instanceof TimeoutError) {
     console.error('No answer from the node in time');
   } else if (error instanceof WebSocketNotConnectedError) {
-    console.error('Socket closed and auto-reconnect disabled');
+    console.error('The connection is gone, the request will not be answered');
   } else {
     throw error;
   }

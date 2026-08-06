@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-underscore-dangle, max-classes-per-file */
 import {
   Provider,
   Subscription,
@@ -7,7 +7,6 @@ import {
   config,
 } from '../src';
 import { logger } from '../src/global/logger';
-import { StarknetChainId } from '../src/global/constants';
 import { getTestAccount, getTestProvider, STRKtokenAddress, TEST_WS_URL } from './config';
 
 const describeIfWs = TEST_WS_URL ? describe : describe.skip;
@@ -157,6 +156,63 @@ class OfflineWebSocket extends EventTarget {
   }
 }
 
+/**
+ * A WebSocket driven entirely by the test: it records what the channel sends and delivers
+ * incoming frames on demand, several in one synchronous burst if asked.
+ *
+ * That burst is the point. A gateway flushing a batch dispatches its frames back to back
+ * within a single read, so a frame can be processed *before* the continuation that the
+ * previous frame woke has had a chance to run. No live node reproduces that window on demand.
+ */
+class ScriptedWebSocket extends EventTarget {
+  static CONNECTING = 0;
+
+  static OPEN = 1;
+
+  static CLOSING = 2;
+
+  static CLOSED = 3;
+
+  static current: ScriptedWebSocket;
+
+  public readyState = ScriptedWebSocket.OPEN;
+
+  public onopen: ((ev: Event) => void) | null = null;
+
+  public onclose: ((ev: Event) => void) | null = null;
+
+  public onerror: ((ev: Event) => void) | null = null;
+
+  public onmessage: ((ev: Event) => void) | null = null;
+
+  /** Every frame the channel has sent, already parsed. */
+  public sent: any[] = [];
+
+  constructor(_url: string) {
+    super();
+    ScriptedWebSocket.current = this;
+  }
+
+  public send(data: string) {
+    this.sent.push(JSON.parse(data));
+  }
+
+  public close() {
+    if (this.readyState === ScriptedWebSocket.CLOSED) return;
+    this.readyState = ScriptedWebSocket.CLOSED;
+    const ev = new Event('close');
+    this.onclose?.(ev);
+    this.dispatchEvent(ev);
+  }
+
+  /** Delivers frames back to back, without yielding to the microtask queue in between. */
+  public deliver(...frames: object[]) {
+    frames.forEach((frame) => {
+      this.dispatchEvent(new MessageEvent('message', { data: JSON.stringify(frame) }));
+    });
+  }
+}
+
 /** Routes every channel built inside the calling describe through `OfflineWebSocket`. */
 const useOfflineSocket = () => {
   beforeAll(() => {
@@ -169,6 +225,20 @@ const useOfflineSocket = () => {
 };
 
 describeIfWs('E2E WebSocket Tests', () => {
+  /**
+   * The chain the node under test actually serves.
+   *
+   * Asserting against a hardcoded `SN_SEPOLIA` pinned the whole suite to one network and made
+   * every run on another one fail on the constant rather than on anything real. Reading it from
+   * the RPC provider also makes the assertion stronger: it now checks that the WebSocket channel
+   * and the HTTP channel agree on the chain, instead of checking a literal.
+   */
+  let expectedChainId: string;
+
+  beforeAll(async () => {
+    expectedChainId = await new Provider(getTestProvider()).getChainId();
+  });
+
   describe('websocket specific endpoints', () => {
     // Updated for RPC 0.9: removed subscribePendingTransaction (not available in 0.9)
     // Added subscribeNewTransactionReceipts and subscribeNewTransactions (new in 0.9)
@@ -219,7 +289,7 @@ describeIfWs('E2E WebSocket Tests', () => {
       // To prove the connection is working, make a simple RPC call.
       // This avoids the flakiness of creating and tearing down a real subscription.
       const chainId = await webSocketChannel.sendReceive('starknet_chainId');
-      expect(chainId).toBe(StarknetChainId.SN_SEPOLIA);
+      expect(chainId).toBe(expectedChainId);
     });
 
     test('Test subscribeNewHeads', async () => {
@@ -399,7 +469,7 @@ describeIfWs('E2E WebSocket Tests', () => {
 
     test('regular rpc endpoint', async () => {
       const response = await webSocketChannel.sendReceive('starknet_chainId');
-      expect(response).toBe(StarknetChainId.SN_SEPOLIA);
+      expect(response).toBe(expectedChainId);
     });
   });
 
@@ -493,7 +563,7 @@ describeIfWs('E2E WebSocket Tests', () => {
             .sendReceive('starknet_chainId')
             .then((result) => {
               // 3. This assertion runs after reconnection, proving the queue was processed.
-              expect(result).toBe(StarknetChainId.SN_SEPOLIA);
+              expect(result).toBe(expectedChainId);
               done(); // 4. Test is done when the queued request has been successfully processed.
             })
             // Report the failure rather than leave `done()` uncalled: a queued request has no
@@ -729,6 +799,193 @@ describe('Unit Test: Subscription Class', () => {
     // And the subscription should be removed from the channel once.
     expect(mockChannel.removeSubscription).toHaveBeenCalledTimes(1);
     expect(mockChannel.removeSubscription).toHaveBeenCalledWith('sub_123');
+  });
+
+  test('unsubscribe stays idempotent when called again before the first reply', async () => {
+    // The sequential test above never exercises the window that matters: `unsubscribe()`
+    // closes the subscription only after the round-trip, so a second caller arriving while
+    // the first request is still on the wire passes the guard too and sends a duplicate
+    // `starknet_unsubscribe`. That happens for real whenever a node pushes two events in one
+    // burst and the handler unsubscribes on each — the second request is then still in flight
+    // when the channel is closed, and settles as an unhandled rejection.
+    let reply: (value: boolean) => void;
+    mockChannel.unsubscribe = jest.fn().mockReturnValue(
+      new Promise<boolean>((resolve) => {
+        reply = resolve;
+      })
+    );
+
+    const first = subscription.unsubscribe();
+    const second = subscription.unsubscribe();
+    reply!(true);
+
+    await expect(first).resolves.toBe(true);
+    await expect(second).resolves.toBe(true);
+    expect(mockChannel.unsubscribe).toHaveBeenCalledTimes(1);
+    expect(mockChannel.removeSubscription).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Unit Test: WebSocketChannel subscription lifecycle', () => {
+  let webSocketChannel: WebSocketChannel;
+
+  beforeAll(() => {
+    config.set('websocket', ScriptedWebSocket as any);
+  });
+
+  afterAll(() => {
+    config.set('websocket', undefined as any);
+  });
+
+  afterEach(() => {
+    webSocketChannel?.disconnect();
+  });
+
+  test('an event arriving in the same burst as the subscription reply is not lost', async () => {
+    // The subscription id only exists once the reply arrives, and the continuation that
+    // registers it runs a microtask later. An event flushed in the same burst is therefore
+    // looked up before that registration and, without a fix, dropped with nothing but a
+    // warning — a silent hole that no assertion in the E2E suite can see.
+    webSocketChannel = new WebSocketChannel({ nodeUrl: 'wss://mock', autoReconnect: false });
+    const ws = ScriptedWebSocket.current;
+
+    const pending = webSocketChannel.subscribeNewHeads();
+
+    ws.deliver(
+      { jsonrpc: '2.0', id: 0, result: 'SUB_1' },
+      {
+        jsonrpc: '2.0',
+        method: 'starknet_subscriptionNewHeads',
+        params: { subscription_id: 'SUB_1', result: { block_number: 42 } },
+      }
+    );
+
+    const sub = await pending;
+    const handler = jest.fn();
+    sub.on(handler); // Attaching flushes whatever was buffered before the handler existed.
+
+    expect(handler).toHaveBeenCalledWith({ block_number: 42 });
+  });
+
+  test('an event for a genuinely unknown subscription is still discarded', async () => {
+    webSocketChannel = new WebSocketChannel({ nodeUrl: 'wss://mock', autoReconnect: false });
+    const ws = ScriptedWebSocket.current;
+    const warnSpy = jest.spyOn(logger, 'warn').mockImplementation(() => {});
+
+    ws.deliver({
+      jsonrpc: '2.0',
+      method: 'starknet_subscriptionNewHeads',
+      params: { subscription_id: 'NEVER_SUBSCRIBED', result: { block_number: 1 } },
+    });
+
+    // Deferred delivery must not turn "unknown id" into a leak: once the retry finds nothing,
+    // the event is dropped and reported, exactly as before.
+    await Promise.resolve();
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('untracked subscription ID: NEVER_SUBSCRIBED')
+    );
+
+    warnSpy.mockRestore();
+  });
+
+  test('a subscription that cannot be restored stops reporting itself as live', async () => {
+    // A reconnection re-subscribes every active subscription. One that fails was dropped from
+    // the channel with nothing but a log line, while the `Subscription` the caller holds kept
+    // saying it was open — with a handler attached that would never be called again.
+    webSocketChannel = new WebSocketChannel({ nodeUrl: 'wss://mock', autoReconnect: false });
+    const ws = ScriptedWebSocket.current;
+    const errorSpy = jest.spyOn(logger, 'error').mockImplementation(() => {});
+
+    const pending = webSocketChannel.subscribeNewHeads();
+    ws.deliver({ jsonrpc: '2.0', id: 0, result: 'SUB_1' });
+    const sub = await pending;
+    expect(sub.isClosed).toBe(false);
+
+    const restoring = (webSocketChannel as any)._restoreSubscriptions();
+    ws.deliver({ jsonrpc: '2.0', id: 1, error: { code: 1, message: 'subscription refused' } });
+    await restoring;
+
+    expect(sub.isClosed).toBe(true);
+    expect(errorSpy).toHaveBeenCalled();
+
+    errorSpy.mockRestore();
+  });
+});
+
+describe('Unit Test: WebSocketChannel waitForUnsubscription', () => {
+  let webSocketChannel: WebSocketChannel;
+
+  beforeAll(() => {
+    config.set('websocket', ScriptedWebSocket as any);
+  });
+
+  afterAll(() => {
+    config.set('websocket', undefined as any);
+  });
+
+  afterEach(() => {
+    webSocketChannel?.disconnect();
+  });
+
+  /** Opens a channel and completes one subscription, leaving the reply id counter at 1. */
+  const subscribed = async () => {
+    webSocketChannel = new WebSocketChannel({ nodeUrl: 'wss://mock', autoReconnect: false });
+    const ws = ScriptedWebSocket.current;
+    const pending = webSocketChannel.subscribeNewHeads();
+    ws.deliver({ jsonrpc: '2.0', id: 0, result: 'SUB_1' });
+    return { ws, sub: await pending };
+  };
+
+  /** Records how a promise settled without ever leaving it unhandled. */
+  const track = (promise: Promise<unknown>) => {
+    const state = { settled: undefined as 'resolved' | 'rejected' | undefined };
+    promise.then(
+      () => {
+        state.settled = 'resolved';
+      },
+      () => {
+        state.settled = 'rejected';
+      }
+    );
+    return state;
+  };
+
+  test('resolves once the subscription is unsubscribed', async () => {
+    const { ws, sub } = await subscribed();
+
+    const waiting = track(webSocketChannel.waitForUnsubscription(sub.id));
+    const unsubscribing = sub.unsubscribe();
+    ws.deliver({ jsonrpc: '2.0', id: 1, result: true });
+
+    await expect(unsubscribing).resolves.toBe(true);
+    await withTimeout(Promise.resolve(), 0);
+    expect(waiting.settled).toBe('resolved');
+  });
+
+  test('rejects when the node refuses the unsubscribe', async () => {
+    // `unsubscribe` only announces success, so a `false` reply left every waiter pending
+    // forever — and a caller awaiting it had no timeout of its own to fall back on.
+    const { ws, sub } = await subscribed();
+
+    const waiting = track(webSocketChannel.waitForUnsubscription(sub.id));
+    const unsubscribing = sub.unsubscribe();
+    ws.deliver({ jsonrpc: '2.0', id: 1, result: false });
+
+    await expect(unsubscribing).resolves.toBe(false);
+    await withTimeout(Promise.resolve(), 0);
+    expect(waiting.settled).toBe('rejected');
+  });
+
+  test('rejects when the connection closes while waiting', async () => {
+    // After a close the unsubscribe can never be observed: a reconnection restores the
+    // subscription under a new id, so this one will never be announced.
+    const { sub } = await subscribed();
+
+    const waiting = track(webSocketChannel.waitForUnsubscription(sub.id));
+    webSocketChannel.disconnect();
+
+    await withTimeout(Promise.resolve(), 0);
+    expect(waiting.settled).toBe('rejected');
   });
 });
 

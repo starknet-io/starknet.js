@@ -219,6 +219,19 @@ export class WebSocketChannel {
   /** Abort handles for the requests currently on the wire, one per pending `sendReceive`. */
   private inFlight = new Set<(reason: string) => void>();
 
+  /**
+   * Callers blocked in `waitForUnsubscription`, keyed by subscription id.
+   *
+   * Held here rather than as `unsubscribe` event listeners because that event only ever
+   * announces success: a waiter attached to it cannot learn that the node refused the
+   * unsubscribe or that the connection went away, and would wait forever with no timeout of
+   * its own to fall back on.
+   */
+  private unsubscribeWaiters = new Map<
+    SUBSCRIPTION_ID,
+    Set<{ resolve: () => void; reject: (error: Error) => void }>
+  >();
+
   private events = new EventEmitter<WebSocketChannelEvents>();
 
   private openListener = (ev: Event) => {
@@ -469,6 +482,7 @@ export class WebSocketChannel {
     this.isReconnecting = false;
     this._rejectRequestQueue('the connection was closed by the user');
     this._rejectInFlight('the connection was closed by the user');
+    this._rejectUnsubscribeWaiters('the connection was closed by the user');
     this.websocket.close(code, reason);
   }
 
@@ -497,13 +511,49 @@ export class WebSocketChannel {
    * @returns {Promise<boolean>} A Promise that resolves with `true` if the unsubscription was successful.
    */
   public async unsubscribe(subscriptionId: SUBSCRIPTION_ID) {
-    const status = await this.sendReceive<boolean>('starknet_unsubscribe', {
-      subscription_id: subscriptionId,
-    });
+    let status: boolean;
+    try {
+      status = await this.sendReceive<boolean>('starknet_unsubscribe', {
+        subscription_id: subscriptionId,
+      });
+    } catch (error) {
+      this._settleUnsubscribeWaiters(subscriptionId, error as Error);
+      throw error;
+    }
     if (status) {
       this.events.emit('unsubscribe', subscriptionId);
+      this._settleUnsubscribeWaiters(subscriptionId);
+    } else {
+      this._settleUnsubscribeWaiters(
+        subscriptionId,
+        new Error(`Node refused to unsubscribe subscription ${subscriptionId}`)
+      );
     }
     return status;
+  }
+
+  /** Settles every caller waiting on one subscription id: resolved, or rejected with `error`. */
+  private _settleUnsubscribeWaiters(subscriptionId: SUBSCRIPTION_ID, error?: Error): void {
+    const waiters = this.unsubscribeWaiters.get(subscriptionId);
+    if (!waiters) return;
+    this.unsubscribeWaiters.delete(subscriptionId);
+    waiters.forEach((waiter) => (error ? waiter.reject(error) : waiter.resolve()));
+  }
+
+  /**
+   * Rejects every caller still waiting on any subscription.
+   *
+   * Once the connection is gone, no unsubscribe can be observed on it: a reconnection restores
+   * each subscription under a fresh id, so the id being waited on will never be announced.
+   */
+  private _rejectUnsubscribeWaiters(reason: string): void {
+    if (this.unsubscribeWaiters.size === 0) return;
+    Array.from(this.unsubscribeWaiters.keys()).forEach((id) =>
+      this._settleUnsubscribeWaiters(
+        id,
+        new WebSocketNotConnectedError(`Subscription ${id} was never unsubscribed: ${reason}`)
+      )
+    );
   }
 
   /**
@@ -517,14 +567,10 @@ export class WebSocketChannel {
    * ```
    */
   public waitForUnsubscription(targetId: SUBSCRIPTION_ID): Promise<void> {
-    return new Promise((resolve) => {
-      const listener = (unsubId: SUBSCRIPTION_ID) => {
-        if (unsubId === targetId) {
-          this.events.off('unsubscribe', listener);
-          resolve();
-        }
-      };
-      this.events.on('unsubscribe', listener);
+    return new Promise((resolve, reject) => {
+      const waiters = this.unsubscribeWaiters.get(targetId) ?? new Set();
+      waiters.add({ resolve, reject });
+      this.unsubscribeWaiters.set(targetId, waiters);
     });
   }
 
@@ -606,7 +652,9 @@ export class WebSocketChannel {
         logger.info(`Subscription ${sub.method} restored with new ID: ${newSubId}`);
       } catch (error) {
         logger.error(`Failed to restore subscription ${sub.method}:`, error);
-        // The subscription is not added back to activeSubscriptions if it fails
+        // Not added back to activeSubscriptions — and closed, so the handle the caller still
+        // holds stops claiming to be live when nothing will ever be delivered to it again.
+        sub._markClosed();
       }
     });
 
@@ -712,6 +760,7 @@ export class WebSocketChannel {
     // after `disconnect()`, which drains them before closing — the closing handshake itself is
     // not guaranteed to complete.
     this._rejectInFlight('the connection was closed');
+    this._rejectUnsubscribeWaiters('the connection was closed');
     this.events.emit('close', ev);
 
     if (!this.userInitiatedClose) {
@@ -741,9 +790,22 @@ export class WebSocketChannel {
       if (subscription) {
         subscription._handleEvent(result);
       } else {
-        logger.warn(
-          `WebSocketChannel: Received event for untracked subscription ID: ${subscription_id}.`
-        );
+        // The registration for this id can still be one microtask away: the reply carrying it
+        // and this event may be flushed in the same burst, and the continuation that registers
+        // the subscription has not run yet. Retry once at the end of the current tick — the
+        // continuation was queued first, so it wins — then give up, so an id that genuinely
+        // does not exist is still dropped. Events deferred this way keep their relative order,
+        // and any event arriving in a later tick is necessarily delivered after them.
+        queueMicrotask(() => {
+          const registered = this.activeSubscriptions.get(subscription_id);
+          if (registered) {
+            registered._handleEvent(result);
+          } else {
+            logger.warn(
+              `WebSocketChannel: Received event for untracked subscription ID: ${subscription_id}.`
+            );
+          }
+        });
       }
     }
 
