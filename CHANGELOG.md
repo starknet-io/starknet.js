@@ -1,3 +1,15 @@
+## [10.6.7](https://github.com/starknet-io/starknet.js/compare/v10.6.6...v10.6.7) (2026-08-06)
+
+### Bug Fixes
+
+- **ws:** settle in-flight requests when the connection drops ([8eae9c9](https://github.com/starknet-io/starknet.js/commit/8eae9c9457befe6e0c3f4fd30a56025fe5455fd8))
+
+## [10.6.6](https://github.com/starknet-io/starknet.js/compare/v10.6.5...v10.6.6) (2026-08-05)
+
+### Bug Fixes
+
+- **ws:** reject queued requests instead of hanging ([82ced97](https://github.com/starknet-io/starknet.js/commit/82ced97dc6dc409131bc5650db076efedf467101))
+
 ## [10.6.5](https://github.com/starknet-io/starknet.js/compare/v10.6.4...v10.6.5) (2026-08-05)
 
 ### Bug Fixes

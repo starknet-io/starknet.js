@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { WebSocketChannel, config } from '../src';
+import { WebSocketChannel, WebSocketNotConnectedError, config } from '../src';
 
 /**
  * Unit tests for the auto-reconnection state machine, using a mock WebSocket
@@ -11,6 +11,20 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
     new Promise((resolve) => {
       setTimeout(resolve, ms);
     });
+
+  /**
+   * Report how `promise` settled, or `'pending'` if it had not within `ms`. The losing timer
+   * is cleared either way: an un-cleared one outlives the test and keeps Jest from exiting.
+   */
+  const outcomeWithin = (promise: Promise<unknown>, ms: number): Promise<string> => {
+    let timer: NodeJS.Timeout | undefined;
+    return Promise.race([
+      promise.then(() => 'resolved').catch(() => 'rejected'),
+      new Promise<string>((resolve) => {
+        timer = setTimeout(() => resolve('pending'), ms);
+      }),
+    ]).finally(() => clearTimeout(timer));
+  };
 
   let originalLogLevel: ReturnType<typeof config.get>;
 
@@ -27,10 +41,21 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
     config.set('logLevel', originalLogLevel as any);
   });
 
-  /** Counts how many sockets get created, to detect a runaway reconnection loop. */
-  const makeMock = (behavior: 'flap' | 'stable') => {
+  /**
+   * A mock WebSocket whose behaviour on connect is chosen per test:
+   * - `stable` — connects and stays open.
+   * - `flap` — connects, then drops 10ms later, as a rate-limiting gateway does.
+   * - `error-after-first` — the first socket connects, every later one fails with `error`.
+   * - `refuse-after-first` — same, but the refusal is a bare `close` with no `error` first.
+   *
+   * `created` counts the sockets opened, which is how a runaway reconnection loop is detected.
+   */
+  type SocketBehavior = 'stable' | 'flap' | 'error-after-first' | 'refuse-after-first';
+
+  const makeMock = (behavior: SocketBehavior) => {
     let created = 0;
     let current: any = null;
+
     class MockWS extends EventTarget {
       static CONNECTING = 0;
 
@@ -40,7 +65,7 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
 
       static CLOSED = 3;
 
-      public readyState = 0;
+      public readyState = MockWS.CONNECTING;
 
       public onopen: ((ev: Event) => void) | null = null;
 
@@ -56,17 +81,22 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
         super();
         created += 1;
         current = this;
+        const isFirst = created === 1;
         this.timers.push(
           setTimeout(() => {
-            if (this.readyState === 3) return; // closed before it could open
-            this.readyState = 1;
-            const ev = new Event('open');
-            this.onopen?.(ev);
-            this.dispatchEvent(ev);
+            if (this.readyState === MockWS.CLOSED) return; // closed before it could open
+            if (!isFirst && behavior === 'error-after-first') {
+              this.readyState = MockWS.CLOSED;
+              this.emit('error');
+              return;
+            }
+            if (!isFirst && behavior === 'refuse-after-first') {
+              this.emitClose();
+              return;
+            }
+            this.readyState = MockWS.OPEN;
+            this.emit('open');
             if (behavior === 'flap') {
-              // Accept the connection then immediately drop it, as a rate-limiting
-              // gateway does. This used to reset the retry counter every cycle and
-              // reconnect forever.
               this.timers.push(setTimeout(() => this.emitClose(), 10));
             }
           }, 5)
@@ -82,13 +112,20 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
       public emitClose() {
         this.timers.forEach(clearTimeout);
         this.timers = [];
-        if (this.readyState === 3) return;
-        this.readyState = 3;
-        const ev = new Event('close');
-        this.onclose?.(ev);
+        if (this.readyState === MockWS.CLOSED) return;
+        this.readyState = MockWS.CLOSED;
+        this.emit('close');
+      }
+
+      /** Fires both the `on*` property and the listeners, as a real WebSocket does. */
+      private emit(type: 'open' | 'close' | 'error') {
+        const ev = new Event(type);
+        const handlers = { open: this.onopen, close: this.onclose, error: this.onerror };
+        handlers[type]?.(ev);
         this.dispatchEvent(ev);
       }
     }
+
     return {
       MockWS,
       get created() {
@@ -117,8 +154,9 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
 
     await wait(3000);
 
-    // 1 initial + at most `retries` reconnection attempts. Without the fix this
-    // grows without bound (hundreds within a few seconds).
+    // 1 initial socket + at most `retries` reconnection attempts. A gateway that accepts then
+    // immediately drops must not reset the retry counter on every cycle: that reconnects
+    // forever, opening hundreds of sockets within a few seconds.
     expect(mock.created).toBeLessThanOrEqual(6);
 
     channel.disconnect();
@@ -140,8 +178,8 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
     await channel.waitForConnection();
     expect(channel.isConnected()).toBe(true);
 
-    // Five drops, more than `retries`, each followed by a stable period. Each must
-    // reconnect: the counter resets after the connection stays open past the threshold.
+    // Five drops, more than `retries`, each followed by a stable period. Each must reconnect:
+    // the counter resets after the connection stays open past the threshold.
     for (let k = 0; k < 5; k += 1) {
       mock.current.emitClose();
       // eslint-disable-next-line no-await-in-loop
@@ -153,12 +191,10 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
   });
 
   test('draining the request queue while still disconnected does not loop forever', () => {
-    // Regression: `_processRequestQueue` used to iterate `this.requestQueue` directly.
-    // When the socket dropped again mid-reconnect, `sendReceive` re-queued each request
-    // synchronously into that same array, so the loop never emptied it — an unbounded
-    // synchronous loop that allocated until the process OOM-crashed. Here the channel is
-    // held in the "reconnecting" state so every `sendReceive` re-queues, and a push
-    // counter proves the loop stays bounded instead of running away.
+    // The channel is held in the "reconnecting" state, so every `sendReceive` re-queues. A
+    // `_processRequestQueue` iterating its own array in place would therefore never empty it —
+    // an unbounded synchronous loop allocating a Promise per turn until the process OOMs. The
+    // push counter proves the loop stays bounded.
     const mock = makeMock('stable');
     config.set('websocket', mock.MockWS as any);
 
@@ -199,9 +235,8 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
     // eslint-disable-next-line no-underscore-dangle
     internal._processRequestQueue();
 
-    // With the fix the seeded request is re-queued at most once (into the fresh, detached
-    // queue), so the instrumented array sees no re-push. Without it, `requeueCount` blows
-    // past the cap.
+    // The seeded request is re-queued at most once, into the fresh detached queue, so the
+    // instrumented array sees no re-push.
     expect(requeueCount).toBeLessThanOrEqual(1);
     // The request is deferred to the next reconnection cycle, not dropped.
     expect(internal.requestQueue.length).toBe(1);
@@ -263,10 +298,9 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
   };
 
   test('a non-JSON frame does not escape the message listener; the request still times out', async () => {
-    // Regression: `sendReceive`'s message listener parsed the frame with an unguarded
-    // `JSON.parse`. A gateway pushing a plain-text body over the open socket made it throw
-    // from inside the WebSocket event dispatch — not the promise chain — so no caller-side
-    // try/catch could intercept it and the host process died on an uncaughtException.
+    // An unguarded `JSON.parse` on the frame throws from inside the WebSocket event dispatch
+    // rather than the promise chain, so no caller-side try/catch can intercept it and the host
+    // process dies on an uncaughtException.
     const mock = makeMessageMock();
     config.set('websocket', mock.MockWS as any);
 
@@ -292,6 +326,8 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
     const error = await settled;
     expect(error).toBeInstanceOf(Error);
     expect((error as Error).message).toContain('timed out after 200ms');
+
+    channel.disconnect();
   });
 
   test('a valid response arriving after a malformed frame still resolves the request', async () => {
@@ -312,5 +348,131 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
     );
 
     await expect(pending).resolves.toBe('0x534e5f5345504f4c4941');
+
+    channel.disconnect();
+  });
+
+  test('rejects queued requests once reconnection gives up', async () => {
+    // A queued request carries no timeout of its own — `requestTimeout` is armed only once it
+    // is actually sent. If the give-up path left the queue untouched, the promise would stay
+    // pending forever and no caller-side timeout could rescue it: in CI a few seconds of
+    // gateway unavailability became a test hanging for the full 5-minute Jest timeout.
+    const mock = makeMock('error-after-first');
+    config.set('websocket', mock.MockWS as any);
+
+    const channel = new WebSocketChannel({
+      nodeUrl: 'wss://mock',
+      reconnectOptions: { retries: 2, delay: 20, exponential: false },
+    });
+    await channel.waitForConnection();
+
+    // Drop the connection: the channel enters a reconnection cycle that can never succeed.
+    mock.current.emitClose();
+    const pending = channel.sendReceive('starknet_chainId');
+
+    await expect(pending).rejects.toThrow(WebSocketNotConnectedError);
+    await expect(pending).rejects.toThrow(/never sent: reconnection gave up after 2 attempts/);
+
+    channel.disconnect();
+    // Explicit per-test timeout: the whole point is that the promise settles. Without it, a
+    // regression would hang for the suite-wide 5 minutes instead of failing.
+  }, 10000);
+
+  test('rejects queued requests when the user disconnects mid-reconnection', async () => {
+    const mock = makeMock('error-after-first');
+    config.set('websocket', mock.MockWS as any);
+
+    const channel = new WebSocketChannel({
+      nodeUrl: 'wss://mock',
+      // Long enough that the retries are still pending when disconnect() is called.
+      reconnectOptions: { retries: 10, delay: 5000, exponential: false },
+    });
+    await channel.waitForConnection();
+
+    mock.current.emitClose();
+    const pending = channel.sendReceive('starknet_chainId');
+
+    channel.disconnect();
+
+    await expect(pending).rejects.toThrow(WebSocketNotConnectedError);
+    await expect(pending).rejects.toThrow(/never sent: the connection was closed by the user/);
+
+    // The reconnection flag must be cleared too, otherwise every later request would queue
+    // for a reconnection that is no longer coming.
+    expect((channel as unknown as { isReconnecting: boolean }).isReconnecting).toBe(false);
+    // See the note on the previous test.
+  }, 10000);
+
+  test('settles an in-flight request when the user disconnects', async () => {
+    // A request already on the wire lives entirely inside the `sendReceive` closure — a timer
+    // plus two socket listeners, unreachable from outside. A clean close emits `close`, not
+    // `error`, so neither handler fires and the timer runs its full 60s default, holding the
+    // Node event loop open and leaving the caller's promise pending all that time.
+    const mock = makeMock('stable');
+    config.set('websocket', mock.MockWS as any);
+
+    const channel = new WebSocketChannel({ nodeUrl: 'wss://mock' });
+    await channel.waitForConnection();
+
+    // Goes on the wire rather than into the queue: the socket is open. The mock's `send()`
+    // is a no-op, so no reply will ever come back.
+    const pending = channel.sendReceive('starknet_chainId');
+
+    channel.disconnect();
+
+    await expect(outcomeWithin(pending, 1000)).resolves.toBe('rejected');
+  });
+
+  test('settles an in-flight request when the connection drops', async () => {
+    // Same trapped request, but on a drop the channel did not own: `disconnect()` is never
+    // called, so the close path itself has to settle it.
+    const mock = makeMock('stable');
+    config.set('websocket', mock.MockWS as any);
+
+    const channel = new WebSocketChannel({
+      nodeUrl: 'wss://mock',
+      reconnectOptions: { retries: 2, delay: 20, exponential: false },
+    });
+    await channel.waitForConnection();
+
+    const pending = channel.sendReceive('starknet_chainId');
+    mock.current.emitClose();
+
+    await expect(outcomeWithin(pending, 1000)).resolves.toBe('rejected');
+    await expect(pending).rejects.toThrow(WebSocketNotConnectedError);
+
+    channel.disconnect();
+  });
+
+  test('settles a queued request when a reconnection attempt is refused without an error event', async () => {
+    // A rate-limiting gateway refuses a new connection by closing the socket, without
+    // necessarily emitting `error` first. A `tryReconnect` arming its retry only from `onerror`
+    // never reschedules; the `close` that did arrive returns early from `_startReconnect`
+    // because `isReconnecting` is still true. No further attempt is made, `reconnectAttempts`
+    // never reaches `retries`, and the give-up branch that rejects the queue stays unreachable.
+    const mock = makeMock('refuse-after-first');
+    config.set('websocket', mock.MockWS as any);
+
+    const channel = new WebSocketChannel({
+      nodeUrl: 'wss://mock',
+      reconnectOptions: {
+        retries: 3,
+        delay: 20,
+        exponential: false,
+        stableConnectionThreshold: 100,
+      },
+    });
+    await channel.waitForConnection();
+
+    // Drop the live connection. Every reconnection attempt from here on is refused.
+    mock.current.emitClose();
+
+    // Queued, because the channel is now in the reconnecting state.
+    const pending = channel.sendReceive('starknet_chainId');
+
+    // Three retries of 20ms plus the give-up rejection land well inside 2s.
+    await expect(outcomeWithin(pending, 2000)).resolves.toBe('rejected');
+
+    channel.disconnect();
   });
 });

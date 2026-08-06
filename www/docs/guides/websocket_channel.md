@@ -255,6 +255,11 @@ methods.
 A call made while the connection is down is queued and sent once the socket is back. If no answer
 comes within `requestTimeout` (60 s by default), the promise rejects with a `TimeoutError`.
 
+A queued call is never left pending: if the connection never comes back — reconnection gave up, or
+you called `disconnect()` — the promise rejects with a `WebSocketNotConnectedError` instead. Note
+that `requestTimeout` only starts once the request is actually sent, so it is the reconnection
+settings below, not `requestTimeout`, that bound how long a queued call can wait.
+
 :::tip
 `channel.send()` sends a request and returns its id at once, without waiting for the answer. You then
 have to read the incoming messages yourself (`channel.on('message', …)`) and find the one carrying
@@ -266,6 +271,9 @@ the same id. In most cases, use `sendReceive()`.
 If the connection drops, the channel reconnects with an exponential backoff, re-subscribes all your
 active streams — your existing `Subscription` objects keep working, with nothing to do on your side —
 then flushes the queued requests.
+
+A stream the node refuses to re-subscribe cannot be recovered: its `Subscription` is closed, and
+`isClosed` reports it.
 
 The defaults are usually fine; tune them if needed:
 
@@ -288,6 +296,10 @@ const channel = new WebSocketChannel({
 stable and the retry counter is reset. It prevents a node that accepts then immediately drops the
 connection from being retried forever.
 
+Once `retries` attempts have failed, the channel gives up and stops reconnecting on its own. Any
+request still queued at that point is rejected with a `WebSocketNotConnectedError`. Call
+`reconnect()` to start over.
+
 ## Error handling
 
 ```typescript
@@ -299,7 +311,7 @@ try {
   if (error instanceof TimeoutError) {
     console.error('No answer from the node in time');
   } else if (error instanceof WebSocketNotConnectedError) {
-    console.error('Socket closed and auto-reconnect disabled');
+    console.error('The connection is gone, the request will not be answered');
   } else {
     throw error;
   }
