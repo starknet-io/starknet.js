@@ -216,6 +216,9 @@ export class WebSocketChannel {
     reject: (reason?: any) => void;
   }> = [];
 
+  /** Abort handles for the requests currently on the wire, one per pending `sendReceive`. */
+  private inFlight = new Set<(reason: string) => void>();
+
   private events = new EventEmitter<WebSocketChannelEvents>();
 
   private openListener = (ev: Event) => {
@@ -322,14 +325,30 @@ export class WebSocketChannel {
     }
 
     const sendId = this.send(method, params);
+    // The socket the request actually went out on: a reconnection replaces `this.websocket`,
+    // and the listeners below must be removed from the instance they were added to.
+    const socket = this.websocket;
 
     return new Promise((resolve, reject) => {
-      let timeoutId: NodeJS.Timeout;
-
-      if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
+      if (socket.readyState !== WebSocket.OPEN) {
         reject(new WebSocketNotConnectedError('WebSocket not available or not connected.'));
         return;
       }
+
+      let timeoutId: NodeJS.Timeout;
+
+      /* eslint-disable @typescript-eslint/no-use-before-define --
+         `settle` and the handlers it detaches are mutually recursive; every name it reads is
+         defined by the time it can run. */
+      // Detaches everything this request owns, so no exit path leaves a listener, a timer or
+      // an abort handle behind.
+      const settle = () => {
+        clearTimeout(timeoutId);
+        socket.removeEventListener('message', messageHandler);
+        socket.removeEventListener('error', errorHandler);
+        this.inFlight.delete(abort);
+      };
+      /* eslint-enable @typescript-eslint/no-use-before-define */
 
       const messageHandler = (event: MessageEvent) => {
         if (!isString(event.data)) {
@@ -340,38 +359,27 @@ export class WebSocketChannel {
         try {
           message = JSON.parse(event.data);
         } catch (error) {
-          // Skip the malformed frame instead of rejecting the pending promise: a non-JSON
-          // frame (e.g. a gateway pushing a plain-text error body over the open socket)
-          // carries no request id, so it cannot be attributed to a specific in-flight
-          // request. Letting the parse throw here would escape the WebSocket event dispatch
-          // rather than the promise chain, so no caller-side try/catch could intercept it
-          // and it would kill the process as an uncaught exception. The pending request is
-          // still ended by `requestTimeout`.
+          // Skip the malformed frame instead of rejecting: it carries no request id, so it
+          // cannot be attributed to a pending request. Letting the parse throw would escape
+          // the WebSocket event dispatch rather than the promise chain — no caller-side
+          // try/catch could intercept it, and it would kill the process as an uncaught
+          // exception. The request is still ended by `requestTimeout`.
           logger.error(
             `WebSocketChannel: Error parsing incoming message: ${event.data}, Error: ${error}`
           );
           return;
         }
-        if (message.id === sendId) {
-          clearTimeout(timeoutId);
-          this.websocket.removeEventListener('message', messageHandler);
-          // eslint-disable-next-line @typescript-eslint/no-use-before-define
-          this.websocket.removeEventListener('error', errorHandler);
-
-          if ('result' in message) {
-            resolve(message.result as T);
-          } else {
-            reject(
-              new Error(`Error on ${method} (id: ${sendId}): ${JSON.stringify(message.error)}`)
-            );
-          }
+        if (message.id !== sendId) return;
+        settle();
+        if ('result' in message) {
+          resolve(message.result as T);
+        } else {
+          reject(new Error(`Error on ${method} (id: ${sendId}): ${JSON.stringify(message.error)}`));
         }
       };
 
       const errorHandler = (event: Event) => {
-        clearTimeout(timeoutId);
-        this.websocket.removeEventListener('message', messageHandler);
-        this.websocket.removeEventListener('error', errorHandler);
+        settle();
         reject(
           new Error(
             `WebSocket error during ${method} (id: ${sendId}): ${event.type || 'Unknown error'}`
@@ -379,13 +387,22 @@ export class WebSocketChannel {
         );
       };
 
-      this.websocket.addEventListener('message', messageHandler);
-      this.websocket.addEventListener('error', errorHandler);
+      // The only handle on this request from outside its closure. See `_rejectInFlight`.
+      const abort = (reason: string) => {
+        settle();
+        reject(
+          new WebSocketNotConnectedError(
+            `Request ${method} (id: ${sendId}) went unanswered: ${reason}`
+          )
+        );
+      };
+
+      socket.addEventListener('message', messageHandler);
+      socket.addEventListener('error', errorHandler);
+      this.inFlight.add(abort);
 
       timeoutId = setTimeout(() => {
-        // Clean up listeners
-        this.websocket.removeEventListener('message', messageHandler);
-        this.websocket.removeEventListener('error', errorHandler);
+        settle();
         reject(
           new TimeoutError(
             `Request ${method} (id: ${sendId}) timed out after ${this.requestTimeout}ms`
@@ -451,6 +468,7 @@ export class WebSocketChannel {
     // queue for a reconnection that is no longer coming.
     this.isReconnecting = false;
     this._rejectRequestQueue('the connection was closed by the user');
+    this._rejectInFlight('the connection was closed by the user');
     this.websocket.close(code, reason);
   }
 
@@ -525,14 +543,11 @@ export class WebSocketChannel {
   }
 
   private _processRequestQueue(): void {
-    // Snapshot and detach the queue before draining it. `sendReceive` re-queues a
-    // request synchronously when the connection is not open (e.g. the socket dropped
-    // again mid-reconnect, so `isReconnecting` is true or `isConnected()` is false).
-    // Iterating `this.requestQueue` directly would let those re-queued items be
-    // re-processed in the same pass — an unbounded synchronous loop that allocates a
-    // Promise per turn until the process runs out of memory. Draining a detached
-    // snapshot bounds the loop to the requests present now; re-queued ones land in the
-    // fresh `this.requestQueue` and wait for the next reconnection cycle.
+    // Drain a detached snapshot. `sendReceive` re-queues synchronously when the connection is
+    // not open (the socket dropped again mid-reconnect), so iterating `this.requestQueue` in
+    // place would re-process those items in the same pass — an unbounded synchronous loop
+    // allocating a Promise per turn. Re-queued requests land in the fresh array instead and
+    // wait for the next reconnection cycle.
     const pending = this.requestQueue;
     this.requestQueue = [];
     logger.info(`WebSocket: Processing ${pending.length} queued requests.`);
@@ -559,6 +574,23 @@ export class WebSocketChannel {
     pending.forEach(({ method, reject }) => {
       reject(new WebSocketNotConnectedError(`Request ${method} was never sent: ${reason}`));
     });
+  }
+
+  /**
+   * Settle every request already on the wire.
+   *
+   * The counterpart of `_rejectRequestQueue`, for requests past the queue. Their only other
+   * exit is the `requestTimeout` timer, so without this the caller waits the whole timeout —
+   * 60s by default — for a reply that can no longer arrive, and that pending timer keeps the
+   * Node event loop alive for just as long.
+   */
+  private _rejectInFlight(reason: string): void {
+    if (this.inFlight.size === 0) return;
+    // Snapshot before draining: each abort removes itself from the set as it settles.
+    const pending = Array.from(this.inFlight);
+    this.inFlight.clear();
+    logger.info(`WebSocket: Rejecting ${pending.length} in-flight request(s). Reason: ${reason}.`);
+    pending.forEach((abort) => abort(reason));
   }
 
   private async _restoreSubscriptions(): Promise<void> {
@@ -627,8 +659,31 @@ export class WebSocketChannel {
 
       this.reconnect(); // Attempt to reconnect
 
+      // A failed attempt surfaces as `error`, as `close`, or as both — browsers emit `error`
+      // then `close`, while a gateway refusing the connection outright (rate limiting) may only
+      // close it. Scheduling from `error` alone deadlocks on that last case: the `close` that
+      // does arrive hits the `isReconnecting` guard in `_startReconnect` and returns, so
+      // `reconnectAttempts` never reaches `retries` and even the give-up branch is unreachable.
+      // Schedule from whichever signal comes first, and only once, so the two paths cannot
+      // start parallel reconnection loops.
+      let attemptSettled = false;
+      const scheduleRetry = () => {
+        // `isReconnecting` is cleared both by `disconnect()` and by the give-up branch; the
+        // close that follows either must not arm a further attempt, or a timer outlives
+        // the channel.
+        if (attemptSettled || !this.isReconnecting) return;
+        attemptSettled = true;
+        const delay = this.reconnectOptions.exponential
+          ? this.reconnectOptions.delay * 2 ** (this.reconnectAttempts - 1)
+          : this.reconnectOptions.delay;
+        logger.info(`WebSocket: Reconnect attempt failed. Retrying in ${delay}ms.`);
+        this.reconnectTimeoutId = setTimeout(tryReconnect, delay);
+      };
+
       this.websocket.onopen = async () => {
         logger.info('WebSocket: Reconnection successful.');
+        // A later drop on this socket goes through `onCloseProxy`, not this attempt's retry.
+        attemptSettled = true;
         this.isReconnecting = false;
         // The attempt counter is reset by the openListener's stability timer, not here:
         // a reconnection that drops again before proving stable must keep its count.
@@ -638,13 +693,10 @@ export class WebSocketChannel {
         this.events.emit('open', new Event('open'));
       };
 
-      this.websocket.onerror = () => {
-        const delay = this.reconnectOptions.exponential
-          ? this.reconnectOptions.delay * 2 ** (this.reconnectAttempts - 1)
-          : this.reconnectOptions.delay;
-        logger.info(`WebSocket: Reconnect attempt failed. Retrying in ${delay}ms.`);
-        this.reconnectTimeoutId = setTimeout(tryReconnect, delay);
-      };
+      this.websocket.onerror = scheduleRetry;
+      // Registered as a listener rather than assigned to `onclose`: `waitForDisconnection()`
+      // owns that property, and overwriting it would break a caller awaiting the close.
+      this.websocket.addEventListener('close', scheduleRetry);
     };
 
     tryReconnect();
@@ -655,6 +707,11 @@ export class WebSocketChannel {
     this.websocket.removeEventListener('close', this.closeListener);
     this.websocket.removeEventListener('message', this.messageListener);
     this.websocket.removeEventListener('error', this.errorListener);
+    // Nothing on the wire can still be answered on a closed socket, and a clean close emits no
+    // `error` event, so without this those requests would sit until `requestTimeout`. A no-op
+    // after `disconnect()`, which drains them before closing — the closing handshake itself is
+    // not guaranteed to complete.
+    this._rejectInFlight('the connection was closed');
     this.events.emit('close', ev);
 
     if (!this.userInitiatedClose) {

@@ -1,5 +1,11 @@
 /* eslint-disable no-underscore-dangle */
-import { Provider, Subscription, SubscriptionNewHeadsEvent, WebSocketChannel } from '../src';
+import {
+  Provider,
+  Subscription,
+  SubscriptionNewHeadsEvent,
+  WebSocketChannel,
+  config,
+} from '../src';
 import { logger } from '../src/global/logger';
 import { StarknetChainId } from '../src/global/constants';
 import { getTestAccount, getTestProvider, STRKtokenAddress, TEST_WS_URL } from './config';
@@ -10,19 +16,43 @@ const NODE_URL = TEST_WS_URL!;
 /**
  * Simulate an abnormal network drop to exercise auto-reconnection.
  *
- * A real network drop surfaces to the client as a `close` event (RFC 6455 code
- * 1006) without a closing handshake; the channel reacts to that event exactly as
- * it does here and starts reconnecting. We cannot use `socket.close()` for this:
- * some Starknet gateways (Pathfinder) never complete the closing handshake while a
- * subscription is active, so the `close` event would never fire and reconnection
- * would never start. Dispatching the event directly is both reliable and a closer
- * match to a real drop. The now-orphaned socket is closed best-effort to avoid
- * leaking the connection.
+ * A real drop surfaces as a `close` event (RFC 6455 code 1006) without a closing handshake,
+ * and the channel reacts to that event exactly as it does here. `socket.close()` cannot be
+ * used instead: some gateways (Pathfinder) never complete the closing handshake while a
+ * subscription is active, so the `close` event would never fire and reconnection would
+ * never start.
+ *
+ * The socket the channel abandons is then released here, because nothing else will — the
+ * channel has already moved on to its replacement, so no teardown can reach it. Closing it is
+ * not enough on its own: a graceful close that the gateway will not answer while a subscription
+ * is still bound leaves the connection open for the rest of the run, and a single one of those
+ * keeps the Node event loop alive after the suite has passed. Note that `--detectOpenHandles`
+ * does not attribute that handle to anything, so it is no help in tracking it down.
  */
 const simulateConnectionDrop = (channel: WebSocketChannel) => {
   const socket = channel.websocket;
+  // Subscription ids still bound to this socket, captured before the drop: restoring them on
+  // the replacement socket clears the map.
+  const subscriptionIds = Array.from(
+    ((channel as any).activeSubscriptions as Map<string, unknown>).keys()
+  );
+
   socket.dispatchEvent(new Event('close'));
+
   try {
+    // Unsubscribe before closing, so the gateway has no reason to hold the connection. The
+    // replies land on a socket whose listeners `onCloseProxy` has already detached, so they
+    // are simply ignored.
+    subscriptionIds.forEach((id, i) => {
+      socket.send(
+        JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1_000_000 + i,
+          method: 'starknet_unsubscribe',
+          params: { subscription_id: id },
+        })
+      );
+    });
     socket.close();
   } catch {
     // ignore: the socket may already be closing/closed
@@ -32,15 +62,14 @@ const simulateConnectionDrop = (channel: WebSocketChannel) => {
 /**
  * Open a WebSocket channel, retrying on connection errors.
  *
- * The shared gateways rate-limit new connections per IP. Opening several in quick
- * succession (as this suite does) gets a fresh connection rejected with an error
- * event, which `waitForConnection()` surfaces as a rejection. The limit replenishes
- * within ~1s, so retry with a spaced backoff.
+ * The shared gateways rate-limit new connections per IP, and a whole suite run opens around
+ * twenty; once the limit trips it can take tens of seconds to replenish, and the rejected
+ * connection surfaces through `waitForConnection()`. Hence five attempts with exponential
+ * backoff, 1/2/4/8s — ~15s of waiting, while a connection that succeeds first try never sleeps.
  *
- * `autoReconnect` is forced off: this helper owns the retry loop, and letting the
- * channel also auto-reconnect in the background on a failed attempt would spawn
- * overlapping reconnection loops (each retrying for tens of seconds) that pile up
- * under rate-limiting.
+ * `autoReconnect` is forced off: this helper owns the retry loop, and letting the channel also
+ * reconnect in the background on a failed attempt would spawn overlapping reconnection loops
+ * (each retrying for tens of seconds) that pile up under rate-limiting.
  */
 const openChannel = async (
   options: ConstructorParameters<typeof WebSocketChannel>[0]
@@ -57,13 +86,86 @@ const openChannel = async (
     } catch (error) {
       lastError = error;
       channel.disconnect();
+      // Last attempt: the loop is about to throw, so sleeping only delays the report.
+      if (attempt === retries - 1) break;
       // eslint-disable-next-line no-await-in-loop
       await new Promise((resolve) => {
-        setTimeout(resolve, backoffMs);
+        setTimeout(resolve, backoffMs * 2 ** attempt);
       });
     }
   }
   throw lastError;
+};
+
+/**
+ * Resolve when `promise` settles or `ms` elapses, whichever comes first.
+ *
+ * The losing timer is always cleared: an un-cleared one keeps the Node event loop alive past
+ * the end of the run, which is what makes Jest report that it "did not exit".
+ */
+const withTimeout = async (promise: Promise<unknown>, ms: number): Promise<void> => {
+  let timer: NodeJS.Timeout | undefined;
+  await Promise.race([
+    promise,
+    new Promise((resolve) => {
+      timer = setTimeout(resolve, ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
+};
+
+/**
+ * A WebSocket that never touches the network.
+ *
+ * The unit describes at the bottom of this file need no connection and pass
+ * `nodeUrl: 'ws://dummy-url'`, but the channel constructor opens a socket regardless and that
+ * host never resolves — each one then sits in CONNECTING on a DNS lookup that never completes,
+ * keeping the Node event loop alive after the run. A socket stuck before DNS resolution cannot
+ * finish closing either, so the only fix is to never open one.
+ */
+class OfflineWebSocket extends EventTarget {
+  static CONNECTING = 0;
+
+  static OPEN = 1;
+
+  static CLOSING = 2;
+
+  static CLOSED = 3;
+
+  public readyState = OfflineWebSocket.CONNECTING;
+
+  public onopen: ((ev: Event) => void) | null = null;
+
+  public onclose: ((ev: Event) => void) | null = null;
+
+  public onerror: ((ev: Event) => void) | null = null;
+
+  public onmessage: ((ev: Event) => void) | null = null;
+
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor, no-useless-constructor
+  constructor(_url: string) {
+    super();
+  }
+
+  public send() {}
+
+  public close() {
+    if (this.readyState === OfflineWebSocket.CLOSED) return;
+    this.readyState = OfflineWebSocket.CLOSED;
+    const ev = new Event('close');
+    this.onclose?.(ev);
+    this.dispatchEvent(ev);
+  }
+}
+
+/** Routes every channel built inside the calling describe through `OfflineWebSocket`. */
+const useOfflineSocket = () => {
+  beforeAll(() => {
+    config.set('websocket', OfflineWebSocket as any);
+  });
+
+  afterAll(() => {
+    config.set('websocket', undefined as any);
+  });
 };
 
 describeIfWs('E2E WebSocket Tests', () => {
@@ -287,9 +389,12 @@ describeIfWs('E2E WebSocket Tests', () => {
     });
 
     afterAll(async () => {
-      expect(webSocketChannel.isConnected()).toBe(true);
+      // `beforeAll` can fail to connect at all (per-IP rate limiting), leaving the channel
+      // unassigned. Without this guard teardown throws a TypeError, which Jest reports as
+      // "Test suite failed to run", hiding the connection error that actually caused it.
+      if (!webSocketChannel) return;
       webSocketChannel.disconnect();
-      await webSocketChannel.waitForDisconnection();
+      await webSocketChannel.waitForDisconnection().catch(() => undefined);
     });
 
     test('regular rpc endpoint', async () => {
@@ -303,19 +408,30 @@ describeIfWs('E2E WebSocket Tests', () => {
 
     afterEach(async () => {
       // Ensure the channel is always disconnected after each test to prevent open handles.
-      if (webSocketChannel) {
-        webSocketChannel.disconnect();
-        // Some gateways (Pathfinder) never complete the closing handshake while a
-        // subscription is still active, so waitForDisconnection() could hang here.
-        // Bound the wait: the next test always builds a fresh channel, and the node
-        // reclaims the idle socket on its own.
-        await Promise.race([
-          webSocketChannel.waitForDisconnection(),
-          new Promise((resolve) => {
-            setTimeout(resolve, 3000);
-          }),
-        ]);
-      }
+      if (!webSocketChannel) return;
+
+      // Unsubscribe first: a gateway that will not complete the closing handshake of a
+      // still-subscribed socket leaves it in CLOSING for good, and that handle outlives the
+      // whole run. Several tests here call `done()` from inside a subscription handler, so
+      // nothing else drops them. Best-effort and bounded — teardown must not fail or stall
+      // on a dead socket.
+      const subs: Array<{ isClosed: boolean; unsubscribe: () => Promise<boolean> }> = Array.from(
+        ((webSocketChannel as any).activeSubscriptions as Map<string, any>).values()
+      );
+      await withTimeout(
+        Promise.all(subs.filter((s) => !s.isClosed).map((s) => s.unsubscribe().catch(() => false))),
+        2000
+      );
+
+      webSocketChannel.disconnect();
+      // Those same gateways can leave `waitForDisconnection()` hanging, so bound it: the next
+      // test builds a fresh channel and the node reclaims the idle socket on its own. It also
+      // rejects on the socket's `error` event, which some nodes (devnet among them) emit while
+      // closing — a noisy shutdown must not fail the test that just ran.
+      await withTimeout(
+        webSocketChannel.waitForDisconnection().catch(() => undefined),
+        3000
+      );
     });
 
     test('should automatically reconnect on connection drop', (done) => {
@@ -380,10 +496,9 @@ describeIfWs('E2E WebSocket Tests', () => {
               expect(result).toBe(StarknetChainId.SN_SEPOLIA);
               done(); // 4. Test is done when the queued request has been successfully processed.
             })
-            // Report the failure instead of leaving `done()` uncalled. A queued request
-            // carries no timeout of its own, and reconnection giving up does not settle it,
-            // so anything other than the happy path would otherwise hang until Jest's
-            // global 5-minute timeout with no indication of what went wrong.
+            // Report the failure rather than leave `done()` uncalled: a queued request has no
+            // timeout of its own, so the test would otherwise hang until Jest's global one
+            // with no indication of what went wrong.
             .catch(done);
         }
       });
@@ -418,8 +533,7 @@ describeIfWs('E2E WebSocket Tests', () => {
                 done();
               });
             })
-            // See the note on the previous test: report the failure rather than leaving
-            // `done()` uncalled and hanging until the global timeout.
+            // See the note on the previous test.
             .catch(done);
         }
       });
@@ -452,9 +566,8 @@ describeIfWs('E2E WebSocket Tests', () => {
             // Now, simulate a drop
             simulateConnectionDrop(webSocketChannel);
           } catch (error) {
-            // This handler is `async`, so a rejection here would surface as an unobserved
-            // promise rejection and leave `done()` uncalled — the test would hang until the
-            // global timeout instead of reporting the cause.
+            // This handler is `async`: an unobserved rejection would leave `done()` uncalled
+            // and the test hanging until the global timeout instead of reporting the cause.
             done(error);
           }
         }
@@ -466,6 +579,8 @@ describeIfWs('E2E WebSocket Tests', () => {
 });
 
 describe('Unit Test: WebSocketChannel Buffering', () => {
+  useOfflineSocket();
+
   let webSocketChannel: WebSocketChannel;
   let sub: Subscription;
 
@@ -561,6 +676,8 @@ describe('Unit Test: WebSocketChannel Buffering', () => {
 });
 
 describe('Unit Test: Subscription Class', () => {
+  useOfflineSocket();
+
   let mockChannel: WebSocketChannel;
   let subscription: Subscription;
 
@@ -616,6 +733,8 @@ describe('Unit Test: Subscription Class', () => {
 });
 
 describe('Unit Test: WebSocketChannel request id resolution', () => {
+  useOfflineSocket();
+
   let webSocketChannel: WebSocketChannel;
   let sendSpy: jest.SpyInstance;
 
