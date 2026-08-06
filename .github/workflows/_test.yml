@@ -86,12 +86,12 @@ jobs:
         name: run tests
         run: |
           args=()
-          # --forceExit: the WebSocket suite exercises auto-reconnection against a
-          # live gateway that (on Pathfinder) never completes the closing handshake
-          # of a still-subscribed socket, leaving an open handle that would keep
-          # Jest from exiting after the run completes. The `--` lets npm forward the
-          # flag through to Jest.
-          [[ "${{ inputs.protocol }}" == "WS" ]] && args+=( '--forceExit' '__tests__/WebSocket' )
+          # The WS run is restricted to the WebSocket suites; the `--` lets npm forward the
+          # path filter through to Jest. It used to also need --forceExit, because dropping a
+          # still-subscribed socket left a connection the gateway would not release and Jest
+          # never exited; the suite now unsubscribes that socket itself, so a run that hangs
+          # here is a real leak and must not be papered over.
+          [[ "${{ inputs.protocol }}" == "WS" ]] && args+=( '__tests__/WebSocket' )
           npm run test:coverage -- "${args[@]}"
         env:
           TEST_RPC_URL: ${{ steps.node-url.outputs.rpc-url }}
