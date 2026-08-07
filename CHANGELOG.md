@@ -1,3 +1,9 @@
+## [10.6.8](https://github.com/starknet-io/starknet.js/compare/v10.6.7...v10.6.8) (2026-08-07)
+
+### Bug Fixes
+
+- **ws:** close the subscription lifecycle races ([c242c76](https://github.com/starknet-io/starknet.js/commit/c242c76ab73f508ecd454d1d7eb2fde8728c4f9d))
+
 ## [10.6.7](https://github.com/starknet-io/starknet.js/compare/v10.6.6...v10.6.7) (2026-08-06)
 
 ### Bug Fixes
