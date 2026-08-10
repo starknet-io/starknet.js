@@ -56,4 +56,32 @@ describe('BatchClient', () => {
 
     expect(sendBatchSpy).toHaveBeenCalledTimes(1);
   });
+
+  test('sends the batch through an injected transport instead of baseFetch', async () => {
+    const transportRequest = jest.fn(async (body: any) =>
+      body.map((entry: any) => ({ jsonrpc: '2.0', id: entry.id, result: '0x1' }))
+    );
+    const baseFetch = jest.fn();
+
+    const injected = new BatchClient<RPC.Methods>({
+      nodeUrl: provider.channel.nodeUrl,
+      headers: provider.channel.headers,
+      interval: 0,
+      baseFetch: baseFetch as any,
+      transport: { request: transportRequest } as any,
+      rpcMethods: {} as RPC.Methods,
+    });
+
+    const [first, second] = await Promise.all([
+      injected.fetch('starknet_blockNumber'),
+      injected.fetch('starknet_chainId'),
+    ]);
+
+    expect(baseFetch).not.toHaveBeenCalled();
+    expect(transportRequest).toHaveBeenCalledTimes(1);
+    expect(transportRequest.mock.calls[0][0]).toHaveLength(2);
+    // Each caller gets its own reply back, matched on the id it was issued.
+    expect(first.result).toBe('0x1');
+    expect(second.result).toBe('0x1');
+  });
 });
