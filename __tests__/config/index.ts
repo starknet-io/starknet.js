@@ -4,6 +4,7 @@ export * from './helpers/devnetApi';
 export * from './helpers/env';
 export * from './helpers/initDevnetHistory';
 export * from './helpers/logging';
+export * from './helpers/waitUntil';
 export * from './helpers/mockTransport';
 export * from './helpers/mockWebSocket';
 export * from './schema';

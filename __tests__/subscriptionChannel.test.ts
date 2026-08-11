@@ -195,6 +195,29 @@ describe('UNIT TEST: SubscriptionChannel restoration', () => {
     return { mock, transport, channel };
   };
 
+  test('a manual reconnect re-establishes the subscription, like an automatic one', async () => {
+    // Defect §9.1 #1: `reconnect()` used to bring the socket back without its subscriptions.
+    const { mock, transport, channel } = openReconnecting();
+
+    const subscribing = channel.subscribeNewHeads();
+    await wait(5);
+    answerLast(mock, '11');
+    const subscription = await subscribing;
+
+    transport.close();
+    transport.reconnect();
+    mock.last.open();
+    await wait(5);
+    answerLast(mock, '22');
+    await wait(5);
+
+    expect(subscription.isClosed).toBe(false);
+    expect(subscription.id).toBe('22');
+
+    channel.close();
+    transport.close();
+  });
+
   test('re-issues a subscription under a fresh id and keeps its handler', async () => {
     const { mock, transport, channel } = openReconnecting();
 

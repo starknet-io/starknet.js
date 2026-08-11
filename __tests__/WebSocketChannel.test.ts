@@ -13,6 +13,7 @@ import {
   getTestProvider,
   STRKtokenAddress,
   TEST_WS_URL,
+  waitUntil,
 } from './config';
 
 const describeIfWs = TEST_WS_URL ? describe : describe.skip;
@@ -116,33 +117,6 @@ const withTimeout = async (promise: Promise<unknown>, ms: number): Promise<void>
       timer = setTimeout(resolve, ms);
     }),
   ]).finally(() => clearTimeout(timer));
-};
-
-/**
- * Resolve once `predicate()` holds.
- *
- * Subscription tests collect their notifications into an array and assert on it here, rather than
- * counting inside the subscription handler and unsubscribing on the Nth call. A counter cannot
- * express "the events belonging to *my* transaction", and cannot tell them apart from a backlog
- * the node replays at subscription time — which devnet does for `starknet_subscribeEvents`,
- * delivering the previous block's events before anything has happened.
- */
-const waitUntil = async (
-  predicate: () => boolean,
-  timeoutMs = 60_000,
-  /** Ran before each poll. `createBlockForDevnet` when the condition needs a block to happen. */
-  tick?: () => Promise<unknown>
-): Promise<void> => {
-  const deadline = Date.now() + timeoutMs;
-  while (!predicate()) {
-    if (Date.now() > deadline) throw new Error('waitUntil: the condition never became true');
-    // eslint-disable-next-line no-await-in-loop
-    if (tick) await tick();
-    // eslint-disable-next-line no-await-in-loop
-    await new Promise((resolve) => {
-      setTimeout(resolve, 250);
-    });
-  }
 };
 
 /**
@@ -859,6 +833,72 @@ describe('Unit Test: Subscription Class', () => {
     expect(() => {
       subscription.on(handler2);
     }).toThrow('A handler is already attached to this subscription.');
+  });
+
+  test('re-attaching the same handler is a no-op rather than a throw', () => {
+    // React StrictMode invokes an effect twice with the same function. Throwing there fails a
+    // correct component; only a *different* handler is a genuine mistake.
+    const handler = jest.fn();
+
+    subscription.on(handler);
+    expect(() => subscription.on(handler)).not.toThrow();
+
+    subscription._handleEvent({ block_number: 1 } as any);
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  test('off() detaches, and events buffer again until the next on()', () => {
+    const first = jest.fn();
+    subscription.on(first);
+    subscription.off();
+
+    subscription._handleEvent({ block_number: 7 } as any);
+    expect(first).not.toHaveBeenCalled();
+
+    const second = jest.fn();
+    subscription.on(second);
+    expect(second).toHaveBeenCalledWith({ block_number: 7 });
+  });
+
+  test('on() on a closed subscription does nothing instead of throwing', () => {
+    // A closed subscription can never deliver again, so refusing here would force a component to
+    // build a new object for no benefit.
+    subscription.on(jest.fn());
+    subscription._markClosed();
+
+    expect(() => subscription.on(jest.fn())).not.toThrow();
+  });
+
+  test('onClose fires when the node refuses to re-establish the subscription', () => {
+    // The case the connection state cannot cover: the socket stays up, this one subscription dies.
+    const closed = jest.fn();
+    subscription.onClose(closed);
+
+    subscription._markClosed();
+
+    expect(closed).toHaveBeenCalledTimes(1);
+    expect(subscription.isClosed).toBe(true);
+  });
+
+  test('onClose on an already closed subscription fires immediately', () => {
+    // The closure can land between the subscribe call resolving and the consumer wiring its
+    // listener; a listener attached one tick late must not wait forever.
+    subscription._markClosed();
+
+    const closed = jest.fn();
+    subscription.onClose(closed);
+
+    expect(closed).toHaveBeenCalledTimes(1);
+  });
+
+  test('the detach function returned by onClose prevents the call', () => {
+    const closed = jest.fn();
+    const detach = subscription.onClose(closed);
+
+    detach();
+    subscription._markClosed();
+
+    expect(closed).not.toHaveBeenCalled();
   });
 
   test('unsubscribe should be idempotent and only call the channel once', async () => {

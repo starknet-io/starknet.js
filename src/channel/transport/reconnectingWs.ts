@@ -107,7 +107,13 @@ export class ReconnectingWsTransport extends WsTransport {
       // Deliberately not awaited: this runs from a socket event handler, which has nowhere to
       // return a promise to. Failures inside are handled by `completeReconnection` itself.
       this.completeReconnection();
+      return;
     }
+    // A *first* open still has a queue to drain. `request` holds anything issued while the socket
+    // was not yet usable, and that is the normal path for a caller who does not wait for the
+    // connection — `WebSocketProvider.create()` probes the spec version as soon as the transport
+    // exists. Restoration hooks are skipped here on purpose: nothing was subscribed yet.
+    this.processRequestQueue();
   }
 
   protected override onClosed(): void {
@@ -244,11 +250,24 @@ export class ReconnectingWsTransport extends WsTransport {
     });
   }
 
-  /** Manually opens a fresh connection, cancelling the effect of an earlier `close()`. */
+  /**
+   * Manually opens a fresh connection, cancelling the effect of an earlier `close()`.
+   *
+   * Flagged as a reconnection so `onOpened` runs `completeReconnection()`: a manual reconnect owes
+   * the caller exactly what an automatic one delivers — subscriptions restored first, then the
+   * request queue flushed behind them. Without the flag the socket came back empty, which is the
+   * React StrictMode path: mount, cleanup `close()`, remount `reconnect()`, subscriptions
+   * silently lost.
+   *
+   * Reporting `'reconnecting'` rather than `'connecting'` is the honest label, and it keeps
+   * `queuesRequests` true for the gap, so a request issued before the socket opens is queued
+   * instead of refused.
+   */
   public reconnect(): void {
     this.userInitiatedClose = false;
     this.attemptSettled = false;
-    this.setState('connecting');
+    this.isReconnecting = true;
+    this.setState('reconnecting');
     this.swapSocket(new this.WsImplementation(this.nodeUrl));
   }
 

@@ -201,4 +201,59 @@ describe('UNIT TEST: ReconnectingWsTransport', () => {
     expect(mock.sockets).toHaveLength(socketCount);
     expect(transport.getState()).toBe('closed');
   });
+
+  test('a request made before the first connection opens is sent, not stranded', async () => {
+    // The queue is the only place such a request can go — nothing is on the wire yet. It used to
+    // be flushed solely from the reconnection path, so on a *first* open it was never drained and
+    // the caller waited forever. `WebSocketProvider.create()` takes exactly this path: it probes
+    // `starknet_specVersion` as soon as the transport exists.
+    const mock = createMockWebSocket();
+    const transport = new ReconnectingWsTransport({
+      nodeUrl: 'ws://mock',
+      websocket: mock.MockWebSocket as any,
+      requestTimeout: 500,
+      reconnectOptions: RECONNECT,
+    });
+
+    const pending = transport.request({ id: 1, jsonrpc: '2.0', method: 'starknet_specVersion' });
+    mock.last.open();
+    await wait(5);
+    answerLast(mock, '0.10.3');
+
+    await expect(pending).resolves.toMatchObject({ result: '0.10.3' });
+    transport.close();
+  });
+
+  test('reconnect() runs the reconnected hooks, like an automatic reconnection', async () => {
+    // The StrictMode path: mount, cleanup `close()`, remount `reconnect()`. Without the hooks a
+    // manual reconnection comes back with a live socket and no subscriptions.
+    const mock = createMockWebSocket();
+    const transport = opened(mock);
+    const hook = jest.fn().mockResolvedValue(undefined);
+    transport.onReconnected(hook);
+
+    transport.close();
+    transport.reconnect();
+    mock.last.open();
+    await wait(5);
+
+    expect(hook).toHaveBeenCalledTimes(1);
+    transport.close();
+  });
+
+  test('a request issued between reconnect() and the socket opening is queued, not refused', async () => {
+    const mock = createMockWebSocket();
+    const transport = opened(mock);
+
+    transport.close();
+    transport.reconnect();
+    const pending = transport.request({ id: 1, jsonrpc: '2.0', method: 'starknet_chainId' });
+
+    mock.last.open();
+    await wait(5);
+    answerLast(mock, '0x534e5f5345504f4c4941');
+
+    await expect(pending).resolves.toMatchObject({ result: '0x534e5f5345504f4c4941' });
+    transport.close();
+  });
 });
