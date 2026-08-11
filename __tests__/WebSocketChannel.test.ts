@@ -901,7 +901,8 @@ describe('Unit Test: WebSocketChannel subscription lifecycle', () => {
     const sub = await pending;
     expect(sub.isClosed).toBe(false);
 
-    const restoring = (webSocketChannel as any)._restoreSubscriptions();
+    // Restoration lives on the subscription channel the façade delegates to.
+    const restoring = (webSocketChannel as any).subscriptionChannel.restore();
     ws.deliver({ jsonrpc: '2.0', id: 1, error: { code: 1, message: 'subscription refused' } });
     await restoring;
 

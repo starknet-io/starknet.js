@@ -1,8 +1,19 @@
 /* eslint-disable no-underscore-dangle */
 import type { SUBSCRIPTION_ID } from '../../types/api';
 import { logger } from '../../global/logger';
-import type { WebSocketChannel } from './ws_0_10';
 import { EventEmitter } from '../../utils/eventEmitter';
+
+/**
+ * The minimum a `Subscription` needs from whatever channel created it.
+ *
+ * Declared structurally so both `WebSocketChannel` and `SubscriptionChannel` qualify without
+ * either of them being named here — which is what keeps `subscription.ts` from depending on the
+ * classes that depend on it.
+ */
+export type SubscriptionOwner = {
+  unsubscribe(subscriptionId: SUBSCRIPTION_ID): Promise<boolean>;
+  removeSubscription(subscriptionId: SUBSCRIPTION_ID): void;
+};
 
 type SubscriptionEvents<T> = {
   event: T;
@@ -14,8 +25,8 @@ type SubscriptionEvents<T> = {
  * Options for creating a new Subscription instance
  */
 export type SubscriptionOptions = {
-  /** The containing WebSocketChannel instance */
-  channel: WebSocketChannel;
+  /** The channel that created this subscription and can end it */
+  channel: SubscriptionOwner;
   /** The JSON-RPC method used to create this subscription */
   method: string;
   /** The parameters used to create this subscription (optional, defaults to empty object) */
@@ -51,10 +62,10 @@ export type SubscriptionOptions = {
  */
 export class Subscription<T = any> {
   /**
-   * The containing `WebSocketChannel` instance.
+   * The channel that created this subscription.
    * @internal
    */
-  public channel: WebSocketChannel;
+  public channel: SubscriptionOwner;
 
   /**
    * The JSON-RPC method used to create this subscription.
