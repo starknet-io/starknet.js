@@ -76,4 +76,22 @@ describe('Should test StarknetId utils', () => {
     // no name before .stark — invalid
     expect(isStarkDomain('.stark')).toBe(false);
   });
+
+  test('Should accept bigAlphabet characters that the encoder supports', () => {
+    // '这' and '来' are the two bigAlphabet characters used by useEncoded/useDecoded.
+    // The encoder round-trips names containing them, so the guard must accept them too,
+    // otherwise getAddressFromStarkName rejects names the same version encodes correctly.
+    expect(isStarkDomain('来baba这.stark')).toBe(true);
+    expect(isStarkDomain('starknet这.stark')).toBe(true);
+    expect(isStarkDomain('这.stark')).toBe(true);
+
+    // guard stays consistent with the encoder for the same name
+    const name = '来baba这';
+    expect(useDecoded([useEncoded(name)])).toBe(`${name}.stark`);
+    expect(isStarkDomain(`${name}.stark`)).toBe(true);
+
+    // both bigAlphabet chars are single UTF-16 units, so the 48-char label limit is unchanged
+    expect(isStarkDomain(`${'来'.repeat(48)}.stark`)).toBe(true);
+    expect(isStarkDomain(`${'来'.repeat(49)}.stark`)).toBe(false);
+  });
 });

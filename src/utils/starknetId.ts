@@ -424,7 +424,12 @@ export function isStarkDomain(domain: string): boolean {
       label.length > 0 &&
       label.length <= 48 &&
       [...label].every((char) => {
-        return (char >= 'a' && char <= 'z') || (char >= '0' && char <= '9') || char === '-';
+        return (
+          (char >= 'a' && char <= 'z') ||
+          (char >= '0' && char <= '9') ||
+          char === '-' ||
+          bigAlphabet.includes(char)
+        );
       })
     );
   });
