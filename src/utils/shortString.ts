@@ -119,7 +119,9 @@ export function splitLongString(longStr: string): string[] {
 export function encodeShortString(str: string): string {
   if (!isASCII(str)) throw new Error(`${str} is not an ASCII string`);
   if (!isShortString(str)) throw new Error(`${str} is too long`);
-  return addHexPrefix(str.replace(/./g, (char) => char.charCodeAt(0).toString(16)));
+  return addHexPrefix(
+    str.replace(/[\s\S]/g, (char) => char.charCodeAt(0).toString(16).padStart(2, '0'))
+  );
 }
 
 /**

@@ -12,6 +12,14 @@ describe('shortString', () => {
     expect(encodeShortString('hello')).toMatchInlineSnapshot(`"0x68656c6c6f"`);
   });
 
+  test('should zero-pad control chars and round-trip', () => {
+    // 0x09 (tab) is a valid ASCII char < 0x10; without padding it would emit a
+    // single nibble and misalign every following byte.
+    expect(encodeShortString('a\tb')).toBe('0x610962');
+    expect(decodeShortString(encodeShortString('a\tb'))).toBe('a\tb');
+    expect(decodeShortString(encodeShortString('a\nb'))).toBe('a\nb');
+  });
+
   test('should throw if string to encode is too long', () => {
     expect(() =>
       encodeShortString('hello world hello world hello world hello world hello world hello world')
