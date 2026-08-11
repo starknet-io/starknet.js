@@ -7,7 +7,13 @@ import {
   config,
 } from '../src';
 import { logger } from '../src/global/logger';
-import { getTestAccount, getTestProvider, STRKtokenAddress, TEST_WS_URL } from './config';
+import {
+  createBlockForDevnet,
+  getTestAccount,
+  getTestProvider,
+  STRKtokenAddress,
+  TEST_WS_URL,
+} from './config';
 
 const describeIfWs = TEST_WS_URL ? describe : describe.skip;
 const NODE_URL = TEST_WS_URL!;
@@ -110,6 +116,33 @@ const withTimeout = async (promise: Promise<unknown>, ms: number): Promise<void>
       timer = setTimeout(resolve, ms);
     }),
   ]).finally(() => clearTimeout(timer));
+};
+
+/**
+ * Resolve once `predicate()` holds.
+ *
+ * Subscription tests collect their notifications into an array and assert on it here, rather than
+ * counting inside the subscription handler and unsubscribing on the Nth call. A counter cannot
+ * express "the events belonging to *my* transaction", and cannot tell them apart from a backlog
+ * the node replays at subscription time — which devnet does for `starknet_subscribeEvents`,
+ * delivering the previous block's events before anything has happened.
+ */
+const waitUntil = async (
+  predicate: () => boolean,
+  timeoutMs = 60_000,
+  /** Ran before each poll. `createBlockForDevnet` when the condition needs a block to happen. */
+  tick?: () => Promise<unknown>
+): Promise<void> => {
+  const deadline = Date.now() + timeoutMs;
+  while (!predicate()) {
+    if (Date.now() > deadline) throw new Error('waitUntil: the condition never became true');
+    // eslint-disable-next-line no-await-in-loop
+    if (tick) await tick();
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve) => {
+      setTimeout(resolve, 250);
+    });
+  }
 };
 
 /**
@@ -297,35 +330,55 @@ describeIfWs('E2E WebSocket Tests', () => {
       const sub: SubscriptionNewHeadsEvent = await webSocketChannel.subscribeNewHeads();
       expect(sub).toBeInstanceOf(Subscription);
 
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        if (i === 2) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
+      const received: unknown[] = [];
+      sub.on((result) => {
+        received.push(result);
       });
 
-      await webSocketChannel.waitForUnsubscription(sub.id);
+      // devnet mints a block only on demand, so waiting for two would wait forever. Off devnet
+      // `createBlockForDevnet()` is a no-op and the chain produces them on its own.
+      await createBlockForDevnet();
+      await createBlockForDevnet();
+      await waitUntil(() => received.length >= 2);
+      received.forEach((result) => expect(result).toBeDefined());
+
+      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
+      // resolved by the unsubscription itself, so arming it afterwards waits on something that
+      // has already happened — forever, since it carries no timeout of its own.
+      const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
+      const status = await sub.unsubscribe();
+      expect(status).toBe(true);
+      await unsubscribed;
     });
 
     test('Test subscribeEvents', async () => {
       const sub = await webSocketChannel.subscribeEvents();
       expect(sub).toBeInstanceOf(Subscription);
 
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('keys');
-        if (i === 5) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
+      const received: any[] = [];
+      sub.on((result) => {
+        received.push(result);
       });
 
-      await webSocketChannel.waitForUnsubscription(sub.id);
+      const { transaction_hash } = await account.execute({
+        contractAddress: STRKtokenAddress,
+        entrypoint: 'transfer',
+        calldata: [account.address, '10', '0'],
+      });
+
+      // Only this transaction's events count: devnet replays the previous block's events at
+      // subscription time, and a public node carries everyone else's traffic.
+      const mine = () => received.filter((e) => e.transaction_hash === transaction_hash);
+      await waitUntil(() => mine().length >= 2);
+      mine().forEach((result) => expect(result).toHaveProperty('keys'));
+
+      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
+      // resolved by the unsubscription itself, so arming it afterwards waits on something that
+      // has already happened — forever, since it carries no timeout of its own.
+      const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
+      const status = await sub.unsubscribe();
+      expect(status).toBe(true);
+      await unsubscribed;
     });
 
     test('Test subscribeEvents with finality status filter', async () => {
@@ -334,36 +387,56 @@ describeIfWs('E2E WebSocket Tests', () => {
       });
       expect(sub).toBeInstanceOf(Subscription);
 
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('keys');
-        if (i === 2) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
+      const received: any[] = [];
+      sub.on((result) => {
+        received.push(result);
       });
 
-      await webSocketChannel.waitForUnsubscription(sub.id);
+      const { transaction_hash } = await account.execute({
+        contractAddress: STRKtokenAddress,
+        entrypoint: 'transfer',
+        calldata: [account.address, '10', '0'],
+      });
+
+      const mine = () => received.filter((e) => e.transaction_hash === transaction_hash);
+      await waitUntil(() => mine().length >= 2);
+      mine().forEach((result) => expect(result).toHaveProperty('keys'));
+
+      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
+      // resolved by the unsubscription itself, so arming it afterwards waits on something that
+      // has already happened — forever, since it carries no timeout of its own.
+      const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
+      const status = await sub.unsubscribe();
+      expect(status).toBe(true);
+      await unsubscribed;
     });
 
     test('Test subscribeNewTransactionReceipts', async () => {
       const sub = await webSocketChannel.subscribeNewTransactionReceipts();
       expect(sub).toBeInstanceOf(Subscription);
 
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('execution_status');
-        if (i === 2) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
+      const received: any[] = [];
+      sub.on((result) => {
+        received.push(result);
       });
 
-      await webSocketChannel.waitForUnsubscription(sub.id);
+      const { transaction_hash } = await account.execute({
+        contractAddress: STRKtokenAddress,
+        entrypoint: 'transfer',
+        calldata: [account.address, '10', '0'],
+      });
+
+      const mine = () => received.filter((r) => r.transaction_hash === transaction_hash);
+      await waitUntil(() => mine().length >= 1);
+      expect(mine()[0]).toHaveProperty('execution_status');
+
+      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
+      // resolved by the unsubscription itself, so arming it afterwards waits on something that
+      // has already happened — forever, since it carries no timeout of its own.
+      const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
+      const status = await sub.unsubscribe();
+      expect(status).toBe(true);
+      await unsubscribed;
     });
 
     test('Test subscribeNewTransactionReceipts with finality status filter', async () => {
@@ -372,36 +445,56 @@ describeIfWs('E2E WebSocket Tests', () => {
       });
       expect(sub).toBeInstanceOf(Subscription);
 
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('execution_status');
-        if (i === 1) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
+      const received: any[] = [];
+      sub.on((result) => {
+        received.push(result);
       });
 
-      await webSocketChannel.waitForUnsubscription(sub.id);
+      const { transaction_hash } = await account.execute({
+        contractAddress: STRKtokenAddress,
+        entrypoint: 'transfer',
+        calldata: [account.address, '10', '0'],
+      });
+
+      const mine = () => received.filter((r) => r.transaction_hash === transaction_hash);
+      await waitUntil(() => mine().length >= 1);
+      expect(mine()[0]).toHaveProperty('execution_status');
+
+      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
+      // resolved by the unsubscription itself, so arming it afterwards waits on something that
+      // has already happened — forever, since it carries no timeout of its own.
+      const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
+      const status = await sub.unsubscribe();
+      expect(status).toBe(true);
+      await unsubscribed;
     });
 
     test('Test subscribeNewTransactions', async () => {
       const sub = await webSocketChannel.subscribeNewTransactions();
       expect(sub).toBeInstanceOf(Subscription);
 
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('nonce');
-        if (i === 2) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
+      const received: any[] = [];
+      sub.on((result) => {
+        received.push(result);
       });
 
-      await webSocketChannel.waitForUnsubscription(sub.id);
+      const { transaction_hash } = await account.execute({
+        contractAddress: STRKtokenAddress,
+        entrypoint: 'transfer',
+        calldata: [account.address, '10', '0'],
+      });
+
+      const mine = () => received.filter((t) => t.transaction_hash === transaction_hash);
+      await waitUntil(() => mine().length >= 1);
+      expect(mine()[0]).toHaveProperty('nonce');
+
+      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
+      // resolved by the unsubscription itself, so arming it afterwards waits on something that
+      // has already happened — forever, since it carries no timeout of its own.
+      const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
+      const status = await sub.unsubscribe();
+      expect(status).toBe(true);
+      await unsubscribed;
     });
 
     test('Test subscribeNewTransactions with finality status filter', async () => {
@@ -410,18 +503,28 @@ describeIfWs('E2E WebSocket Tests', () => {
       });
       expect(sub).toBeInstanceOf(Subscription);
 
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('nonce');
-        if (i === 1) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
+      const received: any[] = [];
+      sub.on((result) => {
+        received.push(result);
       });
 
-      await webSocketChannel.waitForUnsubscription(sub.id);
+      const { transaction_hash } = await account.execute({
+        contractAddress: STRKtokenAddress,
+        entrypoint: 'transfer',
+        calldata: [account.address, '10', '0'],
+      });
+
+      const mine = () => received.filter((t) => t.transaction_hash === transaction_hash);
+      await waitUntil(() => mine().length >= 1);
+      expect(mine()[0]).toHaveProperty('nonce');
+
+      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
+      // resolved by the unsubscription itself, so arming it afterwards waits on something that
+      // has already happened — forever, since it carries no timeout of its own.
+      const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
+      const status = await sub.unsubscribe();
+      expect(status).toBe(true);
+      await unsubscribed;
     });
 
     test('Test subscribeTransactionStatus', async () => {
@@ -574,76 +677,53 @@ describeIfWs('E2E WebSocket Tests', () => {
       });
     });
 
-    test('should queue subscribe requests when reconnecting and process them after', (done) => {
+    test('should queue subscribe requests when reconnecting and process them after', async () => {
       webSocketChannel = new WebSocketChannel({
         nodeUrl: NODE_URL,
         reconnectOptions: { retries: 5, delay: 1000, exponential: false },
       });
+      await webSocketChannel.waitForConnection();
 
-      let hasReconnected = false;
-      webSocketChannel.on('open', () => {
-        if (hasReconnected) {
-          // Reconnected. The promise from the queued subscribeNewHeads will resolve now.
-        } else {
-          // 1. First connection, now simulate a drop
-          hasReconnected = true;
-          simulateConnectionDrop(webSocketChannel);
+      // Drop, then subscribe straight away: the request cannot reach the wire, so it can only
+      // be queued. Resolving at all is therefore the proof that the queue was processed.
+      simulateConnectionDrop(webSocketChannel);
+      const sub = await webSocketChannel.subscribeNewHeads();
 
-          // 2. Immediately try to subscribe. The request should be queued.
-          webSocketChannel
-            .subscribeNewHeads()
-            .then((sub) => {
-              // 3. This should only execute after reconnection.
-              expect(sub).toBeInstanceOf(Subscription);
-              expect(webSocketChannel.isConnected()).toBe(true);
+      expect(sub).toBeInstanceOf(Subscription);
+      expect(webSocketChannel.isConnected()).toBe(true);
 
-              // 4. To prove it's a real subscription, wait for one event.
-              sub.on((data) => {
-                expect(data).toBeDefined();
-                done();
-              });
-            })
-            // See the note on the previous test.
-            .catch(done);
-        }
+      // And it is a real subscription, not just a resolved promise.
+      const received: unknown[] = [];
+      sub.on((data) => {
+        received.push(data);
       });
+      await waitUntil(() => received.length > 0, 30_000, createBlockForDevnet);
+      expect(received[0]).toBeDefined();
     });
 
-    test('should restore active subscriptions after an automatic reconnection', (done) => {
+    test('should restore active subscriptions after an automatic reconnection', async () => {
       webSocketChannel = new WebSocketChannel({
         nodeUrl: NODE_URL,
         reconnectOptions: { retries: 5, delay: 1000, exponential: false },
       });
+      await webSocketChannel.waitForConnection();
 
-      let connectionCount = 0;
-
-      const eventHandler = (data: any) => {
-        // The handler is called. If this is after the reconnection (connectionCount > 1),
-        // it proves the subscription was successfully restored.
-        if (connectionCount > 1) {
-          expect(data).toBeDefined();
-          done();
-        }
-      };
-
-      webSocketChannel.on('open', async () => {
-        connectionCount += 1;
-        if (connectionCount === 1) {
-          try {
-            // First connection: set up the subscription
-            const sub = await webSocketChannel.subscribeNewHeads();
-            sub.on(eventHandler);
-            // Now, simulate a drop
-            simulateConnectionDrop(webSocketChannel);
-          } catch (error) {
-            // This handler is `async`: an unobserved rejection would leave `done()` uncalled
-            // and the test hanging until the global timeout instead of reporting the cause.
-            done(error);
-          }
-        }
-        // On the second 'open' event (connectionCount === 2), the test will implicitly
-        // be waiting for the eventHandler to be called, which will resolve the test.
+      const sub = await webSocketChannel.subscribeNewHeads();
+      const received: unknown[] = [];
+      sub.on((data) => {
+        received.push(data);
       });
+
+      simulateConnectionDrop(webSocketChannel);
+      await waitUntil(() => webSocketChannel.isConnected(), 30_000);
+      // Only what arrives after the reconnection can prove the subscription was restored.
+      received.length = 0;
+
+      // Restoration completes after the socket reports itself open, and devnet mints nothing on
+      // its own, so keep asking for a block until an event lands. Off devnet the tick is a no-op
+      // and the chain's own cadence provides it.
+      await waitUntil(() => received.length > 0, 30_000, createBlockForDevnet);
+      expect(received[0]).toBeDefined();
     });
   });
 });
@@ -1039,5 +1119,44 @@ describe('Unit Test: WebSocketChannel request id resolution', () => {
     // The managed counter is independent of user-set ids, and starts at 0.
     expect(webSocketChannel.send('starknet_chainId')).toBe(0);
     expect(webSocketChannel.send('starknet_chainId')).toBe(1);
+  });
+});
+
+describe('Unit Test: WebSocketChannel waitForDisconnection', () => {
+  useOfflineSocket();
+
+  let webSocketChannel: WebSocketChannel;
+
+  beforeEach(() => {
+    webSocketChannel = new WebSocketChannel({ nodeUrl: 'ws://dummy-url', autoReconnect: false });
+  });
+
+  afterEach(() => {
+    webSocketChannel.disconnect();
+  });
+
+  test('resolves when the peer closes uncleanly, error first', async () => {
+    const socket = webSocketChannel.websocket as any;
+    socket.readyState = OfflineWebSocket.OPEN;
+    const waiting = webSocketChannel.waitForDisconnection();
+
+    // What devnet produces: it answers a client `close()` by dropping the TCP connection, so the
+    // socket is already leaving OPEN when the error lands and the close follows right after.
+    socket.readyState = OfflineWebSocket.CLOSING;
+    socket.dispatchEvent(new Event('error'));
+    socket.close();
+
+    await expect(waiting).resolves.toBe(OfflineWebSocket.CLOSED);
+  });
+
+  test('still rejects on an error that leaves the socket open', async () => {
+    const socket = webSocketChannel.websocket as any;
+    socket.readyState = OfflineWebSocket.OPEN;
+    const waiting = webSocketChannel.waitForDisconnection();
+
+    const failure = new Event('error');
+    socket.dispatchEvent(failure);
+
+    await expect(waiting).rejects.toBe(failure);
   });
 });

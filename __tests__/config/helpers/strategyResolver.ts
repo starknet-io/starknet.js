@@ -1,6 +1,10 @@
 /* eslint-disable no-console */
 import accountResolver from './accountResolver';
-import { GS_DEFAULT_TEST_PROVIDER_URL, LOCAL_DEVNET_NOT_RUNNING_MESSAGE } from '../constants';
+import {
+  GS_DEFAULT_TEST_PROVIDER_URL,
+  GS_DEFAULT_TEST_WS_URL,
+  LOCAL_DEVNET_NOT_RUNNING_MESSAGE,
+} from '../constants';
 import { setIfNullish } from './env';
 import { RpcProvider } from '../../../src';
 import { DEFAULT_GLOBAL_CONFIG } from '../../../src/global/constants';
@@ -60,6 +64,13 @@ class StrategyResolver {
 
     if (!hasRpcUrl && this.isDevnet) {
       process.env.TEST_RPC_URL = GS_DEFAULT_TEST_PROVIDER_URL;
+    }
+
+    // Only fills a gap: an explicit TEST_WS_URL points at a node the caller chose, and must never
+    // be replaced by the local devnet's socket. Without this the WebSocket suites have no url on
+    // devnet and skip entirely, which is why they had never run there.
+    if (this.isDevnet) {
+      process.env.TEST_WS_URL ??= GS_DEFAULT_TEST_WS_URL;
     }
 
     setIfNullish('IS_RPC', this.isRpcNode);

@@ -376,6 +376,13 @@ export class WebSocketChannel {
         resolve(this.websocket.readyState);
       });
       const offError = this.transport.on('error', (event) => {
+        // An `error` the socket does not survive belongs to the disconnection, not to a failure
+        // of it. starknet-devnet answers a client `close()` by dropping the TCP connection, so
+        // Node reports `error` then `close` 1006; rejecting there would fail on the peer's
+        // rudeness while the socket does exactly what was awaited. The `close` is still coming,
+        // so the waiter stays armed. An error on a socket that is still OPEN is a different
+        // matter and keeps rejecting, unchanged.
+        if (this.websocket.readyState !== WebSocket.OPEN) return;
         settle();
         reject(event);
       });

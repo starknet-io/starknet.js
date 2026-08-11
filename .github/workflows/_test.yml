@@ -60,14 +60,16 @@ jobs:
         if: ${{ !inputs.ignore-scripts }}
       - id: node-url
         name: resolve node urls
-        # Against the devnet service started above, the url is fixed. Otherwise the
-        # urls are built from the Starknet Foundation base domain:
+        # Against the devnet service started above, both urls are fixed — devnet serves
+        # plain JSON-RPC and subscriptions on a dedicated /ws path. Otherwise the urls
+        # are built from the Starknet Foundation base domain:
         #   https://sepolia.<domain>/<node>/rpc/<version>
         #   wss://sepolia.<domain>/<node>/ws/<version>
         # The WS suites also drive an account, so an rpc url is always needed.
         run: |
           if [ "$USE_DEVNET" = 'true' ]; then
             rpc_url='http://127.0.0.1:5050/rpc'
+            ws_url='ws://127.0.0.1:5050/ws'
           elif [ -n "$SNF_NODE_URL" ] && [ -n "$NODE" ] && [ -n "$VERSION" ]; then
             base="sepolia.$SNF_NODE_URL/$NODE"
             rpc_url="https://$base/rpc/$VERSION"
