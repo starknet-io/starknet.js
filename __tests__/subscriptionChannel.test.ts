@@ -2,7 +2,7 @@ import { RPC0102, RPC0103, RPC09 } from '../src';
 import { SubscriptionChannel } from '../src/channel/ws/subscriptionChannel';
 import { ReconnectingWsTransport, WsTransport } from '../src/channel/transport';
 import { RpcError, WebSocketNotConnectedError } from '../src/utils/errors';
-import { createMockWebSocket } from './config';
+import { createMockWebSocket, withoutErrorLogs } from './config';
 
 /**
  * A transport wired to a mock socket, already open, plus the handles a test needs to answer
@@ -242,12 +242,16 @@ describe('UNIT TEST: SubscriptionChannel restoration', () => {
     await wait(5);
 
     const resent = mock.last.sentBodies;
-    mock.last.reply({
-      jsonrpc: '2.0',
-      id: resent[resent.length - 1].id,
-      error: { code: 66, message: 'Too many subscriptions' },
+    // The refusal is logged on the way through; that is the behaviour under test, but it must
+    // not print under a passing run.
+    await withoutErrorLogs(async () => {
+      mock.last.reply({
+        jsonrpc: '2.0',
+        id: resent[resent.length - 1].id,
+        error: { code: 66, message: 'Too many subscriptions' },
+      });
+      await wait(5);
     });
-    await wait(5);
 
     expect(subscription.isClosed).toBe(true);
 

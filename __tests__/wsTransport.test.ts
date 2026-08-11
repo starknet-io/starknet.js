@@ -1,6 +1,6 @@
 import { WsTransport } from '../src/channel/transport';
 import { TimeoutError, WebSocketNotConnectedError } from '../src/utils/errors';
-import { createMockWebSocket } from './config';
+import { createMockWebSocket, withoutErrorLogs } from './config';
 
 describe('UNIT TEST: WsTransport lifecycle', () => {
   const opened: WsTransport[] = [];
@@ -278,7 +278,9 @@ describe('UNIT TEST: WsTransport requests', () => {
     await Promise.resolve();
     const ev: any = new Event('message');
     ev.data = 'not json at all';
-    mock.last.dispatchEvent(ev);
+    // The transport logs the parse failure; that is the point, but it must not print under a
+    // passing run.
+    await withoutErrorLogs(() => mock.last.dispatchEvent(ev));
 
     await expect(pending).rejects.toBeInstanceOf(TimeoutError);
   });
