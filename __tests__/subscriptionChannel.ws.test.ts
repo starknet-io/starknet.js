@@ -1,33 +1,33 @@
 import { RPC0103, WsTransport } from '../src';
-import { createBlockForDevnet, describeIfDevnet, getTestProvider } from './config';
+import { createBlockForDevnet, describeIfWs, TEST_WS_URL, withTimeout } from './config';
 
 /**
- * Real subscriptions against devnet's WebSocket endpoint.
+ * Real subscriptions over a real socket.
  *
  * devnet does not mint blocks on a timer — it makes one per transaction — so a `newHeads`
  * subscription observes nothing until something creates a block. `createBlockForDevnet()` is
  * that lever, and it is why this test drives its own events instead of waiting for the chain.
- *
- * The URL is derived locally: devnet serves its socket on a dedicated `/ws` path, which is not a
- * general rule (Pathfinder serves it on the same path as HTTP, differing only by scheme). Giving
- * the whole suite a WebSocket URL is Lot A's job.
+ * Off devnet it is a no-op and the chain provides its own cadence.
  */
-describeIfDevnet('E2E: SubscriptionChannel over a real socket', () => {
-  let wsUrl: string;
+describeIfWs('E2E: SubscriptionChannel over a real socket', () => {
+  const wsUrl = TEST_WS_URL!;
   let transport: WsTransport;
   let channel: RPC0103.SubscriptionChannel;
-
-  beforeAll(() => {
-    const { nodeUrl } = getTestProvider().channel;
-    wsUrl = `${nodeUrl.replace(/^http/, 'ws').replace(/\/[^/]*$/, '')}/ws`;
-  });
 
   beforeEach(() => {
     transport = new WsTransport({ nodeUrl: wsUrl, requestTimeout: 15_000 });
     channel = new RPC0103.SubscriptionChannel({ transport });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    // Unsubscribe before closing, and do not assume a test did it. A gateway that will not
+    // complete the closing handshake of a still-subscribed socket leaves it in CLOSING for good,
+    // and that handle outlives the whole run — measured against Pathfinder. devnet drops the
+    // connection instead, which hides the problem rather than removing it. Bounded, because a
+    // node that has stopped answering must not stall teardown.
+    const live = Array.from(channel.subscriptions.values()).filter((sub) => !sub.isClosed);
+    await withTimeout(Promise.all(live.map((sub) => sub.unsubscribe().catch(() => false))), 2000);
+
     channel.close();
     transport.close();
   });

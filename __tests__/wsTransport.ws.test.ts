@@ -1,23 +1,16 @@
 import { RPC0102, RPC0103, RPC09, WsTransport } from '../src';
-import { describeIfDevnet, getTestProvider } from './config';
+import { describeIfWs, TEST_WS_URL } from './config';
 
 /**
  * The point of Lot C1, stated as a test: the versioned request channels were not modified, and
  * they now work over a WebSocket purely by being handed a different transport.
  *
- * Devnet only. It serves plain JSON-RPC — not just subscriptions — on its `/ws` endpoint, which
- * is what makes this runnable without a public node. Deriving a WebSocket URL for the whole
- * suite is Lot A's job; until then this file derives its own.
+ * Runs wherever a socket is available. The node must serve plain JSON-RPC on it, not only
+ * subscriptions — devnet and Pathfinder both do.
  */
-describeIfDevnet('E2E: versioned channels over WsTransport', () => {
-  let wsUrl: string;
+describeIfWs('E2E: versioned channels over WsTransport', () => {
+  const wsUrl = TEST_WS_URL!;
   let transport: WsTransport;
-
-  beforeAll(() => {
-    const { nodeUrl } = getTestProvider().channel;
-    // http://127.0.0.1:5050/rpc → ws://127.0.0.1:5050/ws
-    wsUrl = `${nodeUrl.replace(/^http/, 'ws').replace(/\/[^/]*$/, '')}/ws`;
-  });
 
   beforeEach(() => {
     transport = new WsTransport({ nodeUrl: wsUrl, requestTimeout: 10_000 });

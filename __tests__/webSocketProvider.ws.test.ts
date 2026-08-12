@@ -1,26 +1,34 @@
 import { WebSocketProvider } from '../src';
-import { createBlockForDevnet, describeIfDevnet, getTestProvider, waitUntil } from './config';
+import {
+  createBlockForDevnet,
+  describeIfWs,
+  getTestProvider,
+  TEST_WS_URL,
+  waitUntil,
+} from './config';
 
 /**
  * The point of the whole transport design, against a real node: one socket serving both plain
  * JSON-RPC and subscriptions, through a provider that behaves like any other.
- *
- * Devnet only. It serves both on its `/ws` endpoint, which is what makes this runnable without a
- * public node.
  */
-describeIfDevnet('E2E: WebSocketProvider over a real socket', () => {
-  let wsUrl: string;
+describeIfWs('E2E: WebSocketProvider over a real socket', () => {
+  const wsUrl = TEST_WS_URL!;
   let provider: WebSocketProvider;
 
-  beforeAll(() => {
-    const { nodeUrl } = getTestProvider().channel;
-    // http://127.0.0.1:5050/rpc → ws://127.0.0.1:5050/ws
-    wsUrl = `${nodeUrl.replace(/^http/, 'ws').replace(/\/[^/]*$/, '')}/ws`;
-  });
+  afterEach(async () => {
+    if (!provider) return;
 
-  afterEach(() => {
+    // Unsubscribe first, and do not assume the test got that far. A gateway that will not
+    // complete the closing handshake of a still-subscribed socket leaves it in CLOSING for good,
+    // and that handle outlives the whole run — measured against Pathfinder. A test that fails
+    // before its own `unsubscribe()` must not turn into a run that never exits.
+    const live = Array.from(provider.subscriptions.subscriptions.values()).filter(
+      (sub) => !sub.isClosed
+    );
+    await Promise.all(live.map((sub) => sub.unsubscribe().catch(() => false)));
+
     // The socket is a libuv handle the event loop holds onto; nothing collects it on its own.
-    provider?.transport.close();
+    provider.transport.close();
   });
 
   test('create() probes the node and serves requests over the socket', async () => {
@@ -48,7 +56,11 @@ describeIfDevnet('E2E: WebSocketProvider over a real socket', () => {
     await waitUntil(() => received.length >= 1, 30_000, createBlockForDevnet);
     const after = await provider.getBlockNumber();
 
-    expect(after).toBeGreaterThan(before);
+    // Not `toBeGreaterThan`: a public node announces a head over the subscription before
+    // `starknet_blockNumber` reports it, so requiring the request to have caught up asserts an
+    // ordering no node promises. What this test owes is that both halves work on one socket —
+    // a request answers, a notification arrives — and that the chain has not gone backwards.
+    expect(after).toBeGreaterThanOrEqual(before);
     expect(received[0]).toBeDefined();
 
     expect(await sub.unsubscribe()).toBe(true);
