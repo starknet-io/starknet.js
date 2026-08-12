@@ -29,29 +29,39 @@ const NODE_FACTORY = /createTestProvider|getTestAccount|getTestProvider/;
  * file is evaluated before any module resolution the test config would need, and importing the
  * test helpers here would pull `src` into config loading. */
 const DEVNET_RPC_URL = 'http://127.0.0.1:5050/';
-const DEVNET_WS_URL = 'ws://127.0.0.1:5050/ws';
 
 /**
- * Is a devnet answering on the default port?
+ * Is the node at `rpcUrl` a devnet?
  *
- * The config is evaluated **before** `globalSetup`, so the WebSocket url devnet runs derive there
- * does not exist yet — and the projects have to be declared now. Hence this probe, a single
- * `starknet_syncing` POST with a short deadline.
+ * Asked of the **configured** url, never inferred from the absence of one: CI hands devnet's url
+ * in explicitly, so keying off "nothing was provided" classified the CI devnet job as a public
+ * node and let the batch suite run over a socket that refuses batches.
+ *
+ * `devnet_getPredeployedAccounts` is the question, not `starknet_syncing`: every node answers the
+ * latter, so it proves a node is there and nothing more. A real node answers this one with
+ * `-32601 Method not found`.
+ *
+ * The config is evaluated **before** `globalSetup`, so the WebSocket url a devnet run derives
+ * there does not exist yet, and the projects have to be declared now — hence the probe here.
  */
-const devnetIsUp = async (): Promise<boolean> => {
+const isDevnetNode = async (rpcUrl: string): Promise<boolean> => {
   try {
-    const response = await fetch(DEVNET_RPC_URL, {
+    const response = await fetch(rpcUrl, {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'starknet_syncing' }),
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'devnet_getPredeployedAccounts' }),
       signal: AbortSignal.timeout(2000),
     });
-    const { jsonrpc } = (await response.json()) as { jsonrpc?: string };
-    return jsonrpc === '2.0';
+    const body = (await response.json()) as { result?: unknown };
+    return Array.isArray(body?.result);
   } catch {
     return false;
   }
 };
+
+/** `http://host:5050/rpc` → `ws://host:5050/ws`, devnet's dedicated socket path. */
+const devnetWsUrlFor = (rpcUrl: string): string =>
+  `${rpcUrl.replace(/^http/, 'ws').replace(/\/[^/]*$/, '')}/ws`;
 
 const testFilesUnder = (dir: string): string[] =>
   readdirSync(dir, { recursive: true, encoding: 'utf8' })
@@ -67,14 +77,14 @@ export default async (): Promise<Config> => {
   );
   const unit = all.filter((file) => !wsSpecific.includes(file) && !nodeTouching.includes(file));
 
-  // Mirrors `strategyResolver`: the url is only derived when nothing was provided, and only for a
-  // devnet the caller did not configure away.
-  const usesProvidedSetup = !!(
-    process.env.TEST_ACCOUNT_ADDRESS && process.env.TEST_ACCOUNT_PRIVATE_KEY
-  );
-  const isDevnet = !usesProvidedSetup && !process.env.TEST_RPC_URL && (await devnetIsUp());
+  // Whatever the caller pointed at, falling back to the local devnet the way `strategyResolver`
+  // does. Asking the node itself is what makes this hold in CI, which supplies the url.
+  const rpcUrl = process.env.TEST_RPC_URL || DEVNET_RPC_URL;
+  const isDevnet = await isDevnetNode(rpcUrl);
   if (isDevnet) {
-    process.env.TEST_WS_URL ??= DEVNET_WS_URL;
+    // Derived from the rpc url rather than hardcoded, so a devnet reached at another host still
+    // gets its own socket. Only fills a gap — an explicit TEST_WS_URL always wins.
+    process.env.TEST_WS_URL ??= devnetWsUrlFor(rpcUrl);
   }
   const hasWs = !!process.env.TEST_WS_URL;
 
