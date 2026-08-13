@@ -5,7 +5,6 @@ import {
   createTestProvider,
   describeIfDevnet,
   describeIfNotDevnet,
-  describeIfRpc,
   describeIfTestnet,
   ETHtokenAddress,
   STRKtokenAddress,
@@ -61,7 +60,7 @@ function expectZeroTipEstimate() {
   };
 }
 
-describeIfRpc('RPCProvider', () => {
+describe('RPCProvider', () => {
   let rpcProvider: RpcProvider;
   let provider: ProviderInterface;
   let account: Account;
@@ -496,7 +495,7 @@ describeIfRpc('RPCProvider', () => {
   });
 
   describe('Tip Estimation', () => {
-    describeIfRpc('getEstimateTip', () => {
+    describe('getEstimateTip', () => {
       test('should estimate tip from latest block or handle insufficient data', async () => {
         const tipEstimate = await rpcProvider.getEstimateTip('latest', {
           minTxsNecessary: 1, // Use low threshold for test reliability

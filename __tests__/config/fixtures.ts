@@ -24,7 +24,6 @@ const describeIf = (condition: boolean) => (condition ? describe : describe.skip
  * without anything being exported; elsewhere it follows `TEST_WS_URL`.
  */
 export const describeIfWs = describeIf(!!TEST_WS_URL);
-export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
 export const describeIfNotDevnet = describeIf(process.env.IS_DEVNET === 'false');
 export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
 export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');

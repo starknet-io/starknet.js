@@ -12,8 +12,6 @@ import { DEFAULT_GLOBAL_CONFIG } from '../../../src/global/constants';
 class StrategyResolver {
   private isDevnet = false;
 
-  private isRpcNode = false;
-
   get isRpcDevnet() {
     return this.isDevnet || !!process.env.TEST_RPC_URL;
   }
@@ -60,8 +58,6 @@ class StrategyResolver {
   async resolveRpc(): Promise<void> {
     const hasRpcUrl = !!process.env.TEST_RPC_URL;
 
-    this.isRpcNode = hasRpcUrl || this.isDevnet;
-
     if (!hasRpcUrl && this.isDevnet) {
       process.env.TEST_RPC_URL = GS_DEFAULT_TEST_PROVIDER_URL;
     }
@@ -73,7 +69,6 @@ class StrategyResolver {
       process.env.TEST_WS_URL ??= GS_DEFAULT_TEST_WS_URL;
     }
 
-    setIfNullish('IS_RPC', this.isRpcNode);
     setIfNullish('IS_TESTNET', await this.isTestnet);
 
     console.log('Detected RPC');
@@ -105,7 +100,6 @@ class StrategyResolver {
 
     console.table({
       IS_DEVNET: process.env.IS_DEVNET,
-      IS_RPC: process.env.IS_RPC,
       IS_TESTNET: process.env.IS_TESTNET,
       'Detected Spec Version': process.env.RPC_SPEC_VERSION,
     });
@@ -129,7 +123,6 @@ class StrategyResolver {
 
   private async useProvidedSetup(): Promise<void> {
     setIfNullish('IS_DEVNET', false);
-    setIfNullish('IS_RPC', !!process.env.TEST_RPC_URL);
     if (!process.env.RPC_SPEC_VERSION) {
       await this.getNodeSpecVersion();
     }
