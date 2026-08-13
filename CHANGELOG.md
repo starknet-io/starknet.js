@@ -1,3 +1,9 @@
+# [10.7.0](https://github.com/starknet-io/starknet.js/compare/v10.6.8...v10.7.0) (2026-08-13)
+
+### Features
+
+- **deps:** bump types-js 0.10.4-beta.2 and get-starknet 6.0.4 ([cf26a77](https://github.com/starknet-io/starknet.js/commit/cf26a77dc706c841a207bc76fb2ff7a5a7955be9))
+
 ## [10.6.8](https://github.com/starknet-io/starknet.js/compare/v10.6.7...v10.6.8) (2026-08-07)
 
 ### Bug Fixes
