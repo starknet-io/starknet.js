@@ -62,7 +62,7 @@ export function fromWalletApiCall(call: WalletApiCall): Call {
 }
 
 /**
- * Convert a list of STRK20 actions to the wallet-api format. Only the `subaccount_invoke`
+ * Convert a list of STRK20 actions to the wallet-api format. Only the `shadow_account_invoke`
  * action embeds calls; every other action is already spec-shaped and is passed through
  * untouched.
  * @param {STRK20_ACTION[]} actions - The STRK20 actions, holding Starknet.js calls.
@@ -71,7 +71,7 @@ export function fromWalletApiCall(call: WalletApiCall): Call {
  * ```typescript
  * const result = toWalletApiActions([
  *   {
- *     type: 'subaccount_invoke',
+ *     type: 'shadow_account_invoke',
  *     dapp_name: 'myDapp',
  *     nonce: '0x0',
  *     calls: [{ contractAddress: '0x123', entrypoint: 'stake', calldata: [] }],
@@ -79,7 +79,7 @@ export function fromWalletApiCall(call: WalletApiCall): Call {
  *   },
  * ]);
  * // result = [{
- * //   type: 'subaccount_invoke',
+ * //   type: 'shadow_account_invoke',
  * //   dapp_name: 'myDapp',
  * //   nonce: '0x0',
  * //   calls: [{ contract_address: '0x123', entry_point: 'stake', calldata: [] }],
@@ -89,7 +89,7 @@ export function fromWalletApiCall(call: WalletApiCall): Call {
  */
 export function toWalletApiActions(actions: STRK20_ACTION[]): STRK20_ACTION_SPEC[] {
   return actions.map((action) =>
-    action.type === 'subaccount_invoke'
+    action.type === 'shadow_account_invoke'
       ? { ...action, calls: action.calls.map(toWalletApiCall) }
       : action
   );

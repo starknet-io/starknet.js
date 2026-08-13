@@ -15,8 +15,8 @@ flowchart TB
   end
  subgraph EXEC["PUBLIC — where your calls run"]
         Helper["Invoke helper<br>shared, holds nothing"]
-        Anonymizer["Sub-account<br>anonymizer"]
-        SubAccount["Your sub-account<br>public balance<br>unlinkable address"]
+        Anonymizer["Shadow account<br>anonymizer"]
+        ShadowAccount["Your shadow account<br>public balance<br>unlinkable address"]
   end
     Dapp["DAPP contract"]
     Open["Open note<br>shielded again, but its<br>amount is revealed"]
@@ -24,21 +24,21 @@ flowchart TB
     Notes -- withdraw --> Account
     Notes -- transfer --> Peer
     Notes -- invoke --> Helper
-    Notes -- subaccount_invoke --> Anonymizer
-    Notes -- "withdraw (funding)" --> SubAccount
+    Notes -- shadow_account_invoke --> Anonymizer
+    Notes -- "withdraw (funding)" --> ShadowAccount
     Helper ~~~ Anonymizer
-    Anonymizer -. deploys .-> SubAccount
+    Anonymizer -. deploys .-> ShadowAccount
     Helper -- calls --> Dapp
-    SubAccount -- calls --> Dapp
+    ShadowAccount -- calls --> Dapp
     Helper -. proceeds .-> Open
-    SubAccount -. collect_policy .-> Open
+    ShadowAccount -. collect_policy .-> Open
     Open -. settled .-> Notes
     Notes:::shielded
     Open:::shielded
     Peer:::shielded
     Anonymizer:::infra
     Account:::public
-    SubAccount:::public
+    ShadowAccount:::public
     Helper:::public
     Dapp:::public
     classDef shielded fill:#4c1d95,stroke:#c4b5fd,stroke-width:2px,color:#f5f3ff

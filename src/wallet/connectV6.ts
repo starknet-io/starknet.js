@@ -178,31 +178,31 @@ export function strk20InvokeTransaction(
 }
 
 /**
- * Compute the commitment of a DAPP STRK20 sub-account. The commitment is computed locally
- * by the wallet from the user private state ; no transaction is sent.
+ * Compute the commitment of a DAPP STRK20 shadow account. The commitment is computed
+ * locally by the wallet from the user private state ; no transaction is sent.
  *
- * When `nonce` is given, the full commitment of this single sub-account is returned. When
- * `nonce` is omitted, the partial (nonce independent) commitment is returned instead : it
- * is shared by every sub-account the user derives for this DAPP, so it can be published
- * once to let a DAPP recognize all the sub-accounts of a user without learning any
- * individual nonce.
+ * When `nonce` is given, the full commitment of this single shadow account is returned.
+ * When `nonce` is omitted, the partial (nonce independent) commitment is returned instead :
+ * it is shared by every shadow account the user derives for this DAPP, so it can be
+ * published once to let a DAPP recognize all the shadow accounts of a user without learning
+ * any individual nonce.
  * @param {WalletWithStarknetFeaturesV6} walletWSF - The get-starknet V6 wallet object to use.
- * @param {STRK20_DAPP_NAME} dapp_name - The DAPP that scopes the sub-account(s).
- * @param {FELT} [nonce] - The sub-account nonce ; each nonce selects a distinct sub-account for this user + DAPP. Omit it to get the partial commitment.
- * @returns {Promise<FELT>} The sub-account commitment.
+ * @param {STRK20_DAPP_NAME} dapp_name - The DAPP that scopes the shadow account(s).
+ * @param {FELT} [nonce] - The shadow account nonce ; each nonce selects a distinct shadow account for this user + DAPP. Omit it to get the partial commitment.
+ * @returns {Promise<FELT>} The shadow account commitment.
  * @example
  * ```typescript
- * const commitment = await strk20SubaccountCommitment(walletWSF, 'myDapp', '0x0');
+ * const commitment = await strk20ShadowAccountCommitment(walletWSF, 'myDapp', '0x0');
  * // commitment = '0x5f2e...'
  * ```
  */
-export function strk20SubaccountCommitment(
+export function strk20ShadowAccountCommitment(
   walletWSF: WalletWithStarknetFeaturesV6,
   dapp_name: STRK20_DAPP_NAME,
   nonce?: FELT
 ): Promise<FELT> {
   return walletWSF.features['starknet:walletApi'].request({
-    type: 'wallet_strk20SubaccountCommitment',
+    type: 'wallet_strk20ShadowAccountCommitment',
     params: { dapp_name, nonce },
   });
 }

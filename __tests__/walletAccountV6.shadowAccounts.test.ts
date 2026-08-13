@@ -3,8 +3,8 @@ import type { STRK20_ACTION } from '../src/wallet/types/strk20.type';
 
 /**
  * Test double of `@starknet-io/get-starknet-wallet-standard-v6`'s `StarknetInjectedWallet`,
- * recording every RPC message it receives so that the STRK20 sub-account payloads built by
- * `WalletAccountV6` can be asserted. Only the features needed to connect are implemented.
+ * recording every RPC message it receives so that the STRK20 shadow account payloads built
+ * by `WalletAccountV6` can be asserted. Only the features needed to connect are implemented.
  */
 function createRecordingWallet(results: Record<string, unknown> = {}) {
   const request = jest.fn(async ({ type }: { type: string }) => {
@@ -39,32 +39,32 @@ const connect = async (results: Record<string, unknown> = {}) => {
 const messageOf = (fake: { request: jest.Mock }, type: string) =>
   fake.request.mock.calls.map(([message]) => message).find((message) => message.type === type);
 
-describe('WalletAccountV6 STRK20 sub-accounts', () => {
-  test('strk20SubaccountCommitment forwards dapp_name and nonce, and returns the commitment', async () => {
-    const { fake, wallet } = await connect({ wallet_strk20SubaccountCommitment: '0x5f2e' });
+describe('WalletAccountV6 STRK20 shadow accounts', () => {
+  test('strk20ShadowAccountCommitment forwards dapp_name and nonce, and returns the commitment', async () => {
+    const { fake, wallet } = await connect({ wallet_strk20ShadowAccountCommitment: '0x5f2e' });
 
-    const commitment = await wallet.strk20SubaccountCommitment('myDapp', '0x2');
+    const commitment = await wallet.strk20ShadowAccountCommitment('myDapp', '0x2');
 
-    expect(messageOf(fake, 'wallet_strk20SubaccountCommitment')).toEqual({
-      type: 'wallet_strk20SubaccountCommitment',
+    expect(messageOf(fake, 'wallet_strk20ShadowAccountCommitment')).toEqual({
+      type: 'wallet_strk20ShadowAccountCommitment',
       params: { dapp_name: 'myDapp', nonce: '0x2' },
     });
     expect(commitment).toBe('0x5f2e');
   });
 
-  test('strk20SubaccountCommitment keeps the nonce undefined when omitted', async () => {
-    // A defaulted nonce would silently return the full commitment of sub-account 0
+  test('strk20ShadowAccountCommitment keeps the nonce undefined when omitted', async () => {
+    // A defaulted nonce would silently return the full commitment of shadow account 0
     // instead of the partial (nonce independent) commitment of the DAPP.
-    const { fake, wallet } = await connect({ wallet_strk20SubaccountCommitment: '0xpartial' });
+    const { fake, wallet } = await connect({ wallet_strk20ShadowAccountCommitment: '0xpartial' });
 
-    await wallet.strk20SubaccountCommitment('myDapp');
+    await wallet.strk20ShadowAccountCommitment('myDapp');
 
-    const message = messageOf(fake, 'wallet_strk20SubaccountCommitment');
+    const message = messageOf(fake, 'wallet_strk20ShadowAccountCommitment');
     expect(message.params.nonce).toBeUndefined();
     expect(message.params.dapp_name).toBe('myDapp');
   });
 
-  test('strk20InvokeTransaction converts the sub-account calls to the wallet-api format', async () => {
+  test('strk20InvokeTransaction converts the shadow account calls to the wallet-api format', async () => {
     const { fake, wallet } = await connect({
       wallet_strk20InvokeTransaction: { transaction_hash: '0x6f7d' },
     });
@@ -72,7 +72,7 @@ describe('WalletAccountV6 STRK20 sub-accounts', () => {
     const actions: STRK20_ACTION[] = [
       { type: 'transfer', token: '0x4718', amount: 'OPEN', recipient: '0x111' },
       {
-        type: 'subaccount_invoke',
+        type: 'shadow_account_invoke',
         dapp_name: 'myDapp',
         nonce: '0x1',
         // Starknet.js call, camelCase, with uncompiled calldata
@@ -90,7 +90,7 @@ describe('WalletAccountV6 STRK20 sub-accounts', () => {
           // non-invoke actions are passed through untouched
           { type: 'transfer', token: '0x4718', amount: 'OPEN', recipient: '0x111' },
           {
-            type: 'subaccount_invoke',
+            type: 'shadow_account_invoke',
             dapp_name: 'myDapp',
             nonce: '0x1',
             // converted: snake_case fields, calldata compiled to hex felts
@@ -126,11 +126,11 @@ describe('WalletAccountV6 STRK20 sub-accounts', () => {
   });
 });
 
-describe('WalletAccountV6 STRK20 sub-accounts types', () => {
+describe('WalletAccountV6 STRK20 shadow accounts types', () => {
   // Type level guards, verified by `npm run ts:check`.
-  test('the action type rejects malformed sub-account actions', () => {
+  test('the action type rejects malformed shadow account actions', () => {
     const missingNonce = {
-      type: 'subaccount_invoke',
+      type: 'shadow_account_invoke',
       dapp_name: 'myDapp',
       calls: [],
       collect_policy: { type: 'all' },
@@ -138,7 +138,7 @@ describe('WalletAccountV6 STRK20 sub-accounts types', () => {
     } satisfies STRK20_ACTION;
 
     const unknownPolicy = {
-      type: 'subaccount_invoke',
+      type: 'shadow_account_invoke',
       dapp_name: 'myDapp',
       nonce: '0x0',
       calls: [],
@@ -147,7 +147,7 @@ describe('WalletAccountV6 STRK20 sub-accounts types', () => {
     } satisfies STRK20_ACTION;
 
     const walletApiCall = {
-      type: 'subaccount_invoke',
+      type: 'shadow_account_invoke',
       dapp_name: 'myDapp',
       nonce: '0x0',
       // @ts-expect-error a DAPP passes Starknet.js calls, not wallet-api ones

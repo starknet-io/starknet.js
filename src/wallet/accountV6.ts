@@ -17,7 +17,7 @@ import {
   strk20Balances,
   strk20InvokeTransaction,
   strk20PrepareInvoke,
-  strk20SubaccountCommitment,
+  strk20ShadowAccountCommitment,
   switchStarknetChain,
 } from './connectV6';
 import { StarknetChainId } from '../global/constants';
@@ -126,25 +126,25 @@ export class WalletAccountV6 extends WalletAccountV5 {
   }
 
   /**
-   * Compute the commitment of a DAPP STRK20 sub-account. The commitment is computed
+   * Compute the commitment of a DAPP STRK20 shadow account. The commitment is computed
    * locally by the wallet from the user private state ; no transaction is sent.
    *
-   * When `nonce` is given, the full commitment of this single sub-account is returned.
+   * When `nonce` is given, the full commitment of this single shadow account is returned.
    * When `nonce` is omitted, the partial (nonce independent) commitment is returned
-   * instead : it is shared by every sub-account the user derives for this DAPP, so it can
-   * be published once to let a DAPP recognize all the sub-accounts of a user without
-   * learning any individual nonce.
-   * @param {STRK20_DAPP_NAME} dappName - The DAPP that scopes the sub-account(s).
-   * @param {FELT} [nonce] - The sub-account nonce ; each nonce selects a distinct sub-account for this user + DAPP. Omit it to get the partial commitment.
-   * @returns {Promise<FELT>} The sub-account commitment.
+   * instead : it is shared by every shadow account the user derives for this DAPP, so it
+   * can be published once to let a DAPP recognize all the shadow accounts of a user
+   * without learning any individual nonce.
+   * @param {STRK20_DAPP_NAME} dappName - The DAPP that scopes the shadow account(s).
+   * @param {FELT} [nonce] - The shadow account nonce ; each nonce selects a distinct shadow account for this user + DAPP. Omit it to get the partial commitment.
+   * @returns {Promise<FELT>} The shadow account commitment.
    * @example
    * ```typescript
-   * const commitment = await myWalletAccount.strk20SubaccountCommitment('myDapp', '0x0');
+   * const commitment = await myWalletAccount.strk20ShadowAccountCommitment('myDapp', '0x0');
    * // commitment = '0x5f2e...'
    * ```
    */
-  public strk20SubaccountCommitment(dappName: STRK20_DAPP_NAME, nonce?: FELT): Promise<FELT> {
-    return strk20SubaccountCommitment(this.v6Provider, dappName, nonce);
+  public strk20ShadowAccountCommitment(dappName: STRK20_DAPP_NAME, nonce?: FELT): Promise<FELT> {
+    return strk20ShadowAccountCommitment(this.v6Provider, dappName, nonce);
   }
 
   static async connect(
