@@ -3,9 +3,16 @@ import type { JRPC } from '../../types/api';
 import { stringify } from '../../utils/json';
 import type { RpcTransport } from './types';
 
+/** What {@link HttpTransport} needs to POST an envelope. */
 export type HttpTransportOptions = {
+  /**
+   * The HTTP endpoint of the Starknet node.
+   * @example 'https://starknet-sepolia.public.blastapi.io/rpc/v0_10'
+   */
   nodeUrl: string;
+  /** Extra headers sent with every request, an API key for instance. */
   headers?: object;
+  /** The `fetch` implementation to use. */
   baseFetch: NonNullable<RpcProviderOptions['baseFetch']>;
 };
 
@@ -34,6 +41,17 @@ export function postJsonRpc(
  *
  * `nodeUrl`, `headers` and `baseFetch` are read once at construction, as `BatchClient` has
  * always done.
+ *
+ * You rarely build one yourself — `RpcProvider` does it from its own options. Pass it explicitly
+ * only to share it, or to give several providers the same configured `fetch`.
+ * @example
+ * ```typescript
+ * const transport = new HttpTransport({
+ *   nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_10',
+ *   baseFetch: fetch,
+ * });
+ * const myProvider = new RpcProvider({ transport });
+ * ```
  */
 export class HttpTransport implements RpcTransport {
   private readonly options: HttpTransportOptions;
@@ -42,6 +60,12 @@ export class HttpTransport implements RpcTransport {
     this.options = options;
   }
 
+  /**
+   * POSTs the envelope and resolves with the parsed answer. See {@link RpcTransport.request} for
+   * the contract every transport honours.
+   * @param body - A request envelope, or an array of them for a batch.
+   * @returns The response envelope, or an array of them.
+   */
   public request(body: JRPC.RequestBody): Promise<JRPC.ResponseBody>;
   public request(body: JRPC.RequestBody[]): Promise<JRPC.ResponseBody[]>;
   public async request(

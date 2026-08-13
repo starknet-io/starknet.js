@@ -24,6 +24,21 @@ import type { JRPC } from '../../types/api';
  * correlate on the id rather than on position.
  */
 export interface RpcTransport {
+  /**
+   * Sends one JSON-RPC envelope, or a batch of them, and resolves with the node's answer.
+   * @param body - A request envelope, or an array of them for a batch.
+   * @returns The matching response envelope, or an array of them — error envelopes included, see
+   * the resolution-versus-rejection rule above.
+   * @example
+   * ```typescript
+   * const answer = await transport.request({
+   *   jsonrpc: '2.0',
+   *   id: 1,
+   *   method: 'starknet_blockNumber',
+   *   params: [],
+   * });
+   * ```
+   */
   request(body: JRPC.RequestBody): Promise<JRPC.ResponseBody>;
   request(body: JRPC.RequestBody[]): Promise<JRPC.ResponseBody[]>;
 }

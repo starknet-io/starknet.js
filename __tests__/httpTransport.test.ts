@@ -35,7 +35,7 @@ describe('UNIT TEST: HttpTransport', () => {
   });
 
   test('resolves an error envelope instead of rejecting', async () => {
-    // Spec §7: a protocol error is a completed round trip as far as the transport is
+    // A protocol error is a completed round trip as far as the transport is
     // concerned. Turning it into a typed RpcError is the channel's job, not the transport's.
     const errorEnvelope = {
       jsonrpc: '2.0',
@@ -61,7 +61,7 @@ describe('UNIT TEST: HttpTransport', () => {
   });
 
   test('posts an array for a batch and returns the replies with their ids untouched', async () => {
-    // Spec §6: BatchClient correlates on the id, so the transport must not rewrite it —
+    // BatchClient correlates on the id, so the transport must not rewrite it —
     // and must not assume the node answers in request order.
     const replies = [
       { jsonrpc: '2.0', id: 'batched_2', result: '0xb' },

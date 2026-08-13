@@ -18,6 +18,10 @@ import {
  * Named `.ws.test.ts` because the runner derives its `ws-specific` category from that suffix: a
  * file that needs a socket says so in its name, so the category never needs a hand-kept list.
  * The mocked half of these tests lives in `WebSocketChannel.test.ts` and needs no URL at all.
+ *
+ * Throughout, `waitForUnsubscription` is armed *before* the `unsubscribe()` it waits on: the
+ * waiter is keyed by subscription id and only ever resolved by the unsubscription itself, so
+ * arming it afterwards waits forever on something that has already happened.
  */
 const NODE_URL = TEST_WS_URL!;
 
@@ -37,13 +41,8 @@ describeIfWs('E2E WebSocket Tests', () => {
   });
 
   describe('websocket specific endpoints', () => {
-    // Updated for RPC 0.9: removed subscribePendingTransaction (not available in 0.9)
-    // Added subscribeNewTransactionReceipts and subscribeNewTransactions (new in 0.9)
-    // account provider
     const provider = getTestProvider();
     const account = getTestAccount(provider);
-
-    // websocket
     let webSocketChannel: WebSocketChannel;
 
     beforeEach(async () => {
@@ -106,9 +105,6 @@ describeIfWs('E2E WebSocket Tests', () => {
       await waitUntil(() => received.length >= 2);
       received.forEach((result) => expect(result).toBeDefined());
 
-      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
-      // resolved by the unsubscription itself, so arming it afterwards waits on something that
-      // has already happened — forever, since it carries no timeout of its own.
       const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
       const status = await sub.unsubscribe();
       expect(status).toBe(true);
@@ -136,9 +132,6 @@ describeIfWs('E2E WebSocket Tests', () => {
       await waitUntil(() => mine().length >= 2);
       mine().forEach((result) => expect(result).toHaveProperty('keys'));
 
-      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
-      // resolved by the unsubscription itself, so arming it afterwards waits on something that
-      // has already happened — forever, since it carries no timeout of its own.
       const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
       const status = await sub.unsubscribe();
       expect(status).toBe(true);
@@ -166,9 +159,6 @@ describeIfWs('E2E WebSocket Tests', () => {
       await waitUntil(() => mine().length >= 2);
       mine().forEach((result) => expect(result).toHaveProperty('keys'));
 
-      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
-      // resolved by the unsubscription itself, so arming it afterwards waits on something that
-      // has already happened — forever, since it carries no timeout of its own.
       const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
       const status = await sub.unsubscribe();
       expect(status).toBe(true);
@@ -194,9 +184,6 @@ describeIfWs('E2E WebSocket Tests', () => {
       await waitUntil(() => mine().length >= 1);
       expect(mine()[0]).toHaveProperty('execution_status');
 
-      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
-      // resolved by the unsubscription itself, so arming it afterwards waits on something that
-      // has already happened — forever, since it carries no timeout of its own.
       const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
       const status = await sub.unsubscribe();
       expect(status).toBe(true);
@@ -224,9 +211,6 @@ describeIfWs('E2E WebSocket Tests', () => {
       await waitUntil(() => mine().length >= 1);
       expect(mine()[0]).toHaveProperty('execution_status');
 
-      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
-      // resolved by the unsubscription itself, so arming it afterwards waits on something that
-      // has already happened — forever, since it carries no timeout of its own.
       const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
       const status = await sub.unsubscribe();
       expect(status).toBe(true);
@@ -252,9 +236,6 @@ describeIfWs('E2E WebSocket Tests', () => {
       await waitUntil(() => mine().length >= 1);
       expect(mine()[0]).toHaveProperty('nonce');
 
-      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
-      // resolved by the unsubscription itself, so arming it afterwards waits on something that
-      // has already happened — forever, since it carries no timeout of its own.
       const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
       const status = await sub.unsubscribe();
       expect(status).toBe(true);
@@ -282,9 +263,6 @@ describeIfWs('E2E WebSocket Tests', () => {
       await waitUntil(() => mine().length >= 1);
       expect(mine()[0]).toHaveProperty('nonce');
 
-      // Armed before the unsubscribe: the waiter is keyed by subscription id and is only ever
-      // resolved by the unsubscription itself, so arming it afterwards waits on something that
-      // has already happened — forever, since it carries no timeout of its own.
       const unsubscribed = webSocketChannel.waitForUnsubscription(sub.id);
       const status = await sub.unsubscribe();
       expect(status).toBe(true);
@@ -418,20 +396,16 @@ describeIfWs('E2E WebSocket Tests', () => {
 
       let hasReconnected = false;
       webSocketChannel.on('open', () => {
-        if (hasReconnected) {
-          // Reconnected. The promise from the queued sendReceive will resolve now.
-        } else {
-          // 1. First connection, now simulate a drop
+        // The second `open` is the reconnection itself: nothing to do here, the queued
+        // `sendReceive` below resolves on its own and ends the test.
+        if (!hasReconnected) {
           hasReconnected = true;
           simulateConnectionDrop(webSocketChannel);
-
-          // 2. Immediately try to send a request. It should be queued.
           webSocketChannel
             .sendReceive('starknet_chainId')
             .then((result) => {
-              // 3. This assertion runs after reconnection, proving the queue was processed.
               expect(result).toBe(expectedChainId);
-              done(); // 4. Test is done when the queued request has been successfully processed.
+              done();
             })
             // Report the failure rather than leave `done()` uncalled: a queued request has no
             // timeout of its own, so the test would otherwise hang until Jest's global one
@@ -455,8 +429,6 @@ describeIfWs('E2E WebSocket Tests', () => {
 
       expect(sub).toBeInstanceOf(Subscription);
       expect(webSocketChannel.isConnected()).toBe(true);
-
-      // And it is a real subscription, not just a resolved promise.
       const received: unknown[] = [];
       sub.on((data) => {
         received.push(data);

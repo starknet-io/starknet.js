@@ -1,0 +1,45 @@
+---
+config:
+  theme: neo-dark
+  look: neo
+  layout: elk
+---
+flowchart TB
+ subgraph APP["Client dApp"]
+        App["Account<br>Contract"]
+  end
+ subgraph PROVIDERS["Provider"]
+        Rpc["RpcProvider"]
+        Ws["WebSocketProvider"]
+  end
+ subgraph CHANNELS["Channel"]
+        ReqCh["RpcChannel<br>requests"]
+        SubCh["SubscriptionChannel<br>subscriptions"]
+  end
+ subgraph TRANSPORTS["Transport"]
+        Http["HttpTransport"]
+        WsT["WsTransport"]
+  end
+ subgraph NETWORK["Starknet Network"]
+        Node["Starknet RPC Node"]
+  end
+    App e1@--> Rpc
+    App e2@--> Ws
+    Ws e3@-. "extends" .-> Rpc
+    Rpc e4@-- ".channel" --> ReqCh
+    Ws e5@-- ".channel" --> ReqCh
+    Ws e6@-- ".subscriptions" --> SubCh
+    ReqCh e7@-- ".transport" --> Http
+    ReqCh e8@-- ".transport" --> WsT
+    SubCh e9@-- ".transport" --> WsT
+    Http e10@-- "http(s)://" --> Node
+    WsT e11@-- "ws(s)://" --> Node
+    Node@{ shape: dbl-circ}
+    e4@{ animation: slow }
+    e5@{ animation: slow }
+    e6@{ animation: slow }
+    e7@{ animation: slow }
+    e8@{ animation: slow }
+    e9@{ animation: slow }
+    e10@{ animation: fast }
+    e11@{ animation: fast }

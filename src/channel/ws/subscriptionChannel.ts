@@ -29,6 +29,7 @@ type ReconnectAware = {
 const isReconnectAware = (transport: unknown): transport is ReconnectAware =>
   typeof (transport as ReconnectAware).onReconnected === 'function';
 
+/** What a {@link SubscriptionChannel} needs: a socket to borrow, and how much to buffer. */
 export type SubscriptionChannelOptions = {
   /** The transport to send on and listen to. Borrowed, never closed by this channel. */
   transport: WsTransport;
@@ -45,6 +46,18 @@ export type SubscriptionChannelOptions = {
  *
  * It borrows a `WsTransport`: it sends through it, listens to its notifications, and learns from
  * its state that the connection is gone. It never closes the socket — one object owns it.
+ *
+ * Reach for it directly only when you want subscriptions without a provider; otherwise use
+ * `WebSocketProvider`, whose `subscriptions` property is an instance of this class already paired
+ * with the request channel of the same spec version.
+ * @example
+ * ```typescript
+ * const transport = new ReconnectingWsTransport({ nodeUrl: 'wss://…/rpc/v0_10' });
+ * const channel = new RPC0103.SubscriptionChannel({ transport });
+ *
+ * const sub = await channel.subscribeNewHeads();
+ * sub.on((header) => console.log(header.block_number));
+ * ```
  */
 export class SubscriptionChannel {
   readonly id: string = 'RPC0.10.2-subscriptions';
@@ -166,6 +179,14 @@ export class SubscriptionChannel {
 
   /**
    * Subscribes to new block headers.
+   * @param params - Where to start from. Defaults to the latest block; a block number or hash
+   * replays from there, up to 1024 blocks back.
+   * @returns A `Subscription` delivering one block header per new block.
+   * @example
+   * ```typescript
+   * const sub = await channel.subscribeNewHeads();
+   * sub.on((header) => console.log(header.block_number, header.block_hash));
+   * ```
    */
   public async subscribeNewHeads(
     params: SubscribeNewHeadsParams = {}
@@ -179,6 +200,17 @@ export class SubscriptionChannel {
 
   /**
    * Subscribes to events matching a given filter.
+   * @param params - Filters on the emitting address, the event keys, the starting block and the
+   * finality status. All are optional: without any, every event of the network is delivered.
+   * @returns A `Subscription` delivering one emitted event at a time.
+   * @example
+   * ```typescript
+   * const sub = await channel.subscribeEvents({
+   *   fromAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+   *   finalityStatus: 'ACCEPTED_ON_L2',
+   * });
+   * sub.on((event) => console.log(event.from_address, event.keys, event.data));
+   * ```
    */
   public async subscribeEvents(
     params: SubscribeEventsParams = {}
@@ -201,6 +233,13 @@ export class SubscriptionChannel {
 
   /**
    * Subscribes to status updates for a specific transaction.
+   * @param params - The `transactionHash` to follow, and optionally the block to start from.
+   * @returns A `Subscription` delivering the transaction's current status, then every change.
+   * @example
+   * ```typescript
+   * const sub = await channel.subscribeTransactionStatus({ transactionHash: '0x0123...' });
+   * sub.on((update) => console.log(update.status.finality_status));
+   * ```
    */
   public async subscribeTransactionStatus(
     params: SubscribeTransactionStatusParams
@@ -215,6 +254,18 @@ export class SubscriptionChannel {
 
   /**
    * Subscribes to new transaction receipts.
+   *
+   * Same filters as {@link subscribeNewTransactions}, but the full receipt is delivered instead of
+   * the transaction.
+   * @param params - Optional filters on the finality status and on the sender addresses.
+   * @returns A `Subscription` delivering one receipt per matching transaction.
+   * @example
+   * ```typescript
+   * const sub = await channel.subscribeNewTransactionReceipts({
+   *   finalityStatus: ['ACCEPTED_ON_L2'],
+   * });
+   * sub.on((receipt) => console.log(receipt.transaction_hash, receipt.execution_status));
+   * ```
    */
   public async subscribeNewTransactionReceipts(
     params: SubscribeNewTransactionReceiptsParams = {}
@@ -229,7 +280,19 @@ export class SubscriptionChannel {
   }
 
   /**
-   * Subscribes to new transactions.
+   * Subscribes to new transactions and to their finality status changes.
+   *
+   * One event is fired per status update, so the same transaction can be delivered several times.
+   * @param params - Optional filters on the finality status (defaults to `['ACCEPTED_ON_L2']`) and
+   * on the sender addresses.
+   * @returns A `Subscription` delivering one transaction per matching status update.
+   * @example
+   * ```typescript
+   * const sub = await channel.subscribeNewTransactions({
+   *   finalityStatus: ['RECEIVED', 'ACCEPTED_ON_L2'],
+   * });
+   * sub.on((tx) => console.log(tx.transaction_hash, tx.finality_status));
+   * ```
    */
   public async subscribeNewTransactions(
     params: SubscribeNewTransactionsParams = {}

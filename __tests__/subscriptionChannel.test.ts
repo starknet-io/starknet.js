@@ -51,7 +51,7 @@ describe('UNIT TEST: SubscriptionChannel core', () => {
   });
 
   test('keeps a subscription id as a string, never as a number', async () => {
-    // Spec §6: node-issued subscription ids routinely exceed Number.MAX_SAFE_INTEGER, so any
+    // Node-issued subscription ids routinely exceed Number.MAX_SAFE_INTEGER, so any
     // numeric coercion silently corrupts them and the event never finds its subscription.
     const { mock, channel, transport } = openChannel();
     const hugeId = '17529898712701846618';
@@ -130,7 +130,7 @@ describe('UNIT TEST: SubscriptionChannel core', () => {
   });
 
   test('rejects unsubscribe waiters when the connection dies', async () => {
-    // Spec §4.5: this is why the subscription channel needs the transport's observable state.
+    // This is why the subscription channel needs the transport's observable state.
     // Without it `waitForUnsubscription` hangs forever — the defect 10.6.8 fixed.
     const { mock, channel, transport } = openChannel();
 
@@ -196,7 +196,7 @@ describe('UNIT TEST: SubscriptionChannel restoration', () => {
   };
 
   test('a manual reconnect re-establishes the subscription, like an automatic one', async () => {
-    // Defect §9.1 #1: `reconnect()` used to bring the socket back without its subscriptions.
+    // `reconnect()` used to bring the socket back without its subscriptions.
     const { mock, transport, channel } = openReconnecting();
 
     const subscribing = channel.subscribeNewHeads();
@@ -304,7 +304,7 @@ describe('UNIT TEST: SubscriptionChannel restoration', () => {
 
 describe('UNIT TEST: one namespace per spec version', () => {
   test('each namespace exports its request channel and its subscription channel', () => {
-    // Spec §4.3: one version axis. A namespace means "everything for this spec version", so
+    // One version axis. A namespace means "everything for this spec version", so
     // adding spec 0.11 is one namespace to add rather than two to remember.
     expect(typeof RPC09.RpcChannel).toBe('function');
     expect(typeof RPC09.SubscriptionChannel).toBe('function');

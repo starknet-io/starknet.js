@@ -149,7 +149,7 @@ describe('UNIT TEST: WsTransport requests', () => {
   });
 
   test('allocates its own wire id and gives the caller theirs back', async () => {
-    // Spec §6: one socket outlives several channels, and every channel numbers its own
+    // One socket outlives several channels, and every channel numbers its own
     // requests from 1. The transport must renumber on the wire, and restore the caller's id
     // on the reply — BatchClient correlates on it.
     const mock = createMockWebSocket();
@@ -198,7 +198,7 @@ describe('UNIT TEST: WsTransport requests', () => {
   });
 
   test('resolves an error envelope instead of rejecting', async () => {
-    // Spec §7: the same contract as HttpTransport. `errorHandler` on the channel turns this
+    // The same contract as HttpTransport. `errorHandler` on the channel turns this
     // into a typed RpcError, so application code sees identical errors on both transports.
     const mock = createMockWebSocket();
     const transport = transportFor(mock);
@@ -351,7 +351,7 @@ describe('UNIT TEST: WsTransport notifications', () => {
   });
 
   test('hands a node-pushed notification to its listeners', () => {
-    // Spec §5: a notification carries `method` and `params.subscription_id` and no `id`.
+    // A notification carries `method` and `params.subscription_id` and no `id`.
     // The discrimination is on the shape of the frame, never on id values — a subscription id
     // is a decimal string that routinely exceeds Number.MAX_SAFE_INTEGER.
     const mock = createMockWebSocket();

@@ -12,8 +12,15 @@ import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
 import type { RpcProviderOptions } from '../types';
 import { RpcProvider } from './rpc';
 
+/**
+ * Everything {@link WebSocketProvider} accepts: the provider options, the socket options of
+ * {@link ReconnectingWsTransport}, and the subscription-channel options.
+ */
 export type WebSocketProviderOptions = RpcProviderOptions &
-  Omit<Partial<ReconnectingWsTransportOptions>, 'nodeUrl'> & {
+  Omit<Partial<ReconnectingWsTransportOptions>, 'nodeUrl'> &
+  // Derived rather than restated, so an option added to the subscription channel reaches this
+  // provider without a second edit. `transport` is excluded because it is settled below.
+  Omit<RPC0103.SubscriptionChannelOptions, 'transport'> & {
     /**
      * An already-built transport to borrow. Mutually exclusive with `nodeUrl`, and the form to
      * use in React: the socket lives at module scope while components own only subscriptions.
@@ -89,9 +96,11 @@ export class WebSocketProvider extends RpcProvider {
     options: WebSocketProviderOptions,
     transport: WsTransport
   ): AnySubscriptionChannel {
+    const channelOptions = { transport, maxBufferSize: options.maxBufferSize };
+
     const forVersion = (specVersion: string): AnySubscriptionChannel => {
-      if (isVersion('0.9', specVersion)) return new RPC09.SubscriptionChannel({ transport });
-      if (isVersion('0.10', specVersion)) return new RPC0103.SubscriptionChannel({ transport });
+      if (isVersion('0.9', specVersion)) return new RPC09.SubscriptionChannel(channelOptions);
+      if (isVersion('0.10', specVersion)) return new RPC0103.SubscriptionChannel(channelOptions);
       throw new LibraryError(`unsupported subscription channel for spec version: ${specVersion}`);
     };
 
@@ -109,7 +118,11 @@ export class WebSocketProvider extends RpcProvider {
   // that a mixin-expanded class is generated; repeating that here with a narrower constructor
   // makes the derived static side unassignable to the base's. Mirroring the base's parameter and
   // return shapes keeps the override legal, and the cast below is checked by the tests.
-  static async create<T extends RpcProvider>(
+  //
+  // `T` defaults to `WebSocketProvider` because untying `this` also unties the inference: with no
+  // contextual type, `T` would otherwise fall back to its constraint and hand the caller a plain
+  // `RpcProvider`, on which `subscriptions` does not exist. An annotated target still wins.
+  static async create<T extends RpcProvider = WebSocketProvider>(
     this: any,
     optionsOrProvider?: RpcProviderOptions
   ): Promise<T> {

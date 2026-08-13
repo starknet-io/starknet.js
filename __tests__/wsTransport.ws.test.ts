@@ -61,7 +61,7 @@ describeIfWs('E2E: versioned channels over WsTransport', () => {
   // and id restoration are covered in `wsTransport.test.ts` against a mock socket.
 
   test('reports a protocol error as a typed RpcError, exactly as HTTP does', async () => {
-    // Spec §7: the error contract is what makes Contract and Account transport-agnostic.
+    // The error contract is what makes Contract and Account transport-agnostic.
     const channel = new RPC0103.RpcChannel({ nodeUrl: wsUrl, transport });
 
     await expect(channel.getBlockWithTxHashes('0xdeadbeef')).rejects.toThrow();

@@ -2,25 +2,55 @@
 sidebar_position: 7
 ---
 
-# WebSocket Channel
+# WebSocket
 
-`WebSocketChannel` keeps a persistent connection to a Starknet node and streams data as it happens:
-new blocks, contract events, transaction status. The same connection can also be used to send any
-regular RPC request.
+A Starknet node pushes new blocks, contract events and transaction status over a WebSocket, and
+only over a WebSocket. Opening one is what lets your application **react** to the chain instead of
+polling it — that is the reason this guide exists.
 
-It reconnects on its own when the connection drops, restores the subscriptions it had, and replays
-the requests that were pending meanwhile.
+Once the socket is open, it can carry ordinary RPC requests too, so you do not need a second HTTP
+connection alongside it. The connection reconnects on its own when it drops, restores the
+subscriptions it had, and replays the requests that were pending meanwhile.
 
 :::info
 This guide covers RPC spec **0.10**; your node must expose a WebSocket endpoint — see
 [WebSocket endpoints](#websocket-endpoints) below.
 
-Unlike `RpcProvider`, `WebSocketChannel` is not versioned: the subscription methods are the same in
-RPC 0.9 and 0.10, so the channel also works against a 0.9 node — except for the two 0.10.1+
-additions, `fromAddress` as an array and the `tags` option.
+The subscription methods are the same in RPC 0.9 and 0.10, so everything here also works against a
+0.9 node — except for the two 0.10.1+ additions, `fromAddress` as an array and the `tags` option.
 :::
 
-## Create a channel
+## Getting a connection
+
+Two objects can open a socket, and the choice is only about what else you need from it.
+
+| Object              | What it gives you                                    | Use it when                                                |
+| ------------------- | ---------------------------------------------------- | ---------------------------------------------------------- |
+| `WebSocketProvider` | A full provider **and** subscriptions, on one socket | Your app also sends transactions or reads state            |
+| `WebSocketChannel`  | Subscriptions and raw requests, nothing else         | You only subscribe, or you keep an HTTP provider beside it |
+
+### With a provider
+
+`WebSocketProvider` is an `RpcProvider`, so `Account` and `Contract` accept it unchanged, and its
+`subscriptions` property carries the streams:
+
+```typescript
+import { WebSocketProvider } from 'starknet';
+
+const myProvider = new WebSocketProvider({
+  nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
+});
+
+const sub = await myProvider.subscriptions.subscribeNewHeads();
+```
+
+See [Requests and subscriptions over WebSocket](./provider_instance.md#requests-and-subscriptions-over-websocket)
+in the Provider guide for the construction options and for when to prefer HTTP.
+
+### With a channel alone
+
+`WebSocketChannel` opens and owns its socket, and exposes the same `subscribe…()` methods without
+the provider surface:
 
 ```typescript
 import { WebSocketChannel } from 'starknet';
@@ -31,19 +61,8 @@ const channel = new WebSocketChannel({
 
 // Wait for the socket to be open before subscribing.
 await channel.waitForConnection();
-```
 
-Node.js 22+ and browsers provide a global `WebSocket`, which is used automatically. In an environment
-that has none, pass an implementation with the `websocket` option:
-
-```typescript
-import WebSocket from 'ws';
-import { WebSocketChannel, WebSocketModule } from 'starknet';
-
-const channel = new WebSocketChannel({
-  nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
-  websocket: WebSocket as WebSocketModule,
-});
+const sub = await channel.subscribeNewHeads();
 ```
 
 When you are done, close the connection — this also stops the automatic reconnection:
@@ -52,6 +71,16 @@ When you are done, close the connection — this also stops the automatic reconn
 channel.disconnect();
 await channel.waitForDisconnection();
 ```
+
+Node.js 22+ and browsers provide a global `WebSocket`, which is used automatically. An environment
+that has none can be given an implementation through the `websocket` option, or globally with
+[`config.set('websocket', …)`](./configuration.md).
+
+:::note
+The examples in the rest of this guide are written on `myProvider.subscriptions`. Every one of them
+works identically on a `WebSocketChannel` — write `channel.subscribeNewHeads()` where the example
+writes `myProvider.subscriptions.subscribeNewHeads()`.
+:::
 
 ### WebSocket endpoints
 
@@ -90,18 +119,20 @@ WebSocket only with an API key. A node exposing a `wss://` address does not nece
 :::warning
 A node applies its own limits to the WebSocket traffic — for example the number of new connections
 per IP and per second, the number of simultaneous subscriptions, or the maximum lifetime of a socket.
-Reaching one of them shows up as a connection refused when opening the channel, or as a socket closed
+Reaching one of them shows up as a connection refused when opening the socket, or as a socket closed
 while everything was working (the [automatic reconnection](#reconnection) then takes over). Check
 these limits with your node provider before subscribing to a busy stream.
 :::
 
-## Subscribe to a stream
+## Subscriptions
+
+### Subscribe to a stream
 
 Every `subscribe…()` method resolves to a `Subscription` object. Attach a handler with `.on()`, and
 stop the stream with `.unsubscribe()`:
 
 ```typescript
-const sub = await channel.subscribeNewHeads();
+const sub = await myProvider.subscriptions.subscribeNewHeads();
 
 sub.on((blockHeader) => {
   console.log('New block', blockHeader.block_number, blockHeader.block_hash);
@@ -117,16 +148,21 @@ receives an event, and so on.
 If data arrives before you attach a handler, it is buffered (up to `maxBufferSize`, 1000 by default)
 and delivered in order as soon as `.on()` is called, so nothing is lost during an asynchronous setup.
 
-:::warning
-A subscription accepts only one handler: calling `.on()` a second time throws.
-:::
+A subscription holds **one handler at a time**. Attaching a different one while the first is still
+in place throws; detach it first with `.off()`, which leaves the subscription open and starts
+buffering again:
+
+```typescript
+sub.off(); // stop delivering, keep the stream alive
+sub.on(anotherHandler); // now allowed
+```
 
 ### Sharing a stream between consumers
 
 When several parts of your code need the same stream, dispatch from a single handler:
 
 ```typescript
-const sub = await channel.subscribeEvents({ fromAddress });
+const sub = await myProvider.subscriptions.subscribeEvents({ fromAddress });
 
 sub.on((event) => {
   updateUI(event);
@@ -134,28 +170,36 @@ sub.on((event) => {
 });
 ```
 
-Subscribing twice with the same parameters also works — you get two independent streams, each with
-its own handler and its own `unsubscribe()` — but the node then sends everything twice:
+Subscribing twice with the same parameters also works, and gives two independent streams — but the
+node then sends everything twice, for no benefit over dispatching from one handler.
+
+### When a subscription closes
+
+`unsubscribe()` is not the only way a stream ends. After a reconnection, the node may refuse to
+re-establish a subscription; it is then closed for good, and no further event will arrive even
+though the connection itself is healthy. `onClose()` tells you about both cases:
 
 ```typescript
-const subUI = await channel.subscribeEvents({ fromAddress });
-const subCache = await channel.subscribeEvents({ fromAddress });
+const detach = sub.onClose(() => {
+  console.warn('This stream is over');
+});
 
-subUI.on(updateUI);
-subCache.on(updateCache);
+// `isClosed` answers the same question at any time:
+if (sub.isClosed) reSubscribe();
 ```
 
-## Subscription methods
+`onClose()` returns a function that detaches the listener. Registering on an already-closed
+subscription calls your listener immediately, so a late registration cannot miss the closure.
 
 ### `subscribeNewHeads`
 
 New block headers:
 
 ```typescript
-const sub = await channel.subscribeNewHeads();
+const sub = await myProvider.subscriptions.subscribeNewHeads();
 
 // Or start from an earlier block (up to 1024 blocks back):
-const sub2 = await channel.subscribeNewHeads({ blockIdentifier: 1_500_000 });
+const sub2 = await myProvider.subscriptions.subscribeNewHeads({ blockIdentifier: 1_500_000 });
 ```
 
 `blockIdentifier` accepts `'latest'` (default), a block number, or a block hash.
@@ -165,7 +209,7 @@ const sub2 = await channel.subscribeNewHeads({ blockIdentifier: 1_500_000 });
 Contract events, with optional filters:
 
 ```typescript
-const sub = await channel.subscribeEvents({
+const sub = await myProvider.subscriptions.subscribeEvents({
   fromAddress: '0x049d36...', // one address, or an array of addresses (RPC 0.10.1+)
   keys: [['0x02db34...']], // event key filter
   finalityStatus: 'ACCEPTED_ON_L2', // or 'PRE_CONFIRMED'
@@ -183,7 +227,7 @@ All filters are optional — without any, you receive every event of the network
 Status updates of one transaction, starting with its current status:
 
 ```typescript
-const sub = await channel.subscribeTransactionStatus({
+const sub = await myProvider.subscriptions.subscribeTransactionStatus({
   transactionHash: '0x0123...',
 });
 
@@ -198,7 +242,7 @@ sub.on((update) => {
 New transactions and their finality status changes:
 
 ```typescript
-const sub = await channel.subscribeNewTransactions({
+const sub = await myProvider.subscriptions.subscribeNewTransactions({
   finalityStatus: ['RECEIVED', 'ACCEPTED_ON_L2'], // default: ['ACCEPTED_ON_L2']
   senderAddress: ['0x0456...'], // optional sender filter
 });
@@ -214,7 +258,7 @@ event is fired for each status update, so the same transaction can show up sever
 To also receive the SNIP-36 proof facts of the transactions, add the corresponding tag (RPC 0.10.1+):
 
 ```typescript
-const sub = await channel.subscribeNewTransactions({
+const sub = await myProvider.subscriptions.subscribeNewTransactions({
   tags: ['INCLUDE_PROOF_FACTS'],
 });
 ```
@@ -224,7 +268,7 @@ const sub = await channel.subscribeNewTransactions({
 Same filters, but you receive the full receipt instead of the transaction:
 
 ```typescript
-const sub = await channel.subscribeNewTransactionReceipts({
+const sub = await myProvider.subscriptions.subscribeNewTransactionReceipts({
   finalityStatus: ['ACCEPTED_ON_L2'], // or 'PRE_CONFIRMED'
   senderAddress: ['0x0456...'],
 });
@@ -234,14 +278,118 @@ sub.on((receipt) => {
 });
 ```
 
-## Sending RPC requests
+## Managing the connection
 
-`sendReceive()` sends any JSON-RPC method over the socket and resolves with its result, so you do not
-need a second HTTP connection for occasional reads:
+### Sharing one socket
+
+The socket is a separate object — a **transport** — and it can be built once and lent to several
+providers or channels. One connection then serves them all:
+
+```typescript
+import { ReconnectingWsTransport, WebSocketProvider } from 'starknet';
+
+const transport = new ReconnectingWsTransport({
+  nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
+});
+
+const myProvider = new WebSocketProvider({ transport });
+```
+
+Beware of the lifecycle when you share: `dispose()` closes the socket whether the provider built it
+or borrowed it, so calling it on one consumer disconnects all the others. With a shared transport,
+leave the providers alone and close the transport itself when the application shuts down:
+
+```typescript
+transport.close();
+```
+
+This is the form to use in a front-end framework: the transport lives at module scope, outside the
+component tree, while components own only their subscriptions. See [In a React app](#in-a-react-app).
+
+### Reconnection
+
+If the connection drops, it is re-established with an exponential backoff, all your active streams
+are re-subscribed — your existing `Subscription` objects keep working, with nothing to do on your
+side — and the queued requests are then flushed.
+
+A stream the node refuses to re-subscribe cannot be recovered: its `Subscription` is closed, which
+[`onClose()`](#when-a-subscription-closes) reports.
+
+The defaults suit most applications. To tune the behavior — `autoReconnect`, `reconnectOptions`,
+`requestTimeout`, `maxBufferSize` — see the
+[API reference](/docs/next/API/classes/WebSocketProvider), where each option is documented with its
+default.
+
+Reconnection is not infinite: once the retries are exhausted it gives up and stops on its own, and
+any request still queued at that point is rejected with a `WebSocketNotConnectedError`. Call
+`reconnect()` on the transport to start over.
+
+### Connection state
+
+A transport reports its state, and notifies on every transition:
+
+```typescript
+myProvider.transport.getState(); // 'connecting' | 'open' | 'reconnecting' | 'closed'
+
+const detach = myProvider.transport.on('statechange', () => {
+  console.log('now', myProvider.transport.getState());
+});
+```
+
+`on()` returns the function that detaches the listener.
+
+### In a React app
+
+The pair `getState()` / `on('statechange')` is exactly what `useSyncExternalStore` expects, so
+connection state can drive the UI without any adapter:
+
+```tsx
+import { useSyncExternalStore } from 'react';
+import { transport } from './starknet'; // the module-scope transport
+
+export function ConnectionBadge() {
+  const state = useSyncExternalStore(
+    (onStoreChange) => transport.on('statechange', onStoreChange),
+    () => transport.getState()
+  );
+
+  return <span>{state}</span>;
+}
+```
+
+Under server-side rendering, pass a third argument returning the state to use on the server.
+
+`Subscription.onClose()` follows the same contract, so it plugs straight into an effect:
+
+```tsx
+useEffect(() => sub.onClose(() => setLive(false)), [sub]);
+```
+
+Three things to keep in mind in a browser application:
+
+- **Hot module reload.** A module-scope transport is re-executed on reload: the new socket opens
+  while the old one stays alive and keeps reconnecting. Close the previous one explicitly —
+  `import.meta.hot?.dispose(() => transport.close())`.
+- **Backgrounded tabs and mobile.** Browsers throttle timers in background tabs, which stretches the
+  reconnection backoff, and iOS closes backgrounded sockets outright. Forcing a reconnect on
+  `visibilitychange` and `online` belongs in your application, not in the library.
+- **A socket cannot be serialized.** It does not go into `localStorage`, into `redux-persist`, or
+  into React state. Keep the transport in a module singleton or a Context.
+
+### Sending RPC requests
+
+With a `WebSocketProvider`, the ordinary provider methods already travel over the socket — there is
+nothing specific to do:
+
+```typescript
+const blockNumber = await myProvider.getBlockNumber();
+```
+
+On a bare `WebSocketChannel`, `sendReceive()` sends any JSON-RPC method and resolves with its
+result:
 
 ```typescript
 const chainId = await channel.sendReceive<string>('starknet_chainId');
-const blockNumber = await channel.sendReceive<number>('starknet_blockNumber');
 
 const nonce = await channel.sendReceive('starknet_getNonce', {
   block_id: 'latest',
@@ -249,64 +397,19 @@ const nonce = await channel.sendReceive('starknet_getNonce', {
 });
 ```
 
-Parameters and result are the raw RPC ones — no conversion is applied, unlike the `RpcProvider`
-methods.
+Parameters and result are the raw RPC ones — no conversion is applied, unlike the provider methods.
 
-A call made while the connection is down is queued and sent once the socket is back. If no answer
-comes within `requestTimeout` (60 s by default), the promise rejects with a `TimeoutError`.
+A call made while the connection is down is queued and sent once the socket is back, whichever
+object you use. It is never left pending: it rejects with a `TimeoutError` if the node does not
+answer in time, or with a `WebSocketNotConnectedError` if the connection never comes back.
 
-A queued call is never left pending: if the connection never comes back — reconnection gave up, or
-you called `disconnect()` — the promise rejects with a `WebSocketNotConnectedError` instead. Note
-that `requestTimeout` only starts once the request is actually sent, so it is the reconnection
-settings below, not `requestTimeout`, that bound how long a queued call can wait.
-
-:::tip
-`channel.send()` sends a request and returns its id at once, without waiting for the answer. You then
-have to read the incoming messages yourself (`channel.on('message', …)`) and find the one carrying
-the same id. In most cases, use `sendReceive()`.
-:::
-
-## Reconnection
-
-If the connection drops, the channel reconnects with an exponential backoff, re-subscribes all your
-active streams — your existing `Subscription` objects keep working, with nothing to do on your side —
-then flushes the queued requests.
-
-A stream the node refuses to re-subscribe cannot be recovered: its `Subscription` is closed, and
-`isClosed` reports it.
-
-The defaults are usually fine; tune them if needed:
-
-```typescript
-const channel = new WebSocketChannel({
-  nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
-  autoReconnect: true, // default: true
-  reconnectOptions: {
-    retries: 5, // default: 5 attempts before giving up
-    delay: 2000, // default: 2000 ms before the first retry
-    exponential: true, // default: true — the delay doubles at each attempt
-    stableConnectionThreshold: 5000, // default: 5000 ms
-  },
-  requestTimeout: 60000, // default: 60000 ms
-  maxBufferSize: 1000, // default: 1000 events per subscription
-});
-```
-
-`stableConnectionThreshold` is how long a new connection must stay open before it is considered
-stable and the retry counter is reset. It prevents a node that accepts then immediately drops the
-connection from being retried forever.
-
-Once `retries` attempts have failed, the channel gives up and stops reconnecting on its own. Any
-request still queued at that point is rejected with a `WebSocketNotConnectedError`. Call
-`reconnect()` to start over.
-
-## Error handling
+### Error handling
 
 ```typescript
 import { TimeoutError, WebSocketNotConnectedError } from 'starknet';
 
 try {
-  const chainId = await channel.sendReceive('starknet_chainId');
+  const blockNumber = await myProvider.getBlockNumber();
 } catch (error) {
   if (error instanceof TimeoutError) {
     console.error('No answer from the node in time');
@@ -321,23 +424,22 @@ try {
 ## Complete example
 
 ```typescript
-import { WebSocketChannel, TimeoutError } from 'starknet';
+import { WebSocketProvider, TimeoutError } from 'starknet';
 
 async function main() {
-  const channel = new WebSocketChannel({
+  const myProvider = await WebSocketProvider.create({
     nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
   });
 
   try {
-    await channel.waitForConnection();
-    console.log('Connected to', await channel.sendReceive('starknet_chainId'));
+    console.log('Connected to', await myProvider.getChainId());
 
-    const headsSub = await channel.subscribeNewHeads();
+    const headsSub = await myProvider.subscriptions.subscribeNewHeads();
     headsSub.on((header) => {
       console.log(`Block ${header.block_number}: ${header.block_hash}`);
     });
 
-    const eventsSub = await channel.subscribeEvents({
+    const eventsSub = await myProvider.subscriptions.subscribeEvents({
       fromAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7', // ETH token
       finalityStatus: 'ACCEPTED_ON_L2',
     });
@@ -356,14 +458,13 @@ async function main() {
     if (error instanceof TimeoutError) console.error('Node did not answer:', error.message);
     else console.error(error);
   } finally {
-    channel.disconnect();
-    await channel.waitForDisconnection();
+    myProvider.dispose();
   }
 }
 
 main();
 ```
 
-All the types (`WebSocketOptions`, `Subscription`, the `Subscribe…Params` interfaces, …) are exported
-from `starknet`; see the [API documentation](/docs/next/API/classes/WebSocketChannel) for the full
-list.
+All the types (`WebSocketProviderOptions`, `WebSocketOptions`, `Subscription`, the
+`Subscribe…Params` interfaces, …) are exported from `starknet`; see the
+[API documentation](/docs/next/API/classes/WebSocketProvider) for the full list.

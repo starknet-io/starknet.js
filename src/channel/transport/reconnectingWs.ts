@@ -4,9 +4,11 @@ import { WebSocketNotConnectedError } from '../../utils/errors';
 import type { ReconnectOptions } from '../ws/ws_0_10';
 import { WsTransport, type WsTransportOptions } from './ws';
 
+/** What {@link ReconnectingWsTransport} needs, on top of the socket options it inherits. */
 export type ReconnectingWsTransportOptions = WsTransportOptions & {
   /** Reconnect automatically when the connection drops. Defaults to `true`. */
   autoReconnect?: boolean;
+  /** How many times to retry, how long to wait, and when a connection counts as stable. */
   reconnectOptions?: ReconnectOptions;
 };
 
@@ -24,6 +26,18 @@ export type ReconnectingWsTransportOptions = WsTransportOptions & {
  * Subscription restoration is not done here: the transport does not know what a subscription is.
  * It exposes `onReconnected`, awaited after the new connection opens and **before** the queue is
  * flushed, so a queued request cannot overtake the re-subscription it was queued behind.
+ *
+ * This is the transport to build once at module scope and lend to everything that talks to the
+ * same node — one socket then serves them all, and it survives the drops a shared gateway imposes.
+ * @example
+ * ```typescript
+ * const transport = new ReconnectingWsTransport({
+ *   nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
+ * });
+ *
+ * const myProvider = new WebSocketProvider({ transport });
+ * transport.on('statechange', () => console.log(transport.getState()));
+ * ```
  */
 export class ReconnectingWsTransport extends WsTransport {
   private readonly autoReconnect: boolean;
@@ -206,6 +220,17 @@ export class ReconnectingWsTransport extends WsTransport {
       .then(() => this.processRequestQueue());
   }
 
+  /**
+   * Sends the envelope, queueing it when the connection is down. See
+   * {@link RpcTransport.request} for the contract every transport honours.
+   *
+   * A queued call is never left pending: it goes out when the socket comes back, and rejects with
+   * a `WebSocketNotConnectedError` if reconnection gives up or {@link close} is called. Note that
+   * `requestTimeout` only starts once the request is on the wire, so the reconnection settings —
+   * not `requestTimeout` — bound how long a queued call can wait.
+   * @param body - A request envelope, or an array of them for a batch.
+   * @returns The response envelope, or an array of them.
+   */
   public request(body: JRPC.RequestBody): Promise<JRPC.ResponseBody>;
   public request(body: JRPC.RequestBody[]): Promise<JRPC.ResponseBody[]>;
   public async request(
@@ -271,6 +296,14 @@ export class ReconnectingWsTransport extends WsTransport {
     this.swapSocket(new this.WsImplementation(this.nodeUrl));
   }
 
+  /**
+   * Closes the socket for good, and stops the automatic reconnection with it.
+   *
+   * Any request still queued is rejected rather than left waiting for a connection that is no
+   * longer coming. Call {@link reconnect} to start over afterwards.
+   * @param code - WebSocket close code sent to the node.
+   * @param reason - Human-readable close reason sent to the node.
+   */
   public override close(code?: number, reason?: string): void {
     if (this.reconnectTimeoutId) {
       clearTimeout(this.reconnectTimeoutId);

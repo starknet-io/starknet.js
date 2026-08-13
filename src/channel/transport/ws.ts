@@ -46,6 +46,7 @@ export type WsTransportEvents = {
   message: MessageEvent;
 };
 
+/** What {@link WsTransport} needs to open its socket. */
 export type WsTransportOptions = {
   /** @example 'wss://starknet-sepolia.public.blastapi.io/rpc/v0_10' */
   nodeUrl: string;
@@ -75,6 +76,16 @@ export type WsTransportOptions = {
  * A refusal is answered with `id: null`, which belongs to no request, so every call in the batch
  * runs out its `requestTimeout` instead of failing fast. Check the target node before combining
  * the two.
+ *
+ * Prefer {@link ReconnectingWsTransport} for anything long-lived: a shared gateway drops idle
+ * connections, and this one does not come back.
+ * @example
+ * ```typescript
+ * const transport = new WsTransport({ nodeUrl: 'wss://your-starknet-node/rpc/v0_10' });
+ * const myProvider = new WebSocketProvider({ transport });
+ * // ... later
+ * transport.close();
+ * ```
  */
 export class WsTransport implements RpcTransport {
   /** The URL of the WebSocket RPC node. */
@@ -383,6 +394,16 @@ export class WsTransport implements RpcTransport {
     return this.ready;
   }
 
+  /**
+   * Sends the envelope over the socket and resolves with the node's answer. See
+   * {@link RpcTransport.request} for the contract every transport honours.
+   *
+   * Waits for the socket to be usable when it is not yet, and rejects with a `TimeoutError` after
+   * `requestTimeout`, or with a `WebSocketNotConnectedError` if the connection is lost meanwhile.
+   * @param body - A request envelope, or an array of them for a batch — read the note on batch
+   * portability in the class description first.
+   * @returns The response envelope, or an array of them.
+   */
   public request(body: JRPC.RequestBody): Promise<JRPC.ResponseBody>;
   public request(body: JRPC.RequestBody[]): Promise<JRPC.ResponseBody[]>;
   public async request(

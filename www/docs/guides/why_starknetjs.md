@@ -35,11 +35,12 @@ Key components and their interactions:
 
 ## Starknet.js Core Components
 
-### 1. Provider & Channel
+### 1. Provider, Channel & Transport
 
-- Both handle communication with the network at different levels.
-- **`Provider`**: Your main connection to Starknet nodes. Handles high-level communication. Available as the `RpcProvider` class.
-- **`Channel`**: Handles low-level communication. Available as the `RpcChannel` and `WebSocketChannel` classes that support HTTP and WebSocket connections, respectively.
+- All three handle communication with the network, at decreasing levels.
+- **`Provider`**: Your main connection to Starknet nodes. Handles high-level communication. Available as the `RpcProvider` class, and as `WebSocketProvider` when you also want subscriptions.
+- **`Channel`**: Handles low-level communication — the JSON-RPC methods of one spec version. `RpcChannel` carries the requests; subscriptions are served by `WebSocketChannel`, or by the `subscriptions` of a `WebSocketProvider`.
+- **`Transport`**: Carries the JSON-RPC envelopes over the wire, as `HttpTransport` or `WsTransport`. This is an independent choice: the same channel code runs over either, and only a WebSocket can carry subscriptions.
 
 ### 2. Account
 
