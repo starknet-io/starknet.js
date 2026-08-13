@@ -44,7 +44,7 @@ describe('BatchClient', () => {
   });
 
   test('batch request using Provider', async () => {
-    const myBatchProvider = await createTestProvider(false, { batch: 0 });
+    const myBatchProvider = await createTestProvider({ batch: 0 });
 
     const sendBatchSpy = jest.spyOn((myBatchProvider.channel as any).batchClient, 'sendBatch');
 

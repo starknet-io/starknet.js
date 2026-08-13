@@ -69,8 +69,21 @@ const testFilesUnder = (dir: string): string[] =>
     .map((name) => `${dir}/${name}`)
     .sort();
 
+/**
+ * Every test file, wherever it lives.
+ *
+ * Most are under the root `__tests__/`, but a plugin keeps its own beside its source in
+ * `src/**\/__tests__/`. The glob this config replaced was `**\/__tests__/**`, which caught both;
+ * scanning only the root directory silently dropped that file from the suite.
+ */
+const allTestFiles = (): string[] =>
+  [
+    ...testFilesUnder('__tests__'),
+    ...testFilesUnder('src').filter((file) => file.includes('/__tests__/')),
+  ].sort();
+
 export default async (): Promise<Config> => {
-  const all = testFilesUnder('__tests__');
+  const all = allTestFiles();
   const wsSpecific = all.filter((file) => file.endsWith('.ws.test.ts'));
   const nodeTouching = all.filter(
     (file) => !file.endsWith('.ws.test.ts') && NODE_FACTORY.test(readFileSync(file, 'utf8'))
@@ -113,6 +126,17 @@ export default async (): Promise<Config> => {
   return {
     // Runs once for every project, and its `process.env` mutations reach all of them.
     globalSetup: './__tests__/config/jestGlobalSetup.ts',
+    /**
+     * One account is authorised per run, so no two suites may drive it at once.
+     *
+     * A file touching a node is now two suites — one per transport — so even a single-file
+     * invocation races against itself: `npx jest <file>` fails with nonce and duplicate-hash
+     * errors that read like application bugs, and which side loses varies from run to run.
+     * Stated here rather than left to `-i` in the npm scripts, so an ad-hoc run is correct by
+     * default. Override with `--maxWorkers=N` when running `unit` alone, which has no such
+     * constraint.
+     */
+    maxWorkers: 1,
     projects: [
       { ...shared, displayName: 'unit', testMatch: toMatch(unit) },
       {

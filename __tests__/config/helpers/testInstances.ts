@@ -2,14 +2,13 @@
  * Test Instance Initialization
  *
  * This module provides factory functions for creating test providers and accounts:
- * - createTestProvider: Async provider factory (recommended, uses Provider.create)
+ * - createTestProvider: Async provider factory (recommended, uses RpcProvider.create)
  * - getTestProvider: Sync provider factory (legacy, uses direct constructor)
  * - getTestAccount: Account factory with devnet adaptations
  * - Token addresses and transaction version constants
  */
 import {
   Account,
-  Provider,
   ProviderInterface,
   RpcProvider,
   getTipStatsFromBlocks,
@@ -100,35 +99,13 @@ function buildTestProviderOptions(setProviderOptions?: RpcProviderOptions): RpcP
 }
 
 export async function createTestProvider(
-  isProvider?: true,
   setProviderOptions?: RpcProviderOptions
-): Promise<ProviderInterface>;
-export async function createTestProvider(
-  isProvider?: false,
-  setProviderOptions?: RpcProviderOptions
-): Promise<RpcProvider>;
-export async function createTestProvider(
-  isProvider: boolean = true,
-  setProviderOptions?: RpcProviderOptions
-): Promise<ProviderInterface | RpcProvider> {
-  const providerOptions = buildTestProviderOptions(setProviderOptions);
-  return isProvider ? Provider.create(providerOptions) : RpcProvider.create(providerOptions);
+): Promise<RpcProvider> {
+  return RpcProvider.create(buildTestProviderOptions(setProviderOptions));
 }
 
-export function getTestProvider(
-  isProvider?: true,
-  setProviderOptions?: RpcProviderOptions
-): ProviderInterface;
-export function getTestProvider(
-  isProvider?: false,
-  setProviderOptions?: RpcProviderOptions
-): RpcProvider;
-export function getTestProvider(
-  isProvider: boolean = true,
-  setProviderOptions?: RpcProviderOptions
-): ProviderInterface | RpcProvider {
-  const providerOptions = buildTestProviderOptions(setProviderOptions);
-  return isProvider ? new Provider(providerOptions) : new RpcProvider(providerOptions);
+export function getTestProvider(setProviderOptions?: RpcProviderOptions): RpcProvider {
+  return new RpcProvider(buildTestProviderOptions(setProviderOptions));
 }
 
 export const TEST_TX_VERSION = process.env.TX_VERSION as SupportedTransactionVersion;

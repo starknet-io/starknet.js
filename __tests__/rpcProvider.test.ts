@@ -68,7 +68,7 @@ describe('RPCProvider', () => {
   initializeMatcher(expect);
 
   beforeAll(async () => {
-    rpcProvider = await createTestProvider(false);
+    rpcProvider = await createTestProvider();
     provider = await createTestProvider();
     account = getTestAccount(provider);
 

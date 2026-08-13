@@ -15,7 +15,7 @@ describeIfRpc09('UNIT TEST: RPC 0.9.0 Channel', () => {
   initializeMatcher(expect);
 
   beforeAll(async () => {
-    nodeUrl = (await createTestProvider(false)).channel.nodeUrl;
+    nodeUrl = (await createTestProvider()).channel.nodeUrl;
     channel09 = new RPC09.RpcChannel({ nodeUrl });
 
     await createBlockForDevnet();
