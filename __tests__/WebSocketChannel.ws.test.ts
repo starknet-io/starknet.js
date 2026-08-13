@@ -1,4 +1,4 @@
-import { Provider, Subscription, SubscriptionNewHeadsEvent, WebSocketChannel } from '../src';
+import { Subscription, SubscriptionNewHeadsEvent, WebSocketChannel } from '../src';
 import {
   createBlockForDevnet,
   describeIfWs,
@@ -33,14 +33,14 @@ describeIfWs('E2E WebSocket Tests', () => {
   let expectedChainId: string;
 
   beforeAll(async () => {
-    expectedChainId = await new Provider(getTestProvider()).getChainId();
+    expectedChainId = await getTestProvider().getChainId();
   });
 
   describe('websocket specific endpoints', () => {
     // Updated for RPC 0.9: removed subscribePendingTransaction (not available in 0.9)
     // Added subscribeNewTransactionReceipts and subscribeNewTransactions (new in 0.9)
     // account provider
-    const provider = new Provider(getTestProvider());
+    const provider = getTestProvider();
     const account = getTestAccount(provider);
 
     // websocket

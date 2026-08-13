@@ -4,8 +4,8 @@ import {
   CallData,
   Contract,
   DeclareDeployUDCResponse,
-  Provider,
   ProviderInterface,
+  RpcProvider,
   TransactionType,
   cairo,
   ec,
@@ -35,9 +35,8 @@ const { toHex, hexToDecimalString, toBigInt } = num;
 const { randomAddress } = stark;
 const { Signature } = ec.starkCurve;
 
-// only Rpc0.8
 describe('deploy and test Account', () => {
-  let provider: Provider;
+  let provider: RpcProvider;
   let account: Account;
   let erc20: Contract;
   let erc20CallData: CallData;
@@ -50,7 +49,7 @@ describe('deploy and test Account', () => {
   beforeAll(async () => {
     initializeMatcher(expect);
 
-    provider = new Provider(await createTestProvider());
+    provider = await createTestProvider();
     account = getTestAccount(provider);
     expect(account).toBeInstanceOf(Account);
 
@@ -525,7 +524,7 @@ describe('deploy and test Account', () => {
     });
 
     test('change from provider to account', async () => {
-      expect(erc20.providerOrAccount).toBeInstanceOf(Provider);
+      expect(erc20.providerOrAccount).toBeInstanceOf(RpcProvider);
       erc20.providerOrAccount = account;
       expect(erc20.providerOrAccount).toBeInstanceOf(Account);
     });

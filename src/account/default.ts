@@ -7,7 +7,7 @@ import {
   ZERO,
 } from '../global/constants';
 import { logger } from '../global/logger';
-import { Provider } from '../provider';
+import { RpcProvider } from '../provider';
 import { ETransactionVersion, ETransactionVersion3 } from '../provider/types/spec.type';
 import { Signer, type SignerInterface } from '../signer';
 import {
@@ -103,7 +103,7 @@ export interface Account
   extends StarknetIdAccountMethods, BrotherIdProviderMethods, FastExecuteAccountMethods {}
 
 export class Account implements AccountInterface {
-  public provider: Provider;
+  public provider: RpcProvider;
 
   public signer: SignerInterface;
 
@@ -132,7 +132,7 @@ export class Account implements AccountInterface {
       paymaster,
       defaultTipType,
     } = options;
-    this.provider = provider instanceof Provider ? provider : new Provider(provider);
+    this.provider = provider instanceof RpcProvider ? provider : new RpcProvider(provider);
     this.address = address.toLowerCase();
     this.signer = isString(signer) || signer instanceof Uint8Array ? new Signer(signer) : signer;
 
