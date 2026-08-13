@@ -135,7 +135,7 @@ As of 2026-08, the **Ready** and **Xverse** wallets support the STRK20 wallet AP
 
 ![STRK20 architecture](./pictures/strk20-architecture.svg)
 
-Reading the diagram: a **solid arrow** is an action your DAPP declares in its `STRK20_ACTION[]`; a **dotted arrow** is infrastructure work the pool and the wallet do for you, and the green box is infrastructure driven by the pool: only the pool can make it execute anything, though your DAPP may freely query its read-only views (see [Address of a sub-account](#address-of-a-sub-account)). **Purple** boxes are shielded — observers see that the pool changed state, not who owns what. **Grey** boxes are ordinary public on-chain activity: a sub-account holds **public** ERC-20 funds, and its privacy comes solely from the fact that its address cannot be linked back to you. The open note is the in-between case: it lives in the pool, but filling it publishes the amount it received.
+Reading the diagram: a **solid arrow** is an action your DAPP declares in its `STRK20_ACTION[]`; a **dotted arrow** is infrastructure work the pool and the wallet do for you, and the green box is infrastructure driven by the pool: only the pool can make it execute anything, though your DAPP may freely query its read-only views (see [Address of a shadow account](#address-of-a-shadow-account)). **Purple** boxes are shielded — observers see that the pool changed state, not who owns what. **Grey** boxes are ordinary public on-chain activity: a shadow account holds **public** ERC-20 funds, and its privacy comes solely from the fact that its address cannot be linked back to you. The open note is the in-between case: it lives in the pool, but filling it publishes the amount it received.
 
 `WalletAccountV6` exposes four dedicated methods for these operations, plus `executeWithProof()`.
 
@@ -143,18 +143,18 @@ Reading the diagram: a **solid arrow** is an action your DAPP declares in its `S
 
 A DAPP describes what it wants with an array of `STRK20_ACTION`. There are exactly five action types:
 
-| Action             | `type`                | Fields                                            | Effect                                                        |
-| ------------------ | --------------------- | ------------------------------------------------- | ------------------------------------------------------------- |
-| Deposit            | `"deposit"`           | `token`, `amount`                                 | Public funds → pool (always to self).                         |
-| Withdraw           | `"withdraw"`          | `token`, `amount`, `recipient`                    | Pool → public `recipient` address.                            |
-| Transfer           | `"transfer"`          | `token`, `amount` (FELT or `"OPEN"`), `recipient` | Private transfer inside the pool to another registered user.  |
-| Invoke             | `"invoke"`            | `contract`, `calldata`                            | Calls an invoke helper contract, executed by the pool.        |
-| Sub-account invoke | `"subaccount_invoke"` | `dapp_name`, `nonce`, `calls`, `collect_policy`   | Calls contracts through the user's sub-account for this DAPP. |
+| Action                | `type`                    | Fields                                            | Effect                                                           |
+| --------------------- | ------------------------- | ------------------------------------------------- | ---------------------------------------------------------------- |
+| Deposit               | `"deposit"`               | `token`, `amount`                                 | Public funds → pool (always to self).                            |
+| Withdraw              | `"withdraw"`              | `token`, `amount`, `recipient`                    | Pool → public `recipient` address.                               |
+| Transfer              | `"transfer"`              | `token`, `amount` (FELT or `"OPEN"`), `recipient` | Private transfer inside the pool to another registered user.     |
+| Invoke                | `"invoke"`                | `contract`, `calldata`                            | Calls an invoke helper contract, executed by the pool.           |
+| Shadow account invoke | `"shadow_account_invoke"` | `dapp_name`, `nonce`, `calls`, `collect_policy`   | Calls contracts through the user's shadow account for this DAPP. |
 
 `amount` is always expressed in the token's smallest unit.
 
 :::note About `amount: "OPEN"`
-`"OPEN"` is only meaningful inside a **multi-action transaction**. It creates an empty _open note_ whose value is unknown at build time (e.g. the output of an AMM swap) and is filled later in the **same transaction** by a paired `invoke` or `subaccount_invoke` action. It is never used on its own.
+`"OPEN"` is only meaningful inside a **multi-action transaction**. It creates an empty _open note_ whose value is unknown at build time (e.g. the output of an AMM swap) and is filled later in the **same transaction** by a paired `invoke` or `shadow_account_invoke` action. It is never used on its own.
 :::
 
 A simple deposit, for example:
@@ -207,11 +207,11 @@ const actions: STRK20_ACTION[] = [
 The number of open notes **created** by `transfer` actions must match the number **filled** by the invoke. Otherwise the wallet rejects the request with `INVALID_REQUEST_PAYLOAD`, before generating any proof.
 :::
 
-#### Helper or sub-account?
+#### Helper or shadow account?
 
 Both run calls on your behalf without revealing who you are, but they are not interchangeable:
 
-|                             | `invoke` (helper)                                                | `subaccount_invoke` (sub-account)                                     |
+|                             | `invoke` (helper)                                                | `shadow_account_invoke` (shadow account)                              |
 | --------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
 | Contract                    | One dedicated helper per operation, someone has to write it      | Generic infrastructure, nothing to write                              |
 | Caller seen by the protocol | The shared helper address, identical for every user              | Your own stable pseudonymous address                                  |
@@ -276,19 +276,19 @@ const simulated = await myWalletAccount.strk20PrepareInvoke(actions, true);
 const fee = await mySponsorAccount.estimateInvokeFee(simulated.call);
 ```
 
-#### STRK20 sub-accounts
+#### STRK20 shadow accounts
 
-A **sub-account** is a persistent, pseudonymous identity that a user owns for one specific DAPP. It is derived from (user, `dapp_name`, `nonce`), deployed lazily at a deterministic address on first use, and driven exclusively through the pool. Each `nonce` gives the user a distinct sub-account for the same DAPP, so they can compartment their activity.
+A **shadow account** is a persistent, pseudonymous identity that a user owns for one specific DAPP. It is derived from (user, `dapp_name`, `nonce`), deployed lazily at a deterministic address on first use, and driven exclusively through the pool. Each `nonce` gives the user a distinct shadow account for the same DAPP, so they can compartment their activity.
 
 :::warning
-A sub-account holds **public ERC-20 funds**: its balance and its transactions are visible on-chain like any other address. The privacy it provides is the **unlinkability** between that address and the user's main address — not the shielding of its content. It is also **not** an account contract: it has no keys, and only the sub-account anonymizer can execute through it.
+A shadow account holds **public ERC-20 funds**: its balance and its transactions are visible on-chain like any other address. The privacy it provides is the **unlinkability** between that address and the user's main address — not the shielding of its content. It is also **not** an account contract: it has no keys, and only the shadow account anonymizer can execute through it.
 :::
 
-A sub-account is funded from the shielded balance with a `withdraw` action, and the proceeds of its calls are collected back into an open note, according to `collect_policy`:
+A shadow account is funded from the shielded balance with a `withdraw` action, and the proceeds of its calls are collected back into an open note, according to `collect_policy`:
 
 | `collect_policy`            | Effect                                                    |
 | --------------------------- | --------------------------------------------------------- |
-| `{ type: 'all' }`           | Collects the entire token balance of the sub-account.     |
+| `{ type: 'all' }`           | Collects the entire token balance of the shadow account.  |
 | `{ type: 'diff' }`          | Collects only the balance gained during this interaction. |
 | `{ type: 'exact', amount }` | Collects exactly `amount`.                                |
 
@@ -296,18 +296,18 @@ A sub-account is funded from the shielded balance with a `withdraw` action, and 
 import type { STRK20_ACTION } from 'starknet';
 
 const actions: STRK20_ACTION[] = [
-  // 1. Fund the sub-account from the shielded balance:
+  // 1. Fund the shadow account from the shielded balance:
   {
     type: 'withdraw',
     token: strkAddress,
     amount: '0x4563918244f40000',
-    recipient: subAccountAddress,
+    recipient: shadowAccountAddress,
   },
   // 2. One open note per expected output token:
   { type: 'transfer', token: strkAddress, amount: 'OPEN', recipient: myAddress },
-  // 3. The calls, executed by the sub-account:
+  // 3. The calls, executed by the shadow account:
   {
-    type: 'subaccount_invoke',
+    type: 'shadow_account_invoke',
     dapp_name: 'myDapp',
     nonce: '0x0',
     calls: [myContract.populate('stake', { amount: 1000n })],
@@ -319,52 +319,36 @@ const result = await myWalletAccount.strk20InvokeTransaction(actions);
 
 Note that `calls` holds standard Starknet.js `Call` objects, exactly as returned by `myContract.populate()`.
 
-#### Sub-account commitment
+#### Shadow account commitment
 
-A DAPP can recognize a returning user through the **commitment** of their sub-accounts. The wallet computes it locally, without sending any transaction:
+A DAPP can recognize a returning user through the **commitment** of their shadow accounts. The wallet computes it locally, without sending any transaction:
 
 ```typescript
-// Full commitment of one sub-account:
-const commitment = await myWalletAccount.strk20SubaccountCommitment('myDapp', '0x0');
+// Full commitment of one shadow account:
+const commitment = await myWalletAccount.strk20ShadowAccountCommitment('myDapp', '0x0');
 
-// Partial commitment, shared by every sub-account this user derives for this DAPP:
-const partial = await myWalletAccount.strk20SubaccountCommitment('myDapp');
+// Partial commitment, shared by every shadow account this user derives for this DAPP:
+const partial = await myWalletAccount.strk20ShadowAccountCommitment('myDapp');
 ```
 
 :::note
-Omitting `nonce` is **not** the same as passing `'0x0'`. Without a nonce, you get the partial commitment, which lets a DAPP recognize all the sub-accounts of a user without learning any individual nonce. With a nonce, you get the commitment of that one sub-account.
+Omitting `nonce` is **not** the same as passing `'0x0'`. Without a nonce, you get the partial commitment, which lets a DAPP recognize all the shadow accounts of a user without learning any individual nonce. With a nonce, you get the commitment of that one shadow account.
 :::
 
-#### Address of a sub-account
+#### Address of a shadow account
 
-Most DAPPs never need it: a `subaccount_invoke` action is self-contained — `dapp_name` and `nonce` are enough for the wallet to route the calls. You need the address only when you have to **name** the sub-account from the outside: funding it through the `recipient` of a `withdraw` action, or passing it in the calldata of one of your contracts.
+Most DAPPs never need it: a `shadow_account_invoke` action is self-contained — `dapp_name` and `nonce` are enough for the wallet to route the calls. You need the address only when you have to **name** the shadow account from the outside: funding it through the `recipient` of a `withdraw` action, or passing it in the calldata of one of your contracts.
 
-The commitment returned above is exactly the **salt** of the sub-account deterministic deployment. Computing the address also requires the `SubAccount` class hash and the anonymizer address, and **no wallet API method returns either** — your DAPP has to know them.
+The commitment returned above is exactly the **salt** of the shadow account deterministic deployment. Computing the address also requires the anonymizer address and the `SubAccount` class hash, and **no wallet API method returns either** — they come from the chain, not from the wallet.
 
-The **sub-account anonymizer** is the contract that deploys and drives sub-accounts on behalf of the pool:
+The **shadow account anonymizer** is the contract that deploys and drives shadow accounts on behalf of the pool. Its address is the one constant your DAPP has to know:
 
-| Network | Sub-account anonymizer                                               |
+| Network | Shadow account anonymizer                                            |
 | ------- | -------------------------------------------------------------------- |
 | Mainnet | `0x04f33230dc57855c6e7eabe66dfa0fde82c5458fd0e54827cdb7cb4c474888a7` |
 | Sepolia | `0x010a2285310c107c731d997afc147afb7495daff6397c2d242133d9fe8d9b147` |
 
-The `SubAccount` class hash currently used is `0x00956ddc41ec881359cf100ab14003bdbcaf67155cffa572e203383e59c85d51`.
-
-With those two constants you can derive the address **offline**, from the full commitment, with no RPC call:
-
-```typescript
-import { hash } from 'starknet';
-
-const commitment = await myWalletAccount.strk20SubaccountCommitment('myDapp', '0x0');
-const subAccountAddress = hash.calculateContractAddressFromHash(
-  commitment, // the commitment is the deployment salt
-  SUB_ACCOUNT_CLASS_HASH,
-  [], // the SubAccount constructor takes no argument
-  ANONYMIZER_ADDRESS
-);
-```
-
-The anonymizer also exposes a view that scans a range of nonces, which additionally tells you whether each sub-account is already deployed. It takes the **partial** commitment:
+Do not hardcode the class hash: the anonymizer exposes it, so reading it from there keeps your DAPP correct across upgrades of the shadow account contract.
 
 ```typescript
 const anonymizer = new Contract({
@@ -372,17 +356,39 @@ const anonymizer = new Contract({
   address: ANONYMIZER_ADDRESS,
   providerOrAccount: myProvider,
 });
-const partial = await myWalletAccount.strk20SubaccountCommitment('myDapp');
+const shadowAccountClassHash = await anonymizer.get_shadow_account_class_hash();
+```
 
-// nonces 0 to 4 — the range is limited to 1024 nonces per call:
-const subAccounts = await anonymizer.get_sub_accounts(partial, 0, 5);
+Read it once and keep it — deriving addresses from it is then **offline**, with no further RPC call:
+
+```typescript
+import { hash } from 'starknet';
+
+const commitment = await myWalletAccount.strk20ShadowAccountCommitment('myDapp', '0x0');
+const shadowAccountAddress = hash.calculateContractAddressFromHash(
+  commitment, // the commitment is the deployment salt
+  shadowAccountClassHash,
+  [], // the SubAccount constructor takes no argument
+  ANONYMIZER_ADDRESS
+);
+```
+
+The same anonymizer also exposes a view that scans a range of nonces, which additionally tells you whether each shadow account is already deployed. It takes the **partial** commitment:
+
+```typescript
+const partial = await myWalletAccount.strk20ShadowAccountCommitment('myDapp');
+
+// nonces 0 to 4 — the range is limited to 1024 nonces per call.
+// Last argument: true stops at the first undeployed nonce and returns only the
+// contiguous deployed prefix, false resolves every nonce of the range.
+const shadowAccounts = await anonymizer.get_shadow_accounts(partial, 0, 5, false);
 // each entry = { nonce, address, is_deployed }
 ```
 
-Both routes return the same address. The offline one costs nothing and works before the sub-account exists; the view is useful to know which nonces the user has already activated.
+Both routes return the same address. Once you hold the class hash the offline one costs nothing and works before the shadow account exists; the view is useful to know which nonces the user has already activated.
 
 :::note
-A sub-account is deployed **lazily**, on its first `subaccount_invoke`. Its address is deterministic and therefore known — and fundable — before it exists on-chain.
+A shadow account is deployed **lazily**, on its first `shadow_account_invoke`. Its address is deterministic and therefore known — and fundable — before it exists on-chain.
 :::
 
 ### Subscription to events

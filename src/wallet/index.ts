@@ -10,7 +10,7 @@ export * from './accountV6';
 export type {
   STRK20_ACTION,
   STRK20_CALL_AND_PROOF,
-  STRK20_SUBACCOUNT_INVOKE_ACTION,
+  STRK20_SHADOW_ACCOUNT_INVOKE_ACTION,
 } from './types/strk20.type';
 
 export type {

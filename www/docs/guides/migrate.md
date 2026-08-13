@@ -830,7 +830,7 @@ v10:
   broadcasting into two steps.
 - **`WalletAccountV6`** and the `walletV6` namespace: wallet-standard connection
   (`standardConnect()`), STRK20 privacy methods (`strk20Balances`, `strk20PrepareInvoke`,
-  `strk20InvokeTransaction`, `strk20SubaccountCommitment`) and sub-accounts — see the
+  `strk20InvokeTransaction`, `strk20ShadowAccountCommitment`) and shadow accounts — see the
   [WalletAccount guide](./account/walletAccount.md).
 - **Initial storage reads:** pass `returnInitialReads: true` to `getSimulateTransaction()` or
   `getBlockTransactionsTraces()` to get an `initial_reads` field back, and
