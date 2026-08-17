@@ -14,31 +14,38 @@ If you encounter any missing changes, please let us know and we will update this
 
 1. **Account Composition** - Account no longer extends Provider, uses composition instead
 2. **Plugin Class Names** - `StarknetId` → `StarknetIdImpl`, `BrotherId` → `BrotherIdImpl`
-3. **Plugin Import Paths** - `provider/extensions/` → `plugins/`
+3. **Plugin Import Paths** - `provider/extensions/` → package root
 4. **Compression Functions** - `compressProgram()` and `decompressProgram()` are now async
 5. **SimulateTransaction Response** - `SimulateTransactionOverheadResponse` changed from array to object
 6. **Provider fetch() Method** - Now `async` (low impact)
 7. **Removed Global Singletons** - `defaultProvider` and `defaultPaymaster` removed, use `RpcProvider.create()` instead
 8. **ts-mixer Removed** - No longer a dependency
 9. **getStorageAt() Return Type** - Now returns `STORAGE_RESULT` object instead of `string`
-10. **Transaction proof Field** - Now `string` (base64) instead of `number[]`
+10. **fastExecute Moved to a Plugin** - `account.fastExecute()` and `provider.fastWaitForTransaction()` now come from the `fastExecute` plugin
+11. **Paymaster Option Renamed** - `PaymasterRpcOptions.default` → `mute`
+12. **felt252 Validation** - `CairoFelt()` now throws on out-of-range values, and `CairoFelt252.toApiRequest()` returns decimal
+13. **RPC Namespace Renames** - `RPCSPEC010` → `RPCSPEC0103`, `RPC010` → `RPC0102` / `RPC0103`
 
 ### Breaking Changes Summary
 
-| Change                                                           | Severity   | Impact                                                   |
-| ---------------------------------------------------------------- | ---------- | -------------------------------------------------------- |
-| Account composition (`account.xyz()` → `account.provider.xyz()`) | **High**   | All provider method calls on Account must be updated     |
-| Removed `defaultProvider` and `defaultPaymaster` singletons      | **Medium** | Use `await RpcProvider.create()` or `new PaymasterRpc()` |
-| `getStorageAt()` returns object instead of string                | **Medium** | Must use `.value` property to access FELT value          |
-| Transaction `proof` field is base64 string instead of array      | **Medium** | Encode `number[]` to base64 string when constructing tx  |
-| Compression functions now async (`await compressProgram()`)      | **Medium** | Only if using compress/decompress functions directly     |
-| Plugin class renames (`StarknetId` → `StarknetIdImpl`)           | **Medium** | Only affects direct imports of these classes             |
-| Plugin import paths (`extensions/` → `plugins/`)                 | **Medium** | Only affects direct imports                              |
-| `SimulateTransactionOverheadResponse` is now an object           | **Medium** | Must access `.simulated_transactions` for the array      |
-| Removed `default` parameter from RPC options                     | **Low**    | Parameter was only used by removed singletons            |
-| `fetch()` is now `async`                                         | **Low**    | Already returned Promise, minimal impact                 |
-| `ts-mixer` removed                                               | **Low**    | Only affects if you used it as transitive dependency     |
-| `plugins: false` disables defaults                               | **Info**   | Behavioral change, intentional opt-out                   |
+| Change                                                           | Severity   | Impact                                                    |
+| ---------------------------------------------------------------- | ---------- | --------------------------------------------------------- |
+| Account composition (`account.xyz()` → `account.provider.xyz()`) | **High**   | All provider method calls on Account must be updated      |
+| Removed `defaultProvider` and `defaultPaymaster` singletons      | **Medium** | Use `await RpcProvider.create()` or `new PaymasterRpc()`  |
+| `getStorageAt()` returns object instead of string                | **Medium** | Must use `.value` property to access FELT value           |
+| Compression functions now async (`await compressProgram()`)      | **Medium** | Also `parseContract()` and the contract-class helpers     |
+| Plugin class renames (`StarknetId` → `StarknetIdImpl`)           | **Medium** | Only affects direct imports of these classes              |
+| Plugin import paths (`extensions/` → package root)               | **Medium** | Only affects direct imports                               |
+| `SimulateTransactionOverheadResponse` is now an object           | **Medium** | Must access `.simulated_transactions` for the array       |
+| `fastExecute` is now a plugin                                    | **Medium** | Types renamed; methods disappear with `plugins: false`    |
+| `RPCSPEC010` / `RPC010` namespaces renamed                       | **Medium** | Only affects raw spec types and direct channel imports    |
+| `PaymasterRpcOptions.default` renamed to `mute`                  | **Low**    | Only affects manual `PaymasterRpc` construction           |
+| felt252 range validation is now enforced                         | **Low**    | Out-of-range values used to pass silently, they now throw |
+| `Storage` response type renamed to `StorageResponse`             | **Low**    | Only affects code importing the type                      |
+| Removed `default` parameter from RPC options                     | **Low**    | Parameter was only used by removed singletons             |
+| `fetch()` is now `async`                                         | **Low**    | Already returned Promise, minimal impact                  |
+| `ts-mixer` and `pako` removed                                    | **Low**    | Only affects if you used them as transitive dependencies  |
+| `plugins: false` disables defaults                               | **Info**   | Behavioral change, intentional opt-out                    |
 
 **Quick migration steps:**
 
@@ -71,7 +78,7 @@ In v9, `Account` extended `Provider`, giving direct access to all provider metho
 **❌ v9 (no longer works):**
 
 ```typescript
-const account = new Account(provider, address, privateKey);
+const account = new Account({ provider, address, signer: privateKey });
 
 await account.waitForTransaction(txHash);
 await account.getBlock('latest');
@@ -81,7 +88,7 @@ await account.getChainId();
 **✅ v10:**
 
 ```typescript
-const account = new Account(provider, address, privateKey);
+const account = new Account({ provider, address, signer: privateKey });
 
 // Provider methods now require .provider
 await account.provider.waitForTransaction(txHash);
@@ -213,7 +220,7 @@ const contract = new Contract({ abi, address, providerOrAccount: provider });
 const result = await contract.call('balanceOf', [address]);
 ```
 
-## Breaking Change 4: Plugin System
+## Breaking Change 3: Plugin System
 
 ### What Changed
 
@@ -250,21 +257,28 @@ import { StarknetId } from 'starknet/provider/extensions/starknetId';
 **✅ v10:**
 
 ```typescript
-import { starknetId, StarknetIdImpl } from 'starknet';
-// Or
-import { starknetId } from 'starknet/plugins/starknet-id';
+import { StarknetIdImpl } from 'starknet';
+// Or, for the plugin factory (see "Disabling or Customizing Plugins" below):
+import { starknetIdPlugin } from 'starknet';
 ```
+
+:::caution
+The StarknetId plugin factory is named **`starknetIdPlugin`**, not `starknetId`: the bare
+`starknetId` name is already taken by the utility namespace (`starknetId.useEncoded`,
+`starknetId.isStarkDomain`, ...), exactly as in v9. The two other factories keep their plain
+names, `brotherId()` and `fastExecute()`.
+:::
 
 ### Default Behavior
 
-**Good news:** For most users, plugins work the same way. StarknetId and BrotherId plugins are **automatically installed** by default:
+**Good news:** For most users, plugins work the same way. The StarknetId, BrotherId and fastExecute plugins are **automatically installed** by default:
 
 ```typescript
 // These work out of the box in v10 (no changes needed)
 const provider = new RpcProvider({ nodeUrl });
 await provider.getStarkName(address); // ✅ Works
 
-const account = new Account(provider, address, privateKey);
+const account = new Account({ provider, address, signer: privateKey });
 await account.getStarkName(); // ✅ Works
 ```
 
@@ -280,11 +294,11 @@ const provider = new RpcProvider({
 });
 
 // Use specific plugins only
-import { starknetId } from 'starknet';
+import { starknetIdPlugin, brotherId, fastExecute } from 'starknet';
 
 const provider = new RpcProvider({
   nodeUrl,
-  plugins: [starknetId()],
+  plugins: [starknetIdPlugin()],
 });
 
 // Add custom plugins
@@ -298,7 +312,7 @@ const provider = new RpcProvider({
 
 For more details on creating and using plugins, see the [Plugin System Guide](./plugins.md).
 
-## Breaking Change 5: Provider fetch() Method
+## Breaking Change 4: Provider fetch() Method
 
 ### What Changed
 
@@ -338,7 +352,7 @@ const result = await provider.fetch('starknet_getBlockWithTxHashes', { block_id:
 provider.fetch('starknet_chainId').then((result) => console.log(result));
 ```
 
-## Breaking Change 6: Compression Functions Now Async
+## Breaking Change 5: Compression Functions Now Async
 
 ### What Changed
 
@@ -371,7 +385,9 @@ const decompressed = await stark.decompressProgram(compressed);
 **Who is affected:**
 
 - Users manually compressing/decompressing Cairo 0 programs
-- Users calling `parseContract()` directly (also now async)
+- Users calling one of the contract-class helpers that internally compress, which became async
+  for the same reason: `parseContract()`, `createSierraContractClass()` and
+  `contractClassResponseToLegacyCompiledContract()`
 - Advanced use cases involving manual contract compilation
 
 **Who is NOT affected:**
@@ -396,7 +412,23 @@ async function processContract(program) {
 }
 ```
 
-## Breaking Change 7: SimulateTransaction Response Structure
+The same applies to the contract-class helpers:
+
+```typescript
+import { provider, contractClassResponseToLegacyCompiledContract } from 'starknet';
+
+// Before (v9)
+const contractClass = provider.parseContract(compiledContract);
+const sierra = provider.createSierraContractClass(compiledSierra);
+const legacy = contractClassResponseToLegacyCompiledContract(response);
+
+// After (v10)
+const contractClass = await provider.parseContract(compiledContract);
+const sierra = await provider.createSierraContractClass(compiledSierra);
+const legacy = await contractClassResponseToLegacyCompiledContract(response);
+```
+
+## Breaking Change 6: SimulateTransaction Response Structure
 
 ### What Changed
 
@@ -457,7 +489,7 @@ const fee = simResult.simulated_transactions[0].overall_fee;
 const traces = simResult.simulated_transactions.map((s) => s.transaction_trace);
 ```
 
-## Breaking Change 8: ts-mixer Removed
+## Breaking Change 7: ts-mixer Removed
 
 ### What Changed
 
@@ -481,20 +513,21 @@ If your code didn't directly use `ts-mixer`, no changes are needed. If you were 
 2. Access provider methods via `account.provider`
 3. If you depended on `ts-mixer` as a transitive dependency, add it directly to your `package.json`
 
-## Breaking Change 9: getStorageAt() Return Type
+## Breaking Change 8: getStorageAt() Return Type
 
 ### What Changed
 
-The `getStorageAt()` method now returns a `STORAGE_RESULT` object instead of a plain string.
+The `getStorageAt()` method now returns a `STORAGE_RESULT` object instead of a plain string. The
+response type exported by the library was renamed accordingly: `Storage` → `StorageResponse`.
 
-**❌ v10.0.0:**
+**❌ v9:**
 
 ```typescript
 const value = await provider.getStorageAt(address, key);
 const felt = BigInt(value); // ✗ Error: value is now an object
 ```
 
-**✅ v10.0.1+:**
+**✅ v10:**
 
 ```typescript
 const result = await provider.getStorageAt(address, key);
@@ -529,64 +562,154 @@ const { value, last_update_block } = await provider.getStorageAt(addr, key);
 const felt = BigInt(value);
 ```
 
-## Breaking Change 10: Transaction proof Field Type
+If you imported the response type, rename it:
 
-**⚠️ REQUIRED CHANGE** - Proof must be base64 encoded string. TypeScript will error if you pass number[].
+```typescript
+import type { StorageResponse } from 'starknet'; // ✅ Was `Storage`
+```
+
+## Breaking Change 9: fastExecute Is Now a Plugin
 
 ### What Changed
 
-The `proof` field in transactions changed from `number[]` (array of numbers) to `string` (base64-encoded).
+In v9, `fastExecute()` was a native `Account` method and `fastWaitForTransaction()` a native
+`RpcProvider` method. In v10 both come from the `fastExecute` plugin, which is part of
+`defaultPlugins`.
 
-**❌ v9.x (No longer works)**
-
-```typescript
-const invocation = {
-  type: 'INVOKE',
-  proof: [1, 2, 3, 4], // ✗ Type Error: number[] not assignable to string
-};
-```
-
-**✅ v10.0.1+ (Required approach)**
+**Good news:** with the default configuration, nothing changes:
 
 ```typescript
-import { stark } from 'starknet';
-
-// Step 1: MUST encode array to base64 before any method call
-const proofBase64 = stark.encodeProof([1, 2, 3, 4]);
-// result = "AQAAAAIAAAADAAAABAAAAAUAAAAv"
-
-// Step 2: Pass encoded string
-await account.execute(calls, {
-  proof: proofBase64, // ✓ Must be base64 string
-});
+// Still works out of the box in v10
+const resp = await account.fastExecute(call, { tip }, { retries: 30, retryInterval: 500 });
 ```
 
-### Why This Change?
-
-The RPC specification now requires proofs to be encoded as base64 strings of big-endian packed u32 values for consistency with the network.
-
-### Migration Guide
-
-**Required:** Use `stark.encodeProof()` to convert number arrays to base64 before calling any Account method:
+**❌ Breaks if you opted out of plugins:**
 
 ```typescript
-import { stark } from 'starknet';
-
-// REQUIRED: Convert to base64
-const proofBase64 = stark.encodeProof(proofArray);
-
-// Then pass to Account methods
-await account.execute(calls, { proof: proofBase64 });
-await account.estimateInvokeFee(calls, { proof: proofBase64 });
-await account.simulateTransaction(invocations, { proof: proofBase64 });
+const account = new Account({ provider, address, signer, plugins: false });
+await account.fastExecute(call); // ✗ Method does not exist anymore
 ```
 
-**Optional:** Decode if you need to convert back
+Re-add the plugin explicitly when you disable the defaults:
 
 ```typescript
-// If needed, decode base64 back to number array
-const proofArray = stark.decodeProof(proofBase64);
+import { fastExecute } from 'starknet';
+
+const account = new Account({ provider, address, signer, plugins: [fastExecute()] });
 ```
+
+### Type Renames
+
+The two related types were renamed to follow the naming convention:
+
+```typescript
+import type { FastExecuteResponse } from 'starknet'; // ✅ Was fastExecuteResponse
+import type { FastWaitForTransactionOptions } from 'starknet'; // ✅ Was fastWaitForTransactionOptions
+```
+
+Method signatures are unchanged.
+
+## Breaking Change 10: Paymaster `default` Option Renamed
+
+### What Changed
+
+`PaymasterRpcOptions.default` was renamed to `mute`. It silences the informational message emitted
+when a `PaymasterRpc` falls back to its default node URL.
+
+**❌ v9:**
+
+```typescript
+const myPaymaster = new PaymasterRpc({ default: true });
+```
+
+**✅ v10:**
+
+```typescript
+const myPaymaster = new PaymasterRpc({ mute: true });
+```
+
+Note that `RpcProviderOptions.default` was removed entirely (it only served the deleted
+`defaultProvider` singleton) and has no replacement.
+
+## Breaking Change 11: felt252 Range Validation
+
+### What Changed
+
+`CairoFelt()` now validates that the value fits in the felt252 range `[0, P)` and throws otherwise.
+In v9, an out-of-range value was silently converted and sent to the network.
+
+```typescript
+// v9: accepted silently
+// v10: throws `Value ... is out of felt252 range [0, ...)`
+CairoFelt(2n ** 252n);
+```
+
+In addition, `CairoFelt252.toApiRequest()` now returns the **decimal** string representation instead
+of the hexadecimal one, which aligns it with the rest of the compiled calldata:
+
+```typescript
+new CairoFelt252(1000n).toApiRequest(); // v9: ['0x3e8'] → v10: ['1000']
+```
+
+### Impact
+
+**Low** for normal use: `CallData.compile()` and contract calls behave the same, since the network
+receives equivalent values. It only affects code that compares compiled calldata to hard-coded
+strings, or that relied on out-of-range values not throwing.
+
+## Breaking Change 12: RPC Namespace Renames
+
+Two public exports were renamed to track the new default RPC spec version. These only affect advanced usage (raw RPC spec types and direct channel imports).
+
+### `RPCSPEC010` → `RPCSPEC0103`
+
+The namespace re-exporting the 0.10.x RPC spec types was renamed.
+
+**❌ v9:**
+
+```typescript
+import { RPCSPEC010 } from 'starknet';
+
+type MyBlock = RPCSPEC010.BLOCK_WITH_TXS;
+```
+
+**✅ v10:**
+
+```typescript
+import { RPCSPEC0103 } from 'starknet';
+
+type MyBlock = RPCSPEC0103.BLOCK_WITH_TXS;
+```
+
+### `RPC010` → `RPC0102` / `RPC0103`
+
+The channel namespace for the 0.10.x RPC implementation was renamed. v10 exposes two channel variants: `RPC0102` (spec 0.10.2) and `RPC0103` (spec 0.10.3, the default).
+
+**❌ v9:**
+
+```typescript
+import { RPC010 } from 'starknet';
+```
+
+**✅ v10:**
+
+```typescript
+import { RPC0103 } from 'starknet'; // spec 0.10.3 (default)
+import { RPC0102 } from 'starknet'; // spec 0.10.2 (legacy)
+```
+
+:::note
+Standard usage via `RpcProvider`, `Account`, and high-level methods is unaffected by these renames.
+:::
+
+## Other Minor Changes
+
+- `getBlock()` called without argument is now typed `Promise<Block>` instead of
+  `Promise<PreConfirmedBlock>`. The runtime behavior is unchanged — it returns the block designated
+  by the provider `blockIdentifier` option — but code that accessed pre-confirmed-only fields on the
+  result no longer type-checks. Use `getBlock('pre_confirmed')` for the pre-confirmed block.
+- `pako` is no longer a dependency (replaced by the native Compression Streams API), alongside the
+  removal of `ts-mixer`.
 
 ## Migration Checklist
 
@@ -600,13 +723,17 @@ When upgrading from v9 to v10:
 - [ ] **Plugin System:**
   - [ ] Update plugin imports: `StarknetId` → `StarknetIdImpl` (if importing directly)
   - [ ] Update plugin imports: `BrotherId` → `BrotherIdImpl` (if importing directly)
-  - [ ] Update import paths: `starknet/provider/extensions/` → `starknet/plugins/`
+  - [ ] Update import paths: `starknet/provider/extensions/` → package root (`'starknet'`)
+  - [ ] Use `starknetIdPlugin()` for the plugin factory, not `starknetId()`
   - [ ] Test that plugin methods still work: `getStarkName()`, `getAddressFromStarkName()`, etc.
-  - [ ] If using `plugins: false`, verify this is intentional (disables StarknetId/BrotherId)
+  - [ ] If using `plugins: false`, verify this is intentional (disables StarknetId/BrotherId/fastExecute)
+- [ ] **fastExecute:**
+  - [ ] Rename the types: `fastExecuteResponse` → `FastExecuteResponse`, `fastWaitForTransactionOptions` → `FastWaitForTransactionOptions`
+  - [ ] If you disabled the default plugins, add `fastExecute()` back to keep `account.fastExecute()` and `provider.fastWaitForTransaction()`
 - [ ] **Compression Functions:**
   - [ ] Search for `compressProgram()` calls and add `await`
   - [ ] Search for `decompressProgram()` calls and add `await`
-  - [ ] Search for `parseContract()` calls and add `await` (if used directly)
+  - [ ] Search for `parseContract()`, `createSierraContractClass()` and `contractClassResponseToLegacyCompiledContract()` calls and add `await`
   - [ ] Make calling functions `async` if they weren't already
 - [ ] **Provider Changes:**
   - [ ] Review any code using `provider.fetch()` with `.then()` chains
@@ -614,25 +741,104 @@ When upgrading from v9 to v10:
 - [ ] **Storage Queries:**
   - [ ] Find all `getStorageAt()` calls
   - [ ] Update usage from `BigInt(result)` to `BigInt(result.value)`
+  - [ ] Rename the imported type `Storage` → `StorageResponse`
   - [ ] Optionally use `result.last_update_block` if you need metadata
-- [ ] **Transaction Proofs:** ⚠️ REQUIRED
-  - [ ] Find all places where `proof` is used in Account methods
-  - [ ] Convert `number[]` to base64 string using `stark.encodeProof(proofArray)`
-  - [ ] Pass the encoded string: `Account.execute({ ..., proof: encodedProofString })`
-  - [ ] TypeScript will error if proof is still a number[] array
+- [ ] **Paymaster:**
+  - [ ] Rename the `default` option to `mute` in `new PaymasterRpc({ ... })`
+- [ ] **Cairo Types:**
+  - [ ] Check that no felt252 value you build is outside `[0, P)` — it now throws instead of being silently converted
+  - [ ] If you compare compiled calldata to hard-coded strings, note that `CairoFelt252.toApiRequest()` returns decimal, not hex
 - [ ] **SimulateTransaction Response:**
   - [ ] Find all `getSimulateTransaction()` calls
   - [ ] Replace direct array access (e.g., `result[0]`, `result.map()`) with `result.simulated_transactions[0]`, `result.simulated_transactions.map()`
   - [ ] Optionally use `result.initial_reads` if using `returnInitialReads` option
 - [ ] **Dependencies:**
   - [ ] Remove any references to `ts-mixer` if you were using it
-  - [ ] If you depended on `ts-mixer` transitively, add it to your `package.json`
+  - [ ] If you depended on `ts-mixer` or `pako` transitively, add them to your `package.json`
 - [ ] **Custom Extensions:**
   - [ ] If you created custom extensions, migrate them to the plugin system (see [Plugin Guide](./plugins.md))
 - [ ] **Testing:**
   - [ ] Run your test suite to catch any missed migrations
   - [ ] Verify all provider method calls work with `account.provider.xyz()`
   - [ ] Test plugin functionality (StarknetId, BrotherId)
+
+## New in v10: Transaction `proof` and `proofFacts` Fields
+
+v9 had no transaction proof at all. v10 adds two optional fields to the v3 transaction details,
+following RPC 0.10.1+: `proof` and `proofFacts`. Nothing to migrate — this section only describes
+how to use them.
+
+The `proof` field is typed as a `string`: a base64 encoding of big-endian packed `u32` values.
+Use `stark.encodeProof()` to build it from a number array:
+
+```typescript
+import { stark } from 'starknet';
+
+// Step 1: encode the array to base64
+const proofBase64 = stark.encodeProof([1, 2, 3, 4]);
+// result = "AQAAAAIAAAADAAAABAAAAA=="
+
+// Step 2: pass the encoded string
+await account.execute(calls, {
+  proof: proofBase64, // must be a base64 string
+});
+```
+
+The same option is accepted by the other Account methods:
+
+```typescript
+await account.estimateInvokeFee(calls, { proof: proofBase64 });
+await account.simulateTransaction(invocations, { proof: proofBase64 });
+```
+
+Decode it back if needed:
+
+```typescript
+const proofArray = stark.decodeProof(proofBase64);
+```
+
+### The `proofFacts` Field
+
+`proofFacts` is an optional companion to `proof`. When present, it changes the v3 transaction hash computation (the Poseidon of all proof facts is folded into the hash).
+
+```typescript
+// proofFacts is optional — pass only when your SNIP-36 off-chain computation
+// produces facts that must be committed on-chain
+await account.execute(calls, {
+  proof: proofBase64, // base64-encoded proof (see above)
+  proofFacts: [fact1, fact2], // BigNumberish[] — omit if unused
+});
+```
+
+:::note
+Both fields are optional: code that never sets them behaves exactly as before. Set them only when
+your use case requires SNIP-36 fact commitment — see the [Proofs (SNIP-36) guide](./account/proofs.md).
+:::
+
+## What Else Is New in v10
+
+None of the following requires any migration work, but they are worth knowing about once you are on
+v10:
+
+- **RPC 0.10.3 support.** Two channels ship side by side, `RPC0102` (spec 0.10.2) and `RPC0103`
+  (spec 0.10.3, the default). `RpcProvider.create()` picks the right one from the node.
+- **Runtime plugin installation** with `provider.use(plugin)`, fully typed — see the
+  [Plugin System Guide](./plugins.md).
+- **`contract.compile(method, args)`** returns the compiled `Calldata` alone, without the
+  `Invocation` wrapper produced by `populate()`.
+- **`account.getSignedTransaction()` / `provider.invokeSignedTx()`** to split signing and
+  broadcasting into two steps.
+- **`WalletAccountV6`** and the `walletV6` namespace: wallet-standard connection
+  (`standardConnect()`), STRK20 privacy methods (`strk20Balances`, `strk20PrepareInvoke`,
+  `strk20InvokeTransaction`, `strk20ShadowAccountCommitment`) and shadow accounts — see the
+  [WalletAccount guide](./account/walletAccount.md).
+- **Initial storage reads:** pass `returnInitialReads: true` to `getSimulateTransaction()` or
+  `getBlockTransactionsTraces()` to get an `initial_reads` field back, and
+  `getTransaction(txHash, { includeProofFacts: true })` to get the proof facts of a transaction.
+- **WebSocket subscriptions:** `fromAddress` now accepts an array of addresses, transaction
+  subscriptions accept `tags`, and reconnection accepts a `stableConnectionThreshold` option — see
+  the [WebSocket guide](./websocket_channel.md).
+- **`walletAccount.onChange()`** now returns an unsubscribe function.
 
 ## Need Help?
 

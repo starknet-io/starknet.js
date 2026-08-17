@@ -174,19 +174,22 @@ export class RpcChannel {
     params?: RPC.Methods[T]['params']
   ): Promise<RPC.Methods[T]['result']> {
     try {
+      let error: JRPC.Error | undefined;
+      let result: RPC.Methods[T]['result'] | undefined;
       if (this.batchClient) {
-        const { error, result } = await this.batchClient.fetch(
-          method,
-          params,
-          (this.requestId += 1)
-        );
-        this.errorHandler(method, params, error);
-        return result as RPC.Methods[T]['result'];
+        ({ error, result } = await this.batchClient.fetch(method, params, (this.requestId += 1)));
+      } else {
+        const rawResult = await this.fetch(method, params, (this.requestId += 1));
+        ({ error, result } = await rawResult.json());
       }
-
-      const rawResult = await this.fetch(method, params, (this.requestId += 1));
-      const { error, result } = await rawResult.json();
       this.errorHandler(method, params, error);
+      if (result === undefined) {
+        // No `error` and no `result`: the node reply is malformed or not a valid
+        // JSON-RPC response (e.g. an HTTP 404 from a misconfigured node URL). See issue #1238.
+        throw new LibraryError(
+          `RPC: '${method}' returned an empty response (no result and no error). The node reply is malformed or not a valid JSON-RPC response.`
+        );
+      }
       return result as RPC.Methods[T]['result'];
     } catch (error: any) {
       this.errorHandler(method, params, error?.response?.data, error);
@@ -485,10 +488,10 @@ export class RpcChannel {
         if (retries <= 0) {
           throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
         }
+        retries -= 1;
+        // eslint-disable-next-line no-await-in-loop
+        await wait(retryInterval);
       }
-      retries -= 1;
-      // eslint-disable-next-line no-await-in-loop
-      await wait(retryInterval);
     }
     return txReceipt as RPC.TXN_RECEIPT;
   }
@@ -580,6 +583,13 @@ export class RpcChannel {
       invoke_transaction: transaction,
     });
 
+    return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
+  }
+
+  public async invokeSignedTx(transaction: RPC.INVOKE_TXN_V3) {
+    const promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
+      invoke_transaction: transaction,
+    });
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
 
@@ -696,6 +706,14 @@ export class RpcChannel {
     assert(
       versionType !== 'transaction' || isRPC08Plus_ResourceBoundsBN(invocation.resourceBounds),
       SYSTEM_MESSAGES.SWOldV3
+    );
+
+    // SNIP-36 fields only exist in the RPC 0.10.1+ payload, but the transaction hash
+    // commits to `proofFacts` whatever the RPC version. Dropping them silently here
+    // would broadcast a transaction whose signature can never be verified.
+    assert(
+      !invocation.proofFacts?.length && !invocation.proof,
+      SYSTEM_MESSAGES.snip36RequiresRPC010
     );
 
     const details = {

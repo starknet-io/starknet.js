@@ -1,26 +1,26 @@
-import { LibraryError, RPC0101, RpcError } from '../src';
+import { LibraryError, RPC0102, RpcError } from '../src';
 import {
   createBlockForDevnet,
   createTestProvider,
   initializeMatcher,
-  testIfRpc010,
+  describeIfRpc010,
 } from './config';
 
-testIfRpc010('RpcChannel', () => {
+describeIfRpc010('RpcChannel', () => {
   let nodeUrl: string;
-  let channel08: RPC0101.RpcChannel;
+  let channel08: RPC0102.RpcChannel;
   initializeMatcher(expect);
 
   beforeAll(async () => {
     nodeUrl = (await createTestProvider(false)).channel.nodeUrl;
-    channel08 = new RPC0101.RpcChannel({ nodeUrl });
+    channel08 = new RPC0102.RpcChannel({ nodeUrl });
 
     await createBlockForDevnet();
   });
 
   test('baseFetch override', async () => {
     const baseFetch = jest.fn();
-    const fetchChannel08 = new RPC0101.RpcChannel({ nodeUrl, baseFetch });
+    const fetchChannel08 = new RPC0102.RpcChannel({ nodeUrl, baseFetch });
     (fetchChannel08.fetch as any)();
     expect(baseFetch).toHaveBeenCalledTimes(1);
     baseFetch.mockClear();
@@ -59,7 +59,7 @@ testIfRpc010('RpcChannel', () => {
 });
 
 describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
-  let channel: RPC0101.RpcChannel;
+  let channel: RPC0102.RpcChannel;
   let fetchSpy: jest.SpyInstance;
 
   const mockJsonResponse = (result: any) => ({
@@ -67,11 +67,89 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
   });
 
   beforeAll(() => {
-    channel = new RPC0101.RpcChannel({ nodeUrl: 'http://localhost:5050/rpc' });
+    channel = new RPC0102.RpcChannel({ nodeUrl: 'http://localhost:5050/rpc' });
   });
 
   afterEach(() => {
     fetchSpy?.mockRestore();
+  });
+
+  describe('waitForTransaction', () => {
+    test('returns immediately after the receipt is available', async () => {
+      jest.useFakeTimers();
+      const receipt = { transaction_hash: '0x123' };
+      const transactionStatusSpy = jest
+        .spyOn(channel, 'getTransactionStatus')
+        .mockResolvedValueOnce({
+          finality_status: 'ACCEPTED_ON_L2',
+          execution_status: 'SUCCEEDED',
+        });
+      const transactionReceiptSpy = jest
+        .spyOn(channel, 'getTransactionReceipt')
+        .mockResolvedValueOnce(receipt as any);
+
+      const promise = channel.waitForTransaction('0x123', { retryInterval: 1_000 });
+      let settled = false;
+      const settledPromise = promise.then((result) => {
+        settled = true;
+        return result;
+      });
+
+      try {
+        await jest.advanceTimersByTimeAsync(1_000);
+        await Promise.resolve();
+
+        expect(settled).toBe(true);
+        await expect(settledPromise).resolves.toBe(receipt);
+      } finally {
+        transactionStatusSpy.mockRestore();
+        transactionReceiptSpy.mockRestore();
+        jest.useRealTimers();
+      }
+    });
+
+    test('waits one retry interval when the receipt is not available yet', async () => {
+      jest.useFakeTimers();
+      const receipt = { transaction_hash: '0x123' };
+      const transactionStatusSpy = jest
+        .spyOn(channel, 'getTransactionStatus')
+        .mockResolvedValueOnce({
+          finality_status: 'ACCEPTED_ON_L2',
+          execution_status: 'SUCCEEDED',
+        });
+      const transactionReceiptSpy = jest
+        .spyOn(channel, 'getTransactionReceipt')
+        .mockRejectedValueOnce(new Error('Transaction hash not found'))
+        .mockResolvedValueOnce(receipt as any);
+
+      const promise = channel.waitForTransaction('0x123', { retryInterval: 1_000 });
+      let settled = false;
+      const settledPromise = promise.then((result) => {
+        settled = true;
+        return result;
+      });
+
+      try {
+        // status polling interval elapsed, first receipt attempt rejected
+        await jest.advanceTimersByTimeAsync(1_000);
+        expect(transactionReceiptSpy).toHaveBeenCalledTimes(1);
+        expect(settled).toBe(false);
+
+        // pacing between two receipt attempts is preserved
+        await jest.advanceTimersByTimeAsync(999);
+        expect(transactionReceiptSpy).toHaveBeenCalledTimes(1);
+        expect(settled).toBe(false);
+
+        await jest.advanceTimersByTimeAsync(1);
+        expect(transactionReceiptSpy).toHaveBeenCalledTimes(2);
+        expect(settled).toBe(true);
+        await expect(settledPromise).resolves.toBe(receipt);
+      } finally {
+        transactionStatusSpy.mockRestore();
+        transactionReceiptSpy.mockRestore();
+        jest.useRealTimers();
+      }
+    });
   });
 
   describe('response_flags (includeProofFacts)', () => {
@@ -304,6 +382,33 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
       const result = await channel.buildTransaction(invocation);
 
       expect(result).not.toHaveProperty('proof_facts');
+    });
+  });
+
+  describe('malformed RPC response', () => {
+    test('throws a clear error when response has neither result nor error', async () => {
+      // Reproduces issue #1238: a node (e.g. Alchemy returning 404) replies with a
+      // body that is missing both `result` and `error`. Previously this returned
+      // `undefined` and crashed downstream with `response.flat is not a function`.
+      fetchSpy = jest.spyOn(channel, 'fetch');
+      fetchSpy.mockResolvedValueOnce({
+        json: async () => ({ jsonrpc: '2.0', id: 1 }),
+      } as any);
+
+      await expect((channel as any).fetchEndpoint('starknet_chainId')).rejects.toThrow(
+        LibraryError
+      );
+    });
+
+    test('preserves a falsy but valid result (genesis block number 0)', async () => {
+      // Guards against the naive `if (!result)` check: 0 is a legitimate Starknet
+      // result (e.g. genesis block number) and must be returned, not treated as an error.
+      fetchSpy = jest.spyOn(channel, 'fetch');
+      fetchSpy.mockResolvedValueOnce({
+        json: async () => ({ jsonrpc: '2.0', result: 0, id: 1 }),
+      } as any);
+
+      await expect((channel as any).fetchEndpoint('starknet_blockNumber')).resolves.toBe(0);
     });
   });
 });

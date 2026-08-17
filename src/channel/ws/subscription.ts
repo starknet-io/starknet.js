@@ -84,6 +84,9 @@ export class Subscription<T = any> {
 
   private _isClosed = false;
 
+  // The unsubscribe request currently on the wire, shared by concurrent callers.
+  private pendingUnsubscribe: Promise<boolean> | null = null;
+
   /**
    * @internal
    * @param options - Subscription configuration options
@@ -102,6 +105,21 @@ export class Subscription<T = any> {
    */
   public get isClosed(): boolean {
     return this._isClosed;
+  }
+
+  /**
+   * Closes the subscription locally, without contacting the node.
+   *
+   * Used when the channel knows the subscription is gone and cannot be recovered — a
+   * re-subscribe refused after a reconnection, for instance. Without it the object would keep
+   * reporting itself as open while no event could ever reach its handler again.
+   * @internal
+   */
+  public _markClosed(): void {
+    if (this._isClosed) return;
+    this._isClosed = true;
+    this.events.emit('unsubscribe', undefined);
+    this.events.clear();
   }
 
   /**
@@ -156,13 +174,33 @@ export class Subscription<T = any> {
     if (this._isClosed) {
       return true; // Already unsubscribed, treat as success.
     }
-    const success = await this.channel.unsubscribe(this.id);
-    if (success) {
-      this._isClosed = true;
-      this.channel.removeSubscription(this.id);
-      this.events.emit('unsubscribe', undefined);
-      this.events.clear(); // Clean up all listeners.
+    // Concurrent callers share the request already on the wire. The `_isClosed` guard above
+    // only closes once the round-trip completes, so without this a caller arriving before the
+    // reply passes it too and sends a second `starknet_unsubscribe`. That happens for real
+    // whenever a node pushes several events in one burst and the handler unsubscribes on each:
+    // the node answers the first request and ignores the rest, leaving them on the wire until
+    // the connection closes — at which point they settle as unhandled rejections.
+    if (this.pendingUnsubscribe) {
+      return this.pendingUnsubscribe;
     }
-    return success;
+
+    this.pendingUnsubscribe = (async () => {
+      try {
+        const success = await this.channel.unsubscribe(this.id);
+        if (success) {
+          this._isClosed = true;
+          this.channel.removeSubscription(this.id);
+          this.events.emit('unsubscribe', undefined);
+          this.events.clear(); // Clean up all listeners.
+        }
+        return success;
+      } finally {
+        // Released so a failed attempt can be retried; after a successful one the `_isClosed`
+        // guard short-circuits before ever reaching here again.
+        this.pendingUnsubscribe = null;
+      }
+    })();
+
+    return this.pendingUnsubscribe;
   }
 }

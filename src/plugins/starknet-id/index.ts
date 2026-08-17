@@ -299,10 +299,13 @@ export class StarknetIdImpl {
 /**
  * StarknetId plugin - adds domain name resolution methods.
  *
+ * Exported from the package root as `starknetIdPlugin`, because the bare
+ * `starknetId` name is taken by the utility namespace.
+ *
  * @example
  * ```typescript
- * import { RpcProvider, starknetId } from 'starknet';
- * const provider = new RpcProvider({ plugins: [starknetId()] });
+ * import { RpcProvider, starknetIdPlugin } from 'starknet';
+ * const provider = new RpcProvider({ plugins: [starknetIdPlugin()] });
  * const name = await provider.getStarkName('0x123...');
  * ```
  */

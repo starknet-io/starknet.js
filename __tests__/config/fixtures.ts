@@ -6,7 +6,7 @@
  * - Precomputed class hashes for common contracts
  * - Conditional test suite helpers (describeIf*, testIf*)
  */
-import { config, hash } from '../../src';
+import { config, hash, isVersion } from '../../src';
 import { CONTRACTS } from './helpers/contract';
 
 export { CONTRACTS };
@@ -23,8 +23,11 @@ export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
 export const describeIfNotDevnet = describeIf(process.env.IS_DEVNET === 'false');
 export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
 export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
-export const testIfRpc010 = describeIf(process.env.RPC_SPEC_VERSION === '0.10.0');
-export const describeIfRpc09 = describeIf(process.env.RPC_SPEC_VERSION === '0.9.0');
+// Match the whole spec family: nodes report patch and pre-release versions
+// (ex. '0.10.2', '0.10.3-rc.0'), which are all served by the 0.10 channel.
+const specVersion = process.env.RPC_SPEC_VERSION ?? '';
+export const describeIfRpc010 = describeIf(isVersion('0.10', specVersion));
+export const describeIfRpc09 = describeIf(isVersion('0.9', specVersion));
 
 export const erc20ClassHash: string = hash.computeContractClassHash(CONTRACTS.Erc20Oz100.sierra); // Cairo 1
 export const C1v2ClassHash: string = hash.computeContractClassHash(CONTRACTS.C1v2.sierra); // Cairo 1

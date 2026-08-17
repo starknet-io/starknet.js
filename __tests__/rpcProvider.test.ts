@@ -8,6 +8,7 @@ import {
   describeIfRpc,
   describeIfTestnet,
   ETHtokenAddress,
+  STRKtokenAddress,
   getTestAccount,
   initializeMatcher,
   waitNextBlock,
@@ -316,7 +317,7 @@ describeIfRpc('RPCProvider', () => {
     beforeAll(async () => {
       // add a Tx to be sure to have at least one Tx in the last block
       const { transaction_hash } = await account.execute({
-        contractAddress: ETHtokenAddress,
+        contractAddress: STRKtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: account.address,
@@ -805,6 +806,44 @@ describeIfRpc('RPCProvider', () => {
       await expect(
         rpcProvider.verifyMessageInStarknet(typedDataExample, signature, wrongAccountAddress)
       ).rejects.toThrow();
+    });
+  });
+
+  describe('invokeSignedTx', () => {
+    let contractAddress: string;
+    let testContract: Contract;
+
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: CONTRACTS.Minimalist.sierra,
+        casm: CONTRACTS.Minimalist.casm,
+      });
+      contractAddress = deploy.contract_address;
+      testContract = new Contract({
+        abi: CONTRACTS.Minimalist.sierra.abi,
+        address: contractAddress,
+        providerOrAccount: provider,
+      });
+    });
+
+    test('submits a signed transaction and modifies on-chain state', async () => {
+      const nameString = 'Test';
+      const nameHex = new CairoBytes31(nameString).toHexString();
+      const signedTx = await account.getSignedTransaction({
+        contractAddress: testContract.address,
+        entrypoint: 'set_name4',
+        calldata: [nameHex],
+      });
+      const response = await rpcProvider.invokeSignedTx(signedTx);
+
+      expect(response).toHaveProperty('transaction_hash');
+      await rpcProvider.waitForTransaction(response.transaction_hash);
+
+      const nameAfter = await testContract.get_name4();
+      expect(nameAfter).toBe(BigInt(nameHex));
+
+      // resubmission shall fail
+      await expect(rpcProvider.invokeSignedTx(signedTx)).rejects.toThrow();
     });
   });
 });

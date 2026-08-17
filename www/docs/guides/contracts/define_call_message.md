@@ -456,7 +456,13 @@ const myCall: Call = myContract.populate('get_elements', functionParameters);
 const res = await myContract.get_elements(myCall.calldata);
 ```
 
-It can be used only with methods that know the ABI: `Contract.populate, myCallData.compile`.  
+If you have a `Contract` instance and only need the compiled `Calldata` (not a full `Call`), you can use `Contract.compile`. It is the contract-bound equivalent of `myCallData.compile`, so you don't have to build a `CallData` object yourself:
+
+```typescript
+const myCalldata: Calldata = myContract.compile('setup_elements', functionParameters);
+```
+
+It can be used only with methods that know the ABI: `Contract.populate, Contract.compile, myCallData.compile`.  
 Starknet.js will perform a full check of conformity with the ABI of the contract, reorder the object's properties if necessary, stop if something is wrong or missing, remove not requested properties, and convert everything to Starknet format.  
 Starknet.js will alert you earlier of errors in your parameters (with human comprehensible words), before the call to Starknet. So, no more incomprehensible Starknet messages due to parameters construction.
 
@@ -535,11 +541,12 @@ These types of arguments can't be used at your convenience everywhere. Here is a
 |                                    account.declareAndDeploy |         ✔️          |       ✔️        |                    |                              |                    |                       |           ✔️            |
 |                                            CallData.compile |         ✔️          |       ✔️        |                    |                              |                    |                       |           ✔️            |
 |                                          myCallData.compile |         ✔️          |       ✔️        |         ✔️         |                              |                    |                       |           ✔️            |
+|                                            Contract.compile |         ✔️          |       ✔️        |         ✔️         |                              |                    |                       |           ✔️            |
 |                                           Contract.populate |         ✔️          |       ✔️        |         ✔️         |                              |                    |                       |           ✔️            |
 |                     hash. calculateContract AddressFromHash |         ✔️          |       ✔️        |                    |                              |                    |                       |           ✔️            |
 
 > (\*) = with `parseRequest: false`  
-> (\*\*) = result of `Calldata.compile, myCallData.compile, myContract.populate().calldata`
+> (\*\*) = result of `Calldata.compile, myCallData.compile, myContract.compile, myContract.populate().calldata`
 
 ## Receive data from a Cairo contract
 

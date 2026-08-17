@@ -48,14 +48,17 @@ export const isTypeArray = (type: string) =>
  * @param {string} type - The type to be checked.
  * @returns - `true` if the type is a tuple type, otherwise `false`.
  */
-export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
+export const isTypeTuple = (type: string) => type.startsWith('(') && type.endsWith(')');
 /**
  * Checks whether a given type is a named tuple.
  *
  * @param {string} type - The type to be checked.
  * @returns - True if the type is a named tuple, false otherwise.
  */
-export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
+export const isTypeNamedTuple = (type: string) => {
+  const start = type.indexOf('(');
+  return start !== -1 && type.indexOf(')', start + 1) !== -1 && type.includes(':');
+};
 /**
  * Checks if a given type is a struct.
  *
@@ -158,7 +161,7 @@ export const isCairo1Type = (type: string) => type.includes('::');
 export const getArrayType = (type: string) => {
   return isCairo1Type(type)
     ? type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'))
-    : type.replace('*', '');
+    : type.replaceAll('*', '');
 };
 
 /**

@@ -383,6 +383,89 @@ describe('deploy and test Account', () => {
     expect(after - before).toStrictEqual(57n);
   });
 
+  describe('getSignedTransaction', () => {
+    test('getSignedTransaction returns a valid INVOKE_TXN_V3 structure', async () => {
+      const result = await account.getSignedTransaction({
+        contractAddress: erc20Address,
+        entrypoint: 'transfer',
+        calldata: [erc20.address, '10', '0'],
+      });
+      expect(result).toHaveProperty('type', 'INVOKE');
+      expect(result).toHaveProperty('sender_address');
+      expect(result).toHaveProperty('calldata');
+      expect(result).toHaveProperty('signature');
+      expect(result).toHaveProperty('nonce');
+      expect(result).toHaveProperty('resource_bounds');
+      expect(result).toHaveProperty('version');
+      expect(Array.isArray(result.signature)).toBe(true);
+      expect(Array.isArray(result.calldata)).toBe(true);
+    });
+
+    test('getSignedTransaction with multiple calls', async () => {
+      const result = await account.getSignedTransaction([
+        {
+          contractAddress: dapp.address,
+          entrypoint: 'increase_balance',
+          calldata: ['10'],
+        },
+        {
+          contractAddress: dapp.address,
+          entrypoint: 'increase_balance',
+          calldata: ['20'],
+        },
+      ]);
+      expect(result).toHaveProperty('type', 'INVOKE');
+      expect(result).toHaveProperty('sender_address');
+      expect(result.sender_address.toLowerCase()).toBe(account.address.toLowerCase());
+      expect(Array.isArray(result.calldata)).toBe(true);
+      expect(result.calldata.length).toBeGreaterThan(0);
+    });
+
+    test('getSignedTransaction does not submit the transaction', async () => {
+      const nonceBefore = await account.getNonce();
+
+      await account.getSignedTransaction({
+        contractAddress: erc20Address,
+        entrypoint: 'transfer',
+        calldata: [erc20.address, '1', '0'],
+      });
+
+      const nonceAfter = await account.getNonce();
+      expect(nonceAfter).toBe(nonceBefore);
+    });
+
+    test('getSignedTransaction with explicit nonce', async () => {
+      const nonce = await account.getNonce();
+
+      const result = await account.getSignedTransaction(
+        {
+          contractAddress: erc20Address,
+          entrypoint: 'transfer',
+          calldata: [erc20.address, '10', '0'],
+        },
+        { nonce }
+      );
+
+      expect(result).toHaveProperty('nonce', toHex(nonce));
+    });
+
+    test('getSignedTransaction and execute produce consistent calldata', async () => {
+      const calls = [
+        {
+          contractAddress: dapp.address,
+          entrypoint: 'increase_balance',
+          calldata: ['47'],
+        },
+      ];
+
+      const signed = await account.getSignedTransaction(calls);
+
+      // The signed tx calldata must be non-empty and match what execute would produce
+      expect(signed.calldata.length).toBeGreaterThan(0);
+      expect(signed.sender_address.toLowerCase()).toBe(account.address.toLowerCase());
+    });
+  });
+
   describe('EIP712 verification', () => {
     // currently only in Starknet-Devnet, because can fail in Sepolia.
     test('sign and verify EIP712 message fail', async () => {

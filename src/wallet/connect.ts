@@ -13,6 +13,7 @@ import {
   TypedData,
   Signature,
   SpecVersion,
+  type API_VERSION,
   AccountChangeEventHandler,
   NetworkChangeEventHandler,
 } from '../types/api';
@@ -133,6 +134,14 @@ export function signMessage(swo: StarknetWindowObject, typedData: TypedData): Pr
  */
 export function supportedSpecs(swo: StarknetWindowObject): Promise<SpecVersion[]> {
   return swo.request({ type: 'wallet_supportedSpecs' });
+}
+
+/**
+ * Get the list of supported wallet API versions.
+ * @returns An array of supported wallet API version strings.
+ */
+export function supportedWalletApi(swo: StarknetWindowObject): Promise<API_VERSION[]> {
+  return swo.request({ type: 'wallet_supportedWalletApi' });
 }
 
 /**

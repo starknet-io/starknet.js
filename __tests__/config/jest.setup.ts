@@ -17,7 +17,7 @@ beforeAll(() => {
 
 const util = require('util');
 
-jest.setTimeout(50 * 60 * 1000);
+jest.setTimeout(5 * 60 * 1000);
 
 const combiner: object[] = [];
 

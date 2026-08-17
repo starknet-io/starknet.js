@@ -83,6 +83,7 @@ describe('isTypeTuple', () => {
 
   test('should return false if given type is not Tuple ', () => {
     expect(isTypeTuple('core::bool')).toEqual(false);
+    expect(isTypeTuple(`(${'('.repeat(10_000)}`)).toEqual(false);
   });
 });
 
@@ -94,6 +95,7 @@ describe('isTypeNamedTuple', () => {
 
   test('should return false if given type is not named Tuple ', () => {
     expect(isTypeNamedTuple('(felt, felt)')).toEqual(false);
+    expect(isTypeNamedTuple(`${'('.repeat(10_000)}:`)).toEqual(false);
   });
 });
 
@@ -244,6 +246,7 @@ describe('isCairo1Type', () => {
 describe('getArrayType', () => {
   test('should extract type from an array', () => {
     expect(getArrayType('felt*')).toEqual('felt');
+    expect(getArrayType('felt**')).toEqual('felt');
     expect(getArrayType('core::array::Array::<core::bool>')).toEqual('core::bool');
   });
 });

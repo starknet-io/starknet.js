@@ -19,6 +19,7 @@ import {
   CompiledSierra,
   DeclareContractPayload,
   MultiDeployContractResponse,
+  ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
   type PaymasterOptions,
@@ -30,6 +31,7 @@ import {
   addInvokeTransaction,
   addStarknetChain,
   getPermissions,
+  standardConnect,
   subscribeWalletEvent,
   requestAccounts,
   signMessage,
@@ -53,6 +55,12 @@ export class WalletAccountV5 extends Account {
    */
   private unsubscribe: () => void;
 
+  /**
+   * Unsubscribe functions for the callbacks registered through {@link onChange}.
+   * Released by {@link unsubscribeChange}.
+   */
+  private changeSubscriptions: Array<() => void> = [];
+
   constructor(options: WalletAccountV5Options) {
     super({ ...options, signer: '' }); // At this point unknown address
     this.walletProvider = options.walletProvider;
@@ -74,12 +82,25 @@ export class WalletAccountV5 extends Account {
   /**
    * WALLET EVENTS
    */
-  public onChange(callback: (change: StandardEventsChangeProperties) => void): void {
-    subscribeWalletEvent(this.walletProvider, callback);
+  /**
+   * Subscribe a callback to wallet account/network changes.
+   * @param {(change: StandardEventsChangeProperties) => void} callback called on each change.
+   * @returns {() => void} a function to unsubscribe this specific callback.
+   */
+  public onChange(callback: (change: StandardEventsChangeProperties) => void): () => void {
+    const unsubscribe = subscribeWalletEvent(this.walletProvider, callback);
+    this.changeSubscriptions.push(unsubscribe);
+    return unsubscribe;
   }
 
+  /**
+   * Unsubscribe from all wallet events, including the callbacks registered through {@link onChange}.
+   * To call before the instance is deleted.
+   */
   public unsubscribeChange(): void {
     this.unsubscribe();
+    this.changeSubscriptions.forEach((unsubscribe) => unsubscribe());
+    this.changeSubscriptions = [];
   }
 
   /**
@@ -159,13 +180,18 @@ export class WalletAccountV5 extends Account {
   }
 
   static async connect(
-    provider: ProviderInterface,
+    provider: ProviderOptions | ProviderInterface,
     walletProvider: WalletWithStarknetFeatures,
     cairoVersion?: CairoVersion,
     paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false
   ) {
-    const [accountAddress] = await requestAccounts(walletProvider, silentMode);
+    // Use the wallet-standard `standard:connect` feature to authorize accounts AND prime
+    // the wrapper internal state, so that subsequent wallet events propagate (see onChange).
+    // Empty `accounts` (user refusal / silent without session) leaves the address undefined,
+    // matching the previous behavior — no crash.
+    const { accounts } = await standardConnect(walletProvider, silentMode);
+    const accountAddress = accounts[0]?.address;
     return new WalletAccountV5({
       provider,
       walletProvider,
@@ -176,7 +202,7 @@ export class WalletAccountV5 extends Account {
   }
 
   static async connectSilent(
-    provider: ProviderInterface,
+    provider: ProviderOptions | ProviderInterface,
     walletProvider: WalletWithStarknetFeatures,
     cairoVersion?: CairoVersion,
     paymaster?: PaymasterOptions | PaymasterInterface

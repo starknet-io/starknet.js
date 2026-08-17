@@ -185,31 +185,31 @@ describe('CairoUint16 class Unit Tests', () => {
   });
 
   describe('toApiRequest method', () => {
-    test('should return hex string array for zero', () => {
+    test('should return decimal string array for zero', () => {
       const u16 = new CairoUint16(0);
       const result = u16.toApiRequest();
-      expect(result).toEqual(['0x0']);
+      expect(result).toEqual(['0']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return hex string array for small numbers', () => {
+    test('should return decimal string array for small numbers', () => {
       const u16 = new CairoUint16(42);
       const result = u16.toApiRequest();
-      expect(result).toEqual(['0x2a']);
+      expect(result).toEqual(['42']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return hex string array for large numbers', () => {
+    test('should return decimal string array for large numbers', () => {
       const u16 = new CairoUint16(65535);
       const result = u16.toApiRequest();
-      expect(result).toEqual(['0xffff']);
+      expect(result).toEqual(['65535']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
     test('should handle bigint input', () => {
       const u16 = new CairoUint16(32768n);
       const result = u16.toApiRequest();
-      expect(result).toEqual(['0x8000']);
+      expect(result).toEqual(['32768']);
       expect(result).toHaveProperty('__compiled__', true);
     });
   });
@@ -306,7 +306,7 @@ describe('CairoUint16 class Unit Tests', () => {
 
         expect(bigintVal).toBe(BigInt(val));
         expect(hexVal).toBe(`0x${val.toString(16)}`);
-        expect(apiRequest[0]).toBe(hexVal);
+        expect(apiRequest[0]).toBe(BigInt(hexVal).toString());
       });
     });
 

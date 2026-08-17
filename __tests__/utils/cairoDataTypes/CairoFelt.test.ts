@@ -41,19 +41,19 @@ describe('CairoFelt function', () => {
 
   test('should properly handle large BigInt values', () => {
     // Examples of large BigInt values found in blockchain environments.
-    expect(
+    expect(() =>
       CairoFelt(
         BigInt('57896044618658097711785492504343953926634992332820282019728792003956564819967')
       )
-    ).toBe('57896044618658097711785492504343953926634992332820282019728792003956564819967');
+    ).toThrow(/out of felt252 range/);
     expect(CairoFelt(BigInt('1524157875019052100'))).toBe('1524157875019052100');
   });
 
   test('should properly handle large hex number strings', () => {
     // Examples of large hex number strings found in blockchain environments.
-    expect(CairoFelt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141')).toBe(
-      '115792089237316195423570985008687907852837564279074904382605163141518161494337'
-    );
+    expect(() =>
+      CairoFelt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141')
+    ).toThrow(/out of felt252 range/);
     expect(CairoFelt('0x10A')).toBe('266');
   });
 
@@ -81,12 +81,12 @@ describe('CairoFelt function', () => {
   });
 
   test('should correctly handle zero-prefixed and hexadecimal string numbers', () => {
-    expect(CairoFelt('00123')).toBe('00123');
+    expect(CairoFelt('00123')).toBe('123');
     expect(CairoFelt('0xFF')).toBe(BigInt('0xFF').toString());
   });
 
-  test('should properly handle smallest integer', () => {
-    expect(CairoFelt(Number.MIN_SAFE_INTEGER)).toBe('-9007199254740991');
+  test('should reject negative integers', () => {
+    expect(() => CairoFelt(Number.MIN_SAFE_INTEGER)).toThrow(/out of felt252 range/);
   });
 
   test('should properly handle largest integer', () => {
@@ -173,8 +173,8 @@ describe('CairoFelt function', () => {
     const overflowNumber = BigInt(
       '115792089237316195423570985008687907853269984665640564039457584007913129639936'
     );
-    // CairoFelt does not currently check for uint256 overflow.
-    expect(() => CairoFelt(overflowNumber)).not.toThrow(); // CHANGED
+    // CairoFelt now checks for felt252 overflow.
+    expect(() => CairoFelt(overflowNumber)).toThrow(/out of felt252 range/);
   });
 
   test('should reject non-hexadecimal strings and invalid hex formats', () => {
@@ -192,8 +192,7 @@ describe('CairoFelt function', () => {
   });
 
   test('should handle zero-prefixed numbers and hex correctly', () => {
-    // CairoFelt currently does not remove leading zeros. You may need to update 'CairoFelt' to strip leading zeros if you need it to.
-    expect(CairoFelt('00123')).not.toBe('123'); //
+    expect(CairoFelt('00123')).toBe('123');
 
     expect(CairoFelt('0x00000123')).toBe(BigInt('0x00000123').toString());
   });
@@ -207,11 +206,9 @@ describe('CairoFelt function', () => {
   });
 
   test('should properly handle edge numeric values and formats', () => {
-    expect(CairoFelt(Number.MIN_SAFE_INTEGER)).toBe('-9007199254740991');
     expect(CairoFelt(Number.MAX_SAFE_INTEGER)).toBe('9007199254740991');
 
-    // CairoFelt doesn't currently throw for numbers beyond the safe upper limit for JavaScript numbers (Number.MAX_SAFE_INTEGER + 1). Update CairoFelt if you want to enforce this rule.
-    expect(() => CairoFelt(9007199254740992n)).not.toThrow(); //
+    expect(() => CairoFelt(9007199254740992n)).not.toThrow();
 
     expect(CairoFelt('0x0')).toBe('0');
   });
@@ -226,10 +223,10 @@ describe('CairoFelt function', () => {
     expect(() => CairoFelt(validAddress)).not.toThrow();
   });
 
-  test('should properly handle string values within uint256 limit', () => {
+  test('should reject values outside felt252 range even if within uint256 limit', () => {
     const withinLimit =
       '115792089237316195423570985008687907853269984665640564039457584007913129639935'; // Inside the upper limit of a uint256
-    expect(() => CairoFelt(BigInt(withinLimit))).not.toThrow();
+    expect(() => CairoFelt(BigInt(withinLimit))).toThrow(/out of felt252 range/);
   });
 
   test('should handle Regular strings that can be converted', () => {

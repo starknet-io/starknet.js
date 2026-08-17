@@ -299,7 +299,7 @@ export default function responseParser({
           parsedDataArr.push(
             parseResponseValue(
               responseIterator,
-              { name, type: output.type.replace('*', '') },
+              { name, type: output.type.replaceAll('*', '') },
               parser,
               structs,
               enums

@@ -74,6 +74,8 @@ await myProvider.waitForTransaction(tx2.transaction_hash);
 
 Use `Contract.populate()` to prepare call data for complex parameters or multicalls.
 
+When you only need the compiled `Calldata` (and not a full `Call`), use `Contract.compile()` instead — for example `myContract.compile('transfer', { recipient, amount })` rather than `myContract.populate('transfer', { recipient, amount }).calldata`.
+
 :::
 
 :::info

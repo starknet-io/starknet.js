@@ -4,385 +4,366 @@ sidebar_position: 7
 
 # WebSocket Channel
 
-The `WebSocketChannel` provides a robust, real-time connection to a Starknet RPC Node, enabling you to subscribe to events and receive updates as they happen. It's designed for production use with features like automatic reconnection, request queueing, and a modern subscription management API.
+`WebSocketChannel` keeps a persistent connection to a Starknet node and streams data as it happens:
+new blocks, contract events, transaction status. The same connection can also be used to send any
+regular RPC request.
 
-Ensure that you are using a node that supports the required RPC spec (RPC 0.9).
+It reconnects on its own when the connection drops, restores the subscriptions it had, and replays
+the requests that were pending meanwhile.
 
-## Key Features
+:::info
+This guide covers RPC spec **0.10**; your node must expose a WebSocket endpoint — see
+[WebSocket endpoints](#websocket-endpoints) below.
 
-- **Object-Based API**: All subscription methods now use object-based parameters for better type safety and extensibility
-- **Modern Subscription Management**: Uses a `Subscription` object to manage event streams with typed results
-- **Automatic Reconnection**: Automatically detects connection drops and reconnects with an exponential backoff strategy
-- **Request Queueing**: Queues any requests made while the connection is down and executes them upon reconnection
-- **Event Buffering**: Buffers events for a subscription if no handler is attached, preventing event loss
-- **Custom Errors**: Throws specific, catchable errors like `TimeoutError` for more reliable error handling
-- **Full Type Safety**: Complete TypeScript support with exported parameter interfaces and subscription types
+Unlike `RpcProvider`, `WebSocketChannel` is not versioned: the subscription methods are the same in
+RPC 0.9 and 0.10, so the channel also works against a 0.9 node — except for the two 0.10.1+
+additions, `fromAddress` as an array and the `tags` option.
+:::
 
-## Importing
-
-To get started, import the necessary classes and types from the `starknet` library.
-
-```typescript
-import {
-  WebSocketChannel,
-  WebSocketOptions,
-  ReconnectOptions,
-  WebSocketModule,
-  Subscription,
-  SubscriptionOptions,
-  // Subscription parameter interfaces
-  SubscribeNewHeadsParams,
-  SubscribeEventsParams,
-  SubscribeTransactionStatusParams,
-  SubscribeNewTransactionReceiptsParams,
-  SubscribeNewTransactionsParams,
-  // Typed subscription results
-  SubscriptionNewHeadsEvent,
-  SubscriptionStarknetEventsEvent,
-  SubscriptionTransactionStatusEvent,
-  SubscriptionNewTransactionReceiptsEvent,
-  SubscriptionNewTransactionEvent,
-  // Error types
-  TimeoutError,
-  WebSocketNotConnectedError,
-} from 'starknet';
-```
-
-## Creating a WebSocket Channel
-
-Instantiate `WebSocketChannel` with your node's WebSocket URL.
+## Create a channel
 
 ```typescript
+import { WebSocketChannel } from 'starknet';
+
 const channel = new WebSocketChannel({
-  nodeUrl: 'wss://your-starknet-node/rpc/v0_9',
+  nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
 });
 
-// It's good practice to wait for the initial connection.
+// Wait for the socket to be open before subscribing.
 await channel.waitForConnection();
 ```
 
-If you are in an environment without a native `WebSocket` object (like older node.js), you can provide a custom implementation (e.g., from the `ws` library).
+Node.js 22+ and browsers provide a global `WebSocket`, which is used automatically. In an environment
+that has none, pass an implementation with the `websocket` option:
 
 ```typescript
 import WebSocket from 'ws';
+import { WebSocketChannel, WebSocketModule } from 'starknet';
 
 const channel = new WebSocketChannel({
-  nodeUrl: '...',
-  websocket: WebSocket as WebSocketModule, // Provide the implementation class
+  nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
+  websocket: WebSocket as WebSocketModule,
 });
-
-await channel.waitForConnection();
 ```
 
-### Advanced Configuration
-
-You can customize the channel's behavior with `WebSocketOptions`.
+When you are done, close the connection — this also stops the automatic reconnection:
 
 ```typescript
-const options: WebSocketOptions = {
-  nodeUrl: '...',
-  autoReconnect: true, // Default: true
-  reconnectOptions: {
-    retries: 5, // Default: 5
-    delay: 2000, // Default: 2000ms
-  },
-  requestTimeout: 60000, // Default: 60000ms
-  maxBufferSize: 1000, // Default: 1000 events per subscription
-};
-
-const channel = new WebSocketChannel(options);
+channel.disconnect();
+await channel.waitForDisconnection();
 ```
 
-## Subscribing to Events
+### WebSocket endpoints
 
-When you call a subscription method (e.g., `subscribeNewHeads`), it returns a `Promise` that resolves with a `Subscription` object. This object is your handle to that specific event stream.
-
-You attach a listener with `.on()` and stop listening with `.unsubscribe()`.
+The WebSocket address is not always the HTTP one with the `wss://` scheme: the port and the path
+depend on the node. Working examples:
 
 ```typescript
-// 1. Subscribe to an event stream using object-based API.
-const sub: SubscriptionNewHeadsEvent = await channel.subscribeNewHeads({
-  blockIdentifier: 'latest', // optional: 'latest', 'pending', block hash, or block number
+// Alchemy Mainnet — same URL as the HTTP one, with the wss:// scheme:
+const channelAlchemyMainnet = new WebSocketChannel({
+  nodeUrl: 'wss://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_10/' + alchemyKey,
 });
 
-// 2. Attach a handler to process incoming data.
-sub.on((data) => {
-  console.log('Received new block header:', data.block_number);
+// Alchemy Sepolia Testnet:
+const channelAlchemySepolia = new WebSocketChannel({
+  nodeUrl: 'wss://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/' + alchemyKey,
 });
 
-// 3. When you're done, unsubscribe.
-// This is automatically handled if the channel disconnects and restores the subscription.
-// You only need to call this when you explicitly want to stop listening.
+// Local Pathfinder — same port as HTTP, but the path is mandatory:
+const channelPathfinder = new WebSocketChannel({ nodeUrl: 'ws://127.0.0.1:9545/rpc/v0_10' });
+
+// Local Juno — dedicated port, enabled with the `--ws` option (default port 6061):
+const channelJuno = new WebSocketChannel({ nodeUrl: 'ws://127.0.0.1:6061/ws/v0_10' });
+
+// Local starknet-devnet — `/ws` path on the devnet port:
+const channelDevnet = new WebSocketChannel({ nodeUrl: 'ws://127.0.0.1:5050/ws' });
+```
+
+> Take care to safely manage your API key. It's a confidential item!
+
+:::note
+Free public endpoints supporting the Starknet subscriptions are rare: most node providers serve the
+WebSocket only with an API key. A node exposing a `wss://` address does not necessarily accept
+`starknet_subscribe…` requests.
+:::
+
+:::warning
+A node applies its own limits to the WebSocket traffic — for example the number of new connections
+per IP and per second, the number of simultaneous subscriptions, or the maximum lifetime of a socket.
+Reaching one of them shows up as a connection refused when opening the channel, or as a socket closed
+while everything was working (the [automatic reconnection](#reconnection) then takes over). Check
+these limits with your node provider before subscribing to a busy stream.
+:::
+
+## Subscribe to a stream
+
+Every `subscribe…()` method resolves to a `Subscription` object. Attach a handler with `.on()`, and
+stop the stream with `.unsubscribe()`:
+
+```typescript
+const sub = await channel.subscribeNewHeads();
+
+sub.on((blockHeader) => {
+  console.log('New block', blockHeader.block_number, blockHeader.block_hash);
+});
+
+// ... later
 await sub.unsubscribe();
 ```
 
-### Event Buffering
+The handler is typed from the subscription: `blockHeader` above is a block header, an event handler
+receives an event, and so on.
 
-If you `await` a subscription but don't immediately attach an `.on()` handler, the `Subscription` object will buffer incoming events. Once you attach a handler, all buffered events will be delivered in order before any new events are processed. This prevents event loss during asynchronous setup.
+If data arrives before you attach a handler, it is buffered (up to `maxBufferSize`, 1000 by default)
+and delivered in order as soon as `.on()` is called, so nothing is lost during an asynchronous setup.
 
-The buffer size is limited by the `maxBufferSize` in the channel options. If the buffer is full, the oldest events are dropped.
+:::warning
+A subscription accepts only one handler: calling `.on()` a second time throws.
+:::
 
-## Type Safety and Exported Types
+### Sharing a stream between consumers
 
-Starknet.js v8 provides complete TypeScript support for WebSocket subscriptions. All subscription methods return properly typed `Subscription` objects, and parameter interfaces are exported for external use.
+When several parts of your code need the same stream, dispatch from a single handler:
 
 ```typescript
-import { SubscriptionNewHeadsEvent, SubscribeEventsParams } from 'starknet';
+const sub = await channel.subscribeEvents({ fromAddress });
 
-// Typed subscription result
-const headsSub: SubscriptionNewHeadsEvent = await channel.subscribeNewHeads();
-
-// Typed parameters
-const eventsParams: SubscribeEventsParams = {
-  fromAddress: '0x1234...',
-  finalityStatus: 'ACCEPTED_ON_L2',
-};
-const eventsSub = await channel.subscribeEvents(eventsParams);
-
-// Type-safe event handling
-headsSub.on((blockHeader) => {
-  // blockHeader is properly typed as NewHeadsEvent['result']
-  console.log('Block number:', blockHeader.block_number);
-  console.log('Block hash:', blockHeader.block_hash);
+sub.on((event) => {
+  updateUI(event);
+  updateCache(event);
 });
 ```
 
-### Available Parameter Types
-
-All subscription parameter interfaces are exported:
-
-- `SubscribeNewHeadsParams` - For `subscribeNewHeads()`
-- `SubscribeEventsParams` - For `subscribeEvents()`
-- `SubscribeTransactionStatusParams` - For `subscribeTransactionStatus()`
-- `SubscribeNewTransactionReceiptsParams` - For `subscribeNewTransactionReceipts()`
-- `SubscribeNewTransactionsParams` - For `subscribeNewTransactions()`
-
-### Available Subscription Result Types
-
-All subscription result types are exported for type annotations:
-
-- `SubscriptionNewHeadsEvent` - Result type for new block headers
-- `SubscriptionStarknetEventsEvent` - Result type for contract events
-- `SubscriptionTransactionStatusEvent` - Result type for transaction status updates
-- `SubscriptionNewTransactionReceiptsEvent` - Result type for transaction receipts
-- `SubscriptionNewTransactionEvent` - Result type for new transactions
-
-## Automatic Reconnection and Queueing
-
-The channel is designed to be resilient. If the connection drops, it will automatically try to reconnect. While reconnecting:
-
-- Any API calls (e.g., `sendReceive`, `subscribeNewHeads`) will be queued.
-- Once the connection is restored, the queue will be processed automatically.
-- All previously active subscriptions will be **automatically re-subscribed**. The original `Subscription` objects you hold will continue to work without any need for manual intervention.
-
-## Error Handling
-
-The channel throws specific errors, allowing for precise error handling.
+Subscribing twice with the same parameters also works — you get two independent streams, each with
+its own handler and its own `unsubscribe()` — but the node then sends everything twice:
 
 ```typescript
-try {
-  const result = await channel.sendReceive('starknet_chainId');
-} catch (e) {
-  if (e instanceof TimeoutError) {
-    console.error('The request timed out!');
-  } else if (e instanceof WebSocketNotConnectedError) {
-    console.error('The WebSocket is not connected.');
-  } else {
-    console.error('An unknown error occurred:', e);
-  }
-}
+const subUI = await channel.subscribeEvents({ fromAddress });
+const subCache = await channel.subscribeEvents({ fromAddress });
+
+subUI.on(updateUI);
+subCache.on(updateCache);
 ```
 
-## Available Subscription Methods
+## Subscription methods
 
-All subscription methods now use object-based parameters for better type safety and extensibility. Each method returns a `Promise<Subscription>` with typed results.
+### `subscribeNewHeads`
 
-### `subscribeNewHeads(params?: SubscribeNewHeadsParams)`
-
-Subscribes to new block headers.
+New block headers:
 
 ```typescript
-// Subscribe to all new blocks
-const sub1 = await channel.subscribeNewHeads();
+const sub = await channel.subscribeNewHeads();
 
-// Subscribe from a specific block
-const sub2 = await channel.subscribeNewHeads({
-  blockIdentifier: 'latest', // or block number/hash
+// Or start from an earlier block (up to 1024 blocks back):
+const sub2 = await channel.subscribeNewHeads({ blockIdentifier: 1_500_000 });
+```
+
+`blockIdentifier` accepts `'latest'` (default), a block number, or a block hash.
+
+### `subscribeEvents`
+
+Contract events, with optional filters:
+
+```typescript
+const sub = await channel.subscribeEvents({
+  fromAddress: '0x049d36...', // one address, or an array of addresses (RPC 0.10.1+)
+  keys: [['0x02db34...']], // event key filter
+  finalityStatus: 'ACCEPTED_ON_L2', // or 'PRE_CONFIRMED'
+});
+
+sub.on((event) => {
+  console.log(event.from_address, event.keys, event.data, event.transaction_hash);
 });
 ```
 
-### `subscribeEvents(params?: SubscribeEventsParams)`
+All filters are optional — without any, you receive every event of the network.
 
-Subscribes to contract events with optional filtering.
+### `subscribeTransactionStatus`
 
-```typescript
-// Subscribe to all events
-const sub1 = await channel.subscribeEvents();
-
-// Subscribe to events with filters
-const sub2 = await channel.subscribeEvents({
-  fromAddress: '0x1234...', // Filter by contract address
-  keys: [['0xkey1', '0xkey2']], // Filter by event keys
-  blockIdentifier: 'latest',
-  finalityStatus: 'ACCEPTED_ON_L2', // Filter by finality status
-});
-```
-
-### `subscribeTransactionStatus(params: SubscribeTransactionStatusParams)`
-
-Subscribes to status updates for a specific transaction.
+Status updates of one transaction, starting with its current status:
 
 ```typescript
 const sub = await channel.subscribeTransactionStatus({
-  transactionHash: '0x1234...', // Required
-  blockIdentifier: 'latest', // Optional
+  transactionHash: '0x0123...',
+});
+
+sub.on((update) => {
+  console.log(update.transaction_hash, update.status.finality_status);
+  // status.execution_status and status.failure_reason are set once executed
 });
 ```
 
-### `subscribeNewTransactionReceipts(params?: SubscribeNewTransactionReceiptsParams)`
+### `subscribeNewTransactions`
 
-Subscribes to new transaction receipts (RPC 0.9+).
+New transactions and their finality status changes:
 
 ```typescript
-// Subscribe to all transaction receipts
-const sub1 = await channel.subscribeNewTransactionReceipts();
+const sub = await channel.subscribeNewTransactions({
+  finalityStatus: ['RECEIVED', 'ACCEPTED_ON_L2'], // default: ['ACCEPTED_ON_L2']
+  senderAddress: ['0x0456...'], // optional sender filter
+});
 
-// Subscribe with filters
-const sub2 = await channel.subscribeNewTransactionReceipts({
-  finalityStatus: ['ACCEPTED_ON_L2'], // Filter by finality status
-  senderAddress: ['0x1234...', '0x5678...'], // Filter by sender addresses
+sub.on((transaction) => {
+  console.log(transaction.transaction_hash, transaction.finality_status);
 });
 ```
 
-### `subscribeNewTransactions(params?: SubscribeNewTransactionsParams)`
+`finalityStatus` accepts `'RECEIVED'`, `'CANDIDATE'`, `'PRE_CONFIRMED'` and `'ACCEPTED_ON_L2'`. One
+event is fired for each status update, so the same transaction can show up several times.
 
-Subscribes to new transactions (RPC 0.9+).
+To also receive the SNIP-36 proof facts of the transactions, add the corresponding tag (RPC 0.10.1+):
 
 ```typescript
-// Subscribe to all transactions
-const sub1 = await channel.subscribeNewTransactions();
-
-// Subscribe with filters
-const sub2 = await channel.subscribeNewTransactions({
-  finalityStatus: ['ACCEPTED_ON_L2'], // Filter by finality status
-  senderAddress: ['0x1234...'], // Filter by sender addresses
+const sub = await channel.subscribeNewTransactions({
+  tags: ['INCLUDE_PROOF_FACTS'],
 });
 ```
 
-## Migration from v7 to v8
+### `subscribeNewTransactionReceipts`
 
-The WebSocket API has been updated to use object-based parameters:
+Same filters, but you receive the full receipt instead of the transaction:
 
 ```typescript
-// v7 (positional arguments)
-const sub = await channel.subscribeEvents(
-  '0x1234...', // fromAddress
-  [['0xkey1']], // keys
-  'latest', // blockIdentifier
-  'ACCEPTED_ON_L2' // finalityStatus
-);
+const sub = await channel.subscribeNewTransactionReceipts({
+  finalityStatus: ['ACCEPTED_ON_L2'], // or 'PRE_CONFIRMED'
+  senderAddress: ['0x0456...'],
+});
 
-// v8 (object-based parameters)
-const sub = await channel.subscribeEvents({
-  fromAddress: '0x1234...',
-  keys: [['0xkey1']],
-  blockIdentifier: 'latest',
-  finalityStatus: 'ACCEPTED_ON_L2',
+sub.on((receipt) => {
+  console.log(receipt.transaction_hash, receipt.execution_status, receipt.block_number);
 });
 ```
 
-**Breaking Changes:**
+## Sending RPC requests
 
-- `subscribePendingTransaction` has been removed (not available in RPC 0.9)
-- All subscription methods now use object parameters
-- New methods `subscribeNewTransactionReceipts` and `subscribeNewTransactions` added for RPC 0.9
-
-## Complete Example
-
-Here's a comprehensive example showcasing the new object-based API and type safety:
+`sendReceive()` sends any JSON-RPC method over the socket and resolves with its result, so you do not
+need a second HTTP connection for occasional reads:
 
 ```typescript
-import {
-  WebSocketChannel,
-  SubscriptionNewHeadsEvent,
-  SubscriptionStarknetEventsEvent,
-  SubscribeEventsParams,
-  TimeoutError,
-  WebSocketNotConnectedError,
-} from 'starknet';
+const chainId = await channel.sendReceive<string>('starknet_chainId');
+const blockNumber = await channel.sendReceive<number>('starknet_blockNumber');
+
+const nonce = await channel.sendReceive('starknet_getNonce', {
+  block_id: 'latest',
+  contract_address: '0x0456...',
+});
+```
+
+Parameters and result are the raw RPC ones — no conversion is applied, unlike the `RpcProvider`
+methods.
+
+A call made while the connection is down is queued and sent once the socket is back. If no answer
+comes within `requestTimeout` (60 s by default), the promise rejects with a `TimeoutError`.
+
+A queued call is never left pending: if the connection never comes back — reconnection gave up, or
+you called `disconnect()` — the promise rejects with a `WebSocketNotConnectedError` instead. Note
+that `requestTimeout` only starts once the request is actually sent, so it is the reconnection
+settings below, not `requestTimeout`, that bound how long a queued call can wait.
+
+:::tip
+`channel.send()` sends a request and returns its id at once, without waiting for the answer. You then
+have to read the incoming messages yourself (`channel.on('message', …)`) and find the one carrying
+the same id. In most cases, use `sendReceive()`.
+:::
+
+## Reconnection
+
+If the connection drops, the channel reconnects with an exponential backoff, re-subscribes all your
+active streams — your existing `Subscription` objects keep working, with nothing to do on your side —
+then flushes the queued requests.
+
+A stream the node refuses to re-subscribe cannot be recovered: its `Subscription` is closed, and
+`isClosed` reports it.
+
+The defaults are usually fine; tune them if needed:
+
+```typescript
+const channel = new WebSocketChannel({
+  nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
+  autoReconnect: true, // default: true
+  reconnectOptions: {
+    retries: 5, // default: 5 attempts before giving up
+    delay: 2000, // default: 2000 ms before the first retry
+    exponential: true, // default: true — the delay doubles at each attempt
+    stableConnectionThreshold: 5000, // default: 5000 ms
+  },
+  requestTimeout: 60000, // default: 60000 ms
+  maxBufferSize: 1000, // default: 1000 events per subscription
+});
+```
+
+`stableConnectionThreshold` is how long a new connection must stay open before it is considered
+stable and the retry counter is reset. It prevents a node that accepts then immediately drops the
+connection from being retried forever.
+
+Once `retries` attempts have failed, the channel gives up and stops reconnecting on its own. Any
+request still queued at that point is rejected with a `WebSocketNotConnectedError`. Call
+`reconnect()` to start over.
+
+## Error handling
+
+```typescript
+import { TimeoutError, WebSocketNotConnectedError } from 'starknet';
+
+try {
+  const chainId = await channel.sendReceive('starknet_chainId');
+} catch (error) {
+  if (error instanceof TimeoutError) {
+    console.error('No answer from the node in time');
+  } else if (error instanceof WebSocketNotConnectedError) {
+    console.error('The connection is gone, the request will not be answered');
+  } else {
+    throw error;
+  }
+}
+```
+
+## Complete example
+
+```typescript
+import { WebSocketChannel, TimeoutError } from 'starknet';
 
 async function main() {
-  // Create WebSocket channel
   const channel = new WebSocketChannel({
-    nodeUrl: 'wss://starknet-sepolia.public.blastapi.io/rpc/v0_9',
-    autoReconnect: true,
-    reconnectOptions: {
-      retries: 5,
-      delay: 2000,
-    },
-    requestTimeout: 30000,
-    maxBufferSize: 1000,
+    nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
   });
 
   try {
-    // Wait for connection
     await channel.waitForConnection();
-    console.log('Connected to WebSocket');
+    console.log('Connected to', await channel.sendReceive('starknet_chainId'));
 
-    // Subscribe to new block headers
-    const headsSub: SubscriptionNewHeadsEvent = await channel.subscribeNewHeads({
-      blockIdentifier: 'latest',
+    const headsSub = await channel.subscribeNewHeads();
+    headsSub.on((header) => {
+      console.log(`Block ${header.block_number}: ${header.block_hash}`);
     });
 
-    headsSub.on((blockHeader) => {
-      console.log(`New block ${blockHeader.block_number}: ${blockHeader.block_hash}`);
-    });
-
-    // Subscribe to contract events with filtering
-    const eventParams: SubscribeEventsParams = {
+    const eventsSub = await channel.subscribeEvents({
       fromAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7', // ETH token
       finalityStatus: 'ACCEPTED_ON_L2',
-    };
-
-    const eventsSub: SubscriptionStarknetEventsEvent = await channel.subscribeEvents(eventParams);
-
-    eventsSub.on((eventData) => {
-      console.log('Contract event:', eventData.event);
+    });
+    eventsSub.on((event) => {
+      console.log(`Event from ${event.from_address} in tx ${event.transaction_hash}`);
     });
 
-    // Subscribe to transaction receipts (RPC 0.9+)
-    const receiptsSub = await channel.subscribeNewTransactionReceipts({
-      finalityStatus: ['ACCEPTED_ON_L2'],
+    // Listen for 1 minute
+    await new Promise((resolve) => {
+      setTimeout(resolve, 60_000);
     });
 
-    receiptsSub.on((receipt) => {
-      console.log('New transaction receipt:', receipt.transaction_receipt.transaction_hash);
-    });
-
-    // Keep running for demonstration
-    await new Promise((resolve) => setTimeout(resolve, 60000));
-
-    // Clean up subscriptions
     await headsSub.unsubscribe();
     await eventsSub.unsubscribe();
-    await receiptsSub.unsubscribe();
   } catch (error) {
-    if (error instanceof TimeoutError) {
-      console.error('Connection timeout:', error.message);
-    } else if (error instanceof WebSocketNotConnectedError) {
-      console.error('WebSocket not connected:', error.message);
-    } else {
-      console.error('Unexpected error:', error);
-    }
+    if (error instanceof TimeoutError) console.error('Node did not answer:', error.message);
+    else console.error(error);
   } finally {
-    // Close the connection
     channel.disconnect();
     await channel.waitForDisconnection();
-    console.log('Disconnected from WebSocket');
   }
 }
 
-main().catch(console.error);
+main();
 ```
 
-For more details, see the complete [API documentation](/docs/next/API/classes/WebSocketChannel).
+All the types (`WebSocketOptions`, `Subscription`, the `Subscribe…Params` interfaces, …) are exported
+from `starknet`; see the [API documentation](/docs/next/API/classes/WebSocketChannel) for the full
+list.

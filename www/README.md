@@ -1,6 +1,6 @@
 # Website
 
-This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+This website is built using [Docusaurus 3](https://docusaurus.io/), a modern static website generator.
 
 ## Installation
 
@@ -44,7 +44,7 @@ If you are using GitHub pages for hosting, this command is a convenient way to b
 
 Documentation for previous versions is located in [/www/versioned_docs](/www/versioned_docs) and normally does not need to be modified.
 Documentation for the future official release of your work is located in [/www/docs](/www/docs) of your branch. There you have the API documentation in [/www/docs/API](/www/docs/API) and the guides in [/www/docs/guides](/www/docs/guides).
-Official documentation is available to users at [www.starknetjs.com](https://www.starknetjs.com/). You can choose the documentation version you need in the top menu bar. NEXT version corresponds to the documentation of the last commit of the `develop` branch.
+Official documentation is available to users at [starknet-io.github.io/starknet.js](https://starknet-io.github.io/starknet.js/). You can choose the documentation version you need in the top menu bar. NEXT version corresponds to the documentation of the last commit of the `develop` branch.
 
 ## Update documentation
 
@@ -97,3 +97,56 @@ npm run docusaurus docs:version X.Y.Z
 - Commit your work, and merge it in `develop`
 - perform the official release of `X.Y.Z` in `main`
 - In the official documentation, the new version of documentation for `X.Y.Z` is available, and NEXT version is temporarily identical
+
+## Diagrams (Mermaid)
+
+A diagram is a Mermaid `.mmd` source stored next to its guide, in the `pictures/` folder, rendered
+by hand to a `.svg` — for example `docs/guides/account/pictures/strk20-architecture.mmd` and the
+matching `.svg`. The `.mmd` is the source of truth, the `.svg` is what the guide embeds: **commit
+both**.
+
+To update one: edit the `.mmd`, paste its **entire** content into [mermaid.live](https://mermaid.live)
+— front matter included, it carries the theme — then **reset the zoom and re-center the preview**
+before exporting through _Actions → SVG_, and overwrite the `.svg`.
+
+### Why resetting the view matters
+
+The preview panel is a pan/zoom surface and the export captures its current state, which corrupts
+the SVG in two ways:
+
+- the root `<svg>` gets `width="100%" height="100%"` instead of numeric dimensions;
+- `<g class="svg-pan-zoom_viewport">` gets a `transform="matrix(…)"` freezing the zoom and the pan.
+
+The symptom is misleading, because such a file **opens perfectly in a browser** — only the dev
+server rejects it. Docusaurus sizes images with `image-size`, which reads `width`/`height` on the
+root `<svg>` and falls back to `viewBox` only when both are **absent**; `"100%"` is neither a
+number nor absent, so it throws:
+
+```
+TypeError: Invalid SVG
+[WARNING] The image at ".../pictures/xxx.svg" can't be read correctly. Please ensure it's a valid image.
+```
+
+### Checking an exported diagram
+
+The root tag must carry numeric dimensions, and no `matrix(…)` should remain:
+
+```bash
+grep -o '<svg[^>]*>' docs/guides/account/pictures/xxx.svg
+grep -c 'matrix(' docs/guides/account/pictures/xxx.svg   # expected: 0
+```
+
+If you have to reframe a diagram by hand, measure it rather than estimating the bounding box from
+the file — control points of the edge curves extend well past the visible drawing and lead to a
+frame that is offset and clipped:
+
+```bash
+inkscape --query-all xxx.svg | head -1   # id,x,y,width,height of the whole drawing
+```
+
+Aim for equal margins: with a `viewBox="x0 y0 W H"`, the reported `x`/`y` are the left and top
+margins, and the right and bottom ones are `W - x - width` and `H - y - height`.
+
+Note that Inkscape renders these files poorly — it ignores the `<foreignObject>` elements holding
+every Mermaid label. Use it to measure geometry, not to preview: the browser is the reference for
+text and colors.

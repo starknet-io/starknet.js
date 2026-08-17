@@ -29,7 +29,7 @@ export class CairoInt64 {
   }
 
   toApiRequest(): string[] {
-    return addCompiledFlag([this.toHexString()]);
+    return addCompiledFlag([BigInt(this.toHexString()).toString()]);
   }
 
   toBigInt() {

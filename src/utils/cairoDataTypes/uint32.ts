@@ -28,7 +28,7 @@ export class CairoUint32 {
   }
 
   toApiRequest(): string[] {
-    return addCompiledFlag([this.toHexString()]);
+    return addCompiledFlag([BigInt(this.toHexString()).toString()]);
   }
 
   toBigInt() {

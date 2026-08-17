@@ -290,26 +290,26 @@ describe('CairoInt32 class Unit Tests', () => {
   });
 
   describe('toApiRequest method', () => {
-    test('should return hex string array for zero', () => {
+    test('should return decimal string array for zero', () => {
       const i32 = new CairoInt32(0);
       const result = i32.toApiRequest();
-      expect(result).toEqual(['0x0']);
+      expect(result).toEqual(['0']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return hex string array for positive numbers', () => {
+    test('should return decimal string array for positive numbers', () => {
       const i32 = new CairoInt32(1000000);
       const result = i32.toApiRequest();
-      expect(result).toEqual(['0xf4240']);
+      expect(result).toEqual(['1000000']);
       expect(result).toHaveProperty('__compiled__', true);
     });
 
-    test('should return field element hex representation for negative numbers', () => {
+    test('should return field element decimal representation for negative numbers', () => {
       const i32 = new CairoInt32(-1000000);
       const result = i32.toApiRequest();
       // Negative value -1000000 becomes PRIME + (-1000000) = PRIME - 1000000
       const fieldElement = PRIME - 1000000n;
-      const expectedValue = `0x${fieldElement.toString(16)}`;
+      const expectedValue = fieldElement.toString();
       expect(result).toEqual([expectedValue]);
       expect(result).toHaveProperty('__compiled__', true);
     });
@@ -318,8 +318,8 @@ describe('CairoInt32 class Unit Tests', () => {
       const minI32 = new CairoInt32(-2147483648);
       const maxI32 = new CairoInt32(2147483647);
       const minFieldElement = PRIME - 2147483648n;
-      const expectedMinValue = `0x${minFieldElement.toString(16)}`;
-      const expectedMaxValue = '0x7fffffff';
+      const expectedMinValue = minFieldElement.toString();
+      const expectedMaxValue = '2147483647';
       expect(minI32.toApiRequest()).toEqual([expectedMinValue]);
       expect(maxI32.toApiRequest()).toEqual([expectedMaxValue]);
     });
@@ -401,8 +401,8 @@ describe('CairoInt32 class Unit Tests', () => {
         } else {
           expect(hexVal).toBe(`0x${val.toString(16)}`);
         }
-        // apiRequest should equal hexVal
-        expect(apiRequest[0]).toBe(hexVal);
+        // apiRequest should equal the decimal representation of hexVal
+        expect(apiRequest[0]).toBe(BigInt(hexVal).toString());
       });
     });
 

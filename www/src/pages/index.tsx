@@ -1,20 +1,19 @@
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
+import CodeBlock from '@theme/CodeBlock';
 import Layout from '@theme/Layout';
 import clsx from 'clsx';
 import React from 'react';
-import { Helmet } from 'react-helmet';
 
 import styles from './index.module.css';
-import BrowserOnly from '@docusaurus/BrowserOnly';
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
-        <img src={`${siteConfig.baseUrl}img/Starknet-JS_logo.png`} />
+        <img className={styles.heroLogo} src={`${siteConfig.baseUrl}img/Starknet-JS_logo.png`} />
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
           <Link className="button button--secondary button--lg" to="/docs/guides/intro">
@@ -24,42 +23,38 @@ function HomepageHeader() {
       </div>
     </header>
   );
-};
+}
 
-function XFeed() {
+function SkillSection() {
   return (
-    <BrowserOnly>
-      {() =>
-        <div className={clsx('hero hero--primary', styles.heroBanner, styles.feedSection)}>
-          <div className={clsx(styles.feedContainer)}>
-            <a
-            className={clsx('twitter-timeline', styles.twitterTarget)}
-              data-width={600}
-              data-height={400}
-              data-dnt="true"
-              href="https://twitter.com/starknetjs?ref_src=twsrc%5Etfw"
-              text-align="center"
-            >Tweets by Starknetjs</a>
-            <Helmet>
-              <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
-            </Helmet>
-          </div>
-        </div>
-      }
-    </BrowserOnly>
-  )
+    <div className={clsx('hero hero--primary', styles.heroBanner, styles.skillSection)}>
+      <div className={clsx(styles.skillContainer)}>
+        <h2>Teach your AI coding agent starknet.js</h2>
+        <p>
+          AI training data is outdated — install the starknet.js skill to give your coding agent
+          accurate, up-to-date guidance. Works with Claude Code, Codex, Cursor, Gemini CLI, and any
+          other agent supporting the open skill standard.
+        </p>
+        <CodeBlock language="bash">npx skills add starknet-io/starknet.js</CodeBlock>
+        <p>or copy the skill files directly:</p>
+        <CodeBlock language="bash">
+          {'mkdir -p ~/.claude/skills/starknet-js && curl -s --output-dir ~/.claude/skills/starknet-js --remote-name-all "https://raw.githubusercontent.com/starknet-io/starknet.js/develop/skills/starknet-js/{SKILL.md,calldata.md,interacting.md}"'}
+        </CodeBlock>
+        <p className={styles.skillNote}>
+          This command installs into Claude Code&apos;s skills folder — adapt the target directory
+          for other agents.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export default function Home(): JSX.Element {
-  const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout
-      title={``}
-      description="JavaScript library for Starknet"
-    >
+    <Layout title={``} description="JavaScript library for Starknet">
       <HomepageHeader />
       <main>
-        <XFeed></XFeed>
+        <SkillSection />
         <HomepageFeatures />
       </main>
     </Layout>

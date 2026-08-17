@@ -20,14 +20,16 @@ jobs:
     name: Run release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.ref }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
           cache: 'npm'
       - run: npm ci --ignore-scripts ${{ inputs.dry-run }}
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
         run: npx semantic-release --debug ${{ inputs.debug }} --dry-run ${{ inputs.dry-run }}

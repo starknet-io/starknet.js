@@ -104,9 +104,11 @@ const _SupportedRpcVersion = {
   '0.9.0': '0.9.0',
   '0.10.0': '0.10.0',
   '0.10.2': '0.10.2',
+  '0.10.3': '0.10.3',
   v0_9_0: '0.9.0',
   v0_10_0: '0.10.0',
   v0_10_2: '0.10.2',
+  v0_10_3: '0.10.3',
 } as const;
 type _SupportedRpcVersion = ValuesType<typeof _SupportedRpcVersion>;
 export { _SupportedRpcVersion as SupportedRpcVersion };
@@ -116,7 +118,8 @@ export { _SupportedRpcVersion as SupportedRpcVersion };
  */
 export type SupportedRpcVersion0_10 =
   | typeof _SupportedRpcVersion.v0_10_0
-  | typeof _SupportedRpcVersion.v0_10_2;
+  | typeof _SupportedRpcVersion.v0_10_2
+  | typeof _SupportedRpcVersion.v0_10_3;
 
 export type SupportedTransactionVersion = typeof ETransactionVersion.V3;
 export type SupportedCairoVersion = '1';
@@ -239,6 +242,8 @@ export const SYSTEM_MESSAGES = {
   txEvictedFromMempool: 'Transaction TTL, evicted from the mempool, try to increase the tip',
   consensusFailed: 'Consensus failed to finalize the block proposal',
   txFailsBlockBuildingValidation: 'Transaction fails block building validation',
+  snip36RequiresRPC010:
+    'SNIP-36 `proof` and `proofFacts` are not supported by RPC 0.9, connect to a RPC 0.10.1+ node!',
 };
 
 export const SN_VERSION_IMPLEMENTING_BLAKE_FOR_COMPILED_CLASS = '0.14.1' as const;

@@ -4,7 +4,7 @@ export interface PaymasterOptions extends PaymasterRpcOptions {}
 
 export type PaymasterRpcOptions = {
   nodeUrl?: string | NetworkName;
-  default?: boolean;
   headers?: object;
   baseFetch?: WindowOrWorkerGlobalScope['fetch'];
+  mute?: boolean;
 };
