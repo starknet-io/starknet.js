@@ -1247,7 +1247,7 @@ describe('Complex interaction', () => {
     });
 
     test('estimate fee transfer', async () => {
-      const gas = await erc20Contract.estimateFee.transfer(stark.randomAddress(), cairo.uint256(1));
+      const gas = await erc20Contract.estimateFee.transfer(stark.randomFelt(), cairo.uint256(1));
       expect(gas).toMatchSchemaRef('EstimateFeeResponseOverhead');
     });
   });

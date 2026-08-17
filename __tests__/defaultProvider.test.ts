@@ -32,7 +32,7 @@ describe('defaultProvider', () => {
   let erc20Constructor: Calldata;
   let erc20ConstructorParams: RawArgs;
   const erc20CallData = new CallData(CONTRACTS.Erc20Oz100.sierra.abi);
-  const wallet = stark.randomAddress();
+  const wallet = stark.randomFelt();
   initializeMatcher(expect);
 
   beforeAll(async () => {

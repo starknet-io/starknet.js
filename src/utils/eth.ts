@@ -1,4 +1,4 @@
-import { secp256k1 } from '@noble/curves/secp256k1';
+import { secp256k1 } from '@noble/curves/secp256k1.js';
 
 import { addHexPrefix, buf2hex, removeHexPrefix, sanitizeHex } from './encode';
 import type { BigNumberish } from '../types';
@@ -11,12 +11,12 @@ import assert from './assert';
  * @returns an Hex string
  * @example
  * ```typescript
- * const myPK: string = randomAddress()
+ * const myPK: string = ethRandomPrivateKey()
  * // result = "0xf04e69ac152fba37c02929c2ae78c9a481461dda42dbc6c6e286be6eb2a8ab83"
  * ```
  */
 export function ethRandomPrivateKey(): string {
-  return sanitizeHex(buf2hex(secp256k1.utils.randomPrivateKey()));
+  return sanitizeHex(buf2hex(secp256k1.utils.randomSecretKey()));
 }
 
 /**

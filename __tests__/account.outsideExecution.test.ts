@@ -41,7 +41,7 @@ describe('Account and OutsideExecution', () => {
   let executorAccount: Account;
   let signerAccount: Account;
 
-  const targetPK = stark.randomAddress();
+  const targetPK = stark.randomStarkPrivateKey();
   const targetPubK = ec.starkCurve.getStarkKey(targetPK);
 
   // For ERC20 transfer outside call

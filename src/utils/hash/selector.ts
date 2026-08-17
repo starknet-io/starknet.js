@@ -1,6 +1,6 @@
 import { keccak } from '@scure/starknet';
-import { keccak_256 } from '@noble/hashes/sha3';
-import { bytesToHex } from '@noble/curves/abstract/utils';
+import { keccak_256 } from '@noble/hashes/sha3.js';
+import { bytesToHex } from '@noble/curves/utils.js';
 import { MASK_250 } from '../../global/constants';
 import { BigNumberish } from '../../types';
 import { addHexPrefix, removeHexPrefix, utf8ToArray } from '../encode';
