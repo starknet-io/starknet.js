@@ -1,3 +1,26 @@
+# [11.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v10.7.0...v11.0.0-beta.1) (2026-08-17)
+
+- feat!: starknet.js v11 ([0e360fd](https://github.com/starknet-io/starknet.js/commit/0e360fd7cf29546b9979bd201f0d77fb9817147f))
+
+### Bug Fixes
+
+- **test:** detect devnet by asking the node, not by the absence of a url ([62b3944](https://github.com/starknet-io/starknet.js/commit/62b39442812278592e6831ccb3d7f6fc917eb621))
+- **ws:** tolerate an unclean close, and run the suite on devnet ([5c706f0](https://github.com/starknet-io/starknet.js/commit/5c706f0b59ebd17ed13a73a381199731630a4ec9))
+- **ws:** webSocketProvider.create() typing, and the transport documentation ([00dcc5c](https://github.com/starknet-io/starknet.js/commit/00dcc5c6938af0d784f7b5fef9c47b229f365519))
+
+### Features
+
+- **channel:** carry requests and subscriptions over one WebSocket transport ([6344efc](https://github.com/starknet-io/starknet.js/commit/6344efc17ffdaf389419b35a9ce803fc539b626b))
+- **channel:** route RPC requests through a pluggable transport ([5af8a51](https://github.com/starknet-io/starknet.js/commit/5af8a5162bdcbbc414031447d8be856e263238ad))
+- **provider:** deprecate the Provider alias in favour of RpcProvider ([08dad8c](https://github.com/starknet-io/starknet.js/commit/08dad8c8f50bec207a67622fd9253cce3f41a796))
+- **stark:** add randomFelt and randomStarkPrivateKey generators ([04c612e](https://github.com/starknet-io/starknet.js/commit/04c612e7f5bc1913607e8fcd6807677dba8b90fc))
+- **test:** one npm test, four URL-driven categories ([4e8e2c6](https://github.com/starknet-io/starknet.js/commit/4e8e2c61db1d2939799dfa042a8ba46ef270683e))
+- **ws:** webSocketProvider, one socket for requests and subscriptions ([2af307a](https://github.com/starknet-io/starknet.js/commit/2af307a13421b67349216730e2ca4cd09aba39a2))
+
+### BREAKING CHANGES
+
+- @noble/curves, @noble/hashes and @scure/starknet bumped to 2.x. WeierstrassSignatureType is now weierstrass.ECDSASignature, a plain {r, s} object instead of the v1 signature class.
+
 # [10.7.0](https://github.com/starknet-io/starknet.js/compare/v10.6.8...v10.7.0) (2026-08-13)
 
 ### Features
