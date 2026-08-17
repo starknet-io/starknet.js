@@ -11,7 +11,7 @@ import assert from './assert';
  * @returns an Hex string
  * @example
  * ```typescript
- * const myPK: string = randomAddress()
+ * const myPK: string = ethRandomPrivateKey()
  * // result = "0xf04e69ac152fba37c02929c2ae78c9a481461dda42dbc6c6e286be6eb2a8ab83"
  * ```
  */

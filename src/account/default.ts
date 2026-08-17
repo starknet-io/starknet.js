@@ -73,7 +73,7 @@ import {
 import { parseContract } from '../utils/provider';
 import { supportsInterface } from '../utils/src5';
 import {
-  randomAddress,
+  randomFelt,
   resourceBoundsToEstimateFeeResponse,
   signatureToHexArray,
   toFeeVersion,
@@ -704,7 +704,7 @@ export class Account implements AccountInterface {
    * ```
    */
   public async getSnip9Nonce(): Promise<string> {
-    const nonce = randomAddress();
+    const nonce = randomFelt();
     const isValidNonce = await this.isValidSnip9Nonce(nonce);
     if (!isValidNonce) {
       return this.getSnip9Nonce();
