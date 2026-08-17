@@ -230,10 +230,10 @@ const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_10' });
 Example of a connection to a local development node, with starknet-devnet:
 
 ```typescript
-// For RPC 0.10.x (starknet-devnet v0.8.2)
+// For RPC 0.10.x (starknet-devnet v0.9.2)
 const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 
-// For RPC 0.9.1 (starknet-devnet v0.6.1)
+// For RPC 0.9.x (starknet-devnet v0.6.1)
 const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 ```
 

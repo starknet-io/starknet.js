@@ -55,10 +55,25 @@ describeIfWs('E2E: versioned channels over WsTransport', () => {
     expect(typeof specVersion).toBe('string');
   });
 
-  // No batching test here on purpose. devnet answers `-32700 Parse error` to a JSON-RPC array
-  // on its `/ws` endpoint (measured 2026-08-10 with a raw socket, no starknet.js involved), so
-  // `batch` over a WebSocket cannot be exercised against it. The transport's own batch encoding
-  // and id restoration are covered in `wsTransport.test.ts` against a mock socket.
+  test('a batching channel gets its calls answered in one frame', async () => {
+    // Batching is the channel's feature, but the array it produces is the transport's problem:
+    // one frame out, one frame back, and each caller id restored from it. `wsTransport.test.ts`
+    // proves the encoding against a mock socket; this proves a real node accepts it.
+    const channel = new RPC0103.RpcChannel({ nodeUrl: wsUrl, transport, batch: 0 });
+    const requestSpy = jest.spyOn(transport, 'request');
+
+    const [chainId, specVersion] = await Promise.all([
+      channel.getChainId(),
+      channel.getSpecVersion(),
+    ]);
+
+    // One call carrying both, not two calls — otherwise the node never sees an array and the
+    // test would pass on a node that refuses one.
+    expect(requestSpy).toHaveBeenCalledTimes(1);
+    expect(requestSpy.mock.calls[0][0]).toHaveLength(2);
+    expect(chainId).toMatch(/^0x/);
+    expect(typeof specVersion).toBe('string');
+  });
 
   test('reports a protocol error as a typed RpcError, exactly as HTTP does', async () => {
     // The error contract is what makes Contract and Account transport-agnostic.

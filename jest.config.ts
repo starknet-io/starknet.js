@@ -33,9 +33,10 @@ const DEVNET_RPC_URL = 'http://127.0.0.1:5050/';
 /**
  * Is the node at `rpcUrl` a devnet?
  *
- * Asked of the **configured** url, never inferred from the absence of one: CI hands devnet's url
- * in explicitly, so keying off "nothing was provided" classified the CI devnet job as a public
- * node and let the batch suite run over a socket that refuses batches.
+ * Asked only to fill in `TEST_WS_URL` when the caller left it unset: devnet serves subscriptions
+ * on a dedicated `/ws` path, which no general rule could derive from its rpc url. The question
+ * goes to the **configured** url rather than being inferred from the absence of one, so a devnet
+ * reached at another host is recognized too.
  *
  * `devnet_getPredeployedAccounts` is the question, not `starknet_syncing`: every node answers the
  * latter, so it proves a node is there and nothing more. A real node answers this one with
@@ -101,19 +102,6 @@ export default async (): Promise<Config> => {
   }
   const hasWs = !!process.env.TEST_WS_URL;
 
-  /**
-   * The one file the WebSocket run cannot carry, and only against devnet.
-   *
-   * devnet answers `-32700 Parse error` to a JSON-RPC batch on its `/ws` endpoint — measured
-   * 2026-08-10 — and the refusal carries `id: null`, so it belongs to no request and every call in
-   * the batch runs out its timeout instead of failing fast. Pathfinder accepts the same batch over
-   * the same kind of socket, so this is a devnet limitation, not a transport one: the exclusion is
-   * conditional, and disappears on any node that implements §6 of JSON-RPC 2.0.
-   */
-  const overWebSocket = nodeTouching.filter(
-    (file) => !(isDevnet && file.endsWith('utils/batch.test.ts'))
-  );
-
   const toMatch = (files: string[]) => files.map((file) => `<rootDir>/${file}`);
 
   const shared = {
@@ -150,7 +138,7 @@ export default async (): Promise<Config> => {
             {
               ...shared,
               displayName: 'node-ws',
-              testMatch: toMatch(overWebSocket),
+              testMatch: toMatch(nodeTouching),
               setupFiles: ['<rootDir>/__tests__/config/projects/ws.ts'],
             },
             {

@@ -38,7 +38,8 @@ There are **two** kinds of tests, and the default command needs live infrastruct
   (`http://127.0.0.1:5050`) and no `TEST_ACCOUNT_*` env vars are set. The root-level
   `__tests__/*.test.ts` suites (account, contract, provider, paymaster, wallet…)
   exercise real RPC calls. To run them, start a devnet (Docker:
-  `shardlabs/starknet-devnet-rs`) or point at a node via `TEST_RPC_URL` +
+  `shardlabs/starknet-devnet-rs`, **0.9.2 or later**, which the `node-ws` project needs
+  for JSON-RPC batches over `/ws`) or point at a node via `TEST_RPC_URL` +
   `TEST_ACCOUNT_ADDRESS` + `TEST_ACCOUNT_PRIVATE_KEY` (see CONTRIBUTING.md).
   Two suites under `__tests__/utils/` (`ethSigner`, `batch`) also need a node and are
   excluded from `test:unit`.
