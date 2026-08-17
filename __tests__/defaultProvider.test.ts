@@ -4,8 +4,8 @@ import {
   BlockNumber,
   CallData,
   LibraryError,
-  Provider,
   ProviderInterface,
+  RpcProvider,
   stark,
   num,
   type Calldata,
@@ -36,9 +36,9 @@ describe('defaultProvider', () => {
   initializeMatcher(expect);
 
   beforeAll(async () => {
-    testProvider = new Provider(await createTestProvider());
+    testProvider = await createTestProvider();
     account = getTestAccount(testProvider);
-    expect(testProvider).toBeInstanceOf(Provider);
+    expect(testProvider).toBeInstanceOf(RpcProvider);
 
     erc20ConstructorParams = {
       name: 'Token',

@@ -8,6 +8,16 @@ sidebar_position: 4
 
 The `RpcProvider` object connects your DAPP to the network.
 
+As the diagram shows, a provider is the result of two independent choices:
+
+- **the RPC spec version** your node speaks, which selects the channel — 0.9 or 0.10;
+- **the transport** that carries the JSON-RPC envelopes — HTTP or WebSocket.
+
+The two are orthogonal: the same channel code runs over either transport. `RpcProvider` uses HTTP
+and is the default. [`WebSocketProvider`](#requests-and-subscriptions-over-websocket) puts requests
+and subscriptions on a single socket — and a socket is the only thing that can carry subscriptions,
+which is the reason to open one.
+
 The first thing to do is to define which network you want to interact with (Mainnet, Testnet, Devnet, ...).
 
 Then you need to select a node. A node is a safe way to connect with the Starknet blockchain. You can use:
@@ -220,14 +230,87 @@ const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_10' });
 Example of a connection to a local development node, with starknet-devnet:
 
 ```typescript
-// For RPC 0.10.x (starknet-devnet v0.8.2)
+// For RPC 0.10.x (starknet-devnet v0.9.2)
 const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 
-// For RPC 0.9.1 (starknet-devnet v0.6.1)
+// For RPC 0.9.x (starknet-devnet v0.6.1)
 const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 ```
 
 > If you customized the host or port during starknet-devnet initialization, adapt the script accordingly.
+
+## Requests and subscriptions over WebSocket
+
+`RpcProvider` sends every request over HTTP, and that stays the right default. `WebSocketProvider`
+is the variant that keeps one socket open and uses it for both requests and subscriptions:
+
+```typescript
+import { WebSocketProvider } from 'starknet';
+
+const myProvider = new WebSocketProvider({
+  nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
+});
+
+// The usual provider surface, unchanged:
+const blockNumber = await myProvider.getBlockNumber();
+
+// Plus the subscriptions, on the same connection:
+const sub = await myProvider.subscriptions.subscribeNewHeads();
+sub.on((header) => console.log('New block', header.block_number));
+```
+
+It **is** an `RpcProvider`, so `Account` and `Contract` accept it without knowing the difference:
+
+```typescript
+const myAccount = new Account({ provider: myProvider, address, signer: privateKey });
+```
+
+Like `RpcProvider.create()`, `WebSocketProvider.create()` asks the node which spec version it speaks
+and builds the matching channels, at the cost of one round trip:
+
+```typescript
+const myProvider = await WebSocketProvider.create({
+  nodeUrl: 'wss://your-starknet-node/rpc/v0_10',
+});
+```
+
+Unlike an HTTP provider, it holds an open connection, so release it when you are done:
+
+```typescript
+myProvider.dispose();
+```
+
+The WebSocket address is rarely the HTTP one with a `wss://` scheme — the port and path depend on
+the node. See [WebSocket endpoints](./websocket_channel.md#websocket-endpoints) for working
+examples, and the [WebSocket guide](./websocket_channel.md) for subscriptions, reconnection and
+connection sharing.
+
+### Choosing HTTP or WebSocket
+
+**Subscriptions need a WebSocket.** A node only pushes new blocks, events or transaction status over
+a socket. Any application that reacts to the chain instead of polling it needs one, and this is the
+decisive argument — the reason `WebSocketProvider` exists at all.
+
+**One connection instead of two.** Once the socket is open for subscriptions, sending the requests
+through it as well spares you a second, parallel connection to the same node.
+
+**It is also faster, moderately.** On a realistic transaction workload, the starknet.js test suite
+runs about 6 % faster over WebSocket than over HTTP, at identical code and assertions. The figure
+comes from a paired comparison — every file run twice in the same CI job, against the same node,
+once per transport — repeated on Juno and Pathfinder, in RPC 0.9 and 0.10. All four runs agree in
+direction, between 4 % and 8 %. Keep the effect in proportion: most of that time is spent waiting
+for the chain, which no transport can accelerate, so the gain is diluted. It is a welcome bonus,
+not a reason to switch.
+
+**What HTTP gives you in exchange is having nothing to manage**: no connection state, no
+reconnection, no lifecycle. A socket can drop, it is subject to per-node limits (connections per IP,
+simultaneous subscriptions, maximum socket lifetime), and it cannot be serialized into a store or
+into React state. In a browser it also buys less than it looks for requests alone, since HTTP/2
+keep-alive already amortizes connection setup.
+
+So: **HTTP by default, WebSocket when you subscribe.** A third setup stays perfectly sensible if you
+prefer it — an `RpcProvider` over HTTP for the requests, and a `WebSocketChannel` alongside for the
+subscriptions only.
 
 ## Batch JSON-RPC
 

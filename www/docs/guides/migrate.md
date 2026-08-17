@@ -838,6 +838,9 @@ v10:
 - **WebSocket subscriptions:** `fromAddress` now accepts an array of addresses, transaction
   subscriptions accept `tags`, and reconnection accepts a `stableConnectionThreshold` option — see
   the [WebSocket guide](./websocket_channel.md).
+- **WebSocket transport:** `WebSocketProvider` serves requests and subscriptions from a single
+  socket, and the socket itself is now a separate object that several providers can share — see
+  [Requests and subscriptions over WebSocket](./provider_instance.md#requests-and-subscriptions-over-websocket).
 - **`walletAccount.onChange()`** now returns an unsubscribe function.
 
 ## Need Help?

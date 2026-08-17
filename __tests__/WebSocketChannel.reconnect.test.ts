@@ -192,22 +192,23 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
 
   test('draining the request queue while still disconnected does not loop forever', () => {
     // The channel is held in the "reconnecting" state, so every `sendReceive` re-queues. A
-    // `_processRequestQueue` iterating its own array in place would therefore never empty it —
+    // `processRequestQueue` iterating its own array in place would therefore never empty it —
     // an unbounded synchronous loop allocating a Promise per turn until the process OOMs. The
     // push counter proves the loop stays bounded.
     const mock = makeMock('stable');
     config.set('websocket', mock.MockWS as any);
 
     const channel = new WebSocketChannel({ nodeUrl: 'wss://mock' });
-    const internal = channel as unknown as {
+    // The queue and the reconnection flag live on the transport the façade delegates to. Its
+    // entries carry the JSON-RPC body rather than a method name: a batch has no single method.
+    const internal = (channel as any).transport as {
       requestQueue: Array<{
-        method: string;
-        params?: object;
+        body: { id: number | string; jsonrpc: '2.0'; method: string; params?: object };
         resolve: (v: any) => void;
         reject: (r?: any) => void;
       }>;
       isReconnecting: boolean;
-      _processRequestQueue: () => void;
+      processRequestQueue: () => void;
     };
 
     // Force the re-queue branch of sendReceive for the whole call.
@@ -225,15 +226,13 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
     };
     // Seed a single pending request without tripping the counter.
     Array.prototype.push.call(queue, {
-      method: 'starknet_chainId',
-      params: undefined,
+      body: { id: 0, jsonrpc: '2.0', method: 'starknet_chainId' },
       resolve: () => {},
       reject: () => {},
     });
     internal.requestQueue = queue;
 
-    // eslint-disable-next-line no-underscore-dangle
-    internal._processRequestQueue();
+    internal.processRequestQueue();
 
     // The seeded request is re-queued at most once, into the fresh detached queue, so the
     // instrumented array sees no re-push.
@@ -399,7 +398,7 @@ describe('Unit Test: WebSocketChannel auto-reconnection', () => {
 
     // The reconnection flag must be cleared too, otherwise every later request would queue
     // for a reconnection that is no longer coming.
-    expect((channel as unknown as { isReconnecting: boolean }).isReconnecting).toBe(false);
+    expect((channel as any).transport.isReconnecting).toBe(false);
     // See the note on the previous test.
   }, 10000);
 

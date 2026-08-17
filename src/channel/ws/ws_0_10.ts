@@ -14,17 +14,13 @@ import {
 } from '../../types/api'; // Default exported RPC 0.9 Types
 
 import { BigNumberish, SubscriptionBlockIdentifier } from '../../types';
-import { WebSocketEvent } from '../../types/api/jsonrpc';
 import { EventEmitter } from '../../utils/eventEmitter';
-import { TimeoutError, WebSocketNotConnectedError } from '../../utils/errors';
+import { WebSocketNotConnectedError } from '../../utils/errors';
 import WebSocket from '../../utils/connect/ws';
 import { stringify } from '../../utils/json';
-import { isString, isObject } from '../../utils/typed';
-import { bigNumberishArrayToHexadecimalStringArray, toHex } from '../../utils/num';
-import { Block } from '../../utils/provider';
-import { config } from '../../global/config';
-import { logger } from '../../global/logger';
+import { ReconnectingWsTransport } from '../transport/reconnectingWs';
 import { Subscription } from './subscription';
+import { SubscriptionChannel } from './subscriptionChannel';
 
 // Subscription parameter interfaces for object-based API
 export interface SubscribeNewHeadsParams {
@@ -156,6 +152,11 @@ type WebSocketChannelEvents = {
  * Manages a WebSocket connection to a Starknet node for receiving real-time updates.
  * This class handles subscriptions, automatic reconnection, and request queueing.
  *
+ * Since the transport split, this is a façade: the socket and its reconnection policy live in
+ * `ReconnectingWsTransport`, and the `starknet_subscribe*` surface lives in `SubscriptionChannel`.
+ * Every member below behaves exactly as it did before — `WebSocketChannel.test.ts` and
+ * `WebSocketChannel.reconnect.test.ts` are the specification of that, and they pass unmodified.
+ *
  * @example
  * ```typescript
  * const channel = new WebSocketChannel({ nodeUrl: 'YOUR_NODE_URL' });
@@ -178,80 +179,31 @@ export class WebSocketChannel {
    */
   public nodeUrl: string;
 
-  /**
-   * The underlying WebSocket instance.
-   */
-  public websocket: WebSocket;
+  /** Carries the frames and owns the socket lifecycle. */
+  private readonly transport: ReconnectingWsTransport;
 
-  // Store the WebSocket implementation class to allow for custom implementations.
-  private WsImplementation: WebSocketModule;
-
-  // Map of active subscriptions, keyed by their ID.
-  private activeSubscriptions: Map<SUBSCRIPTION_ID, Subscription<any>> = new Map();
-
-  private readonly maxBufferSize: number;
-
-  private readonly autoReconnect: boolean;
-
-  private readonly reconnectOptions: Required<ReconnectOptions>;
-
-  private readonly requestTimeout: number;
-
-  private isReconnecting = false;
-
-  private reconnectAttempts = 0;
-
-  private userInitiatedClose = false;
-
-  private reconnectTimeoutId: NodeJS.Timeout | null = null;
-
-  // Fires once a (re)connection has stayed open long enough to be considered stable,
-  // resetting the reconnection attempt counter.
-  private reconnectStabilityTimeoutId: NodeJS.Timeout | null = null;
-
-  private requestQueue: Array<{
-    method: string;
-    params?: object;
-    resolve: (value: any) => void;
-    reject: (reason?: any) => void;
-  }> = [];
-
-  /** Abort handles for the requests currently on the wire, one per pending `sendReceive`. */
-  private inFlight = new Set<(reason: string) => void>();
-
-  /**
-   * Callers blocked in `waitForUnsubscription`, keyed by subscription id.
-   *
-   * Held here rather than as `unsubscribe` event listeners because that event only ever
-   * announces success: a waiter attached to it cannot learn that the node refused the
-   * unsubscribe or that the connection went away, and would wait forever with no timeout of
-   * its own to fall back on.
-   */
-  private unsubscribeWaiters = new Map<
-    SUBSCRIPTION_ID,
-    Set<{ resolve: () => void; reject: (error: Error) => void }>
-  >();
+  /** Owns `activeSubscriptions`, the unsubscribe waiters and the five subscribe methods. */
+  private readonly subscriptionChannel: SubscriptionChannel;
 
   private events = new EventEmitter<WebSocketChannelEvents>();
 
-  private openListener = (ev: Event) => {
-    // A connection is considered stable only after it has stayed open for a while;
-    // resetting the retry counter is deferred until then (see scheduleReconnectAttemptsReset).
-    this.scheduleReconnectAttemptsReset();
-    this.events.emit('open', ev);
-  };
-
-  private closeListener = this.onCloseProxy.bind(this);
-
-  private messageListener = this.onMessageProxy.bind(this);
-
-  private errorListener = (ev: Event) => this.events.emit('error', ev);
+  /**
+   * The underlying WebSocket instance.
+   *
+   * A getter rather than a field: a reconnection replaces the socket, and callers — including
+   * the test suite, which spies on `channel.websocket.send` — must see the live one.
+   */
+  public get websocket(): WebSocket {
+    return this.transport.socket;
+  }
 
   /**
-   * JSON RPC latest sent message ID.
-   * The receiving message is expected to contain the same ID.
+   * Map of active subscriptions, keyed by their ID.
+   * @internal
    */
-  private sendId: number = 0;
+  private get activeSubscriptions(): ReadonlyMap<SUBSCRIPTION_ID, Subscription<any>> {
+    return this.subscriptionChannel.subscriptions;
+  }
 
   /**
    * Creates an instance of WebSocketChannel.
@@ -259,32 +211,24 @@ export class WebSocketChannel {
    */
   constructor(options: WebSocketOptions) {
     this.nodeUrl = options.nodeUrl;
-    this.maxBufferSize = options.maxBufferSize ?? 1000;
-    this.autoReconnect = options.autoReconnect ?? true;
-    this.reconnectOptions = {
-      retries: options.reconnectOptions?.retries ?? 5,
-      delay: options.reconnectOptions?.delay ?? 2000,
-      exponential: options.reconnectOptions?.exponential ?? true,
-      stableConnectionThreshold: options.reconnectOptions?.stableConnectionThreshold ?? 5000,
-    };
-    this.requestTimeout = options.requestTimeout ?? 60000;
+    this.transport = new ReconnectingWsTransport({
+      nodeUrl: options.nodeUrl,
+      websocket: options.websocket,
+      requestTimeout: options.requestTimeout,
+      autoReconnect: options.autoReconnect,
+      reconnectOptions: options.reconnectOptions,
+    });
+    this.subscriptionChannel = new SubscriptionChannel({
+      transport: this.transport,
+      maxBufferSize: options.maxBufferSize,
+    });
 
-    this.WsImplementation = options.websocket || config.get('websocket') || WebSocket;
-    this.websocket = new this.WsImplementation(this.nodeUrl);
-
-    this.websocket.addEventListener('open', this.openListener);
-    this.websocket.addEventListener('close', this.closeListener);
-    this.websocket.addEventListener('message', this.messageListener);
-    this.websocket.addEventListener('error', this.errorListener);
-  }
-
-  private idResolver(id?: number) {
-    // An unmanaged, user-set ID. Tested against `undefined` rather than for
-    // truthiness: 0 is a valid JSON-RPC id and must be honoured as passed.
-    if (id !== undefined) return id;
-    // Managed ID, intentionally returned old and then incremented.
-    // eslint-disable-next-line no-plusplus
-    return this.sendId++;
+    // Relayed from the transport rather than from a socket, so a listener survives a
+    // reconnection replacing the socket underneath it.
+    this.transport.on('open', (event) => this.events.emit('open', event));
+    this.transport.on('close', (event) => this.events.emit('close', event as CloseEvent));
+    this.transport.on('error', (event) => this.events.emit('error', event));
+    this.transport.on('message', (event) => this.events.emit('message', event));
   }
 
   /**
@@ -302,7 +246,10 @@ export class WebSocketChannel {
         'WebSocketChannel.send() failed due to socket being disconnected'
       );
     }
-    const usedId = this.idResolver(id);
+    // An unmanaged, user-set ID. Tested against `undefined` rather than for truthiness: 0 is a
+    // valid JSON-RPC id and must be honoured as passed. The managed id comes from the
+    // transport's own sequence, so a write made here cannot collide with one it is tracking.
+    const usedId = id !== undefined ? id : this.transport.allocateRequestId();
     const rpcRequestBody: JRPC.RequestBody = {
       id: usedId,
       jsonrpc: '2.0',
@@ -312,6 +259,23 @@ export class WebSocketChannel {
     // Stringify should remove undefined params
     this.websocket.send(stringify(rpcRequestBody));
     return usedId;
+  }
+
+  /**
+   * Refuses a call that has nowhere to go, the way `send()` used to.
+   *
+   * Every method below used to reach the socket through `send()`, which threw this exact error
+   * when the connection was down and nothing was going to pick the request up later. The refusal
+   * now originates in the transport, which is generic and rightly words it differently — so the
+   * decision is reproduced here instead, at the boundary where the legacy contract applies.
+   *
+   * The condition is the transport's own: it refuses only when the request would not be queued.
+   */
+  private assertSendable(): void {
+    if (this.isConnected() || this.transport.queuesRequests) return;
+    throw new WebSocketNotConnectedError(
+      'WebSocketChannel.send() failed due to socket being disconnected'
+    );
   }
 
   /**
@@ -325,104 +289,21 @@ export class WebSocketChannel {
    * @throws {TimeoutError} If the request does not receive a response within the configured `requestTimeout`.
    * @throws {WebSocketNotConnectedError} If the WebSocket is not connected and auto-reconnect is disabled.
    */
-  public sendReceive<T = any>(method: string, params?: object): Promise<T> {
-    // If we are in the process of reconnecting, or if we are disconnected but expect to reconnect, queue the request.
-    if (
-      this.isReconnecting ||
-      (!this.isConnected() && this.autoReconnect && !this.userInitiatedClose)
-    ) {
-      logger.info(`WebSocket: Connection unavailable, queueing request: ${method}`);
-      return new Promise<T>((resolve, reject) => {
-        this.requestQueue.push({ method, params, resolve, reject });
-      });
+  public async sendReceive<T = any>(method: string, params?: object): Promise<T> {
+    this.assertSendable();
+    // The id is the transport's business: it renumbers on the wire and restores this one on the
+    // reply, which nothing here reads.
+    const response = (await this.transport.request({
+      id: 0,
+      jsonrpc: '2.0',
+      method,
+      ...(params && { params }),
+    })) as JRPC.ResponseBody & { error?: JRPC.Error; result?: T };
+
+    if (response.error) {
+      throw new Error(`Error on ${method}: ${JSON.stringify(response.error)}`);
     }
-
-    const sendId = this.send(method, params);
-    // The socket the request actually went out on: a reconnection replaces `this.websocket`,
-    // and the listeners below must be removed from the instance they were added to.
-    const socket = this.websocket;
-
-    return new Promise((resolve, reject) => {
-      if (socket.readyState !== WebSocket.OPEN) {
-        reject(new WebSocketNotConnectedError('WebSocket not available or not connected.'));
-        return;
-      }
-
-      let timeoutId: NodeJS.Timeout;
-
-      /* eslint-disable @typescript-eslint/no-use-before-define --
-         `settle` and the handlers it detaches are mutually recursive; every name it reads is
-         defined by the time it can run. */
-      // Detaches everything this request owns, so no exit path leaves a listener, a timer or
-      // an abort handle behind.
-      const settle = () => {
-        clearTimeout(timeoutId);
-        socket.removeEventListener('message', messageHandler);
-        socket.removeEventListener('error', errorHandler);
-        this.inFlight.delete(abort);
-      };
-      /* eslint-enable @typescript-eslint/no-use-before-define */
-
-      const messageHandler = (event: MessageEvent) => {
-        if (!isString(event.data)) {
-          logger.warn('WebSocket received non-string message data:', event.data);
-          return;
-        }
-        let message: JRPC.ResponseBody;
-        try {
-          message = JSON.parse(event.data);
-        } catch (error) {
-          // Skip the malformed frame instead of rejecting: it carries no request id, so it
-          // cannot be attributed to a pending request. Letting the parse throw would escape
-          // the WebSocket event dispatch rather than the promise chain — no caller-side
-          // try/catch could intercept it, and it would kill the process as an uncaught
-          // exception. The request is still ended by `requestTimeout`.
-          logger.error(
-            `WebSocketChannel: Error parsing incoming message: ${event.data}, Error: ${error}`
-          );
-          return;
-        }
-        if (message.id !== sendId) return;
-        settle();
-        if ('result' in message) {
-          resolve(message.result as T);
-        } else {
-          reject(new Error(`Error on ${method} (id: ${sendId}): ${JSON.stringify(message.error)}`));
-        }
-      };
-
-      const errorHandler = (event: Event) => {
-        settle();
-        reject(
-          new Error(
-            `WebSocket error during ${method} (id: ${sendId}): ${event.type || 'Unknown error'}`
-          )
-        );
-      };
-
-      // The only handle on this request from outside its closure. See `_rejectInFlight`.
-      const abort = (reason: string) => {
-        settle();
-        reject(
-          new WebSocketNotConnectedError(
-            `Request ${method} (id: ${sendId}) went unanswered: ${reason}`
-          )
-        );
-      };
-
-      socket.addEventListener('message', messageHandler);
-      socket.addEventListener('error', errorHandler);
-      this.inFlight.add(abort);
-
-      timeoutId = setTimeout(() => {
-        settle();
-        reject(
-          new TimeoutError(
-            `Request ${method} (id: ${sendId}) timed out after ${this.requestTimeout}ms`
-          )
-        );
-      }, this.requestTimeout);
-    });
+    return response.result as T;
   }
 
   /**
@@ -430,7 +311,7 @@ export class WebSocketChannel {
    * @returns {boolean} `true` if the connection is open, `false` otherwise.
    */
   public isConnected() {
-    return this.websocket.readyState === WebSocket.OPEN;
+    return this.transport.isConnected();
   }
 
   /**
@@ -445,18 +326,26 @@ export class WebSocketChannel {
    * ```
    */
   public async waitForConnection(): Promise<WebSocket['readyState']> {
-    // Wait for the websocket to connect
-    if (this.websocket.readyState !== WebSocket.OPEN) {
-      return new Promise((resolve, reject) => {
-        if (!this.websocket) return;
-        this.websocket.onopen = () => resolve(this.websocket.readyState);
-        this.websocket.onerror = (error) => {
-          return reject(error);
-        };
-      });
-    }
+    if (this.isConnected()) return this.websocket.readyState;
 
-    return this.websocket.readyState;
+    return new Promise((resolve, reject) => {
+      /* eslint-disable @typescript-eslint/no-use-before-define --
+         the two detach handles are mutually recursive; both are assigned by the time either
+         callback can run. */
+      const settle = () => {
+        offOpen();
+        offError();
+      };
+      const offOpen = this.transport.on('open', () => {
+        settle();
+        resolve(this.websocket.readyState);
+      });
+      const offError = this.transport.on('error', (event) => {
+        settle();
+        reject(event);
+      });
+      /* eslint-enable @typescript-eslint/no-use-before-define */
+    });
   }
 
   /**
@@ -466,24 +355,7 @@ export class WebSocketChannel {
    * @param {string} [reason] - The WebSocket connection close reason.
    */
   public disconnect(code?: number, reason?: string) {
-    if (this.reconnectTimeoutId) {
-      clearTimeout(this.reconnectTimeoutId);
-      this.reconnectTimeoutId = null;
-    }
-    if (this.reconnectStabilityTimeoutId) {
-      clearTimeout(this.reconnectStabilityTimeoutId);
-      this.reconnectStabilityTimeoutId = null;
-    }
-    // Set the flag before closing so the resulting `close` event does not trigger
-    // an automatic reconnection.
-    this.userInitiatedClose = true;
-    // Clear the reconnection state too: left set, it would make every later sendReceive()
-    // queue for a reconnection that is no longer coming.
-    this.isReconnecting = false;
-    this._rejectRequestQueue('the connection was closed by the user');
-    this._rejectInFlight('the connection was closed by the user');
-    this._rejectUnsubscribeWaiters('the connection was closed by the user');
-    this.websocket.close(code, reason);
+    this.transport.close(code, reason);
   }
 
   /**
@@ -491,16 +363,31 @@ export class WebSocketChannel {
    * @returns {Promise<number | Event>} A Promise that resolves with the WebSocket's `readyState` or a `CloseEvent` when disconnected.
    */
   public async waitForDisconnection(): Promise<WebSocket['readyState'] | Event> {
-    // Wait for the websocket to disconnect
-    if (this.websocket.readyState !== WebSocket.CLOSED) {
-      return new Promise((resolve, reject) => {
-        if (!this.websocket) return;
-        this.websocket.onclose = () => resolve(this.websocket.readyState);
-        this.websocket.onerror = reject;
-      });
-    }
+    if (this.websocket.readyState === WebSocket.CLOSED) return this.websocket.readyState;
 
-    return this.websocket.readyState;
+    return new Promise((resolve, reject) => {
+      /* eslint-disable @typescript-eslint/no-use-before-define -- see waitForConnection */
+      const settle = () => {
+        offClose();
+        offError();
+      };
+      const offClose = this.transport.on('close', () => {
+        settle();
+        resolve(this.websocket.readyState);
+      });
+      const offError = this.transport.on('error', (event) => {
+        // An `error` the socket does not survive belongs to the disconnection, not to a failure
+        // of it. starknet-devnet answers a client `close()` by dropping the TCP connection, so
+        // Node reports `error` then `close` 1006; rejecting there would fail on the peer's
+        // rudeness while the socket does exactly what was awaited. The `close` is still coming,
+        // so the waiter stays armed. An error on a socket that is still OPEN is a different
+        // matter and keeps rejecting, unchanged.
+        if (this.websocket.readyState !== WebSocket.OPEN) return;
+        settle();
+        reject(event);
+      });
+      /* eslint-enable @typescript-eslint/no-use-before-define */
+    });
   }
 
   /**
@@ -511,49 +398,12 @@ export class WebSocketChannel {
    * @returns {Promise<boolean>} A Promise that resolves with `true` if the unsubscription was successful.
    */
   public async unsubscribe(subscriptionId: SUBSCRIPTION_ID) {
-    let status: boolean;
-    try {
-      status = await this.sendReceive<boolean>('starknet_unsubscribe', {
-        subscription_id: subscriptionId,
-      });
-    } catch (error) {
-      this._settleUnsubscribeWaiters(subscriptionId, error as Error);
-      throw error;
-    }
+    this.assertSendable();
+    const status = await this.subscriptionChannel.unsubscribe(subscriptionId);
     if (status) {
       this.events.emit('unsubscribe', subscriptionId);
-      this._settleUnsubscribeWaiters(subscriptionId);
-    } else {
-      this._settleUnsubscribeWaiters(
-        subscriptionId,
-        new Error(`Node refused to unsubscribe subscription ${subscriptionId}`)
-      );
     }
     return status;
-  }
-
-  /** Settles every caller waiting on one subscription id: resolved, or rejected with `error`. */
-  private _settleUnsubscribeWaiters(subscriptionId: SUBSCRIPTION_ID, error?: Error): void {
-    const waiters = this.unsubscribeWaiters.get(subscriptionId);
-    if (!waiters) return;
-    this.unsubscribeWaiters.delete(subscriptionId);
-    waiters.forEach((waiter) => (error ? waiter.reject(error) : waiter.resolve()));
-  }
-
-  /**
-   * Rejects every caller still waiting on any subscription.
-   *
-   * Once the connection is gone, no unsubscribe can be observed on it: a reconnection restores
-   * each subscription under a fresh id, so the id being waited on will never be announced.
-   */
-  private _rejectUnsubscribeWaiters(reason: string): void {
-    if (this.unsubscribeWaiters.size === 0) return;
-    Array.from(this.unsubscribeWaiters.keys()).forEach((id) =>
-      this._settleUnsubscribeWaiters(
-        id,
-        new WebSocketNotConnectedError(`Subscription ${id} was never unsubscribed: ${reason}`)
-      )
-    );
   }
 
   /**
@@ -567,11 +417,7 @@ export class WebSocketChannel {
    * ```
    */
   public waitForUnsubscription(targetId: SUBSCRIPTION_ID): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const waiters = this.unsubscribeWaiters.get(targetId) ?? new Set();
-      waiters.add({ resolve, reject });
-      this.unsubscribeWaiters.set(targetId, waiters);
-    });
+    return this.subscriptionChannel.waitForUnsubscription(targetId);
   }
 
   /**
@@ -579,240 +425,7 @@ export class WebSocketChannel {
    * This creates a new WebSocket instance and re-establishes listeners.
    */
   public reconnect() {
-    this.userInitiatedClose = false;
-    this.websocket = new this.WsImplementation(this.nodeUrl);
-
-    this.websocket.addEventListener('open', this.openListener);
-    this.websocket.addEventListener('close', this.closeListener);
-    this.websocket.addEventListener('message', this.messageListener);
-    this.websocket.addEventListener('error', this.errorListener);
-  }
-
-  private _processRequestQueue(): void {
-    // Drain a detached snapshot. `sendReceive` re-queues synchronously when the connection is
-    // not open (the socket dropped again mid-reconnect), so iterating `this.requestQueue` in
-    // place would re-process those items in the same pass — an unbounded synchronous loop
-    // allocating a Promise per turn. Re-queued requests land in the fresh array instead and
-    // wait for the next reconnection cycle.
-    const pending = this.requestQueue;
-    this.requestQueue = [];
-    logger.info(`WebSocket: Processing ${pending.length} queued requests.`);
-    pending.forEach(({ method, params, resolve, reject }) => {
-      this.sendReceive(method, params).then(resolve).catch(reject);
-    });
-  }
-
-  /**
-   * Reject every request still waiting in the queue.
-   *
-   * A queued request carries no timeout of its own: the `requestTimeout` timer is only
-   * armed once the request is actually put on the wire. So once the channel reaches a state
-   * where the queue can never be flushed — reconnection gave up, or the user closed the
-   * connection — the queued promises would stay pending forever, and no caller-side timeout
-   * could rescue them. Settling them here is the only way out.
-   */
-  private _rejectRequestQueue(reason: string): void {
-    if (this.requestQueue.length === 0) return;
-    // Detach before iterating, for the same reason as _processRequestQueue.
-    const pending = this.requestQueue;
-    this.requestQueue = [];
-    logger.info(`WebSocket: Rejecting ${pending.length} queued request(s). Reason: ${reason}.`);
-    pending.forEach(({ method, reject }) => {
-      reject(new WebSocketNotConnectedError(`Request ${method} was never sent: ${reason}`));
-    });
-  }
-
-  /**
-   * Settle every request already on the wire.
-   *
-   * The counterpart of `_rejectRequestQueue`, for requests past the queue. Their only other
-   * exit is the `requestTimeout` timer, so without this the caller waits the whole timeout —
-   * 60s by default — for a reply that can no longer arrive, and that pending timer keeps the
-   * Node event loop alive for just as long.
-   */
-  private _rejectInFlight(reason: string): void {
-    if (this.inFlight.size === 0) return;
-    // Snapshot before draining: each abort removes itself from the set as it settles.
-    const pending = Array.from(this.inFlight);
-    this.inFlight.clear();
-    logger.info(`WebSocket: Rejecting ${pending.length} in-flight request(s). Reason: ${reason}.`);
-    pending.forEach((abort) => abort(reason));
-  }
-
-  private async _restoreSubscriptions(): Promise<void> {
-    const oldSubscriptions = Array.from(this.activeSubscriptions.values());
-    this.activeSubscriptions.clear();
-
-    const restorePromises = oldSubscriptions.map(async (sub) => {
-      try {
-        const newSubId = await this.sendReceive<SUBSCRIPTION_ID>(sub.method, sub.params);
-        // eslint-disable-next-line no-param-reassign
-        sub.id = newSubId; // Update the subscription with the new ID
-        this.activeSubscriptions.set(newSubId, sub);
-        logger.info(`Subscription ${sub.method} restored with new ID: ${newSubId}`);
-      } catch (error) {
-        logger.error(`Failed to restore subscription ${sub.method}:`, error);
-        // Not added back to activeSubscriptions — and closed, so the handle the caller still
-        // holds stops claiming to be live when nothing will ever be delivered to it again.
-        sub._markClosed();
-      }
-    });
-
-    await Promise.all(restorePromises);
-  }
-
-  /**
-   * Reset the reconnection attempt counter, but only once the current connection has
-   * stayed open for `stableConnectionThreshold` ms. A connection that opens and then
-   * immediately drops (a flapping gateway) never reaches this point, so its attempts
-   * keep accumulating toward the retry cap instead of resetting every cycle.
-   */
-  private scheduleReconnectAttemptsReset() {
-    if (this.reconnectStabilityTimeoutId) {
-      clearTimeout(this.reconnectStabilityTimeoutId);
-    }
-    this.reconnectStabilityTimeoutId = setTimeout(() => {
-      this.reconnectAttempts = 0;
-      this.reconnectStabilityTimeoutId = null;
-    }, this.reconnectOptions.stableConnectionThreshold);
-  }
-
-  private _startReconnect() {
-    if (this.isReconnecting || !this.autoReconnect) {
-      return;
-    }
-
-    // The connection that just dropped did not prove stable, so cancel any pending
-    // counter reset and keep the accumulated attempts (bounds a flapping reconnect).
-    if (this.reconnectStabilityTimeoutId) {
-      clearTimeout(this.reconnectStabilityTimeoutId);
-      this.reconnectStabilityTimeoutId = null;
-    }
-    this.isReconnecting = true;
-
-    const tryReconnect = () => {
-      if (this.reconnectAttempts >= this.reconnectOptions.retries) {
-        logger.error('WebSocket: Maximum reconnection retries reached. Giving up.');
-        this.isReconnecting = false;
-        this._rejectRequestQueue(
-          `reconnection gave up after ${this.reconnectOptions.retries} attempts`
-        );
-        return;
-      }
-
-      this.reconnectAttempts += 1;
-      logger.info(
-        `WebSocket: Connection lost. Attempting to reconnect... (${this.reconnectAttempts}/${this.reconnectOptions.retries})`
-      );
-
-      this.reconnect(); // Attempt to reconnect
-
-      // A failed attempt surfaces as `error`, as `close`, or as both — browsers emit `error`
-      // then `close`, while a gateway refusing the connection outright (rate limiting) may only
-      // close it. Scheduling from `error` alone deadlocks on that last case: the `close` that
-      // does arrive hits the `isReconnecting` guard in `_startReconnect` and returns, so
-      // `reconnectAttempts` never reaches `retries` and even the give-up branch is unreachable.
-      // Schedule from whichever signal comes first, and only once, so the two paths cannot
-      // start parallel reconnection loops.
-      let attemptSettled = false;
-      const scheduleRetry = () => {
-        // `isReconnecting` is cleared both by `disconnect()` and by the give-up branch; the
-        // close that follows either must not arm a further attempt, or a timer outlives
-        // the channel.
-        if (attemptSettled || !this.isReconnecting) return;
-        attemptSettled = true;
-        const delay = this.reconnectOptions.exponential
-          ? this.reconnectOptions.delay * 2 ** (this.reconnectAttempts - 1)
-          : this.reconnectOptions.delay;
-        logger.info(`WebSocket: Reconnect attempt failed. Retrying in ${delay}ms.`);
-        this.reconnectTimeoutId = setTimeout(tryReconnect, delay);
-      };
-
-      this.websocket.onopen = async () => {
-        logger.info('WebSocket: Reconnection successful.');
-        // A later drop on this socket goes through `onCloseProxy`, not this attempt's retry.
-        attemptSettled = true;
-        this.isReconnecting = false;
-        // The attempt counter is reset by the openListener's stability timer, not here:
-        // a reconnection that drops again before proving stable must keep its count.
-        await this._restoreSubscriptions();
-        this._processRequestQueue();
-        // Manually trigger the onOpen listeners as the original 'open' event was consumed.
-        this.events.emit('open', new Event('open'));
-      };
-
-      this.websocket.onerror = scheduleRetry;
-      // Registered as a listener rather than assigned to `onclose`: `waitForDisconnection()`
-      // owns that property, and overwriting it would break a caller awaiting the close.
-      this.websocket.addEventListener('close', scheduleRetry);
-    };
-
-    tryReconnect();
-  }
-
-  private onCloseProxy(ev: CloseEvent) {
-    this.websocket.removeEventListener('open', this.openListener);
-    this.websocket.removeEventListener('close', this.closeListener);
-    this.websocket.removeEventListener('message', this.messageListener);
-    this.websocket.removeEventListener('error', this.errorListener);
-    // Nothing on the wire can still be answered on a closed socket, and a clean close emits no
-    // `error` event, so without this those requests would sit until `requestTimeout`. A no-op
-    // after `disconnect()`, which drains them before closing — the closing handshake itself is
-    // not guaranteed to complete.
-    this._rejectInFlight('the connection was closed');
-    this._rejectUnsubscribeWaiters('the connection was closed');
-    this.events.emit('close', ev);
-
-    if (!this.userInitiatedClose) {
-      this._startReconnect();
-    }
-  }
-
-  private onMessageProxy(event: MessageEvent<any>) {
-    let message: WebSocketEvent;
-    try {
-      message = JSON.parse(event.data);
-    } catch (error) {
-      logger.error(
-        `WebSocketChannel: Error parsing incoming message: ${event.data}, Error: ${error}`
-      );
-      return; // Stop processing this malformed message.
-    }
-
-    // Check if it's a subscription event.
-    if (message.method && isObject(message.params) && 'subscription_id' in message.params) {
-      const { result, subscription_id } = message.params as {
-        result: any;
-        subscription_id: SUBSCRIPTION_ID;
-      };
-      const subscription = this.activeSubscriptions.get(subscription_id);
-
-      if (subscription) {
-        subscription._handleEvent(result);
-      } else {
-        // The registration for this id can still be one microtask away: the reply carrying it
-        // and this event may be flushed in the same burst, and the continuation that registers
-        // the subscription has not run yet. Retry once at the end of the current tick — the
-        // continuation was queued first, so it wins — then give up, so an id that genuinely
-        // does not exist is still dropped. Events deferred this way keep their relative order,
-        // and any event arriving in a later tick is necessarily delivered after them.
-        queueMicrotask(() => {
-          const registered = this.activeSubscriptions.get(subscription_id);
-          if (registered) {
-            registered._handleEvent(result);
-          } else {
-            logger.warn(
-              `WebSocketChannel: Received event for untracked subscription ID: ${subscription_id}.`
-            );
-          }
-        });
-      }
-    }
-
-    logger.debug('onMessageProxy:', event.data);
-
-    // Call the general onMessage handler if provided by the user for all messages.
-    this.events.emit('message', event);
+    this.transport.reconnect();
   }
 
   /**
@@ -823,20 +436,8 @@ export class WebSocketChannel {
   public async subscribeNewHeads(
     params: SubscribeNewHeadsParams = {}
   ): Promise<SubscriptionNewHeadsEvent> {
-    const method = 'starknet_subscribeNewHeads';
-    const rpcParams = {
-      block_id: params.blockIdentifier ? new Block(params.blockIdentifier).identifier : undefined,
-    };
-    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
-    const subscription = new Subscription({
-      channel: this,
-      method,
-      params: rpcParams,
-      id: subId,
-      maxBufferSize: this.maxBufferSize,
-    });
-    this.activeSubscriptions.set(subId, subscription);
-    return subscription;
+    this.assertSendable();
+    return this.subscriptionChannel.subscribeNewHeads(params);
   }
 
   /**
@@ -847,29 +448,8 @@ export class WebSocketChannel {
   public async subscribeEvents(
     params: SubscribeEventsParams = {}
   ): Promise<SubscriptionStarknetEventsEvent> {
-    const method = 'starknet_subscribeEvents';
-    let from_address: string | string[] | undefined;
-    if (params.fromAddress !== undefined) {
-      from_address = Array.isArray(params.fromAddress)
-        ? bigNumberishArrayToHexadecimalStringArray(params.fromAddress)
-        : toHex(params.fromAddress);
-    }
-    const rpcParams = {
-      from_address,
-      keys: params.keys,
-      block_id: params.blockIdentifier ? new Block(params.blockIdentifier).identifier : undefined,
-      finality_status: params.finalityStatus,
-    };
-    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
-    const subscription = new Subscription({
-      channel: this,
-      method,
-      params: rpcParams,
-      id: subId,
-      maxBufferSize: this.maxBufferSize,
-    });
-    this.activeSubscriptions.set(subId, subscription);
-    return subscription;
+    this.assertSendable();
+    return this.subscriptionChannel.subscribeEvents(params);
   }
 
   /**
@@ -880,21 +460,8 @@ export class WebSocketChannel {
   public async subscribeTransactionStatus(
     params: SubscribeTransactionStatusParams
   ): Promise<SubscriptionTransactionStatusEvent> {
-    const method = 'starknet_subscribeTransactionStatus';
-    const rpcParams = {
-      transaction_hash: toHex(params.transactionHash),
-      block_id: params.blockIdentifier ? new Block(params.blockIdentifier).identifier : undefined,
-    };
-    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
-    const subscription = new Subscription({
-      channel: this,
-      method,
-      params: rpcParams,
-      id: subId,
-      maxBufferSize: this.maxBufferSize,
-    });
-    this.activeSubscriptions.set(subId, subscription);
-    return subscription;
+    this.assertSendable();
+    return this.subscriptionChannel.subscribeTransactionStatus(params);
   }
 
   /**
@@ -905,22 +472,8 @@ export class WebSocketChannel {
   public async subscribeNewTransactionReceipts(
     params: SubscribeNewTransactionReceiptsParams = {}
   ): Promise<SubscriptionNewTransactionReceiptsEvent> {
-    const method = 'starknet_subscribeNewTransactionReceipts';
-    const rpcParams = {
-      finality_status: params.finalityStatus,
-      sender_address:
-        params.senderAddress && bigNumberishArrayToHexadecimalStringArray(params.senderAddress),
-    };
-    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
-    const subscription = new Subscription({
-      channel: this,
-      method,
-      params: rpcParams,
-      id: subId,
-      maxBufferSize: this.maxBufferSize,
-    });
-    this.activeSubscriptions.set(subId, subscription);
-    return subscription;
+    this.assertSendable();
+    return this.subscriptionChannel.subscribeNewTransactionReceipts(params);
   }
 
   /**
@@ -931,23 +484,8 @@ export class WebSocketChannel {
   public async subscribeNewTransactions(
     params: SubscribeNewTransactionsParams = {}
   ): Promise<SubscriptionNewTransactionEvent> {
-    const method = 'starknet_subscribeNewTransactions';
-    const rpcParams = {
-      finality_status: params.finalityStatus,
-      sender_address:
-        params.senderAddress && bigNumberishArrayToHexadecimalStringArray(params.senderAddress),
-      tags: params.tags,
-    };
-    const subId = await this.sendReceive<SUBSCRIPTION_ID>(method, rpcParams);
-    const subscription = new Subscription({
-      channel: this,
-      method,
-      params: rpcParams,
-      id: subId,
-      maxBufferSize: this.maxBufferSize,
-    });
-    this.activeSubscriptions.set(subId, subscription);
-    return subscription;
+    this.assertSendable();
+    return this.subscriptionChannel.subscribeNewTransactions(params);
   }
 
   /**
@@ -955,7 +493,7 @@ export class WebSocketChannel {
    * @internal
    */
   public removeSubscription(id: SUBSCRIPTION_ID) {
-    this.activeSubscriptions.delete(id);
+    this.subscriptionChannel.removeSubscription(id);
   }
 
   /**

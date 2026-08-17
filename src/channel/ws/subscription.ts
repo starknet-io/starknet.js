@@ -1,8 +1,19 @@
 /* eslint-disable no-underscore-dangle */
 import type { SUBSCRIPTION_ID } from '../../types/api';
 import { logger } from '../../global/logger';
-import type { WebSocketChannel } from './ws_0_10';
 import { EventEmitter } from '../../utils/eventEmitter';
+
+/**
+ * The minimum a `Subscription` needs from whatever channel created it.
+ *
+ * Declared structurally so both `WebSocketChannel` and `SubscriptionChannel` qualify without
+ * either of them being named here — which is what keeps `subscription.ts` from depending on the
+ * classes that depend on it.
+ */
+export type SubscriptionOwner = {
+  unsubscribe(subscriptionId: SUBSCRIPTION_ID): Promise<boolean>;
+  removeSubscription(subscriptionId: SUBSCRIPTION_ID): void;
+};
 
 type SubscriptionEvents<T> = {
   event: T;
@@ -14,8 +25,8 @@ type SubscriptionEvents<T> = {
  * Options for creating a new Subscription instance
  */
 export type SubscriptionOptions = {
-  /** The containing WebSocketChannel instance */
-  channel: WebSocketChannel;
+  /** The channel that created this subscription and can end it */
+  channel: SubscriptionOwner;
   /** The JSON-RPC method used to create this subscription */
   method: string;
   /** The parameters used to create this subscription (optional, defaults to empty object) */
@@ -51,10 +62,10 @@ export type SubscriptionOptions = {
  */
 export class Subscription<T = any> {
   /**
-   * The containing `WebSocketChannel` instance.
+   * The channel that created this subscription.
    * @internal
    */
-  public channel: WebSocketChannel;
+  public channel: SubscriptionOwner;
 
   /**
    * The JSON-RPC method used to create this subscription.
@@ -108,6 +119,30 @@ export class Subscription<T = any> {
   }
 
   /**
+   * Registers a listener for this subscription's closure, whatever causes it: an explicit
+   * `unsubscribe()`, or the channel giving up on re-establishing it after a reconnection.
+   *
+   * The second case is the reason this exists. A subscription killed by a refused restore stops
+   * delivering while the connection stays up, so the transport's `statechange` says nothing about
+   * it and a consumer would wait forever on events that can no longer come.
+   *
+   * @param listener - Called once, when the subscription closes.
+   * @returns the detach function, so the pair matches `useSyncExternalStore`'s subscribe contract.
+   */
+  public onClose(listener: () => void): () => void {
+    // Attaching after the fact must still inform: the closure can land between the subscribe call
+    // resolving and the consumer wiring its listener.
+    if (this._isClosed) {
+      listener();
+      return () => {};
+    }
+    this.events.on('unsubscribe', listener);
+    return () => {
+      this.events.off('unsubscribe', listener);
+    };
+  }
+
+  /**
    * Closes the subscription locally, without contacting the node.
    *
    * Used when the channel knows the subscription is gone and cannot be recovered — a
@@ -118,6 +153,9 @@ export class Subscription<T = any> {
   public _markClosed(): void {
     if (this._isClosed) return;
     this._isClosed = true;
+    // Released with the closure: nothing can reach it again, and holding it would keep a
+    // component's closure alive for as long as the subscription object is referenced.
+    this.handler = null;
     this.events.emit('unsubscribe', undefined);
     this.events.clear();
   }
@@ -146,10 +184,18 @@ export class Subscription<T = any> {
    * When a handler is attached, any buffered events will be passed to it sequentially.
    * Subsequent events will be passed directly as they arrive.
    *
+   * Re-attaching the **same** handler is a no-op: React StrictMode invokes an effect twice, and
+   * throwing there would fail a correct component. A *different* handler while one is attached is
+   * still refused — that is a genuine mistake, not a lifecycle artefact.
+   *
    * @param {(data: T) => void} handler - The function to call with event data.
-   * @throws {Error} If a handler is already attached to this subscription.
+   * @throws {Error} If a different handler is already attached to this subscription.
    */
   public on(handler: (data: T) => void): void {
+    // A closed subscription can never deliver again. Refusing here would force a component to
+    // build a new object for no benefit, so this is ignored, like `unsubscribe()` on a closed one.
+    if (this._isClosed) return;
+    if (this.handler === handler) return;
     if (this.handler) {
       // To avoid complexity, we only allow one handler at a time.
       // Users can implement their own multi-handler logic if needed.
@@ -164,6 +210,18 @@ export class Subscription<T = any> {
         this.handler(event);
       }
     }
+  }
+
+  /**
+   * Detaches the current handler.
+   *
+   * Events arriving afterwards are buffered again, so a later `on()` receives them: the
+   * subscription itself is untouched, only the delivery is paused. This is what a React effect
+   * cleanup needs — dropping the handler without tearing down a subscription the component may
+   * re-attach to on its next mount.
+   */
+  public off(): void {
+    this.handler = null;
   }
 
   /**
@@ -189,6 +247,7 @@ export class Subscription<T = any> {
         const success = await this.channel.unsubscribe(this.id);
         if (success) {
           this._isClosed = true;
+          this.handler = null; // Same reason as in `_markClosed`.
           this.channel.removeSubscription(this.id);
           this.events.emit('unsubscribe', undefined);
           this.events.clear(); // Clean up all listeners.

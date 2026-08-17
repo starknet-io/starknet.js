@@ -24,14 +24,6 @@ on:
         description: 'Node: Pathfinder'
         type: boolean
         default: true
-      matrix-protocol-rpc:
-        description: 'Protocol: RPC'
-        type: boolean
-        default: true
-      matrix-protocol-ws:
-        description: 'Protocol: WS'
-        type: boolean
-        default: true
       matrix-version-v0_9:
         description: 'RPC version: 0.9'
         type: boolean
@@ -55,7 +47,6 @@ jobs:
             // console.log(context)
             const adjustType = {
               node: (t) => t[0].toUpperCase() + t.slice(1),
-              protocol: (t) => t.toUpperCase(),
               version: (t) => t
             };
             //
@@ -69,20 +60,20 @@ jobs:
             //
             return groupInputs(context.payload.inputs);
   tests:
-    name: Run test on ${{ matrix.node }} ${{ matrix.protocol }} ${{ matrix.version }}
+    name: Run test on ${{ matrix.node }} ${{ matrix.version }}
     needs: [prepare-matrix]
     strategy:
       max-parallel: 1
       fail-fast: ${{ inputs.fail-fast }}
+      # No protocol axis: each job exercises every transport its urls allow, so a job per
+      # protocol would only run the same suites twice.
       matrix:
         node: ${{ fromJson(needs.prepare-matrix.outputs.matrix).node }}
-        protocol: ${{ fromJson(needs.prepare-matrix.outputs.matrix).protocol }}
         version: ${{ fromJson(needs.prepare-matrix.outputs.matrix).version }}
 
     uses: ./.github/workflows/_test.yml
     with:
       ignore-scripts: ${{ inputs.ignore-scripts }}
-      protocol: ${{ matrix.protocol }}
       node: ${{ matrix.node }}
       version: ${{ matrix.version }}
     secrets: inherit

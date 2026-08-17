@@ -4,8 +4,8 @@ import {
   CallData,
   Contract,
   EthSigner,
-  Provider,
   ProviderInterface,
+  RpcProvider,
   addAddressPadding,
   cairo,
   encode,
@@ -68,7 +68,7 @@ describe('Ethereum signer', () => {
     let ethPubKContract: Contract;
 
     beforeAll(async () => {
-      provider = new Provider(await createTestProvider());
+      provider = await createTestProvider();
       account = getTestAccount(provider);
 
       const { deploy } = await account.declareAndDeploy({
@@ -100,12 +100,12 @@ describe('Ethereum signer', () => {
 
   describeIfDevnet('ETH account tx V3', () => {
     // devnet only because fee cost is high
-    let provider: Provider;
+    let provider: RpcProvider;
     let account: Account;
     let ethAccount: Account;
 
     beforeAll(async () => {
-      provider = new Provider(await createTestProvider());
+      provider = await createTestProvider();
       account = getTestAccount(provider);
 
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({

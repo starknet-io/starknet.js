@@ -57,21 +57,21 @@ jobs:
       use-devnet: true
 
   tests-main:
-    name: Run test on ${{ matrix.node }} ${{ matrix.protocol }} ${{ matrix.version }}
+    name: Run test on ${{ matrix.node }} ${{ matrix.version }}
     if: |
       github.event_name != 'workflow_dispatch'
       && (github.base_ref || github.ref_name) == 'main'
     strategy:
       max-parallel: 1
       fail-fast: false
+      # No protocol axis: each job now exercises every transport its urls allow, so splitting
+      # RPC from WS would only run the same suites twice across two jobs.
       matrix:
-        protocol: [RPC, WS]
         node: [Juno, Pathfinder]
         version: [v0_9, v0_10]
 
     uses: ./.github/workflows/_test.yml
     with:
-      protocol: ${{ matrix.protocol }}
       node: ${{ matrix.node }}
       version: ${{ matrix.version }}
     secrets: inherit

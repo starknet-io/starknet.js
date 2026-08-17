@@ -38,10 +38,30 @@ There are **two** kinds of tests, and the default command needs live infrastruct
   (`http://127.0.0.1:5050`) and no `TEST_ACCOUNT_*` env vars are set. The root-level
   `__tests__/*.test.ts` suites (account, contract, provider, paymaster, wallet…)
   exercise real RPC calls. To run them, start a devnet (Docker:
-  `shardlabs/starknet-devnet-rs`) or point at a node via `TEST_RPC_URL` +
+  `shardlabs/starknet-devnet-rs`, **0.9.2 or later**, which the `node-ws` project needs
+  for JSON-RPC batches over `/ws`) or point at a node via `TEST_RPC_URL` +
   `TEST_ACCOUNT_ADDRESS` + `TEST_ACCOUNT_PRIVATE_KEY` (see CONTRIBUTING.md).
   Two suites under `__tests__/utils/` (`ethSigner`, `batch`) also need a node and are
   excluded from `test:unit`.
+
+  That one command declares **four Jest projects**, and the available URLs decide
+  which ones exist:
+
+  | Project       | Files                                 | Runs when            |
+  | ------------- | ------------------------------------- | -------------------- |
+  | `unit`        | tests that never build a provider     | always               |
+  | `node-http`   | tests that do, over HTTP              | an HTTP url resolves |
+  | `node-ws`     | the same files, over a WebSocket      | a WS url resolves    |
+  | `ws-specific` | `*.ws.test.ts`, needing a live socket | a WS url resolves    |
+
+  So **a node-touching file runs twice**, once per transport — expect two results per
+  file, and `--selectProjects=node-http` to look at one. `TEST_WS_URL` enables the two
+  WebSocket projects; against a devnet it is derived from `TEST_RPC_URL` automatically.
+  A file needing a socket of its own says so by being named `*.ws.test.ts`.
+
+  Only **one account** is authorized per run, so the config pins `maxWorkers: 1`. Do not
+  raise it: parallel suites drive the same account and fail on nonces and duplicate
+  transaction hashes — errors that look like application bugs.
 
 If you cannot start a devnet, run `npm run test:unit` + `npm run lint` +
 `npm run ts:check` and say so explicitly — do not claim the full suite passed.
@@ -51,25 +71,30 @@ If you cannot start a devnet, run `npm run test:unit` + `npm run lint` +
 High-level classes are re-exported from `src/index.ts`; utils are exported as
 namespaces (`hash`, `num`, `cairo`, `shortString`, …).
 
-| Module       | What lives there                                                                                                                                                                              |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `account/`   | `Account` (+ `AccountInterface`) — signs and sends transactions, declares/deploys, fees.                                                                                                      |
-| `contract/`  | `Contract` (+ `ContractInterface`) — typed wrapper to call/invoke a deployed contract via its ABI.                                                                                            |
-| `provider/`  | `RpcProvider` (+ `ProviderInterface`) — read chain state; `RPCResponseParser` shapes responses.                                                                                               |
-| `channel/`   | Transport layer: `RpcChannel` (JSON-RPC) and `WebSocketChannel` / `Subscription` (WS).                                                                                                        |
-| `signer/`    | `Signer`, `EthSigner`, `LedgerSigner*` (+ `SignerInterface`) — message/transaction signing.                                                                                                   |
-| `wallet/`    | `WalletAccount` / `WalletAccountV5` — browser wallet (get-starknet / wallet-standard) integration.                                                                                            |
-| `paymaster/` | `PaymasterRpc` (+ `PaymasterInterface`) — gasless / sponsored transaction flows.                                                                                                              |
-| `deployer/`  | `Deployer` (+ `DeployerInterface`) — UDC-based contract deployment helpers.                                                                                                                   |
-| `plugins/`   | Plugin framework + implementations (`starknet-id`, `fast-execute`, `brother-id`).                                                                                                             |
-| `service/`   | Shared service-layer types.                                                                                                                                                                   |
-| `utils/`     | Pure helpers: `calldata` (encode/decode), `hash`, `cairoDataTypes`, `num`, `shortString`, `merkle`, `typedData`, `transaction`, `address`, `ec`, etc. **Most have unit tests** → `test:unit`. |
-| `types/`     | Public TypeScript types, including RPC API types (`types/api`) and Starknet spec bindings.                                                                                                    |
-| `global/`    | Global config, constants, and logger.                                                                                                                                                         |
+| Module               | What lives there                                                                                                                                                                              |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `account/`           | `Account` (+ `AccountInterface`) — signs and sends transactions, declares/deploys, fees.                                                                                                      |
+| `contract/`          | `Contract` (+ `ContractInterface`) — typed wrapper to call/invoke a deployed contract via its ABI.                                                                                            |
+| `provider/`          | `RpcProvider` (+ `ProviderInterface`) — read chain state; `RPCResponseParser` shapes responses. `WebSocketProvider` serves requests and subscriptions from one socket.                        |
+| `channel/`           | JSON-RPC layer: `RpcChannel` (requests) and `SubscriptionChannel` / `Subscription` (WS subscriptions), both versioned; `WebSocketChannel` bundles a socket with the subscription surface.     |
+| `channel/transport/` | What carries the envelopes, below the channels and independent of the spec version: `HttpTransport`, `WsTransport`, `ReconnectingWsTransport`.                                                |
+| `signer/`            | `Signer`, `EthSigner`, `LedgerSigner*` (+ `SignerInterface`) — message/transaction signing.                                                                                                   |
+| `wallet/`            | `WalletAccount` / `WalletAccountV5` — browser wallet (get-starknet / wallet-standard) integration.                                                                                            |
+| `paymaster/`         | `PaymasterRpc` (+ `PaymasterInterface`) — gasless / sponsored transaction flows.                                                                                                              |
+| `deployer/`          | `Deployer` (+ `DeployerInterface`) — UDC-based contract deployment helpers.                                                                                                                   |
+| `plugins/`           | Plugin framework + implementations (`starknet-id`, `fast-execute`, `brother-id`).                                                                                                             |
+| `service/`           | Shared service-layer types.                                                                                                                                                                   |
+| `utils/`             | Pure helpers: `calldata` (encode/decode), `hash`, `cairoDataTypes`, `num`, `shortString`, `merkle`, `typedData`, `transaction`, `address`, `ec`, etc. **Most have unit tests** → `test:unit`. |
+| `types/`             | Public TypeScript types, including RPC API types (`types/api`) and Starknet spec bindings.                                                                                                    |
+| `global/`            | Global config, constants, and logger.                                                                                                                                                         |
 
 Multiple RPC spec versions are supported simultaneously (e.g. `v0_8`, `v0_9`); the
 pinned `starknet_specs` dev-dependencies define them. Be version-aware when touching
 `channel/`, `provider/`, or `types/api`.
+
+Spec version and transport are two independent axes: the same channel code runs over
+HTTP or over a WebSocket, and only `channel/transport/` knows which. A change that ties
+one axis to the other is a design regression, not a shortcut.
 
 ## Conventions
 

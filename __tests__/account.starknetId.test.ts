@@ -1,17 +1,17 @@
-import { Account, Provider, num, shortString } from '../src';
+import { Account, RpcProvider, num, shortString } from '../src';
 import { CONTRACTS, createTestProvider, getTestAccount, STRKtokenAddress } from './config';
 
 const { hexToDecimalString } = num;
 
 describe('deploy and test Wallet', () => {
-  let provider: Provider;
+  let provider: RpcProvider;
   let account: Account;
   let identityAddress: string;
   let namingAddress: string;
   let multicallAddress: string;
 
   beforeAll(async () => {
-    provider = new Provider(await createTestProvider());
+    provider = await createTestProvider();
     account = getTestAccount(provider);
 
     // Deploy Starknet id contract

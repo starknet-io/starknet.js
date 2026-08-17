@@ -1,6 +1,6 @@
-import { stringify } from '../json';
 import { RpcProviderOptions } from '../../types';
 import { JRPC } from '../../types/api';
+import { HttpTransport, type RpcTransport } from '../../channel/transport';
 
 export type BatchClientOptions<T extends { [key: string]: { params?: any; result?: any } }> = {
   nodeUrl: string;
@@ -8,6 +8,12 @@ export type BatchClientOptions<T extends { [key: string]: { params?: any; result
   interval: number;
   baseFetch: NonNullable<RpcProviderOptions['baseFetch']>;
   rpcMethods: T;
+  /**
+   * Carries the batch to the node. Defaults to an `HttpTransport` built from `nodeUrl`,
+   * `headers` and `baseFetch`, which is what this client did on its own before the option
+   * existed.
+   */
+  transport?: RpcTransport;
 };
 
 export class BatchClient<T extends { [key: string]: { params?: any; result?: any } }> {
@@ -29,7 +35,7 @@ export class BatchClient<T extends { [key: string]: { params?: any; result?: any
 
   private delayPromiseResolve?: () => void;
 
-  private baseFetch: BatchClientOptions<T>['baseFetch'];
+  private transport: RpcTransport;
 
   private rpcMethods: T;
 
@@ -37,7 +43,13 @@ export class BatchClient<T extends { [key: string]: { params?: any; result?: any
     this.nodeUrl = options.nodeUrl;
     this.headers = options.headers;
     this.interval = options.interval;
-    this.baseFetch = options.baseFetch;
+    this.transport =
+      options.transport ??
+      new HttpTransport({
+        nodeUrl: options.nodeUrl,
+        headers: options.headers,
+        baseFetch: options.baseFetch,
+      });
     this.rpcMethods = options.rpcMethods;
   }
 
@@ -84,14 +96,8 @@ export class BatchClient<T extends { [key: string]: { params?: any; result?: any
     return request.id;
   }
 
-  private async sendBatch(requests: JRPC.RequestBody[]) {
-    const raw = await this.baseFetch(this.nodeUrl, {
-      method: 'POST',
-      body: stringify(requests),
-      headers: this.headers as Record<string, string>,
-    });
-
-    return raw.json();
+  private async sendBatch(requests: JRPC.RequestBody[]): Promise<JRPC.ResponseBody[]> {
+    return this.transport.request(requests);
   }
 
   /**

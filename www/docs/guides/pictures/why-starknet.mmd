@@ -1,37 +1,40 @@
 ---
 config:
   theme: neo-dark
+  look: neo
   layout: elk
 ---
-flowchart LR
+flowchart TB
  subgraph CLIENT["Client dApp"]
         Browser["Browser"]
         Nodejs["Node.js"]
   end
  subgraph LIBRARY["Starknet JS"]
         Interface["Instance"]
-        Channel["Channel"]
-        Provider["Provider"]
         Account["Account"]
         Contract["Contract"]
+        Provider["Provider"]
+        Channel["Channel"]
+        Transport["Transport"]
         Utils["Utils"]
         Signer["Signer"]
   end
  subgraph NETWORK["Starknet Network"]
         Starknet["Starknet RPC Node"]
   end
-    Browser L_Browser_Interface_0@-- <br> --> Interface
-    Nodejs --> Interface
+    Browser e1@--> Interface
+    Nodejs e2@--> Interface
     Interface --> Provider & Account & Contract & Channel
-    Channel L_Channel_Starknet_0@-- </br> --> Starknet
-    Provider L_Provider_Channel_0@-- <br> --> Channel
-    Account L_Account_Provider_0@-- <br> --> Provider
-    Contract L_Contract_Account_0@-- <br> --> Account
+    Contract e3@--> Account
     Contract --> Provider
+    Account e4@--> Provider
+    Provider e5@--> Channel
+    Channel e6@--> Transport
+    Transport e7@-- "http(s):// · ws(s)://" --> Starknet
     Interface@{ shape: dbl-circ}
-    L_Browser_Interface_0@{ animation: slow } 
-    L_Interface_Contract_0@{ animation: slow } 
-    L_Channel_Starknet_0@{ animation: slow } 
-    L_Provider_Channel_0@{ animation: slow } 
-    L_Account_Provider_0@{ animation: slow } 
-    L_Contract_Account_0@{ animation: slow }
+    e1@{ animation: slow }
+    e3@{ animation: slow }
+    e4@{ animation: slow }
+    e5@{ animation: slow }
+    e6@{ animation: slow }
+    e7@{ animation: fast }

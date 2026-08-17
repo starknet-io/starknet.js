@@ -4,6 +4,9 @@ import {
   createTestProvider,
   describeIfRpc09,
   initializeMatcher,
+  spyOnTransport,
+  rpcResult,
+  rpcErrorReply,
 } from './config';
 
 describeIfRpc09('UNIT TEST: RPC 0.9.0 Channel', () => {
@@ -12,7 +15,7 @@ describeIfRpc09('UNIT TEST: RPC 0.9.0 Channel', () => {
   initializeMatcher(expect);
 
   beforeAll(async () => {
-    nodeUrl = (await createTestProvider(false)).channel.nodeUrl;
+    nodeUrl = (await createTestProvider()).channel.nodeUrl;
     channel09 = new RPC09.RpcChannel({ nodeUrl });
 
     await createBlockForDevnet();
@@ -27,17 +30,8 @@ describeIfRpc09('UNIT TEST: RPC 0.9.0 Channel', () => {
   });
 
   test('RPC error handling', async () => {
-    const fetchSpy = jest.spyOn(channel09, 'fetch');
-    fetchSpy.mockResolvedValue({
-      json: async () => ({
-        jsonrpc: '2.0',
-        error: {
-          code: 24,
-          message: 'Block not found',
-        },
-        id: 0,
-      }),
-    } as any);
+    const transportSpy = spyOnTransport(channel09);
+    transportSpy.mockResolvedValue(rpcErrorReply(24, 'Block not found'));
 
     expect.assertions(3);
     try {
@@ -48,22 +42,20 @@ describeIfRpc09('UNIT TEST: RPC 0.9.0 Channel', () => {
       expect(error).toBeInstanceOf(RpcError);
       expect((error as RpcError).isType('BLOCK_NOT_FOUND')).toBe(true);
     }
-    fetchSpy.mockRestore();
+    transportSpy.mockRestore();
   });
 
   test('throws a clear error when response has neither result nor error', async () => {
     // Issue #1238: a malformed/empty reply (no result, no error) must throw a
     // LibraryError instead of silently returning undefined.
-    const fetchSpy = jest.spyOn(channel09, 'fetch');
-    fetchSpy.mockResolvedValueOnce({
-      json: async () => ({ jsonrpc: '2.0', id: 1 }),
-    } as any);
+    const transportSpy = spyOnTransport(channel09);
+    transportSpy.mockResolvedValueOnce({ jsonrpc: '2.0', id: 1 } as any);
 
     await expect(
       // @ts-expect-error private method accessed for testing
       channel09.fetchEndpoint('starknet_chainId')
     ).rejects.toThrow(LibraryError);
-    fetchSpy.mockRestore();
+    transportSpy.mockRestore();
   });
 
   describe('RPC 0.9.0 specific methods', () => {
@@ -78,61 +70,47 @@ describeIfRpc09('UNIT TEST: RPC 0.9.0 Channel', () => {
 
       // Since this is a new method that may not have real data in devnet,
       // we'll mock the response to test the method structure
-      const fetchSpy = jest.spyOn(channel09, 'fetch');
-      fetchSpy.mockResolvedValueOnce({
-        json: async () => ({
-          jsonrpc: '2.0',
-          result: [],
-          id: 1,
-        }),
-      } as any);
+      const transportSpy = spyOnTransport(channel09);
+      transportSpy.mockResolvedValueOnce(rpcResult([]));
 
       const response = await channel09.getMessagesStatus(dummyTxHash);
       expect(Array.isArray(response)).toBe(true);
 
-      fetchSpy.mockRestore();
+      transportSpy.mockRestore();
     });
 
     test('getStorageProof', async () => {
       // Test storage proof with empty arrays
-      const fetchSpy = jest.spyOn(channel09, 'fetch');
-      fetchSpy.mockResolvedValueOnce({
-        json: async () => ({
-          jsonrpc: '2.0',
-          result: {
-            classes_proof: [],
-            contracts_proof: [],
-            contracts_storage_proofs: [],
-          },
-          id: 1,
-        }),
-      } as any);
+      const transportSpy = spyOnTransport(channel09);
+      transportSpy.mockResolvedValueOnce(
+        rpcResult({
+          classes_proof: [],
+          contracts_proof: [],
+          contracts_storage_proofs: [],
+        })
+      );
 
       const response = await channel09.getStorageProof();
       expect(response).toHaveProperty('classes_proof');
       expect(response).toHaveProperty('contracts_proof');
       expect(response).toHaveProperty('contracts_storage_proofs');
 
-      fetchSpy.mockRestore();
+      transportSpy.mockRestore();
     });
 
     test('getCompiledCasm', async () => {
       // Test with a dummy class hash
       const dummyClassHash = '0x123456789abcdef';
 
-      const fetchSpy = jest.spyOn(channel09, 'fetch');
-      fetchSpy.mockResolvedValueOnce({
-        json: async () => ({
-          jsonrpc: '2.0',
-          result: {
-            bytecode: [],
-            hints: [],
-            pythonic_hints: [],
-            compiler_version: '2.0.0',
-          },
-          id: 1,
-        }),
-      } as any);
+      const transportSpy = spyOnTransport(channel09);
+      transportSpy.mockResolvedValueOnce(
+        rpcResult({
+          bytecode: [],
+          hints: [],
+          pythonic_hints: [],
+          compiler_version: '2.0.0',
+        })
+      );
 
       const response = await channel09.getCompiledCasm(dummyClassHash);
       expect(response).toHaveProperty('bytecode');
@@ -140,7 +118,7 @@ describeIfRpc09('UNIT TEST: RPC 0.9.0 Channel', () => {
       expect(response).toHaveProperty('pythonic_hints');
       expect(response).toHaveProperty('compiler_version');
 
-      fetchSpy.mockRestore();
+      transportSpy.mockRestore();
     });
 
     test('simulateTransaction supports V3 transactions', async () => {
@@ -168,10 +146,8 @@ describeIfRpc09('UNIT TEST: RPC 0.9.0 Channel', () => {
         id: 1,
       };
 
-      const fetchSpy = jest.spyOn(channel09, 'fetch');
-      fetchSpy.mockResolvedValueOnce({
-        json: async () => mockSimulateResponse,
-      } as any);
+      const transportSpy = spyOnTransport(channel09);
+      transportSpy.mockResolvedValueOnce(mockSimulateResponse as any);
 
       // Mock invocation with V3 transaction structure
       const mockInvocation = {
@@ -196,8 +172,43 @@ describeIfRpc09('UNIT TEST: RPC 0.9.0 Channel', () => {
       const response = await channel09.simulateTransaction([mockInvocation]);
       expect(Array.isArray(response)).toBe(true);
 
-      fetchSpy.mockRestore();
+      transportSpy.mockRestore();
     });
+  });
+});
+
+describe('UNIT TEST: RPC 0.9.0 Channel transport option', () => {
+  // These run on any node version: nothing here reaches one. They are what proves the 0.9
+  // channel is wired to the transport, since the `describeIfRpc09` block above is skipped
+  // whenever the test node serves 0.10.
+  test('uses an injected transport and never touches baseFetch', async () => {
+    const baseFetch = jest.fn();
+    const request = jest.fn(async () => ({ jsonrpc: '2.0', id: 1, result: '0x1' }));
+    const injected = new RPC09.RpcChannel({
+      nodeUrl: 'http://localhost:5050/rpc',
+      baseFetch: baseFetch as any,
+      transport: { request } as any,
+    });
+
+    await expect((injected as any).fetchEndpoint('starknet_chainId')).resolves.toBe('0x1');
+
+    expect(baseFetch).not.toHaveBeenCalled();
+    expect(request).toHaveBeenCalledWith(
+      expect.objectContaining({ jsonrpc: '2.0', method: 'starknet_chainId' })
+    );
+  });
+
+  test('numbers its own requests, starting at 1', async () => {
+    const request = jest.fn(async () => ({ jsonrpc: '2.0', id: 1, result: '0x1' }));
+    const injected = new RPC09.RpcChannel({
+      nodeUrl: 'http://localhost:5050/rpc',
+      transport: { request } as any,
+    });
+
+    await (injected as any).fetchEndpoint('starknet_chainId');
+    await (injected as any).fetchEndpoint('starknet_chainId');
+
+    expect(request.mock.calls.map(([envelope]: any) => envelope.id)).toEqual([1, 2]);
   });
 });
 
