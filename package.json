@@ -101,10 +101,10 @@
     "typescript-coverage-report": "npm:@penovicp/typescript-coverage-report@^1.0.0-beta.2"
   },
   "dependencies": {
-    "@noble/curves": "~1.7.0",
-    "@noble/hashes": "~1.6.0",
-    "@scure/base": "~1.2.1",
-    "@scure/starknet": "1.1.0",
+    "@noble/curves": "~2.3.0",
+    "@noble/hashes": "~2.3.0",
+    "@scure/base": "~2.3.0",
+    "@scure/starknet": "2.3.0",
     "@starknet-io/get-starknet-wallet-standard": "^5.0.0",
     "@starknet-io/get-starknet-wallet-standard-v6": "npm:@starknet-io/get-starknet-wallet-standard@6.0.4",
     "@starknet-io/starknet-types-0101": "npm:@starknet-io/types-js@0.10.2",
@@ -115,7 +115,7 @@
     "lossless-json": "^4.2.0"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",

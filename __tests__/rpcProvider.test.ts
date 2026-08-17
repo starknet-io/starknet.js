@@ -5,7 +5,6 @@ import {
   createTestProvider,
   describeIfDevnet,
   describeIfNotDevnet,
-  describeIfRpc,
   describeIfTestnet,
   ETHtokenAddress,
   STRKtokenAddress,
@@ -61,7 +60,7 @@ function expectZeroTipEstimate() {
   };
 }
 
-describeIfRpc('RPCProvider', () => {
+describe('RPCProvider', () => {
   let rpcProvider: RpcProvider;
   let provider: ProviderInterface;
   let account: Account;
@@ -69,7 +68,7 @@ describeIfRpc('RPCProvider', () => {
   initializeMatcher(expect);
 
   beforeAll(async () => {
-    rpcProvider = await createTestProvider(false);
+    rpcProvider = await createTestProvider();
     provider = await createTestProvider();
     account = getTestAccount(provider);
 
@@ -379,7 +378,7 @@ describeIfRpc('RPCProvider', () => {
           owner: account.address,
         };
         const erc20Constructor = erc20CallData.compile('constructor', erc20ConstructorParams);
-        const randomWallet = stark.randomAddress();
+        const randomWallet = stark.randomFelt();
         const transferSelector = num.toHexString(
           '271746229759260285552388728919865295615886751538523744128730118297934206697'
         );
@@ -496,7 +495,7 @@ describeIfRpc('RPCProvider', () => {
   });
 
   describe('Tip Estimation', () => {
-    describeIfRpc('getEstimateTip', () => {
+    describe('getEstimateTip', () => {
       test('should estimate tip from latest block or handle insufficient data', async () => {
         const tipEstimate = await rpcProvider.getEstimateTip('latest', {
           minTxsNecessary: 1, // Use low threshold for test reliability

@@ -1,4 +1,4 @@
-import { Provider } from '../src';
+import { RpcProvider } from '../src';
 import { SupportedRpcVersion } from '../src/global/constants';
 import { getDefaultNodes, getSupportedRpcVersions } from '../src/utils/provider';
 
@@ -65,7 +65,7 @@ function isTransientError(error: any): boolean {
  *  - `undefined` for any genuine failure (unsupported spec, malformed response...).
  */
 async function getSpecVersionWithRetry(
-  provider: InstanceType<typeof Provider>,
+  provider: RpcProvider,
   nodeUrl: string,
   retries = 3
 ): Promise<string | undefined> {
@@ -105,7 +105,7 @@ describe('Default RPC Nodes', () => {
           Object.keys(rpcNodes).map(async (network: any) => {
             return Promise.all(
               rpcNodes[network as keyof typeof rpcNodes].map(async (it: any) => {
-                const provider = new Provider({ nodeUrl: it });
+                const provider = new RpcProvider({ nodeUrl: it });
                 const version = await getSpecVersionWithRetry(provider, it);
 
                 return {

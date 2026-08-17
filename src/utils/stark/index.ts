@@ -1,5 +1,7 @@
-import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
+import { randomBytes } from '@noble/hashes/utils.js';
+import { getPublicKey, utils } from '@scure/starknet';
 import { config } from '../../global/config';
+import { PRIME } from '../../global/constants';
 import { EstimateFeeResponseOverhead, FeeEstimate } from '../../provider/types/index.type';
 import {
   EDAMode,
@@ -18,7 +20,14 @@ import {
   Signature,
   UniversalDetails,
 } from '../../types';
-import { addHexPrefix, atobUniversal, btoaUniversal, buf2hex, removeHexPrefix } from '../encode';
+import {
+  addHexPrefix,
+  atobUniversal,
+  btoaUniversal,
+  buf2hex,
+  removeHexPrefix,
+  uint8ArrayToBigInt,
+} from '../encode';
 import { parse, stringify } from '../json';
 import {
   addPercent,
@@ -113,8 +122,54 @@ export async function decompressProgram(
 }
 
 /**
+ * Random felt.
+ *
+ * A felt is an integer in the range [0, PRIME), PRIME being 2**251 + 17 * 2**192 + 1.
+ * Every value of this range has the same probability to be returned.
+ *
+ * Use it when a value only has to be unpredictable : a deployment salt, a SNIP-9 nonce,
+ * a test value. Do not use it as a private key : the range of a private key is narrower
+ * than the range of a felt (see {@link randomStarkPrivateKey}).
+ * @returns {string} an hex string of a random felt
+ * @example
+ * ```typescript
+ * const result = stark.randomFelt();
+ * // result = "0x51fc8126a13cd5ddb29a71ca399cb1e814f086f5af1b502d7151c14929554f"
+ * ```
+ */
+export function randomFelt(): string {
+  // 48 = 32 bytes (the size of a felt) + 16 bytes of margin (FIPS 186-5, RFC 9380).
+  // Without that margin, PRIME would fit only 31 times in the range of the draw, making
+  // some felts 3% more likely than the others. With it, PRIME fits about 10**40 times in
+  // that range, and the difference becomes undetectable.
+  return toHex(uint8ArrayToBigInt(randomBytes(48)) % PRIME);
+}
+
+/**
+ * Random private key of the Stark curve.
+ *
+ * A private key is an integer in the range [1, n), n being the order of the Stark curve :
+ * 3618502788666131213697322783095070105526743751716087489154079457884512865583.
+ * This range is slightly narrower than the range of a felt, so a random felt is not
+ * always a usable private key : always create a key with this function.
+ * @returns {string} an hex string of a random private key, always 32 bytes long
+ * @example
+ * ```typescript
+ * const privateKey = stark.randomStarkPrivateKey();
+ * // privateKey = "0x0051fc8126a13cd5ddb29a71ca399cb1e814f086f5af1b502d7151c14929554f"
+ * const publicKey = ec.starkCurve.getStarkKey(privateKey);
+ * ```
+ */
+export function randomStarkPrivateKey(): string {
+  return addHexPrefix(buf2hex(utils.randomPrivateKey()));
+}
+
+/**
  * Random Address based on random keyPair
- * @returns {string} an hex string of a random Starknet address
+ * @deprecated misleading name : the result is a random felt, not an address.
+ * Use {@link randomFelt} for a salt or a nonce, and {@link randomStarkPrivateKey} for a
+ * private key.
+ * @returns {string} an hex string of a random felt
  * @example
  * ```typescript
  * const result = stark.randomAddress();
@@ -122,8 +177,7 @@ export async function decompressProgram(
  * ```
  */
 export function randomAddress(): string {
-  const randomKeyPair = utils.randomPrivateKey();
-  return getStarkKey(randomKeyPair);
+  return randomFelt();
 }
 
 /**
@@ -180,7 +234,7 @@ export function formatSignature(sig?: Signature): ArraySignatureType {
     const { r, s } = sig;
     return [toHex(r), toHex(s)];
   } catch (e) {
-    throw new Error('Signature need to be weierstrass.SignatureType or an array for custom');
+    throw new Error('Signature need to be weierstrass.ECDSASignature or an array for custom');
   }
 }
 

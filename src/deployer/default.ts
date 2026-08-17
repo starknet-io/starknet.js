@@ -10,7 +10,7 @@ import { CallData } from '../utils/calldata';
 import { starkCurve } from '../utils/ec';
 import { calculateContractAddressFromHash } from '../utils/hash';
 import { toCairoBool, toHex } from '../utils/num';
-import { randomAddress } from '../utils/stark';
+import { randomFelt } from '../utils/stark';
 import { getCompiledCalldata } from '../utils/transaction/getCompiledCalldata';
 import type { DeployerInterface } from './interface';
 import type { DeployerCall } from './types/index.type';
@@ -51,7 +51,7 @@ export class Deployer implements DeployerInterface {
         return CallData.compile(constructorCalldata);
       });
 
-      const deploySalt = salt ?? randomAddress();
+      const deploySalt = salt ?? randomFelt();
 
       return {
         call: {

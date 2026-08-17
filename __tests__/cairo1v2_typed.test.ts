@@ -710,7 +710,7 @@ describe('Cairo 1', () => {
 
     beforeAll(async () => {
       // Deploy Cairo 1 Account
-      const priKey = stark.randomAddress();
+      const priKey = stark.randomStarkPrivateKey();
       const pubKey = ec.starkCurve.getStarkKey(priKey);
 
       const calldata = { publicKey: pubKey };

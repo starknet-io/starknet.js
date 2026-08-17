@@ -15,7 +15,7 @@ import {
   hash,
   outsideExecution,
   OutsideExecutionVersion,
-  Provider,
+  RpcProvider,
   src5,
   stark,
   TransactionType,
@@ -37,11 +37,11 @@ import {
 } from './config';
 
 describe('Account and OutsideExecution', () => {
-  let provider: Provider;
+  let provider: RpcProvider;
   let executorAccount: Account;
   let signerAccount: Account;
 
-  const targetPK = stark.randomAddress();
+  const targetPK = stark.randomStarkPrivateKey();
   const targetPubK = ec.starkCurve.getStarkKey(targetPK);
 
   // For ERC20 transfer outside call
@@ -58,7 +58,7 @@ describe('Account and OutsideExecution', () => {
   initializeMatcher(expect);
 
   beforeAll(async () => {
-    provider = new Provider(await createTestProvider());
+    provider = await createTestProvider();
     executorAccount = getTestAccount(provider);
     recipientAccount = executorAccount;
     strkContract = new Contract({

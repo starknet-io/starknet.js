@@ -24,13 +24,14 @@ import {
 import assert from '../utils/assert';
 import { ETransactionType, JRPC, RPCSPEC09 as RPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
+import { HttpTransport, type RpcTransport } from './transport';
+import { postJsonRpc } from './transport/http';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import { LibraryError, RpcError } from '../utils/errors';
 import { validateAndParseEthAddress } from '../utils/eth';
 import fetch from '../utils/connect/fetch';
 import { getSelector, getSelectorFromName } from '../utils/hash';
-import { stringify } from '../utils/json';
 import { isNumber } from '../utils/typed';
 import {
   bigNumberishArrayToHexadecimalStringArray,
@@ -84,6 +85,9 @@ export class RpcChannel {
 
   private baseFetch: NonNullable<RpcProviderOptions['baseFetch']>;
 
+  /** Carries envelopes to the node. `HttpTransport` unless the caller injected its own. */
+  private transport: RpcTransport;
+
   constructor(optionsOrProvider?: RpcProviderOptions) {
     const {
       baseFetch,
@@ -95,6 +99,7 @@ export class RpcChannel {
       retries,
       specVersion,
       transactionRetryIntervalFallback,
+      transport,
       waitMode,
     } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
@@ -116,6 +121,14 @@ export class RpcChannel {
 
     this.waitMode = waitMode ?? false;
 
+    this.transport =
+      transport ??
+      new HttpTransport({
+        nodeUrl: this.nodeUrl,
+        headers: this.headers,
+        baseFetch: this.baseFetch,
+      });
+
     this.requestId = 0;
 
     if (isNumber(batch)) {
@@ -124,6 +137,7 @@ export class RpcChannel {
         headers: this.headers,
         interval: batch,
         baseFetch: this.baseFetch,
+        transport: this.transport,
         rpcMethods: {} as RPC.Methods, // Type information only, not used at runtime
       });
     }
@@ -143,6 +157,12 @@ export class RpcChannel {
     this.chainId = chainId;
   }
 
+  /**
+   * Escape hatch: POSTs a single JSON-RPC call and hands back the raw HTTP response.
+   *
+   * No longer on the `fetchEndpoint` path — that one goes through the transport — but kept
+   * because it is public API and `RpcProvider.fetch()` is built on it.
+   */
   public fetch(method: string, params?: object, id: string | number = 0) {
     const rpcRequestBody: JRPC.RequestBody = {
       id,
@@ -150,11 +170,10 @@ export class RpcChannel {
       method,
       ...(params && { params }),
     };
-    return this.baseFetch(this.nodeUrl, {
-      method: 'POST',
-      body: stringify(rpcRequestBody),
-      headers: this.headers as Record<string, string>,
-    });
+    return postJsonRpc(
+      { nodeUrl: this.nodeUrl, headers: this.headers, baseFetch: this.baseFetch },
+      rpcRequestBody
+    );
   }
 
   protected errorHandler(method: string, params: any, rpcError?: JRPC.Error, otherError?: any) {
@@ -176,11 +195,21 @@ export class RpcChannel {
     try {
       let error: JRPC.Error | undefined;
       let result: RPC.Methods[T]['result'] | undefined;
+      this.requestId += 1;
+      const id = this.requestId;
       if (this.batchClient) {
-        ({ error, result } = await this.batchClient.fetch(method, params, (this.requestId += 1)));
+        ({ error, result } = await this.batchClient.fetch(method, params, id));
       } else {
-        const rawResult = await this.fetch(method, params, (this.requestId += 1));
-        ({ error, result } = await rawResult.json());
+        const response = await this.transport.request({
+          id,
+          jsonrpc: '2.0',
+          method,
+          ...(params && { params }),
+        });
+        ({ error, result } = response as JRPC.ResponseBody & {
+          error?: JRPC.Error;
+          result?: RPC.Methods[T]['result'];
+        });
       }
       this.errorHandler(method, params, error);
       if (result === undefined) {

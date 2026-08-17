@@ -4,6 +4,10 @@ import {
   createTestProvider,
   initializeMatcher,
   describeIfRpc010,
+  spyOnTransport,
+  rpcResult,
+  rpcErrorReply,
+  sentEnvelope,
 } from './config';
 
 describeIfRpc010('RpcChannel', () => {
@@ -12,7 +16,7 @@ describeIfRpc010('RpcChannel', () => {
   initializeMatcher(expect);
 
   beforeAll(async () => {
-    nodeUrl = (await createTestProvider(false)).channel.nodeUrl;
+    nodeUrl = (await createTestProvider()).channel.nodeUrl;
     channel08 = new RPC0102.RpcChannel({ nodeUrl });
 
     await createBlockForDevnet();
@@ -27,17 +31,8 @@ describeIfRpc010('RpcChannel', () => {
   });
 
   test('RPC error handling', async () => {
-    const fetchSpy = jest.spyOn(channel08, 'fetch');
-    fetchSpy.mockResolvedValue({
-      json: async () => ({
-        jsonrpc: '2.0',
-        error: {
-          code: 24,
-          message: 'Block not found',
-        },
-        id: 0,
-      }),
-    } as any);
+    const transportSpy = spyOnTransport(channel08);
+    transportSpy.mockResolvedValue(rpcErrorReply(24, 'Block not found'));
 
     expect.assertions(3);
     try {
@@ -47,7 +42,7 @@ describeIfRpc010('RpcChannel', () => {
       expect(error).toBeInstanceOf(RpcError);
       expect((error as RpcError).isType('BLOCK_NOT_FOUND')).toBe(true);
     }
-    fetchSpy.mockRestore();
+    transportSpy.mockRestore();
   });
 
   describe('RPC 0.8.1', () => {
@@ -60,18 +55,14 @@ describeIfRpc010('RpcChannel', () => {
 
 describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
   let channel: RPC0102.RpcChannel;
-  let fetchSpy: jest.SpyInstance;
-
-  const mockJsonResponse = (result: any) => ({
-    json: async () => ({ jsonrpc: '2.0', result, id: 1 }),
-  });
+  let transportSpy: jest.SpyInstance;
 
   beforeAll(() => {
     channel = new RPC0102.RpcChannel({ nodeUrl: 'http://localhost:5050/rpc' });
   });
 
   afterEach(() => {
-    fetchSpy?.mockRestore();
+    transportSpy?.mockRestore();
   });
 
   describe('waitForTransaction', () => {
@@ -154,120 +145,122 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
 
   describe('response_flags (includeProofFacts)', () => {
     test('getBlockWithTxs with includeProofFacts sends response_flags', async () => {
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce(mockJsonResponse({ block_hash: '0x1' }) as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(rpcResult({ block_hash: '0x1' }));
 
       await channel.getBlockWithTxs('latest', { includeProofFacts: true });
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        'starknet_getBlockWithTxs',
+      expect(transportSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          response_flags: ['INCLUDE_PROOF_FACTS'],
-        }),
-        expect.any(Number)
+          method: 'starknet_getBlockWithTxs',
+          params: expect.objectContaining({
+            response_flags: ['INCLUDE_PROOF_FACTS'],
+          }),
+        })
       );
     });
 
     test('getBlockWithTxs without includeProofFacts omits response_flags', async () => {
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce(mockJsonResponse({ block_hash: '0x1' }) as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(rpcResult({ block_hash: '0x1' }));
 
       await channel.getBlockWithTxs('latest');
 
-      const params = fetchSpy.mock.calls[0][1];
-      expect(params).not.toHaveProperty('response_flags');
+      expect(sentEnvelope(transportSpy).params).not.toHaveProperty('response_flags');
     });
 
     test('getBlockWithReceipts with includeProofFacts sends response_flags', async () => {
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce(mockJsonResponse({ block_hash: '0x1' }) as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(rpcResult({ block_hash: '0x1' }));
 
       await channel.getBlockWithReceipts('latest', { includeProofFacts: true });
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        'starknet_getBlockWithReceipts',
+      expect(transportSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          response_flags: ['INCLUDE_PROOF_FACTS'],
-        }),
-        expect.any(Number)
+          method: 'starknet_getBlockWithReceipts',
+          params: expect.objectContaining({
+            response_flags: ['INCLUDE_PROOF_FACTS'],
+          }),
+        })
       );
     });
 
     test('getTransactionByHash with includeProofFacts sends response_flags', async () => {
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce(mockJsonResponse({ type: 'INVOKE' }) as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(rpcResult({ type: 'INVOKE' }));
 
       await channel.getTransactionByHash('0x123', { includeProofFacts: true });
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        'starknet_getTransactionByHash',
+      expect(transportSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          transaction_hash: '0x123',
-          response_flags: ['INCLUDE_PROOF_FACTS'],
-        }),
-        expect.any(Number)
+          method: 'starknet_getTransactionByHash',
+          params: expect.objectContaining({
+            transaction_hash: '0x123',
+            response_flags: ['INCLUDE_PROOF_FACTS'],
+          }),
+        })
       );
     });
 
     test('getTransactionByHash without options omits response_flags', async () => {
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce(mockJsonResponse({ type: 'INVOKE' }) as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(rpcResult({ type: 'INVOKE' }));
 
       await channel.getTransactionByHash('0x123');
 
-      const params = fetchSpy.mock.calls[0][1];
-      expect(params).not.toHaveProperty('response_flags');
+      expect(sentEnvelope(transportSpy).params).not.toHaveProperty('response_flags');
     });
 
     test('getTransactionByBlockIdAndIndex with includeProofFacts sends response_flags', async () => {
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce(mockJsonResponse({ type: 'INVOKE' }) as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(rpcResult({ type: 'INVOKE' }));
 
       await channel.getTransactionByBlockIdAndIndex('latest', 0, { includeProofFacts: true });
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        'starknet_getTransactionByBlockIdAndIndex',
+      expect(transportSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          index: 0,
-          response_flags: ['INCLUDE_PROOF_FACTS'],
-        }),
-        expect.any(Number)
+          method: 'starknet_getTransactionByBlockIdAndIndex',
+          params: expect.objectContaining({
+            index: 0,
+            response_flags: ['INCLUDE_PROOF_FACTS'],
+          }),
+        })
       );
     });
   });
 
   describe('trace_flags (returnInitialReads)', () => {
     test('getBlockTransactionsTraces with returnInitialReads sends trace_flags', async () => {
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce(mockJsonResponse([]) as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(rpcResult([]));
 
       await channel.getBlockTransactionsTraces('latest', { returnInitialReads: true });
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        'starknet_traceBlockTransactions',
+      expect(transportSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          trace_flags: ['RETURN_INITIAL_READS'],
-        }),
-        expect.any(Number)
+          method: 'starknet_traceBlockTransactions',
+          params: expect.objectContaining({
+            trace_flags: ['RETURN_INITIAL_READS'],
+          }),
+        })
       );
     });
 
     test('getBlockTransactionsTraces without returnInitialReads omits trace_flags', async () => {
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce(mockJsonResponse([]) as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(rpcResult([]));
 
       await channel.getBlockTransactionsTraces('latest');
 
-      const params = fetchSpy.mock.calls[0][1];
-      expect(params).not.toHaveProperty('trace_flags');
+      expect(sentEnvelope(transportSpy).params).not.toHaveProperty('trace_flags');
     });
 
     test('simulateTransaction with returnInitialReads sends trace_flags', async () => {
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce(
-        mockJsonResponse({
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(
+        rpcResult({
           simulated_transactions: [],
-        }) as any
+        })
       );
 
       const mockInvocation = {
@@ -291,19 +284,20 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
 
       await channel.simulateTransaction([mockInvocation], { returnInitialReads: true });
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        'starknet_simulateTransactions',
+      expect(transportSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          trace_flags: ['RETURN_INITIAL_READS'],
-          simulation_flags: expect.any(Array),
-        }),
-        expect.any(Number)
+          method: 'starknet_simulateTransactions',
+          params: expect.objectContaining({
+            trace_flags: ['RETURN_INITIAL_READS'],
+            simulation_flags: expect.any(Array),
+          }),
+        })
       );
     });
 
     test('simulateTransaction without returnInitialReads omits trace_flags', async () => {
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce(mockJsonResponse([]) as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(rpcResult([]));
 
       const mockInvocation = {
         type: 'INVOKE' as const,
@@ -326,8 +320,7 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
 
       await channel.simulateTransaction([mockInvocation]);
 
-      const params = fetchSpy.mock.calls[0][1];
-      expect(params).not.toHaveProperty('trace_flags');
+      expect(sentEnvelope(transportSpy).params).not.toHaveProperty('trace_flags');
     });
   });
 
@@ -385,15 +378,45 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
     });
   });
 
+  describe('transport option', () => {
+    test('uses an injected transport and never touches baseFetch', async () => {
+      const baseFetch = jest.fn();
+      const request = jest.fn(async () => ({ jsonrpc: '2.0', id: 1, result: '0x1' }));
+      const injected = new RPC0102.RpcChannel({
+        nodeUrl: 'http://localhost:5050/rpc',
+        baseFetch: baseFetch as any,
+        transport: { request } as any,
+      });
+
+      await expect((injected as any).fetchEndpoint('starknet_chainId')).resolves.toBe('0x1');
+
+      expect(baseFetch).not.toHaveBeenCalled();
+      expect(request).toHaveBeenCalledWith(
+        expect.objectContaining({ jsonrpc: '2.0', method: 'starknet_chainId' })
+      );
+    });
+
+    test('numbers its own requests, starting at 1', async () => {
+      const request = jest.fn(async () => ({ jsonrpc: '2.0', id: 1, result: '0x1' }));
+      const injected = new RPC0102.RpcChannel({
+        nodeUrl: 'http://localhost:5050/rpc',
+        transport: { request } as any,
+      });
+
+      await (injected as any).fetchEndpoint('starknet_chainId');
+      await (injected as any).fetchEndpoint('starknet_chainId');
+
+      expect(request.mock.calls.map(([envelope]: any) => envelope.id)).toEqual([1, 2]);
+    });
+  });
+
   describe('malformed RPC response', () => {
     test('throws a clear error when response has neither result nor error', async () => {
       // Reproduces issue #1238: a node (e.g. Alchemy returning 404) replies with a
       // body that is missing both `result` and `error`. Previously this returned
       // `undefined` and crashed downstream with `response.flat is not a function`.
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce({
-        json: async () => ({ jsonrpc: '2.0', id: 1 }),
-      } as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce({ jsonrpc: '2.0', id: 1 } as any);
 
       await expect((channel as any).fetchEndpoint('starknet_chainId')).rejects.toThrow(
         LibraryError
@@ -403,10 +426,8 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
     test('preserves a falsy but valid result (genesis block number 0)', async () => {
       // Guards against the naive `if (!result)` check: 0 is a legitimate Starknet
       // result (e.g. genesis block number) and must be returned, not treated as an error.
-      fetchSpy = jest.spyOn(channel, 'fetch');
-      fetchSpy.mockResolvedValueOnce({
-        json: async () => ({ jsonrpc: '2.0', result: 0, id: 1 }),
-      } as any);
+      transportSpy = spyOnTransport(channel);
+      transportSpy.mockResolvedValueOnce(rpcResult(0));
 
       await expect((channel as any).fetchEndpoint('starknet_blockNumber')).resolves.toBe(0);
     });

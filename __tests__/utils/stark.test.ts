@@ -2,6 +2,9 @@ import {
   CallData,
   RawArgs,
   UniversalDetails,
+  constants,
+  ec,
+  encode,
   stark,
   FeeEstimate,
   num,
@@ -91,23 +94,59 @@ describe('stark', () => {
     });
   });
 
-  describe('randomAddress', () => {
-    test('generates a random address', () => {
-      const address1 = stark.randomAddress();
-      const address2 = stark.randomAddress();
+  describe('randomFelt', () => {
+    test('generates a different felt at each call', () => {
+      const felt1 = stark.randomFelt();
+      const felt2 = stark.randomFelt();
 
-      expect(typeof address1).toBe('string');
-      expect(typeof address2).toBe('string');
-      expect(address1).toMatch(/^0x[a-f0-9]+$/i);
-      expect(address2).toMatch(/^0x[a-f0-9]+$/i);
-      expect(address1).not.toBe(address2);
+      expect(typeof felt1).toBe('string');
+      expect(typeof felt2).toBe('string');
+      expect(felt1).toMatch(/^0x[a-f0-9]+$/i);
+      expect(felt2).toMatch(/^0x[a-f0-9]+$/i);
+      expect(felt1).not.toBe(felt2);
     });
 
-    test('generates valid starknet addresses', () => {
-      for (let i = 0; i < 5; i += 1) {
-        const address = stark.randomAddress();
-        expect(address).toMatch(/^0x[a-f0-9]{1,64}$/i);
+    test('generates values inside the felt range', () => {
+      for (let i = 0; i < 20; i += 1) {
+        const felt = BigInt(stark.randomFelt());
+        expect(felt).toBeGreaterThanOrEqual(0n);
+        expect(felt).toBeLessThan(constants.PRIME);
       }
+    });
+  });
+
+  describe('randomStarkPrivateKey', () => {
+    test('generates a different key at each call', () => {
+      const key1 = stark.randomStarkPrivateKey();
+      const key2 = stark.randomStarkPrivateKey();
+
+      expect(key1).toMatch(/^0x[a-f0-9]{64}$/i);
+      expect(key2).toMatch(/^0x[a-f0-9]{64}$/i);
+      expect(key1).not.toBe(key2);
+    });
+
+    test('generates keys usable by the Stark curve', () => {
+      // curve order, upper bound of the private key range
+      const order = 3618502788666131213697322783095070105526743751716087489154079457884512865583n;
+      for (let i = 0; i < 20; i += 1) {
+        const key = stark.randomStarkPrivateKey();
+        expect(BigInt(key)).toBeGreaterThan(0n);
+        expect(BigInt(key)).toBeLessThan(order);
+        // isValidPrivateKey does not accept the '0x' prefix, unlike the other key inputs
+        expect(ec.starkCurve.utils.isValidPrivateKey(encode.removeHexPrefix(key))).toBe(true);
+        expect(ec.starkCurve.getStarkKey(key)).toMatch(/^0x[a-f0-9]+$/i);
+        expect(ec.starkCurve.sign('0x123', key).r).toBeGreaterThan(0n);
+      }
+    });
+  });
+
+  describe('randomAddress', () => {
+    test('is kept as a deprecated alias of randomFelt', () => {
+      const address = stark.randomAddress();
+
+      expect(address).toMatch(/^0x[a-f0-9]+$/i);
+      expect(BigInt(address)).toBeLessThan(constants.PRIME);
+      expect(stark.randomAddress()).not.toBe(address);
     });
   });
 
@@ -147,7 +186,7 @@ describe('stark', () => {
 
       test('throws error for invalid signature format', () => {
         expect(() => stark.formatSignature({ invalid: 'signature' } as any)).toThrow(
-          'Signature need to be weierstrass.SignatureType or an array for custom'
+          'Signature need to be weierstrass.ECDSASignature or an array for custom'
         );
       });
     });
@@ -202,9 +241,9 @@ describe('stark', () => {
 
   describe('getSharedSecret', () => {
     test('derives shared secret from private key and public key', () => {
-      const userAPrivK = stark.randomAddress();
+      const userAPrivK = stark.randomStarkPrivateKey();
       const userAFullPubK = stark.getFullPublicKey(userAPrivK);
-      const userBPrivK = stark.randomAddress();
+      const userBPrivK = stark.randomStarkPrivateKey();
       const userBFullPubK = stark.getFullPublicKey(userBPrivK);
       // User B is sending its pubK to user A.
       // user A is calculating the secret
