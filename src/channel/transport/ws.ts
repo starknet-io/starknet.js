@@ -67,15 +67,13 @@ export type WsTransportOptions = {
  * This transport connects once. When the connection goes away it settles everything waiting on
  * it and reports `'closed'`; it does not reconnect.
  *
- * **Batches depend on the node**, so `batch` combined with this transport is not portable.
- * Measured 2026-08-10 with a raw socket:
- *
- * - Pathfinder accepts an array and answers with a single array frame;
- * - starknet-devnet refuses it outright on its `/ws` endpoint, with `-32700 Parse error`.
+ * **Batches depend on the node.** Pathfinder accepts an array and answers with a single array
+ * frame (measured 2026-08-10 with a raw socket), and so does starknet-devnet from 0.9.2 —
+ * `wsTransport.ws.test.ts` exercises it against a real node. Devnet before 0.9.2 refuses it on
+ * its `/ws` endpoint with `-32700 Parse error`.
  *
  * A refusal is answered with `id: null`, which belongs to no request, so every call in the batch
- * runs out its `requestTimeout` instead of failing fast. Check the target node before combining
- * the two.
+ * runs out its `requestTimeout` instead of failing fast — worth checking on an unfamiliar node.
  *
  * Prefer {@link ReconnectingWsTransport} for anything long-lived: a shared gateway drops idle
  * connections, and this one does not come back.
