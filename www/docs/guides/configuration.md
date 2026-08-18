@@ -19,7 +19,7 @@ import { config } from 'starknet';
 // Set existing or custom global property
 config.set('rpcVersion', '0.9.0');
 
-// Set WebSocket implementation for Node.js (if using older than Node.js 22)
+// Set WebSocket implementation for Node.js (if using older than Node.js 22.11)
 import WebSocket from 'ws';
 config.set('websocket', WebSocket);
 
