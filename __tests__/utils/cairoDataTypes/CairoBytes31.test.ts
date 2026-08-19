@@ -407,4 +407,41 @@ describe('CairoBytes31 class Unit Tests', () => {
       expect(bytes31.data.every((byte) => byte === 42)).toBe(true);
     });
   });
+
+  describe('fromText static method', () => {
+    test('should encode a decimal-looking string as text, not as a number', () => {
+      // the constructor reads '12345' as the number 12345 (0x3039)
+      expect(CairoBytes31.fromText('12345').toHexString()).toBe('0x3132333435');
+    });
+
+    test('should encode a hex-looking string as text, not as a number', () => {
+      // the constructor reads '0x68656c6c6f' as the number it spells
+      expect(CairoBytes31.fromText('0x68656c6c6f').toHexString()).toBe(
+        '0x307836383635366336633666'
+      );
+    });
+
+    test('should encode text as its UTF-8 bytes', () => {
+      expect(CairoBytes31.fromText('hello').toHexString()).toBe('0x68656c6c6f');
+      expect(CairoBytes31.fromText('café').toHexString()).toBe('0x636166c3a9');
+    });
+
+    test('should give each control character its own byte', () => {
+      expect(CairoBytes31.fromText('a\tb').toHexString()).toBe('0x610962');
+      expect(CairoBytes31.fromText('a\nb').toHexString()).toBe('0x610a62');
+    });
+
+    test('should round-trip through decodeUtf8', () => {
+      const texts = ['hello', 'café', 'a\tb', '0x68656c6c6f', '12345'];
+      texts.forEach((text) => {
+        expect(CairoBytes31.fromText(text).decodeUtf8()).toBe(text);
+      });
+    });
+
+    test('should reject text longer than 31 bytes', () => {
+      expect(() => CairoBytes31.fromText('x'.repeat(32))).toThrow(
+        'Data is too long: 32 bytes (max 31 bytes)'
+      );
+    });
+  });
 });

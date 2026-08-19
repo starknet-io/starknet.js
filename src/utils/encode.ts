@@ -41,18 +41,13 @@ export function arrayBufferToString(array: ArrayBuffer): string {
  * @example
  * ```typescript
  * const myString = 'Hi';
- * const result = encode.utf8ToArray(myString);
+ * const result = encode.utf8ToUint8Array(myString);
  * // result = Uint8Array(2) [ 72, 105 ]
  * ```
  */
 export function utf8ToUint8Array(str: string): Uint8Array {
   return new TextEncoder().encode(str);
 }
-
-/**
- * @deprecated use utf8ToUint8Array instead
- */
-export const utf8ToArray = utf8ToUint8Array;
 
 /**
  * Convert utf8-string to bigint

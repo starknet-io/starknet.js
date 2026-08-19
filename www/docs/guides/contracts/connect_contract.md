@@ -173,12 +173,6 @@ const result = await myContract
     parseRequest: true, // Parse and validate input arguments
     parseResponse: true, // Parse response into structured data
 
-    // Custom response formatting
-    formatResponse: {
-      balance: uint256ToBN, // Convert uint256 to BigNumber
-      tokens: (arr) => arr.map(Number), // Convert array elements to numbers
-    },
-
     // Transaction details (for writes)
     nonce: '0x1',
     version: '0x1',
@@ -206,20 +200,7 @@ const pastBalance = await myContract
   .get_balance(address);
 ```
 
-2. **Custom Response Formatting**:
-
-```typescript
-const { tokens, owner } = await myContract
-  .withOptions({
-    formatResponse: {
-      tokens: (arr) => arr.map(BigInt),
-      owner: (addr) => addr.toLowerCase(),
-    },
-  })
-  .get_token_info();
-```
-
-3. **Raw Data Mode**:
+2. **Raw Data Mode**:
 
 ```typescript
 const rawResult = await myContract
@@ -230,7 +211,7 @@ const rawResult = await myContract
   .my_function();
 ```
 
-4. **V3 Transaction with Resource Bounds**:
+3. **V3 Transaction with Resource Bounds**:
 
 ```typescript
 const tx = await myContract

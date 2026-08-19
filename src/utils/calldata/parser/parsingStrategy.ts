@@ -1,8 +1,7 @@
 import { CairoBytes31 } from '../../cairoDataTypes/bytes31';
 import { CairoByteArray } from '../../cairoDataTypes/byteArray';
-import { AbiEntryType, BigNumberish } from '../../../types';
+import { AbiEntryType } from '../../../types';
 import { CairoFelt252 } from '../../cairoDataTypes/felt';
-import { felt } from '../cairo';
 import { CairoUint256 } from '../../cairoDataTypes/uint256';
 import { CairoUint512 } from '../../cairoDataTypes/uint512';
 import { CairoUint8 } from '../../cairoDataTypes/uint8';
@@ -153,20 +152,23 @@ export const fastParsingStrategy: ParsingStrategy = {
     [CairoUint512.abiSelector]: (val: unknown) => {
       return new CairoUint512(val).toApiRequest();
     },
+    // These five skip their own CairoUintNN class, which is what makes this strategy the fast one:
+    // no range check, just the conversion to a felt. CairoFelt252 accepts the same inputs as the
+    // classes it stands in for, text included.
     [CairoUint8.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
+      return new CairoFelt252(val).toBigInt().toString();
     },
     [CairoUint16.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
+      return new CairoFelt252(val).toBigInt().toString();
     },
     [CairoUint64.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
+      return new CairoFelt252(val).toBigInt().toString();
     },
     [CairoUint96.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
+      return new CairoFelt252(val).toBigInt().toString();
     },
     [CairoUint128.abiSelector]: (val: unknown) => {
-      return felt(val as BigNumberish);
+      return new CairoFelt252(val).toBigInt().toString();
     },
     [CairoInt8.abiSelector]: (val: unknown) => {
       return new CairoInt8(val).toApiRequest();

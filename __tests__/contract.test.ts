@@ -21,6 +21,7 @@ import {
 } from '../src';
 
 import { CONTRACTS, createTestProvider, getTestAccount, initializeMatcher } from './config';
+import { CairoBytes31 } from '../src/utils/cairoDataTypes/bytes31';
 
 describe('contract module', () => {
   let erc20Address: string;
@@ -510,8 +511,8 @@ describe('Complex interaction', () => {
 
   test('Assert helpers and non helpers data produce same result', async () => {
     const feltedData = CallData.compile({
-      name: cairo.felt('Token'),
-      symbol: cairo.felt('ERC20'),
+      name: CairoBytes31.fromText('Token').toHexString(),
+      symbol: CairoBytes31.fromText('ERC20').toHexString(),
       decimals: cairo.felt(18),
       initial_supply: cairo.uint256('1000000000'),
       recipient: cairo.felt(account.address),
@@ -1132,9 +1133,9 @@ describe('Complex interaction', () => {
             formatResponse,
           })
           .echo(
-            shortString.encodeShortString(request.t1),
+            CairoBytes31.fromText(request.t1).toHexString(),
             request.n1,
-            request.tl2.map(shortString.encodeShortString),
+            request.tl2.map((text: string) => CairoBytes31.fromText(text).toHexString()),
             request.k1,
             request.k2,
             request.u1,
@@ -1166,7 +1167,7 @@ describe('Complex interaction', () => {
           .iecho(
             request.t1,
             request.n1,
-            request.tl2.map(shortString.encodeShortString),
+            request.tl2.map((text: string) => CairoBytes31.fromText(text).toHexString()),
             request.k1,
             request.k2,
             request.u1,

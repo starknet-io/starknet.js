@@ -1,5 +1,11 @@
 /* eslint-disable no-underscore-dangle */
-import { addHexPrefix, buf2hex, stringToUint8Array, uint8ArrayToBigInt } from '../encode';
+import {
+  addHexPrefix,
+  buf2hex,
+  stringToUint8Array,
+  uint8ArrayToBigInt,
+  utf8ToUint8Array,
+} from '../encode';
 import { getNext } from '../num';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
@@ -30,6 +36,24 @@ export class CairoBytes31 {
       return new Uint8Array(data);
     }
     throw new Error('Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array');
+  }
+
+  /**
+   * Build from text, with no interpretation of what the text looks like.
+   *
+   * The constructor reads a string the way calldata does — `'0x1a'` as a hexadecimal number,
+   * `'12345'` as a decimal one — so a string spelling a number never reaches its UTF-8 branch.
+   * Here there is no such ambiguity: the argument is text, and its UTF-8 bytes are the value.
+   * @param {string} text the text to encode, 31 bytes max once UTF-8 encoded
+   * @returns {CairoBytes31} the text as a bytes31
+   * @example
+   * ```typescript
+   * const result = CairoBytes31.fromText('12345').toHexString();
+   * // result = "0x3132333435"     (the text, where the constructor would read the number 0x3039)
+   * ```
+   */
+  static fromText(text: string): CairoBytes31 {
+    return new CairoBytes31(utf8ToUint8Array(text));
   }
 
   toApiRequest(): string[] {

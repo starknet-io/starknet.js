@@ -18,7 +18,7 @@ import { isCairo1Abi } from '../calldata/cairo';
 import { AbiParserInterface } from '../calldata/parser/interface';
 import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
-import { addHexPrefix, utf8ToArray } from '../encode';
+import { addHexPrefix, utf8ToUint8Array } from '../encode';
 import { toHex } from '../num';
 import { isUndefined, isObject } from '../typed';
 
@@ -60,7 +60,7 @@ function getCairo0AbiEvents(abi: Abi): AbiEvents {
       abiEntryMod.name = entryName;
       return {
         ...acc,
-        [addHexPrefix(starkCurve.keccak(utf8ToArray(entryName)).toString(16))]: abiEntryMod,
+        [addHexPrefix(starkCurve.keccak(utf8ToUint8Array(entryName)).toString(16))]: abiEntryMod,
       };
     }, {});
 }
@@ -113,12 +113,12 @@ function getCairo1AbiEvents(abi: Abi): AbiEvents {
 
     const final = nameList.pop();
     let result: AbiEvents = {
-      [addHexPrefix(starkCurve.keccak(utf8ToArray(final!)).toString(16))]: event,
+      [addHexPrefix(starkCurve.keccak(utf8ToUint8Array(final!)).toString(16))]: event,
     };
 
     while (nameList.length > 0) {
       result = {
-        [addHexPrefix(starkCurve.keccak(utf8ToArray(nameList.pop()!)).toString(16))]: result,
+        [addHexPrefix(starkCurve.keccak(utf8ToUint8Array(nameList.pop()!)).toString(16))]: result,
       };
     }
     result = { ...result };

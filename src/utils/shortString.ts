@@ -1,5 +1,4 @@
 import { TEXT_TO_FELT_MAX_LEN } from '../global/constants';
-import { addHexPrefix, removeHexPrefix } from './encode';
 import { isHex, isStringWholeNumber } from './num';
 import { isString } from './typed';
 
@@ -103,43 +102,4 @@ export const isLongText = (val: any): boolean => isText(val) && !isShortString(v
 export function splitLongString(longStr: string): string[] {
   const regex = RegExp(`[^]{1,${TEXT_TO_FELT_MAX_LEN}}`, 'g');
   return longStr.match(regex) || [];
-}
-
-/**
- * @deprecated use Utf8 instead
- * Convert an ASCII short string to a hexadecimal string.
- * @param {string} str short string (ASCII string, 31 characters max)
- * @returns {string} hex-string with 248 bits max
- * @example
- * ```typescript
- * const result = shortString.encodeShortString("uri/pict/t38.jpg");
- * // result = "0x7572692f706963742f7433382e6a7067"
- * ```
- */
-export function encodeShortString(str: string): string {
-  if (!isASCII(str)) throw new Error(`${str} is not an ASCII string`);
-  if (!isShortString(str)) throw new Error(`${str} is too long`);
-  return addHexPrefix(str.replace(/./g, (char) => char.charCodeAt(0).toString(16)));
-}
-
-/**
- * @deprecated use Utf8 instead
- * Convert a hexadecimal or decimal string to an ASCII string.
- * @param {string} str representing a 248 bit max number (ex. "0x1A4F64EA56" or "236942575435676423")
- * @returns {string} short string; 31 characters max
- * @example
- * ```typescript
- * const result = shortString.decodeShortString("0x7572692f706963742f7433382e6a7067");
- * // result = "uri/pict/t38.jpg"
- * ```
- */
-export function decodeShortString(str: string): string {
-  if (!isASCII(str)) throw new Error(`${str} is not an ASCII string`);
-  if (isHex(str)) {
-    return removeHexPrefix(str).replace(/.{2}/g, (hex) => String.fromCharCode(parseInt(hex, 16)));
-  }
-  if (isDecimalString(str)) {
-    return decodeShortString('0X'.concat(BigInt(str).toString(16)));
-  }
-  throw new Error(`${str} is not Hex or decimal`);
 }

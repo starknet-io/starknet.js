@@ -11,7 +11,9 @@ import {
 } from '../types';
 import assert from './assert';
 import { byteArrayFromString } from './calldata/byteArray';
+import { CairoBytes31 } from './cairoDataTypes/bytes31';
 import { starkCurve } from './ec';
+import { utf8ToBigInt } from './encode';
 import {
   computePedersenHash,
   computePedersenHashOnElements,
@@ -21,7 +23,6 @@ import {
 } from './hash';
 import { MerkleTree } from './merkle';
 import { isBigNumberish, isHex, toHex } from './num';
-import { encodeShortString } from './shortString';
 import { isBoolean, isString } from './typed';
 
 interface Context {
@@ -90,7 +91,7 @@ function getHex(value: BigNumberish): string {
     return toHex(value);
   } catch (e) {
     if (isString(value)) {
-      return toHex(encodeShortString(value));
+      return toHex(CairoBytes31.fromText(value).toBigInt());
     }
     throw new Error(`Invalid BigNumberish: ${value}`);
   }
@@ -431,7 +432,7 @@ export function encodeValue(
     }
     case 'felt':
     case 'shortstring': {
-      // TODO: should 'shortstring' diverge into directly using encodeShortString()?
+      // TODO: should 'shortstring' diverge into directly using CairoBytes31.fromText()?
       if (revision === Revision.ACTIVE) {
         assertRange(getHex(data as string), type, RANGE_FELT);
       } // else fall through to default
@@ -601,7 +602,7 @@ export function getMessageHash(typedData: TypedData, accountAddress: BigNumberis
   const { domain, hashMethod } = revisionConfiguration[revision];
 
   const message = [
-    encodeShortString('StarkNet Message'),
+    utf8ToBigInt('StarkNet Message'),
     getStructHash(typedData.types, domain, typedData.domain, revision),
     accountAddress,
     getStructHash(typedData.types, typedData.primaryType, typedData.message, revision),

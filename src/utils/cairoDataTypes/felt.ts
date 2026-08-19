@@ -1,10 +1,8 @@
 /* eslint-disable no-underscore-dangle */
-// TODO Convert to CairoFelt base on CairoUint256 and implement it in the codebase in the backward compatible manner
 
 import { BigNumberish } from '../../types';
 import { PRIME } from '../../global/constants';
-import { getNext, isHex, isStringWholeNumber } from '../num';
-import { encodeShortString, isShortString, isText } from '../shortString';
+import { getNext } from '../num';
 import { isBoolean, isString, isBigInt, isNumber } from '../typed';
 import {
   stringToUint8Array,
@@ -107,50 +105,4 @@ export class CairoFelt252 {
      */
     return new CairoFelt252(getNext(responseIterator));
   }
-}
-
-/**
- * @deprecated use the CairoFelt252 class instead, this one is limited to ASCII strings
- * Create felt Cairo type (cairo type helper)
- * @returns format: felt-string
- */
-export function CairoFelt(it: BigNumberish): string {
-  // BN or number
-  if (isBigInt(it) || Number.isInteger(it)) {
-    const val = BigInt(it);
-    CairoFelt252.assertRange(val);
-    return val.toString();
-  }
-
-  // Handling strings
-  if (isString(it)) {
-    // Hex strings
-    if (isHex(it)) {
-      const val = BigInt(it);
-      CairoFelt252.assertRange(val);
-      return val.toString();
-    }
-    // Text strings that must be short
-    if (isText(it)) {
-      if (!isShortString(it)) {
-        throw new Error(
-          `${it} is a long string > 31 chars. Please split it into an array of short strings.`
-        );
-      }
-      // Assuming encodeShortString returns a hex representation of the string
-      return BigInt(encodeShortString(it)).toString();
-    }
-    // Whole numeric strings
-    if (isStringWholeNumber(it)) {
-      const val = BigInt(it);
-      CairoFelt252.assertRange(val);
-      return val.toString();
-    }
-  }
-  // bool to felt
-  if (isBoolean(it)) {
-    return `${+it}`;
-  }
-
-  throw new Error(`${it} can't be computed by felt()`);
 }
