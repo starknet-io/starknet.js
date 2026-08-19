@@ -1,3 +1,15 @@
+# [11.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.1...v11.0.0-beta.2) (2026-08-19)
+
+- feat(cairo)!: remove the deprecated string helpers, add CairoBytes31.fromText ([49331fe](https://github.com/starknet-io/starknet.js/commit/49331fe4ffc002c6adf711c0484a4f5b70954fc9))
+
+### BREAKING CHANGES
+
+- shortString.encodeShortString(), shortString.decodeShortString(),
+  CairoFelt() and encode.utf8ToArray() are removed. Use
+  CairoBytes31.fromText(text).toHexString(), new CairoBytes31(felt).decodeUtf8(),
+  CairoFelt252 and encode.utf8ToUint8Array(). cairo.felt() no longer accepts text,
+  booleans or non-integer numbers.
+
 # [11.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v10.7.0...v11.0.0-beta.1) (2026-08-17)
 
 - feat!: starknet.js v11 ([0e360fd](https://github.com/starknet-io/starknet.js/commit/0e360fd7cf29546b9979bd201f0d77fb9817147f))
