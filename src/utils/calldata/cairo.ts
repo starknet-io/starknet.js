@@ -12,9 +12,11 @@ import {
   Uint256,
   Uint512,
 } from '../../types';
-import { CairoFelt } from '../cairoDataTypes/felt';
+import { CairoFelt252 } from '../cairoDataTypes/felt';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
+import { isBigNumberish } from '../num';
+import { isNumber } from '../typed';
 
 // Intended for internal usage, maybe should be exported somewhere else and not exported to utils
 /**
@@ -269,8 +271,30 @@ export const tuple = (
 
 /**
  * Create felt Cairo type (cairo type helper)
- * @returns format: felt-string
+ *
+ * **Accepted:** a whole number, in any of the forms the `BigNumberish` type covers — a `number`, a
+ * `bigint`, a hexadecimal string (`'0x101'`) or a decimal string (`'257'`).
+ *
+ * **Refused:** everything else, and text in particular. A `felt252` is a field element, not a
+ * string type, so a text argument is an error rather than something to encode silently — which
+ * also removes a trap: `'-123'` used to come back as `758198835`, the text `-123`. To carry text
+ * in a felt252, encode it explicitly with `CairoBytes31.fromText()`. Booleans are refused for the
+ * same reason, and so are non-integer numbers.
+ * @param {BigNumberish} it a whole number, as a number, a bigint, a hex string or a decimal string
+ * @returns {string} the felt as a decimal string
+ * @example
+ * ```typescript
+ * const result = felt('0x101');
+ * // result = "257"
+ * ```
  */
 export function felt(it: BigNumberish): string {
-  return CairoFelt(it);
+  if (!isBigNumberish(it) || (isNumber(it) && !Number.isInteger(it))) {
+    throw new Error(
+      `${it} can't be computed by felt(): only a whole number of type BigNumberish is accepted — a number, a bigint, a hex string or a decimal string. To carry text in a felt252, encode it with CairoBytes31.fromText(text).toHexString()`
+    );
+  }
+  const val = BigInt(it);
+  CairoFelt252.assertRange(val);
+  return val.toString();
 }

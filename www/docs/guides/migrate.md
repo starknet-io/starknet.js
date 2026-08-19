@@ -11,31 +11,34 @@ If you hit a change that is not described here, please tell us and we will compl
 
 ## Quick summary
 
-v11 carries two independent workstreams. The cryptographic dependencies move to their v2, ESM-only
-generation (`@noble/curves` 1.7 → 2.3, `@noble/hashes` 1.6 → 2.3, `@scure/base` 1.2 → 2.3,
-`@scure/starknet` 1.1 → 2.3), and RPC requests now travel through a pluggable transport, which lets
-a single WebSocket serve both requests and subscriptions.
+v11 carries three independent workstreams. The cryptographic dependencies move to their v2,
+ESM-only generation (`@noble/curves` 1.7 → 2.3, `@noble/hashes` 1.6 → 2.3, `@scure/base` 1.2 → 2.3,
+`@scure/starknet` 1.1 → 2.3), RPC requests now travel through a pluggable transport, which lets a
+single WebSocket serve both requests and subscriptions, and the string helpers deprecated back in
+v8.2.0 are finally removed.
 
-**Only the first one breaks anything.** The transport layer is added underneath the existing API,
-which is why the list below is short.
+**The transport layer breaks nothing** — it is added underneath the existing API. The other two do.
 
-| Change                                           | Severity   | What you have to do                            |
-| ------------------------------------------------ | ---------- | ---------------------------------------------- |
-| Node.js >= 22.12 is now required                 | **High**   | Upgrade Node, or use the ESM build             |
-| Jest: the crypto dependencies are ESM-only       | **High**   | Add one line to your `transformIgnorePatterns` |
-| Signature objects lost their v1 encoding methods | **Medium** | Rename `toDERHex()` and its three siblings     |
-| `@noble` / `@scure` import paths changed         | **Low**    | Only if you import these packages directly     |
+| Change                                            | Severity   | What you have to do                            |
+| ------------------------------------------------- | ---------- | ---------------------------------------------- |
+| Node.js >= 22.12 is now required                  | **High**   | Upgrade Node, or use the ESM build             |
+| `encodeShortString` / `decodeShortString` removed | **High**   | Switch to `CairoBytes31`                       |
+| Jest: the crypto dependencies are ESM-only        | **High**   | Add one line to your `transformIgnorePatterns` |
+| `cairo.felt()` only accepts a number              | **Medium** | Encode text yourself before passing it         |
+| Signature objects lost their v1 encoding methods  | **Medium** | Rename `toDERHex()` and its three siblings     |
+| `CairoFelt()` and `encode.utf8ToArray()` removed  | **Low**    | Rename to `CairoFelt252` / `utf8ToUint8Array`  |
+| `@noble` / `@scure` import paths changed          | **Low**    | Only if you import these packages directly     |
 
 Two deprecations ship with the release — `stark.randomAddress()` and `Provider` — but neither of
 them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
 
 ### What did not change
 
-Worth stating, because the release is a major: `Account`, `Contract`, `CallData`, the Cairo type
-helpers and the `Signer` interface are untouched. `WebSocketChannel` keeps exactly the API it had in
-v10 — same constructor options, same `subscribe*` methods, same events. No RPC spec version is added
-or dropped: 0.9 and 0.10.x remain supported, with 0.10.3 as the default. And nothing was removed
-from the package exports.
+Worth stating, because the release is a major: `Account`, `Contract`, `CallData` and the `Signer`
+interface are untouched. `WebSocketChannel` keeps exactly the API it had in v10 — same constructor
+options, same `subscribe*` methods, same events. No RPC spec version is added or dropped: 0.9 and
+0.10.x remain supported, with 0.10.3 as the default. What left the package exports is listed above,
+and every one of those had been marked `@deprecated` for at least three major versions.
 
 ### Migration in three minutes
 
@@ -48,6 +51,10 @@ npm install starknet@^11.0.0
 ```
 
 ```typescript
+// Text to a felt, and back
+const felt = CairoBytes31.fromText('Stark').toHexString(); // ✅ was shortString.encodeShortString()
+const text = new CairoBytes31(felt).decodeUtf8(); //          ✅ was shortString.decodeShortString()
+
 // Verifying a signature: the encoding step is gone
 const isValid = ec.starkCurve.verify(signature, msgHash, pubKey); // ✅ was signature.toDERHex()
 
@@ -83,7 +90,54 @@ Error [ERR_REQUIRE_ESM]: require() of ES Module …
 ESM consumers (`import` / `"type": "module"`) and the browser IIFE build are **not** affected, and
 work on any Node 22.
 
-### 2. Jest: the crypto dependencies must be transformed
+### 2. The deprecated string helpers are removed
+
+`shortString.encodeShortString()` and `shortString.decodeShortString()` were marked `@deprecated` in
+v8.2.0 (August 2025) and survived v8, v9 and v10 untouched. They are now gone, along with
+`CairoFelt()` and `encode.utf8ToArray()`.
+
+| v10                                   | v11                                              |
+| ------------------------------------- | ------------------------------------------------ |
+| `shortString.encodeShortString(text)` | `CairoBytes31.fromText(text).toHexString()`      |
+| `shortString.decodeShortString(felt)` | `new CairoBytes31(num.toHex(felt)).decodeUtf8()` |
+| `CairoFelt(value)`                    | `new CairoFelt252(value).toBigInt().toString()`  |
+| `encode.utf8ToArray(text)`            | `encode.utf8ToUint8Array(text)`                  |
+
+The rest of the `shortString` namespace — `isASCII`, `isShortString`, `isText`, `splitLongString`,
+`isDecimalString`, `isShortText`, `isLongText` — is untouched.
+
+**Use `fromText()`, not the constructor.** This is the one detail to get right. The `CairoBytes31`
+constructor reads a string the way calldata does: `'0x1a'` as a hexadecimal number, `'12345'` as a
+decimal one. A string that spells a number would therefore become that number instead of its text,
+without any error. `fromText()` has no such ambiguity — whatever it is given is text.
+
+```typescript
+CairoBytes31.fromText('12345').toHexString(); // 0x3132333435 — the text
+new CairoBytes31('12345').toHexString(); //     0x3039       — the number 12345
+```
+
+**What you gain.** The removed encoder was ASCII-only, and for any byte below `0x10` it emitted a
+single hex digit instead of two, which misaligned every following byte:
+
+```
+shortString.encodeShortString('a\tb')        ->  0x61962    (wrong)
+CairoBytes31.fromText('a\tb').toHexString()  ->  0x610962   (right)
+```
+
+The decoder had the symmetric defect on an odd-length hex string — which is exactly the form a node
+returns for such a felt, since `NUM_AS_HEX` carries no leading zero. Both are fixed, and text is now
+UTF-8 instead of ASCII-only.
+
+The same correction reaches two places that decoded through the old helper:
+`byteArray.stringFromByteArray()` and the `formatResponse` option of `Contract`. For
+`stringFromByteArray`, a multi-byte character split across two 31-byte words now survives the round
+trip as well.
+
+One edge case changes with them: an empty string passed where a `u8`, `u16`, `u64`, `u96` or `u128`
+is expected used to raise `Cannot convert 0x to a BigInt`, and is now read as `0` — which is what
+`felt252`, `u32` and the ABI-less `CallData.compile()` have always done with it.
+
+### 3. Jest: the crypto dependencies must be transformed
 
 Jest ignores `node_modules` when transforming, so the ESM-only `@noble/*` and `@scure/*` packages
 reach the runtime untranspiled. Importing starknet.js from a test then fails with:
@@ -115,7 +169,31 @@ jest.mock('@scure/starknet', () => ({
 }));
 ```
 
-### 3. Signature objects are plain `ECDSASignature` values
+### 4. `cairo.felt()` only accepts a number
+
+Its signature has always been `felt(it: BigNumberish)`, and `BigNumberish` is
+`string | number | bigint`, where a string means a number written in hexadecimal or in decimal.
+Passing text was therefore a use the signature never announced — it happened to work, by stretching
+the type past what it declares. v11 aligns the implementation with the type it has always claimed.
+
+```typescript
+cairo.felt('0x101'); // ✅ 257
+cairo.felt('257'); //   ✅ 257
+cairo.felt(257n); //    ✅ 257
+cairo.felt('hello'); // ❌ throws, and the message names the replacement
+```
+
+Booleans and non-integer numbers are refused for the same reason: neither is a `BigNumberish`. To
+carry text in a `felt252`, encode it first with `CairoBytes31.fromText(text).toHexString()`.
+
+Honouring the type also removes an ambiguity: `cairo.felt('-123')` used to return `758198835`,
+which is the text `-123` encoded as a felt, rather than failing on a value it cannot represent.
+
+`CallData.compile()` is **not** affected. Without an ABI it still accepts text for a felt252
+argument, and with an ABI a `core::felt252` parameter goes through `CairoFelt252`, which accepts
+text exactly as it did in v10.
+
+### 5. Signature objects are plain `ECDSASignature` values
 
 `WeierstrassSignatureType` was an alias of `weierstrass.SignatureType`, the `@noble/curves` v1
 signature **class**. It is now an alias of `weierstrass.ECDSASignature`, which carries `r`, `s` and
@@ -155,7 +233,7 @@ const isValid = ec.starkCurve.verify(signature, msgHash, publicKey);
 `ec.starkCurve.sign()` still returns an instance of `ec.starkCurve.Signature`, so an `instanceof`
 test against it keeps working.
 
-### 4. `@noble` / `@scure` import paths changed
+### 6. `@noble` / `@scure` import paths changed
 
 This one only concerns you if you import these packages **directly**, alongside starknet.js. Their
 v2 generation requires explicit `.js` suffixes, and moved some entry points:

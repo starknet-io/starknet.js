@@ -7,10 +7,9 @@ import { BigNumberish, LegacyCompiledContract, RawArgs } from '../../../types';
 import { CallData } from '../../calldata';
 import { felt } from '../../calldata/cairo';
 import { starkCurve } from '../../ec';
-import { addHexPrefix, utf8ToArray } from '../../encode';
+import { addHexPrefix, utf8ToBigInt, utf8ToUint8Array } from '../../encode';
 import { parse, stringify } from '../../json';
 import { toHex } from '../../num';
-import { encodeShortString } from '../../shortString';
 import { isString } from '../../typed';
 import { formatSpaces, nullSkipReplacer } from './util';
 import {
@@ -70,7 +69,7 @@ export function computeHintedClassHash(compiledContract: LegacyCompiledContract)
   const { abi, program } = compiledContract;
   const contractClass = { abi, program };
   const serializedJson = formatSpaces(stringify(contractClass, nullSkipReplacer));
-  return addHexPrefix(starkCurve.keccak(utf8ToArray(serializedJson)).toString(16));
+  return addHexPrefix(starkCurve.keccak(utf8ToUint8Array(serializedJson)).toString(16));
 }
 
 /**
@@ -104,7 +103,7 @@ export function computeLegacyContractClassHash(contract: LegacyCompiledContract 
   );
 
   const builtinsHash = computeHashOnElements(
-    compiledContract.program.builtins.map((s) => encodeShortString(s))
+    compiledContract.program.builtins.map((s) => utf8ToBigInt(s))
   );
 
   const hintedClassHash = computeHintedClassHash(compiledContract);

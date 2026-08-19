@@ -2,7 +2,7 @@
  * Shared utilities for class hash computation
  */
 import { Builtins, ContractEntryPointFields } from '../../../types';
-import { encodeShortString } from '../../shortString';
+import { utf8ToBigInt } from '../../encode';
 
 /**
  * Compiled class version constant used in Cairo 1 compiled class hashing
@@ -58,7 +58,7 @@ export function nullSkipReplacer(key: string, value: any) {
  * Common pattern used in both Poseidon and Blake2s hashing
  */
 export function encodeBuiltins(builtins: Builtins): bigint[] {
-  return builtins.map((it: any) => BigInt(encodeShortString(it)));
+  return builtins.map((it: any) => utf8ToBigInt(it));
 }
 
 /**

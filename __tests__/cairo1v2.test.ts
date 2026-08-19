@@ -22,9 +22,9 @@ import {
   json,
   num,
   selector,
-  shortString,
 } from '../src';
 import { CONTRACTS, createTestProvider, getTestAccount, initializeMatcher } from './config';
+import { CairoBytes31 } from '../src/utils/cairoDataTypes/bytes31';
 import { createAbiParser } from '../src/utils/calldata/parser';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -316,7 +316,7 @@ describe('Cairo 1', () => {
       const status = await cairo1Contract.echo_struct({
         val: 'simple',
       });
-      expect(shortString.decodeShortString(status.val)).toBe('simple');
+      expect(new CairoBytes31(toHex(status.val)).decodeUtf8()).toBe('simple');
     });
 
     test('Cairo 1 more complex structs', async () => {
@@ -412,7 +412,7 @@ describe('Cairo 1', () => {
       expect(myCairoEnum.activeVariant()).toEqual('Error');
 
       const myCairoEnum2: CairoCustomEnum = await cairo1Contract.my_enum_output(100);
-      expect(myCairoEnum2.unwrap()).toEqual(BigInt(shortString.encodeShortString('attention:100')));
+      expect(myCairoEnum2.unwrap()).toEqual(CairoBytes31.fromText('attention:100').toBigInt());
       expect(myCairoEnum2.activeVariant()).toEqual('Warning');
 
       const myCairoEnum3: CairoCustomEnum = await cairo1Contract.my_enum_output(150);

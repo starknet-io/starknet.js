@@ -52,7 +52,7 @@ export const UDC = {
   ENTRYPOINT: 'deploy_contract',
 } as const;
 
-export const OutsideExecutionCallerAny = '0x414e595f43414c4c4552'; // encodeShortString('ANY_CALLER')
+export const OutsideExecutionCallerAny = '0x414e595f43414c4c4552'; // CairoBytes31.fromText('ANY_CALLER')
 export const SNIP9_V1_INTERFACE_ID =
   '0x68cfd18b92d1907b8ba3cc324900277f5a3622099431ea85dd8089255e4181';
 export const SNIP9_V2_INTERFACE_ID =
@@ -81,18 +81,18 @@ type _NetworkName = ValuesType<typeof _NetworkName>;
 export { _NetworkName as NetworkName };
 
 const _StarknetChainId = {
-  SN_MAIN: '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
-  SN_SEPOLIA: '0x534e5f5345504f4c4941', // encodeShortString('SN_SEPOLIA')
+  SN_MAIN: '0x534e5f4d41494e', // CairoBytes31.fromText('SN_MAIN'),
+  SN_SEPOLIA: '0x534e5f5345504f4c4941', // CairoBytes31.fromText('SN_SEPOLIA')
 } as const;
 type _StarknetChainId = ValuesType<typeof _StarknetChainId>;
 export { _StarknetChainId as StarknetChainId };
 
 const _TransactionHashPrefix = {
-  DECLARE: '0x6465636c617265', // encodeShortString('declare'),
-  DEPLOY: '0x6465706c6f79', // encodeShortString('deploy'),
-  DEPLOY_ACCOUNT: '0x6465706c6f795f6163636f756e74', // encodeShortString('deploy_account'),
-  INVOKE: '0x696e766f6b65', // encodeShortString('invoke'),
-  L1_HANDLER: '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
+  DECLARE: '0x6465636c617265', // CairoBytes31.fromText('declare'),
+  DEPLOY: '0x6465706c6f79', // CairoBytes31.fromText('deploy'),
+  DEPLOY_ACCOUNT: '0x6465706c6f795f6163636f756e74', // CairoBytes31.fromText('deploy_account'),
+  INVOKE: '0x696e766f6b65', // CairoBytes31.fromText('invoke'),
+  L1_HANDLER: '0x6c315f68616e646c6572', // CairoBytes31.fromText('l1_handler'),
 } as const;
 type _TransactionHashPrefix = ValuesType<typeof _TransactionHashPrefix>;
 export { _TransactionHashPrefix as TransactionHashPrefix };

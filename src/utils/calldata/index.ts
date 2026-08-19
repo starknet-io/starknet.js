@@ -15,6 +15,7 @@ import {
   ValidateType,
 } from '../../types';
 import assert from '../assert';
+import { CairoFelt252 } from '../cairoDataTypes/felt';
 import { toHex } from '../num';
 import { isBigInt } from '../typed';
 import { getSelectorFromName } from '../hash/selector';
@@ -219,7 +220,9 @@ export class CallData {
             // normal object
             return getEntries(value, `${prefix}${kk}.`);
           }
-          return [[`${prefix}${kk}`, felt(value)]];
+          // no ABI here, so no declared type to arbitrate: the value is taken for whatever
+          // CairoFelt252 can make of it — number, hex or decimal string, boolean, or text
+          return [[`${prefix}${kk}`, new CairoFelt252(value).toBigInt().toString()]];
         });
       };
       const result = Object.fromEntries(getEntries(obj));

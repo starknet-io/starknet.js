@@ -6,8 +6,8 @@ import { poseidonHashMany } from '@scure/starknet';
 
 import { StarknetChainId, TransactionHashPrefix } from '../../../global/constants';
 import { BigNumberish, Calldata } from '../../../types';
+import { utf8ToBigInt } from '../../encode';
 import { toHex } from '../../num';
-import { encodeShortString } from '../../shortString';
 import { EDAMode, type ResourceBoundsBN } from '../../../provider/types/spec.type';
 
 const AToBI = (array: BigNumberish[]) => array.map((it: BigNumberish) => BigInt(it));
@@ -17,9 +17,9 @@ const DATA_AVAILABILITY_MODE_BITS = 32n;
 const MAX_AMOUNT_BITS = 64n;
 const MAX_PRICE_PER_UNIT_BITS = 128n;
 const RESOURCE_VALUE_OFFSET = MAX_AMOUNT_BITS + MAX_PRICE_PER_UNIT_BITS;
-const L1_GAS_NAME = BigInt(encodeShortString('L1_GAS'));
-const L2_GAS_NAME = BigInt(encodeShortString('L2_GAS'));
-const L1_DATA_GAS_NAME = BigInt(encodeShortString('L1_DATA'));
+const L1_GAS_NAME = utf8ToBigInt('L1_GAS');
+const L2_GAS_NAME = utf8ToBigInt('L2_GAS');
+const L1_DATA_GAS_NAME = utf8ToBigInt('L1_DATA');
 
 export function hashDAMode(nonceDAMode: BigNumberish, feeDAMode: BigNumberish) {
   return (BigInt(nonceDAMode) << DATA_AVAILABILITY_MODE_BITS) + BigInt(feeDAMode);

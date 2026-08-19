@@ -1,5 +1,6 @@
 import { isBigInt, isObject } from '../typed';
-import { decodeShortString } from '../shortString';
+import { CairoBytes31 } from '../cairoDataTypes/bytes31';
+import { toHex } from '../num';
 
 const guard = {
   /**
@@ -87,7 +88,7 @@ export default function formatter(
           return acc;
         }
         guard.isBN(data, type, key);
-        acc[key] = decodeShortString(value);
+        acc[key] = new CairoBytes31(toHex(value)).decodeUtf8();
         return acc;
       }
       if (elType === 'number') {

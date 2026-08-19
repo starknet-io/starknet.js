@@ -3,7 +3,7 @@ import { keccak_256 } from '@noble/hashes/sha3.js';
 import { bytesToHex } from '@noble/curves/utils.js';
 import { MASK_250 } from '../../global/constants';
 import { BigNumberish } from '../../types';
-import { addHexPrefix, removeHexPrefix, utf8ToArray } from '../encode';
+import { addHexPrefix, removeHexPrefix, utf8ToUint8Array } from '../encode';
 import { hexToBytes, isHex, isStringWholeNumber, toHex } from '../num';
 import { isBigInt, isNumber } from '../typed';
 
@@ -32,7 +32,7 @@ export function keccakBn(value: BigNumberish): string {
  * @returns format: hex-string
  */
 function keccakHex(str: string): string {
-  return addHexPrefix(keccak(utf8ToArray(str)).toString(16));
+  return addHexPrefix(keccak(utf8ToUint8Array(str)).toString(16));
 }
 
 /**
