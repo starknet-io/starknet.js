@@ -42,7 +42,7 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
     const estimate = await account.estimateInvokeFee(myCall);
     const res = await account.execute(myCall, {
       resourceBounds: estimate.resourceBounds,
-    }); // maxFee needed to not throw error in getEstimateFee
+    }); // resourceBounds provided, so the fee estimation is skipped
     const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.SUCCEEDED);
     expect(txR.statusReceipt).toBe('SUCCEEDED');
@@ -66,7 +66,7 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
     const estim: EstimateFeeResponseOverhead = await account.estimateInvokeFee(
       contract.populate('test_fail', { p1: 100 })
     );
-    const res = await account.execute(myCall, { ...estim }); // maxFee needed to not throw error in getEstimateFee
+    const res = await account.execute(myCall, { ...estim }); // resourceBounds provided, so the fee estimation is skipped
     const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.REVERTED);
     expect(txR.statusReceipt).toBe('REVERTED');
@@ -92,7 +92,7 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
       {
         resourceBounds: estimate.resourceBounds,
       }
-    ); // maxFee needed to not throw error in getEstimateFee
+    ); // resourceBounds provided, so the fee estimation is skipped
     const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.SUCCEEDED);
     expect(txR.statusReceipt).toBe('SUCCEEDED');
@@ -116,7 +116,7 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
     const estim: EstimateFeeResponseOverhead = await account.estimateInvokeFee(
       contract.populate('test_fail', { p1: 100 })
     );
-    const res = await account.execute(myCall, { ...estim }); // maxFee needed to not throw error in getEstimateFee
+    const res = await account.execute(myCall, { ...estim }); // resourceBounds provided, so the fee estimation is skipped
     const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.REVERTED);
     expect(txR.statusReceipt).toBe('REVERTED');
@@ -142,7 +142,7 @@ describe('Transaction receipt utility - RPC 0.8+ - V3', () => {
       {
         resourceBounds: estimate.resourceBounds,
       }
-    ); // maxFee needed to not throw error in getEstimateFee
+    ); // resourceBounds provided, so the fee estimation is skipped
 
     // Create a mock transaction receipt with a non-existent status
     const receiptWoHelper = (await provider.channel.waitForTransaction(

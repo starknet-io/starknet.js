@@ -5,11 +5,7 @@ import {
   InvocationsSignerDetails,
   Signature,
   TypedData,
-  V3DeclareSignerDetails,
-  V3DeployAccountSignerDetails,
-  V3InvocationsSignerDetails,
 } from '../types';
-import { ETransactionVersion3 } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { starkCurve } from '../utils/ec';
 import { buf2hex } from '../utils/encode';
@@ -45,69 +41,46 @@ export class Signer implements SignerInterface {
     details: InvocationsSignerDetails
   ): Promise<Signature> {
     const compiledCalldata = getExecuteCalldata(transactions, details.cairoVersion);
-    let msgHash;
+    const msgHash = calculateInvokeTransactionHash({
+      ...details,
+      senderAddress: details.walletAddress,
+      compiledCalldata,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
 
-    // TODO: How to do generic union discriminator for all like this
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3InvocationsSignerDetails;
-      msgHash = calculateInvokeTransactionHash({
-        ...det,
-        senderAddress: det.walletAddress,
-        compiledCalldata,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signTransaction version');
-    }
-
-    return this.signRaw(msgHash as string);
+    return this.signRaw(msgHash);
   }
 
   public async signDeployAccountTransaction(
     details: DeployAccountSignerDetails
   ): Promise<Signature> {
     const compiledConstructorCalldata = CallData.compile(details.constructorCalldata);
-    /*     const version = BigInt(details.version).toString(); */
-    let msgHash;
+    const msgHash = calculateDeployAccountTransactionHash({
+      ...details,
+      salt: details.addressSalt,
+      compiledConstructorCalldata,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
 
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3DeployAccountSignerDetails;
-      msgHash = calculateDeployAccountTransactionHash({
-        ...det,
-        salt: det.addressSalt,
-        compiledConstructorCalldata,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signDeployAccountTransaction version');
-    }
-
-    return this.signRaw(msgHash as string);
+    return this.signRaw(msgHash);
   }
 
   public async signDeclareTransaction(
     // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
     details: DeclareSignerDetails
   ): Promise<Signature> {
-    let msgHash;
+    const msgHash = calculateDeclareTransactionHash({
+      ...details,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
 
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3DeclareSignerDetails;
-      msgHash = calculateDeclareTransactionHash({
-        ...det,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signDeclareTransaction version');
-    }
-
-    return this.signRaw(msgHash as string);
+    return this.signRaw(msgHash);
   }
 
   protected async signRaw(msgHash: string): Promise<Signature> {

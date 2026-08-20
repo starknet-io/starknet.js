@@ -55,9 +55,6 @@ type Merge<T1, T2> = Simplify<
 export type ETransactionVersion = RPCSPEC09.ETransactionVersion;
 export const { ETransactionVersion } = RPCSPEC09;
 
-export type ETransactionVersion2 = RPCSPEC09.ETransactionVersion2;
-export const { ETransactionVersion2 } = RPCSPEC09;
-
 export type ETransactionVersion3 = RPCSPEC09.ETransactionVersion3;
 export const { ETransactionVersion3 } = RPCSPEC09;
 

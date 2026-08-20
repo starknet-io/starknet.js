@@ -89,7 +89,6 @@ export { _StarknetChainId as StarknetChainId };
 
 const _TransactionHashPrefix = {
   DECLARE: '0x6465636c617265', // CairoBytes31.fromText('declare'),
-  DEPLOY: '0x6465706c6f79', // CairoBytes31.fromText('deploy'),
   DEPLOY_ACCOUNT: '0x6465706c6f795f6163636f756e74', // CairoBytes31.fromText('deploy_account'),
   INVOKE: '0x696e766f6b65', // CairoBytes31.fromText('invoke'),
   L1_HANDLER: '0x6c315f68616e646c6572', // CairoBytes31.fromText('l1_handler'),
@@ -227,16 +226,12 @@ export const PAYMASTER_RPC_NODES = {
 
 // Default system messages
 export const SYSTEM_MESSAGES = {
-  legacyTxWarningMessage:
-    'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
-  legacyTxRPC08Message:
-    'RPC 0.8+ do not support legacy transactions, use RPC 0.8+ v3 transactions!',
+  nonV3Tx: 'Only V3 transactions are supported by RPC 0.9+',
   SWOldV3: 'RPC 0.7 V3 tx (improper resource bounds) not supported in RPC 0.8+',
   channelVersionMismatch:
     'Channel specification version is not compatible with the connected node Specification Version',
   unsupportedSpecVersion:
     'The connected node specification version is not supported by this library',
-  maxFeeInV3: 'maxFee is not supported in V3 transactions, use resourceBounds instead',
   declareNonSierra: 'Declaring non Sierra (Cairo0)contract using RPC 0.8+',
   unsupportedMethodForRpcVersion: 'Unsupported method for RPC version',
   txEvictedFromMempool: 'Transaction TTL, evicted from the mempool, try to increase the tip',

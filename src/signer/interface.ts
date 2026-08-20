@@ -61,7 +61,7 @@ export abstract class SignerInterface {
    * @param {Call[]} transactions - Array of Call objects representing the transactions
    * @param {InvocationsSignerDetails} transactionsDetail - Transaction details including V3 fields
    * @returns {Promise<Signature>} the signature of the transaction
-   * @remarks Only supports V3 transactions. V0, V1, and V2 transactions will throw an error.
+   * @remarks Only V3 transactions are supported; any other version throws an error.
    * @example
    * ```typescript
    * const mySigner = new Signer("0x123");
@@ -102,7 +102,7 @@ export abstract class SignerInterface {
    *
    * @param {DeployAccountSignerDetails} transaction - Transaction details to deploy an account contract
    * @returns {Promise<Signature>} the signature of the transaction to deploy an account
-   * @remarks Only supports V3 transactions. V0, V1, and V2 transactions will throw an error.
+   * @remarks Only V3 transactions are supported; any other version throws an error.
    * @example
    * ```typescript
    * const mySigner = new Signer("0x123");
@@ -139,7 +139,7 @@ export abstract class SignerInterface {
    *
    * @param {DeclareSignerDetails} transaction - Transaction details to declare a contract class
    * @returns {Promise<Signature>} the signature of the transaction to declare a class
-   * @remarks Only supports V3 transactions. V0, V1, and V2 transactions will throw an error.
+   * @remarks Only V3 transactions are supported; any other version throws an error.
    * @example
    * ```typescript
    * const mySigner = new Signer("0x123");

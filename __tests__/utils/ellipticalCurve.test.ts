@@ -30,45 +30,6 @@ test('computeHashOnElements()', () => {
   );
 });
 
-// TODO check this test, it hash message using v1 tx ?
-/* test('hashMessage()', () => {
-  const privateKey = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
-  const account = '2007067565103695475819120104515800035851923905855118399071773059478896040938';
-  const transactions = [
-    {
-      contractAddress:
-        '3290661298119599979891444342541795905081168856323302956721669397616389152866',
-      entrypoint: 'set_number',
-      calldata: ['47'],
-    },
-  ];
-  const nonce = '3';
-  const maxFee = '0';
-  const calldata = [...fromCallsToExecuteCalldata(transactions), nonce];
-
-  const hashMsg = calculateTransactionHash(
-    account,
-    BigInt(constants.TRANSACTION_VERSION.V1),
-    calldata,
-    maxFee,
-    StarknetChainId.SN_SEPOLIA,
-    nonce
-  );
-
-  expect(hashMsg).toMatchInlineSnapshot(
-    `"0xa006ce6da518722c1af8bdb1d8a42cee638102c670bb1a55f063bff10506d4"`
-  );
-
-  const { r, s } = ec.starkCurve.sign(hashMsg, privateKey);
-
-  expect(r.toString()).toMatchInlineSnapshot(
-    `"384207128292005766686294801921397180350977625816434242436096267488258549139"`
-  );
-  expect(s.toString()).toMatchInlineSnapshot(
-    `"2521602681140573534692734854765316415611209530542226558354401890884906162365"`
-  );
-}); */
-
 test('verify signed message()', () => {
   const pk = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
   const account = '0x33f45f07e1bd1a51b45fc24ec8c8c9908db9e42191be9e169bfcac0c0d99745';
