@@ -1,3 +1,13 @@
+# [11.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.2...v11.0.0-beta.3) (2026-08-20)
+
+### Features
+
+- **receipt:** remove the deprecated ReceiptTx class ([e57933c](https://github.com/starknet-io/starknet.js/commit/e57933cc491249b5b1593e84b4d90750e9bdf7dc))
+
+### BREAKING CHANGES
+
+- **receipt:** remove the deprecated ReceiptTx class
+
 # [11.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.1...v11.0.0-beta.2) (2026-08-19)
 
 - feat(cairo)!: remove the deprecated string helpers, add CairoBytes31.fromText ([49331fe](https://github.com/starknet-io/starknet.js/commit/49331fe4ffc002c6adf711c0484a4f5b70954fc9))
