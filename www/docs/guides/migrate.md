@@ -28,6 +28,7 @@ v8.2.0 are finally removed.
 | Signature objects lost their v1 encoding methods  | **Medium** | Rename `toDERHex()` and its three siblings     |
 | `CairoFelt()` and `encode.utf8ToArray()` removed  | **Low**    | Rename to `CairoFelt252` / `utf8ToUint8Array`  |
 | `@noble` / `@scure` import paths changed          | **Low**    | Only if you import these packages directly     |
+| The `ReceiptTx` class removed                     | **Low**    | Only if you used `instanceof ReceiptTx`        |
 
 Two deprecations ship with the release — `stark.randomAddress()` and `Provider` — but neither of
 them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
@@ -268,6 +269,24 @@ const key = secp256k1.utils.randomSecretKey(); // ✅ was randomPrivateKey()
 
 Note that `ec.starkCurve.utils.randomPrivateKey()` keeps its name — but prefer
 `stark.randomStarkPrivateKey()`, which returns a `0x`-prefixed hex string instead of bytes.
+
+### 7. The `ReceiptTx` class is removed
+
+`ReceiptTx` was marked `@deprecated` in v6.24.0 (February 2025) in favour of the
+`createTransactionReceipt()` factory, and survived v7, v8, v9 and v10. It is now gone.
+
+Receipts themselves do not change: `getTransactionReceipt()` and `waitForTransaction()` already
+returned the factory's object, with the same properties and the same helpers. Only code naming the
+class breaks — `new ReceiptTx()`, which the library never used internally, and `instanceof`:
+
+```typescript
+const receipt = await provider.waitForTransaction(transaction_hash);
+
+receipt.isSuccess(); // the helpers are unchanged
+receipt.statusReceipt; // ✅ 'SUCCEEDED' | 'REVERTED' | 'ERROR', replaces `instanceof ReceiptTx`
+```
+
+The `TransactionReceiptStatus` and `TransactionReceiptValue` types are unaffected.
 
 ## Part 2 — Deprecations
 

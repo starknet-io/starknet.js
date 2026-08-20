@@ -15,7 +15,6 @@ import {
   num,
   byteArray,
   RpcError,
-  ReceiptTx,
   RpcProvider,
   contractLoader,
 } from '../src';
@@ -1116,7 +1115,7 @@ describe('Complex interaction', () => {
 
       const result4 = await echoContract.invoke('iecho', args, { waitForTransaction: true });
       expect(result4.block_number).toBeDefined();
-      expect(result4).toBeInstanceOf(ReceiptTx);
+      expect(result4.statusReceipt).toBe('SUCCEEDED');
       expect(result4.isSuccess()).toBe(true);
 
       const result5 = await echoContract.withOptions({ waitForTransaction: true }).iecho(calldata);
