@@ -22,6 +22,8 @@ on:
       - 'src/**'
       - 'package*'
       - 'ts*'
+      # a change to the release configuration must be able to run the release
+      - '.releaserc*'
       - '!www/**'
   push:
     branches:
@@ -35,6 +37,8 @@ on:
       - 'src/**'
       - 'package*'
       - 'ts*'
+      # a change to the release configuration must be able to run the release
+      - '.releaserc*'
       - '!www/**'
 
 # Cancel redundant in-progress runs for the same ref (replaces the

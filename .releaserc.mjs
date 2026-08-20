@@ -1,5 +1,19 @@
 /* eslint-disable no-template-curly-in-string */
 /**
+ * The default `angular` preset predates the `!` breaking-change marker: its
+ * `headerPattern` has no `!?` before the colon, so `feat(scope)!: subject` does not
+ * parse at all. The commit is then read as having no type, matches no release rule
+ * and triggers no release — silently, because commitlint accepts the form. These
+ * options add the marker back, and must be passed to the notes generator too:
+ * without them there the release happens with an empty changelog entry.
+ */
+const parserOpts = {
+  headerPattern: /^(\w*)(?:\((.*)\))?!?: (.*)$/,
+  headerCorrespondence: ['type', 'scope', 'subject'],
+  breakingHeaderPattern: /^(\w*)(?:\((.*)\))?!: (.*)$/,
+};
+
+/**
  * @type {import('semantic-release').GlobalConfig}
  */
 export default {
@@ -23,8 +37,8 @@ export default {
     },
   ],
   plugins: [
-    '@semantic-release/commit-analyzer',
-    '@semantic-release/release-notes-generator',
+    ['@semantic-release/commit-analyzer', { parserOpts }],
+    ['@semantic-release/release-notes-generator', { parserOpts }],
     '@semantic-release/changelog',
     '@semantic-release/npm',
     [
