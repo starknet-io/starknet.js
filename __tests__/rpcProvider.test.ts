@@ -22,7 +22,6 @@ import {
   ProviderInterface,
   RPC,
   RPCResponseParser,
-  ReceiptTx,
   RpcProvider,
   TransactionExecutionStatus,
   cairo,
@@ -288,12 +287,18 @@ describe('RPCProvider', () => {
 
     test('successful - default', async () => {
       transactionStatusSpy.mockResolvedValueOnce(response.successful);
-      await expect(rpcProvider.waitForTransaction(0)).resolves.toBeInstanceOf(ReceiptTx);
+      transactionReceiptSpy.mockResolvedValueOnce({ execution_status: 'SUCCEEDED' });
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toMatchObject({
+        statusReceipt: 'SUCCEEDED',
+      });
     });
 
     test('reverted - default', async () => {
       transactionStatusSpy.mockResolvedValueOnce(response.reverted);
-      await expect(rpcProvider.waitForTransaction(0)).resolves.toBeInstanceOf(ReceiptTx);
+      transactionReceiptSpy.mockResolvedValueOnce({ execution_status: 'REVERTED' });
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toMatchObject({
+        statusReceipt: 'REVERTED',
+      });
     });
 
     test('reverted - as error state', async () => {

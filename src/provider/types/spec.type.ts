@@ -80,27 +80,6 @@ export type PRE_CONFIRMED_STATE_UPDATE = Merge<
   RPCSPEC0103.PRE_CONFIRMED_STATE_UPDATE,
   RPCSPEC09.PRE_CONFIRMED_STATE_UPDATE
 >;
-// TODO: Can we remove all of this ?
-/* export type INVOKE_TXN_RECEIPT = IsInBlock<RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'INVOKE'>>;
-export type DECLARE_TXN_RECEIPT = IsInBlock<RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'DECLARE'>>;
-export type DEPLOY_ACCOUNT_TXN_RECEIPT = IsInBlock<
-  RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'DEPLOY_ACCOUNT'>
->;
-export type L1_HANDLER_TXN_RECEIPT = IsInBlock<RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'L1_HANDLER'>>; */
-
-/* export type PENDING_INVOKE_TXN_RECEIPT = RPCSPEC08.IsPending<
-  RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'INVOKE'>
->;
-export type PENDING_DECLARE_TXN_RECEIPT = RPCSPEC08.IsPending<
-  RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'DECLARE'>
->;
-export type PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT = RPCSPEC08.IsPending<
-  RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'DEPLOY_ACCOUNT'>
->;
-export type PENDING_L1_HANDLER_TXN_RECEIPT = RPCSPEC08.IsPending<
-  RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'L1_HANDLER'>
->; */
-//
 
 export type BlockWithTxHashes = Merge<RPCSPEC0103.BlockWithTxHashes, RPCSPEC09.BlockWithTxHashes>;
 export type ContractClassPayload = Merge<RPCSPEC0103.ContractClass, RPCSPEC09.ContractClass>;
