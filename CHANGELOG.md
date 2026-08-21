@@ -1,3 +1,15 @@
+# [11.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.3...v11.0.0-beta.4) (2026-08-21)
+
+### Bug Fixes
+
+- remove leftover v1 transaction references ([52424df](https://github.com/starknet-io/starknet.js/commit/52424df0f3dee61ab477bf06adddca189ac313f7))
+
+### BREAKING CHANGES
+
+- v2hash, ETransactionVersion2, Details,
+  InvocationsDetails.maxFee and TransactionHashPrefix.DEPLOY are removed.
+  See the v10 to v11 migration guide, section 8.
+
 # [11.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.2...v11.0.0-beta.3) (2026-08-20)
 
 ### Features
