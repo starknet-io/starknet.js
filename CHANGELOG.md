@@ -1,3 +1,9 @@
+## [10.7.1](https://github.com/starknet-io/starknet.js/compare/v10.7.0...v10.7.1) (2026-08-21)
+
+### Bug Fixes
+
+- **provider:** accept pre-release RPC spec versions ([436f433](https://github.com/starknet-io/starknet.js/commit/436f433e57039f3ae12c651c937d6b7e21592de1))
+
 # [10.7.0](https://github.com/starknet-io/starknet.js/compare/v10.6.8...v10.7.0) (2026-08-13)
 
 ### Features
