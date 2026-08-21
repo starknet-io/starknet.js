@@ -86,6 +86,25 @@ export function toAnyPatchVersion(version: string) {
 }
 
 /**
+ * Strip the semver pre-release and build metadata suffixes from a version.
+ * A node can report a pre-release of a spec version (ex. Pathfinder reporting '0.10.3-rc.0');
+ * the SDK handles it as the release it is a candidate for.
+ * Input that is not a semver version is returned unchanged.
+ * ex. '0.10.3-rc.0' -> '0.10.3', '0.10.3+build.1' -> '0.10.3', '0.10.2' -> '0.10.2'
+ *
+ * @param {string} version
+ * @returns {string} the version without its pre-release and build metadata suffixes
+ * @example
+ * ```typescript
+ * const result = toReleaseVersion('0.10.3-rc.0');
+ * // result = '0.10.3'
+ * ```
+ */
+export function toReleaseVersion(version: string): string {
+  return version.split(/[-+]/)[0];
+}
+
+/**
  * Convert version to API format.
  * ex. '0.8.1' -> 'v0_8', '0.8' -> 'v0_8'
  * @param {string} version
@@ -100,6 +119,8 @@ export function toApiVersion(version: string): string {
  * Compare two semantic version strings segment by segment.
  * This function safely compares versions without collision risk between
  * versions like '0.0.1000' and '0.1.0'.
+ * Pre-release and build metadata suffixes are ignored, so a version is compared as
+ * the release it is a candidate for: '0.14.1-rc.0' compares equal to '0.14.1'.
  *
  * @param {string} a First version string (e.g., '0.0.9')
  * @param {string} b Second version string (e.g., '0.0.10')
@@ -122,8 +143,11 @@ export function toApiVersion(version: string): string {
  * ```
  */
 export function compareVersions(a: string, b: string): number {
-  const aParts = a.split('.').map(Number);
-  const bParts = b.split('.').map(Number);
+  // A pre-release is compared as the release it is a candidate for. Without this,
+  // the '3-rc' segment of '0.10.3-rc.0' parses to NaN and is read as 0, which would
+  // rank the release candidate below every non-zero patch of the same minor.
+  const aParts = toReleaseVersion(a).split('.').map(Number);
+  const bParts = toReleaseVersion(b).split('.').map(Number);
 
   const maxLen = Math.max(aParts.length, bParts.length);
 

@@ -42,7 +42,7 @@ import { LibraryError } from '../utils/errors';
 import { solidityUint256PackedKeccak256 } from '../utils/hash';
 import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
-import { isSupportedSpecVersion, isVersion } from '../utils/resolve';
+import { isSupportedSpecVersion, isVersion, toReleaseVersion } from '../utils/resolve';
 import { RPCResponseParser } from './modules/responseParser';
 import { getTipStatsFromBlocks, TipAnalysisOptions, TipEstimate } from './modules/tip';
 import { createTransactionReceipt } from '../utils/transactionReceipt/transactionReceipt';
@@ -132,19 +132,22 @@ export class RpcProvider implements ProviderInterface {
   ): Promise<T> {
     const channel = new RPC09.RpcChannel({ ...optionsOrProvider });
     const spec = await channel.getSpecVersion();
+    // a node can report a pre-release of a spec version (ex. '0.10.3-rc.0'), which the
+    // SDK handles as the release it is a candidate for
+    const specVersion = toReleaseVersion(spec);
 
     // Optimistic Warning in case of the patch version
-    if (!isSupportedSpecVersion(spec)) {
+    if (!isSupportedSpecVersion(specVersion)) {
       logger.warn(`Using incompatible node spec version ${spec}`);
     }
 
-    if (isVersion('0.9', spec)) {
+    if (isVersion('0.9', specVersion)) {
       return new this({
         ...optionsOrProvider,
         specVersion: SupportedRpcVersion.v0_9_0,
       }) as T;
     }
-    if (isVersion('0.10', spec)) {
+    if (isVersion('0.10', specVersion)) {
       return new this({
         ...optionsOrProvider,
         specVersion: SupportedRpcVersion.v0_10_3,
