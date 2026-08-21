@@ -39,7 +39,7 @@ import {
   toStorageKey,
 } from '../utils/num';
 import { Block, getDefaultNodeUrl, wait } from '../utils/provider';
-import { isSupportedSpecVersion, isV3Tx, isVersion } from '../utils/resolve';
+import { isSupportedSpecVersion, isV3Tx, isVersion, toReleaseVersion } from '../utils/resolve';
 import {
   decompressProgram,
   signatureToHexArray,
@@ -110,7 +110,11 @@ export class RpcChannel {
     this.chainId = chainId;
     this.headers = { ...channelDefaults.options.headers, ...headers };
     this.retries = retries ?? channelDefaults.options.retries;
-    this.specVersion = specVersion;
+    // A caller can forward a node-reported pre-release (ex. '0.9.0-rc.1'), a shape the
+    // option type does not describe; keep the release version it is a candidate for.
+    this.specVersion = specVersion
+      ? (toReleaseVersion(specVersion) as SupportedRpcVersion)
+      : undefined;
     this.transactionRetryIntervalFallback =
       transactionRetryIntervalFallback ?? channelDefaults.options.transactionRetryIntervalFallback;
 
@@ -216,22 +220,25 @@ export class RpcChannel {
    */
   public async setUpSpecVersion() {
     if (!this.specVersion) {
-      const unknownSpecVersion = await this.fetchEndpoint('starknet_specVersion');
+      const nodeSpecVersion = await this.fetchEndpoint('starknet_specVersion');
+      // a node can report a pre-release of a spec version (ex. '0.9.0-rc.1'), which the
+      // SDK handles as the release it is a candidate for
+      const specVersion = toReleaseVersion(nodeSpecVersion);
 
       // check if the channel is compatible with the node
-      if (!isVersion(this.channelSpecVersion, unknownSpecVersion)) {
+      if (!isVersion(this.channelSpecVersion, specVersion)) {
         logger.error(SYSTEM_MESSAGES.channelVersionMismatch, {
           channelId: this.id,
           channelSpecVersion: this.channelSpecVersion,
-          nodeSpecVersion: this.specVersion,
+          nodeSpecVersion,
         });
       }
 
-      if (!isSupportedSpecVersion(unknownSpecVersion)) {
+      if (!isSupportedSpecVersion(specVersion)) {
         throw new LibraryError(`${SYSTEM_MESSAGES.unsupportedSpecVersion}, channelId: ${this.id}`);
       }
 
-      this.specVersion = unknownSpecVersion;
+      this.specVersion = specVersion;
     }
     return this.specVersion;
   }

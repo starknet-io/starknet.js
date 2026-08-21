@@ -1,6 +1,7 @@
 import {
   isVersion,
   toAnyPatchVersion,
+  toReleaseVersion,
   isSupportedSpecVersion,
   constants,
   toApiVersion,
@@ -19,7 +20,7 @@ import type {
 } from '../../src';
 
 describe('isVersion', () => {
-  it('matches exact versions', () => {
+  test('matches exact versions', () => {
     expect(isVersion('0.7.0', '0.7.0')).toBe(true);
     expect(isVersion('0.7', '0.7')).toBe(true);
     expect(isVersion('1.2.3', '1.2.3')).toBe(true);
@@ -29,21 +30,21 @@ describe('isVersion', () => {
     expect(isVersion('1.0.0', '2.0.0')).toBe(false);
   });
 
-  it('handles wildcard in major version', () => {
+  test('handles wildcard in major version', () => {
     expect(isVersion('*.7.0', '0.7.0')).toBe(true);
     expect(isVersion('*.7.0', '1.7.0')).toBe(true);
     expect(isVersion('*.7.0', '2.7.0')).toBe(true);
     expect(isVersion('*.7.0', '0.8.0')).toBe(false);
   });
 
-  it('handles wildcard in minor version', () => {
+  test('handles wildcard in minor version', () => {
     expect(isVersion('0.*.0', '0.7.0')).toBe(true);
     expect(isVersion('0.*.0', '0.8.0')).toBe(true);
     expect(isVersion('0.*.0', '0.9.0')).toBe(true);
     expect(isVersion('0.*.0', '1.7.0')).toBe(false);
   });
 
-  it('handles wildcard in patch version', () => {
+  test('handles wildcard in patch version', () => {
     expect(isVersion('0.7.*', '0.7.0')).toBe(true);
     expect(isVersion('0.7.*', '0.7.1')).toBe(true);
     expect(isVersion('0.7', '0.7.1')).toBe(true);
@@ -56,7 +57,7 @@ describe('isVersion', () => {
     expect(isVersion('0.7', '0.8.1')).toBe(false);
   });
 
-  it('handles multiple wildcards', () => {
+  test('handles multiple wildcards', () => {
     expect(isVersion('*.*.0', '0.7.0')).toBe(true);
     expect(isVersion('*.*.0', '1.8.0')).toBe(true);
     expect(isVersion('*.*.0', '0.7.1')).toBe(false);
@@ -74,109 +75,151 @@ describe('isVersion', () => {
     expect(isVersion('*.3.4', '2.3.4')).toBe(true);
   });
 
-  it('handles shorter provided version', () => {
+  test('handles shorter provided version', () => {
     expect(isVersion('0.7.1', '0.7')).toBe(false);
   });
 });
 
 describe('toAnyPatchVersion', () => {
-  it('converts version strings to wildcard patch versions', () => {
+  test('converts version strings to wildcard patch versions', () => {
     expect(toAnyPatchVersion('0.7.0')).toBe('0.7.*');
     expect(toAnyPatchVersion('1.2.3')).toBe('1.2.*');
     expect(toAnyPatchVersion('0.8')).toBe('0.8');
     expect(toAnyPatchVersion('2.0')).toBe('2.0');
   });
 
-  it('handles versions with pre-release tags', () => {
+  test('handles versions with pre-release tags', () => {
     expect(toAnyPatchVersion('1.2.3-rc1')).toBe('1.2.*');
   });
 
-  it('handles invalid or empty version strings', () => {
+  test('handles invalid or empty version strings', () => {
     expect(toAnyPatchVersion('')).toBe('');
     expect(toAnyPatchVersion('invalid')).toBe('invalid');
     expect(toAnyPatchVersion('0')).toBe('0');
   });
 
-  it('handles already wildcarded versions', () => {
+  test('handles already wildcarded versions', () => {
     expect(toAnyPatchVersion('0.7.*')).toBe('0.7.*');
     expect(toAnyPatchVersion('1.*')).toBe('1.*');
     expect(toAnyPatchVersion('*')).toBe('*');
   });
 });
 
+describe('toReleaseVersion', () => {
+  test('strips the pre-release suffix', () => {
+    expect(toReleaseVersion('0.10.3-rc.0')).toBe('0.10.3');
+    expect(toReleaseVersion('1.2.3-rc1')).toBe('1.2.3');
+    expect(toReleaseVersion('0.9.0-alpha.1')).toBe('0.9.0');
+  });
+
+  test('strips the build metadata suffix', () => {
+    expect(toReleaseVersion('0.10.3+build.1')).toBe('0.10.3');
+    expect(toReleaseVersion('0.10.3-rc.0+build.1')).toBe('0.10.3');
+  });
+
+  test('leaves release versions untouched', () => {
+    expect(toReleaseVersion('0.10.3')).toBe('0.10.3');
+    expect(toReleaseVersion('0.9.0')).toBe('0.9.0');
+    expect(toReleaseVersion('0.10')).toBe('0.10');
+  });
+
+  test('leaves non semver input untouched', () => {
+    expect(toReleaseVersion('')).toBe('');
+    expect(toReleaseVersion('invalid')).toBe('invalid');
+    expect(toReleaseVersion('*')).toBe('*');
+    expect(toReleaseVersion('0.7.*')).toBe('0.7.*');
+  });
+});
+
 describe('isSupportedSpecVersion', () => {
-  it('returns true for supported spec versions', () => {
+  test('returns true for supported spec versions', () => {
     expect(isSupportedSpecVersion('0.9.0')).toBe(true);
     expect(isSupportedSpecVersion('0.10.0')).toBe(true);
     expect(isSupportedSpecVersion('0.9', { allowAnyPatchVersion: true })).toBe(true);
     expect(isSupportedSpecVersion('0.10', { allowAnyPatchVersion: true })).toBe(true);
   });
 
-  it('returns false for unsupported spec versions', () => {
+  test('returns false for unsupported spec versions', () => {
     expect(isSupportedSpecVersion('0.6')).toBe(false);
     expect(isSupportedSpecVersion('2.0')).toBe(false);
     expect(isSupportedSpecVersion('')).toBe(false);
     expect(isSupportedSpecVersion('invalid')).toBe(false);
   });
 
-  it('handles wildcard and partial versions', () => {
+  test('handles wildcard and partial versions', () => {
     expect(isSupportedSpecVersion('*')).toBe(false);
     expect(isSupportedSpecVersion('0.*')).toBe(false);
     expect(isSupportedSpecVersion('*.8')).toBe(false);
   });
 
   describe('isSupportedSpecVersion', () => {
-    it('returns true for exact supported version', () => {
+    test('returns true for exact supported version', () => {
       expect(isSupportedSpecVersion(constants.SupportedRpcVersion.v0_9_0)).toBe(true);
     });
 
-    it('returns false for unsupported version', () => {
+    test('returns false for unsupported version', () => {
       expect(isSupportedSpecVersion('9.9.9')).toBe(false);
     });
 
-    it('returns true for supported version with allowAnyPatchVersion=true', () => {
+    test('returns true for supported version with allowAnyPatchVersion=true', () => {
       expect(isSupportedSpecVersion('0.9.5', { allowAnyPatchVersion: true })).toBe(true);
     });
 
-    it('returns false for supported version with allowAnyPatchVersion=false and mismatched patch', () => {
+    test('returns false for supported version with allowAnyPatchVersion=false and mismatched patch', () => {
       expect(isSupportedSpecVersion('0.7.444', { allowAnyPatchVersion: false })).toBe(false);
     });
 
-    it('returns true for supported version with wildcard in SupportedRpcVersion', () => {
+    test('returns true for supported version with wildcard in SupportedRpcVersion', () => {
       // Simulate a SupportedRpcVersion with a wildcard
       expect(isSupportedSpecVersion('0.9.123', { allowAnyPatchVersion: true })).toBe(true);
     });
 
-    it('returns false for empty version', () => {
+    test('returns false for empty version', () => {
       expect(isSupportedSpecVersion('')).toBe(false);
     });
 
-    it('returns false for malformed version', () => {
+    test('returns false for malformed version', () => {
       expect(isSupportedSpecVersion('abc.def.ghi')).toBe(false);
     });
 
-    it('returns true for supported version with allowAnyPatchVersion explicitly set to true', () => {
+    test('returns true for supported version with allowAnyPatchVersion explicitly set to true', () => {
       expect(isSupportedSpecVersion('0.9.2', { allowAnyPatchVersion: true })).toBe(true);
     });
 
-    it('returns false for supported version with allowAnyPatchVersion explicitly set to false', () => {
+    test('returns false for supported version with allowAnyPatchVersion explicitly set to false', () => {
       expect(isSupportedSpecVersion('0.7.2', { allowAnyPatchVersion: false })).toBe(false);
     });
 
-    it('returns true for supported version when options is omitted (defaults to false)', () => {
+    test('returns true for supported version when options is omitted (defaults to false)', () => {
       expect(isSupportedSpecVersion('0.9.0')).toBe(true);
       expect(isSupportedSpecVersion('0.9.11')).toBe(false);
     });
 
-    it('returns false for unsupported version regardless of options', () => {
+    test('returns false for unsupported version regardless of options', () => {
       expect(isSupportedSpecVersion('1.2.3', { allowAnyPatchVersion: true })).toBe(false);
       expect(isSupportedSpecVersion('1.2.3', { allowAnyPatchVersion: false })).toBe(false);
+    });
+  });
+
+  describe('combined with toReleaseVersion', () => {
+    test('accepts a pre-release of a supported spec version', () => {
+      expect(isSupportedSpecVersion(toReleaseVersion('0.10.3-rc.0'))).toBe(true);
+      expect(isSupportedSpecVersion(toReleaseVersion('0.9.0-rc.1'))).toBe(true);
+    });
+
+    test('keeps rejecting a pre-release of an unsupported patch', () => {
+      expect(isSupportedSpecVersion(toReleaseVersion('0.10.999-rc.0'))).toBe(false);
+      expect(isSupportedSpecVersion(toReleaseVersion('0.7.0-rc.0'))).toBe(false);
+    });
+
+    test('does not change the isSupportedSpecVersion default on a raw pre-release', () => {
+      expect(isSupportedSpecVersion('0.10.3-rc.0')).toBe(false);
     });
   });
 });
 
 describe('toApiVersion', () => {
-  it('converts version strings like "0.8.1" or "0.8" to "v0_8"', () => {
+  test('converts version strings like "0.8.1" or "0.8" to "v0_8"', () => {
     expect(toApiVersion('0.8.1')).toBe('v0_8');
     expect(toApiVersion('0.8')).toBe('v0_8');
     expect(toApiVersion('1.2.3')).toBe('v1_2');
@@ -187,28 +230,28 @@ describe('toApiVersion', () => {
 
 describe('compareVersions', () => {
   describe('basic comparisons', () => {
-    it('correctly compares patch versions', () => {
+    test('correctly compares patch versions', () => {
       expect(compareVersions('0.0.9', '0.0.10')).toBe(-1);
       expect(compareVersions('0.0.10', '0.0.9')).toBe(1);
       expect(compareVersions('1.2.3', '1.2.4')).toBe(-1);
       expect(compareVersions('1.2.4', '1.2.3')).toBe(1);
     });
 
-    it('correctly compares minor versions', () => {
+    test('correctly compares minor versions', () => {
       expect(compareVersions('0.1.0', '0.2.0')).toBe(-1);
       expect(compareVersions('0.2.0', '0.1.0')).toBe(1);
       expect(compareVersions('1.1.5', '1.2.0')).toBe(-1);
       expect(compareVersions('1.2.0', '1.1.5')).toBe(1);
     });
 
-    it('correctly compares major versions', () => {
+    test('correctly compares major versions', () => {
       expect(compareVersions('1.0.0', '2.0.0')).toBe(-1);
       expect(compareVersions('2.0.0', '1.0.0')).toBe(1);
       expect(compareVersions('0.9.9', '1.0.0')).toBe(-1);
       expect(compareVersions('1.0.0', '0.9.9')).toBe(1);
     });
 
-    it('returns 0 for equal versions', () => {
+    test('returns 0 for equal versions', () => {
       expect(compareVersions('0.0.9', '0.0.9')).toBe(0);
       expect(compareVersions('1.2.3', '1.2.3')).toBe(0);
       expect(compareVersions('0.14.1', '0.14.1')).toBe(0);
@@ -216,7 +259,7 @@ describe('compareVersions', () => {
   });
 
   describe('edge cases', () => {
-    it('handles missing version segments (treats as 0)', () => {
+    test('handles missing version segments (treats as 0)', () => {
       expect(compareVersions('0.1', '0.1.0')).toBe(0);
       expect(compareVersions('0.1.0', '0.1')).toBe(0);
       expect(compareVersions('1', '1.0.0')).toBe(0);
@@ -225,14 +268,14 @@ describe('compareVersions', () => {
       expect(compareVersions('0.1.1', '0.1')).toBe(1);
     });
 
-    it('correctly handles versions with different segment counts', () => {
+    test('correctly handles versions with different segment counts', () => {
       expect(compareVersions('0.0.99', '0.1')).toBe(-1);
       expect(compareVersions('0.1', '0.0.99')).toBe(1);
       expect(compareVersions('1.2', '1.2.3')).toBe(-1);
       expect(compareVersions('1.2.3', '1.2')).toBe(1);
     });
 
-    it('safely avoids collision between versions like 0.0.1000 and 0.1.0', () => {
+    test('safely avoids collision between versions like 0.0.1000 and 0.1.0', () => {
       // This is the key safety test - these should NOT be equal
       expect(compareVersions('0.0.1000', '0.1.0')).toBe(-1);
       expect(compareVersions('0.1.0', '0.0.1000')).toBe(1);
@@ -240,7 +283,7 @@ describe('compareVersions', () => {
       expect(compareVersions('0.1.0', '0.1.0')).toBe(0);
     });
 
-    it('handles large version numbers', () => {
+    test('handles large version numbers', () => {
       expect(compareVersions('0.0.999', '0.1.0')).toBe(-1);
       expect(compareVersions('0.999.0', '1.0.0')).toBe(-1);
       expect(compareVersions('10.500.2000', '10.500.2001')).toBe(-1);
@@ -249,14 +292,14 @@ describe('compareVersions', () => {
   });
 
   describe('real-world starknet version comparisons', () => {
-    it('compares starknet RPC versions correctly', () => {
+    test('compares starknet RPC versions correctly', () => {
       expect(compareVersions('0.8.1', '0.9.0')).toBe(-1);
       expect(compareVersions('0.9.0', '0.8.1')).toBe(1);
       expect(compareVersions('0.14.0', '0.14.1')).toBe(-1);
       expect(compareVersions('0.14.1', '0.14.0')).toBe(1);
     });
 
-    it('can be used for version threshold checks', () => {
+    test('can be used for version threshold checks', () => {
       // Example: Blake2s should be used for version >= 0.14.1
       const useBlake = (version: string) => compareVersions(version, '0.14.1') >= 0;
 
@@ -268,10 +311,32 @@ describe('compareVersions', () => {
       expect(useBlake('0.13.9')).toBe(false);
     });
   });
+
+  describe('pre-release versions', () => {
+    test('compares a pre-release as the release it is a candidate for', () => {
+      expect(compareVersions('0.10.3-rc.0', '0.10.3')).toBe(0);
+      expect(compareVersions('0.10.3', '0.10.3-rc.0')).toBe(0);
+      expect(compareVersions('1.2.3+build.4', '1.2.3')).toBe(0);
+    });
+
+    test('orders a pre-release against other patches of the same minor', () => {
+      expect(compareVersions('0.10.3-rc.0', '0.10.2')).toBe(1);
+      expect(compareVersions('0.10.2', '0.10.3-rc.0')).toBe(-1);
+      expect(compareVersions('0.10.3-rc.0', '0.10.4')).toBe(-1);
+    });
+
+    test('keeps threshold checks correct for a pre-release node', () => {
+      // A 0.14.1 release candidate already implements the 0.14.1 behavior
+      const useBlake = (version: string) => compareVersions(version, '0.14.1') >= 0;
+
+      expect(useBlake('0.14.1-rc.0')).toBe(true);
+      expect(useBlake('0.14.0-rc.0')).toBe(false);
+    });
+  });
 });
 
 describe('isV3Tx', () => {
-  it('returns true for V3 transactions with explicit version 3', () => {
+  test('returns true for V3 transactions with explicit version 3', () => {
     const v3Details: InvocationsDetailsWithNonce = {
       nonce: 1,
       version: 3,
@@ -279,7 +344,7 @@ describe('isV3Tx', () => {
     expect(isV3Tx(v3Details)).toBe(true);
   });
 
-  it('returns true for V3 transactions with hex version 0x3', () => {
+  test('returns true for V3 transactions with hex version 0x3', () => {
     const v3Details: InvocationsDetailsWithNonce = {
       nonce: 1,
       version: '0x3',
@@ -287,7 +352,7 @@ describe('isV3Tx', () => {
     expect(isV3Tx(v3Details)).toBe(true);
   });
 
-  it('returns true for F3 transactions (feemarket version)', () => {
+  test('returns true for F3 transactions (feemarket version)', () => {
     const f3Details: InvocationsDetailsWithNonce = {
       nonce: 1,
       version: ETransactionVersion.F3,
@@ -295,14 +360,14 @@ describe('isV3Tx', () => {
     expect(isV3Tx(f3Details)).toBe(true);
   });
 
-  it('returns true when version is not specified (defaults to V3)', () => {
+  test('returns true when version is not specified (defaults to V3)', () => {
     const defaultDetails: InvocationsDetailsWithNonce = {
       nonce: 1,
     };
     expect(isV3Tx(defaultDetails)).toBe(true);
   });
 
-  it('returns false for V2 transactions', () => {
+  test('returns false for V2 transactions', () => {
     const v2Details: InvocationsDetailsWithNonce = {
       nonce: 1,
       version: 2,
@@ -310,7 +375,7 @@ describe('isV3Tx', () => {
     expect(isV3Tx(v2Details)).toBe(false);
   });
 
-  it('returns false for V1 transactions', () => {
+  test('returns false for V1 transactions', () => {
     const v1Details: InvocationsDetailsWithNonce = {
       nonce: 1,
       version: 1,
@@ -318,7 +383,7 @@ describe('isV3Tx', () => {
     expect(isV3Tx(v1Details)).toBe(false);
   });
 
-  it('returns false for hex version 0x1', () => {
+  test('returns false for hex version 0x1', () => {
     const v1Details: InvocationsDetailsWithNonce = {
       nonce: 1,
       version: '0x1',
@@ -328,7 +393,7 @@ describe('isV3Tx', () => {
 });
 
 describe('isPreConfirmedBlock', () => {
-  it('returns true for blocks with PRE_CONFIRMED status', () => {
+  test('returns true for blocks with PRE_CONFIRMED status', () => {
     const preConfirmedBlock = {
       status: 'PRE_CONFIRMED',
       transactions: [],
@@ -337,7 +402,7 @@ describe('isPreConfirmedBlock', () => {
     expect(isPreConfirmedBlock(preConfirmedBlock)).toBe(true);
   });
 
-  it('returns false for blocks with ACCEPTED_ON_L2 status', () => {
+  test('returns false for blocks with ACCEPTED_ON_L2 status', () => {
     const acceptedBlock = {
       status: 'ACCEPTED_ON_L2',
       block_hash: '0x123',
@@ -347,7 +412,7 @@ describe('isPreConfirmedBlock', () => {
     expect(isPreConfirmedBlock(acceptedBlock)).toBe(false);
   });
 
-  it('returns false for blocks with ACCEPTED_ON_L1 status', () => {
+  test('returns false for blocks with ACCEPTED_ON_L1 status', () => {
     const acceptedBlock = {
       status: 'ACCEPTED_ON_L1',
       block_hash: '0x123',
@@ -357,7 +422,7 @@ describe('isPreConfirmedBlock', () => {
     expect(isPreConfirmedBlock(acceptedBlock)).toBe(false);
   });
 
-  it('returns false for blocks with REJECTED status', () => {
+  test('returns false for blocks with REJECTED status', () => {
     const rejectedBlock = {
       status: 'REJECTED',
       transactions: [],
@@ -368,7 +433,7 @@ describe('isPreConfirmedBlock', () => {
 });
 
 describe('isPreConfirmedTransaction', () => {
-  it('returns true for transactions without block_hash', () => {
+  test('returns true for transactions without block_hash', () => {
     const preConfirmedTx = {
       transaction_hash: '0x123',
       execution_status: 'SUCCEEDED',
@@ -377,7 +442,7 @@ describe('isPreConfirmedTransaction', () => {
     expect(isPreConfirmedTransaction(preConfirmedTx)).toBe(true);
   });
 
-  it('returns false for transactions with block_hash', () => {
+  test('returns false for transactions with block_hash', () => {
     const confirmedTx = {
       transaction_hash: '0x123',
       block_hash: '0xabc',
@@ -387,7 +452,7 @@ describe('isPreConfirmedTransaction', () => {
     expect(isPreConfirmedTransaction(confirmedTx)).toBe(false);
   });
 
-  it('returns true for transactions with undefined block_hash', () => {
+  test('returns true for transactions with undefined block_hash', () => {
     const tx = {
       transaction_hash: '0x123',
       execution_status: 'SUCCEEDED',
@@ -398,7 +463,7 @@ describe('isPreConfirmedTransaction', () => {
     expect(isPreConfirmedTransaction(tx)).toBe(false);
   });
 
-  it('returns false for reverted transactions with block_hash', () => {
+  test('returns false for reverted transactions with block_hash', () => {
     const revertedTx = {
       transaction_hash: '0x123',
       block_hash: '0xdef',
@@ -411,7 +476,7 @@ describe('isPreConfirmedTransaction', () => {
 });
 
 describe('isPreConfirmedStateUpdate', () => {
-  it('returns true for state updates without block_hash', () => {
+  test('returns true for state updates without block_hash', () => {
     const preConfirmedState = {
       old_root: '0x123',
       new_root: '0x456',
@@ -426,7 +491,7 @@ describe('isPreConfirmedStateUpdate', () => {
     expect(isPreConfirmedStateUpdate(preConfirmedState)).toBe(true);
   });
 
-  it('returns false for state updates with block_hash', () => {
+  test('returns false for state updates with block_hash', () => {
     const confirmedState = {
       block_hash: '0xabc',
       old_root: '0x123',
@@ -442,7 +507,7 @@ describe('isPreConfirmedStateUpdate', () => {
     expect(isPreConfirmedStateUpdate(confirmedState)).toBe(false);
   });
 
-  it('returns true for minimal pre-confirmed state update', () => {
+  test('returns true for minimal pre-confirmed state update', () => {
     const minimalState = {
       new_root: '0x789',
       old_root: '0x012',
@@ -451,7 +516,7 @@ describe('isPreConfirmedStateUpdate', () => {
     expect(isPreConfirmedStateUpdate(minimalState)).toBe(true);
   });
 
-  it('returns false for state update with undefined block_hash', () => {
+  test('returns false for state update with undefined block_hash', () => {
     const state = {
       block_hash: undefined,
       old_root: '0x123',
