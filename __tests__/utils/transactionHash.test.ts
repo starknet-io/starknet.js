@@ -1,25 +1,8 @@
 import { poseidonHashMany } from '@scure/starknet';
 
-import { constants, hash, v2hash, v3hash } from '../../src';
+import { constants, hash, v3hash } from '../../src';
 import { EDAMode } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
-
-describe('TxV2 Hash Tests', () => {
-  describe('calculateTransactionHashCommon()', () => {
-    test('should match most simple python output', () => {
-      const result = v2hash.calculateTransactionHashCommon(
-        constants.TransactionHashPrefix.INVOKE,
-        '0x0',
-        '0x2a',
-        '0x64',
-        [],
-        '0x0',
-        constants.StarknetChainId.SN_SEPOLIA
-      );
-      expect(result).toBe('0x63ba2bc7f3a3912597e221d5fad8eb0783e0684a428b47fa4737faf66f46dfb');
-    });
-  });
-});
 
 describe('TxV3 Invoke proofFacts Hash Tests', () => {
   const baseArgs = {

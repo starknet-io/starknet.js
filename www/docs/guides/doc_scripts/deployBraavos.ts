@@ -194,7 +194,7 @@ export async function estimateBraavosAccountDeployFee(
     blockIdentifier,
     skipValidate
   );
-  const suggestedMaxFee = stark.estimateFeeToBounds({
+  const resourceBounds = stark.estimateFeeToBounds({
     ...response,
     overall_fee: Number(response.overall_fee),
     l1_gas_consumed: Number(response.l1_gas_consumed),
@@ -205,7 +205,7 @@ export async function estimateBraavosAccountDeployFee(
     l1_data_gas_price: Number(response.l1_data_gas_price),
   });
   return {
-    resourceBounds: suggestedMaxFee,
+    resourceBounds,
     feeDataAvailabilityMode: EDataAvailabilityMode.L1,
     nonceDataAvailabilityMode: EDataAvailabilityMode.L1,
     tip: 10 ** 13, // not handled in Starknet 0.13.5
@@ -221,7 +221,7 @@ export function isV3tx(version: string): boolean {
 export async function deployBraavosAccount(
   privateKeyBraavos: BigNumberish,
   provider: RpcProvider,
-  maxFeeDetails?: UniversalDetails
+  providedDetails?: UniversalDetails
 ): Promise<DeployContractResponse> {
   const nonce = constants.ZERO;
   const chainId = await provider.getChainId();
@@ -230,7 +230,7 @@ export async function deployBraavosAccount(
   const BraavosAccountAddress = calculateAddressBraavos(privateKeyBraavos);
   const BraavosConstructorCallData = BraavosConstructor(starkKeyPubBraavos);
   const feeDetails: UniversalDetails =
-    maxFeeDetails ?? (await estimateBraavosAccountDeployFee(privateKeyBraavos, provider, {}));
+    providedDetails ?? (await estimateBraavosAccountDeployFee(privateKeyBraavos, provider, {}));
   const txVersion = ETransactionVersion.V3;
   const payload: DeployAccountContractTransaction = await buildBraavosAccountDeployPayload(
     privateKeyBraavos,

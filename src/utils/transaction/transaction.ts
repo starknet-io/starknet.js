@@ -162,13 +162,11 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
 /**
  * Return transaction versions based on version type, default version type is 'transaction'.
  * @param {'fee' | 'transaction'} [versionType] the type of version ("fee" or "transaction")
- * @returns {v1: ETransactionVersion, v2: ETransactionVersion, v3: ETransactionVersion} an object containing the transaction versions.
+ * @returns {v3: ETransactionVersion} an object containing the transaction versions.
  * @example
  * ```typescript
  * const result = transaction.getVersionsByType('fee');
  * // result = {
- * //   v1: '0x100000000000000000000000000000001',
- * //   v2: '0x100000000000000000000000000000002',
  * //   v3: '0x100000000000000000000000000000003'
  * // }
  * ```

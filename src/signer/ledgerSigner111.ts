@@ -1,11 +1,8 @@
 /* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
 import type {
   InvocationsSignerDetails,
-  V3InvocationsSignerDetails,
   DeployAccountSignerDetails,
-  V3DeployAccountSignerDetails,
   DeclareSignerDetails,
-  V3DeclareSignerDetails,
   TypedData,
   Call,
   Signature,
@@ -27,7 +24,6 @@ import { intDAM } from '../utils/stark';
 import { addHexPrefix, buf2hex, concatenateArrayBuffer, removeHexPrefix } from '../utils/encode';
 import { hexToBytes, stringToSha256ToArrayBuff4, toHex } from '../utils/num';
 import { starkCurve } from '../utils/ec';
-import { ETransactionVersion3 } from '../types/api';
 
 // import type _Transport from '@ledgerhq/hw-transport';
 // NOTE: the preceding line was substituted because of the '@ledgerhq/hw-transport' module bug listed in
@@ -158,9 +154,9 @@ export class LedgerSigner111<Transport extends Record<any, any> = any> implement
   }
 
   /**
-   * Sign in a Ledger a V1 or a V3 transaction. This is a blind sign on the Ledger screen.
+   * Sign in a Ledger a V3 transaction. This is a blind sign on the Ledger screen.
    * @param {Call1[]} transactions An array of `Call` transactions (generated for example by `myContract.populate()`).
-   * @param {InvocationsSignerDetails} transactionsDetail An object that includes all the necessary inputs to hash the transaction. Can be `V2InvocationsSignerDetails` or `V3InvocationsSignerDetails` type.
+   * @param {InvocationsSignerDetails} transactionsDetail An object that includes all the necessary inputs to hash the transaction.
    * @returns {Signature} The signed transaction.
    * @example
    * ```typescript
@@ -197,28 +193,21 @@ export class LedgerSigner111<Transport extends Record<any, any> = any> implement
     transactionsDetail: InvocationsSignerDetails
   ): Promise<Signature> {
     const compiledCalldata = getExecuteCalldata(transactions, transactionsDetail.cairoVersion);
-    let msgHash;
+    const msgHash = calculateInvokeTransactionHash({
+      ...transactionsDetail,
+      senderAddress: transactionsDetail.walletAddress,
+      compiledCalldata,
+      version: transactionsDetail.version,
+      nonceDataAvailabilityMode: intDAM(transactionsDetail.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(transactionsDetail.feeDataAvailabilityMode),
+    });
 
-    if (Object.values(ETransactionVersion3).includes(transactionsDetail.version as any)) {
-      const det = transactionsDetail as V3InvocationsSignerDetails;
-      msgHash = calculateInvokeTransactionHash({
-        ...det,
-        senderAddress: det.walletAddress,
-        compiledCalldata,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signTransaction version');
-    }
-
-    return this.signRaw(msgHash as string);
+    return this.signRaw(msgHash);
   }
 
   /**
    * Sign in a Ledger the deployment of a new account. This is a blind sign on the Ledger screen.
-   * @param {DeployAccountSignerDetails} details An object that includes all necessary data to calculate the Hash. It can be `V2DeployAccountSignerDetails` or `V3DeployAccountSignerDetails` types.
+   * @param {DeployAccountSignerDetails} details An object that includes all necessary data to calculate the Hash.
    * @returns {Signature} The deploy account signature.
    * @example
    * ```typescript
@@ -232,29 +221,21 @@ export class LedgerSigner111<Transport extends Record<any, any> = any> implement
     details: DeployAccountSignerDetails
   ): Promise<Signature> {
     const compiledConstructorCalldata = CallData.compile(details.constructorCalldata);
-    /*     const version = BigInt(details.version).toString(); */
-    let msgHash;
+    const msgHash = calculateDeployAccountTransactionHash({
+      ...details,
+      salt: details.addressSalt,
+      compiledConstructorCalldata,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
 
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3DeployAccountSignerDetails;
-      msgHash = calculateDeployAccountTransactionHash({
-        ...det,
-        salt: det.addressSalt,
-        compiledConstructorCalldata,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signDeployAccountTransaction version');
-    }
-
-    return this.signRaw(msgHash as string);
+    return this.signRaw(msgHash);
   }
 
   /**
    * Sign in a Ledger the declaration of a new class. This is a blind sign on the Ledger screen.
-   * @param {DeclareSignerDetails} details An object that includes all necessary data to calculate the Hash. It can be `V3DeclareSignerDetails` or `V2DeclareSignerDetails` types.
+   * @param {DeclareSignerDetails} details An object that includes all necessary data to calculate the Hash.
    * @returns {Signature} The declare Signature.
    * @example
    * ```typescript
@@ -268,19 +249,13 @@ export class LedgerSigner111<Transport extends Record<any, any> = any> implement
     // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
     details: DeclareSignerDetails
   ): Promise<Signature> {
-    let msgHash;
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3DeclareSignerDetails;
-      msgHash = calculateDeclareTransactionHash({
-        ...det,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signDeclareTransaction version');
-    }
-    return this.signRaw(msgHash as string);
+    const msgHash = calculateDeclareTransactionHash({
+      ...details,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
+    return this.signRaw(msgHash);
   }
 
   /**

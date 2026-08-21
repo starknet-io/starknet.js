@@ -15,20 +15,22 @@ v11 carries three independent workstreams. The cryptographic dependencies move t
 ESM-only generation (`@noble/curves` 1.7 → 2.3, `@noble/hashes` 1.6 → 2.3, `@scure/base` 1.2 → 2.3,
 `@scure/starknet` 1.1 → 2.3), RPC requests now travel through a pluggable transport, which lets a
 single WebSocket serve both requests and subscriptions, and the string helpers deprecated back in
-v8.2.0 are finally removed.
+v8.2.0 are finally removed. A fourth, much smaller pass clears out what remained of the V0–V2
+transaction API.
 
 **The transport layer breaks nothing** — it is added underneath the existing API. The other two do.
 
-| Change                                            | Severity   | What you have to do                            |
-| ------------------------------------------------- | ---------- | ---------------------------------------------- |
-| Node.js >= 22.12 is now required                  | **High**   | Upgrade Node, or use the ESM build             |
-| `encodeShortString` / `decodeShortString` removed | **High**   | Switch to `CairoBytes31`                       |
-| Jest: the crypto dependencies are ESM-only        | **High**   | Add one line to your `transformIgnorePatterns` |
-| `cairo.felt()` only accepts a number              | **Medium** | Encode text yourself before passing it         |
-| Signature objects lost their v1 encoding methods  | **Medium** | Rename `toDERHex()` and its three siblings     |
-| `CairoFelt()` and `encode.utf8ToArray()` removed  | **Low**    | Rename to `CairoFelt252` / `utf8ToUint8Array`  |
-| `@noble` / `@scure` import paths changed          | **Low**    | Only if you import these packages directly     |
-| The `ReceiptTx` class removed                     | **Low**    | Only if you used `instanceof ReceiptTx`        |
+| Change                                            | Severity   | What you have to do                                     |
+| ------------------------------------------------- | ---------- | ------------------------------------------------------- |
+| Node.js >= 22.12 is now required                  | **High**   | Upgrade Node, or use the ESM build                      |
+| `encodeShortString` / `decodeShortString` removed | **High**   | Switch to `CairoBytes31`                                |
+| Jest: the crypto dependencies are ESM-only        | **High**   | Add one line to your `transformIgnorePatterns`          |
+| `cairo.felt()` only accepts a number              | **Medium** | Encode text yourself before passing it                  |
+| Signature objects lost their v1 encoding methods  | **Medium** | Rename `toDERHex()` and its three siblings              |
+| `CairoFelt()` and `encode.utf8ToArray()` removed  | **Low**    | Rename to `CairoFelt252` / `utf8ToUint8Array`           |
+| `@noble` / `@scure` import paths changed          | **Low**    | Only if you import these packages directly              |
+| The `ReceiptTx` class removed                     | **Low**    | Only if you used `instanceof ReceiptTx`                 |
+| The leftover v1 transaction API removed           | **Low**    | Only if you imported `v2hash` or `ETransactionVersion2` |
 
 Two deprecations ship with the release — `stark.randomAddress()` and `Provider` — but neither of
 them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
@@ -38,8 +40,9 @@ them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
 Worth stating, because the release is a major: `Account`, `Contract`, `CallData` and the `Signer`
 interface are untouched. `WebSocketChannel` keeps exactly the API it had in v10 — same constructor
 options, same `subscribe*` methods, same events. No RPC spec version is added or dropped: 0.9 and
-0.10.x remain supported, with 0.10.3 as the default. What left the package exports is listed above,
-and every one of those had been marked `@deprecated` for at least three major versions.
+0.10.x remain supported, with 0.10.3 as the default. What left the package exports is listed above.
+Most of it had been marked `@deprecated` for at least three major versions; the rest is the v1
+transaction API, which no live network has accepted for a long time.
 
 ### Migration in three minutes
 
@@ -287,6 +290,27 @@ receipt.statusReceipt; // ✅ 'SUCCEEDED' | 'REVERTED' | 'ERROR', replaces `inst
 ```
 
 The `TransactionReceiptStatus` and `TransactionReceiptValue` types are unaffected.
+
+### 8. The leftover v1 transaction API is removed
+
+Starknet stopped accepting V0, V1 and V2 transactions, and RPC 0.9+ does not define them for
+broadcasting. This release removes the symbols that only existed to build or describe them:
+
+- **`v2hash`** — its `calculate*TransactionHash` helpers computed V0–V2 hashes from a `maxFee`.
+  `v3hash` is untouched. The one function of that module that was never version-specific,
+  `hash.calculateL2MessageTxHash()`, keeps its name, its signature and its result: an `L1_HANDLER`
+  transaction is current Starknet, not an old transaction version.
+- **`ETransactionVersion2`** — the `{ V0, V1, V2, F0, F1, F2 }` enum. `ETransactionVersion` and
+  `ETransactionVersion3` are untouched.
+- **`Details`** — the `{ nonce, maxFee, version, chainId }` type, which the library never used.
+- **`InvocationsDetails.maxFee`** — the field was already ignored at runtime, since `Account`
+  reads a `UniversalDetails`, which has no `maxFee`. Pass `resourceBounds` instead.
+- **`TransactionHashPrefix.DEPLOY`** — the prefix of the V0 `deploy` transaction. The four other
+  prefixes are unchanged.
+- **`SYSTEM_MESSAGES`** — `legacyTxWarningMessage` and `maxFeeInV3` are removed, neither having
+  ever been emitted, and `legacyTxRPC08Message` is renamed `nonV3Tx`.
+
+Sending a transaction is unaffected: `Account` has been building V3 transactions only since v8.
 
 ## Part 2 — Deprecations
 

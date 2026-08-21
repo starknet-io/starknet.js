@@ -1,5 +1,5 @@
 import { StarknetChainId } from '../global/constants';
-import { ETransactionVersion, ETransactionVersion3 } from './api';
+import { ETransactionVersion3 } from './api';
 import {
   BigNumberish,
   CairoVersion,
@@ -8,7 +8,6 @@ import {
 } from './lib';
 
 export type InvocationsSignerDetails = V3InvocationsSignerDetails & {
-  version: `${ETransactionVersion}`;
   skipValidate?: boolean;
 };
 
@@ -19,9 +18,7 @@ export type V3InvocationsSignerDetails = V3TransactionDetails & {
   version: `${ETransactionVersion3}`;
 };
 
-export type DeclareSignerDetails = V3DeclareSignerDetails & {
-  version: `${ETransactionVersion}`;
-};
+export type DeclareSignerDetails = V3DeclareSignerDetails;
 
 export type V3DeclareSignerDetails = V3TransactionDetails & {
   classHash: string;

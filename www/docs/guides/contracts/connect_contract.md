@@ -160,7 +160,7 @@ await myContract.set_coordinate({ x: 10, y: 20 });
 
 ### Using withOptions
 
-The `withOptions` method allows you to customize how the next contract interaction is processed. These options only apply to the immediately following operation and don't persist for subsequent calls. For a complete list of available options, see the [ContractOptions API reference](../../API/type-aliases/ContractOptions.md).
+The `withOptions` method allows you to customize how the next contract interaction is processed. These options only apply to the immediately following operation and don't persist for subsequent calls. For a complete list of available options, see the [WithOptions API reference](../../API/type-aliases/WithOptions.md).
 
 ```typescript
 // Example: Multiple options for a transaction
@@ -175,12 +175,8 @@ const result = await myContract
 
     // Transaction details (for writes)
     nonce: '0x1',
-    version: '0x1',
 
-    // V1 transaction max fee, soon to be deprecated
-    maxFee: 1000n,
-
-    // V3 transaction resource bounds, for RPC 0.8 and later
+    // Resource bounds of the transaction
     resourceBounds: {
       l1_gas: { max_amount: '0x186a0', max_price_per_unit: '0x1' },
       l2_gas: { max_amount: '0x186a0', max_price_per_unit: '0x1' },

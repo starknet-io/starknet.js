@@ -164,7 +164,7 @@ Before sending a message, estimate the fee that will cover both L1 and L2 costs:
 // Assuming account0 is initialized with the v8 object syntax
 // const account0 = new Account({ provider: myProvider, address: accountAddress, signer: privateKey });
 
-const { suggestedMaxFee } = await account0.estimateInvokeFee({
+const { resourceBounds } = await account0.estimateInvokeFee({
   contractAddress: L2ContractAddress,
   entrypoint: 'send_message_to_l1',
   calldata: [
@@ -181,12 +181,14 @@ The message is sent by invoking a function in your Cairo contract. The contract 
 
 ```typescript
 // Send the message by invoking the contract function
-const tx = await account0.execute({
-  contractAddress: L2ContractAddress,
-  entrypoint: 'send_message_to_l1',
-  calldata: [toAddress, '123', '456'],
-  maxFee: suggestedMaxFee,
-});
+const tx = await account0.execute(
+  {
+    contractAddress: L2ContractAddress,
+    entrypoint: 'send_message_to_l1',
+    calldata: [toAddress, '123', '456'],
+  },
+  { resourceBounds }
+);
 
 // Wait for the transaction to be accepted
 await myProvider.waitForTransaction(tx.transaction_hash);

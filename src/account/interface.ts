@@ -230,8 +230,7 @@ export abstract class AccountInterface {
    *
    * @param transactionsDetail - Transaction execution options
    * - .nonce - Override account nonce
-   * - .maxFee - Maximum fee for v1/v2 transactions
-   * - .resourceBounds - Resource limits for v3 transactions
+   * - .resourceBounds - Resource limits for the transaction
    * - .tip - Priority fee tip
    * - .version - Force specific transaction version
    *

@@ -269,7 +269,7 @@ export class Account implements AccountInterface {
         toTransactionVersion(
           toFeeVersion(this.transactionVersion) || ETransactionVersion3.F3,
           version
-        ), // sierra
+        ),
       ],
       nonce,
       blockIdentifier,

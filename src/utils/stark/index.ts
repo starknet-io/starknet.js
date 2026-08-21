@@ -475,8 +475,8 @@ export function intDAM(dam: EDataAvailabilityMode): EDAMode {
  * @throws {Error} If either version is not a valid ETransactionVersion
  * @example
  * ```typescript
- * const result = stark.toTransactionVersion("0x100000000000000000000000000000003", stark.toFeeVersion(2));
- * // result = "0x100000000000000000000000000000002"
+ * const result = stark.toTransactionVersion("0x3", stark.toFeeVersion(3));
+ * // result = "0x100000000000000000000000000000003"
  * ```
  */
 export function toTransactionVersion(defaultVersion: BigNumberish, providedVersion?: BigNumberish) {
@@ -494,22 +494,19 @@ export function toTransactionVersion(defaultVersion: BigNumberish, providedVersi
 
 /**
  * Convert Transaction version to Fee version or throw an error
- * @param {BigNumberish} [providedVersion] 0..3 number representing the transaction version
+ * @param {BigNumberish} [providedVersion] number representing the transaction version
  * @returns {ETransactionVersion | undefined} the fee estimation version corresponding to the transaction version provided
  * @throws {Error} if the transaction version is unknown
  * @example
  * ```typescript
- * const result = stark.toFeeVersion(2);
- * // result = "0x100000000000000000000000000000002"
+ * const result = stark.toFeeVersion(3);
+ * // result = "0x100000000000000000000000000000003"
  * ```
  */
 export function toFeeVersion(providedVersion?: BigNumberish): ETransactionVersion | undefined {
   if (!providedVersion) return undefined;
   const version = toHex(providedVersion);
 
-  if (version === ETransactionVersion.V0) return ETransactionVersion.F0;
-  if (version === ETransactionVersion.V1) return ETransactionVersion.F1;
-  if (version === ETransactionVersion.V2) return ETransactionVersion.F2;
   if (version === ETransactionVersion.V3) return ETransactionVersion.F3;
 
   throw Error(`toFeeVersion: ${version} is not supported`);

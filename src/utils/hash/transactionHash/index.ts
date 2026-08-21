@@ -12,7 +12,7 @@ import {
   calculateInvokeTransactionHash as v3calculateInvokeTransactionHash,
 } from './v3';
 
-export { calculateL2MessageTxHash } from './v2';
+export { calculateL2MessageTxHash } from './l1Message';
 /*
  * INVOKE TX HASH
  */

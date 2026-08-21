@@ -815,8 +815,7 @@ export class RpcChannel {
   > {
     const defaultVersions = getVersionsByType(versionType);
 
-    // V0,V1,V2 not supported on RPC 0.9
-    assert(isV3Tx(invocation), SYSTEM_MESSAGES.legacyTxRPC08Message);
+    assert(isV3Tx(invocation), SYSTEM_MESSAGES.nonV3Tx);
 
     // V3 - Add resource bounds validation for transaction building (not fee estimation)
     assert(

@@ -1,4 +1,3 @@
-import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ETransactionType, SUBSCRIPTION_BLOCK_ID } from '../api';
 import { CairoEnum } from '../cairoEnum';
@@ -191,7 +190,6 @@ export type CompilerVersion = '0' | '1' | '2' | undefined;
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
-  maxFee?: BigNumberish;
   version?: BigNumberish;
 } & Partial<V3TransactionDetails>;
 
@@ -208,16 +206,6 @@ export type V3TransactionDetails = {
   proofFacts?: BigNumberish[];
   /** Proof for the transaction (RPC 0.10.1+) - base64 encoded string */
   proof?: string;
-};
-
-/**
- * Contain all additional details params
- */
-export type Details = {
-  nonce: BigNumberish;
-  maxFee: BigNumberish;
-  version: BigNumberish;
-  chainId: StarknetChainId;
 };
 
 export type InvocationsDetailsWithNonce =

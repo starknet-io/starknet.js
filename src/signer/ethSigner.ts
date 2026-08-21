@@ -10,11 +10,7 @@ import {
   Signature,
   TypedData,
   Uint256,
-  V3DeclareSignerDetails,
-  V3DeployAccountSignerDetails,
-  V3InvocationsSignerDetails,
 } from '../types';
-import { ETransactionVersion3 } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { addHexPrefix, buf2hex, removeHexPrefix, sanitizeHex } from '../utils/encode';
 import { ethRandomPrivateKey } from '../utils/eth';
@@ -72,21 +68,15 @@ export class EthSigner implements SignerInterface {
     details: InvocationsSignerDetails
   ): Promise<Signature> {
     const compiledCalldata = getExecuteCalldata(transactions, details.cairoVersion);
-    let msgHash;
+    const msgHash = calculateInvokeTransactionHash({
+      ...details,
+      senderAddress: details.walletAddress,
+      compiledCalldata,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
 
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3InvocationsSignerDetails;
-      msgHash = calculateInvokeTransactionHash({
-        ...det,
-        senderAddress: det.walletAddress,
-        compiledCalldata,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signTransaction version');
-    }
     const signature = secp256k1.Signature.fromBytes(
       secp256k1.sign(hexToBytes(sanitizeHex(msgHash)), hexToBytes(addHexPrefix(this.pk)), {
         prehash: false,
@@ -101,22 +91,15 @@ export class EthSigner implements SignerInterface {
     details: DeployAccountSignerDetails
   ): Promise<Signature> {
     const compiledConstructorCalldata = CallData.compile(details.constructorCalldata);
-    /*     const version = BigInt(details.version).toString(); */
-    let msgHash;
+    const msgHash = calculateDeployAccountTransactionHash({
+      ...details,
+      salt: details.addressSalt,
+      compiledConstructorCalldata,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
 
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3DeployAccountSignerDetails;
-      msgHash = calculateDeployAccountTransactionHash({
-        ...det,
-        salt: det.addressSalt,
-        compiledConstructorCalldata,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signDeployAccountTransaction version');
-    }
     const signature = secp256k1.Signature.fromBytes(
       secp256k1.sign(hexToBytes(sanitizeHex(msgHash)), hexToBytes(addHexPrefix(this.pk)), {
         prehash: false,
@@ -131,19 +114,12 @@ export class EthSigner implements SignerInterface {
     // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
     details: DeclareSignerDetails
   ): Promise<Signature> {
-    let msgHash;
-
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3DeclareSignerDetails;
-      msgHash = calculateDeclareTransactionHash({
-        ...det,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signDeclareTransaction version');
-    }
+    const msgHash = calculateDeclareTransactionHash({
+      ...details,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
 
     const signature = secp256k1.Signature.fromBytes(
       secp256k1.sign(hexToBytes(sanitizeHex(msgHash)), hexToBytes(addHexPrefix(this.pk)), {

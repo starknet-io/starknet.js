@@ -243,7 +243,6 @@ export abstract class ProviderInterface {
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
-   * - maxFee - optional maxFee
    * @returns response from addTransaction
    */
   public abstract invokeFunction(
@@ -260,7 +259,6 @@ export abstract class ProviderInterface {
    * @param details Invocation Details containing:
    * - nonce
    * - optional version
-   * - optional maxFee
    * @returns a confirmation of sending a transaction on the starknet contract
    */
   public abstract declareContract(
@@ -308,7 +306,6 @@ export abstract class ProviderInterface {
    * @param details - optional details containing:
    * - nonce
    * - version - optional version
-   * - optional maxFee
    * @param blockIdentifier - (optional) block identifier
    * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
@@ -339,7 +336,6 @@ export abstract class ProviderInterface {
    * @param details - optional details containing:
    * - nonce
    * - version - optional version
-   * - optional maxFee
    * @param blockIdentifier - (optional) block identifier
    * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
