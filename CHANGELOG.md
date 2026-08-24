@@ -1,3 +1,9 @@
+# [11.0.0-beta.5](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.4...v11.0.0-beta.5) (2026-08-24)
+
+### Bug Fixes
+
+- **calldata:** long string chunks stay text, at any ABI depth ([06638d9](https://github.com/starknet-io/starknet.js/commit/06638d9b7317caf3e20087c9f92a05a499157213))
+
 # [11.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.3...v11.0.0-beta.4) (2026-08-21)
 
 ### Bug Fixes
