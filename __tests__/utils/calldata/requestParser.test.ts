@@ -50,6 +50,99 @@ describe('requestParser', () => {
       expect(parsedField).toEqual(['1', '599374153440608178282648329058547045']);
     });
 
+    describe('long string in place of an Array<felt252>', () => {
+      // 33 characters : the split isolates a chunk that looks like a decimal number
+      const longText = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567';
+      // 37 characters : the split isolates a chunk that looks like a hex string
+      const longTextHex = `${'A'.repeat(31)}0x1234`;
+      const firstChunk =
+        '115302387975643577911206786302384344998065844015382184106956994275072750645';
+      const firstChunkHex =
+        '115295431991813000957906158479851623934781694290236468482915792900036051265';
+
+      const parse = (type: string, value: unknown) =>
+        parseCalldataField({
+          argsIterator: [value][Symbol.iterator](),
+          input: getAbiEntry(type),
+          structs: getAbiStructs(),
+          enums: getAbiEnums(),
+          parser: new AbiParser1([getAbiEntry(type)]),
+        });
+
+      test('should encode a chunk that looks like a number as text', () => {
+        expect(parse('core::array::Array::<core::felt252>', longText)).toEqual([
+          '2',
+          firstChunk,
+          '13879', // '67' encoded as text, not as the number 67
+        ]);
+      });
+
+      test('should encode a chunk that looks like a hex string as text', () => {
+        expect(parse('core::array::Array::<core::felt252>', longTextHex)).toEqual([
+          '2',
+          firstChunkHex,
+          '53292779582260', // '0x1234' encoded as text, not as the number 4660
+        ]);
+      });
+
+      test('should not convert the items of an array provided by the caller', () => {
+        expect(parse('core::array::Array::<core::felt252>', ['67'])).toEqual(['1', '67']);
+      });
+
+      test('should convert a long string in a struct member', () => {
+        expect(parse('struct_with_felt_array', { felt_array: longText })).toEqual([
+          '2',
+          firstChunk,
+          '13879',
+        ]);
+      });
+
+      test('should convert a long string in a tuple member', () => {
+        expect(
+          parse('(core::array::Array::<core::felt252>, core::felt252)', { 0: longText, 1: 5 })
+        ).toEqual(['2', firstChunk, '13879', '5']);
+      });
+
+      test('should convert a long string in an array of arrays', () => {
+        expect(
+          parse('core::array::Array::<core::array::Array::<core::felt252>>', [longText])
+        ).toEqual(['1', '2', firstChunk, '13879']);
+      });
+
+      test('should convert a long string in an enum variant', () => {
+        expect(
+          parse(
+            'core::option::Option::<core::array::Array::<core::felt252>>',
+            new CairoOption<string>(0, longText)
+          )
+        ).toEqual(['0', '2', firstChunk, '13879']);
+      });
+
+      test('should throw when the array is not an array of felt252', () => {
+        expect(() => parse('core::array::Array::<core::integer::u8>', longText)).toThrow(
+          new Error(`ABI expected parameter test to be array, got ${longText}`)
+        );
+      });
+
+      test('should throw when a nested array is not an array of felt252', () => {
+        expect(() =>
+          parse('core::array::Array::<core::array::Array::<core::integer::u8>>', [longText])
+        ).toThrow(
+          new Error(
+            `ABI expected type core::array::Array::<core::integer::u8> to be array, got ${longText}`
+          )
+        );
+      });
+
+      test('should throw when a struct member is not an array of felt252', () => {
+        expect(() => parse('struct_with_u8_array', { u8_array: longText })).toThrow(
+          new Error(
+            `ABI expected type core::array::Array::<core::integer::u8> to be array, got ${longText}`
+          )
+        );
+      });
+    });
+
     test('should return parsed calldata field for NonZero type', () => {
       const args = [true];
       const argsIterator = args[Symbol.iterator]();

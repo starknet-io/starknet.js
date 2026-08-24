@@ -36,6 +36,30 @@ export const getAbiStructs = (): AbiStructs => ({
     name: 'cairo__struct',
     type: 'struct',
   },
+  struct_with_felt_array: {
+    members: [
+      {
+        name: 'felt_array',
+        type: 'core::array::Array::<core::felt252>',
+        offset: 0,
+      },
+    ],
+    size: 1,
+    name: 'cairo__struct_with_felt_array',
+    type: 'struct',
+  },
+  struct_with_u8_array: {
+    members: [
+      {
+        name: 'u8_array',
+        type: 'core::array::Array::<core::integer::u8>',
+        offset: 0,
+      },
+    ],
+    size: 1,
+    name: 'cairo__struct_with_u8_array',
+    type: 'struct',
+  },
 });
 
 export const getAbiEnums = (): AbiEnums => ({
@@ -49,6 +73,23 @@ export const getAbiEnums = (): AbiEnums => ({
     ],
     size: 2,
     name: 'test_cairo',
+    type: 'enum',
+  },
+  'core::option::Option::<core::array::Array::<core::felt252>>': {
+    variants: [
+      {
+        name: 'Some',
+        type: 'core::array::Array::<core::felt252>',
+        offset: 0,
+      },
+      {
+        name: 'None',
+        type: '()',
+        offset: 1,
+      },
+    ],
+    size: 2,
+    name: 'core::option::Option::<core::array::Array::<core::felt252>>',
     type: 'enum',
   },
 });

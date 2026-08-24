@@ -25,16 +25,17 @@ import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
 import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
-import { addHexPrefix, removeHexPrefix } from '../encode';
+import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToUint8Array } from '../encode';
 import { toHex } from '../num';
 import { isText, splitLongString } from '../shortString';
-import { isUndefined, isString } from '../typed';
+import { isUndefined } from '../typed';
 import {
   felt,
   getArrayType,
   isTypeArray,
   isTypeEnum,
   isTypeEthAddress,
+  isTypeFelt,
   isTypeNonZero,
   isTypeOption,
   isTypeResult,
@@ -54,6 +55,59 @@ import { AbiParserInterface } from './parser';
 import extractTupleMemberTypes from './tuple';
 
 // TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
+
+/**
+ * Test if a long string can be provided in place of an array of values.
+ * Only an array of felt252 can be filled this way, as a felt252 holds up to 31 characters of text.
+ * @param {string} type type from abi
+ * @returns {boolean} Returns true if a long string is a valid input for this type
+ * @example
+ * ```typescript
+ * const result = acceptsLongString('core::array::Array::<core::felt252>');
+ * // result = true
+ * const result2 = acceptsLongString('core::array::Array::<core::integer::u8>');
+ * // result2 = false
+ * ```
+ */
+function acceptsLongString(type: string): boolean {
+  return isTypeArray(type) && isTypeFelt(getArrayType(type));
+}
+
+/**
+ * Convert a long string to the array of felt252 that Cairo is expecting.
+ * Each chunk is encoded to its explicit hex value : the value has already been identified as text,
+ * so a chunk that looks like a number ('67') or like a hex string ('0x12') has to stay text.
+ * @param {string} longStr text to convert
+ * @returns {string[]} an array of hex strings, one per chunk of 31 characters
+ * @example
+ * ```typescript
+ * const result = longStringToFeltArray('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567');
+ * // result = [
+ * //   '0x4142434445464748494a4b4c4d4e4f505152535455565758595a3132333435',
+ * //   '0x3637'
+ * // ]
+ * ```
+ */
+function longStringToFeltArray(longStr: string): string[] {
+  return splitLongString(longStr).map((chunk) => addHexPrefix(buf2hex(utf8ToUint8Array(chunk))));
+}
+
+/**
+ * Build the message of the error thrown when an array type receives an unusable value
+ * @param {string} subject faulty input, as described in the error message
+ * @param {string} type type from abi
+ * @param {unknown} value value provided
+ * @returns {string} the error message
+ * @example
+ * ```typescript
+ * const result = arrayInputErrorMessage('parameter tokens', 'core::array::Array::<core::integer::u8>', 'abc');
+ * // result = "ABI expected parameter tokens to be array, got abc"
+ * ```
+ */
+function arrayInputErrorMessage(subject: string, type: string, value: unknown): string {
+  const expected = acceptsLongString(type) ? 'array or long string' : 'array';
+  return `ABI expected ${subject} to be ${expected}, got ${value}`;
+}
 
 /**
  * parse base types
@@ -187,6 +241,20 @@ function parseCalldataValue({
         parseCalldataValue({ element: it, type: arrayType, structs, enums, parser })
       );
     }, [] as string[]);
+  }
+
+  // value is a long string provided in place of an Array<felt252>, at any depth
+  if (isTypeArray(type) && !Array.isArray(element)) {
+    if (!acceptsLongString(type) || !isText(element)) {
+      throw Error(arrayInputErrorMessage(`type ${type}`, type, element));
+    }
+    return parseCalldataValue({
+      element: longStringToFeltArray(element),
+      type,
+      structs,
+      enums,
+      parser,
+    });
   }
 
   // value is Array
@@ -428,7 +496,7 @@ export function parseCalldataField({
   parser: AbiParserInterface;
 }): string | string[] {
   const { name, type } = input;
-  let { value } = argsIterator.next();
+  const { value } = argsIterator.next();
 
   switch (true) {
     // Fixed array
@@ -439,12 +507,8 @@ export function parseCalldataField({
       return parseCalldataValue({ element: value, type: input.type, structs, enums, parser });
     // Normal Array
     case isTypeArray(type):
-      if (!Array.isArray(value) && !isText(value)) {
-        throw Error(`ABI expected parameter ${name} to be array or long string, got ${value}`);
-      }
-      if (isString(value)) {
-        // long string match cairo felt*
-        value = splitLongString(value);
+      if (!Array.isArray(value) && !(acceptsLongString(type) && isText(value))) {
+        throw Error(arrayInputErrorMessage(`parameter ${name}`, type, value));
       }
       return parseCalldataValue({ element: value, type: input.type, structs, enums, parser });
     case isTypeNonZero(type):
