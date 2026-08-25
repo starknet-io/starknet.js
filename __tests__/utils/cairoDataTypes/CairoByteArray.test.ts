@@ -1,4 +1,5 @@
 import { CairoByteArray, CairoBytes31, CairoFelt252, CairoUint32 } from '../../../src';
+import { byteArrayFromString } from '../../../src/utils/calldata/byteArray';
 
 describe('CairoByteArray Unit Tests', () => {
   describe('String constructor', () => {
@@ -782,6 +783,152 @@ describe('CairoByteArray Unit Tests', () => {
       expect(elements).toHaveLength(Number(apiResponse[0]) + 1);
       elements.slice(0, -1).forEach((e) => expect(e).toHaveLength(31));
       expect(elements.at(-1)).toHaveLength(Number(apiResponse.at(-1)));
+    });
+  });
+
+  describe('fromText static method', () => {
+    // every expected value below comes from Buffer.from(text, 'utf8').toString('hex'),
+    // then BigInt() of that hex - computed outside the library
+    test('should encode a text that spells a decimal number as text', () => {
+      const byteArray = CairoByteArray.fromText('12345');
+
+      expect(byteArray.data).toEqual([]);
+      expect(byteArray.pending_word.toHexString()).toBe('0x3132333435');
+      expect(byteArray.pending_word_len.toBigInt()).toBe(5n);
+      expect(byteArray.toApiRequest()).toEqual(['0', '211295614005', '5']);
+    });
+
+    test('should encode a text that spells a hex string as text', () => {
+      const byteArray = CairoByteArray.fromText('0x4142');
+
+      expect(byteArray.toHexString()).toBe('0x307834313432');
+      expect(byteArray.pending_word_len.toBigInt()).toBe(6n);
+      expect(byteArray.toApiRequest()).toEqual(['0', '53292829848626', '6']);
+    });
+
+    test('should read the same strings differently from the constructor', () => {
+      // the constructor reads '12345' as the decimal number 12345, whose bytes are 0x30 0x39,
+      // and '0x4142' as the two bytes 0x41 0x42 - both legitimate, neither one the text
+      expect(new CairoByteArray('12345').toHexString()).toBe('0x3039');
+      expect(new CairoByteArray('0x4142').toHexString()).toBe('0x4142');
+      expect(CairoByteArray.fromText('12345').toHexString()).toBe('0x3132333435');
+      expect(CairoByteArray.fromText('0x4142').toHexString()).toBe('0x307834313432');
+    });
+
+    test('should leave a text that looks like neither untouched', () => {
+      // 'Take care.' already reached its UTF-8 bytes through the constructor
+      expect(CairoByteArray.fromText('Take care.').toApiRequest()).toEqual(
+        new CairoByteArray('Take care.').toApiRequest()
+      );
+      expect(CairoByteArray.fromText('héllo').toApiRequest()).toEqual(
+        new CairoByteArray('héllo').toApiRequest()
+      );
+    });
+
+    test('should cut a long text into 31-byte words rather than read it as one number', () => {
+      const digits = '1'.repeat(40); // 40 UTF-8 bytes : one full word, then 9 pending bytes
+      const byteArray = CairoByteArray.fromText(digits);
+
+      expect(byteArray.data).toHaveLength(1);
+      expect(byteArray.data[0].toBigInt()).toBe(BigInt(`0x${'31'.repeat(31)}`));
+      expect(byteArray.pending_word.toHexString()).toBe(`0x${'31'.repeat(9)}`);
+      expect(byteArray.pending_word_len.toBigInt()).toBe(9n);
+      expect(byteArray.decodeUtf8()).toBe(digits);
+      // read as one number, the same 40 characters hold in 17 bytes and spell something else
+      expect(new CairoByteArray(digits).pending_word_len.toBigInt()).toBe(17n);
+    });
+
+    test('should round trip through decodeUtf8', () => {
+      expect(CairoByteArray.fromText('12345').decodeUtf8()).toBe('12345');
+      expect(CairoByteArray.fromText('héllo').decodeUtf8()).toBe('héllo');
+    });
+
+    test('should handle an empty text', () => {
+      const byteArray = CairoByteArray.fromText('');
+
+      expect(byteArray.data).toEqual([]);
+      expect(byteArray.pending_word_len.toBigInt()).toBe(0n);
+      expect(byteArray.toApiRequest()).toEqual(['0', '0', '0']);
+    });
+  });
+
+  describe('ByteArray components constructor', () => {
+    // 'A'.repeat(31) then 'BC' : one full data word, then a two-byte pending word.
+    // 0x41 is 'A', 0x4243 is 'BC', and the felt is BigInt of the 62 hex characters.
+    const fullWordHex = `0x${'41'.repeat(31)}`;
+    const fullWordFelt = BigInt(fullWordHex).toString();
+    const text = `${'A'.repeat(31)}BC`;
+
+    test('should adopt a plain ByteArray object', () => {
+      const byteArray = new CairoByteArray({
+        data: [],
+        pending_word: '0x3132333435',
+        pending_word_len: 5,
+      });
+
+      expect(byteArray.toApiRequest()).toEqual(['0', '211295614005', '5']);
+      expect(byteArray.decodeUtf8()).toBe('12345');
+    });
+
+    test('should adopt the object returned by byteArrayFromString', () => {
+      expect(new CairoByteArray(byteArrayFromString('héllo')).decodeUtf8()).toBe('héllo');
+      expect(new CairoByteArray(byteArrayFromString(text)).decodeUtf8()).toBe(text);
+    });
+
+    test('should adopt data words given as a hex string', () => {
+      const byteArray = new CairoByteArray({
+        data: [fullWordHex],
+        pending_word: '0x4243',
+        pending_word_len: 2,
+      });
+
+      expect(byteArray.toApiRequest()).toEqual(['1', fullWordFelt, '16963', '2']);
+      expect(byteArray.decodeUtf8()).toBe(text);
+    });
+
+    test('should adopt data words given as a bigint', () => {
+      const byteArray = new CairoByteArray({
+        data: [BigInt(fullWordHex)],
+        pending_word: 16963n,
+        pending_word_len: 2,
+      });
+
+      expect(byteArray.toApiRequest()).toEqual(['1', fullWordFelt, '16963', '2']);
+      expect(byteArray.decodeUtf8()).toBe(text);
+    });
+
+    test('should adopt an existing CairoByteArray', () => {
+      const source = CairoByteArray.fromText('12345');
+      const copy = new CairoByteArray(source);
+
+      expect(copy.toApiRequest()).toEqual(['0', '211295614005', '5']);
+      expect(copy.decodeUtf8()).toBe('12345');
+    });
+
+    test('should adopt the components as they are, without cutting them again', () => {
+      // a pending word longer than what its content needs stays as declared
+      const byteArray = new CairoByteArray({
+        data: [],
+        pending_word: '0x4142',
+        pending_word_len: 4,
+      });
+
+      expect(byteArray.pending_word_len.toBigInt()).toBe(4n);
+      expect(byteArray.toElements()).toEqual([new Uint8Array([0, 0, 0x41, 0x42])]);
+    });
+
+    test('should recognise the shape in is()', () => {
+      expect(CairoByteArray.is({ data: [], pending_word: 0, pending_word_len: 0 })).toBe(true);
+      expect(CairoByteArray.is(CairoByteArray.fromText('12345'))).toBe(true);
+      expect(CairoByteArray.is({ data: 'ABC' } as any)).toBe(false);
+      expect(CairoByteArray.is({ pending_word: 0, pending_word_len: 0 } as any)).toBe(false);
+      expect(CairoByteArray.is({ data: [], pending_word: 0 } as any)).toBe(false);
+    });
+
+    test('should still reject an object that is not a ByteArray', () => {
+      expect(() => new CairoByteArray({} as any)).toThrow(
+        'Invalid input for CairoByteArray: the only objects supported are Uint8Array, Buffer, and { data, pending_word, pending_word_len }'
+      );
     });
   });
 });

@@ -120,6 +120,14 @@ CairoBytes31.fromText('12345').toHexString(); // 0x3132333435 — the text
 new CairoBytes31('12345').toHexString(); //     0x3039       — the number 12345
 ```
 
+**Passing the result to a contract.** For a `bytes31` parameter, hand over the object itself: v11
+accepts it. For a `felt252` parameter, convert it first, because a felt252 reads a number.
+
+```typescript
+await contract.set_word(CairoBytes31.fromText('12345')); //             a bytes31 parameter
+await contract.set_id(CairoBytes31.fromText('12345').toHexString()); // a felt252 parameter
+```
+
 **What you gain.** The removed encoder was ASCII-only, and for any byte below `0x10` it emitted a
 single hex digit instead of two, which misaligned every following byte:
 
@@ -418,6 +426,25 @@ See [When a subscription closes](./websocket_channel.md#when-a-subscription-clos
 `src/channel/` is reorganized into per-version directories, and the `RPC09`, `RPC0102` and `RPC0103`
 namespaces now export a `SubscriptionChannel` alongside their `RpcChannel`. Pairing the two of the
 same version is what makes a version mismatch between requests and subscriptions impossible.
+
+### Text for a `ByteArray` parameter
+
+A `ByteArray` is a sequence of bytes, so its constructor reads a string the way calldata does:
+`'12345'` is the number 12345, `'0x4142'` is the two bytes `0x41 0x42`, which spell `AB`. A text
+that spells a number had no way through. `CairoByteArray.fromText()` is that way, and mirrors
+`CairoBytes31.fromText()`.
+
+```typescript
+CairoByteArray.fromText('12345').toHexString(); // 0x3132333435 — the text
+new CairoByteArray('12345').toHexString(); //     0x3039       — the number 12345
+```
+
+Hand the result to the contract as it is — v11 accepts an already built `CairoByteArray`, and also
+the object returned by `byteArray.byteArrayFromString()`, which a contract call used to refuse.
+
+```typescript
+await contract.set_label(CairoByteArray.fromText('12345'));
+```
 
 ## Need Help?
 
