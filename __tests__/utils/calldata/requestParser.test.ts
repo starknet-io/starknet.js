@@ -1,13 +1,20 @@
 import { parseCalldataField } from '../../../src/utils/calldata/requestParser';
 import { getAbiEnums, getAbiStructs, getAbiEntry } from '../../factories/abi';
 import {
+  Abi,
   AbiParser1,
+  CairoByteArray,
+  CairoBytes31,
   CairoCustomEnum,
   CairoOption,
   CairoResult,
+  CallData,
   ETH_ADDRESS,
   NON_ZERO_PREFIX,
+  ValidateType,
 } from '../../../src';
+import { byteArrayFromString } from '../../../src/utils/calldata/byteArray';
+import { ABI as StringABI } from '../../../__mocks__/cairo/cairo240/string';
 
 describe('requestParser', () => {
   describe('parseCalldataField', () => {
@@ -385,6 +392,114 @@ describe('requestParser', () => {
           parser: new AbiParser1([getAbiEntry('core::array::Array::<felt>')]),
         })
       ).toThrow(new Error('ABI expected parameter test to be array or long string, got 256'));
+    });
+  });
+
+  describe('a text that spells a number, through the abi', () => {
+    // proceed_string(mess: core::byte_array::ByteArray) and proceed_bytes31(str: bytes31),
+    // taken from the compiled test contract rather than from a hand-written abi
+    const stringCallData = new CallData(StringABI as Abi);
+
+    // Buffer.from('12345', 'utf8').toString('hex') is '3132333435', whose BigInt is this
+    const textFelt = '211295614005';
+
+    test('should keep reading a bare string the way calldata does', () => {
+      // '12345' is the decimal number 12345, whose two bytes 0x30 0x39 spell the text '09'
+      expect(stringCallData.compile('proceed_string', ['12345'])).toEqual(['0', '12345', '2']);
+      expect(stringCallData.compile('proceed_bytes31', ['12345'])).toEqual(['12345']);
+    });
+
+    test('should send the text itself when it is built with fromText', () => {
+      expect(stringCallData.compile('proceed_string', [CairoByteArray.fromText('12345')])).toEqual([
+        '0',
+        textFelt,
+        '5',
+      ]);
+      expect(stringCallData.compile('proceed_bytes31', [CairoBytes31.fromText('12345')])).toEqual([
+        textFelt,
+      ]);
+    });
+
+    test('should accept the object returned by byteArrayFromString', () => {
+      expect(stringCallData.compile('proceed_string', [byteArrayFromString('12345')])).toEqual([
+        '0',
+        textFelt,
+        '5',
+      ]);
+    });
+
+    test('should pass the validation a contract call runs before compiling', () => {
+      expect(() =>
+        stringCallData.validate(ValidateType.CALL, 'proceed_string', [
+          CairoByteArray.fromText('12345'),
+        ])
+      ).not.toThrow();
+      expect(() =>
+        stringCallData.validate(ValidateType.CALL, 'proceed_bytes31', [
+          CairoBytes31.fromText('12345'),
+        ])
+      ).not.toThrow();
+    });
+
+    test('should validate and compile named arguments in a single call', () => {
+      // named arguments are the only form that validates from inside compile
+      expect(
+        stringCallData.compile('proceed_string', { mess: CairoByteArray.fromText('12345') })
+      ).toEqual(['0', textFelt, '5']);
+      expect(
+        stringCallData.compile('proceed_bytes31', { str: CairoBytes31.fromText('12345') })
+      ).toEqual([textFelt]);
+    });
+
+    describe('at any abi depth', () => {
+      // no compiled contract of the repository exposes a nested ByteArray, so the two nesting
+      // cases are declared on top of the real abi - the ByteArray struct itself still comes
+      // from the contract, it is not written again here
+      const nestedCallData = new CallData([
+        ...StringABI,
+        {
+          type: 'struct',
+          name: 'string::string::Labelled',
+          members: [
+            { name: 'label', type: 'core::byte_array::ByteArray' },
+            { name: 'n', type: 'core::integer::u8' },
+          ],
+        },
+        {
+          type: 'function',
+          name: 'proceed_labelled',
+          inputs: [{ name: 'item', type: 'string::string::Labelled' }],
+          outputs: [],
+          state_mutability: 'view',
+        },
+        {
+          type: 'function',
+          name: 'proceed_many',
+          inputs: [{ name: 'items', type: 'core::array::Array::<core::byte_array::ByteArray>' }],
+          outputs: [],
+          state_mutability: 'view',
+        },
+      ] as Abi);
+
+      test('should reach a ByteArray held by a struct member', () => {
+        expect(
+          nestedCallData.compile('proceed_labelled', [
+            { label: CairoByteArray.fromText('12345'), n: 1 },
+          ])
+        ).toEqual(['0', textFelt, '5', '1']);
+      });
+
+      test('should reach a ByteArray held by an array', () => {
+        expect(
+          nestedCallData.compile('proceed_many', [[CairoByteArray.fromText('12345')]])
+        ).toEqual(['1', '0', textFelt, '5']);
+      });
+
+      test('should reach a byteArrayFromString object held by an array', () => {
+        expect(
+          nestedCallData.compile('proceed_many', { items: [byteArrayFromString('12345')] })
+        ).toEqual(['1', '0', textFelt, '5']);
+      });
     });
   });
 });

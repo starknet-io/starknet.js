@@ -233,7 +233,7 @@ describe('Buffer Environment Tests', () => {
       // Test invalid inputs
       expect(() => new CairoByteArray(null as any)).toThrow(/Invalid input: null/);
       expect(() => new CairoByteArray({} as any)).toThrow(
-        /Invalid input.*objects are not supported/
+        /Invalid input for CairoByteArray: the only objects supported/
       );
     });
   });

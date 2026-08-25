@@ -164,6 +164,16 @@ You can send to Starknet.js methods: string.
 await myContract.my_function('http://addressOfMyERC721pictures/image1.jpg');
 ```
 
+If your text may spell a number, encode it explicitly:
+
+```typescript
+await myContract.my_function(CairoByteArray.fromText('12345'));
+```
+
+`fromText` is what tells the library the argument is text: the `CairoByteArray` constructor reads
+`'12345'` as a decimal number and `'0x4142'` as the two bytes `0x41 0x42`, so a string that spells
+a number would not be encoded as text.
+
 To force to send a shortString as a ByteArray with `CallData.compile()`:
 
 ```typescript
