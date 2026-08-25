@@ -1,3 +1,9 @@
+# [11.0.0-beta.6](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.5...v11.0.0-beta.6) (2026-08-25)
+
+### Bug Fixes
+
+- **calldata:** text reaches a ByteArray, whatever it spells ([509c9f8](https://github.com/starknet-io/starknet.js/commit/509c9f80f02ef1f5751bcdbd45a8612c2479f6f8))
+
 # [11.0.0-beta.5](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.4...v11.0.0-beta.5) (2026-08-24)
 
 ### Bug Fixes
