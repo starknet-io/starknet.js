@@ -1,3 +1,11 @@
+# [11.0.0-beta.7](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.6...v11.0.0-beta.7) (2026-08-26)
+
+### Bug Fixes
+
+- **calldata:** a Cairo type serializes itself, abi or not ([c0943fb](https://github.com/starknet-io/starknet.js/commit/c0943fb173ab7e914ae213865c8cf7cf78898746))
+- **calldata:** an abi slot accepts the Cairo type it declares ([b9fa576](https://github.com/starknet-io/starknet.js/commit/b9fa5769aba339a27a989d249d4adef1b04f79a8))
+- **calldata:** out-of-range arguments refused, negative results come back negative ([41bf052](https://github.com/starknet-io/starknet.js/commit/41bf052f11a66d9b72e8db2a964b86c8161546b1))
+
 # [11.0.0-beta.6](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.5...v11.0.0-beta.6) (2026-08-25)
 
 ### Bug Fixes
