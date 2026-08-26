@@ -16,6 +16,7 @@ import {
 } from '../../types';
 import assert from '../assert';
 import { CairoFelt252 } from '../cairoDataTypes/felt';
+import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { toHex } from '../num';
 import { isBigInt } from '../typed';
 import { getSelectorFromName } from '../hash/selector';
@@ -169,8 +170,23 @@ export class CallData {
 
   /**
    * Compile contract callData without abi
+   *
+   * An instance of a Cairo type class — `CairoByteArray`, `CairoBytes31`, `CairoUint256`, … — is
+   * serialized by that class, so it yields the same felts here as it would through an abi. Any
+   * other object is walked field by field, which is what makes a plain `{ low, high }` and the
+   * object of `byteArrayFromString` work just as well.
+   *
+   * A `string[]` value is always read as a Cairo array and gains a length in front of it, an
+   * already compiled one included : pass the instance itself rather than its `toApiRequest()`.
    * @param rawArgs RawArgs representing cairo method arguments or string array of compiled data
    * @returns Calldata
+   * @example
+   * ```typescript
+   * const result = CallData.compile({ text: CairoByteArray.fromText('12345') });
+   * // result = ["0", "211295614005", "5"]
+   * const result2 = CallData.compile({ text: CairoByteArray.fromText('12345').toApiRequest() });
+   * // result2 = ["3", "0", "211295614005", "5"]   the three felts, behind an array length
+   * ```
    */
   static compile(rawArgs: RawArgs): Calldata {
     const createTree = (obj: object) => {
@@ -183,6 +199,25 @@ export class CallData {
           const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
           if (isBigInt(value)) return [[`${prefix}${kk}`, felt(value)]];
           if (Object(value) === value) {
+            // a Cairo type instance already knows its own wire format, and it is the one the abi
+            // path uses. Enumerating it instead would spell out its internals — the byte buffer of
+            // a felt252 or a bytes31 byte by byte, the three fields of a ByteArray.
+            // Tested on the value rather than on `keys` below, which only reaches one level of
+            // prototype: a subclass would otherwise fall back to being enumerated.
+            if (typeof (value as { toApiRequest?: unknown }).toApiRequest === 'function') {
+              // unpacked felt by felt: the array itself must never become a value in the tree,
+              // where it would be read as a Cairo array and gain a length in front of it
+              return (value as { toApiRequest: () => string[] })
+                .toApiRequest()
+                .map((serialized, index) => [`${prefix}${kk}.${index}`, serialized]);
+            }
+            // the one Cairo type class that cannot serialize itself: its items may be of any type,
+            // and turning those into felts without an abi is this function's job, not the class's.
+            // `compile()` gives the shape it documents for exactly this — items keyed by index, so
+            // no length is emitted before them, and each one is walked here like any other value.
+            if (value instanceof CairoFixedArray) {
+              return getEntries(value.compile(), `${prefix}${kk}.`);
+            }
             const methodsKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(value));
             const keys = [...Object.getOwnPropertyNames(value), ...methodsKeys];
             if (keys.includes('isSome') && keys.includes('isNone')) {
@@ -220,8 +255,10 @@ export class CallData {
             // normal object
             return getEntries(value, `${prefix}${kk}.`);
           }
-          // no ABI here, so no declared type to arbitrate: the value is taken for whatever
-          // CairoFelt252 can make of it — number, hex or decimal string, boolean, or text
+          // a leaf carries no type of its own, and there is no abi to declare one — unlike the
+          // values above, which are arbitrated on the type their own class names. So the value is
+          // taken for whatever CairoFelt252 can make of it — number, hex or decimal string,
+          // boolean, or text. Not bigint: those are taken 40 lines above, before this branch
           return [[`${prefix}${kk}`, new CairoFelt252(value).toBigInt().toString()]];
         });
       };
