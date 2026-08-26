@@ -25,6 +25,7 @@ import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
 import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
+import { unwrapCairoScalar } from '../cairoDataTypes/scalar';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToUint8Array } from '../encode';
 import { toHex } from '../num';
 import { isText, splitLongString } from '../shortString';
@@ -117,13 +118,16 @@ function arrayInputErrorMessage(subject: string, type: string, value: unknown): 
  */
 function parseBaseTypes({
   type,
-  val,
+  val: rawVal,
   parser,
 }: {
   type: string;
   val: unknown;
   parser: AbiParserInterface;
 }): AllowArray<string> {
+  // an instance of the very type declared here stands for the number it carries, so a value the
+  // caller has already typed is read exactly like a bare one. Every base type passes through here
+  const val = unwrapCairoScalar(rawVal, type);
   switch (true) {
     case CairoUint256.isAbiType(type):
       return parser.getRequestParser(type)(val);
@@ -228,7 +232,11 @@ function parseCalldataValue({
       const array = new CairoFixedArray(element, type);
       values = array.content;
     } else if (typeof element === 'object') {
-      values = Object.values(element as object);
+      // an instance holds its items in `content`; enumerating it would yield its two fields
+      // instead. The size is still checked against the abi, whose type prevails over the
+      // instance's own
+      values =
+        element instanceof CairoFixedArray ? element.content : Object.values(element as object);
       assert(
         values.length === CairoFixedArray.getFixedArraySize(type),
         `ABI type ${type}: object provided do not includes  ${CairoFixedArray.getFixedArraySize(type)} items. ${values.length} items provided.`
@@ -424,10 +432,16 @@ function parseCalldataValue({
     return parseBaseTypes({ type: getArrayType(type), val: element, parser });
   }
 
-  if (typeof element === 'object') {
+  // reached at any depth: a one-felt instance of the declared type is a value, not a composite to
+  // be walked into, so it is reduced before this guard rather than refused by it
+  const scalar = unwrapCairoScalar(element, type);
+  // a bytes31 stays an instance rather than becoming a number, and is the only Cairo type to reach
+  // this guard as one — ByteArray, u256, u512 and fixed arrays all return above. Its own class
+  // reads it just below
+  if (typeof scalar === 'object' && !(scalar instanceof CairoBytes31)) {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
   }
-  return parseBaseTypes({ type, val: element, parser });
+  return parseBaseTypes({ type, val: scalar, parser });
 }
 
 /**

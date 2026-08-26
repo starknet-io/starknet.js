@@ -10,7 +10,7 @@ import { addCompiledFlag } from '../helpers';
 export class CairoUint32 {
   data: bigint;
 
-  static abiSelector = 'core::u32::u32';
+  static abiSelector = 'core::integer::u32';
 
   constructor(data: BigNumberish) {
     CairoUint32.validate(data);

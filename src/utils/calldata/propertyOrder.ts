@@ -137,6 +137,11 @@ export default function orderPropsByAbi(
   function orderFixedArray(input: Array<any> | Record<string, any>, abiParam: string): Array<any> {
     const typeInFixedArray = CairoFixedArray.getFixedArrayType(abiParam);
     const arraySize = CairoFixedArray.getFixedArraySize(abiParam);
+    // an instance holds its items in `content`; its two fields are not the items. Reading them
+    // here also hands a plain array to everything downstream
+    if (input instanceof CairoFixedArray) {
+      return orderFixedArray(input.content, abiParam);
+    }
     if (Array.isArray(input)) {
       if (arraySize !== input.length) {
         throw new Error(
