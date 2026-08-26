@@ -12,6 +12,7 @@ import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { unwrapCairoScalar } from '../cairoDataTypes/scalar';
+import { RANGE_ETH_ADDRESS } from '../../global/constants';
 import { CairoInt8 } from '../cairoDataTypes/int8';
 import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
@@ -120,6 +121,13 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       );
       break;
 
+    case Uint.u96:
+      assert(
+        param >= 0n && param <= 2n ** 96n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^96-1]`
+      );
+      break;
+
     case Uint.u128:
       assert(
         param >= 0n && param <= 2n ** 128n - 1n,
@@ -194,8 +202,7 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
     assert(!isObject(parameter), `EthAddress type is waiting a BigNumberish. Got "${parameter}"`);
     const param = BigInt(parameter.toString(10));
     assert(
-      // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
-      param >= 0n && param <= 2n ** 160n - 1n,
+      param >= RANGE_ETH_ADDRESS.min && param <= RANGE_ETH_ADDRESS.max,
       `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^160-1]`
     );
     return;

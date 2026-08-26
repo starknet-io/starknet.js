@@ -17,6 +17,7 @@ import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { CairoUint8 } from '../cairoDataTypes/uint8';
 import { CairoUint16 } from '../cairoDataTypes/uint16';
+import { CairoUint32 } from '../cairoDataTypes/uint32';
 import { CairoUint64 } from '../cairoDataTypes/uint64';
 import { CairoUint96 } from '../cairoDataTypes/uint96';
 import { CairoUint128 } from '../cairoDataTypes/uint128';
@@ -137,6 +138,8 @@ function parseBaseTypes({
       return parser.getRequestParser(type)(val);
     case CairoUint16.isAbiType(type):
       return parser.getRequestParser(type)(val);
+    case CairoUint32.isAbiType(type):
+      return parser.getRequestParser(type)(val);
     case CairoUint64.isAbiType(type):
       return parser.getRequestParser(type)(val);
     case CairoUint96.isAbiType(type):
@@ -154,6 +157,10 @@ function parseBaseTypes({
     case CairoInt128.isAbiType(type):
       return parser.getRequestParser(type)(val);
     case CairoBytes31.isAbiType(type):
+      return parser.getRequestParser(type)(val);
+    // reached from parseCalldataField and from the struct branch of parseCalldataValue. Without
+    // this it fell to the felt252 default, which only bounds the field, not the 160 bits
+    case isTypeEthAddress(type):
       return parser.getRequestParser(type)(val);
     case isTypeSecp256k1Point(type): {
       const pubKeyETH = removeHexPrefix(toHex(val as BigNumberish)).padStart(128, '0');

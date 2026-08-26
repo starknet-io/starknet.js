@@ -42,6 +42,10 @@ export const RANGE_I32 = range(-(2n ** 31n), 2n ** 31n - 1n);
 export const RANGE_I64 = range(-(2n ** 63n), 2n ** 63n - 1n);
 export const RANGE_I128 = range(-(2n ** 127n), 2n ** 127n - 1n);
 
+// An Ethereum address, carried in a felt but only 160 bits wide
+// https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
+export const RANGE_ETH_ADDRESS = range(ZERO, 2n ** 160n - 1n);
+
 export const LegacyUDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
