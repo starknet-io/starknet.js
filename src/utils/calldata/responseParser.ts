@@ -17,6 +17,7 @@ import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { CairoUint8 } from '../cairoDataTypes/uint8';
 import { CairoUint16 } from '../cairoDataTypes/uint16';
+import { CairoUint32 } from '../cairoDataTypes/uint32';
 import { CairoUint64 } from '../cairoDataTypes/uint64';
 import { CairoUint96 } from '../cairoDataTypes/uint96';
 import { CairoUint128 } from '../cairoDataTypes/uint128';
@@ -68,6 +69,8 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
     case CairoUint8.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case CairoUint16.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoUint32.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case CairoUint64.isAbiType(type):
       return parser.getResponseParser(type)(it);

@@ -1,11 +1,15 @@
 import { CairoBytes31 } from '../../cairoDataTypes/bytes31';
 import { CairoByteArray } from '../../cairoDataTypes/byteArray';
-import { AbiEntryType } from '../../../types';
+import { AbiEntryType, ETH_ADDRESS } from '../../../types';
+import { RANGE_ETH_ADDRESS } from '../../../global/constants';
+import assert from '../../assert';
+import { addCompiledFlag } from '../../helpers';
 import { CairoFelt252 } from '../../cairoDataTypes/felt';
 import { CairoUint256 } from '../../cairoDataTypes/uint256';
 import { CairoUint512 } from '../../cairoDataTypes/uint512';
 import { CairoUint8 } from '../../cairoDataTypes/uint8';
 import { CairoUint16 } from '../../cairoDataTypes/uint16';
+import { CairoUint32 } from '../../cairoDataTypes/uint32';
 import { CairoUint64 } from '../../cairoDataTypes/uint64';
 import { CairoUint96 } from '../../cairoDataTypes/uint96';
 import { CairoUint128 } from '../../cairoDataTypes/uint128';
@@ -28,7 +32,15 @@ export type ParsingStrategy = {
 // TODO: extend for complex types like structs, tuples, enums, arrays, etc.
 
 /**
- * More robust parsing strategy
+ * The default parsing strategy.
+ *
+ * A request is validated, a response is only decoded. What the caller passes in is the caller's
+ * mistake to catch, so an argument goes through the class of its declared type and is refused
+ * when it does not fit. What a node answers is not, so a response is read as it comes — the
+ * declared type is used there only where reading needs it: a negative i8..i128, which is a field
+ * element on the wire and only its own class turns back into a negative number, a u256 or u512
+ * spread over several felts, a bytes31 or a ByteArray carrying bytes.
+ *
  * Configuration mapping - data-driven approach
  * Configure parsing strategy for each abi type
  */
@@ -44,6 +56,17 @@ export const hdParsingStrategy = {
     [CairoFelt252.abiSelector]: (val: unknown) => {
       return new CairoFelt252(val).toApiRequest();
     },
+    // The one entry whose bound is spelled out here rather than delegated: an EthAddress is a felt
+    // on the wire, narrowed to the 160 bits an Ethereum address occupies, and has no class of its
+    // own to hold that range.
+    [ETH_ADDRESS]: (val: unknown) => {
+      const value = new CairoFelt252(val).toBigInt();
+      assert(
+        value >= RANGE_ETH_ADDRESS.min && value <= RANGE_ETH_ADDRESS.max,
+        `Value is out of EthAddress range [${RANGE_ETH_ADDRESS.min}, ${RANGE_ETH_ADDRESS.max}]`
+      );
+      return addCompiledFlag([value.toString()]);
+    },
     [CairoUint256.abiSelector]: (val: unknown) => {
       return new CairoUint256(val).toApiRequest();
     },
@@ -55,6 +78,9 @@ export const hdParsingStrategy = {
     },
     [CairoUint16.abiSelector]: (val: unknown) => {
       return new CairoUint16(val).toApiRequest();
+    },
+    [CairoUint32.abiSelector]: (val: unknown) => {
+      return new CairoUint32(val).toApiRequest();
     },
     [CairoUint64.abiSelector]: (val: unknown) => {
       return new CairoUint64(val).toApiRequest();
@@ -97,20 +123,28 @@ export const hdParsingStrategy = {
     [CairoUint512.abiSelector]: (responseIterator: Iterator<string>) => {
       return CairoUint512.factoryFromApiResponse(responseIterator).toBigInt();
     },
+    // These five read the felt as it comes, without their own class. What that class would add
+    // here is a range assert, and refusing a node's answer turns a remote anomaly into an
+    // exception the caller can do nothing about — where the same assert on a request catches the
+    // caller's own mistake before any calldata leaves. The signed ones below keep their class
+    // because it does not check there, it decodes: a field element back into a negative number.
     [CairoUint8.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint8.factoryFromApiResponse(responseIterator).toBigInt();
+      return BigInt(getNext(responseIterator));
     },
     [CairoUint16.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint16.factoryFromApiResponse(responseIterator).toBigInt();
+      return BigInt(getNext(responseIterator));
+    },
+    [CairoUint32.abiSelector]: (responseIterator: Iterator<string>) => {
+      return BigInt(getNext(responseIterator));
     },
     [CairoUint64.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint64.factoryFromApiResponse(responseIterator).toBigInt();
+      return BigInt(getNext(responseIterator));
     },
     [CairoUint96.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint96.factoryFromApiResponse(responseIterator).toBigInt();
+      return BigInt(getNext(responseIterator));
     },
     [CairoUint128.abiSelector]: (responseIterator: Iterator<string>) => {
-      return CairoUint128.factoryFromApiResponse(responseIterator).toBigInt();
+      return BigInt(getNext(responseIterator));
     },
     [CairoInt8.abiSelector]: (responseIterator: Iterator<string>) => {
       return CairoInt8.factoryFromApiResponse(responseIterator).toBigInt();
@@ -131,7 +165,13 @@ export const hdParsingStrategy = {
 } as const;
 
 /**
- * Faster parsing strategy
+ * A faster strategy, opt-in through the second argument of `new CallData(abi, strategy)`.
+ *
+ * It buys that speed by not going through the class of the declared type, which costs two things
+ * the caller should weigh: an out-of-range u8/u16/u64/u96/u128 is serialized rather than refused,
+ * and a negative i8..i128 comes back from a call as its raw field element rather than as a
+ * negative number.
+ *
  * Configuration mapping - data-driven approach
  * Configure parsing strategy for each abi type
  */
@@ -146,19 +186,26 @@ export const fastParsingStrategy: ParsingStrategy = {
     [CairoFelt252.abiSelector]: (val: unknown) => {
       return new CairoFelt252(val).toApiRequest();
     },
+    // no 160-bit check here, for the same reason as the integers below
+    [ETH_ADDRESS]: (val: unknown) => {
+      return new CairoFelt252(val).toBigInt().toString();
+    },
     [CairoUint256.abiSelector]: (val: unknown) => {
       return new CairoUint256(val).toApiRequest();
     },
     [CairoUint512.abiSelector]: (val: unknown) => {
       return new CairoUint512(val).toApiRequest();
     },
-    // These five skip their own CairoUintNN class, which is what makes this strategy the fast one:
+    // These six skip their own CairoUintNN class, which is what makes this strategy the fast one:
     // no range check, just the conversion to a felt. CairoFelt252 accepts the same inputs as the
     // classes it stands in for, text included.
     [CairoUint8.abiSelector]: (val: unknown) => {
       return new CairoFelt252(val).toBigInt().toString();
     },
     [CairoUint16.abiSelector]: (val: unknown) => {
+      return new CairoFelt252(val).toBigInt().toString();
+    },
+    [CairoUint32.abiSelector]: (val: unknown) => {
       return new CairoFelt252(val).toBigInt().toString();
     },
     [CairoUint64.abiSelector]: (val: unknown) => {
@@ -206,6 +253,9 @@ export const fastParsingStrategy: ParsingStrategy = {
       return BigInt(getNext(responseIterator));
     },
     [CairoUint16.abiSelector]: (responseIterator: Iterator<string>) => {
+      return BigInt(getNext(responseIterator));
+    },
+    [CairoUint32.abiSelector]: (responseIterator: Iterator<string>) => {
       return BigInt(getNext(responseIterator));
     },
     [CairoUint64.abiSelector]: (responseIterator: Iterator<string>) => {

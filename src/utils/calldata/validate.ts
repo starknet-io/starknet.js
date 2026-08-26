@@ -11,6 +11,8 @@ import assert from '../assert';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../cairoDataTypes/bytes31';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
+import { unwrapCairoScalar } from '../cairoDataTypes/scalar';
+import { RANGE_ETH_ADDRESS } from '../../global/constants';
 import { CairoInt8 } from '../cairoDataTypes/int8';
 import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
@@ -43,12 +45,15 @@ import {
 // TODO: Something like: store_message(a -> *INVALID JS TYPE*, b, c -> *MISSING REQUIRED ARG*)
 
 const validateFelt = (parameter: any, input: AbiEntry) => {
+  // an instance of the very type declared here stands for the number it carries, and is then
+  // checked exactly like a bare one
+  const value: any = unwrapCairoScalar(parameter, input.type);
   assert(
-    isString(parameter) || isNumber(parameter) || isBigInt(parameter),
+    isString(value) || isNumber(value) || isBigInt(value),
     `Validate: arg ${input.name} should be a felt typed as (String, Number or BigInt)`
   );
-  if (isString(parameter) && !isHex(parameter)) return; // shortstring
-  const param = BigInt(parameter.toString(10));
+  if (isString(value) && !isHex(value)) return; // shortstring
+  const param = BigInt(value.toString(10));
   assert(
     // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1266
     param >= 0n && param <= 2n ** 252n - 1n,
@@ -57,33 +62,35 @@ const validateFelt = (parameter: any, input: AbiEntry) => {
 };
 
 const validateUint = (parameter: any, input: AbiEntry) => {
-  if (isNumber(parameter)) {
+  // an instance of the very type declared here stands for the number it carries, and is then
+  // checked exactly like a bare one — a wider type is left untouched, so it fails below
+  const value: any = unwrapCairoScalar(parameter, input.type);
+  if (isNumber(value)) {
     assert(
-      parameter <= Number.MAX_SAFE_INTEGER,
+      value <= Number.MAX_SAFE_INTEGER,
       'Validation: Parameter is too large to be typed as Number use (BigInt or String)'
     );
   }
   assert(
-    isString(parameter) ||
-      isNumber(parameter) ||
-      isBigInt(parameter) ||
-      (isObject(parameter) && 'low' in parameter && 'high' in parameter) ||
-      (isObject(parameter) &&
-        ['limb0', 'limb1', 'limb2', 'limb3'].every((key) => key in parameter)),
+    isString(value) ||
+      isNumber(value) ||
+      isBigInt(value) ||
+      (isObject(value) && 'low' in value && 'high' in value) ||
+      (isObject(value) && ['limb0', 'limb1', 'limb2', 'limb3'].every((key) => key in value)),
     `Validate: arg ${input.name} of cairo type ${
       input.type
-    } should be type (String, Number or BigInt), but is ${typeof parameter} ${parameter}.`
+    } should be type (String, Number or BigInt), but is ${typeof value} ${value}.`
   );
   let param: bigint;
   switch (input.type) {
     case Uint.u256:
-      param = new CairoUint256(parameter as BigNumberish).toBigInt();
+      param = new CairoUint256(value as BigNumberish).toBigInt();
       break;
     case Uint.u512:
-      param = new CairoUint512(parameter as BigNumberish).toBigInt();
+      param = new CairoUint512(value as BigNumberish).toBigInt();
       break;
     default:
-      param = toBigInt(parameter as BigNumberish);
+      param = toBigInt(value as BigNumberish);
   }
   switch (input.type) {
     case Uint.u8:
@@ -111,6 +118,13 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       assert(
         param >= 0n && param <= 2n ** 64n - 1n,
         `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^64-1]`
+      );
+      break;
+
+    case Uint.u96:
+      assert(
+        param >= 0n && param <= 2n ** 96n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^96-1]`
       );
       break;
 
@@ -188,8 +202,7 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
     assert(!isObject(parameter), `EthAddress type is waiting a BigNumberish. Got "${parameter}"`);
     const param = BigInt(parameter.toString(10));
     assert(
-      // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
-      param >= 0n && param <= 2n ** 160n - 1n,
+      param >= RANGE_ETH_ADDRESS.min && param <= RANGE_ETH_ADDRESS.max,
       `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^160-1]`
     );
     return;
@@ -262,6 +275,10 @@ const validateArray = (
         // the type cast is just for the documentation generation, TS narrowing works as expected
         parameter = parameterArray as any;
         break;
+      // an instance holds its items in `content`; enumerating it would yield its two fields instead
+      case parameterArray instanceof CairoFixedArray:
+        parameter = parameterArray.content;
+        break;
       case typeof parameterArray === 'object':
         parameter = Object.values(parameterArray);
         break;
@@ -272,7 +289,15 @@ const validateArray = (
 
   switch (true) {
     case isTypeFelt(baseType):
-      parameter.forEach((param: BigNumberish) => validateFelt(param, input));
+      // the item type, not the array type: what each item is checked against is felt252
+      parameter.forEach((param: BigNumberish) =>
+        validateFelt(param, { name: input.name, type: baseType })
+      );
+      break;
+    // the other one-felt leaf type. Without this branch the whole array falls to the default
+    // below, so an Array<bytes31> was refused here whatever it held, though it serializes fine
+    case CairoBytes31.isAbiType(baseType):
+      parameter.forEach((param: any) => CairoBytes31.validate(param));
       break;
     case isTypeTuple(baseType):
       parameter.forEach((it: any) => validateTuple(it, { name: input.name, type: baseType }));
@@ -431,20 +456,22 @@ export default function validateFields(
       case CairoByteArray.isAbiType(input.type):
         CairoByteArray.validate(parameter);
         break;
+      // these five refuse any object, so an instance of the declared type is reduced first —
+      // unlike CairoBytes31 and CairoByteArray above, whose validate adopts one as it stands
       case CairoInt8.isAbiType(input.type):
-        CairoInt8.validate(parameter);
+        CairoInt8.validate(unwrapCairoScalar(parameter, input.type));
         break;
       case CairoInt16.isAbiType(input.type):
-        CairoInt16.validate(parameter);
+        CairoInt16.validate(unwrapCairoScalar(parameter, input.type));
         break;
       case CairoInt32.isAbiType(input.type):
-        CairoInt32.validate(parameter);
+        CairoInt32.validate(unwrapCairoScalar(parameter, input.type));
         break;
       case CairoInt64.isAbiType(input.type):
-        CairoInt64.validate(parameter);
+        CairoInt64.validate(unwrapCairoScalar(parameter, input.type));
         break;
       case CairoInt128.isAbiType(input.type):
-        CairoInt128.validate(parameter);
+        CairoInt128.validate(unwrapCairoScalar(parameter, input.type));
         break;
       case isTypeArray(input.type) || CairoFixedArray.isTypeFixedArray(input.type):
         validateArray(parameter, input, structs, enums);

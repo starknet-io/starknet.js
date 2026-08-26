@@ -15,8 +15,9 @@ v11 carries three independent workstreams. The cryptographic dependencies move t
 ESM-only generation (`@noble/curves` 1.7 → 2.3, `@noble/hashes` 1.6 → 2.3, `@scure/base` 1.2 → 2.3,
 `@scure/starknet` 1.1 → 2.3), RPC requests now travel through a pluggable transport, which lets a
 single WebSocket serve both requests and subscriptions, and the string helpers deprecated back in
-v8.2.0 are finally removed. A fourth, much smaller pass clears out what remained of the V0–V2
-transaction API.
+v8.2.0 are finally removed. Two much smaller passes follow: one clears out what remained of the
+V0–V2 transaction API, the other puts the type an abi declares back in charge of reading the values
+that cross it.
 
 **The transport layer breaks nothing** — it is added underneath the existing API. The other two do.
 
@@ -27,6 +28,8 @@ transaction API.
 | Jest: the crypto dependencies are ESM-only        | **High**   | Add one line to your `transformIgnorePatterns`          |
 | `cairo.felt()` only accepts a number              | **Medium** | Encode text yourself before passing it                  |
 | Signature objects lost their v1 encoding methods  | **Medium** | Rename `toDERHex()` and its three siblings              |
+| Signed integers decode as signed                  | **Medium** | Drop your own field-element conversion                  |
+| An out-of-range argument is refused               | **Medium** | Fix the value, or opt into `fastParsingStrategy`        |
 | `CairoFelt()` and `encode.utf8ToArray()` removed  | **Low**    | Rename to `CairoFelt252` / `utf8ToUint8Array`           |
 | `@noble` / `@scure` import paths changed          | **Low**    | Only if you import these packages directly              |
 | The `ReceiptTx` class removed                     | **Low**    | Only if you used `instanceof ReceiptTx`                 |
@@ -320,6 +323,44 @@ broadcasting. This release removes the symbols that only existed to build or des
 
 Sending a transaction is unaffected: `Account` has been building V3 transactions only since v8.
 
+### 9. The type the abi declares is the one that reads your value
+
+Both abi parsers defaulted to `fastParsingStrategy`, which reaches `CairoFelt252` instead of the
+class the abi declares. Two consequences follow, and both change in v11.
+
+**A negative `i8`…`i128` came back from a call as its field element.** It now comes back as the
+negative number it is. If you were converting it yourself, drop that conversion.
+
+```typescript
+const delta = await myContract.get_delta(); // an i128 holding -5
+// v10: 3618502788666131213697322783095070105623107215331596699973092056135872020476n
+// v11: -5n
+```
+
+**An argument that does not fit its declared type is refused rather than serialized.** This covers
+`u8`, `u16`, `u32`, `u64`, `u96`, `u128` and `EthAddress`, which reached the calldata unchecked
+when the arguments were passed as an array.
+
+```typescript
+myCallData.compile('set_age', [256]); // a u8 parameter
+// v10: ["256"], sent as it is
+// v11: throws — Value is out of u8 range [0, 255]
+```
+
+Three of those were bounded nowhere before: `u32` and `EthAddress` had no branch of their own, and
+`u96` had one only for the argument-array form. `CairoUint32.abiSelector` is corrected with them,
+from `core::u32::u32` — which no abi ever spells — to `core::integer::u32`.
+
+A **response** is not validated, only decoded. `decodeParameters()` still returns what the node
+sent, even when it does not fit the type you name: what a caller passes in is their own mistake to
+catch, what a node answers is not.
+
+The former behaviour is still available, per `CallData`:
+
+```typescript
+const myCallData = new CallData(abi, fastParsingStrategy);
+```
+
 ## Part 2 — Deprecations
 
 Neither of these breaks anything today. Existing code keeps working; migrate at your own pace.
@@ -445,6 +486,24 @@ the object returned by `byteArray.byteArrayFromString()`, which a contract call 
 ```typescript
 await contract.set_label(CairoByteArray.fromText('12345'));
 ```
+
+### A Cairo type as an argument, with or without an abi
+
+What holds for `CairoByteArray` now holds for every Cairo type class: an instance can be passed
+wherever its own type is declared, at any depth, and `CallData.compile()` serializes one through
+that class instead of walking its fields.
+
+```typescript
+await myContract.set_amount(new CairoUint64(44)); //          a u64 parameter
+CallData.compile({ label: CairoByteArray.fromText('hi') }); // and with no abi at all
+```
+
+Without an abi this used to produce silently wrong calldata — a `CairoByteArray` came out with its
+pending word spelled one felt per byte, a `CairoBytes31` as its 31-byte buffer. It now produces the
+felts the abi path produces.
+
+An instance fills the slot of its own type only: a `CairoUint128` handed to a `u64` parameter is
+refused, whatever number it holds.
 
 ## Need Help?
 

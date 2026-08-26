@@ -8,7 +8,7 @@ import {
   AbiEntryType,
 } from '../../../types';
 import { AbiParserInterface } from './interface';
-import { fastParsingStrategy, ParsingStrategy } from './parsingStrategy';
+import { hdParsingStrategy, ParsingStrategy } from './parsingStrategy';
 
 export class AbiParser2 implements AbiParserInterface {
   abi: Abi;
@@ -17,7 +17,7 @@ export class AbiParser2 implements AbiParserInterface {
 
   constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
     this.abi = abi;
-    this.parsingStrategy = parsingStrategy || fastParsingStrategy;
+    this.parsingStrategy = parsingStrategy || hdParsingStrategy;
   }
 
   public getRequestParser(abiType: AbiEntryType): (val: unknown) => any {
