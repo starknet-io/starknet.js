@@ -4,7 +4,7 @@ import { getDefaultNodes, getSupportedRpcVersions } from '../src/utils/provider'
 
 describe('unit tests', () => {
   xdescribe('getDefaultNodes', () => {
-    it('constructs correct URLs for all supported RPC versions', () => {
+    test('constructs correct URLs for all supported RPC versions', () => {
       const supportedVersions = getSupportedRpcVersions();
       supportedVersions.forEach((version) => {
         const rpcNodes = getDefaultNodes(version);
@@ -19,7 +19,7 @@ describe('unit tests', () => {
     });
   });
   describe('getSupportedRpcVersions', () => {
-    it('should return a non-empty array of strings', () => {
+    test('should return a non-empty array of strings', () => {
       const versions = getSupportedRpcVersions();
       expect(Array.isArray(versions)).toBe(true);
       expect(versions.length).toBeGreaterThan(0);
@@ -28,7 +28,7 @@ describe('unit tests', () => {
       });
     });
 
-    it('should return an array with unique values', () => {
+    test('should return an array with unique values', () => {
       const versions = getSupportedRpcVersions();
       const uniqueVersions = [...new Set(versions)];
       expect(versions.length).toEqual(uniqueVersions.length);

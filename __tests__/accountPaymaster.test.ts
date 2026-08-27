@@ -162,7 +162,7 @@ describe('Account - Paymaster integration', () => {
   });
 
   describe('estimatePaymasterTransactionFee', () => {
-    it('should return estimated transaction fee from paymaster', async () => {
+    test('should return estimated transaction fee from paymaster', async () => {
       const result = await getAccount().estimatePaymasterTransactionFee(originalCalls, {
         feeMode: { mode: 'default', gasToken: '0x456' },
       });
@@ -184,7 +184,7 @@ describe('Account - Paymaster integration', () => {
   });
 
   describe('executePaymasterTransaction', () => {
-    it('should sign and execute transaction via paymaster without checking gas fees', async () => {
+    test('should sign and execute transaction via paymaster without checking gas fees', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -211,7 +211,7 @@ describe('Account - Paymaster integration', () => {
       expect(result).toEqual({ transaction_hash: '0x123' });
     });
 
-    it('should sign and execute transaction via paymaster', async () => {
+    test('should sign and execute transaction via paymaster', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -224,7 +224,7 @@ describe('Account - Paymaster integration', () => {
       expect(result).toEqual({ transaction_hash: '0x123' });
     });
 
-    it('should not throw if token price exceeds maxPriceInGasToken but transaction is sponsored', async () => {
+    test('should not throw if token price exceeds maxPriceInGasToken but transaction is sponsored', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'sponsored' },
       };
@@ -238,7 +238,7 @@ describe('Account - Paymaster integration', () => {
       });
     });
 
-    it('should throw if token price exceeds maxPriceInGasToken', async () => {
+    test('should throw if token price exceeds maxPriceInGasToken', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -248,7 +248,7 @@ describe('Account - Paymaster integration', () => {
       ).rejects.toThrow('Gas token price is too high');
     });
 
-    it('should throw if Gas token value is not equal to the provided gas fees', async () => {
+    test('should throw if Gas token value is not equal to the provided gas fees', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -258,7 +258,7 @@ describe('Account - Paymaster integration', () => {
       ).rejects.toThrow('Gas token value is not equal to the provided gas fees');
     });
 
-    it('should throw if Gas token address is not equal to the provided gas token', async () => {
+    test('should throw if Gas token address is not equal to the provided gas token', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -268,7 +268,7 @@ describe('Account - Paymaster integration', () => {
       ).rejects.toThrow('Gas token address is not equal to the provided gas token');
     });
 
-    it('should throw if provided calls are not strictly equal to the returned calls', async () => {
+    test('should throw if provided calls are not strictly equal to the returned calls', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };

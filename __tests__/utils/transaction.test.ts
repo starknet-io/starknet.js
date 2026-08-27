@@ -3,11 +3,11 @@ import { fromCallsToExecuteCalldata_cairo1, getVersionsByType } from '../../src/
 import { ETransactionVersion } from '../../src';
 
 describe('fromCallsToExecuteCalldata_cairo1', () => {
-  it('should return an array with a length of one when given an empty input', () => {
+  test('should return an array with a length of one when given an empty input', () => {
     expect(fromCallsToExecuteCalldata_cairo1([])).toEqual(['0']);
   });
 
-  it('should transform a list of calls into the full flattened calldata', () => {
+  test('should transform a list of calls into the full flattened calldata', () => {
     const calls: Call[] = [
       {
         contractAddress: '0x123',
@@ -37,21 +37,21 @@ describe('fromCallsToExecuteCalldata_cairo1', () => {
 });
 
 describe('getVersionsByType', () => {
-  it("should return fee versions when versionType is 'fee'", () => {
+  test("should return fee versions when versionType is 'fee'", () => {
     const versions = getVersionsByType('fee');
     expect(versions).toEqual({
       v3: ETransactionVersion.F3,
     });
   });
 
-  it("should return transaction versions when versionType is 'transaction'", () => {
+  test("should return transaction versions when versionType is 'transaction'", () => {
     const versions = getVersionsByType('transaction');
     expect(versions).toEqual({
       v3: ETransactionVersion.V3,
     });
   });
 
-  it('should return transaction versions when versionType is undefined', () => {
+  test('should return transaction versions when versionType is undefined', () => {
     const versions = getVersionsByType();
     expect(versions).toEqual({
       v3: ETransactionVersion.V3,

@@ -73,41 +73,41 @@ describe('Logger', () => {
   });
 
   describe('Log Level Configuration', () => {
-    it('should have config log level', () => {
+    test('should have config log level', () => {
       expect(logger.getLogLevel()).toBe('INFO');
     });
 
-    it('should set and get log level OFF', () => {
+    test('should set and get log level OFF', () => {
       logger.setLogLevel('OFF');
       expect(logger.getLogLevel()).toBe('OFF');
       expect(logger.getEnabledLogLevels()).toStrictEqual([]);
     });
 
-    it('should set and get log level FATAL', () => {
+    test('should set and get log level FATAL', () => {
       logger.setLogLevel('FATAL');
       expect(logger.getLogLevel()).toBe('FATAL');
       expect(logger.getEnabledLogLevels()).toStrictEqual(['FATAL']);
     });
 
-    it('should set and get log level ERROR', () => {
+    test('should set and get log level ERROR', () => {
       logger.setLogLevel('ERROR');
       expect(logger.getLogLevel()).toBe('ERROR');
       expect(logger.getEnabledLogLevels()).toStrictEqual(['ERROR', 'FATAL']);
     });
 
-    it('should set and get log level WARN', () => {
+    test('should set and get log level WARN', () => {
       logger.setLogLevel('WARN');
       expect(logger.getLogLevel()).toBe('WARN');
       expect(logger.getEnabledLogLevels()).toStrictEqual(['WARN', 'ERROR', 'FATAL']);
     });
 
-    it('should set and get log level INFO', () => {
+    test('should set and get log level INFO', () => {
       logger.setLogLevel('INFO');
       expect(logger.getLogLevel()).toBe('INFO');
       expect(logger.getEnabledLogLevels()).toStrictEqual(['INFO', 'WARN', 'ERROR', 'FATAL']);
     });
 
-    it('should set and get log level DEBUG', () => {
+    test('should set and get log level DEBUG', () => {
       logger.setLogLevel('DEBUG');
       expect(logger.getLogLevel()).toBe('DEBUG');
       expect(logger.getEnabledLogLevels()).toStrictEqual([
@@ -121,7 +121,7 @@ describe('Logger', () => {
   });
 
   describe('Log Filtering', () => {
-    it('should log messages at or above current level', () => {
+    test('should log messages at or above current level', () => {
       logger.setLogLevel('WARN');
 
       logger.debug('Debug message');
@@ -131,7 +131,7 @@ describe('Logger', () => {
       expect(gWarn).toHaveBeenCalled();
     });
 
-    it('should not log when level is OFF', () => {
+    test('should not log when level is OFF', () => {
       logger.setLogLevel('OFF');
 
       logger.error('Error message');
@@ -143,14 +143,14 @@ describe('Logger', () => {
   });
 
   describe('Log Methods', () => {
-    it('should format messages correctly', () => {
+    test('should format messages correctly', () => {
       logger.info('Test message', { key: 'value' });
 
       const expectedMessage = `[2024-01-01T00:00:00.000Z] INFO: Test message\n${JSON.stringify({ key: 'value' }, null, 2)}`;
       expect(gInfo).toHaveBeenCalledWith(expectedMessage);
     });
 
-    it('should use appropriate console methods', () => {
+    test('should use appropriate console methods', () => {
       logger.setLogLevel('DEBUG');
       logger.debug('Debug');
       logger.info('Info');
@@ -166,13 +166,13 @@ describe('Logger', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should handle empty data', () => {
+    test('should handle empty data', () => {
       logger.info('Message without data');
       const expectedMessage = '[2024-01-01T00:00:00.000Z] INFO: Message without data';
       expect(gInfo).toHaveBeenCalledWith(expectedMessage);
     });
 
-    it('should handle circular data structures', () => {
+    test('should handle circular data structures', () => {
       logger.setLogLevel('DEBUG');
       const circularObj: any = { a: 'test' };
       circularObj.myself = circularObj;
