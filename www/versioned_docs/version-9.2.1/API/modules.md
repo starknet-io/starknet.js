@@ -2859,7 +2859,7 @@ Advance formatting used to get js types data as result
 
 **`Description`**
 
-https://starknetjs.com/docs/guides/define_call_message/#formatresponse
+https://starknet-js.com/docs/guides/contracts/define_call_message/#formatresponse
 
 **`Example`**
 
