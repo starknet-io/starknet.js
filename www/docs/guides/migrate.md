@@ -15,9 +15,10 @@ v11 carries three independent workstreams. The cryptographic dependencies move t
 ESM-only generation (`@noble/curves` 1.7 → 2.3, `@noble/hashes` 1.6 → 2.3, `@scure/base` 1.2 → 2.3,
 `@scure/starknet` 1.1 → 2.3), RPC requests now travel through a pluggable transport, which lets a
 single WebSocket serve both requests and subscriptions, and the string helpers deprecated back in
-v8.2.0 are finally removed. Two much smaller passes follow: one clears out what remained of the
-V0–V2 transaction API, the other puts the type an abi declares back in charge of reading the values
-that cross it.
+v8.2.0 are finally removed. Three much smaller passes follow: one clears out what remained of the
+V0–V2 transaction API, another puts the type an abi declares back in charge of reading the values
+that cross it, and the last makes Starknet ID refuse a name it cannot encode instead of quietly
+encoding a different one.
 
 **The transport layer breaks nothing** — it is added underneath the existing API. The other two do.
 
@@ -34,6 +35,7 @@ that cross it.
 | `@noble` / `@scure` import paths changed          | **Low**    | Only if you import these packages directly              |
 | The `ReceiptTx` class removed                     | **Low**    | Only if you used `instanceof ReceiptTx`                 |
 | The leftover v1 transaction API removed           | **Low**    | Only if you imported `v2hash` or `ETransactionVersion2` |
+| Starknet ID names are validated, not truncated    | **Low**    | Only if you resolve or encode `.stark` names            |
 
 Two deprecations ship with the release — `stark.randomAddress()` and `Provider` — but neither of
 them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
@@ -360,6 +362,33 @@ The former behaviour is still available, per `CallData`:
 ```typescript
 const myCallData = new CallData(abi, fastParsingStrategy);
 ```
+
+### 10. A Starknet ID name that cannot be encoded is refused
+
+`useEncoded()` used to skip any character outside the two Starknet ID alphabets (`a-z`, `0-9`, `-`
+and `这来`) instead of refusing it. A skipped character did not yield an invalid felt: it yielded the
+felt of a **different, existing name**, which the naming contract resolved to somebody else's
+address.
+
+```typescript
+starknetId.useEncoded('Grug');
+// v10: 9441n — the encoding of 'rug', which resolves to a real mainnet account
+// v11: throws — Invalid character "G" in a Starknet.id name
+```
+
+`encodeBrotherDomain()` calls the encoder with no guard of its own, so `.brother` names gain the
+same protection.
+
+`isStarkDomain()` now derives validity from the encoder instead of restating the alphabets — that
+duplication is what let the guard and the encoding disagree. It also compares the encoded value to
+the field prime, so the set of names it accepts moves in both directions: `这来` names are accepted
+and resolve, where they were wrongly refused since v6.21.2, while **no 48-character label fits in a
+felt** and every one of them is now refused. The real ceiling is 47 ASCII characters, 40 for `这`
+and 20 for `来`.
+
+`getAddressFromStarkName()` already threw on a name its guard turned down, so nothing changes in
+its shape — only in which names it turns down. If you hand it user input, keep it wrapped: an
+unencodable name is an exception, never a silent resolution to the wrong account.
 
 ## Part 2 — Deprecations
 
