@@ -1,4 +1,4 @@
-import { StarknetChainId, ZERO } from '../global/constants';
+import { PRIME, StarknetChainId, ZERO } from '../global/constants';
 import { BigNumberish } from '../types';
 import { tuple } from './calldata/cairo';
 import { CairoCustomEnum } from './calldata/enum/CairoCustomEnum';
@@ -72,14 +72,22 @@ export function useDecoded(encoded: bigint[]): string {
 }
 
 /**
- * Encodes a string into a bigint value.
+ * Encodes a single Starknet.id label into a bigint value.
  *
- * @param {string} decoded The string to be encoded.
+ * Only the characters of the Starknet.id alphabets are accepted: `a-z`, `0-9`, `-` and the two
+ * `bigAlphabet` characters. Any other character throws, so a mistyped name can never be silently
+ * encoded as a different, existing one.
+ *
+ * @param {string} decoded The label to be encoded, without any `.` separator nor `.stark` suffix.
  * @returns {bigint} The encoded bigint value.
+ * @throws {Error} If the label holds a character outside the Starknet.id alphabets.
  * @example
  * ```typescript
- * const result = starknetId.useEncoded("starknet.js");
+ * const result = starknetId.useEncoded("starknetjs");
  * // result = 3015206943634620n
+ *
+ * starknetId.useEncoded("Starknetjs");
+ * // throws an Error: the uppercase "S" is not a Starknet.id character
  * ```
  */
 export function useEncoded(decoded: string): bigint {
@@ -118,6 +126,10 @@ export function useEncoded(decoded: string): bigint {
       const newid = (i === decoded.length - 1 ? 1 : 0) + bigAlphabet.indexOf(char);
       encoded += multiplier * BigInt(newid);
       multiplier *= bigAlphabetSize;
+    } else {
+      throw new Error(
+        `Invalid character "${char}" in a Starknet.id name: allowed characters are "${basicAlphabet}" and "${bigAlphabet}"`
+      );
     }
   }
 
@@ -420,12 +432,17 @@ export function isStarkDomain(domain: string): boolean {
   }
 
   return name.split('.').every((label) => {
-    return (
-      label.length > 0 &&
-      label.length <= 48 &&
-      [...label].every((char) => {
-        return (char >= 'a' && char <= 'z') || (char >= '0' && char <= '9') || char === '-';
-      })
-    );
+    if (label.length === 0 || label.length > 48) {
+      return false;
+    }
+
+    // The encoder owns the alphabets, so deriving from it keeps the guard and the encoding from
+    // ever disagreeing again. The felt bound is checked here because a 48 character label can
+    // still overflow the field.
+    try {
+      return useEncoded(label) < PRIME;
+    } catch {
+      return false;
+    }
   });
 }
