@@ -1,3 +1,17 @@
+# [11.0.0-beta.8](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.7...v11.0.0-beta.8) (2026-08-27)
+
+### Bug Fixes
+
+- **starknetId:** accept bigAlphabet characters in isStarkDomain ([f508984](https://github.com/starknet-io/starknet.js/commit/f5089848f4b4bf526cc814f20fef1918bc67879f)), closes [#1668](https://github.com/starknet-io/starknet.js/issues/1668)
+- **starknetId:** reject names the encoder cannot represent ([76fe9b1](https://github.com/starknet-io/starknet.js/commit/76fe9b1df174d295374417a018e425ee652258c8)), closes [#1668](https://github.com/starknet-io/starknet.js/issues/1668)
+
+### BREAKING CHANGES
+
+- **starknetId:** `useEncoded` throws on any character outside the Starknet.id alphabets
+  instead of silently ignoring it, and `encodeBrotherDomain`, which calls it with no guard,
+  throws on the same input. `isStarkDomain` also rejects labels whose encoding overflows the
+  field, including every 48-character label it used to accept.
+
 # [11.0.0-beta.7](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.6...v11.0.0-beta.7) (2026-08-26)
 
 ### Bug Fixes
