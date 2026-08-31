@@ -70,13 +70,6 @@ export const HARDENING_4BYTES = 2147483648n;
 
 // NOTE: the enum alias exports are made so both the 'const' and 'type' are reachable in the published '.d.ts' file,
 // otherwise the last export hides the preceding export with the same name in this file
-const _BaseUrl = {
-  SN_MAIN: 'https://alpha-mainnet.starknet.io',
-  SN_SEPOLIA: 'https://alpha-sepolia.starknet.io',
-} as const;
-type _BaseUrl = ValuesType<typeof _BaseUrl>;
-export { _BaseUrl as BaseUrl };
-
 const _NetworkName = {
   SN_MAIN: 'SN_MAIN',
   SN_SEPOLIA: 'SN_SEPOLIA',

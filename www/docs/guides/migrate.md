@@ -36,6 +36,7 @@ encoding a different one.
 | The `ReceiptTx` class removed                     | **Low**    | Only if you used `instanceof ReceiptTx`                 |
 | The leftover v1 transaction API removed           | **Low**    | Only if you imported `v2hash` or `ETransactionVersion2` |
 | Starknet ID names are validated, not truncated    | **Low**    | Only if you resolve or encode `.stark` names            |
+| The feeder gateway `BaseUrl` constant removed     | **Low**    | Only if you imported `constants.BaseUrl`                |
 
 Two deprecations ship with the release — `stark.randomAddress()` and `Provider` — but neither of
 them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
@@ -389,6 +390,39 @@ and 20 for `来`.
 `getAddressFromStarkName()` already threw on a name its guard turned down, so nothing changes in
 its shape — only in which names it turns down. If you hand it user input, keep it wrapped: an
 unencodable name is an exception, never a silent resolution to the wrong account.
+
+### 11. The feeder gateway `BaseUrl` constant is removed
+
+`constants.BaseUrl` held the two roots of the feeder gateway, `https://alpha-mainnet.starknet.io`
+and `https://alpha-sepolia.starknet.io`. Starknet v0.14.4 removes six of that gateway's endpoints —
+`call`, `get_storage_at`, `get_nonce`, `get_class_hash_at`, `get_code` and `get_full_contract`. The
+library has spoken JSON-RPC only since v7 and no longer read this constant anywhere, so all it
+exported was a pair of urls about to stop answering.
+
+The replacement depends on what you took from it. To name a network and let the library pick a
+public RPC node for it, use `constants.NetworkName`:
+
+```typescript
+// v10
+const nodeUrl = constants.BaseUrl.SN_MAIN;
+// v11
+const nodeUrl = provider.getDefaultNodeUrl(constants.NetworkName.SN_MAIN);
+```
+
+`RpcProvider` accepts that network name directly, and resolves it the same way:
+
+```typescript
+const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_MAIN });
+```
+
+To reach a node you chose yourself — the better approach, as the public ones are shared and
+throttled — pass its RPC url:
+
+```typescript
+const myProvider = new RpcProvider({
+  nodeUrl: 'https://api.zan.top/public/starknet-mainnet/rpc/v0_10',
+});
+```
 
 ## Part 2 — Deprecations
 
