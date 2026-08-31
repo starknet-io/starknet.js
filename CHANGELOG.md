@@ -1,3 +1,16 @@
+# [11.0.0-beta.9](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.8...v11.0.0-beta.9) (2026-08-31)
+
+### Features
+
+- **constants:** remove the feeder gateway BaseUrl constant ([c455e2a](https://github.com/starknet-io/starknet.js/commit/c455e2a7410817135729f652a8bd46aa45b9cec6))
+
+### BREAKING CHANGES
+
+- **constants:** `constants.BaseUrl` is removed. It exposed the feeder
+  gateway roots, whose endpoints Starknet v0.14.4 deletes; the library has
+  been JSON-RPC only since v7 and never read it. Use `constants.NetworkName`
+  with `provider.getDefaultNodeUrl()`, or your own node's RPC url.
+
 # [11.0.0-beta.8](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.7...v11.0.0-beta.8) (2026-08-27)
 
 ### Bug Fixes
