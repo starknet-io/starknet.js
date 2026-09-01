@@ -26,17 +26,16 @@ import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
 import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
-import { addHexPrefix, removeHexPrefix } from '../encode';
+import { CairoBool } from '../cairoDataTypes/bool';
+import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
 import {
   getArrayType,
   isCairo1Type,
   isLen,
   isTypeArray,
-  isTypeBool,
   isTypeEnum,
   isTypeEthAddress,
   isTypeNonZero,
-  isTypeSecp256k1Point,
   isTypeTuple,
 } from './cairo';
 import {
@@ -59,9 +58,8 @@ import extractTupleMemberTypes from './tuple';
 function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInterface) {
   let temp;
   switch (true) {
-    case isTypeBool(type):
-      temp = it.next().value;
-      return Boolean(BigInt(temp));
+    case CairoBool.isAbiType(type):
+      return parser.getResponseParser(type)(it);
     case CairoUint256.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case CairoUint512.isAbiType(type):
@@ -93,13 +91,8 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
       return BigInt(temp);
     case CairoBytes31.isAbiType(type):
       return parser.getResponseParser(type)(it);
-    case isTypeSecp256k1Point(type):
-      const xLow = removeHexPrefix(it.next().value).padStart(32, '0');
-      const xHigh = removeHexPrefix(it.next().value).padStart(32, '0');
-      const yLow = removeHexPrefix(it.next().value).padStart(32, '0');
-      const yHigh = removeHexPrefix(it.next().value).padStart(32, '0');
-      const pubK = BigInt(addHexPrefix(xHigh + xLow + yHigh + yLow));
-      return pubK;
+    case CairoSecp256k1Point.isAbiType(type):
+      return parser.getResponseParser(type)(it);
     default:
       // TODO: this is for all simple types felt and rest to BN, at the moment handle as felt
       return parser.getResponseParser(CairoFelt252.abiSelector)(it);
