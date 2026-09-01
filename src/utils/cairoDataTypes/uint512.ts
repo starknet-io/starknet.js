@@ -6,6 +6,7 @@ import { UINT_128_MAX } from './uint256';
 import { isObject } from '../typed';
 import { getNext, isBigNumberish } from '../num';
 import assert from '../assert';
+import { addCompiledFlag } from '../helpers';
 
 /**
  * The largest u512, 2^512 - 1.
@@ -174,8 +175,8 @@ export class CairoUint512 {
   /**
    * Throw unless a whole value can be represented as a u512, and give back its number.
    *
-   * A string is only accepted while it spells a number : one that does not is refused for its
-   * type, whatever the message says about strings.
+   * A string is only accepted while it spells a number, in base 10 or 16 : one that does not is
+   * refused for its type.
    * @param {BigNumberish} bigNumberish the value to check
    * @returns {bigint} the value as a number, once accepted
    * @throws {Error} when the value is null, undefined, of an unread type, or out of range
@@ -192,7 +193,7 @@ export class CairoUint512 {
     assert(bigNumberish !== undefined, 'undefined value is not allowed for u512');
     assert(
       isBigNumberish(bigNumberish) || isObject(bigNumberish),
-      `Unsupported data type '${typeof bigNumberish}' for u512. Expected string, number, bigint, or Uint512 object`
+      `Unsupported data type '${typeof bigNumberish}' for u512. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint512 object`
     );
 
     const bigInt = BigInt(bigNumberish as BigNumberish);
@@ -351,7 +352,7 @@ export class CairoUint512 {
 
   /**
    * Serialize to the four felts a contract call carries.
-   * @returns {string[]} the four limbs as decimal strings, lowest first
+   * @returns {string[]} the four limbs as decimal strings, lowest first, flagged as compiled
    * @example
    * ```typescript
    * const result = new CairoUint512(255).toApiRequest();
@@ -360,11 +361,11 @@ export class CairoUint512 {
    */
   toApiRequest(): string[] {
     // lower limb first : https://github.com/starkware-libs/cairo/blob/07484c52791b76abcc18fd86265756904557d0d2/corelib/src/test/integer_test.cairo#L767
-    return [
+    return addCompiledFlag([
       this.limb0.toString(),
       this.limb1.toString(),
       this.limb2.toString(),
       this.limb3.toString(),
-    ];
+    ]);
   }
 }

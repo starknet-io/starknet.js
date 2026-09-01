@@ -97,25 +97,9 @@ export class CairoFixedArray {
       `The type ${arrayType} is not a Cairo fixed array. Needs [type; length].`
     );
 
-    // Validate that the type includes content type
-    try {
-      CairoFixedArray.getFixedArrayType(arrayType);
-    } catch {
-      throw new Error(
-        `The type ${arrayType} do not includes any content type. Needs [type; length].`
-      );
-    }
-
-    // Validate that the type includes array size
-    let arraySize: number;
-    try {
-      arraySize = CairoFixedArray.getFixedArraySize(arrayType);
-    } catch {
-      throw new Error(
-        `The type ${arrayType} type do not includes any length. Needs [type; length].`
-      );
-    }
-
+    // the assert above already had `parseFixedArrayType` read the type, and this reads it again on
+    // the same string : both halves are there, so this cannot raise.
+    const arraySize = CairoFixedArray.getFixedArraySize(arrayType);
     assert(
       arraySize === content.length,
       `The ABI type ${arrayType} is expecting ${arraySize} items. ${content.length} items provided.`
