@@ -9,6 +9,33 @@ describe('CairoFixedArray class test', () => {
     expect(() => new CairoFixedArray([2, 4, 6], '[; 3]')).toThrow();
   });
 
+  test('the constructor refuses in exactly two ways', () => {
+    // whatever a type is malformed by — not bracketed, no item type, no length, a length that is
+    // not digits — the first assert catches it, and its message is the only one a bad type gives.
+    // The item count is the other, checked once the type is known to be a well formed one.
+    const malformed = [
+      'core::integer::u32',
+      'core::integer::u32; 3',
+      '[core::integer::u32]',
+      '[core::integer::u32;3]',
+      '[core::integer::u32; ]',
+      '[core::integer::u32; zorg]',
+      '[; 3]',
+      '[; ]',
+      '[]',
+      '',
+    ];
+    malformed.forEach((arrayType) => {
+      expect(() => new CairoFixedArray([2, 4, 6], arrayType)).toThrow(
+        `The type ${arrayType} is not a Cairo fixed array. Needs [type; length].`
+      );
+    });
+
+    expect(() => new CairoFixedArray([2, 4], '[core::integer::u32; 3]')).toThrow(
+      'The ABI type [core::integer::u32; 3] is expecting 3 items. 2 items provided.'
+    );
+  });
+
   test('use dynamic class methods', () => {
     const myFixedArray = new CairoFixedArray([1, 2, 3], '[core::integer::u32; 3]');
     expect(myFixedArray.getFixedArraySize()).toBe(3);

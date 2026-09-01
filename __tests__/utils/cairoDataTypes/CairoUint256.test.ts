@@ -8,6 +8,7 @@ import {
   UINT_256_LOW_MIN,
   UINT_256_MAX,
   UINT_256_MIN,
+  transaction,
 } from '../../../src';
 
 describe('CairoUint256 class test', () => {
@@ -118,19 +119,19 @@ describe('CairoUint256 class test', () => {
     expect(() => {
       CairoUint256.validate(Symbol('test') as any);
     }).toThrow(
-      "Unsupported data type 'symbol' for u256. Expected string, number, bigint, or Uint256 object"
+      "Unsupported data type 'symbol' for u256. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint256 object"
     );
 
     expect(() => {
       CairoUint256.validate((() => {}) as any);
     }).toThrow(
-      "Unsupported data type 'function' for u256. Expected string, number, bigint, or Uint256 object"
+      "Unsupported data type 'function' for u256. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint256 object"
     );
 
     expect(() => {
       CairoUint256.validate(true as any);
     }).toThrow(
-      "Unsupported data type 'boolean' for u256. Expected string, number, bigint, or Uint256 object"
+      "Unsupported data type 'boolean' for u256. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint256 object"
     );
   });
 
@@ -230,5 +231,21 @@ describe('CairoUint256 class test', () => {
       '340282366920938463463374607431768211455',
       '340282366920938463463374607431768211455',
     ]);
+  });
+
+  describe('toApiRequest is flagged as compiled', () => {
+    test('should carry the __compiled__ flag', () => {
+      const result = new CairoUint256(255).toApiRequest();
+      expect(result).toEqual(['255', '0']);
+      expect(result).toHaveProperty('__compiled__', true);
+    });
+
+    test('should be taken as calldata by a call that skips request parsing', () => {
+      // the shape `Contract.invoke` builds under `withOptions({ parseRequest: false })` : `args` is
+      // the argument list, its only item is already serialized, and the callback hands `args` back
+      // untouched. Only the flag tells the two apart, and without it the calldata stays nested.
+      const args = [new CairoUint256(255).toApiRequest()];
+      expect(transaction.getCompiledCalldata(args, () => args)).toEqual(['255', '0']);
+    });
   });
 });

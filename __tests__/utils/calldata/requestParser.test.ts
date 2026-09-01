@@ -341,7 +341,7 @@ describe('requestParser', () => {
         })
       ).toThrow(
         new Error(
-          "Unsupported data type 'string' for u256. Expected string, number, bigint, or Uint256 object"
+          "Unsupported data type 'string' for u256. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint256 object"
         )
       );
     });

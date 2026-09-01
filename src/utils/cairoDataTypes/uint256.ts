@@ -5,6 +5,7 @@ import { addHexPrefix } from '../encode';
 import { isObject } from '../typed';
 import { getNext, isBigNumberish } from '../num';
 import assert from '../assert';
+import { addCompiledFlag } from '../helpers';
 
 /**
  * The largest u128, and the mask that cuts a u256 in two.
@@ -171,8 +172,8 @@ export class CairoUint256 {
   /**
    * Throw unless a whole value can be represented as a u256, and give back its number.
    *
-   * A string is only accepted while it spells a number : one that does not is refused for its
-   * type, whatever the message says about strings.
+   * A string is only accepted while it spells a number, in base 10 or 16 : one that does not is
+   * refused for its type.
    * @param {BigNumberish} bigNumberish the value to check
    * @returns {bigint} the value as a number, once accepted
    * @throws {Error} when the value is null, undefined, of an unread type, or out of range
@@ -189,7 +190,7 @@ export class CairoUint256 {
     assert(bigNumberish !== undefined, 'undefined value is not allowed for u256');
     assert(
       isBigNumberish(bigNumberish) || isObject(bigNumberish),
-      `Unsupported data type '${typeof bigNumberish}' for u256. Expected string, number, bigint, or Uint256 object`
+      `Unsupported data type '${typeof bigNumberish}' for u256. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint256 object`
     );
 
     const bigInt = BigInt(bigNumberish as BigNumberish);
@@ -335,7 +336,7 @@ export class CairoUint256 {
 
   /**
    * Serialize to the two felts a contract call carries.
-   * @returns {string[]} the two halves as decimal strings, low first
+   * @returns {string[]} the two halves as decimal strings, low first, flagged as compiled
    * @example
    * ```typescript
    * const result = new CairoUint256(255).toApiRequest();
@@ -343,6 +344,6 @@ export class CairoUint256 {
    * ```
    */
   toApiRequest() {
-    return [this.low.toString(), this.high.toString()];
+    return addCompiledFlag([this.low.toString(), this.high.toString()]);
   }
 }

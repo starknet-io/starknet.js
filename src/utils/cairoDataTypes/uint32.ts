@@ -161,7 +161,7 @@ export class CairoUint32 {
    * ```typescript
    * CairoUint32.validate(70000); // passes
    * CairoUint32.validate(4294967296);
-   * // throws Error("Value is out of u32 range [0, 2^32)")
+   * // throws Error("Value is out of u32 range [0, 4294967295]")
    * ```
    */
   static validate(data: BigNumberish | boolean | unknown): void {
@@ -173,7 +173,10 @@ export class CairoUint32 {
     );
 
     const value = CairoUint32.__processData(data);
-    assert(value >= RANGE_U32.min && value <= RANGE_U32.max, 'Value is out of u32 range [0, 2^32)');
+    assert(
+      value >= RANGE_U32.min && value <= RANGE_U32.max,
+      `Value is out of u32 range [${RANGE_U32.min}, ${RANGE_U32.max}]`
+    );
   }
 
   /**
