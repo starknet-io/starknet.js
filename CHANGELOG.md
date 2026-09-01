@@ -1,3 +1,9 @@
+# [11.0.0-beta.10](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.9...v11.0.0-beta.10) (2026-09-01)
+
+### Bug Fixes
+
+- **cairoDataTypes:** correct u256 and u512 toApiRequest and validate ([11d758b](https://github.com/starknet-io/starknet.js/commit/11d758bfed27e3c8b170d930c47253f42a110dfb))
+
 # [11.0.0-beta.9](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.8...v11.0.0-beta.9) (2026-08-31)
 
 ### Features
