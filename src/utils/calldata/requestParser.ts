@@ -26,9 +26,10 @@ import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
 import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
+import { CairoBool } from '../cairoDataTypes/bool';
+import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
 import { unwrapCairoScalar } from '../cairoDataTypes/scalar';
-import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToUint8Array } from '../encode';
-import { toHex } from '../num';
+import { addHexPrefix, buf2hex, utf8ToUint8Array } from '../encode';
 import { isText, splitLongString } from '../shortString';
 import { isUndefined } from '../typed';
 import {
@@ -41,10 +42,8 @@ import {
   isTypeNonZero,
   isTypeOption,
   isTypeResult,
-  isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
-  uint256,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -158,21 +157,19 @@ function parseBaseTypes({
       return parser.getRequestParser(type)(val);
     case CairoBytes31.isAbiType(type):
       return parser.getRequestParser(type)(val);
+    // without this a bool fell to the felt252 default, which bounds the field but not the two
+    // values a bool actually has. `validateFields` is stricter still upstream, and asks for a real
+    // boolean — this catches what reaches the parser by another road.
+    case CairoBool.isAbiType(type):
+      return parser.getRequestParser(type)(val);
     // reached from parseCalldataField and from the struct branch of parseCalldataValue. Without
     // this it fell to the felt252 default, which only bounds the field, not the 160 bits
     case isTypeEthAddress(type):
       return parser.getRequestParser(type)(val);
-    case isTypeSecp256k1Point(type): {
-      const pubKeyETH = removeHexPrefix(toHex(val as BigNumberish)).padStart(128, '0');
-      const pubKeyETHy = uint256(addHexPrefix(pubKeyETH.slice(-64)));
-      const pubKeyETHx = uint256(addHexPrefix(pubKeyETH.slice(0, -64)));
-      return [
-        felt(pubKeyETHx.low),
-        felt(pubKeyETHx.high),
-        felt(pubKeyETHy.low),
-        felt(pubKeyETHy.high),
-      ];
-    }
+    // the four felts a point occupies used to be spelled out here; the class now holds that split,
+    // and both strategies carry it since the felt252 default would emit a single felt
+    case CairoSecp256k1Point.isAbiType(type):
+      return parser.getRequestParser(type)(val);
     default:
       // TODO: check but u32 should land here with rest of the simple types, at the moment handle as felt
       return parser.getRequestParser(CairoFelt252.abiSelector)(val);

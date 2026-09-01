@@ -1,10 +1,10 @@
 import { CairoBytes31 } from '../../cairoDataTypes/bytes31';
 import { CairoByteArray } from '../../cairoDataTypes/byteArray';
 import { AbiEntryType, ETH_ADDRESS } from '../../../types';
-import { RANGE_ETH_ADDRESS } from '../../../global/constants';
-import assert from '../../assert';
-import { addCompiledFlag } from '../../helpers';
 import { CairoFelt252 } from '../../cairoDataTypes/felt';
+import { CairoBool } from '../../cairoDataTypes/bool';
+import { CairoEthAddress } from '../../cairoDataTypes/ethAddress';
+import { CairoSecp256k1Point } from '../../cairoDataTypes/secp256k1Point';
 import { CairoUint256 } from '../../cairoDataTypes/uint256';
 import { CairoUint512 } from '../../cairoDataTypes/uint512';
 import { CairoUint8 } from '../../cairoDataTypes/uint8';
@@ -56,16 +56,17 @@ export const hdParsingStrategy = {
     [CairoFelt252.abiSelector]: (val: unknown) => {
       return new CairoFelt252(val).toApiRequest();
     },
-    // The one entry whose bound is spelled out here rather than delegated: an EthAddress is a felt
-    // on the wire, narrowed to the 160 bits an Ethereum address occupies, and has no class of its
-    // own to hold that range.
     [ETH_ADDRESS]: (val: unknown) => {
-      const value = new CairoFelt252(val).toBigInt();
-      assert(
-        value >= RANGE_ETH_ADDRESS.min && value <= RANGE_ETH_ADDRESS.max,
-        `Value is out of EthAddress range [${RANGE_ETH_ADDRESS.min}, ${RANGE_ETH_ADDRESS.max}]`
-      );
-      return addCompiledFlag([value.toString()]);
+      return new CairoEthAddress(val).toApiRequest();
+    },
+    [CairoBool.abiSelector]: (val: unknown) => {
+      return new CairoBool(val).toApiRequest();
+    },
+    // Four felts, not one: a point is two 256-bit coordinates, each split into two 128-bit limbs.
+    // It has to be spelled out in both strategies rather than left to the felt252 default, which
+    // would emit a single felt and quietly corrupt the calldata.
+    [CairoSecp256k1Point.abiSelector]: (val: unknown) => {
+      return new CairoSecp256k1Point(val).toApiRequest();
     },
     [CairoUint256.abiSelector]: (val: unknown) => {
       return new CairoUint256(val).toApiRequest();
@@ -116,6 +117,17 @@ export const hdParsingStrategy = {
     },
     [CairoFelt252.abiSelector]: (responseIterator: Iterator<string>) => {
       return CairoFelt252.factoryFromApiResponse(responseIterator).toBigInt();
+    },
+    // Read as it comes, without its class, for the same reason as the unsigned integers below: a
+    // bool that is neither 0 nor 1 is a node anomaly, and refusing it here would turn something
+    // the caller cannot act on into an exception.
+    [CairoBool.abiSelector]: (responseIterator: Iterator<string>) => {
+      return Boolean(BigInt(getNext(responseIterator)));
+    },
+    // The class is what reads this one: four felts have to be recombined into the single number a
+    // point is, and that is decoding, not checking.
+    [CairoSecp256k1Point.abiSelector]: (responseIterator: Iterator<string>) => {
+      return CairoSecp256k1Point.factoryFromApiResponse(responseIterator).toBigInt();
     },
     [CairoUint256.abiSelector]: (responseIterator: Iterator<string>) => {
       return CairoUint256.factoryFromApiResponse(responseIterator).toBigInt();
@@ -190,6 +202,17 @@ export const fastParsingStrategy: ParsingStrategy = {
     [ETH_ADDRESS]: (val: unknown) => {
       return new CairoFelt252(val).toBigInt().toString();
     },
+    // No 0-or-1 check here either, for the same reason as the integers below. This is what a bool
+    // already got before it had an entry at all, by falling through to the felt252 default.
+    [CairoBool.abiSelector]: (val: unknown) => {
+      return new CairoFelt252(val).toBigInt().toString();
+    },
+    // Present here too, and doing the same work as in the strategy above: this entry is not a
+    // range check that speed could trade away, it is the only thing that turns a point into its
+    // four felts. Without it the felt252 default would emit one.
+    [CairoSecp256k1Point.abiSelector]: (val: unknown) => {
+      return new CairoSecp256k1Point(val).toApiRequest();
+    },
     [CairoUint256.abiSelector]: (val: unknown) => {
       return new CairoUint256(val).toApiRequest();
     },
@@ -242,6 +265,16 @@ export const fastParsingStrategy: ParsingStrategy = {
     },
     [CairoFelt252.abiSelector]: (responseIterator: Iterator<string>) => {
       return BigInt(getNext(responseIterator));
+    },
+    // Identical to the strategy above: reading a bool back is decoding, not checking, so there is
+    // nothing here for speed to trade away.
+    [CairoBool.abiSelector]: (responseIterator: Iterator<string>) => {
+      return Boolean(BigInt(getNext(responseIterator)));
+    },
+    // Identical too, and required: recombining four felts into one number is the only way to read
+    // a point back, whatever the strategy.
+    [CairoSecp256k1Point.abiSelector]: (responseIterator: Iterator<string>) => {
+      return CairoSecp256k1Point.factoryFromApiResponse(responseIterator).toBigInt();
     },
     [CairoUint256.abiSelector]: (responseIterator: Iterator<string>) => {
       return CairoUint256.factoryFromApiResponse(responseIterator).toBigInt();

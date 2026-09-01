@@ -15,3 +15,6 @@ export * from './byteArray';
 export * from './bytes31';
 export * from './felt';
 export * from './uint32';
+export * from './bool';
+export * from './ethAddress';
+export * from './secp256k1Point';
