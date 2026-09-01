@@ -1,3 +1,17 @@
+# [11.0.0-beta.11](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.10...v11.0.0-beta.11) (2026-09-01)
+
+### Features
+
+- **cairoDataTypes:** add CairoBool, CairoEthAddress and CairoSecp256k1Point ([332dd1e](https://github.com/starknet-io/starknet.js/commit/332dd1e2fbf9db756343768327788f9114a897b1))
+
+### BREAKING CHANGES
+
+- **cairoDataTypes:** three inputs that used to reach the calldata are now refused.
+  A core::bool argument that is neither a boolean nor 0/1 throws instead of being
+  serialized as a felt. An EthAddress built from text throws instead of being
+  encoded as its UTF-8 bytes. A Secp256k1Point wider than 512 bits throws instead
+  of emitting four corrupted felts.
+
 # [11.0.0-beta.10](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.9...v11.0.0-beta.10) (2026-09-01)
 
 ### Bug Fixes
