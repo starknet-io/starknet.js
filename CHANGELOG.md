@@ -1,3 +1,9 @@
+# [11.0.0-beta.12](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.11...v11.0.0-beta.12) (2026-09-02)
+
+### Features
+
+- **cairoDataTypes:** add the composite Cairo type classes and their strategy ([58d1ae7](https://github.com/starknet-io/starknet.js/commit/58d1ae716443d1db96589eb6cbb35f2ae7784159)), closes [#1484](https://github.com/starknet-io/starknet.js/issues/1484) [#1688](https://github.com/starknet-io/starknet.js/issues/1688) [#1484](https://github.com/starknet-io/starknet.js/issues/1484)
+
 # [11.0.0-beta.11](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.10...v11.0.0-beta.11) (2026-09-01)
 
 ### Features
