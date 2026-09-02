@@ -18,3 +18,5 @@ export * from './uint32';
 export * from './bool';
 export * from './ethAddress';
 export * from './secp256k1Point';
+export * from './classHash';
+export * from './contractAddress';

@@ -46,6 +46,12 @@ export const RANGE_I128 = range(-(2n ** 127n), 2n ** 127n - 1n);
 // https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
 export const RANGE_ETH_ADDRESS = range(ZERO, 2n ** 160n - 1n);
 
+// A contract address is narrower than the field it lives in: an address is computed modulo
+// ADDR_BOUND, and `validateAndParseAddress` already refuses anything past it. The 252-bit bound
+// the RPC spec states is looser than both, and never the one that binds.
+// There is no such narrowing for a class hash, which is a hash output and so any felt252.
+export const RANGE_CONTRACT_ADDRESS = range(ZERO, ADDR_BOUND - 1n);
+
 export const LegacyUDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
