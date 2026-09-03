@@ -1,7 +1,11 @@
-import { CairoClassHash, CairoContractAddress, Literal } from '../../../src';
-import { validateAndParseAddress } from '../../../src/utils/address';
+import {
+  CairoClassHash,
+  CairoContractAddress,
+  Literal,
+  cairoTypeStrategy as S,
+  validateAndParseAddress,
+} from '../../../src';
 import { ADDR_BOUND, PRIME } from '../../../src/global/constants';
-import { cairoTypeStrategy as S } from '../../../src/utils/calldata/parser/cairoTypeStrategy';
 
 /** An address written the way a node writes it, so that beta's own validator will read it. */
 const padded = (value: bigint) => `0x${value.toString(16).padStart(64, '0')}`;

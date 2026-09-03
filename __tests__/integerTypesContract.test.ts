@@ -1,4 +1,4 @@
-import { Account, Contract, ProviderInterface, hdParsingStrategy } from '../src';
+import { Account, Contract, ProviderInterface, cairoTypeStrategy } from '../src';
 import { CONTRACTS, createTestProvider, getTestAccount } from './config';
 import { CairoUint8 } from '../src/utils/cairoDataTypes/uint8';
 import { CairoUint16 } from '../src/utils/cairoDataTypes/uint16';
@@ -182,13 +182,15 @@ describe('Integer Types Contract Integration Tests', () => {
     provider = await createTestProvider();
     account = await getTestAccount(provider);
 
-    // Deploy IntegerTypesStorage contract using Contract.factory with hdParsingStrategy
+    // Deploy IntegerTypesStorage contract using Contract.factory with the default strategy stated
+    // explicitly. It is a Cairo 2 contract, so the shape it takes is the one the Cairo type
+    // classes run on; `hdParsingStrategy` serves a Cairo 0 abi and is refused here.
     integerTypesContract = await Contract.factory({
       contract: CONTRACTS.TestIntegerTypesStorage.sierra,
       casm: CONTRACTS.TestIntegerTypesStorage.casm,
       account,
       constructorCalldata: [],
-      parsingStrategy: hdParsingStrategy,
+      parsingStrategy: cairoTypeStrategy,
     });
   }, 60000);
 

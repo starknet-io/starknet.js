@@ -694,21 +694,25 @@ describe('Cairo 1', () => {
         { address: 1193046n, is_claimed: true },
         { address: 624485n, is_claimed: false },
       ]);
-      const res4 = c1v2CallData.decodeParameters('core::integer::u8', ['0x123456']);
-      expect(res4).toBe(1193046n);
+      // a response is built as the type asked for, and building it checks the range, so the felt
+      // has to fit — 0x123456 is not a u8
+      const res4 = c1v2CallData.decodeParameters('core::integer::u8', ['0x12']);
+      expect(res4).toBe(18n);
       const res5 = c1v2CallData.decodeParameters('core::bool', ['0x1']);
       expect(res5).toBe(true);
       const res6 = c1v2CallData.decodeParameters('core::felt252', ['0x123456']);
       expect(res6).toBe(1193046n);
       const res7 = c1v2CallData.decodeParameters('core::integer::u256', ['0x123456', '0x789']);
       expect(num.toHex(res7.toString())).toBe('0x78900000000000000000000000000123456');
-      const res8 = c1v2CallData.decodeParameters('core::array::Array::<core::integer::u16>', [
+      // u32 rather than u16: the items are built as their declared type, and 0x123456 is past a
+      // u16. The values read back are the same, so what these two assert has not moved
+      const res8 = c1v2CallData.decodeParameters('core::array::Array::<core::integer::u32>', [
         '2',
         '0x123456',
         '0x789',
       ]);
       expect(res8).toEqual([1193046n, 1929n]);
-      const res9 = c1v2CallData.decodeParameters('core::array::Span::<core::integer::u16>', [
+      const res9 = c1v2CallData.decodeParameters('core::array::Span::<core::integer::u32>', [
         '2',
         '0x123456',
         '0x789',

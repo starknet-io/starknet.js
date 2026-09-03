@@ -14,6 +14,7 @@ import {
   ProviderInterface,
   byteArray,
   cairo,
+  cairoTypeStrategy,
   num,
   type Uint512,
 } from '../src';
@@ -475,7 +476,11 @@ describe('Cairo v2.4 onwards', () => {
       const myCalldata3 = myCallData.compile('fixed_array', [CairoFixedArray.compile(myArray)]);
       const res3 = await fixedArrayContract.call('fixed_array', myCalldata3);
       expect(res3).toEqual(expectedRes);
-      const myFixedArray = new CairoFixedArray(myArray, '[core::integer::u32; 8]');
+      const myFixedArray = new CairoFixedArray(
+        myArray,
+        '[core::integer::u32; 8]',
+        cairoTypeStrategy
+      );
       const myCalldata4 = myCallData.compile('fixed_array', { x: myFixedArray.compile() });
       const res4 = await fixedArrayContract.call('fixed_array', myCalldata4);
       expect(res4).toEqual(expectedRes);

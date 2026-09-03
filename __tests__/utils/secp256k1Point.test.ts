@@ -14,9 +14,9 @@ describe('secp256k1Point cairo type test', () => {
       myCallDataAccount.compile('constructor', {
         public_key: point,
       });
-    }).toThrow(
-      'Validate: arg public_key must be core::starknet::secp256k1::Secp256k1Point : a 512 bits number.'
-    );
+      // the message is CairoSecp256k1Point's own now: the class is what refuses the value, where
+      // a separate validation pass used to speak first
+    }).toThrow('input is bigger than SECP256K1_POINT_MAX');
   });
 
   test('secp256k1Point compile', () => {

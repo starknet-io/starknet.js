@@ -16,9 +16,10 @@ ESM-only generation (`@noble/curves` 1.7 → 2.3, `@noble/hashes` 1.6 → 2.3, `
 `@scure/starknet` 1.1 → 2.3), RPC requests now travel through a pluggable transport, which lets a
 single WebSocket serve both requests and subscriptions, and the string helpers deprecated back in
 v8.2.0 are finally removed. Three much smaller passes follow: one clears out what remained of the
-V0–V2 transaction API, another puts the type an abi declares back in charge of reading the values
-that cross it, and the last makes Starknet ID refuse a name it cannot encode instead of quietly
-encoding a different one.
+V0–V2 transaction API, another puts the type an abi declares back in charge of the values that
+cross it — the calldata codec is rebuilt on the Cairo type classes, and every value is now read and
+written by the class its type names — and the last makes Starknet ID refuse a name it cannot encode
+instead of quietly encoding a different one.
 
 **The transport layer breaks nothing** — it is added underneath the existing API. The other two do.
 
@@ -30,7 +31,10 @@ encoding a different one.
 | `cairo.felt()` only accepts a number              | **Medium** | Encode text yourself before passing it                  |
 | Signature objects lost their v1 encoding methods  | **Medium** | Rename `toDERHex()` and its three siblings              |
 | Signed integers decode as signed                  | **Medium** | Drop your own field-element conversion                  |
-| An out-of-range argument is refused               | **Medium** | Fix the value, or opt into `fastParsingStrategy`        |
+| An out-of-range argument is refused               | **Medium** | Fix the value, or opt into `fastCairoTypeStrategy`      |
+| An out-of-range response is refused               | **Medium** | Fix the value, or opt into `fastCairoTypeStrategy`      |
+| A custom parsing strategy changed shape           | **Medium** | Only if you passed one to `CallData` or `Contract`      |
+| `CairoFixedArray` takes a parsing strategy        | **Medium** | Only if you built one by hand                           |
 | `CairoFelt()` and `encode.utf8ToArray()` removed  | **Low**    | Rename to `CairoFelt252` / `utf8ToUint8Array`           |
 | `@noble` / `@scure` import paths changed          | **Low**    | Only if you import these packages directly              |
 | The `ReceiptTx` class removed                     | **Low**    | Only if you used `instanceof ReceiptTx`                 |
@@ -354,15 +358,27 @@ Three of those were bounded nowhere before: `u32` and `EthAddress` had no branch
 `u96` had one only for the argument-array form. `CairoUint32.abiSelector` is corrected with them,
 from `core::u32::u32` — which no abi ever spells — to `core::integer::u32`.
 
-A **response** is not validated, only decoded. `decodeParameters()` still returns what the node
-sent, even when it does not fit the type you name: what a caller passes in is their own mistake to
-catch, what a node answers is not.
-
-The former behaviour is still available, per `CallData`:
+**A response is refused the same way.** Reading one builds the declared type from the felts, and
+building it is what checks the range — one and the same pass, so a node answering outside the
+bounds of the type you named raises where v10 handed the value back. This applies at any depth: an
+item of an array, a member of a struct.
 
 ```typescript
-const myCallData = new CallData(abi, fastParsingStrategy);
+myCallData.decodeParameters('core::integer::u8', ['0x123456']);
+// v10: 1193046n
+// v11: throws — Value is out of u8 range [0, 255]
 ```
+
+The former behaviour is still available, per `CallData`, under a new name — see
+[the strategy shapes](#12-the-calldata-codec-runs-on-the-cairo-type-classes) below:
+
+```typescript
+const myCallData = new CallData(abi, fastCairoTypeStrategy);
+```
+
+That strategy gives up the range checks, in both directions. It does **not** give up reading a
+signed integer back as a negative number, which `fastParsingStrategy` did in v10: turning a field
+element back into a negative is a conversion, not a check, and there is nothing left to trade away.
 
 ### 10. A Starknet ID name that cannot be encoded is refused
 
@@ -423,6 +439,72 @@ const myProvider = new RpcProvider({
   nodeUrl: 'https://api.zan.top/public/starknet-mainnet/rpc/v0_10',
 });
 ```
+
+### 12. The calldata codec runs on the Cairo type classes
+
+Serializing an argument and reading a response used to be two long switch statements walking the
+abi. Both now build a Cairo type — `CairoArray`, `CairoTuple`, `CairoStruct`, `CairoTypeOption`… —
+and ask it for its felts. Nothing changes in the calldata a contract receives, nor in the values a
+call returns. Four things change around it.
+
+**The strategy you may pass to `CallData` or `Contract` has a new shape, and a new name.** The
+second argument was `hdParsingStrategy` or `fastParsingStrategy`; those two now serve a Cairo 0 abi
+alone. For anything Cairo 1 or Cairo 2 — every contract compiled since 2023 — use
+`cairoTypeStrategy` or `fastCairoTypeStrategy`. Handing over the wrong shape raises and names the
+one to use, rather than being quietly ignored.
+
+```typescript
+// v10
+const myCallData = new CallData(abi, hdParsingStrategy);
+// v11
+const myCallData = new CallData(abi, cairoTypeStrategy);
+```
+
+A **custom** strategy changes with it. Its `response` entries are handed the value already built,
+where they used to be handed the felts to read:
+
+```typescript
+// v10
+const custom: ParsingStrategy = {
+  request: hdParsingStrategy.request,
+  response: {
+    ...hdParsingStrategy.response,
+    [CairoByteArray.abiSelector]: (it) => CairoByteArray.factoryFromApiResponse(it).toBuffer(),
+  },
+};
+// v11
+const custom: CairoTypeStrategy = {
+  ...cairoTypeStrategy,
+  response: {
+    ...cairoTypeStrategy.response,
+    [CairoByteArray.abiSelector]: (instance) => (instance as CairoByteArray).toBuffer(),
+  },
+};
+```
+
+**An abi type nothing recognizes raises.** It used to fall through to `core::felt252`, so a typo in
+a hand-written abi produced a plausible number instead of an error.
+
+**`CairoFixedArray` takes the strategy that builds its items**, and holds them built. The class was
+the odd one out — every other composite already worked this way — and it now serializes itself
+instead of only preparing an object for `CallData.compile()`. Its static `compile()`,
+`isTypeFixedArray()` and the two type readers are unchanged, so an existing call through
+`CallData.compile()` still reads the same.
+
+```typescript
+// v10
+const myArray = new CairoFixedArray([10, 20, 30], '[core::integer::u32; 3]');
+myArray.content; // [10, 20, 30]
+// v11
+const myArray = new CairoFixedArray([10, 20, 30], '[core::integer::u32; 3]', cairoTypeStrategy);
+myArray.content; // three CairoUint32 — `decompose(cairoTypeStrategy)` gives [10n, 20n, 30n] back
+myArray.toApiRequest(); // ["10", "20", "30"] — it serializes itself now
+```
+
+**`myCallData.validate()` speaks with the classes' voice**, since building a value is what checks
+it. The messages change, and one asymmetry disappears: the named and positional call forms used to
+disagree — `compile('fn', { v: 1 })` was refused for a `core::bool` parameter where
+`compile('fn', [1])` was accepted. Both now accept it, and both refuse `2`.
 
 ## Part 2 — Deprecations
 
@@ -567,6 +649,28 @@ felts the abi path produces.
 
 An instance fills the slot of its own type only: a `CairoUint128` handed to a `u64` parameter is
 refused, whatever number it holds.
+
+### The composite Cairo types, and the strategy that builds them
+
+`CairoArray`, `CairoTuple`, `CairoStruct`, `CairoTypeOption`, `CairoTypeResult`,
+`CairoTypeCustomEnum` and `CairoNonZero` join the leaf classes on the public surface. Each takes a
+value, the abi type it stands for, and the strategy that builds what it holds — `cairoTypeStrategy`
+carries the language's own types.
+
+A type **your contract** declares — a struct, a custom enum — is keyed by the name it was given, so
+building one over it takes the strategy the abi parser assembled. That is what
+`parser.parsingStrategies` is, and a `Contract` exposes its `callData` to reach it:
+
+```typescript
+const strategies = myContract.callData.parser.parsingStrategies;
+const points = new CairoArray(list, 'core::array::Array::<my_contract::Point>', strategies);
+
+points.toApiRequest(); //           the felts, ready for a call
+points.decompose(strategies); //    and back to plain values
+```
+
+`structStrategy()` and `enumStrategy()` build such a strategy from abi declarations directly, when
+you have no parser at hand.
 
 ## Need Help?
 

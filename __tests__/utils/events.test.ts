@@ -56,7 +56,7 @@ describe('getAbiEvents', () => {
       members: [
         {
           name: 'test_name',
-          type: 'test_type',
+          type: 'core::felt252',
           kind: 'data',
         },
       ],
@@ -91,7 +91,7 @@ describe('getAbiEvents', () => {
       members: [
         {
           name: 'test_name',
-          type: 'test_type',
+          type: 'core::felt252',
           kind: 'data',
         },
       ],
@@ -123,7 +123,7 @@ describe('getAbiEvents', () => {
       members: [
         {
           name: 'test_name',
-          type: 'test_type',
+          type: 'core::felt252',
           kind: 'data',
         },
       ],
@@ -147,7 +147,7 @@ describe('Mocked: parseEvents', () => {
       members: [
         {
           name: 'test_name',
-          type: 'test_type',
+          type: 'core::felt252',
           kind: 'data',
         },
       ],
@@ -175,7 +175,7 @@ describe('Mocked: parseEvents', () => {
         members: [
           {
             name: 'test_name',
-            type: 'test_type',
+            type: 'core::felt252',
             offset: 1,
           },
         ],
@@ -238,7 +238,7 @@ describe('Mocked: parseEvents', () => {
       members: [
         {
           name: 'test_name',
-          type: 'test_type',
+          type: 'core::felt252',
           kind: 'data',
         },
       ],
@@ -266,7 +266,7 @@ describe('Mocked: parseEvents', () => {
         members: [
           {
             name: 'test_name',
-            type: 'test_type',
+            type: 'core::felt252',
             offset: 1,
           },
         ],
@@ -329,7 +329,7 @@ describe('Mocked: parseEvents', () => {
       members: [
         {
           name: 'test_name',
-          type: 'test_type',
+          type: 'core::felt252',
           kind: 'data',
         },
       ],
@@ -357,7 +357,7 @@ describe('Mocked: parseEvents', () => {
         members: [
           {
             name: 'test_name',
-            type: 'test_type',
+            type: 'core::felt252',
             offset: 1,
           },
         ],

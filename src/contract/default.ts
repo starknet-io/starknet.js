@@ -32,7 +32,7 @@ import type { AccountInterface } from '../account/interface';
 import type { ProviderInterface } from '../provider/interface';
 import assert from '../utils/assert';
 import { cairo, CallData } from '../utils/calldata';
-import { createAbiParser, ParsingStrategy } from '../utils/calldata/parser';
+import { createAbiParser, type CairoTypeStrategy, ParsingStrategy } from '../utils/calldata/parser';
 import {
   getAbiEvents,
   parseEvents as parseRawEvents,
@@ -137,11 +137,24 @@ export class Contract implements ContractInterface {
 
   readonly [key: string]: AsyncContractFunction | any;
 
-  private callData: CallData;
+  /**
+   * The `CallData` this contract serializes and reads through.
+   *
+   * Reachable because it is the end of a chain whose every other link is: building a Cairo type
+   * over one of this contract's own types — a struct, a custom enum — takes the strategies the abi
+   * parser assembled, and this is the only way to them. Rebuilding a `CallData` from `abi` is not
+   * the same thing: a strategy given to this contract would be lost on the way.
+   *
+   * ```typescript
+   * const strategies = myContract.callData.parser.parsingStrategies;
+   * const points = new CairoArray(list, 'core::array::Array::<my::Point>', strategies);
+   * ```
+   */
+  public callData: CallData;
 
   public withOptionsProps?: WithOptions;
 
-  private parsingStrategy?: ParsingStrategy;
+  private parsingStrategy?: ParsingStrategy | CairoTypeStrategy;
 
   /**
    * Get the provider from providerOrAccount

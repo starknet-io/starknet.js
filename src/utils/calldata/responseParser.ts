@@ -46,8 +46,17 @@ import {
   CairoResult,
   CairoResultVariant,
 } from './enum';
-import { AbiParserInterface } from './parser/interface';
 import extractTupleMemberTypes from './tuple';
+
+/**
+ * All this module needs of a parser: how to read a value of one abi type off a response.
+ *
+ * Stated here rather than imported, for the same reason as in `requestParser.ts` : `AbiParser0` is
+ * what calls into this module, and it imports it.
+ */
+type ResponseReader = {
+  getResponseParser(abiType: string): (responseIterator: Iterator<string>) => any;
+};
 
 /**
  * Parse base types
@@ -55,7 +64,7 @@ import extractTupleMemberTypes from './tuple';
  * @param it iterator
  * @returns bigint | boolean
  */
-function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInterface) {
+function parseBaseTypes(type: string, it: Iterator<string>, parser: ResponseReader) {
   let temp;
   switch (true) {
     case CairoBool.isAbiType(type):
@@ -111,7 +120,7 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
 function parseResponseValue(
   responseIterator: Iterator<string>,
   element: { name: string; type: string },
-  parser: AbiParserInterface,
+  parser: ResponseReader,
   structs?: AbiStructs,
   enums?: AbiEnums
 ): BigNumberish | ParsedStruct | boolean | any[] | CairoEnum {
@@ -262,7 +271,7 @@ export default function responseParser({
   structs: AbiStructs;
   enums: AbiEnums;
   parsedResult?: Args | ParsedStruct;
-  parser: AbiParserInterface;
+  parser: ResponseReader;
 }): any {
   const { name, type } = output;
   let temp;

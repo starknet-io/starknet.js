@@ -15,6 +15,7 @@ import {
 import { CairoFelt252 } from '../cairoDataTypes/felt';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
+import { CairoUint96 } from '../cairoDataTypes/uint96';
 import { isBigNumberish } from '../num';
 import { isNumber } from '../typed';
 
@@ -147,8 +148,7 @@ export const isTypeEthAddress = (type: string) => type === ETH_ADDRESS;
  * @param {string} type - The type to check.
  * @returns - True if the given type is equal to u96, false otherwise.
  */
-export const isTypeU96 = (type: string) =>
-  type === 'core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>';
+export const isTypeU96 = (type: string) => type === CairoUint96.abiSelectorBoundedInt;
 
 export const isTypeSecp256k1Point = (type: string) => type === Literal.Secp256k1Point;
 

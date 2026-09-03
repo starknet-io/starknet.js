@@ -17,6 +17,7 @@ import {
   CairoUint128,
   CairoUint256,
   CallData,
+  cairoTypeStrategy,
 } from '../../../src';
 
 const BYTE_ARRAY_STRUCT = {
@@ -166,12 +167,20 @@ describe('an argument already typed by the caller', () => {
 
     test('a fixed array passed as its own instance', () => {
       // its two fields used to be counted as the items, giving "2 items provided"
-      const fixedArray = new CairoFixedArray([10, 20, 30], '[core::integer::u32; 3]');
+      const fixedArray = new CairoFixedArray(
+        [10, 20, 30],
+        '[core::integer::u32; 3]',
+        cairoTypeStrategy
+      );
       expectBothForms('[core::integer::u32; 3]', fixedArray, ['10', '20', '30']);
     });
 
     test('a fixed array instance whose size disagrees with the abi is refused', () => {
-      const fixedArray = new CairoFixedArray([10, 20], '[core::integer::u32; 2]');
+      const fixedArray = new CairoFixedArray(
+        [10, 20],
+        '[core::integer::u32; 2]',
+        cairoTypeStrategy
+      );
       expectRefusedBothForms('[core::integer::u32; 3]', fixedArray);
     });
   });

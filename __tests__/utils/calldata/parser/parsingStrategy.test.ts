@@ -1,6 +1,12 @@
-import { Abi, CallData } from '../../../../src';
+import {
+  Abi,
+  CairoUint8,
+  CallData,
+  fastCairoTypeStrategy,
+  fastParsingStrategy,
+  hdParsingStrategy,
+} from '../../../../src';
 import { PRIME } from '../../../../src/global/constants';
-import { fastParsingStrategy } from '../../../../src/utils/calldata/parser/parsingStrategy';
 
 const fn = (type: string) => ({
   type: 'function',
@@ -46,14 +52,16 @@ describe('the default parsing strategy', () => {
       expect(() => new CallData(abiFor('core::integer::u64')).compile('fn', [2n ** 64n])).toThrow();
     });
 
-    test('decodes an out-of-range response rather than refusing it', () => {
-      // deliberate, and the counterpart of the test above: the same value that is refused on the
-      // way out is returned on the way in. A node's answer is not the caller's mistake to catch,
-      // and decodeParameters is the tool for reading felts back as a chosen type
-      expect(new CallData(abiFor('core::integer::u8')).parse('fn', ['0x123456'])).toBe(1193046n);
-      expect(
+    test('refuses an out-of-range response too, as it refuses one on the way out', () => {
+      // Both directions go through the same constructor: reading a response builds the declared
+      // type from the felts, and building it is what checks the range. So the value refused by
+      // the test above is refused here too, where it used to be handed back as it came.
+      expect(() => new CallData(abiFor('core::integer::u8')).parse('fn', ['0x123456'])).toThrow(
+        'Value is out of u8 range [0, 255]'
+      );
+      expect(() =>
         new CallData(abiFor('core::integer::u64')).parse('fn', [`0x${(2n ** 64n).toString(16)}`])
-      ).toBe(2n ** 64n);
+      ).toThrow('Value is out of u64 range [0, 18446744073709551615]');
     });
 
     test('leaves ordinary values alone', () => {
@@ -93,20 +101,62 @@ describe('the default parsing strategy', () => {
   });
 
   describe('what opting into the fast strategy gives up', () => {
-    const fast = (type: string) => new CallData(abiV2(type), fastParsingStrategy);
-
-    test('a negative signed integer comes back as its raw field element', () => {
-      const onTheWire = `0x${(PRIME - 5n).toString(16)}`;
-      expect(fast('core::integer::i128').parse('fn', [onTheWire])).toBe(PRIME - 5n);
-    });
+    const fast = (type: string) => new CallData(abiV2(type), fastCairoTypeStrategy);
 
     test('an out-of-range unsigned value reaches the calldata', () => {
       expect(fast('core::integer::u8').compile('fn', [256])).toEqual(['256']);
     });
 
+    test('and comes back from a response, one constructor serving both directions', () => {
+      expect(fast('core::integer::u8').parse('fn', ['0x123456'])).toBe(1193046n);
+    });
+
+    test('a non-boolean bool goes through too, and reads back as true', () => {
+      expect(fast('core::bool').compile('fn', [2])).toEqual(['2']);
+      expect(fast('core::bool').parse('fn', ['0x2'])).toBe(true);
+    });
+
+    test('but a signed integer is still read back as a negative number', () => {
+      // not something speed can trade away: turning a field element back into a negative is a
+      // conversion, not a check, so it is the same in both strategies. `fastParsingStrategy`, the
+      // shape this replaces, did give it up — it had one entry per direction.
+      const onTheWire = `0x${(PRIME - 5n).toString(16)}`;
+      expect(fast('core::integer::i128').parse('fn', [onTheWire])).toBe(-5n);
+    });
+
     test('but ordinary values say exactly what the default says', () => {
       expect(fast('core::integer::u64').compile('fn', [44])).toEqual(['44']);
       expect(fast('core::felt252').parse('fn', ['0x2a'])).toBe(42n);
+    });
+
+    test('and an already typed argument is still accepted', () => {
+      expect(fast('core::integer::u8').compile('fn', [new CairoUint8(44)])).toEqual(['44']);
+    });
+  });
+
+  describe('the strategy shape a Cairo 1 abi refuses', () => {
+    test('should name what to use instead of the Cairo 0 strategies', () => {
+      [hdParsingStrategy, fastParsingStrategy].forEach((strategy) => {
+        expect(() => new CallData(abiV2('core::integer::u8'), strategy as any)).toThrow(
+          'use `cairoTypeStrategy` or `fastCairoTypeStrategy`'
+        );
+        expect(() => new CallData(abiV1('core::integer::u8'), strategy as any)).toThrow(
+          'use `cairoTypeStrategy` or `fastCairoTypeStrategy`'
+        );
+      });
+    });
+
+    test('should still take them for a Cairo 0 abi', () => {
+      const cairo0: Abi = [
+        {
+          type: 'function',
+          name: 'fn',
+          inputs: [{ name: 'v', type: 'felt' }],
+          outputs: [{ name: 'r', type: 'felt' }],
+          stateMutability: 'view',
+        },
+      ] as Abi;
+      expect(new CallData(cairo0, fastParsingStrategy).compile('fn', [44])).toEqual(['44']);
     });
   });
 });
@@ -153,10 +203,15 @@ describe('the leaf types the strategy now carries', () => {
       expect(new CallData(abiV2(BOOL)).compile('fn', [0])).toEqual(['0']);
     });
 
-    test('still asks for a real boolean in the named form, which validates fields first', () => {
-      // the two gates do not agree, and deliberately so: validateFields is stricter than the class
+    test('says the same thing in the named form, where it used to be stricter', () => {
+      // There used to be two gates that disagreed: the named form ran `validateFields`, which
+      // asked for a real boolean, while the array form only went through the class, which takes
+      // 0 and 1. One gate remains — the class — so both forms now answer alike.
       expect(new CallData(abiV2(BOOL)).compile('fn', { v: true })).toEqual(['1']);
-      expect(() => new CallData(abiV2(BOOL)).compile('fn', { v: 1 })).toThrow();
+      expect(new CallData(abiV2(BOOL)).compile('fn', { v: 1 })).toEqual(['1']);
+      expect(() => new CallData(abiV2(BOOL)).compile('fn', { v: 2 })).toThrow(
+        'Only values 0 or 1 are possible in a core::bool, received 2'
+      );
     });
 
     test('reads a bool back as a boolean', () => {
@@ -166,7 +221,7 @@ describe('the leaf types the strategy now carries', () => {
     });
 
     test('the fast strategy lets a non-bool through, as it does for the integers', () => {
-      expect(new CallData(abiV2(BOOL), fastParsingStrategy).compile('fn', [5])).toEqual(['5']);
+      expect(new CallData(abiV2(BOOL), fastCairoTypeStrategy).compile('fn', [5])).toEqual(['5']);
     });
   });
 
@@ -201,14 +256,14 @@ describe('the leaf types the strategy now carries', () => {
         expectedLimbs(value)
       );
       expect(
-        new CallData(abiV2(SECP256K1_POINT), fastParsingStrategy).compile('fn', [value])
+        new CallData(abiV2(SECP256K1_POINT), fastCairoTypeStrategy).compile('fn', [value])
       ).toEqual(expectedLimbs(value));
     });
 
     test('reads a point back as the single number it stands for', () => {
       const felts = expectedLimbs(PUB_KEY).map((d) => `0x${BigInt(d).toString(16)}`);
       expect(new CallData(abiV2(SECP256K1_POINT)).parse('fn', felts)).toBe(PUB_KEY);
-      expect(new CallData(abiV2(SECP256K1_POINT), fastParsingStrategy).parse('fn', felts)).toBe(
+      expect(new CallData(abiV2(SECP256K1_POINT), fastCairoTypeStrategy).parse('fn', felts)).toBe(
         PUB_KEY
       );
     });
