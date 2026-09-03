@@ -1,3 +1,13 @@
+# [11.0.0-beta.13](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.12...v11.0.0-beta.13) (2026-09-03)
+
+### Features
+
+- **calldata:** run the calldata codec on the Cairo type classes ([35f3b80](https://github.com/starknet-io/starknet.js/commit/35f3b804b5efaad4ebb2e2429a5bda00d981eb3e))
+
+### BREAKING CHANGES
+
+- **calldata:** run the calldata codec on the Cairo type classes
+
 # [11.0.0-beta.12](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.11...v11.0.0-beta.12) (2026-09-02)
 
 ### Features
