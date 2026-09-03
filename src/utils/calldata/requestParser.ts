@@ -52,8 +52,18 @@ import {
   CairoResult,
   CairoResultVariant,
 } from './enum';
-import { AbiParserInterface } from './parser';
 import extractTupleMemberTypes from './tuple';
+
+/**
+ * All this module needs of a parser: how to turn a value of one abi type into its felts.
+ *
+ * Stated here rather than imported, and as a shape rather than a class : `AbiParser0` is the only
+ * parser that still calls into this module, and it imports it — naming it back would close the two
+ * into a cycle.
+ */
+type RequestSerializer = {
+  getRequestParser(abiType: string): (val: unknown) => any;
+};
 
 // TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
 
@@ -123,7 +133,7 @@ function parseBaseTypes({
 }: {
   type: string;
   val: unknown;
-  parser: AbiParserInterface;
+  parser: RequestSerializer;
 }): AllowArray<string> {
   // an instance of the very type declared here stands for the number it carries, so a value the
   // caller has already typed is read exactly like a bare one. Every base type passes through here
@@ -222,7 +232,7 @@ function parseCalldataValue({
   type: string;
   structs: AbiStructs;
   enums: AbiEnums;
-  parser: AbiParserInterface;
+  parser: RequestSerializer;
 }): string | string[] {
   if (element === undefined) {
     throw Error(`Missing parameter for type ${type}`);
@@ -233,8 +243,14 @@ function parseCalldataValue({
     const arrayType = CairoFixedArray.getFixedArrayType(type);
     let values: any[] = [];
     if (Array.isArray(element)) {
-      const array = new CairoFixedArray(element, type);
-      values = array.content;
+      // the size check the constructor used to do here, kept verbatim: building an instance now
+      // means building every item as its Cairo type, which is the new path's job, not this one's
+      const arraySize = CairoFixedArray.getFixedArraySize(type);
+      assert(
+        arraySize === element.length,
+        `The ABI type ${type} is expecting ${arraySize} items. ${element.length} items provided.`
+      );
+      values = element;
     } else if (typeof element === 'object') {
       // an instance holds its items in `content`; enumerating it would yield its two fields
       // instead. The size is still checked against the abi, whose type prevails over the
@@ -511,7 +527,7 @@ export function parseCalldataField({
   /** enums from abi */
   enums: AbiEnums;
   /** parser used to serialize the value */
-  parser: AbiParserInterface;
+  parser: RequestSerializer;
 }): string | string[] {
   const { name, type } = input;
   const { value } = argsIterator.next();

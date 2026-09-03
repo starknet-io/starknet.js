@@ -22,6 +22,7 @@ import { isBigInt } from '../typed';
 import { getSelectorFromName } from '../hash/selector';
 import { isLongText } from '../shortString';
 import { byteArrayFromString } from './byteArray';
+import { getAbiEnum, getAbiStruct } from './calldataUtils';
 import { felt, isCairo1Type, isLen } from './cairo';
 import {
   CairoCustomEnum,
@@ -31,12 +32,14 @@ import {
   CairoResultVariant,
 } from './enum';
 import formatter from './formatter';
-import { createAbiParser, isNoConstructorValid, ParsingStrategy } from './parser';
+import {
+  createAbiParser,
+  isNoConstructorValid,
+  type CairoTypeStrategy,
+  ParsingStrategy,
+} from './parser';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
-import { parseCalldataField } from './requestParser';
-import responseParser from './responseParser';
-import validateFields from './validate';
 
 export * as cairo from './cairo';
 export * as byteArray from './byteArray';
@@ -52,7 +55,7 @@ export class CallData {
 
   protected readonly enums: AbiEnums;
 
-  constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
+  constructor(abi: Abi, parsingStrategy?: ParsingStrategy | CairoTypeStrategy) {
     this.structs = CallData.getAbiStruct(abi);
     this.enums = CallData.getAbiEnum(abi);
     this.parser = createAbiParser(abi, parsingStrategy);
@@ -100,8 +103,10 @@ export class CallData {
       );
     }
 
-    // validate parameters
-    validateFields(abiMethod, args, this.structs, this.enums);
+    // Validate the parameters by compiling them and throwing the felts away. Building a Cairo type
+    // is what refuses a value that does not fit, so there is nothing a separate pass could catch
+    // that this does not — and the message is the one `compile` would have given.
+    this.compile(method, args as RawArgs);
   }
 
   /**
@@ -137,8 +142,9 @@ export class CallData {
         this.enums
       );
       args = Object.values(orderedObject);
-      //   // validate array elements to abi
-      validateFields(abiMethod, args, this.structs, this.enums);
+      // only a parser that serializes without building Cairo types has anything to check here;
+      // where those classes do the building, they refuse what does not fit a few lines below
+      this.parser.validateRequestFields(abiMethod, args);
     }
 
     const argsIterator = args[Symbol.iterator]();
@@ -147,15 +153,7 @@ export class CallData {
       (acc, input) =>
         isLen(input.name) && !isCairo1Type(input.type)
           ? acc
-          : acc.concat(
-              parseCalldataField({
-                argsIterator,
-                input,
-                structs: this.structs,
-                enums: this.enums,
-                parser: this.parser,
-              })
-            ),
+          : acc.concat(this.parser.parseRequestField(argsIterator.next().value, input)),
       [] as Calldata
     );
 
@@ -301,14 +299,7 @@ export class CallData {
 
     const parsed = outputs.flat().reduce((acc, output, idx) => {
       const propName = output.name ?? idx;
-      acc[propName] = responseParser({
-        responseIterator,
-        output,
-        structs: this.structs,
-        enums: this.enums,
-        parsedResult: acc,
-        parser: this.parser,
-      });
+      acc[propName] = this.parser.parseResponse(responseIterator, output, acc);
       if (acc[propName] && acc[`${propName}_len`]) {
         delete acc[`${propName}_len`];
       }
@@ -337,15 +328,7 @@ export class CallData {
    * @returns AbiStructs - structs from abi
    */
   static getAbiStruct(abi: Abi): AbiStructs {
-    return abi
-      .filter((abiEntry) => abiEntry.type === 'struct')
-      .reduce(
-        (acc, abiEntry) => ({
-          ...acc,
-          [abiEntry.name]: abiEntry,
-        }),
-        {}
-      );
+    return getAbiStruct(abi);
   }
 
   /**
@@ -354,17 +337,7 @@ export class CallData {
    * @returns AbiEnums - enums from abi
    */
   static getAbiEnum(abi: Abi): AbiEnums {
-    const fullEnumList = abi
-      .filter((abiEntry) => abiEntry.type === 'enum')
-      .reduce(
-        (acc, abiEntry) => ({
-          ...acc,
-          [abiEntry.name]: abiEntry,
-        }),
-        {}
-      );
-    delete fullEnumList['core::bool'];
-    return fullEnumList;
+    return getAbiEnum(abi);
   }
 
   /**
@@ -404,13 +377,7 @@ export class CallData {
     const responseIterator = response.flat()[Symbol.iterator]();
     const decodedArray = typeCairoArray.map(
       (typeParam) =>
-        responseParser({
-          responseIterator,
-          output: { name: '', type: typeParam },
-          parser: this.parser,
-          structs: this.structs,
-          enums: this.enums,
-        }) as CallResult
+        this.parser.parseResponse(responseIterator, { name: '', type: typeParam }) as CallResult
     );
     return decodedArray.length === 1 ? decodedArray[0] : decodedArray;
   }

@@ -10,6 +10,7 @@ import {
   CairoResult,
   CairoResultVariant,
   CairoUint64,
+  cairoTypeStrategy,
   CairoUint256,
   CairoUint512,
   CallData,
@@ -60,7 +61,11 @@ describe('CallData.compile (no abi)', () => {
 
     test('a fixed array carries no length, and not its type string either', () => {
       // used to emit 5 felts: a length in front, and "[core::integer::u32; 3]" as a felt at the end
-      const fixedArray = new CairoFixedArray([10, 20, 30], '[core::integer::u32; 3]');
+      const fixedArray = new CairoFixedArray(
+        [10, 20, 30],
+        '[core::integer::u32; 3]',
+        cairoTypeStrategy
+      );
       expect(CallData.compile({ v: fixedArray })).toEqual(['10', '20', '30']);
       // the instance says what the object of its own compile() says
       expect(CallData.compile({ v: fixedArray })).toEqual(
@@ -75,7 +80,11 @@ describe('CallData.compile (no abi)', () => {
       const second = CairoByteArray.fromText('ab');
       expect(
         CallData.compile({
-          v: new CairoFixedArray([first, second], '[core::byte_array::ByteArray; 2]'),
+          v: new CairoFixedArray(
+            [first, second],
+            '[core::byte_array::ByteArray; 2]',
+            cairoTypeStrategy
+          ),
         })
       ).toEqual([...first.toApiRequest(), ...second.toApiRequest()]);
     });
@@ -88,7 +97,8 @@ describe('CallData.compile (no abi)', () => {
               new CairoOption(CairoOptionVariant.Some, 12),
               new CairoOption(CairoOptionVariant.None),
             ],
-            '[core::option::Option::<core::integer::u32>; 2]'
+            '[core::option::Option::<core::integer::u32>; 2]',
+            cairoTypeStrategy
           ),
         })
       ).toEqual(['0', '12', '1']);
@@ -99,7 +109,7 @@ describe('CallData.compile (no abi)', () => {
         CallData.compile({
           v: new CairoOption(
             CairoOptionVariant.Some,
-            new CairoFixedArray([10, 20, 30], '[core::integer::u32; 3]')
+            new CairoFixedArray([10, 20, 30], '[core::integer::u32; 3]', cairoTypeStrategy)
           ),
         })
       ).toEqual(['0', '10', '20', '30']);

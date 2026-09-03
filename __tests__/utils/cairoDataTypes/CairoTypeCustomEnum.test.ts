@@ -7,16 +7,14 @@ import {
   CairoResultVariant,
   type AbiEnum,
   type AbiStruct,
-} from '../../../src';
-import { CairoStruct } from '../../../src/utils/cairoDataTypes/cairoStruct';
-import { CairoTypeCustomEnum } from '../../../src/utils/cairoDataTypes/cairoTypeCustomEnum';
-import { CairoTypeOption } from '../../../src/utils/cairoDataTypes/cairoTypeOption';
-import { CairoTypeResult } from '../../../src/utils/cairoDataTypes/cairoTypeResult';
-import {
+  CairoStruct,
+  CairoTypeCustomEnum,
+  CairoTypeOption,
+  CairoTypeResult,
   cairoTypeStrategy,
   enumStrategy,
   structStrategy,
-} from '../../../src/utils/calldata/parser/cairoTypeStrategy';
+} from '../../../src';
 
 const POINT = {
   type: 'struct',

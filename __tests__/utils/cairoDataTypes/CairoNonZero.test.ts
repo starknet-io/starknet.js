@@ -1,8 +1,11 @@
-import { CallData, cairo } from '../../../src';
-import { CairoNonZero } from '../../../src/utils/cairoDataTypes/nonZero';
-import { CairoUint8 } from '../../../src/utils/cairoDataTypes/uint8';
-import { CairoUint256 } from '../../../src/utils/cairoDataTypes/uint256';
-import { cairoTypeStrategy as S } from '../../../src/utils/calldata/parser/cairoTypeStrategy';
+import {
+  CairoNonZero,
+  CairoUint8,
+  CairoUint256,
+  CallData,
+  cairo,
+  cairoTypeStrategy as S,
+} from '../../../src';
 
 const NZ8 = 'core::zeroable::NonZero::<core::integer::u8>';
 const NZ256 = 'core::zeroable::NonZero::<core::integer::u256>';

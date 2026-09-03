@@ -7,17 +7,15 @@ import {
   CairoResultVariant,
   type AbiEnum,
   type AbiStruct,
-} from '../../../src';
-import { CairoArray } from '../../../src/utils/cairoDataTypes/array';
-import { CairoStruct } from '../../../src/utils/cairoDataTypes/cairoStruct';
-import { CairoTypeOption } from '../../../src/utils/cairoDataTypes/cairoTypeOption';
-import { CairoTuple } from '../../../src/utils/cairoDataTypes/tuple';
-import { CairoUint8 } from '../../../src/utils/cairoDataTypes/uint8';
-import {
+  CairoArray,
+  CairoStruct,
+  CairoTypeOption,
+  CairoTuple,
+  CairoUint8,
   cairoTypeStrategy,
   enumStrategy,
   structStrategy,
-} from '../../../src/utils/calldata/parser/cairoTypeStrategy';
+} from '../../../src';
 
 const { Some, None } = CairoOptionVariant;
 

@@ -22,15 +22,41 @@ import { CairoUint512 } from '../../cairoDataTypes/uint512';
 import { CairoArray } from '../../cairoDataTypes/array';
 import { CairoStruct } from '../../cairoDataTypes/cairoStruct';
 import { CairoTypeCustomEnum } from '../../cairoDataTypes/cairoTypeCustomEnum';
-import { CairoTypeFixedArray } from '../../cairoDataTypes/cairoTypeFixedArray';
+import { CairoFixedArray } from '../../cairoDataTypes/fixedArray';
 import { CairoTypeOption } from '../../cairoDataTypes/cairoTypeOption';
 import { CairoTypeResult } from '../../cairoDataTypes/cairoTypeResult';
 import { CairoNonZero } from '../../cairoDataTypes/nonZero';
+import { unwrapCairoScalar } from '../../cairoDataTypes/scalar';
 import { CairoTuple } from '../../cairoDataTypes/tuple';
 import type { AbiEnum, AbiStruct, AllowArray } from '../../../types';
 import type { CairoType } from '../../cairoDataTypes/cairoType.interface';
 import type { CairoTypeStrategy, VariantType } from './cairoTypeStrategy.type';
 import assert from '../../assert';
+
+/**
+ * Is this the strategy shape that drives the Cairo type classes?
+ *
+ * Two shapes coexist while Cairo 0 stays on the parsers that predate those classes : the older
+ * {@link ParsingStrategy}, whose entries go straight from a value to its felts, and this one,
+ * whose constructors return an instance. They are told apart by what they carry — `request`
+ * against `constructors` — so that one argument can serve both and neither has to be broken.
+ *
+ * This disappears with the Cairo 0 island.
+ * @param {unknown} strategy the strategy handed to a parser, if any
+ * @returns {boolean} true when it is a strategy of Cairo type classes
+ * @example
+ * ```typescript
+ * const result = isCairoTypeStrategy(cairoTypeStrategy);
+ * // result = true
+ * const result2 = isCairoTypeStrategy(hdParsingStrategy);
+ * // result2 = false     (that one carries `request`)
+ * const result3 = isCairoTypeStrategy(undefined);
+ * // result3 = false
+ * ```
+ */
+export function isCairoTypeStrategy(strategy: unknown): strategy is CairoTypeStrategy {
+  return typeof strategy === 'object' && strategy !== null && 'constructors' in strategy;
+}
 
 /**
  * Is this the response iterator rather than a value a caller passed?
@@ -69,14 +95,20 @@ function isResponseIterator(input: unknown): input is Iterator<string> {
  * ```
  */
 function leafConstructor(cairoType: {
+  abiSelector: string;
   new (input: any): CairoType;
   factoryFromApiResponse(responseIterator: Iterator<string>): CairoType;
 }): (input: Iterator<string> | unknown) => CairoType {
   return (input) =>
     isResponseIterator(input)
       ? cairoType.factoryFromApiResponse(input)
-      : // eslint-disable-next-line new-cap
-        new cairoType(input);
+      : // A caller may hand over a value already typed — `new CairoUint8(44)` where a `u8` is
+        // declared — and the constructor of a leaf takes a number, not one of its own instances.
+        // So it is reduced first, and only when it is an instance of the very class being built:
+        // a `CairoUint128` facing a `u8` slot comes through untouched and is refused just below,
+        // whatever number it holds.
+        // eslint-disable-next-line new-cap
+        new cairoType(unwrapCairoScalar(input, cairoType.abiSelector));
 }
 
 /**
@@ -129,6 +161,10 @@ export const cairoTypeStrategy: CairoTypeStrategy = {
     ...Object.fromEntries(
       LEAF_TYPES.map((cairoType) => [cairoType.abiSelector, leafConstructor(cairoType)])
     ),
+    // The name a compiled abi gives a u96, which is the only one ever met : Cairo has no `u96` of
+    // its own, so the compiler writes out its bounds instead. Keyed here beside the canonical name
+    // rather than replacing it, since both answer `CairoUint96.isAbiType`.
+    [CairoUint96.abiSelectorBoundedInt]: leafConstructor(CairoUint96),
     // A composite is keyed by its selector name rather than by an abi type, and needs the type
     // back : the selector matched a family, and only the caller knows which member of it.
     [CairoTuple.dynamicSelector]: (input, strategy, type) => {
@@ -162,12 +198,12 @@ export const cairoTypeStrategy: CairoTypeStrategy = {
       );
       return new CairoNonZero(input, type, strategy);
     },
-    [CairoTypeFixedArray.dynamicSelector]: (input, strategy, type) => {
+    [CairoFixedArray.dynamicSelector]: (input, strategy, type) => {
       assert(
         type !== undefined,
-        'A CairoTypeFixedArray cannot be built without the abi type it stands for'
+        'A CairoFixedArray cannot be built without the abi type it stands for'
       );
-      return new CairoTypeFixedArray(input, type, strategy);
+      return new CairoFixedArray(input, type, strategy);
     },
   },
   response: {
@@ -184,6 +220,8 @@ export const cairoTypeStrategy: CairoTypeStrategy = {
     [CairoUint32.abiSelector]: (instance) => (instance as CairoUint32).toBigInt(),
     [CairoUint64.abiSelector]: (instance) => (instance as CairoUint64).toBigInt(),
     [CairoUint96.abiSelector]: (instance) => (instance as CairoUint96).toBigInt(),
+    // read back under the name the abi used, which is what `parseResponse` looks the entry up by
+    [CairoUint96.abiSelectorBoundedInt]: (instance) => (instance as CairoUint96).toBigInt(),
     [CairoUint128.abiSelector]: (instance) => (instance as CairoUint128).toBigInt(),
     [CairoUint256.abiSelector]: (instance) => (instance as CairoUint256).toBigInt(),
     [CairoUint512.abiSelector]: (instance) => (instance as CairoUint512).toBigInt(),
@@ -203,8 +241,8 @@ export const cairoTypeStrategy: CairoTypeStrategy = {
       (instance as CairoTypeResult).decompose(strategy),
     [CairoNonZero.dynamicSelector]: (instance, strategy) =>
       (instance as CairoNonZero).decompose(strategy),
-    [CairoTypeFixedArray.dynamicSelector]: (instance, strategy) =>
-      (instance as CairoTypeFixedArray).decompose(strategy),
+    [CairoFixedArray.dynamicSelector]: (instance, strategy) =>
+      (instance as CairoFixedArray).decompose(strategy),
   },
   dynamicSelectors: {
     [CairoTuple.dynamicSelector]: (type) => CairoTuple.isAbiType(type),
@@ -212,40 +250,96 @@ export const cairoTypeStrategy: CairoTypeStrategy = {
     [CairoTypeOption.dynamicSelector]: (type) => CairoTypeOption.isAbiType(type),
     [CairoTypeResult.dynamicSelector]: (type) => CairoTypeResult.isAbiType(type),
     [CairoNonZero.dynamicSelector]: (type) => CairoNonZero.isAbiType(type),
-    [CairoTypeFixedArray.dynamicSelector]: (type) => CairoTypeFixedArray.isAbiType(type),
+    [CairoFixedArray.dynamicSelector]: (type) => CairoFixedArray.isAbiType(type),
   },
 };
 
 /**
- * The strategy for the structs an abi declares, to be used beside {@link cairoTypeStrategy}.
+ * Build one entry that reads and writes a felt without bounding it.
  *
- * A struct is the one Cairo type with no shape to recognize : its abi type is the name the
- * contract chose, which looks like any other. So it cannot be a dynamic selector — one that
- * matched by name would have to know every name in advance, and one that matched anything would
- * shadow every other type. Instead each struct becomes an ordinary entry keyed by its own name,
- * which is what a lookup tries first.
+ * The value still goes through a Cairo type — `CairoFelt252`, which bounds the field itself — but
+ * not through the one the abi declares, so the narrower range that one would enforce is skipped.
+ * That is the whole of what {@link fastCairoTypeStrategy} trades away.
  *
- * That is what the second argument of every composite is for : the strategies are searched in
- * order, so a call passes `[cairoTypeStrategy, structStrategy(structs)]` and gets the language's
- * types from the first and the contract's from the second.
- * @param {AbiStruct[]} structs the struct definitions an abi declares
- * @returns {CairoTypeStrategy} a strategy carrying one entry per struct
+ * A value the caller has already typed is reduced against the **declared** type rather than
+ * against `core::felt252`, so `new CairoUint8(44)` in a `u8` slot is accepted here exactly as it
+ * is by the default strategy.
+ * @param {object} cairoType the class whose abi type this entry stands for
+ * @returns {Function} the constructor entry, building a felt252 whatever the declared type
  * @example
  * ```typescript
- * const point: AbiStruct = {
- *   type: 'struct',
- *   name: 'test::Point',
- *   members: [
- *     { name: 'x', type: 'core::integer::u8' },
- *     { name: 'y', type: 'core::integer::u32' },
- *   ],
- * };
- * const strategies = [cairoTypeStrategy, structStrategy([point])];
- * const felts = strategies[1].constructors['test::Point']({ x: 1, y: 2 }, strategies)
- *   .toApiRequest();
- * // felts = ["1", "2"]
+ * const entry = unboundedLeafConstructor(CairoUint8);
+ * const result = entry(300).toApiRequest();
+ * // result = ["300"]     out of a u8's range, and serialized all the same
+ * const result2 = entry(['0x12c'].values()).toApiRequest();
+ * // result2 = ["300"]
  * ```
  */
+function unboundedLeafConstructor(cairoType: {
+  abiSelector: string;
+}): (input: Iterator<string> | unknown) => CairoType {
+  return (input) =>
+    isResponseIterator(input)
+      ? CairoFelt252.factoryFromApiResponse(input)
+      : new CairoFelt252(unwrapCairoScalar(input, cairoType.abiSelector));
+}
+
+/**
+ * The leaves whose class adds a range and nothing else.
+ *
+ * Those are the ones the fast strategy can skip : what they contribute is a bound, and dropping it
+ * costs a check rather than a conversion. Everything absent from this list keeps its class because
+ * that class *reads* — a `u256` spread over two felts, a `ByteArray` carrying bytes, a signed
+ * integer that is a field element on the wire and a negative number to a caller.
+ */
+const RANGE_ONLY_TYPES = [
+  CairoBool,
+  CairoEthAddress,
+  CairoUint8,
+  CairoUint16,
+  CairoUint32,
+  CairoUint64,
+  CairoUint96,
+  CairoUint128,
+] as const;
+
+/**
+ * A faster strategy, opt-in through the second argument of `new CallData(abi, strategy)`.
+ *
+ * It buys that speed by not going through the class of the declared type for the eight leaves
+ * above, which costs one thing the caller should weigh : an out-of-range `u8`…`u128`, a non-boolean
+ * `bool` or an over-wide `EthAddress` is serialized rather than refused, and read back rather than
+ * refused, since one constructor serves both directions.
+ *
+ * Unlike the `fastParsingStrategy` it replaces, it does **not** give up reading a signed integer
+ * back as a negative number : that is a conversion, not a check, and the shared constructor makes
+ * it the same in both strategies.
+ * @example
+ * ```typescript
+ * const felts = fastCairoTypeStrategy.constructors['core::integer::u8'](300, fastCairoTypeStrategy)
+ *   .toApiRequest();
+ * // felts = ["300"]     which cairoTypeStrategy would refuse
+ * ```
+ */
+export const fastCairoTypeStrategy: CairoTypeStrategy = {
+  ...cairoTypeStrategy,
+  constructors: {
+    ...cairoTypeStrategy.constructors,
+    ...Object.fromEntries(
+      RANGE_ONLY_TYPES.map((cairoType) => [
+        cairoType.abiSelector,
+        unboundedLeafConstructor(cairoType),
+      ])
+    ),
+  },
+  response: {
+    ...cairoTypeStrategy.response,
+    // the only entry that has to follow: the others read their value with `toBigInt`, which a
+    // felt252 answers as well as the class it stands in for, but `toBoolean` is CairoBool's own
+    [CairoBool.abiSelector]: (instance) => Boolean((instance as CairoFelt252).toBigInt()),
+  },
+};
+
 /**
  * The strategy for the custom enums an abi declares, to be used beside {@link cairoTypeStrategy}.
  *
@@ -296,6 +390,36 @@ export function enumStrategy(enums: AbiEnum[]): CairoTypeStrategy {
   };
 }
 
+/**
+ * The strategy for the structs an abi declares, to be used beside {@link cairoTypeStrategy}.
+ *
+ * A struct is the one Cairo type with no shape to recognize : its abi type is the name the
+ * contract chose, which looks like any other. So it cannot be a dynamic selector — one that
+ * matched by name would have to know every name in advance, and one that matched anything would
+ * shadow every other type. Instead each struct becomes an ordinary entry keyed by its own name,
+ * which is what a lookup tries first.
+ *
+ * That is what the second argument of every composite is for : the strategies are searched in
+ * order, so a call passes `[cairoTypeStrategy, structStrategy(structs)]` and gets the language's
+ * types from the first and the contract's from the second.
+ * @param {AbiStruct[]} structs the struct definitions an abi declares
+ * @returns {CairoTypeStrategy} a strategy carrying one entry per struct
+ * @example
+ * ```typescript
+ * const point: AbiStruct = {
+ *   type: 'struct',
+ *   name: 'test::Point',
+ *   members: [
+ *     { name: 'x', type: 'core::integer::u8' },
+ *     { name: 'y', type: 'core::integer::u32' },
+ *   ],
+ * };
+ * const strategies = [cairoTypeStrategy, structStrategy([point])];
+ * const felts = strategies[1].constructors['test::Point']({ x: 1, y: 2 }, strategies)
+ *   .toApiRequest();
+ * // felts = ["1", "2"]
+ * ```
+ */
 export function structStrategy(structs: AbiStruct[]): CairoTypeStrategy {
   return {
     constructors: Object.fromEntries(

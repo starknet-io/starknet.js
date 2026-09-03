@@ -1,7 +1,4 @@
-import { CallData } from '../../../src';
-import { CairoTuple } from '../../../src/utils/cairoDataTypes/tuple';
-import { CairoUint8 } from '../../../src/utils/cairoDataTypes/uint8';
-import { cairoTypeStrategy } from '../../../src/utils/calldata/parser/cairoTypeStrategy';
+import { CairoTuple, CairoUint8, CallData, cairoTypeStrategy } from '../../../src';
 
 const S = cairoTypeStrategy;
 const PAIR = '(core::integer::u8, core::integer::u32)';

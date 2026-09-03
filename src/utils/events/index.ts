@@ -16,7 +16,6 @@ import {
 import assert from '../assert';
 import { isCairo1Abi } from '../calldata/cairo';
 import { AbiParserInterface } from '../calldata/parser/interface';
-import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToUint8Array } from '../encode';
 import { toHex } from '../num';
@@ -238,26 +237,15 @@ export function parseEvents(
 
     const parsedEventData = parsedEvent[eventName];
 
+    // the parser reads the structs and enums off its own abi, which is the one this event came
+    // from — `abiStructs` and `abiEnums` are kept in the signature but no longer consulted.
+    // `parsedEventData` is still passed: that is where a Cairo 0 array finds its `${name}_len`
     abiEventKeys.forEach((key) => {
-      parsedEventData[key.name] = responseParser({
-        responseIterator: keysIter,
-        output: key,
-        structs: abiStructs,
-        enums: abiEnums,
-        parser,
-        parsedResult: parsedEventData,
-      });
+      parsedEventData[key.name] = parser.parseResponse(keysIter, key, parsedEventData);
     });
 
     abiEventData.forEach((data) => {
-      parsedEventData[data.name] = responseParser({
-        responseIterator: dataIter,
-        output: data,
-        structs: abiStructs,
-        enums: abiEnums,
-        parser,
-        parsedResult: parsedEventData,
-      });
+      parsedEventData[data.name] = parser.parseResponse(dataIter, data, parsedEventData);
     });
 
     acc.push(parsedEvent);

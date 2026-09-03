@@ -14,7 +14,7 @@ import type {
 import type { PaymasterDetails, UniversalDetails } from '../../account/types/index.type';
 import type { ProviderInterface } from '../../provider';
 import type { AccountInterface } from '../../account/interface';
-import type { ParsingStrategy } from '../../utils/calldata/parser';
+import type { CairoTypeStrategy, ParsingStrategy } from '../../utils/calldata/parser';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
@@ -75,8 +75,13 @@ export type CommonContractOptions = {
 
   /**
    * Custom parsing strategy for request/response processing
+   *
+   * Which of the two shapes applies follows from the abi: a Cairo 1 or Cairo 2 contract is served
+   * by the Cairo type classes and takes a `CairoTypeStrategy` — `cairoTypeStrategy`,
+   * `fastCairoTypeStrategy`, or one of your own built from either. A Cairo 0 contract takes the
+   * older `ParsingStrategy`. Handing over the wrong one raises, rather than being ignored.
    */
-  parsingStrategy?: ParsingStrategy;
+  parsingStrategy?: ParsingStrategy | CairoTypeStrategy;
 };
 
 export type ContractOptions = {

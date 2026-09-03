@@ -1,8 +1,4 @@
-import { CallData } from '../../../src';
-import { CairoArray } from '../../../src/utils/cairoDataTypes/array';
-import { CairoTuple } from '../../../src/utils/cairoDataTypes/tuple';
-import { CairoUint8 } from '../../../src/utils/cairoDataTypes/uint8';
-import { cairoTypeStrategy } from '../../../src/utils/calldata/parser/cairoTypeStrategy';
+import { CairoArray, CairoTuple, CairoUint8, CallData, cairoTypeStrategy } from '../../../src';
 
 const S = cairoTypeStrategy;
 const U8 = 'core::array::Array::<core::integer::u8>';

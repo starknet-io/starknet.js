@@ -1,10 +1,11 @@
 import {
+  AbiParser0,
+  AbiParser1,
+  AbiParser2,
   createAbiParser,
   getAbiVersion,
   isNoConstructorValid,
-} from '../../../../src/utils/calldata/parser';
-import { AbiParser2 } from '../../../../src/utils/calldata/parser/parser-2.0.0';
-import { AbiParser1 } from '../../../../src/utils/calldata/parser/parser-0-1.1.0';
+} from '../../../../src';
 import { getFunctionAbi, getInterfaceAbi } from '../../../factories/abi';
 
 describe('createAbiParser', () => {
@@ -14,8 +15,16 @@ describe('createAbiParser', () => {
   });
 
   test('should create an AbiParser1 instance', () => {
-    const abiParser = createAbiParser([getFunctionAbi('struct')]);
+    const abiParser = createAbiParser([getFunctionAbi('core::bool')]);
     expect(abiParser instanceof AbiParser1).toEqual(true);
+  });
+
+  // a Cairo 0 abi is the one whose types carry no '::', and it gets its own parser so that the
+  // Cairo 1 ones can move to the Cairo type classes without it
+  test('should create an AbiParser0 instance', () => {
+    const abiParser = createAbiParser([getFunctionAbi('felt')]);
+    expect(abiParser instanceof AbiParser0).toEqual(true);
+    expect(abiParser instanceof AbiParser1).toEqual(false);
   });
 });
 

@@ -1,4 +1,4 @@
-import { AbiParser2 } from '../../../../src/utils/calldata/parser/parser-2.0.0';
+import { AbiParser2 } from '../../../../src';
 import { getFunctionAbi, getInterfaceAbi } from '../../../factories/abi';
 
 describe('AbiParser2', () => {

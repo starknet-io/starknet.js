@@ -1,11 +1,12 @@
-import { CallData, type AbiStruct } from '../../../src';
-import { CairoArray } from '../../../src/utils/cairoDataTypes/array';
-import { CairoStruct } from '../../../src/utils/cairoDataTypes/cairoStruct';
-import { CairoUint8 } from '../../../src/utils/cairoDataTypes/uint8';
 import {
+  CairoArray,
+  CairoStruct,
+  CairoUint8,
+  CallData,
   cairoTypeStrategy,
   structStrategy,
-} from '../../../src/utils/calldata/parser/cairoTypeStrategy';
+  type AbiStruct,
+} from '../../../src';
 
 // hand-written rather than taken from a compiled contract: these are unit tests of the class, and
 // the abi definition is all it ever reads

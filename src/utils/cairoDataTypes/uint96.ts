@@ -49,6 +49,21 @@ export class CairoUint96 {
   static abiSelector = 'core::integer::u96';
 
   /**
+   * The name a compiled abi actually gives this type.
+   *
+   * Cairo has no `u96` of its own : it is a bounded integer, and the compiler writes it out as its
+   * bounds. So {@link CairoUint96.abiSelector} above is the name one would expect and never meets,
+   * while this is the one a contract emits — both are recognized, here and in the parsing strategy.
+   * @example
+   * ```typescript
+   * const result = CairoUint96.abiSelectorBoundedInt;
+   * // result = "core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>"
+   * ```
+   */
+  static abiSelectorBoundedInt =
+    'core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>';
+
+  /**
    * Build from a number, a string or a boolean, refusing anything out of the u96 range.
    *
    * A string is read as a number when it spells one — decimal or hexadecimal — and as UTF-8 text
@@ -205,18 +220,25 @@ export class CairoUint96 {
 
   /**
    * Is this abi type the one this class serializes?
+   *
+   * Both names answer true : the one a reader would write, and the bounded-integer form a compiled
+   * abi actually carries. Only the second is ever met in the wild.
    * @param {string} abiType the abi type to test
-   * @returns {boolean} true for `core::integer::u96`
+   * @returns {boolean} true for `core::integer::u96` and for its bounded-integer name
    * @example
    * ```typescript
    * const result = CairoUint96.isAbiType('core::integer::u96');
    * // result = true
-   * const result2 = CairoUint96.isAbiType('core::felt252');
-   * // result2 = false
+   * const result2 = CairoUint96.isAbiType(
+   *   'core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>'
+   * );
+   * // result2 = true     the name a contract emits
+   * const result3 = CairoUint96.isAbiType('core::felt252');
+   * // result3 = false
    * ```
    */
   static isAbiType(abiType: string): boolean {
-    return abiType === CairoUint96.abiSelector;
+    return abiType === CairoUint96.abiSelector || abiType === CairoUint96.abiSelectorBoundedInt;
   }
 
   /**

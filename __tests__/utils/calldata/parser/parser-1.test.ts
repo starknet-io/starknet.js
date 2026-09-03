@@ -1,4 +1,4 @@
-import { AbiParser1 } from '../../../../src/utils/calldata/parser/parser-0-1.1.0';
+import { AbiParser1 } from '../../../../src';
 import { getFunctionAbi, getInterfaceAbi } from '../../../factories/abi';
 
 describe('AbiParser1', () => {
@@ -14,11 +14,13 @@ describe('AbiParser1', () => {
       expect(abiParser.methodInputsLength(getFunctionAbi('felt'))).toEqual(1);
     });
 
-    test('should return 0 if inputs are empty', () => {
+    test('should count an input named like a Cairo 0 length, which it no longer discounts', () => {
+      // that reduction went to AbiParser0 when it was split off: a `_len` input belongs to a
+      // Cairo 0 array, and a Cairo 1 array is one input carrying its own length
       const abiParser = new AbiParser1([getFunctionAbi('felt')]);
       const functionAbi = getFunctionAbi('felt');
       functionAbi.inputs[0].name = 'test_len';
-      expect(abiParser.methodInputsLength(functionAbi)).toEqual(0);
+      expect(abiParser.methodInputsLength(functionAbi)).toEqual(1);
     });
   });
 
