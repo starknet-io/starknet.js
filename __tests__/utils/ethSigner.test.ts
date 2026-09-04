@@ -152,7 +152,9 @@ describe('Ethereum signer', () => {
         entrypoint: 'transfer',
         calldata: {
           recipient: contractETHAccountAddress,
-          amount: cairo.uint256(2n * 10n ** 18n), // 2 STRK of fees
+          // Hard spending cap for this test. The node checks the balance against the ceiling of
+          // the bounds sent below — 400x the estimate, i.e. 2.03 STRK under Starknet 0.14.4.
+          amount: cairo.uint256(3n * 10n ** 18n), // 3 STRK of fees
         },
       });
       await account.provider.waitForTransaction(transaction_hash);
