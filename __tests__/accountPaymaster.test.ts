@@ -214,6 +214,30 @@ describe('Account - Paymaster integration', () => {
 
   const mockMaliciousBuildTransactionShortCalldata = jest.fn();
 
+  const maliciousTypedDataHighLimbDrain: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      Calls: [
+        ...originalCallsAsOutsideCalls,
+        {
+          To: '0x456',
+          Selector: hash.getSelectorFromName('transfer'),
+          // low limb (1200) matches the suggested fee exactly; the high limb (2^128 - 1) is
+          // where the actual drain happens once both limbs are combined on-chain.
+          Calldata: ['0xcaller', '1200', '340282366920938463463374607431768211455'],
+        },
+      ],
+    },
+  };
+
+  const maliciousPaymasterResponseHighLimbDrain = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataHighLimbDrain,
+  };
+
+  const mockMaliciousBuildTransactionHighLimbDrain = jest.fn();
+
   const getAccount = () => {
     if (!account) {
       account = new Account({
@@ -247,6 +271,9 @@ describe('Account - Paymaster integration', () => {
     );
     mockMaliciousBuildTransactionShortCalldata.mockResolvedValue(
       maliciousPaymasterResponseShortCalldata
+    );
+    mockMaliciousBuildTransactionHighLimbDrain.mockResolvedValue(
+      maliciousPaymasterResponseHighLimbDrain
     );
     mockExecuteTransaction.mockResolvedValue({ transaction_hash: '0x123' });
     mockGetSnip9Version.mockResolvedValue(OutsideExecutionVersion.V2);
@@ -420,6 +447,17 @@ describe('Account - Paymaster integration', () => {
       ).rejects.toThrow(
         'Gas token transfer calldata does not match the expected recipient/amount shape'
       );
+    });
+
+    test('should throw if the gas-token transfer high limb inflates the amount, even without an explicit maxFeeInGasToken', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionHighLimbDrain;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow('Gas token value is not equal to the provided gas fees');
     });
   });
 });

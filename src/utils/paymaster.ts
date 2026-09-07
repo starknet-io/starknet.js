@@ -6,6 +6,7 @@ import { CallData } from './calldata';
 import { toOutsideCallV2 } from './outsideExecution';
 import { getSelectorFromName } from './hash';
 import { toBigInt } from './num';
+import { uint256ToBN } from './uint256';
 import type {
   OutsideCallV1,
   OutsideCallV2,
@@ -44,10 +45,16 @@ const assertGasFeeFromUnsafeCalls = (
 ) => {
   const unsafeCall = toOutsideCallV2(unsafeCalls[unsafeCalls.length - 1]);
   const unsafeGasTokenCalldata = CallData.toCalldata(unsafeCall.Calldata);
-  const unsafeGasTokenValue = unsafeGasTokenCalldata[1];
+  // The transfer amount is a Uint256: low limb at index 1, high limb at index 2. Reading only
+  // the low limb lets a malicious paymaster inflate the signed amount via the high limb while
+  // this check still sees a match.
+  const unsafeGasTokenValue = uint256ToBN({
+    low: unsafeGasTokenCalldata[1],
+    high: unsafeGasTokenCalldata[2],
+  });
   // Assert gas token to signed is stricly equal to the provided gas fees
   assert(
-    BigInt(unsafeGasTokenValue) === BigInt(fees),
+    unsafeGasTokenValue === BigInt(fees),
     'Gas token value is not equal to the provided gas fees'
   );
 };
@@ -227,18 +234,18 @@ export const assertPaymasterTransactionSafety = (
       // Assert gas token address from unsafe calls is equal to the provided gas token
       assertGasTokenFromUnsafeCalls(unsafeCalls, paymasterDetails.feeMode.gasToken);
 
-      // If maxFeeInGasToken is provided, do all safety checks
+      // Assert the signed gas-token amount matches the fee displayed to the user, whether or
+      // not the caller supplied an explicit ceiling below
+      assertGasFeeFromUnsafeCalls(
+        unsafeCalls,
+        preparedTransaction.fee.suggested_max_fee_in_gas_token
+      );
+
+      // If maxFeeInGasToken is provided, also enforce the user-approved ceiling
       if (maxFeeInGasToken) {
-        // Check if the gas token price is too high
         assert(
           preparedTransaction.fee.suggested_max_fee_in_gas_token <= maxFeeInGasToken,
           'Gas token price is too high'
-        );
-
-        // Assert gas fee from unsafe calls is equal to the provided gas fees(the value used to display the gas fee to the user)
-        assertGasFeeFromUnsafeCalls(
-          unsafeCalls,
-          preparedTransaction.fee.suggested_max_fee_in_gas_token
         );
       }
     }
