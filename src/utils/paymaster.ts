@@ -6,7 +6,13 @@ import { CallData } from './calldata';
 import { toOutsideCallV2 } from './outsideExecution';
 import { getSelectorFromName } from './hash';
 import { toBigInt } from './num';
-import type { OutsideCallV1, OutsideCallV2, OutsideExecutionTypedData } from '../types/api';
+import type {
+  OutsideCallV1,
+  OutsideCallV2,
+  OutsideExecutionMessageV1,
+  OutsideExecutionMessageV2,
+  OutsideExecutionTypedData,
+} from '../types/api';
 
 /**
  * Return randomly select available public paymaster node url
@@ -191,11 +197,19 @@ export const assertPaymasterTransactionSafety = (
 
     // A sponsored transaction has no appended gas-token call: nothing left to verify below.
     if (paymasterDetails.feeMode.mode !== 'sponsored') {
-      // extract unsafe calls to verify
-      const unsafeCalls: (OutsideCallV1 | OutsideCallV2)[] =
-        'calls' in preparedTransaction.typed_data.message
-          ? (preparedTransaction.typed_data.message as any).calls
-          : (preparedTransaction.typed_data.message as any).Calls;
+      // extract unsafe calls to verify: the message must declare exactly one of the two
+      // SNIP-9 shapes, never both — otherwise a paymaster could present a benign array to
+      // this check while a different, attacker-chosen array is the one actually signed.
+      const { message } = preparedTransaction.typed_data;
+      const hasV1Calls = 'calls' in message;
+      const hasV2Calls = 'Calls' in message;
+      assert(
+        hasV1Calls !== hasV2Calls,
+        'Paymaster typed data must declare exactly one of "calls" (SNIP-9 V1) or "Calls" (SNIP-9 V2)'
+      );
+      const unsafeCalls: (OutsideCallV1 | OutsideCallV2)[] = hasV1Calls
+        ? (message as OutsideExecutionMessageV1).calls
+        : (message as OutsideExecutionMessageV2).Calls;
 
       // Assert calls provided and unsafe calls are strictly equal
       assertCallsAreStrictlyEqual(calls, unsafeCalls);

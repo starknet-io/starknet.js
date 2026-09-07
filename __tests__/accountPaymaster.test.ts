@@ -1,4 +1,8 @@
-import type { OutsideCallV2, OutsideExecutionTypedDataV2 } from '../src/types/api';
+import type {
+  OutsideCallV2,
+  OutsideExecutionMessageV2,
+  OutsideExecutionTypedDataV2,
+} from '../src/types/api';
 import {
   Account,
   OutsideExecutionVersion,
@@ -148,6 +152,24 @@ describe('Account - Paymaster integration', () => {
 
   const mockMaliciousBuildTransactionWrongChain = jest.fn();
 
+  const maliciousTypedDataDualCallsField: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      // Undeclared lowercase field, added on top of the real `Calls`. It mirrors a fully
+      // valid response (original call + fee call), so it passes every existing check when
+      // read instead of `Calls`.
+      calls: typedData.message.Calls,
+    } as OutsideExecutionMessageV2,
+  };
+
+  const maliciousPaymasterResponseDualCallsField = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataDualCallsField,
+  };
+
+  const mockMaliciousBuildTransactionDualCallsField = jest.fn();
+
   const getAccount = () => {
     if (!account) {
       account = new Account({
@@ -173,6 +195,9 @@ describe('Account - Paymaster integration', () => {
     mockMaliciousBuildTransactionChangeFees.mockResolvedValue(maliciousPaymasterResponseChangeFees);
     mockMaliciousBuildTransactionAddedCalls.mockResolvedValue(maliciousPaymasterResponseAddedCalls);
     mockMaliciousBuildTransactionWrongChain.mockResolvedValue(maliciousPaymasterResponseWrongChain);
+    mockMaliciousBuildTransactionDualCallsField.mockResolvedValue(
+      maliciousPaymasterResponseDualCallsField
+    );
     mockExecuteTransaction.mockResolvedValue({ transaction_hash: '0x123' });
     mockGetSnip9Version.mockResolvedValue(OutsideExecutionVersion.V2);
     mockGetChainId.mockResolvedValue(constants.StarknetChainId.SN_SEPOLIA);
@@ -306,6 +331,19 @@ describe('Account - Paymaster integration', () => {
         getAccount().executePaymasterTransaction(originalCalls, details)
       ).rejects.toThrow(
         "Paymaster typed data domain chainId does not match the account's provider chain"
+      );
+    });
+
+    test('should throw if paymaster typed data declares both "calls" and "Calls"', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionDualCallsField;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow(
+        'Paymaster typed data must declare exactly one of "calls" (SNIP-9 V1) or "Calls" (SNIP-9 V2)'
       );
     });
   });
