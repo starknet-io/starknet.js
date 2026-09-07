@@ -38,13 +38,15 @@ class Logger {
 
   private formatMessage(logMessage: LogMessage): string {
     const { level, message, timestamp, data } = logMessage;
-    let formattedMessage = `[${timestamp}] ${level}: ${message}`;
+    const sanitizedMessage = message.replace(/[\r\n]/g, '');
+    let formattedMessage = `[${timestamp}] ${level}: ${sanitizedMessage}`;
 
     if (data) {
       try {
         formattedMessage += `\n${JSON.stringify(data, null, 2)}`;
       } catch (error) {
-        formattedMessage += `\n[JSON.stringify Error/Circular]: ${error}`;
+        const sanitizedError = String(error).replace(/[\r\n]/g, '');
+        formattedMessage += `\n[JSON.stringify Error/Circular]: ${sanitizedError}`;
       }
     }
 

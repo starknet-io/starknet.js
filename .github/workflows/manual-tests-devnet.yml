@@ -10,6 +10,8 @@ on:
 jobs:
   tests:
     name: Run test on rpc-devnet
+    permissions:
+      contents: read
 
     uses: ./.github/workflows/_test.yml
     with:
