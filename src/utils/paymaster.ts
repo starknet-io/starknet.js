@@ -57,10 +57,20 @@ const assertGasTokenFromUnsafeCalls = (
   gasToken: string
 ) => {
   const unsafeCall = toOutsideCallV2(unsafeCalls[unsafeCalls.length - 1]);
-  // Assert gas token to signed is stricly equal to the provided gas fees
+  // Assert gas token to signed is stricly equal to the provided gas token
   assert(
     BigInt(unsafeCall.To) === BigInt(gasToken),
     'Gas token address is not equal to the provided gas token'
+  );
+  // Assert the appended call is a plain ERC-20 `transfer`, not e.g. an `approve`
+  assert(
+    unsafeCall.Selector === getSelectorFromName('transfer'),
+    'Gas token call selector is not a transfer'
+  );
+  // Assert the calldata shape matches transfer(recipient, amount: Uint256) -> 3 felts
+  assert(
+    CallData.toCalldata(unsafeCall.Calldata).length === 3,
+    'Gas token transfer calldata does not match the expected recipient/amount shape'
   );
 };
 

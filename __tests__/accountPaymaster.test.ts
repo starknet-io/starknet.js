@@ -170,6 +170,50 @@ describe('Account - Paymaster integration', () => {
 
   const mockMaliciousBuildTransactionDualCallsField = jest.fn();
 
+  const maliciousTypedDataApproveInsteadOfTransfer: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      Calls: [
+        ...originalCallsAsOutsideCalls,
+        {
+          To: '0x456',
+          Selector: hash.getSelectorFromName('approve'),
+          Calldata: ['0xcaller', '1200', '0'],
+        },
+      ],
+    },
+  };
+
+  const maliciousPaymasterResponseApproveInsteadOfTransfer = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataApproveInsteadOfTransfer,
+  };
+
+  const mockMaliciousBuildTransactionApproveInsteadOfTransfer = jest.fn();
+
+  const maliciousTypedDataShortCalldata: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      Calls: [
+        ...originalCallsAsOutsideCalls,
+        {
+          To: '0x456',
+          Selector: hash.getSelectorFromName('transfer'),
+          Calldata: ['0xcaller', '1200'], // missing the u256 high limb
+        },
+      ],
+    },
+  };
+
+  const maliciousPaymasterResponseShortCalldata = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataShortCalldata,
+  };
+
+  const mockMaliciousBuildTransactionShortCalldata = jest.fn();
+
   const getAccount = () => {
     if (!account) {
       account = new Account({
@@ -197,6 +241,12 @@ describe('Account - Paymaster integration', () => {
     mockMaliciousBuildTransactionWrongChain.mockResolvedValue(maliciousPaymasterResponseWrongChain);
     mockMaliciousBuildTransactionDualCallsField.mockResolvedValue(
       maliciousPaymasterResponseDualCallsField
+    );
+    mockMaliciousBuildTransactionApproveInsteadOfTransfer.mockResolvedValue(
+      maliciousPaymasterResponseApproveInsteadOfTransfer
+    );
+    mockMaliciousBuildTransactionShortCalldata.mockResolvedValue(
+      maliciousPaymasterResponseShortCalldata
     );
     mockExecuteTransaction.mockResolvedValue({ transaction_hash: '0x123' });
     mockGetSnip9Version.mockResolvedValue(OutsideExecutionVersion.V2);
@@ -344,6 +394,31 @@ describe('Account - Paymaster integration', () => {
         getAccount().executePaymasterTransaction(originalCalls, details)
       ).rejects.toThrow(
         'Paymaster typed data must declare exactly one of "calls" (SNIP-9 V1) or "Calls" (SNIP-9 V2)'
+      );
+    });
+
+    test('should throw if the gas-token call selector is not a transfer', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction =
+        mockMaliciousBuildTransactionApproveInsteadOfTransfer;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow('Gas token call selector is not a transfer');
+    });
+
+    test('should throw if the gas-token call calldata does not have the expected shape', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionShortCalldata;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow(
+        'Gas token transfer calldata does not match the expected recipient/amount shape'
       );
     });
   });
