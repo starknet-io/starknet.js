@@ -17,14 +17,10 @@ describe('validateFields', () => {
   });
 
   describe('felt validation', () => {
-    test('should return void if felt validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi('felt'),
-        ['test'],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate a felt', () => {
+      expect(() =>
+        validateFields(getFunctionAbi('felt'), ['test'], getAbiStructs(), getAbiEnums())
+      ).not.toThrow();
     });
 
     test('should throw an error if felt is not the type of string, number or big int', () => {
@@ -54,86 +50,59 @@ describe('validateFields', () => {
   });
 
   describe('bytes31 validation', () => {
-    test('should return void if bytes31 validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi('core::bytes_31::bytes31'),
-        ['test'],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate a bytes31', () => {
+      expect(() =>
+        validateFields(
+          getFunctionAbi('core::bytes_31::bytes31'),
+          ['test'],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).not.toThrow();
     });
   });
 
   describe('Uint validation', () => {
-    test('should return void if Uint "u8" validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi(Uint.u8),
-        [255n],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate Uint "u8"', () => {
+      expect(() =>
+        validateFields(getFunctionAbi(Uint.u8), [255n], getAbiStructs(), getAbiEnums())
+      ).not.toThrow();
     });
 
-    test('should return void if Uint "u16" validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi(Uint.u16),
-        [65535n],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate Uint "u16"', () => {
+      expect(() =>
+        validateFields(getFunctionAbi(Uint.u16), [65535n], getAbiStructs(), getAbiEnums())
+      ).not.toThrow();
     });
 
-    test('should return void if Uint "u32" validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi(Uint.u32),
-        [4294967295n],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate Uint "u32"', () => {
+      expect(() =>
+        validateFields(getFunctionAbi(Uint.u32), [4294967295n], getAbiStructs(), getAbiEnums())
+      ).not.toThrow();
     });
 
-    test('should return void if Uint "u64" validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi(Uint.u64),
-        [2n ** 64n - 1n],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate Uint "u64"', () => {
+      expect(() =>
+        validateFields(getFunctionAbi(Uint.u64), [2n ** 64n - 1n], getAbiStructs(), getAbiEnums())
+      ).not.toThrow();
     });
 
-    test('should return void if Uint "u128" validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi(Uint.u128),
-        [2n ** 128n - 1n],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate Uint "u128"', () => {
+      expect(() =>
+        validateFields(getFunctionAbi(Uint.u128), [2n ** 128n - 1n], getAbiStructs(), getAbiEnums())
+      ).not.toThrow();
     });
 
-    test('should return void if Uint "u256" validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi(Uint.u256),
-        [2n ** 256n - 1n],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate Uint "u256"', () => {
+      expect(() =>
+        validateFields(getFunctionAbi(Uint.u256), [2n ** 256n - 1n], getAbiStructs(), getAbiEnums())
+      ).not.toThrow();
     });
 
-    test('should return void if Uint "u512" validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi(Uint.u512),
-        [2n ** 512n - 1n],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate Uint "u512"', () => {
+      expect(() =>
+        validateFields(getFunctionAbi(Uint.u512), [2n ** 512n - 1n], getAbiStructs(), getAbiEnums())
+      ).not.toThrow();
     });
 
     test('should throw an error if parameter is too large', () => {
@@ -280,14 +249,10 @@ describe('validateFields', () => {
   });
 
   describe('Boolean validation', () => {
-    test('should return void if boolean validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi('core::bool'),
-        [true],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate a boolean', () => {
+      expect(() =>
+        validateFields(getFunctionAbi('core::bool'), [true], getAbiStructs(), getAbiEnums())
+      ).not.toThrow();
     });
 
     test('should throw an error if boolean validation fails', () => {
@@ -303,14 +268,10 @@ describe('validateFields', () => {
   });
 
   describe('Boolean validation', () => {
-    test('should return void if boolean validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi('core::bool'),
-        [true],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate a boolean', () => {
+      expect(() =>
+        validateFields(getFunctionAbi('core::bool'), [true], getAbiStructs(), getAbiEnums())
+      ).not.toThrow();
     });
 
     test('should throw an error if boolean validation fails', () => {
@@ -326,26 +287,28 @@ describe('validateFields', () => {
   });
 
   describe('ByteArray validation', () => {
-    test('should return void if byte array validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi('core::byte_array::ByteArray'),
-        ['byte_array'],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate a byte array', () => {
+      expect(() =>
+        validateFields(
+          getFunctionAbi('core::byte_array::ByteArray'),
+          ['byte_array'],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).not.toThrow();
     });
   });
 
   describe('Tuple validation', () => {
-    test('should return void if tuple validation passes', () => {
-      const result = validateFields(
-        getFunctionAbi('(core::bool, core::bool)'),
-        [{ min: true, max: true }],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-      expect(result).toBeUndefined();
+    test('should validate a tuple', () => {
+      expect(() =>
+        validateFields(
+          getFunctionAbi('(core::bool, core::bool)'),
+          [{ min: true, max: true }],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).not.toThrow();
     });
 
     test('should throw an error if tupple validation fails', () => {
@@ -363,49 +326,40 @@ describe('validateFields', () => {
   });
 
   describe('Struct validation', () => {
-    test('should return void if struct validation passes for common struct', () => {
-      const result = validateFields(
-        getFunctionAbi('struct'),
-        [{ test_name: 'test' }],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-
-      expect(result).toBeUndefined();
+    test('should validate a common struct', () => {
+      expect(() =>
+        validateFields(
+          getFunctionAbi('struct'),
+          [{ test_name: 'test' }],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).not.toThrow();
     });
 
-    test('should return void if struct validation passes for Uint 256 or 512', () => {
+    test('should validate Uint 256 and Uint 512 structs', () => {
       const abiStructs256 = {
         [Uint.u256]: getAbiStructs().struct,
       };
-      const result256 = validateFields(
-        getFunctionAbi(Uint.u256),
-        [2n ** 256n - 1n],
-        abiStructs256,
-        getAbiEnums()
-      );
+      expect(() =>
+        validateFields(getFunctionAbi(Uint.u256), [2n ** 256n - 1n], abiStructs256, getAbiEnums())
+      ).not.toThrow();
 
       const abiStructs512 = {
         [Uint.u512]: getAbiStructs().struct,
       };
-      const result512 = validateFields(
-        getFunctionAbi(Uint.u512),
-        [2n ** 512n - 1n],
-        abiStructs512,
-        getAbiEnums()
-      );
-
-      expect(result256).toBeUndefined();
-      expect(result512).toBeUndefined();
+      expect(() =>
+        validateFields(getFunctionAbi(Uint.u512), [2n ** 512n - 1n], abiStructs512, getAbiEnums())
+      ).not.toThrow();
     });
 
-    test('should return void if struct validation passes for EthAddress', () => {
+    test('should validate an EthAddress struct', () => {
       const abiStructs = {
         [ETH_ADDRESS]: getAbiStructs().struct,
       };
-      const result = validateFields(getFunctionAbi(ETH_ADDRESS), [1n], abiStructs, getAbiEnums());
-
-      expect(result).toBeUndefined();
+      expect(() =>
+        validateFields(getFunctionAbi(ETH_ADDRESS), [1n], abiStructs, getAbiEnums())
+      ).not.toThrow();
     });
 
     test('should throw an error for EthAddress struct if type is not a BigNumberish', () => {
@@ -459,47 +413,47 @@ describe('validateFields', () => {
   });
 
   describe('Enum validation', () => {
-    test('should return void if enum validation passes for custom enum', () => {
-      const result = validateFields(
-        getFunctionAbi('enum'),
-        [{ variant: 'test', activeVariant: 'test' }],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-
-      expect(result).toBeUndefined();
+    test('should validate a custom enum', () => {
+      expect(() =>
+        validateFields(
+          getFunctionAbi('enum'),
+          [{ variant: 'test', activeVariant: 'test' }],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).not.toThrow();
     });
 
-    test('should return void if enum validation passes for type option', () => {
+    test('should validate an option enum', () => {
       const enumOption = 'core::option::Option::core::bool';
 
       const abiEnums = {
         [enumOption]: getAbiEnums().enum,
       };
-      const result = validateFields(
-        getFunctionAbi(enumOption),
-        [new CairoOption<string>(0, 'content')],
-        getAbiStructs(),
-        abiEnums
-      );
-
-      expect(result).toBeUndefined();
+      expect(() =>
+        validateFields(
+          getFunctionAbi(enumOption),
+          [new CairoOption<string>(0, 'content')],
+          getAbiStructs(),
+          abiEnums
+        )
+      ).not.toThrow();
     });
 
-    test('should return void if enum validation passes for type result', () => {
+    test('should validate a result enum', () => {
       const enumResult = 'core::result::Result::bool';
 
       const abiEnums = {
         [enumResult]: getAbiEnums().enum,
       };
-      const result = validateFields(
-        getFunctionAbi(enumResult),
-        [new CairoResult<number, string>(0, 'content')],
-        getAbiStructs(),
-        abiEnums
-      );
-
-      expect(result).toBeUndefined();
+      expect(() =>
+        validateFields(
+          getFunctionAbi(enumResult),
+          [new CairoResult<number, string>(0, 'content')],
+          getAbiStructs(),
+          abiEnums
+        )
+      ).not.toThrow();
     });
 
     test('should throw an error if arg is not an JS object', () => {
@@ -529,26 +483,26 @@ describe('validateFields', () => {
   });
 
   describe('NonZero validation', () => {
-    test('should return void if non zero validation passes for felt', () => {
-      const result = validateFields(
-        getFunctionAbi(`${NON_ZERO_PREFIX}<felt>`),
-        [1n],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-
-      expect(result).toBeUndefined();
+    test('should validate a non-zero felt', () => {
+      expect(() =>
+        validateFields(
+          getFunctionAbi(`${NON_ZERO_PREFIX}<felt>`),
+          [1n],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).not.toThrow();
     });
 
-    test('should return void if non zero validation passes for Uint', () => {
-      const result = validateFields(
-        getFunctionAbi(`${NON_ZERO_PREFIX}<${Uint.u8}>`),
-        [1n],
-        getAbiStructs(),
-        getAbiEnums()
-      );
-
-      expect(result).toBeUndefined();
+    test('should validate a non-zero Uint', () => {
+      expect(() =>
+        validateFields(
+          getFunctionAbi(`${NON_ZERO_PREFIX}<${Uint.u8}>`),
+          [1n],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).not.toThrow();
     });
 
     test('should throw an error if type is not authorized', () => {
@@ -605,7 +559,7 @@ describe('validateFields', () => {
   });
 
   describe('Array validation', () => {
-    test('should return void if array validation passes for each type', () => {
+    test('should validate arrays of each type', () => {
       const validateArray = (type: string, param: unknown) =>
         validateFields(getFunctionAbi(type), [[param]], getAbiStructs(), getAbiEnums());
 
@@ -625,26 +579,21 @@ describe('validateFields', () => {
       const enumArrayResult = 'core::array::Array::<core::result::Result::core::bool>';
 
       const abiEnums = { 'core::result::Result::core::bool': getAbiEnums().enum };
-      const validatedArrayEnum = validateFields(
-        getFunctionAbi(enumArrayResult),
-        [[new CairoResult<number, string>(0, 'content')]],
-        getAbiStructs(),
-        abiEnums
-      );
-
-      expect(validatedArrayEnum).toBeUndefined();
+      expect(() =>
+        validateFields(
+          getFunctionAbi(enumArrayResult),
+          [[new CairoResult<number, string>(0, 'content')]],
+          getAbiStructs(),
+          abiEnums
+        )
+      ).not.toThrow();
 
       const structArrayEth = `core::array::Array::<${ETH_ADDRESS}>`;
       const abiStructs = { [ETH_ADDRESS]: getAbiStructs().struct };
 
-      const validatedArrayStruct = validateFields(
-        getFunctionAbi(structArrayEth),
-        [[1n]],
-        abiStructs,
-        getAbiEnums()
-      );
-
-      expect(validatedArrayStruct).toBeUndefined();
+      expect(() =>
+        validateFields(getFunctionAbi(structArrayEth), [[1n]], abiStructs, getAbiEnums())
+      ).not.toThrow();
     });
 
     test('should throw an error if parameter is not an array', () => {
