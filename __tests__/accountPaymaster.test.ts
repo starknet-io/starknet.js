@@ -238,6 +238,42 @@ describe('Account - Paymaster integration', () => {
 
   const mockMaliciousBuildTransactionHighLimbDrain = jest.fn();
 
+  const sponsoredTypedData: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      Calls: originalCallsAsOutsideCalls, // sponsored: no appended fee-transfer call
+    },
+  };
+
+  const sponsoredPaymasterResponse = {
+    ...paymasterResponse,
+    typed_data: sponsoredTypedData,
+  };
+
+  const mockSponsoredBuildTransaction = jest.fn();
+
+  const maliciousTypedDataSponsoredSubstitutedCalls: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      Calls: [
+        {
+          To: '0x999',
+          Selector: hash.getSelectorFromName('transfer'),
+          Calldata: ['0xattacker', '999999', '0'],
+        },
+      ], // a call the user never requested; still no fee call since this is "sponsored"
+    },
+  };
+
+  const maliciousPaymasterResponseSponsoredSubstitutedCalls = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataSponsoredSubstitutedCalls,
+  };
+
+  const mockMaliciousBuildTransactionSponsoredSubstitutedCalls = jest.fn();
+
   const getAccount = () => {
     if (!account) {
       account = new Account({
@@ -256,6 +292,10 @@ describe('Account - Paymaster integration', () => {
     jest.clearAllMocks();
     jest.spyOn(getAccount(), 'getSnip9Version').mockImplementation(mockGetSnip9Version);
     jest.spyOn(getAccount().provider, 'getChainId').mockImplementation(mockGetChainId);
+    // Reset to the default mock: individual tests below override this when they need a
+    // specific (malicious or sponsored) response, but the account object is a shared
+    // singleton, so without this reset an override from one test would leak into the next.
+    getAccount().paymaster.buildTransaction = mockBuildTransaction;
     mockBuildTransaction.mockResolvedValue(paymasterResponse);
     mockMaliciousBuildTransactionChangeToken.mockResolvedValue(
       maliciousPaymasterResponseChangeToken
@@ -274,6 +314,10 @@ describe('Account - Paymaster integration', () => {
     );
     mockMaliciousBuildTransactionHighLimbDrain.mockResolvedValue(
       maliciousPaymasterResponseHighLimbDrain
+    );
+    mockSponsoredBuildTransaction.mockResolvedValue(sponsoredPaymasterResponse);
+    mockMaliciousBuildTransactionSponsoredSubstitutedCalls.mockResolvedValue(
+      maliciousPaymasterResponseSponsoredSubstitutedCalls
     );
     mockExecuteTransaction.mockResolvedValue({ transaction_hash: '0x123' });
     mockGetSnip9Version.mockResolvedValue(OutsideExecutionVersion.V2);
@@ -347,6 +391,7 @@ describe('Account - Paymaster integration', () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'sponsored' },
       };
+      getAccount().paymaster.buildTransaction = mockSponsoredBuildTransaction;
       const result = await getAccount().executePaymasterTransaction(
         originalCalls,
         details,
@@ -458,6 +503,18 @@ describe('Account - Paymaster integration', () => {
       await expect(
         getAccount().executePaymasterTransaction(originalCalls, details)
       ).rejects.toThrow('Gas token value is not equal to the provided gas fees');
+    });
+
+    test('should throw if a sponsored transaction substitutes different calls', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'sponsored' },
+      };
+      getAccount().paymaster.buildTransaction =
+        mockMaliciousBuildTransactionSponsoredSubstitutedCalls;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow('Provided calls are not strictly equal to the returned calls');
     });
   });
 });

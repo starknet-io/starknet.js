@@ -85,18 +85,28 @@ const assertGasTokenFromUnsafeCalls = (
  * Asserts that the given calls are strictly equal, otherwise throws an error.
  * @param {Call[]} originalCalls - The original calls.
  * @param {Call[]} unsafeCalls - The unsafe calls.
+ * @param {boolean} [isSponsored] - Whether the transaction is sponsored. A sponsored
+ * transaction appends no gas-token fee-transfer call; a non-sponsored one appends exactly
+ * one. Defaults to `false` for backward compatibility.
  * @throws {Error} Throws an error if the calls are not strictly equal.
+ * @example
+ * ```typescript
+ * paymaster.assertCallsAreStrictlyEqual(originalCalls, unsafeCalls, true); // sponsored: no fee call
+ * ```
  */
 export function assertCallsAreStrictlyEqual(
   originalCalls: Call[],
-  unsafeCalls: (OutsideCallV1 | OutsideCallV2)[]
+  unsafeCalls: (OutsideCallV1 | OutsideCallV2)[],
+  isSponsored: boolean = false
 ) {
   const baseError = 'Provided calls are not strictly equal to the returned calls';
 
-  // Unsafe calls always include one additional call (gas token transfer)
+  // A sponsored transaction appends no gas-token fee-transfer call; a non-sponsored one
+  // appends exactly one.
+  const expectedExtraCalls = isSponsored ? 0 : 1;
   assert(
-    unsafeCalls.length - 1 === originalCalls.length,
-    `${baseError}: Expected ${originalCalls.length + 1} calls, got ${unsafeCalls.length}`
+    unsafeCalls.length - expectedExtraCalls === originalCalls.length,
+    `${baseError}: Expected ${originalCalls.length + expectedExtraCalls} calls, got ${unsafeCalls.length}`
   );
 
   // Compare each original call with the corresponding unsafe call
@@ -212,25 +222,28 @@ export const assertPaymasterTransactionSafety = (
     // regardless of fee mode: a cross-chain signature is dangerous even when sponsored.
     assertChainIdFromTypedData(preparedTransaction.typed_data, chainId);
 
+    // extract unsafe calls to verify: the message must declare exactly one of the two
+    // SNIP-9 shapes, never both — otherwise a paymaster could present a benign array to
+    // this check while a different, attacker-chosen array is the one actually signed.
+    // This runs for every fee mode: a sponsored transaction still executes whatever calls
+    // are in this array, so it needs the same protection.
+    const { message } = preparedTransaction.typed_data;
+    const hasV1Calls = 'calls' in message;
+    const hasV2Calls = 'Calls' in message;
+    assert(
+      hasV1Calls !== hasV2Calls,
+      'Paymaster typed data must declare exactly one of "calls" (SNIP-9 V1) or "Calls" (SNIP-9 V2)'
+    );
+    const unsafeCalls: (OutsideCallV1 | OutsideCallV2)[] = hasV1Calls
+      ? (message as OutsideExecutionMessageV1).calls
+      : (message as OutsideExecutionMessageV2).Calls;
+
+    // A sponsored transaction appends no gas-token call, so the calls array should match the
+    // user's request 1:1; a non-sponsored one appends exactly one (the fee transfer).
+    assertCallsAreStrictlyEqual(calls, unsafeCalls, paymasterDetails.feeMode.mode === 'sponsored');
+
     // A sponsored transaction has no appended gas-token call: nothing left to verify below.
     if (paymasterDetails.feeMode.mode !== 'sponsored') {
-      // extract unsafe calls to verify: the message must declare exactly one of the two
-      // SNIP-9 shapes, never both — otherwise a paymaster could present a benign array to
-      // this check while a different, attacker-chosen array is the one actually signed.
-      const { message } = preparedTransaction.typed_data;
-      const hasV1Calls = 'calls' in message;
-      const hasV2Calls = 'Calls' in message;
-      assert(
-        hasV1Calls !== hasV2Calls,
-        'Paymaster typed data must declare exactly one of "calls" (SNIP-9 V1) or "Calls" (SNIP-9 V2)'
-      );
-      const unsafeCalls: (OutsideCallV1 | OutsideCallV2)[] = hasV1Calls
-        ? (message as OutsideExecutionMessageV1).calls
-        : (message as OutsideExecutionMessageV2).Calls;
-
-      // Assert calls provided and unsafe calls are strictly equal
-      assertCallsAreStrictlyEqual(calls, unsafeCalls);
-
       // Assert gas token address from unsafe calls is equal to the provided gas token
       assertGasTokenFromUnsafeCalls(unsafeCalls, paymasterDetails.feeMode.gasToken);
 
