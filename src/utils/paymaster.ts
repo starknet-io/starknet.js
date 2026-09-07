@@ -1,4 +1,4 @@
-import { NetworkName, PAYMASTER_RPC_NODES } from '../global/constants';
+import { NetworkName, PAYMASTER_RPC_NODES, StarknetChainId } from '../global/constants';
 import { logger } from '../global/logger';
 import { BigNumberish, PaymasterDetails, PreparedTransaction, Call } from '../types';
 import assert from './assert';
@@ -6,7 +6,7 @@ import { CallData } from './calldata';
 import { toOutsideCallV2 } from './outsideExecution';
 import { getSelectorFromName } from './hash';
 import { toBigInt } from './num';
-import type { OutsideCallV1, OutsideCallV2 } from '../types/api';
+import type { OutsideCallV1, OutsideCallV2, OutsideExecutionTypedData } from '../types/api';
 
 /**
  * Return randomly select available public paymaster node url
@@ -130,16 +130,67 @@ export function assertCallsAreStrictlyEqual(
   }
 }
 
+/**
+ * Asserts that the typed-data domain returned by the paymaster is bound to the account's own
+ * provider chain, so a malicious or mismatched paymaster cannot obtain a signature that is
+ * valid on a different chain than the one the user intended.
+ * @param {OutsideExecutionTypedData} typedData - The typed data returned by the paymaster.
+ * @param {StarknetChainId} chainId - The chain id of the account's own provider.
+ * @throws {Error} Throws an error if the domain chainId does not match the provider chain.
+ * @example
+ * ```typescript
+ * assertChainIdFromTypedData(
+ *   { domain: { chainId: '0x534e5f5345504f4c4941' }, message: {}, primaryType: '', types: {} },
+ *   constants.StarknetChainId.SN_SEPOLIA
+ * );
+ * // does not throw
+ * ```
+ */
+const assertChainIdFromTypedData = (
+  typedData: OutsideExecutionTypedData,
+  chainId: StarknetChainId
+) => {
+  assert(
+    typedData.domain.chainId !== undefined && BigInt(typedData.domain.chainId) === BigInt(chainId),
+    "Paymaster typed data domain chainId does not match the account's provider chain"
+  );
+};
+
+/**
+ * Asserts that a paymaster-prepared transaction is safe to sign: the typed-data domain is
+ * bound to the account's own chain, and — for non-sponsored transactions — the calls and the
+ * appended gas-token transfer match what the user actually requested.
+ * @param {PreparedTransaction} preparedTransaction - The transaction returned by the paymaster.
+ * @param {Call[]} calls - The calls originally requested by the user.
+ * @param {PaymasterDetails} paymasterDetails - The fee mode and related paymaster details.
+ * @param {StarknetChainId} chainId - The chain id of the account's own provider.
+ * @param {BigNumberish} [maxFeeInGasToken] - Optional user-approved ceiling on the gas-token fee.
+ * @throws {Error} Throws an error if any of the above safety properties do not hold.
+ * @example
+ * ```typescript
+ * assertPaymasterTransactionSafety(
+ *   preparedTransaction,
+ *   calls,
+ *   { feeMode: { mode: 'default', gasToken: strkAddress } },
+ *   constants.StarknetChainId.SN_SEPOLIA
+ * );
+ * // does not throw if preparedTransaction is exactly what was requested
+ * ```
+ */
 export const assertPaymasterTransactionSafety = (
   preparedTransaction: PreparedTransaction,
   calls: Call[],
   paymasterDetails: PaymasterDetails,
+  chainId: StarknetChainId,
   maxFeeInGasToken?: BigNumberish
 ) => {
-  // If tx is not sponsored, we can skip safety checks
-  if (paymasterDetails.feeMode.mode !== 'sponsored') {
-    // We only check the calls if user effectively has to pay something
-    if (preparedTransaction.type === 'invoke' || preparedTransaction.type === 'deploy_and_invoke') {
+  if (preparedTransaction.type === 'invoke' || preparedTransaction.type === 'deploy_and_invoke') {
+    // The typed-data domain must always be bound to the account's own provider chain,
+    // regardless of fee mode: a cross-chain signature is dangerous even when sponsored.
+    assertChainIdFromTypedData(preparedTransaction.typed_data, chainId);
+
+    // A sponsored transaction has no appended gas-token call: nothing left to verify below.
+    if (paymasterDetails.feeMode.mode !== 'sponsored') {
       // extract unsafe calls to verify
       const unsafeCalls: (OutsideCallV1 | OutsideCallV2)[] =
         'calls' in preparedTransaction.typed_data.message

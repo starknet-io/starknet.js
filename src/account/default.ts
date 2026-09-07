@@ -1138,12 +1138,13 @@ export class Account implements AccountInterface {
     const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
 
     // Check the transaction is safe
-    // Check gas fee value & gas token address
+    // Check chain binding, gas fee value & gas token address
     // Check that provided calls and builded calls are strictly equal
     assertPaymasterTransactionSafety(
       preparedTransaction,
       calls,
       paymasterDetails,
+      await this.provider.getChainId(),
       maxFeeInGasToken
     );
 
