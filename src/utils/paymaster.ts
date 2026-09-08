@@ -6,6 +6,7 @@ import { CallData } from './calldata';
 import { toOutsideCallV2 } from './outsideExecution';
 import { getSelectorFromName } from './hash';
 import { toBigInt } from './num';
+import { encodeShortString } from './shortString';
 import { uint256ToBN } from './uint256';
 import type {
   OutsideCallV1,
@@ -164,6 +165,30 @@ export function assertCallsAreStrictlyEqual(
 }
 
 /**
+ * Normalizes a SNIP-12 domain field declared `shortstring` (e.g. `domain.chainId`) to a felt.
+ * SNIP-29's own typed-data examples always show `chainId` as an already-encoded hex felt
+ * (e.g. `"0x534e5f4d41494e"`), but some paymasters do not follow that and return the raw
+ * shortstring instead (e.g. `"SN_SEPOLIA"`). Both hash to the same felt once encoded, so this
+ * mirrors the same tolerant fallback `src/utils/typedData.ts`'s own hash computation already
+ * uses for `shortstring`/`felt` fields, rather than rejecting a non-compliant but harmless
+ * paymaster response.
+ * @param {string | number} value - The raw domain field value.
+ * @returns {bigint} The felt value of the domain field.
+ * @example
+ * ```typescript
+ * domainFieldToFelt('SN_SEPOLIA'); // 1536727068981429685321n
+ * domainFieldToFelt('0x534e5f5345504f4c4941'); // 1536727068981429685321n
+ * ```
+ */
+const domainFieldToFelt = (value: string | number): bigint => {
+  try {
+    return toBigInt(value);
+  } catch {
+    return toBigInt(encodeShortString(String(value)));
+  }
+};
+
+/**
  * Asserts that the typed-data domain returned by the paymaster is bound to the account's own
  * provider chain, so a malicious or mismatched paymaster cannot obtain a signature that is
  * valid on a different chain than the one the user intended.
@@ -173,7 +198,7 @@ export function assertCallsAreStrictlyEqual(
  * @example
  * ```typescript
  * assertChainIdFromTypedData(
- *   { domain: { chainId: '0x534e5f5345504f4c4941' }, message: {}, primaryType: '', types: {} },
+ *   { domain: { chainId: 'SN_SEPOLIA' }, message: {}, primaryType: '', types: {} },
  *   constants.StarknetChainId.SN_SEPOLIA
  * );
  * // does not throw
@@ -184,7 +209,8 @@ const assertChainIdFromTypedData = (
   chainId: StarknetChainId
 ) => {
   assert(
-    typedData.domain.chainId !== undefined && BigInt(typedData.domain.chainId) === BigInt(chainId),
+    typedData.domain.chainId !== undefined &&
+      domainFieldToFelt(typedData.domain.chainId) === BigInt(chainId),
     "Paymaster typed data domain chainId does not match the account's provider chain"
   );
 };

@@ -274,6 +274,20 @@ describe('Account - Paymaster integration', () => {
 
   const mockMaliciousBuildTransactionSponsoredSubstitutedCalls = jest.fn();
 
+  // SNIP-29's own typed-data examples show domain.chainId as an already-encoded hex felt, but
+  // some paymasters (e.g. AVNU) return the raw shortstring instead. Both hash to the same felt.
+  const typedDataChainIdAsShortstring: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    domain: { chainId: 'SN_SEPOLIA' },
+  };
+
+  const paymasterResponseChainIdAsShortstring = {
+    ...paymasterResponse,
+    typed_data: typedDataChainIdAsShortstring,
+  };
+
+  const mockBuildTransactionChainIdAsShortstring = jest.fn();
+
   const getAccount = () => {
     if (!account) {
       account = new Account({
@@ -318,6 +332,9 @@ describe('Account - Paymaster integration', () => {
     mockSponsoredBuildTransaction.mockResolvedValue(sponsoredPaymasterResponse);
     mockMaliciousBuildTransactionSponsoredSubstitutedCalls.mockResolvedValue(
       maliciousPaymasterResponseSponsoredSubstitutedCalls
+    );
+    mockBuildTransactionChainIdAsShortstring.mockResolvedValue(
+      paymasterResponseChainIdAsShortstring
     );
     mockExecuteTransaction.mockResolvedValue({ transaction_hash: '0x123' });
     mockGetSnip9Version.mockResolvedValue(OutsideExecutionVersion.V2);
@@ -515,6 +532,17 @@ describe('Account - Paymaster integration', () => {
       await expect(
         getAccount().executePaymasterTransaction(originalCalls, details)
       ).rejects.toThrow('Provided calls are not strictly equal to the returned calls');
+    });
+
+    test('should not throw if the domain chainId is a raw shortstring instead of an encoded felt', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction = mockBuildTransactionChainIdAsShortstring;
+
+      const result = await getAccount().executePaymasterTransaction(originalCalls, details);
+
+      expect(result).toEqual({ transaction_hash: '0x123' });
     });
   });
 });
