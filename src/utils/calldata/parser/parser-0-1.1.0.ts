@@ -1,7 +1,7 @@
 import { Abi, AbiEntryType, FunctionAbi } from '../../../types';
 import { isLen } from '../cairo';
 import { AbiParserInterface } from './interface';
-import { fastParsingStrategy, ParsingStrategy } from './parsingStrategy';
+import { hdParsingStrategy, ParsingStrategy } from './parsingStrategy';
 
 export class AbiParser1 implements AbiParserInterface {
   abi: Abi;
@@ -10,7 +10,9 @@ export class AbiParser1 implements AbiParserInterface {
 
   constructor(abi: Abi, parsingStrategy?: ParsingStrategy) {
     this.abi = abi;
-    this.parsingStrategy = parsingStrategy || fastParsingStrategy;
+    // hdParsingStrategy is the default: it decodes signed integers correctly (fastParsingStrategy
+    // returns the raw felt for a negative i8..i128 instead of converting it back from PRIME).
+    this.parsingStrategy = parsingStrategy || hdParsingStrategy;
   }
 
   public getRequestParser(abiType: AbiEntryType): (val: unknown) => any {
