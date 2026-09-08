@@ -1,3 +1,9 @@
+## [10.7.4](https://github.com/starknet-io/starknet.js/compare/v10.7.3...v10.7.4) (2026-09-08)
+
+### Bug Fixes
+
+- **typedData:** reject caller types that shadow SNIP-12 preset names ([3f06927](https://github.com/starknet-io/starknet.js/commit/3f06927e1b1325df657c8056539cff84144d729c))
+
 ## [10.7.3](https://github.com/starknet-io/starknet.js/compare/v10.7.2...v10.7.3) (2026-09-08)
 
 ### Bug Fixes
