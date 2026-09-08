@@ -42,10 +42,14 @@ export class Deployer implements DeployerInterface {
         // compile with abi
         if (abi) {
           const calldataClass = new CallData(abi);
-          // Convert object based raw js arguments to ...args array
-          const rawArgs = Object.values(constructorCalldata);
-          calldataClass.validate(ValidateType.DEPLOY, 'constructor', rawArgs);
-          return calldataClass.compile('constructor', rawArgs);
+          // Array-shaped calldata is already positional: validate its length up front.
+          // Object-shaped calldata must keep its field names until `compile()`, which
+          // orders them by ABI name — flattening here first would make that ordering
+          // depend on JS insertion order instead.
+          if (Array.isArray(constructorCalldata)) {
+            calldataClass.validate(ValidateType.DEPLOY, 'constructor', constructorCalldata);
+          }
+          return calldataClass.compile('constructor', constructorCalldata);
         }
         // compile without abi
         return CallData.compile(constructorCalldata);
