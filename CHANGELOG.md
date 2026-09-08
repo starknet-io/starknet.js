@@ -1,3 +1,9 @@
+## [10.7.5](https://github.com/starknet-io/starknet.js/compare/v10.7.4...v10.7.5) (2026-09-08)
+
+### Bug Fixes
+
+- **calldata:** default to the parsing strategy that decodes signed integers correctly ([d766915](https://github.com/starknet-io/starknet.js/commit/d76691531bd095a13b822249be11aededc472b6d))
+
 ## [10.7.4](https://github.com/starknet-io/starknet.js/compare/v10.7.3...v10.7.4) (2026-09-08)
 
 ### Bug Fixes
