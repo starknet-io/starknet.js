@@ -1,3 +1,14 @@
+## [10.7.2](https://github.com/starknet-io/starknet.js/compare/v10.7.1...v10.7.2) (2026-09-08)
+
+### Bug Fixes
+
+- **paymaster:** accept a raw shortstring for the paymaster typed-data domain chainId ([4abd5ae](https://github.com/starknet-io/starknet.js/commit/4abd5aeec079e8ca14ce098d0ff8790a89aa1c62))
+- **paymaster:** bind paymaster typed-data domain to the account's provider chain ([f194c61](https://github.com/starknet-io/starknet.js/commit/f194c612cd2fa2ecb6515e484f89d6f2bb72892a))
+- **paymaster:** reject paymaster typed data declaring both "calls" and "Calls" ([e618f70](https://github.com/starknet-io/starknet.js/commit/e618f706fe543aa5dbce5b560098ad15d4ca341b))
+- **paymaster:** validate selector and calldata shape of the appended gas-token call ([4b72d35](https://github.com/starknet-io/starknet.js/commit/4b72d35cfe19424fb707dbfdfd4e3877532f86b5))
+- **paymaster:** validate the full u256 gas-token amount unconditionally ([3d1a1ec](https://github.com/starknet-io/starknet.js/commit/3d1a1ec420a769f31bb7fc94b2a68f36ae56630e))
+- **paymaster:** verify calls equality for sponsored paymaster transactions too ([c403643](https://github.com/starknet-io/starknet.js/commit/c403643b580ab5953a2e737d1aa39e083d5f0262))
+
 ## [10.7.1](https://github.com/starknet-io/starknet.js/compare/v10.7.0...v10.7.1) (2026-08-21)
 
 ### Bug Fixes
