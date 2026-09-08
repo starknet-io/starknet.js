@@ -1,3 +1,9 @@
+## [10.7.3](https://github.com/starknet-io/starknet.js/compare/v10.7.2...v10.7.3) (2026-09-08)
+
+### Bug Fixes
+
+- **deployer:** preserve constructor argument names before ABI ordering ([b27222a](https://github.com/starknet-io/starknet.js/commit/b27222afbacf86d0d035b895d4faf0935a305d04))
+
 ## [10.7.2](https://github.com/starknet-io/starknet.js/compare/v10.7.1...v10.7.2) (2026-09-08)
 
 ### Bug Fixes
