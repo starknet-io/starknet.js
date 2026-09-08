@@ -1,5 +1,7 @@
 import { AbiParser1 } from '../../../../src/utils/calldata/parser/parser-0-1.1.0';
 import { getFunctionAbi, getInterfaceAbi } from '../../../factories/abi';
+import { PRIME } from '../../../../src/global/constants';
+import { toHex } from '../../../../src/utils/num';
 
 describe('AbiParser1', () => {
   test('should create an instance', () => {
@@ -39,6 +41,15 @@ describe('AbiParser1', () => {
       const abiParser = new AbiParser1([getFunctionAbi('struct'), getInterfaceAbi()]);
       const legacyFormat = abiParser.getLegacyFormat();
       expect(legacyFormat).toStrictEqual(abiParser.abi);
+    });
+  });
+
+  describe('default parsing strategy', () => {
+    test('decodes a negative i8 response without an explicit parsingStrategy (GHSA-mv8m-rfr4-jcq8)', () => {
+      const abiParser = new AbiParser1([getFunctionAbi('struct')]);
+      const responseIterator = [toHex(PRIME - 1n)].values();
+      const parse = abiParser.getResponseParser('core::integer::i8');
+      expect(parse(responseIterator)).toEqual(-1n);
     });
   });
 });
