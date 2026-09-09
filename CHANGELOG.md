@@ -1,3 +1,10 @@
+## [10.7.6](https://github.com/starknet-io/starknet.js/compare/v10.7.5...v10.7.6) (2026-09-09)
+
+### Bug Fixes
+
+- **logger:** coerce message to string before sanitizing CR/LF ([f0a3058](https://github.com/starknet-io/starknet.js/commit/f0a305811a009b3265185f9b5e0ca48301937ec8))
+- **security:** harden code scanning findings ([63bf7bc](https://github.com/starknet-io/starknet.js/commit/63bf7bc3ac0bcbd3fd04769446f697983ac5b26c))
+
 ## [10.7.5](https://github.com/starknet-io/starknet.js/compare/v10.7.4...v10.7.5) (2026-09-08)
 
 ### Bug Fixes
