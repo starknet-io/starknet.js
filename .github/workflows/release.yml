@@ -37,6 +37,11 @@ on:
       - 'ts*'
       - '!www/**'
 
+# Default every read-only job to the minimum token scope. Release jobs override
+# this with the additional write permissions they need below.
+permissions:
+  contents: read
+
 # Cancel redundant in-progress runs for the same ref (replaces the
 # `cancel_others` behaviour of the now-unmaintained skip-duplicate-actions).
 # Scoped to pull_request only: a push to a release branch is never cancelled,

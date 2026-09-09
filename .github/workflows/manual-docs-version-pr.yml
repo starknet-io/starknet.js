@@ -10,6 +10,9 @@ jobs:
   build_docs:
     name: Documentation build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

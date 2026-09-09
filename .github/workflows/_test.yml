@@ -31,6 +31,8 @@ jobs:
   test:
     name: Run tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     # TODO - periodically check if conditional services are supported; https://github.com/actions/runner/issues/822
     services:

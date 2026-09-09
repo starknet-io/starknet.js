@@ -150,6 +150,12 @@ describe('Logger', () => {
       expect(gInfo).toHaveBeenCalledWith(expectedMessage);
     });
 
+    it('should remove line breaks from messages', () => {
+      logger.info('first\r\nsecond\nthird\rfourth');
+
+      expect(gInfo).toHaveBeenCalledWith('[2024-01-01T00:00:00.000Z] INFO: firstsecondthirdfourth');
+    });
+
     it('should use appropriate console methods', () => {
       logger.setLogLevel('DEBUG');
       logger.debug('Debug');
