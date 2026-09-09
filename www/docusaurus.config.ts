@@ -229,9 +229,9 @@ const config: Config = {
       appId: '86VVNRI64B',
 
       // Public API key: it is safe to commit it
-      apiKey: '6f4db54e4ee0ae77619b41dbe862af7f',
+      apiKey: '1e38429d50835ef8fcae055fba695062',
 
-      indexName: 'starknetjs',
+      indexName: 'starknet-js',
 
       // Algolia "Ask AI" conversational assistant (DocSearch v4).
       // The assistantId is a public value (configured in the Algolia dashboard,
