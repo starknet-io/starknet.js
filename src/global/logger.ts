@@ -38,7 +38,7 @@ class Logger {
 
   private formatMessage(logMessage: LogMessage): string {
     const { level, message, timestamp, data } = logMessage;
-    const sanitizedMessage = message.replace(/[\r\n]/g, '');
+    const sanitizedMessage = String(message).replace(/[\r\n]/g, '');
     let formattedMessage = `[${timestamp}] ${level}: ${sanitizedMessage}`;
 
     if (data) {
