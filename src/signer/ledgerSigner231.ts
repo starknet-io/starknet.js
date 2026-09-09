@@ -307,7 +307,7 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
   protected encodeCall(call: Call): Uint8Array[] {
     const toBuf: Uint8Array = this.convertBnToLedger(call.contractAddress);
     const selectorBuf: Uint8Array = hexToBytes(addAddressPadding(getSelector(call.entrypoint)));
-    let calldataBuf: Uint8Array = new Uint8Array([]);
+    let calldataBuf: Uint8Array;
     if (call.calldata) {
       const compiledCalldata: Calldata = CallData.compile(call.calldata);
       const calldataSizeBuf: Uint8Array = this.convertBnToLedger(compiledCalldata.length);
