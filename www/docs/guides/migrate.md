@@ -24,7 +24,7 @@ If you encounter any missing changes, please let us know and we will update this
 10. **fastExecute Moved to a Plugin** - `account.fastExecute()` and `provider.fastWaitForTransaction()` now come from the `fastExecute` plugin
 11. **Paymaster Option Renamed** - `PaymasterRpcOptions.default` → `mute`
 12. **felt252 Validation** - `CairoFelt()` now throws on out-of-range values, and `CairoFelt252.toApiRequest()` returns decimal
-13. **RPC Namespace Renames** - `RPCSPEC010` → `RPCSPEC0103`, `RPC010` → `RPC0102` / `RPC0103`
+13. **RPC Namespace Renames** - `RPCSPEC010` → `RPCSPEC0104`, `RPC010` → `RPC0102` / `RPC0103` / `RPC0104`
 
 ### Breaking Changes Summary
 
@@ -661,9 +661,9 @@ strings, or that relied on out-of-range values not throwing.
 
 Two public exports were renamed to track the new default RPC spec version. These only affect advanced usage (raw RPC spec types and direct channel imports).
 
-### `RPCSPEC010` → `RPCSPEC0103`
+### `RPCSPEC010` → `RPCSPEC0104`
 
-The namespace re-exporting the 0.10.x RPC spec types was renamed.
+The namespace re-exporting the 0.10.x RPC spec types was renamed. It always tracks the newest supported spec revision, so it moves again whenever one is added: `RPCSPEC0101`, then `RPCSPEC0103`, and `RPCSPEC0104` since v10.8.0.
 
 **❌ v9:**
 
@@ -676,14 +676,14 @@ type MyBlock = RPCSPEC010.BLOCK_WITH_TXS;
 **✅ v10:**
 
 ```typescript
-import { RPCSPEC0103 } from 'starknet';
+import { RPCSPEC0104 } from 'starknet';
 
-type MyBlock = RPCSPEC0103.BLOCK_WITH_TXS;
+type MyBlock = RPCSPEC0104.BLOCK_WITH_TXS;
 ```
 
-### `RPC010` → `RPC0102` / `RPC0103`
+### `RPC010` → `RPC0102` / `RPC0103` / `RPC0104`
 
-The channel namespace for the 0.10.x RPC implementation was renamed. v10 exposes two channel variants: `RPC0102` (spec 0.10.2) and `RPC0103` (spec 0.10.3, the default).
+The channel namespace for the 0.10.x RPC implementation was renamed. v10 exposes one variant per spec revision, the newest being the default; earlier ones remain available.
 
 **❌ v9:**
 
@@ -694,7 +694,8 @@ import { RPC010 } from 'starknet';
 **✅ v10:**
 
 ```typescript
-import { RPC0103 } from 'starknet'; // spec 0.10.3 (default)
+import { RPC0104 } from 'starknet'; // spec 0.10.4 (default)
+import { RPC0103 } from 'starknet'; // spec 0.10.3
 import { RPC0102 } from 'starknet'; // spec 0.10.2 (legacy)
 ```
 
@@ -820,8 +821,9 @@ your use case requires SNIP-36 fact commitment — see the [Proofs (SNIP-36) gui
 None of the following requires any migration work, but they are worth knowing about once you are on
 v10:
 
-- **RPC 0.10.3 support.** Two channels ship side by side, `RPC0102` (spec 0.10.2) and `RPC0103`
-  (spec 0.10.3, the default). `RpcProvider.create()` picks the right one from the node.
+- **RPC 0.10.4 support.** Three channels ship side by side, `RPC0102` (spec 0.10.2), `RPC0103`
+  (spec 0.10.3) and `RPC0104` (spec 0.10.4, the default). `RpcProvider.create()` reads the node
+  spec version and connects through the channel of its generation.
 - **Runtime plugin installation** with `provider.use(plugin)`, fully typed — see the
   [Plugin System Guide](./plugins.md).
 - **`contract.compile(method, args)`** returns the compiled `Calldata` alone, without the

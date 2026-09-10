@@ -39,11 +39,12 @@ The Starknet.js version must align with the RPC version supported by the chosen 
 | :---------------------------: | ------------------------------------- |
 |            v0.7.x             | Starknet.js v6.24.1 or v7.6.4         |
 |            v0.8.x             | Starknet.js v7.6.4 or v8.9.2          |
-|            v0.9.x             | Starknet.js v8.9.2, v9.4.2 or v10.4.0 |
-|            v0.10.0            | Starknet.js v9.4.2 or v10.4.0         |
+|            v0.9.x             | Starknet.js v8.9.2, v9.4.2 or v10.8.0 |
+|            v0.10.0            | Starknet.js v9.4.2 or v10.8.0         |
 |            v0.10.1            | Not supported                         |
-|            v0.10.2            | Starknet.js v10.4.0                   |
-|            v0.10.3            | Starknet.js v10.4.0                   |
+|            v0.10.2            | Starknet.js v10.8.0                   |
+|            v0.10.3            | Starknet.js v10.8.0                   |
+|            v0.10.4            | Starknet.js v10.8.0                   |
 
 :::note
 
@@ -86,12 +87,12 @@ import { RpcProvider } from 'starknet';
 
 **Local Starknet Devnet network:**
 
-|                   Node | with public url | with API key |
-| ---------------------: | :-------------: | :----------: |
-| starknet-devnet v0.2.4 |      v0_7       |     N/A      |
-| starknet-devnet v0.4.3 |      v0_8       |     N/A      |
-| starknet-devnet v0.6.1 |      v0_9       |     N/A      |
-| starknet-devnet v0.9.0 |      v0_10      |     N/A      |
+|                    Node | with public url | with API key |
+| ----------------------: | :-------------: | :----------: |
+|  starknet-devnet v0.2.4 |      v0_7       |     N/A      |
+|  starknet-devnet v0.4.3 |      v0_8       |     N/A      |
+|  starknet-devnet v0.6.1 |      v0_9       |     N/A      |
+| starknet-devnet v0.10.0 |      v0_10      |     N/A      |
 
 :::note
 
@@ -223,7 +224,7 @@ Example of a connection to a local development node, with starknet-devnet:
 // For RPC 0.10.x (starknet-devnet v0.8.2)
 const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 
-// For RPC 0.9.1 (starknet-devnet v0.6.1)
+// For RPC 0.9.0 (starknet-devnet v0.6.1)
 const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 ```
 
