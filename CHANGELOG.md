@@ -1,3 +1,9 @@
+# [11.0.0-beta.14](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.13...v11.0.0-beta.14) (2026-09-10)
+
+### Bug Fixes
+
+- **deps:** bump @noble/[@scure](https://github.com/scure) crypto libs to 2.4.0 ([5c448fe](https://github.com/starknet-io/starknet.js/commit/5c448febcbd16e2d1e27a4f32ec09cfd83e35dca))
+
 # [11.0.0-beta.13](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.12...v11.0.0-beta.13) (2026-09-03)
 
 ### Features
