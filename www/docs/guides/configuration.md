@@ -65,7 +65,7 @@ Here are all the available configuration properties:
 
 ```ts
 {
-  // RPC version to use when communicating with nodes ('0.9.0', '0.10.0', '0.10.2', '0.10.3')
+  // RPC version to use when communicating with nodes ('0.9.0', '0.10.0', '0.10.2', '0.10.3', '0.10.4')
   rpcVersion: '0.10.0',
 
   // Transaction version to use (only V3 is supported in v8)

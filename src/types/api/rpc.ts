@@ -1,2 +1,2 @@
 // see explanation in ./index.ts
-export * from '@starknet-io/starknet-types-0103';
+export * from '@starknet-io/starknet-types-0104';

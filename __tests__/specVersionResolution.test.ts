@@ -83,5 +83,35 @@ describe('spec version resolution', () => {
         warn.mockRestore();
       }
     });
+
+    test('routes every 0.10 patch version to the same channel, reporting the node version', async () => {
+      // spec versions actually reported by nodes in the wild, plus the newly released one
+      const cases = [
+        { reported: '0.10.2', resolved: '0.10.2' },
+        { reported: '0.10.3-rc.0', resolved: '0.10.3' },
+        { reported: '0.10.4', resolved: '0.10.4' },
+      ];
+
+      const providers = await Promise.all(
+        cases.map(({ reported }) => RpcProvider.create({ nodeUrl, baseFetch: stubNode(reported) }))
+      );
+
+      // the channel is picked per generation, so every patch version must share the same one
+      expect(new Set(providers.map((provider) => provider.channel.id)).size).toBe(1);
+
+      providers.forEach((provider, index) => {
+        expect(provider.readSpecVersion()).toBe(cases[index].resolved);
+      });
+    });
+
+    test('routes a 0.9 node to another channel than a 0.10 node', async () => {
+      const [node09, node010] = await Promise.all([
+        RpcProvider.create({ nodeUrl, baseFetch: stubNode('0.9.0') }),
+        RpcProvider.create({ nodeUrl, baseFetch: stubNode('0.10.4') }),
+      ]);
+
+      expect(node09.channel.id).not.toBe(node010.channel.id);
+      expect(node09.readSpecVersion()).toBe('0.9.0');
+    });
   });
 });
