@@ -1,3 +1,13 @@
+# [10.8.0](https://github.com/starknet-io/starknet.js/compare/v10.7.6...v10.8.0) (2026-09-10)
+
+### Bug Fixes
+
+- **deps:** bump get-starknet wallet-standard to 6.0.6 ([5a8cb12](https://github.com/starknet-io/starknet.js/commit/5a8cb121dd0da9de2b0d84ed59d7a3ebbe1ff855))
+
+### Features
+
+- add RPC 0.10.4 support (starknet-types-0104, RpcChannel v0_10_4) ([24561f4](https://github.com/starknet-io/starknet.js/commit/24561f4ba64cde954d8204ff5404e034fd2b87a6))
+
 ## [10.7.6](https://github.com/starknet-io/starknet.js/compare/v10.7.5...v10.7.6) (2026-09-09)
 
 ### Bug Fixes
