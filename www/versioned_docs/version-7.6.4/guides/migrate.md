@@ -91,7 +91,7 @@ const result = await myContract.withOptions(options).some_method(arg1, arg2);
 
 ## Transaction receipt
 
-In the `ReceiptTx` class, the status [`isRejected`](../../6.24.1/API/classes/ReceiptTx#isrejected) has been removed.
+In the `ReceiptTx` class, the status `isRejected` has been removed.
 
 ## Removed deprecated functionalities
 

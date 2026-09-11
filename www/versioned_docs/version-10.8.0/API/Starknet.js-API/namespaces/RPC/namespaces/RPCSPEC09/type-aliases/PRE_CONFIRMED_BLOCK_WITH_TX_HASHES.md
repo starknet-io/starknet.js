@@ -1,0 +1,5 @@
+# Type Alias: PRE_CONFIRMED_BLOCK_WITH_TX_HASHES
+
+> **PRE_CONFIRMED_BLOCK_WITH_TX_HASHES** = [`BLOCK_BODY_WITH_TX_HASHES`](BLOCK_BODY_WITH_TX_HASHES.md) & [`PRE_CONFIRMED_BLOCK_HEADER`](PRE_CONFIRMED_BLOCK_HEADER.md)
+
+Defined in: node_modules/@starknet-io/starknet-types-09/dist/types/api/components.d.ts:376

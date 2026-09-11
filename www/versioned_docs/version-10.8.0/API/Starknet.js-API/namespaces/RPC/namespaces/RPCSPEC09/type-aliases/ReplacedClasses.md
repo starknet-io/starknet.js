@@ -1,0 +1,5 @@
+# Type Alias: ReplacedClasses
+
+> **ReplacedClasses** = [`REPLACED_CLASS`](REPLACED_CLASS.md)[]
+
+Defined in: node_modules/@starknet-io/starknet-types-09/dist/types/api/nonspec.d.ts:124

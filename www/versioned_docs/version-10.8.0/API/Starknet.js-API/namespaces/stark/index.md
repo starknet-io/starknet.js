@@ -1,0 +1,25 @@
+# stark
+
+## Functions
+
+- [compressProgram](functions/compressProgram.md)
+- [decompressProgram](functions/decompressProgram.md)
+- [randomAddress](functions/randomAddress.md)
+- [encodeProof](functions/encodeProof.md)
+- [decodeProof](functions/decodeProof.md)
+- [formatSignature](functions/formatSignature.md)
+- [signatureToDecimalArray](functions/signatureToDecimalArray.md)
+- [signatureToHexArray](functions/signatureToHexArray.md)
+- [getSharedSecret](functions/getSharedSecret.md)
+- [zeroResourceBounds](functions/zeroResourceBounds.md)
+- [toOverheadResourceBounds](functions/toOverheadResourceBounds.md)
+- [resourceBoundsToEstimateFeeResponse](functions/resourceBoundsToEstimateFeeResponse.md)
+- [toOverheadOverallFee](functions/toOverheadOverallFee.md)
+- [ZeroFeeEstimate](functions/ZeroFeeEstimate.md)
+- [intDAM](functions/intDAM.md)
+- [toTransactionVersion](functions/toTransactionVersion.md)
+- [toFeeVersion](functions/toFeeVersion.md)
+- [v3Details](functions/v3Details.md)
+- [getFullPublicKey](functions/getFullPublicKey.md)
+- [resourceBoundsToHexString](functions/resourceBoundsToHexString.md)
+- [resourceBoundsToBigInt](functions/resourceBoundsToBigInt.md)
