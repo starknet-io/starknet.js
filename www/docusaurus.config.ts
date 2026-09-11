@@ -205,6 +205,19 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.js',
+          // `www/docs` tracks the supported 10.x line, so it is the default version and
+          // served at /docs/. The frozen snapshots in `versions.json` are unsupported
+          // lines and are flagged as unmaintained. Update `current.label` when the next
+          // major becomes the development line, and set an explicit `banner` for every
+          // new snapshot added by the "[Manual] Documentation Version PR" workflow.
+          lastVersion: 'current',
+          versions: {
+            current: { label: '10.x', banner: 'none' },
+            '9.2.1': { banner: 'unmaintained' },
+            '8.6.0': { banner: 'unmaintained' },
+            '7.6.4': { banner: 'unmaintained' },
+            '6.24.1': { banner: 'unmaintained' },
+          },
           async sidebarItemsGenerator(args) {
             const sidebarItems = await args.defaultSidebarItemsGenerator(args);
 
