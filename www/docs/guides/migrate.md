@@ -10,21 +10,20 @@ If you encounter any missing changes, please let us know and we will update this
 
 ## Quick Summary
 
-**Main breaking changes in v10:**
+**Main breaking changes in v10**, in the order of the "Breaking Change N" sections below:
 
 1. **Account Composition** - Account no longer extends Provider, uses composition instead
-2. **Plugin Class Names** - `StarknetId` → `StarknetIdImpl`, `BrotherId` → `BrotherIdImpl`
-3. **Plugin Import Paths** - `provider/extensions/` → package root
-4. **Compression Functions** - `compressProgram()` and `decompressProgram()` are now async
-5. **SimulateTransaction Response** - `SimulateTransactionOverheadResponse` changed from array to object
-6. **Provider fetch() Method** - Now `async` (low impact)
-7. **Removed Global Singletons** - `defaultProvider` and `defaultPaymaster` removed, use `RpcProvider.create()` instead
-8. **ts-mixer Removed** - No longer a dependency
-9. **getStorageAt() Return Type** - Now returns `STORAGE_RESULT` object instead of `string`
-10. **fastExecute Moved to a Plugin** - `account.fastExecute()` and `provider.fastWaitForTransaction()` now come from the `fastExecute` plugin
-11. **Paymaster Option Renamed** - `PaymasterRpcOptions.default` → `mute`
-12. **felt252 Validation** - `CairoFelt()` now throws on out-of-range values, and `CairoFelt252.toApiRequest()` returns decimal
-13. **RPC Namespace Renames** - `RPCSPEC010` → `RPCSPEC0104`, `RPC010` → `RPC0102` / `RPC0103` / `RPC0104`
+2. **Removed Global Singletons** - `defaultProvider` and `defaultPaymaster` removed, use `RpcProvider.create()` instead
+3. **Plugin System** - `StarknetId` → `StarknetIdImpl`, `BrotherId` → `BrotherIdImpl`, and imports move from `provider/extensions/` to the package root
+4. **Provider fetch() Method** - Now `async` (low impact)
+5. **Compression Functions** - `compressProgram()` and `decompressProgram()` are now async
+6. **SimulateTransaction Response** - `SimulateTransactionOverheadResponse` changed from array to object
+7. **ts-mixer Removed** - No longer a dependency
+8. **getStorageAt() Return Type** - Now returns `STORAGE_RESULT` object instead of `string`
+9. **fastExecute Moved to a Plugin** - `account.fastExecute()` and `provider.fastWaitForTransaction()` now come from the `fastExecute` plugin
+10. **Paymaster Option Renamed** - `PaymasterRpcOptions.default` → `mute`
+11. **felt252 Validation** - `CairoFelt()` now throws on out-of-range values, and `CairoFelt252.toApiRequest()` returns decimal
+12. **RPC Namespace Renames** - `RPCSPEC010` → `RPCSPEC0104`, `RPC010` → `RPC0102` / `RPC0103` / `RPC0104`
 
 ### Breaking Changes Summary
 
@@ -178,6 +177,7 @@ const tokens = await defaultPaymaster.getSupportedTokens();
 ```typescript
 // For Provider: Use RpcProvider.create() for automatic node version detection
 const myProvider = await RpcProvider.create();
+// or
 const myProvider = await RpcProvider.create({ nodeUrl: constants.NetworkName.SN_MAIN });
 
 // Or create manually if you know the RPC version
@@ -185,6 +185,7 @@ const myProvider = new RpcProvider({ nodeUrl: '...' });
 
 // For Paymaster: Create a new instance
 const myPaymaster = new PaymasterRpc();
+// or
 const myPaymaster = new PaymasterRpc({ nodeUrl: 'https://sepolia.paymaster.avnu.fi' });
 
 // Usage
@@ -769,7 +770,7 @@ v9 had no transaction proof at all. v10 adds two optional fields to the v3 trans
 following RPC 0.10.1+: `proof` and `proofFacts`. Nothing to migrate — this section only describes
 how to use them.
 
-The `proof` field is typed as a `string`: a base64 encoding of big-endian packed `u32` values.
+The `proof` field is typed as a `string`: a base64 encoding of little-endian packed `u32` values.
 Use `stark.encodeProof()` to build it from a number array:
 
 ```typescript

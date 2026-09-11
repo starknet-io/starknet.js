@@ -163,7 +163,7 @@ if (resp.isReady) {
 
 :::info FastExecute Plugin
 
-The `fastExecute()` method is provided by the **FastExecute plugin**, which is included by default in Starknet.js. For more details, configuration options, and best practices, see the [Plugin System guide](../plugins.md#fastexecute-plugin).
+The `fastExecute()` method is provided by the **FastExecute plugin**, which is included by default in Starknet.js. For more details, configuration options, and best practices, see the [Plugin System guide](../plugins.md#fastexecute).
 
 :::
 
