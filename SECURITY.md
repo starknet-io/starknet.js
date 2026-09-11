@@ -10,7 +10,7 @@ Security fixes are applied to the current major release line and to the active p
 | 11.x (pre-release) | Yes              | `beta`             |
 | 9.x and earlier    | No, end-of-life  |                    |
 
-Versions 7.x, 8.x and 9.x reached end-of-life in September 2026 and no longer receive security fixes. If you are on an unsupported version, upgrade to the latest 10.x release. The [migration guide](https://starknetjs.com/docs/guides/migrate) covers the breaking changes between major versions.
+Versions 7.x, 8.x and 9.x reached end-of-life in September 2026 and no longer receive security fixes. If you are on an unsupported version, upgrade to the latest 10.x release. The [migration guide](https://starknet-js.com/docs/guides/migrate) covers the breaking changes between major versions.
 
 ## Reporting a vulnerability
 
