@@ -1,6 +1,6 @@
 # Encoding & decoding Cairo values (Call / calldata)
 
-Every concrete output in this file was executed and verified against starknet.js v10.4.0.
+Every concrete output in this file was executed against starknet.js 10.8.0, not written from memory.
 
 ## Wire format
 
@@ -185,7 +185,7 @@ CallData.compile([new CairoOption(CairoOptionVariant.Some, 8)]); // ['0', '8']
 ```
 
 - **Property order matters** (no ABI to reorder objects). `{ low, high }` for u256, in that order.
-- **Custom enums: list ALL variants** (`undefined` for inactive ones) so the variant index can be derived from position, and **wrap the enum in an array** — `CallData.compile(myEnum)` passed directly (not `[myEnum]`) throws `undefined can't be computed by felt()` in v10:
+- **Custom enums: list ALL variants** (`undefined` for inactive ones) so the variant index can be derived from position, and **wrap the enum in an array** — `CallData.compile(myEnum)` passed directly (not `[myEnum]`) throws `undefined can't be computed by felt()`:
   ```ts
   const en = new CairoCustomEnum({
     Response: undefined,
@@ -218,6 +218,24 @@ CallData.compile([new CairoOption(CairoOptionVariant.Some, 8)]); // ['0', '8']
 - `felt252` returns a `bigint` even when it holds text. Decode text manually: `shortString.decodeShortString(num.toHex(value))`.
 - A Cairo 1 function returning several values returns a tuple → object with `'0'`, `'1'`… keys.
 - Cairo 0 contracts return objects keyed by output names (e.g. `res.balance`).
+
+### Signed integers: `parsingStrategy`
+
+`i8…i128` decode to a **negative `bigint`**, converted back from `P` — that is what the default
+strategy does. The alternative strategy returns the raw felt instead, silently flipping the sign of
+every downstream comparison, balance or P&L computation. A view function returning `-5`:
+
+```ts
+const wire = (P - 5n).toString(); // how -5 travels on the wire
+new CallData(abi).decodeParameters('core::integer::i32', [wire]); // -5n  ← default
+new CallData(abi, hdParsingStrategy).decodeParameters('core::integer::i32', [wire]); // -5n
+new CallData(abi, fastParsingStrategy).decodeParameters('core::integer::i32', [wire]);
+// 3618502788666131213697322783095070105623107215331596699973092056135872020476n  ← raw felt
+```
+
+- `parsingStrategy` is accepted by `new CallData(abi, strategy)` and `new Contract({ …, parsingStrategy })`.
+- The default is `hdParsingStrategy`. Never select `fastParsingStrategy` for a contract exposing
+  signed integers.
 
 ### Decode arbitrary felts: `decodeParameters`
 
@@ -308,7 +326,7 @@ uint256.uint256ToBN({ low, high }); // bigint
 | Prepending `array_len` before an array                   | The library adds length prefixes; a stray `_len` property is ignored/rejected                      |
 | Plain bigint for u256 in static `CallData.compile`       | Encodes 1 felt; use `cairo.uint256()` or `{ low, high }`                                           |
 | `new CairoCustomEnum({ Active: v })` in static compile   | Variant index unknowable without ABI — list all variants; with ABI the single-variant form is fine |
-| `CallData.compile(myEnum)` un-wrapped                    | Throws in v10 — wrap: `CallData.compile([myEnum])`                                                 |
+| `CallData.compile(myEnum)` un-wrapped                    | Throws — wrap: `CallData.compile([myEnum])`                                                        |
 | Passing `'123'` expecting text                           | Numeric-looking strings become numbers; use `encodeShortString`                                    |
 | JS array for `[T; N]` in static compile                  | Gets a length prefix; use `CairoFixedArray.compile([...])`                                         |
 | Expecting `string` from a `felt252` return               | You get `bigint`; decode with `shortString.decodeShortString(num.toHex(v))`                        |
