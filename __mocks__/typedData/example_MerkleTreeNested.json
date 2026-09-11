@@ -1,0 +1,45 @@
+{
+  "types": {
+    "StarknetDomain": [
+      { "name": "name", "type": "shortstring" },
+      { "name": "version", "type": "shortstring" },
+      { "name": "chainId", "type": "shortstring" },
+      { "name": "revision", "type": "shortstring" }
+    ],
+    "Example": [
+      { "name": "flag", "type": "bool" },
+      { "name": "data", "type": "Session" }
+    ],
+    "Session": [{ "name": "root", "type": "merkletree", "contains": "Policy" }],
+    "Policy": [
+      { "name": "contractAddress", "type": "felt" },
+      { "name": "selector", "type": "selector" }
+    ]
+  },
+  "primaryType": "Example",
+  "domain": {
+    "name": "StarkNet Mail",
+    "version": "1",
+    "chainId": "1",
+    "revision": "1"
+  },
+  "message": {
+    "flag": true,
+    "data": {
+      "root": [
+        {
+          "contractAddress": "0x1",
+          "selector": "transfer"
+        },
+        {
+          "contractAddress": "0x2",
+          "selector": "transfer"
+        },
+        {
+          "contractAddress": "0x3",
+          "selector": "transfer"
+        }
+      ]
+    }
+  }
+}
