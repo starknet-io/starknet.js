@@ -91,13 +91,16 @@ export class RpcChannel {
       blockIdentifier,
       chainId,
       headers,
+      nodeName,
       nodeUrl,
       retries,
       specVersion,
       transactionRetryIntervalFallback,
       waitMode,
     } = optionsOrProvider || {};
-    if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
+    if (nodeName && Object.values(NetworkName).includes(nodeName)) {
+      this.nodeUrl = getDefaultNodeUrl(nodeName, this.channelSpecVersion);
+    } else if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, this.channelSpecVersion);
     } else if (nodeUrl) {
       this.nodeUrl = nodeUrl;

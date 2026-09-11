@@ -8,6 +8,10 @@ export interface ProviderOptions extends RpcProviderOptions {}
 export type RpcProviderOptions = {
   nodeUrl?: string | NetworkName;
   /**
+   * Specify network name to resolve default node URL (e.g. SN_MAIN, SN_SEPOLIA)
+   */
+  nodeName?: NetworkName;
+  /**
    * Define the number of retries for waitForTransaction
    */
   retries?: waitForTransactionOptions['retries'];
