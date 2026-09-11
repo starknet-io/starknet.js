@@ -356,6 +356,20 @@ const config: Config = {
 
   plugins: [
     [
+      '@docusaurus/plugin-client-redirects',
+      {
+        // Until 10.x became the default version, the current docs were served under
+        // /docs/next/. Keep those links alive by redirecting every /docs/next/* page to
+        // its /docs/* counterpart. Paths here are relative to `baseUrl`. Versioned
+        // snapshots (/docs/9.2.1/...) never lived under /docs/next/ and are skipped.
+        createRedirects(existingPath: string) {
+          const match = existingPath.match(/^\/docs\/(.+)$/);
+          if (!match || /^\d/.test(match[1])) return undefined;
+          return [`/docs/next/${match[1]}`];
+        },
+      },
+    ],
+    [
       'docusaurus-plugin-typedoc',
       {
         entryPoints: ['../src/index.ts'],
