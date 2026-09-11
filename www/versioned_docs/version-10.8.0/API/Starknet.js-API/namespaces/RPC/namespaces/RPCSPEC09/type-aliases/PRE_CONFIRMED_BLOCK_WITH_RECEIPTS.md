@@ -1,0 +1,5 @@
+# Type Alias: PRE_CONFIRMED_BLOCK_WITH_RECEIPTS
+
+> **PRE_CONFIRMED_BLOCK_WITH_RECEIPTS** = [`BLOCK_BODY_WITH_RECEIPTS`](BLOCK_BODY_WITH_RECEIPTS.md) & [`PRE_CONFIRMED_BLOCK_HEADER`](PRE_CONFIRMED_BLOCK_HEADER.md)
+
+Defined in: node_modules/@starknet-io/starknet-types-09/dist/types/api/components.d.ts:378

@@ -1,0 +1,7 @@
+# Type Alias: TXN_STATUS
+
+> **TXN_STATUS** = [`STATUS_RECEIVED`](STATUS_RECEIVED.md) \| [`STATUS_CANDIDATE`](STATUS_CANDIDATE.md) \| [`STATUS_PRE_CONFIRMED`](STATUS_PRE_CONFIRMED.md) \| [`STATUS_ACCEPTED_ON_L2`](STATUS_ACCEPTED_ON_L2.md) \| [`STATUS_ACCEPTED_ON_L1`](STATUS_ACCEPTED_ON_L1.md)
+
+Defined in: node_modules/@starknet-io/starknet-types-0104/dist/types/api/components.d.ts:118
+
+Represents the finality status of the transaction, including the case the txn is still in the mempool or failed validation during the block construction phase

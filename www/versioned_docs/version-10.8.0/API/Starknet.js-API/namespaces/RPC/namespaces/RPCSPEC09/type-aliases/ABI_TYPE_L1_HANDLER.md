@@ -1,0 +1,5 @@
+# Type Alias: ABI_TYPE_L1_HANDLER
+
+> **ABI_TYPE_L1_HANDLER** = `"l1_handler"`
+
+Defined in: node_modules/@starknet-io/starknet-types-09/dist/types/api/constants.d.ts:56

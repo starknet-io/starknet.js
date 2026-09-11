@@ -1,0 +1,14 @@
+# PROVING_API
+
+## Interfaces
+
+- [ACCOUNT_VALIDATION_FAILED](interfaces/ACCOUNT_VALIDATION_FAILED.md)
+- [SERVICE_BUSY](interfaces/SERVICE_BUSY.md)
+- [INVALID_TRANSACTION_INPUT](interfaces/INVALID_TRANSACTION_INPUT.md)
+- [UNSUPPORTED_TX_TYPE](interfaces/UNSUPPORTED_TX_TYPE.md)
+- [TRANSACTION_BLOCKED](interfaces/TRANSACTION_BLOCKED.md)
+- [RpcTypeToMessageMap](interfaces/RpcTypeToMessageMap.md)
+
+## Type Aliases
+
+- [PROVE_TRANSACTION_RESULT](type-aliases/PROVE_TRANSACTION_RESULT.md)
