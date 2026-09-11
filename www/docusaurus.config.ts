@@ -205,6 +205,19 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.js',
+          // `www/docs` tracks the supported 10.x line, so it is the default version and
+          // served at /docs/. The frozen snapshots in `versions.json` are unsupported
+          // lines and are flagged as unmaintained. Update `current.label` when the next
+          // major becomes the development line, and set an explicit `banner` for every
+          // new snapshot added by the "[Manual] Documentation Version PR" workflow.
+          lastVersion: 'current',
+          versions: {
+            current: { label: '10.x', banner: 'none' },
+            '9.2.1': { banner: 'unmaintained' },
+            '8.6.0': { banner: 'unmaintained' },
+            '7.6.4': { banner: 'unmaintained' },
+            '6.24.1': { banner: 'unmaintained' },
+          },
           async sidebarItemsGenerator(args) {
             const sidebarItems = await args.defaultSidebarItemsGenerator(args);
 
@@ -342,6 +355,20 @@ const config: Config = {
   } satisfies Preset.ThemeConfig,
 
   plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        // Until 10.x became the default version, the current docs were served under
+        // /docs/next/. Keep those links alive by redirecting every /docs/next/* page to
+        // its /docs/* counterpart. Paths here are relative to `baseUrl`. Versioned
+        // snapshots (/docs/9.2.1/...) never lived under /docs/next/ and are skipped.
+        createRedirects(existingPath: string) {
+          const match = existingPath.match(/^\/docs\/(.+)$/);
+          if (!match || /^\d/.test(match[1])) return undefined;
+          return [`/docs/next/${match[1]}`];
+        },
+      },
+    ],
     [
       'docusaurus-plugin-typedoc',
       {

@@ -365,5 +365,5 @@ main();
 ```
 
 All the types (`WebSocketOptions`, `Subscription`, the `Subscribe…Params` interfaces, …) are exported
-from `starknet`; see the [API documentation](/docs/next/API/classes/WebSocketChannel) for the full
+from `starknet`; see the [API documentation](../API/classes/WebSocketChannel) for the full
 list.
