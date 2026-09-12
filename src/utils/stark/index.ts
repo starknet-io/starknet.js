@@ -134,7 +134,7 @@ export function randomAddress(): string {
  * ```typescript
  * const proofArray = [1, 2, 3, 4, 5];
  * const result = stark.encodeProof(proofArray);
- * // result = "AQAAAAIAAAADAAAABAAAAAUAAAAv"
+ * // result = "AQAAAAIAAAADAAAABAAAAAUAAAA="
  * ```
  */
 export function encodeProof(proof: number[]): string {
@@ -147,7 +147,7 @@ export function encodeProof(proof: number[]): string {
  * @returns {number[]} Array of proof integers
  * @example
  * ```typescript
- * const proofBase64 = "AQAAAAIAAAADAAAABAAAAAUAAAAv";
+ * const proofBase64 = "AQAAAAIAAAADAAAABAAAAAUAAAA=";
  * const result = stark.decodeProof(proofBase64);
  * // result = [1, 2, 3, 4, 5]
  * ```

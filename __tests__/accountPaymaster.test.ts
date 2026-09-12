@@ -1,7 +1,12 @@
-import type { OutsideCallV2, OutsideExecutionTypedDataV2 } from '../src/types/api';
+import type {
+  OutsideCallV2,
+  OutsideExecutionMessageV2,
+  OutsideExecutionTypedDataV2,
+} from '../src/types/api';
 import {
   Account,
   OutsideExecutionVersion,
+  constants,
   logger,
   hash,
   type Call,
@@ -20,6 +25,7 @@ describe('Account - Paymaster integration', () => {
   const mockMaliciousBuildTransactionAddedCalls = jest.fn();
   const mockExecuteTransaction = jest.fn();
   const mockGetSnip9Version = jest.fn();
+  const mockGetChainId = jest.fn();
   const mockSignMessage = jest.fn();
 
   const fakeSignature: Signature = ['0x1', '0x2'];
@@ -37,7 +43,7 @@ describe('Account - Paymaster integration', () => {
 
   const typedData: OutsideExecutionTypedDataV2 = {
     types: {},
-    domain: {},
+    domain: { chainId: constants.StarknetChainId.SN_SEPOLIA },
     primaryType: '',
     message: {
       Caller: '0xcaller',
@@ -134,6 +140,154 @@ describe('Account - Paymaster integration', () => {
     typed_data: maliciousTypedDataAddedCalls,
   };
 
+  const maliciousTypedDataWrongChain: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    domain: { chainId: constants.StarknetChainId.SN_MAIN },
+  };
+
+  const maliciousPaymasterResponseWrongChain = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataWrongChain,
+  };
+
+  const mockMaliciousBuildTransactionWrongChain = jest.fn();
+
+  const maliciousTypedDataDualCallsField: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      // Undeclared lowercase field, added on top of the real `Calls`. It mirrors a fully
+      // valid response (original call + fee call), so it passes every existing check when
+      // read instead of `Calls`.
+      calls: typedData.message.Calls,
+    } as OutsideExecutionMessageV2,
+  };
+
+  const maliciousPaymasterResponseDualCallsField = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataDualCallsField,
+  };
+
+  const mockMaliciousBuildTransactionDualCallsField = jest.fn();
+
+  const maliciousTypedDataApproveInsteadOfTransfer: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      Calls: [
+        ...originalCallsAsOutsideCalls,
+        {
+          To: '0x456',
+          Selector: hash.getSelectorFromName('approve'),
+          Calldata: ['0xcaller', '1200', '0'],
+        },
+      ],
+    },
+  };
+
+  const maliciousPaymasterResponseApproveInsteadOfTransfer = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataApproveInsteadOfTransfer,
+  };
+
+  const mockMaliciousBuildTransactionApproveInsteadOfTransfer = jest.fn();
+
+  const maliciousTypedDataShortCalldata: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      Calls: [
+        ...originalCallsAsOutsideCalls,
+        {
+          To: '0x456',
+          Selector: hash.getSelectorFromName('transfer'),
+          Calldata: ['0xcaller', '1200'], // missing the u256 high limb
+        },
+      ],
+    },
+  };
+
+  const maliciousPaymasterResponseShortCalldata = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataShortCalldata,
+  };
+
+  const mockMaliciousBuildTransactionShortCalldata = jest.fn();
+
+  const maliciousTypedDataHighLimbDrain: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      Calls: [
+        ...originalCallsAsOutsideCalls,
+        {
+          To: '0x456',
+          Selector: hash.getSelectorFromName('transfer'),
+          // low limb (1200) matches the suggested fee exactly; the high limb (2^128 - 1) is
+          // where the actual drain happens once both limbs are combined on-chain.
+          Calldata: ['0xcaller', '1200', '340282366920938463463374607431768211455'],
+        },
+      ],
+    },
+  };
+
+  const maliciousPaymasterResponseHighLimbDrain = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataHighLimbDrain,
+  };
+
+  const mockMaliciousBuildTransactionHighLimbDrain = jest.fn();
+
+  const sponsoredTypedData: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      Calls: originalCallsAsOutsideCalls, // sponsored: no appended fee-transfer call
+    },
+  };
+
+  const sponsoredPaymasterResponse = {
+    ...paymasterResponse,
+    typed_data: sponsoredTypedData,
+  };
+
+  const mockSponsoredBuildTransaction = jest.fn();
+
+  const maliciousTypedDataSponsoredSubstitutedCalls: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    message: {
+      ...typedData.message,
+      Calls: [
+        {
+          To: '0x999',
+          Selector: hash.getSelectorFromName('transfer'),
+          Calldata: ['0xattacker', '999999', '0'],
+        },
+      ], // a call the user never requested; still no fee call since this is "sponsored"
+    },
+  };
+
+  const maliciousPaymasterResponseSponsoredSubstitutedCalls = {
+    ...paymasterResponse,
+    typed_data: maliciousTypedDataSponsoredSubstitutedCalls,
+  };
+
+  const mockMaliciousBuildTransactionSponsoredSubstitutedCalls = jest.fn();
+
+  // SNIP-29's own typed-data examples show domain.chainId as an already-encoded hex felt, but
+  // some paymasters (e.g. AVNU) return the raw shortstring instead. Both hash to the same felt.
+  const typedDataChainIdAsShortstring: OutsideExecutionTypedDataV2 = {
+    ...typedData,
+    domain: { chainId: 'SN_SEPOLIA' },
+  };
+
+  const paymasterResponseChainIdAsShortstring = {
+    ...paymasterResponse,
+    typed_data: typedDataChainIdAsShortstring,
+  };
+
+  const mockBuildTransactionChainIdAsShortstring = jest.fn();
+
   const getAccount = () => {
     if (!account) {
       account = new Account({
@@ -151,18 +305,44 @@ describe('Account - Paymaster integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(getAccount(), 'getSnip9Version').mockImplementation(mockGetSnip9Version);
+    jest.spyOn(getAccount().provider, 'getChainId').mockImplementation(mockGetChainId);
+    // Reset to the default mock: individual tests below override this when they need a
+    // specific (malicious or sponsored) response, but the account object is a shared
+    // singleton, so without this reset an override from one test would leak into the next.
+    getAccount().paymaster.buildTransaction = mockBuildTransaction;
     mockBuildTransaction.mockResolvedValue(paymasterResponse);
     mockMaliciousBuildTransactionChangeToken.mockResolvedValue(
       maliciousPaymasterResponseChangeToken
     );
     mockMaliciousBuildTransactionChangeFees.mockResolvedValue(maliciousPaymasterResponseChangeFees);
     mockMaliciousBuildTransactionAddedCalls.mockResolvedValue(maliciousPaymasterResponseAddedCalls);
+    mockMaliciousBuildTransactionWrongChain.mockResolvedValue(maliciousPaymasterResponseWrongChain);
+    mockMaliciousBuildTransactionDualCallsField.mockResolvedValue(
+      maliciousPaymasterResponseDualCallsField
+    );
+    mockMaliciousBuildTransactionApproveInsteadOfTransfer.mockResolvedValue(
+      maliciousPaymasterResponseApproveInsteadOfTransfer
+    );
+    mockMaliciousBuildTransactionShortCalldata.mockResolvedValue(
+      maliciousPaymasterResponseShortCalldata
+    );
+    mockMaliciousBuildTransactionHighLimbDrain.mockResolvedValue(
+      maliciousPaymasterResponseHighLimbDrain
+    );
+    mockSponsoredBuildTransaction.mockResolvedValue(sponsoredPaymasterResponse);
+    mockMaliciousBuildTransactionSponsoredSubstitutedCalls.mockResolvedValue(
+      maliciousPaymasterResponseSponsoredSubstitutedCalls
+    );
+    mockBuildTransactionChainIdAsShortstring.mockResolvedValue(
+      paymasterResponseChainIdAsShortstring
+    );
     mockExecuteTransaction.mockResolvedValue({ transaction_hash: '0x123' });
     mockGetSnip9Version.mockResolvedValue(OutsideExecutionVersion.V2);
+    mockGetChainId.mockResolvedValue(constants.StarknetChainId.SN_SEPOLIA);
   });
 
   describe('estimatePaymasterTransactionFee', () => {
-    it('should return estimated transaction fee from paymaster', async () => {
+    test('should return estimated transaction fee from paymaster', async () => {
       const result = await getAccount().estimatePaymasterTransactionFee(originalCalls, {
         feeMode: { mode: 'default', gasToken: '0x456' },
       });
@@ -184,7 +364,7 @@ describe('Account - Paymaster integration', () => {
   });
 
   describe('executePaymasterTransaction', () => {
-    it('should sign and execute transaction via paymaster without checking gas fees', async () => {
+    test('should sign and execute transaction via paymaster without checking gas fees', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -211,7 +391,7 @@ describe('Account - Paymaster integration', () => {
       expect(result).toEqual({ transaction_hash: '0x123' });
     });
 
-    it('should sign and execute transaction via paymaster', async () => {
+    test('should sign and execute transaction via paymaster', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -224,10 +404,11 @@ describe('Account - Paymaster integration', () => {
       expect(result).toEqual({ transaction_hash: '0x123' });
     });
 
-    it('should not throw if token price exceeds maxPriceInGasToken but transaction is sponsored', async () => {
+    test('should not throw if token price exceeds maxPriceInGasToken but transaction is sponsored', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'sponsored' },
       };
+      getAccount().paymaster.buildTransaction = mockSponsoredBuildTransaction;
       const result = await getAccount().executePaymasterTransaction(
         originalCalls,
         details,
@@ -238,7 +419,7 @@ describe('Account - Paymaster integration', () => {
       });
     });
 
-    it('should throw if token price exceeds maxPriceInGasToken', async () => {
+    test('should throw if token price exceeds maxPriceInGasToken', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -248,7 +429,7 @@ describe('Account - Paymaster integration', () => {
       ).rejects.toThrow('Gas token price is too high');
     });
 
-    it('should throw if Gas token value is not equal to the provided gas fees', async () => {
+    test('should throw if Gas token value is not equal to the provided gas fees', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -258,7 +439,7 @@ describe('Account - Paymaster integration', () => {
       ).rejects.toThrow('Gas token value is not equal to the provided gas fees');
     });
 
-    it('should throw if Gas token address is not equal to the provided gas token', async () => {
+    test('should throw if Gas token address is not equal to the provided gas token', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -268,7 +449,7 @@ describe('Account - Paymaster integration', () => {
       ).rejects.toThrow('Gas token address is not equal to the provided gas token');
     });
 
-    it('should throw if provided calls are not strictly equal to the returned calls', async () => {
+    test('should throw if provided calls are not strictly equal to the returned calls', async () => {
       const details: PaymasterDetails = {
         feeMode: { mode: 'default', gasToken: '0x456' },
       };
@@ -277,6 +458,91 @@ describe('Account - Paymaster integration', () => {
       await expect(
         getAccount().executePaymasterTransaction(originalCalls, details, '0x123456')
       ).rejects.toThrow('Provided calls are not strictly equal to the returned calls');
+    });
+
+    test('should throw if paymaster typed data domain chainId does not match the provider chain', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionWrongChain;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow(
+        "Paymaster typed data domain chainId does not match the account's provider chain"
+      );
+    });
+
+    test('should throw if paymaster typed data declares both "calls" and "Calls"', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionDualCallsField;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow(
+        'Paymaster typed data must declare exactly one of "calls" (SNIP-9 V1) or "Calls" (SNIP-9 V2)'
+      );
+    });
+
+    test('should throw if the gas-token call selector is not a transfer', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction =
+        mockMaliciousBuildTransactionApproveInsteadOfTransfer;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow('Gas token call selector is not a transfer');
+    });
+
+    test('should throw if the gas-token call calldata does not have the expected shape', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionShortCalldata;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow(
+        'Gas token transfer calldata does not match the expected recipient/amount shape'
+      );
+    });
+
+    test('should throw if the gas-token transfer high limb inflates the amount, even without an explicit maxFeeInGasToken', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction = mockMaliciousBuildTransactionHighLimbDrain;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow('Gas token value is not equal to the provided gas fees');
+    });
+
+    test('should throw if a sponsored transaction substitutes different calls', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'sponsored' },
+      };
+      getAccount().paymaster.buildTransaction =
+        mockMaliciousBuildTransactionSponsoredSubstitutedCalls;
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow('Provided calls are not strictly equal to the returned calls');
+    });
+
+    test('should not throw if the domain chainId is a raw shortstring instead of an encoded felt', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      getAccount().paymaster.buildTransaction = mockBuildTransactionChainIdAsShortstring;
+
+      const result = await getAccount().executePaymasterTransaction(originalCalls, details);
+
+      expect(result).toEqual({ transaction_hash: '0x123' });
     });
   });
 });

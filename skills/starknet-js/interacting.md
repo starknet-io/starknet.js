@@ -1,11 +1,11 @@
-# Providers, accounts, contracts, transactions (starknet.js v10)
+# Providers, accounts, contracts, transactions
 
 ## RpcProvider
 
 ```ts
 import { RpcProvider, constants, BlockTag } from 'starknet';
 
-const provider = new RpcProvider({ nodeUrl: 'https://…/rpc/v0_10' }); // default channel: RPC 0.10
+const provider = new RpcProvider({ nodeUrl: 'https://…/rpc/v0_10' }); // default channel: RPC 0.10.4
 const provider09 = new RpcProvider({ nodeUrl: '…/rpc/v0_9', specVersion: '0.9.0' });
 const auto = await RpcProvider.create({ nodeUrl }); // queries the node, picks the right channel
 const sepolia = new RpcProvider(); // random public Sepolia node
@@ -13,7 +13,7 @@ const mainnet = new RpcProvider({ nodeUrl: constants.NetworkName.SN_MAIN });
 ```
 
 - The constructor does NOT read the RPC version from the URL: pass `specVersion` or use `RpcProvider.create()`.
-- v10 talks RPC spec **0.9 and 0.10** (v8: 0.8/0.9; v7: 0.7/0.8). Devnet: `http://127.0.0.1:5050/rpc`.
+- Supported RPC specs: **0.9.0, 0.10.0, 0.10.2, 0.10.3, 0.10.4**. Devnet: `http://127.0.0.1:5050/rpc`.
 - Useful: `getSpecVersion()`, `getBlock('latest')`, `getClassAt(addr)` (→ `{ abi }`), `getNonceForAddress`, `getEvents`, `waitForTransaction`.
 - Batching: `new RpcProvider({ batch: 0 })` merges concurrent requests into one HTTP call.
 - Errors: `catch (e) { if (e instanceof RpcError && e.isType('CONTRACT_NOT_FOUND')) … }`.
@@ -65,7 +65,7 @@ const myContract = new Contract({
 - Write: `const { transaction_hash } = await myContract.transfer(to, amount);` then `waitForTransaction`.
 - `myContract.withOptions({ blockIdentifier, tip, resourceBounds, parseRequest, parseResponse, formatResponse, waitForTransaction }).fn(args)` — applies to the **next call only**. With `waitForTransaction: true`, `invoke` waits and returns the successful receipt (throws on failure).
 - `myContract.estimateFee.transfer(to, amount)` → `{ resourceBounds, … }`.
-- `myContract.populate('fn', args)` → `Call` for multicall; `myContract.compile('fn', args)` → `Calldata` (v10).
+- `myContract.populate('fn', args)` → `Call` for multicall; `myContract.compile('fn', args)` → `Calldata`.
 - Dynamic name: `await myContract[fnName](...args)`. Check deployment: `await myContract.isDeployed()`.
 - Typed ABI (autocompletion): `const typed = myContract.typedv2(myAbiAsConst);` (abi-wan-kanabi).
 
@@ -147,11 +147,14 @@ shortString / byteArray / cairo / uint256; // see calldata.md
 
 ## Version compatibility (node RPC spec ↔ starknet.js)
 
-| RPC spec | starknet.js       |
-| -------- | ----------------- |
-| 0.7.x    | v6 / v7           |
-| 0.8.x    | v7 / v8           |
-| 0.9.x    | v8 / v9 / v10     |
-| 0.10.x   | v9 (0.10.0) / v10 |
+| RPC spec | starknet.js    |
+| -------- | -------------- |
+| 0.7.x    | v6 / v7        |
+| 0.8.x    | v7 / v8        |
+| 0.9.x    | v8 / v9 / v10  |
+| 0.10.0   | v9 / v10       |
+| 0.10.2   | v10 (≥ 10.0.0) |
+| 0.10.3   | v10 (≥ 10.1.0) |
+| 0.10.4   | v10 (≥ 10.8.0) |
 
-Starknet ≥ 0.14 (v8+): V3-only transactions, pre-confirmed block state, mandatory tips.
+Starknet ≥ 0.14: V3-only transactions, pre-confirmed block state, mandatory tips.

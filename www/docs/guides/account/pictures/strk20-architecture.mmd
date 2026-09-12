@@ -1,0 +1,46 @@
+---
+config:
+  theme: neo-dark
+  themeVariables:
+    lineColor: '#8fa1c7'
+    edgeLabelBackground: '#1e293b'
+---
+flowchart TB
+ subgraph WALLET["PUBLIC — your visible identity"]
+        Account["Your account<br>public ERC-20 balance"]
+  end
+ subgraph SHIELDED["SHIELDED — inside the pool"]
+        Notes["Your notes<br>encrypted balance"]
+        Peer["Another user's notes"]
+  end
+ subgraph EXEC["PUBLIC — where your calls run"]
+        Helper["Invoke helper<br>shared, holds nothing"]
+        Anonymizer["Shadow account<br>anonymizer"]
+        ShadowAccount["Your shadow account<br>public balance<br>unlinkable address"]
+  end
+    Dapp["DAPP contract"]
+    Open["Open note<br>shielded again, but its<br>amount is revealed"]
+    Account -- "deposit (screened)" --> Notes
+    Notes -- withdraw --> Account
+    Notes -- transfer --> Peer
+    Notes -- invoke --> Helper
+    Notes -- shadow_account_invoke --> Anonymizer
+    Notes -- "withdraw (funding)" --> ShadowAccount
+    Helper ~~~ Anonymizer
+    Anonymizer -. deploys .-> ShadowAccount
+    Helper -- calls --> Dapp
+    ShadowAccount -- calls --> Dapp
+    Helper -. proceeds .-> Open
+    ShadowAccount -. collect_policy .-> Open
+    Open -. settled .-> Notes
+    Notes:::shielded
+    Open:::shielded
+    Peer:::shielded
+    Anonymizer:::infra
+    Account:::public
+    ShadowAccount:::public
+    Helper:::public
+    Dapp:::public
+    classDef shielded fill:#4c1d95,stroke:#c4b5fd,stroke-width:2px,color:#f5f3ff
+    classDef public fill:#1e293b,stroke:#94a3b8,stroke-width:2px,color:#f8fafc
+    classDef infra fill:#065f46,stroke:#6ee7b7,stroke-width:2px,color:#ecfdf5

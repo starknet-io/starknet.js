@@ -85,19 +85,19 @@ const COMPAT_ANCHOR_RULES: CompatAnchorRule[] = [
   },
 ];
 
+/*
+ * Only two frozen snapshots need this: 8.6.0 and 9.2.1, whose `guides/account/` pages sit
+ * one level deeper than their `API/` tree but still carry `../API/classes/` links (and, in
+ * 8.6.0, a `./doc_scripts/` one). The 6.24.1 and 7.6.4 guides are flat, so the test never
+ * matches them and their links are already correct. The current 10.x guides use the right
+ * depth, which makes this rule a no-op on any snapshot taken from them.
+ */
 const VERSIONED_GUIDE_LINK_RULES: VersionedGuideLinkRule[] = [
   {
     test: (path) => /\/versioned_docs\/version-[^/]+\/guides\/account\//.test(path),
     replacements: [
       [/\]\(\.\.\/API\/classes\//g, '](../../API/classes/'],
       [/\]\(\.\/doc_scripts\/deployBraavos\.ts\)/g, '](../doc_scripts/deployBraavos.ts)'],
-    ],
-  },
-  {
-    test: (path) =>
-      /\/versioned_docs\/version-[^/]+\/guides\/(?:account\/)?paymaster\.md$/.test(path),
-    replacements: [
-      [/\]\(\.\/outsideExecution\.md#check-snip-9-support\)/g, '](./outsideExecution.md)'],
     ],
   },
 ];
@@ -174,6 +174,14 @@ const docsBaseUrl = generateBaseUrl(process.env.DOCS_BASE_URL || DEFAULT_DOCS_BA
 const migrationGuideLink = `${docsBaseUrl}docs/guides/migrate`;
 // const migrationGuideLink = `${docsBaseUrl}docs/next/guides/migrate`;
 
+/*
+ * Archiving helper, not a production setting: a normal build renders every version listed
+ * in `versions.json` on top of the current one. `DOCS_ONLY_CURRENT=true` narrows it to the
+ * current line, which is all that is needed to regenerate `docs/API` before freezing a new
+ * snapshot. CI never sets it, so deployed builds still ship every version.
+ */
+const onlyCurrentDocs = process.env.DOCS_ONLY_CURRENT === 'true';
+
 const config: Config = {
   title: 'Starknet.js',
   tagline: 'JavaScript library for Starknet',
@@ -205,6 +213,27 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.js',
+          // `www/docs` tracks the supported 10.x line, so it is the default version and
+          // served at /docs/. `10.8.0` is a frozen copy of that same supported line and
+          // therefore carries no banner; the older snapshots are end-of-life and are
+          // flagged as unmaintained. When the next major becomes the development line,
+          // update `current.label` and flag `10.8.0` as unmaintained in turn. Every new
+          // snapshot needs an explicit `banner` entry here.
+          lastVersion: 'current',
+          ...(onlyCurrentDocs ? { onlyIncludeVersions: ['current'] } : {}),
+          versions: {
+            current: { label: '10.x', banner: 'none' },
+            // Declared only when they are part of the build, to stay in step with
+            // `onlyIncludeVersions` above.
+            ...(onlyCurrentDocs
+              ? {}
+              : {
+                  '10.8.0': { banner: 'none' },
+                  '9.2.1': { banner: 'unmaintained' },
+                  '8.6.0': { banner: 'unmaintained' },
+                  '7.6.4': { banner: 'unmaintained' },
+                }),
+          },
           async sidebarItemsGenerator(args) {
             const sidebarItems = await args.defaultSidebarItemsGenerator(args);
 
@@ -229,9 +258,9 @@ const config: Config = {
       appId: '86VVNRI64B',
 
       // Public API key: it is safe to commit it
-      apiKey: '6f4db54e4ee0ae77619b41dbe862af7f',
+      apiKey: '1e38429d50835ef8fcae055fba695062',
 
-      indexName: 'starknetjs',
+      indexName: 'starknet-js',
 
       // Algolia "Ask AI" conversational assistant (DocSearch v4).
       // The assistantId is a public value (configured in the Algolia dashboard,
@@ -342,6 +371,20 @@ const config: Config = {
   } satisfies Preset.ThemeConfig,
 
   plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        // Until 10.x became the default version, the current docs were served under
+        // /docs/next/. Keep those links alive by redirecting every /docs/next/* page to
+        // its /docs/* counterpart. Paths here are relative to `baseUrl`. Versioned
+        // snapshots (/docs/9.2.1/...) never lived under /docs/next/ and are skipped.
+        createRedirects(existingPath: string) {
+          const match = existingPath.match(/^\/docs\/(.+)$/);
+          if (!match || /^\d/.test(match[1])) return undefined;
+          return [`/docs/next/${match[1]}`];
+        },
+      },
+    ],
     [
       'docusaurus-plugin-typedoc',
       {

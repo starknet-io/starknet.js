@@ -380,6 +380,43 @@ describe('typedData', () => {
     });
   });
 
+  describe('preset type shadowing (SNIP-12 reserved names)', () => {
+    const shadowedTypedData = (
+      typeName: string,
+      fields: { name: string; type: string }[],
+      amount: any
+    ) => ({
+      ...copyMock(examplePresetTypes),
+      types: {
+        StarknetDomain: examplePresetTypes.types.StarknetDomain,
+        [typeName]: fields,
+        Payload: [{ name: 'amount', type: typeName }],
+      },
+      primaryType: 'Payload',
+      message: { amount },
+    });
+
+    test('rejects a caller-defined "u256" type instead of silently equating distinct schemas', () => {
+      // GHSA-qc84-vrxf-5cqj: schema A and B differ only in which field the caller's own
+      // (reserved) "u256" type declares — SNIP-12 requires the request to be rejected outright,
+      // not resolved by some precedence between the caller's definition and the built-in preset.
+      const schemaA = shadowedTypedData('u256', [{ name: 'low', type: 'u128' }], { low: 1 });
+      const schemaB = shadowedTypedData('u256', [{ name: 'high', type: 'u128' }], { high: 1 });
+
+      expect(() => getMessageHash(schemaA, exampleAddress)).toThrow(/does not match JSON schema/);
+      expect(() => getMessageHash(schemaB, exampleAddress)).toThrow(/does not match JSON schema/);
+    });
+
+    test('a non-reserved type name is unaffected and the two schemas hash differently', () => {
+      const schemaA = shadowedTypedData('Amount', [{ name: 'low', type: 'u128' }], { low: 1 });
+      const schemaB = shadowedTypedData('Amount', [{ name: 'high', type: 'u128' }], { high: 1 });
+
+      expect(getMessageHash(schemaA, exampleAddress)).not.toBe(
+        getMessageHash(schemaB, exampleAddress)
+      );
+    });
+  });
+
   describe('verifyMessage', () => {
     const addr = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
     const privK = '0x71d7bb07b9a64f6f78ac4c816aff4da9';

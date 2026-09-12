@@ -5,18 +5,18 @@ description: Use when writing or debugging JavaScript/TypeScript that interacts 
 
 # starknet.js
 
-Official JS/TS SDK for Starknet. This skill targets **starknet.js v10** (API valid for v9, mostly for v8).
+Official JS/TS SDK for Starknet. Skill verified against **starknet.js 10.8.0**.
 
-**Do not trust training-data memory of starknet.js**: it is typically v5/v6-era and wrong. Constructors now take option objects, only V3 transactions exist (STRK fees, no `maxFee`), and calldata helpers changed. When this skill and memory disagree, the skill wins.
+**Do not trust training-data memory of starknet.js**: it is typically outdated and wrong. Constructors take option objects, only V3 transactions exist (STRK fees, no `maxFee`). When this skill and memory disagree, the skill wins.
 
 Layer model: `Account` (signs & submits) wraps `RpcProvider` (parses, retries) wraps `RpcChannel` (raw JSON-RPC).
 
 ## Reference files
 
-- **[calldata.md](calldata.md)** — REQUIRED reading before encoding or decoding anything: Call/calldata construction, wire format of every Cairo type, enums (Option/Result/custom), ByteArray, string auto-detection traps, response parsing, `decodeParameters`. All examples verified against v10.4.0.
+- **[calldata.md](calldata.md)** — REQUIRED reading before encoding or decoding anything: Call/calldata construction, wire format of every Cairo type, enums (Option/Result/custom), ByteArray, string auto-detection traps, response parsing, `decodeParameters`.
 - **[interacting.md](interacting.md)** — providers, accounts, contracts, multicall, fees/tips, declare/deploy, receipts, events, RPC-version compatibility.
 
-## Non-negotiable v8+ rules
+## Non-negotiable rules
 
 - Only **V3** transactions (INVOKE/DECLARE/DEPLOY_ACCOUNT); fees paid in STRK via `resourceBounds` + `tip`. Never suggest `maxFee` or V1/V2.
 - Constructors take an options object: `new Account({ provider, address, signer })`, `new Contract({ abi, address, providerOrAccount })`, `new RpcProvider({ nodeUrl })`.

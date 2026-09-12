@@ -5,8 +5,14 @@ export type { StarknetPlugin, ProviderHooks, AccountHooks, PluginConfig } from '
 export { PluginManager } from './manager';
 
 // Plugin implementations
+//
+// The StarknetId factory is exported as `starknetIdPlugin` and NOT as `starknetId`:
+// the bare name is already taken at the package root by the `starknetId` utility
+// namespace (`export * as starknetId from './utils/starknetId'` in `src/index.ts`).
+// An explicit export always wins over a wildcard re-export, so a factory exported
+// here as `starknetId` would be silently dropped from the built bundle.
 export {
-  starknetId,
+  starknetId as starknetIdPlugin,
   StarknetIdImpl,
   type StarknetIdProviderMethods,
   type StarknetIdAccountMethods,

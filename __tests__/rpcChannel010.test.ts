@@ -74,6 +74,84 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
     fetchSpy?.mockRestore();
   });
 
+  describe('waitForTransaction', () => {
+    test('returns immediately after the receipt is available', async () => {
+      jest.useFakeTimers();
+      const receipt = { transaction_hash: '0x123' };
+      const transactionStatusSpy = jest
+        .spyOn(channel, 'getTransactionStatus')
+        .mockResolvedValueOnce({
+          finality_status: 'ACCEPTED_ON_L2',
+          execution_status: 'SUCCEEDED',
+        });
+      const transactionReceiptSpy = jest
+        .spyOn(channel, 'getTransactionReceipt')
+        .mockResolvedValueOnce(receipt as any);
+
+      const promise = channel.waitForTransaction('0x123', { retryInterval: 1_000 });
+      let settled = false;
+      const settledPromise = promise.then((result) => {
+        settled = true;
+        return result;
+      });
+
+      try {
+        await jest.advanceTimersByTimeAsync(1_000);
+        await Promise.resolve();
+
+        expect(settled).toBe(true);
+        await expect(settledPromise).resolves.toBe(receipt);
+      } finally {
+        transactionStatusSpy.mockRestore();
+        transactionReceiptSpy.mockRestore();
+        jest.useRealTimers();
+      }
+    });
+
+    test('waits one retry interval when the receipt is not available yet', async () => {
+      jest.useFakeTimers();
+      const receipt = { transaction_hash: '0x123' };
+      const transactionStatusSpy = jest
+        .spyOn(channel, 'getTransactionStatus')
+        .mockResolvedValueOnce({
+          finality_status: 'ACCEPTED_ON_L2',
+          execution_status: 'SUCCEEDED',
+        });
+      const transactionReceiptSpy = jest
+        .spyOn(channel, 'getTransactionReceipt')
+        .mockRejectedValueOnce(new Error('Transaction hash not found'))
+        .mockResolvedValueOnce(receipt as any);
+
+      const promise = channel.waitForTransaction('0x123', { retryInterval: 1_000 });
+      let settled = false;
+      const settledPromise = promise.then((result) => {
+        settled = true;
+        return result;
+      });
+
+      try {
+        // status polling interval elapsed, first receipt attempt rejected
+        await jest.advanceTimersByTimeAsync(1_000);
+        expect(transactionReceiptSpy).toHaveBeenCalledTimes(1);
+        expect(settled).toBe(false);
+
+        // pacing between two receipt attempts is preserved
+        await jest.advanceTimersByTimeAsync(999);
+        expect(transactionReceiptSpy).toHaveBeenCalledTimes(1);
+        expect(settled).toBe(false);
+
+        await jest.advanceTimersByTimeAsync(1);
+        expect(transactionReceiptSpy).toHaveBeenCalledTimes(2);
+        expect(settled).toBe(true);
+        await expect(settledPromise).resolves.toBe(receipt);
+      } finally {
+        transactionStatusSpy.mockRestore();
+        transactionReceiptSpy.mockRestore();
+        jest.useRealTimers();
+      }
+    });
+  });
+
   describe('response_flags (includeProofFacts)', () => {
     test('getBlockWithTxs with includeProofFacts sends response_flags', async () => {
       fetchSpy = jest.spyOn(channel, 'fetch');

@@ -45,6 +45,7 @@ jobs:
   prepare-matrix:
     name: Prepare matrix
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
       matrix: ${{ steps.process-inputs.outputs.result }}
     steps:
@@ -71,6 +72,8 @@ jobs:
   tests:
     name: Run test on ${{ matrix.node }} ${{ matrix.protocol }} ${{ matrix.version }}
     needs: [prepare-matrix]
+    permissions:
+      contents: read
     strategy:
       max-parallel: 1
       fail-fast: ${{ inputs.fail-fast }}

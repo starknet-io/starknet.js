@@ -9,7 +9,7 @@ import {
   IsSucceeded,
   IsType,
   PRE_CONFIRMED_BLOCK_WITH_TX_HASHES,
-  RPCSPEC0103,
+  RPCSPEC0104,
   TransactionReceipt,
 } from '../../types/api';
 
@@ -62,7 +62,7 @@ export type DeclareContractResponse = DeclaredTransaction;
 
 export type CallContractResponse = string[];
 
-export type StorageResponse = RPCSPEC0103.STORAGE_RESULT;
+export type StorageResponse = RPCSPEC0104.STORAGE_RESULT;
 
 export type Nonce = string;
 

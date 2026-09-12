@@ -56,8 +56,9 @@ describeIfTestnet('Proof in transaction', () => {
     });
   });
 
-  // SNIP-36 `proof` and `proofFacts` only exist in the RPC 0.10 spec. The 0.9 channel
-  // silently drops them, so the contract would read empty proof facts and panic.
+  // SNIP-36 `proof` and `proofFacts` only exist in the RPC 0.10 spec. On a 0.9 node the
+  // channel rejects them upfront (SYSTEM_MESSAGES.snip36RequiresRPC010), so these tests
+  // could only observe the SDK guard, never the contract behavior they target.
   describeIfRpc010('proof attached to the transaction', () => {
     test('tx with wrong calldata', async () => {
       const myCall3 = { ...myCall2, calldata: [message.user_id, 0] }; // 0 for is_whitelisted instead of 1

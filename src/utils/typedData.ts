@@ -97,13 +97,21 @@ function getHex(value: BigNumberish): string {
 }
 
 /**
- * Validates that `data` matches the EIP-712 JSON schema.
+ * Validates that `data` matches the EIP-712 JSON schema, and that it does not redefine any
+ * of the active revision's preset type names (SNIP-12 reserves those names and requires such
+ * a request to be rejected).
  */
 export function validateTypedData(data: unknown): data is TypedData {
   const typedData = data as TypedData;
-  return Boolean(
-    typedData.message && typedData.primaryType && typedData.types && identifyRevision(typedData)
-  );
+  if (!(typedData.message && typedData.primaryType && typedData.types)) {
+    return false;
+  }
+  const revision = identifyRevision(typedData);
+  if (!revision) {
+    return false;
+  }
+  const presetNames = Object.keys(revisionConfiguration[revision].presetTypes);
+  return Object.keys(typedData.types).every((name) => !presetNames.includes(name));
 }
 
 /**

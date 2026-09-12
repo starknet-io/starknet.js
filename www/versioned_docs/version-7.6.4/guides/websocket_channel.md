@@ -137,4 +137,4 @@ Each of these methods returns a `Promise<Subscription>`.
 - `subscribeTransactionStatus`
 - `subscribePendingTransaction`
 
-For more details, see the complete [API documentation](/docs/next/API/classes/WebSocketChannel).
+For more details, see the complete [API documentation](../API/classes/WebSocketChannel).

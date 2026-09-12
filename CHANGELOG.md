@@ -1,3 +1,123 @@
+# [10.8.0](https://github.com/starknet-io/starknet.js/compare/v10.7.6...v10.8.0) (2026-09-10)
+
+### Bug Fixes
+
+- **deps:** bump get-starknet wallet-standard to 6.0.6 ([5a8cb12](https://github.com/starknet-io/starknet.js/commit/5a8cb121dd0da9de2b0d84ed59d7a3ebbe1ff855))
+
+### Features
+
+- add RPC 0.10.4 support (starknet-types-0104, RpcChannel v0_10_4) ([24561f4](https://github.com/starknet-io/starknet.js/commit/24561f4ba64cde954d8204ff5404e034fd2b87a6))
+
+## [10.7.6](https://github.com/starknet-io/starknet.js/compare/v10.7.5...v10.7.6) (2026-09-09)
+
+### Bug Fixes
+
+- **logger:** coerce message to string before sanitizing CR/LF ([f0a3058](https://github.com/starknet-io/starknet.js/commit/f0a305811a009b3265185f9b5e0ca48301937ec8))
+- **security:** harden code scanning findings ([63bf7bc](https://github.com/starknet-io/starknet.js/commit/63bf7bc3ac0bcbd3fd04769446f697983ac5b26c))
+
+## [10.7.5](https://github.com/starknet-io/starknet.js/compare/v10.7.4...v10.7.5) (2026-09-08)
+
+### Bug Fixes
+
+- **calldata:** default to the parsing strategy that decodes signed integers correctly ([d766915](https://github.com/starknet-io/starknet.js/commit/d76691531bd095a13b822249be11aededc472b6d))
+
+## [10.7.4](https://github.com/starknet-io/starknet.js/compare/v10.7.3...v10.7.4) (2026-09-08)
+
+### Bug Fixes
+
+- **typedData:** reject caller types that shadow SNIP-12 preset names ([3f06927](https://github.com/starknet-io/starknet.js/commit/3f06927e1b1325df657c8056539cff84144d729c))
+
+## [10.7.3](https://github.com/starknet-io/starknet.js/compare/v10.7.2...v10.7.3) (2026-09-08)
+
+### Bug Fixes
+
+- **deployer:** preserve constructor argument names before ABI ordering ([b27222a](https://github.com/starknet-io/starknet.js/commit/b27222afbacf86d0d035b895d4faf0935a305d04))
+
+## [10.7.2](https://github.com/starknet-io/starknet.js/compare/v10.7.1...v10.7.2) (2026-09-08)
+
+### Bug Fixes
+
+- **paymaster:** accept a raw shortstring for the paymaster typed-data domain chainId ([4abd5ae](https://github.com/starknet-io/starknet.js/commit/4abd5aeec079e8ca14ce098d0ff8790a89aa1c62))
+- **paymaster:** bind paymaster typed-data domain to the account's provider chain ([f194c61](https://github.com/starknet-io/starknet.js/commit/f194c612cd2fa2ecb6515e484f89d6f2bb72892a))
+- **paymaster:** reject paymaster typed data declaring both "calls" and "Calls" ([e618f70](https://github.com/starknet-io/starknet.js/commit/e618f706fe543aa5dbce5b560098ad15d4ca341b))
+- **paymaster:** validate selector and calldata shape of the appended gas-token call ([4b72d35](https://github.com/starknet-io/starknet.js/commit/4b72d35cfe19424fb707dbfdfd4e3877532f86b5))
+- **paymaster:** validate the full u256 gas-token amount unconditionally ([3d1a1ec](https://github.com/starknet-io/starknet.js/commit/3d1a1ec420a769f31bb7fc94b2a68f36ae56630e))
+- **paymaster:** verify calls equality for sponsored paymaster transactions too ([c403643](https://github.com/starknet-io/starknet.js/commit/c403643b580ab5953a2e737d1aa39e083d5f0262))
+
+## [10.7.1](https://github.com/starknet-io/starknet.js/compare/v10.7.0...v10.7.1) (2026-08-21)
+
+### Bug Fixes
+
+- **provider:** accept pre-release RPC spec versions ([436f433](https://github.com/starknet-io/starknet.js/commit/436f433e57039f3ae12c651c937d6b7e21592de1))
+
+# [10.7.0](https://github.com/starknet-io/starknet.js/compare/v10.6.8...v10.7.0) (2026-08-13)
+
+### Features
+
+- **deps:** bump types-js 0.10.4-beta.2 and get-starknet 6.0.4 ([cf26a77](https://github.com/starknet-io/starknet.js/commit/cf26a77dc706c841a207bc76fb2ff7a5a7955be9))
+
+## [10.6.8](https://github.com/starknet-io/starknet.js/compare/v10.6.7...v10.6.8) (2026-08-07)
+
+### Bug Fixes
+
+- **ws:** close the subscription lifecycle races ([c242c76](https://github.com/starknet-io/starknet.js/commit/c242c76ab73f508ecd454d1d7eb2fde8728c4f9d))
+
+## [10.6.7](https://github.com/starknet-io/starknet.js/compare/v10.6.6...v10.6.7) (2026-08-06)
+
+### Bug Fixes
+
+- **ws:** settle in-flight requests when the connection drops ([8eae9c9](https://github.com/starknet-io/starknet.js/commit/8eae9c9457befe6e0c3f4fd30a56025fe5455fd8))
+
+## [10.6.6](https://github.com/starknet-io/starknet.js/compare/v10.6.5...v10.6.6) (2026-08-05)
+
+### Bug Fixes
+
+- **ws:** reject queued requests instead of hanging ([82ced97](https://github.com/starknet-io/starknet.js/commit/82ced97dc6dc409131bc5650db076efedf467101))
+
+## [10.6.5](https://github.com/starknet-io/starknet.js/compare/v10.6.4...v10.6.5) (2026-08-05)
+
+### Bug Fixes
+
+- **ws:** guard malformed frames and honour request id 0 ([cf1f4e2](https://github.com/starknet-io/starknet.js/commit/cf1f4e2c1f58eba5f1d63628959fe2ee47387025))
+
+## [10.6.4](https://github.com/starknet-io/starknet.js/compare/v10.6.3...v10.6.4) (2026-08-04)
+
+### Bug Fixes
+
+- **channel:** reject SNIP-36 fields on RPC 0.9 ([a1a7f65](https://github.com/starknet-io/starknet.js/commit/a1a7f654391b44d9ce3ceea7492f5dfbccaa94f8))
+
+## [10.6.3](https://github.com/starknet-io/starknet.js/compare/v10.6.2...v10.6.3) (2026-07-31)
+
+### Bug Fixes
+
+- **plugins:** export starknetId factory as starknetIdPlugin ([ced6115](https://github.com/starknet-io/starknet.js/commit/ced6115e192905961fc27db3ba1c9d3d17094ea2))
+
+## [10.6.2](https://github.com/starknet-io/starknet.js/compare/v10.6.1...v10.6.2) (2026-07-31)
+
+### Bug Fixes
+
+- avoid extra waitForTransaction receipt delay ([6f21175](https://github.com/starknet-io/starknet.js/commit/6f21175eb4096756e570c9c04010a1b66ae596f1))
+
+## [10.6.1](https://github.com/starknet-io/starknet.js/compare/v10.6.0...v10.6.1) (2026-07-30)
+
+### Bug Fixes
+
+- memory leak2 ([a23f59f](https://github.com/starknet-io/starknet.js/commit/a23f59f3915847d8bbfab677d1ad711c3630c0f3))
+- ws memory leak ([b7a6ba6](https://github.com/starknet-io/starknet.js/commit/b7a6ba662f1923d5036040b19ea6da302eb3d6ae))
+- ws-bound request-queue draining to prevent OOM on reconnect ([0e6f7c1](https://github.com/starknet-io/starknet.js/commit/0e6f7c14050cda982dd8ed3cb231a9fd55554bdc))
+
+# [10.6.0](https://github.com/starknet-io/starknet.js/compare/v10.5.3...v10.6.0) (2026-07-29)
+
+### Features
+
+- sub-account handling ([62ec03c](https://github.com/starknet-io/starknet.js/commit/62ec03c84cfa6f3066b516aa1f4e2d1caaa58444))
+
+## [10.5.3](https://github.com/starknet-io/starknet.js/compare/v10.5.2...v10.5.3) (2026-07-27)
+
+### Bug Fixes
+
+- publish the 10.5.x line to the stable npm latest channel ([6ba35c2](https://github.com/starknet-io/starknet.js/commit/6ba35c293fc2e21cefa65dc8a8f907237c67637b))
+
 ## [10.5.2](https://github.com/starknet-io/starknet.js/compare/v10.5.1...v10.5.2) (2026-07-22)
 
 ### Bug Fixes

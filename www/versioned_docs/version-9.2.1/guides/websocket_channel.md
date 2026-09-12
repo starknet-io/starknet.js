@@ -385,4 +385,4 @@ async function main() {
 main().catch(console.error);
 ```
 
-For more details, see the complete [API documentation](/docs/next/API/classes/WebSocketChannel).
+For more details, see the complete [API documentation](../API/classes/WebSocketChannel).

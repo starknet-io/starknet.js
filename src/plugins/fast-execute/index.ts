@@ -22,7 +22,6 @@ import type {
  * @example
  * ```typescript
  * import { RpcProvider, Account } from 'starknet';
- * import { fastExecute } from 'starknet/plugins';
  *
  * const provider = new RpcProvider({
  *   nodeUrl: url,
