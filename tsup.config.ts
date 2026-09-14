@@ -21,7 +21,7 @@ const browserNodeShimPlugin: Plugin = {
 
 export default defineConfig((overrideOptions) => {
   const baseConfig: Options = {
-    entry: ['src/index.ts'],
+    entry: ['src/index.ts', 'src/utils/index.ts', 'src/utils/num.ts'],
     sourcemap: true,
     clean: true,
     format: ['cjs'],
