@@ -18,6 +18,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.mjs",
+      "require": "./dist/utils/index.js"
+    },
+    "./utils/num": {
+      "types": "./dist/utils/num.d.ts",
+      "import": "./dist/utils/num.mjs",
+      "require": "./dist/utils/num.js"
     }
   },
   "files": [
