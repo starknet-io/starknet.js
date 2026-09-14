@@ -1,3 +1,64 @@
+# [11.0.0](https://github.com/starknet-io/starknet.js/compare/v10.8.0...v11.0.0) (2026-09-14)
+
+### Bug Fixes
+
+- **cairoDataTypes:** correct u256 and u512 toApiRequest and validate ([11d758b](https://github.com/starknet-io/starknet.js/commit/11d758bfed27e3c8b170d930c47253f42a110dfb))
+- **calldata:** a Cairo type serializes itself, abi or not ([c0943fb](https://github.com/starknet-io/starknet.js/commit/c0943fb173ab7e914ae213865c8cf7cf78898746))
+- **calldata:** an abi slot accepts the Cairo type it declares ([b9fa576](https://github.com/starknet-io/starknet.js/commit/b9fa5769aba339a27a989d249d4adef1b04f79a8))
+- **calldata:** long string chunks stay text, at any ABI depth ([06638d9](https://github.com/starknet-io/starknet.js/commit/06638d9b7317caf3e20087c9f92a05a499157213))
+- **calldata:** out-of-range arguments refused, negative results come back negative ([41bf052](https://github.com/starknet-io/starknet.js/commit/41bf052f11a66d9b72e8db2a964b86c8161546b1))
+- **calldata:** text reaches a ByteArray, whatever it spells ([509c9f8](https://github.com/starknet-io/starknet.js/commit/509c9f80f02ef1f5751bcdbd45a8612c2479f6f8))
+- **deps:** bump @noble/[@scure](https://github.com/scure) crypto libs to 2.4.0 ([5c448fe](https://github.com/starknet-io/starknet.js/commit/5c448febcbd16e2d1e27a4f32ec09cfd83e35dca))
+- remove leftover v1 transaction references ([52424df](https://github.com/starknet-io/starknet.js/commit/52424df0f3dee61ab477bf06adddca189ac313f7))
+- **starknetId:** accept bigAlphabet characters in isStarkDomain ([f508984](https://github.com/starknet-io/starknet.js/commit/f5089848f4b4bf526cc814f20fef1918bc67879f)), closes [#1668](https://github.com/starknet-io/starknet.js/issues/1668)
+- **starknetId:** reject names the encoder cannot represent ([76fe9b1](https://github.com/starknet-io/starknet.js/commit/76fe9b1df174d295374417a018e425ee652258c8)), closes [#1668](https://github.com/starknet-io/starknet.js/issues/1668)
+- **test:** detect devnet by asking the node, not by the absence of a url ([62b3944](https://github.com/starknet-io/starknet.js/commit/62b39442812278592e6831ccb3d7f6fc917eb621))
+- **ws:** tolerate an unclean close, and run the suite on devnet ([5c706f0](https://github.com/starknet-io/starknet.js/commit/5c706f0b59ebd17ed13a73a381199731630a4ec9))
+- **ws:** webSocketProvider.create() typing, and the transport documentation ([00dcc5c](https://github.com/starknet-io/starknet.js/commit/00dcc5c6938af0d784f7b5fef9c47b229f365519))
+
+### Features
+
+- **cairoDataTypes:** add CairoBool, CairoEthAddress and CairoSecp256k1Point ([332dd1e](https://github.com/starknet-io/starknet.js/commit/332dd1e2fbf9db756343768327788f9114a897b1))
+- **cairoDataTypes:** add the composite Cairo type classes and their strategy ([58d1ae7](https://github.com/starknet-io/starknet.js/commit/58d1ae716443d1db96589eb6cbb35f2ae7784159)), closes [#1484](https://github.com/starknet-io/starknet.js/issues/1484) [#1688](https://github.com/starknet-io/starknet.js/issues/1688) [#1484](https://github.com/starknet-io/starknet.js/issues/1484)
+- **cairo:** remove the deprecated string helpers, add CairoBytes31.fromText ([49331fe](https://github.com/starknet-io/starknet.js/commit/49331fe4ffc002c6adf711c0484a4f5b70954fc9))
+- **calldata:** run the calldata codec on the Cairo type classes ([35f3b80](https://github.com/starknet-io/starknet.js/commit/35f3b804b5efaad4ebb2e2429a5bda00d981eb3e))
+- **channel:** carry requests and subscriptions over one WebSocket transport ([6344efc](https://github.com/starknet-io/starknet.js/commit/6344efc17ffdaf389419b35a9ce803fc539b626b))
+- **channel:** route RPC requests through a pluggable transport ([5af8a51](https://github.com/starknet-io/starknet.js/commit/5af8a5162bdcbbc414031447d8be856e263238ad))
+- **constants:** remove the feeder gateway BaseUrl constant ([c455e2a](https://github.com/starknet-io/starknet.js/commit/c455e2a7410817135729f652a8bd46aa45b9cec6))
+- **provider:** deprecate the Provider alias in favour of RpcProvider ([08dad8c](https://github.com/starknet-io/starknet.js/commit/08dad8c8f50bec207a67622fd9253cce3f41a796))
+- **receipt:** remove the deprecated ReceiptTx class ([e57933c](https://github.com/starknet-io/starknet.js/commit/e57933cc491249b5b1593e84b4d90750e9bdf7dc))
+- **stark:** add randomFelt and randomStarkPrivateKey generators ([04c612e](https://github.com/starknet-io/starknet.js/commit/04c612e7f5bc1913607e8fcd6807677dba8b90fc))
+- starknet.js v11 ([0e360fd](https://github.com/starknet-io/starknet.js/commit/0e360fd7cf29546b9979bd201f0d77fb9817147f))
+- **test:** one npm test, four URL-driven categories ([4e8e2c6](https://github.com/starknet-io/starknet.js/commit/4e8e2c61db1d2939799dfa042a8ba46ef270683e))
+- **ws:** webSocketProvider, one socket for requests and subscriptions ([2af307a](https://github.com/starknet-io/starknet.js/commit/2af307a13421b67349216730e2ca4cd09aba39a2))
+
+### BREAKING CHANGES
+
+- **calldata:** run the calldata codec on the Cairo type classes
+- **cairoDataTypes:** three inputs that used to reach the calldata are now refused.
+  A core::bool argument that is neither a boolean nor 0/1 throws instead of being
+  serialized as a felt. An EthAddress built from text throws instead of being
+  encoded as its UTF-8 bytes. A Secp256k1Point wider than 512 bits throws instead
+  of emitting four corrupted felts.
+- **constants:** `constants.BaseUrl` is removed. It exposed the feeder
+  gateway roots, whose endpoints Starknet v0.14.4 deletes; the library has
+  been JSON-RPC only since v7 and never read it. Use `constants.NetworkName`
+  with `provider.getDefaultNodeUrl()`, or your own node's RPC url.
+- **starknetId:** `useEncoded` throws on any character outside the Starknet.id alphabets
+  instead of silently ignoring it, and `encodeBrotherDomain`, which calls it with no guard,
+  throws on the same input. `isStarkDomain` also rejects labels whose encoding overflows the
+  field, including every 48-character label it used to accept.
+- v2hash, ETransactionVersion2, Details,
+  InvocationsDetails.maxFee and TransactionHashPrefix.DEPLOY are removed.
+  See the v10 to v11 migration guide, section 8.
+- **receipt:** remove the deprecated ReceiptTx class
+- **cairo:** shortString.encodeShortString(), shortString.decodeShortString(),
+  CairoFelt() and encode.utf8ToArray() are removed. Use
+  CairoBytes31.fromText(text).toHexString(), new CairoBytes31(felt).decodeUtf8(),
+  CairoFelt252 and encode.utf8ToUint8Array(). cairo.felt() no longer accepts text,
+  booleans or non-integer numbers.
+- @noble/curves, @noble/hashes and @scure/starknet bumped to 2.x. WeierstrassSignatureType is now weierstrass.ECDSASignature, a plain {r, s} object instead of the v1 signature class.
+
 # [11.0.0-beta.14](https://github.com/starknet-io/starknet.js/compare/v11.0.0-beta.13...v11.0.0-beta.14) (2026-09-10)
 
 ### Bug Fixes
