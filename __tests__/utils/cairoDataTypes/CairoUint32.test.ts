@@ -50,14 +50,18 @@ describe('CairoUint32 class Unit Tests', () => {
     });
 
     test('should reject negative values', () => {
-      expect(() => new CairoUint32(-1)).toThrow('Value is out of u32 range [0, 2^32)');
-      expect(() => new CairoUint32(-100n)).toThrow('Value is out of u32 range [0, 2^32)');
+      expect(() => new CairoUint32(-1)).toThrow('Value is out of u32 range [0, 4294967295]');
+      expect(() => new CairoUint32(-100n)).toThrow('Value is out of u32 range [0, 4294967295]');
     });
 
     test('should reject values greater than 2^32 - 1', () => {
       const overflowValue = 2n ** 32n; // 4294967296
-      expect(() => new CairoUint32(overflowValue)).toThrow('Value is out of u32 range [0, 2^32)');
-      expect(() => new CairoUint32(4294967296)).toThrow('Value is out of u32 range [0, 2^32)');
+      expect(() => new CairoUint32(overflowValue)).toThrow(
+        'Value is out of u32 range [0, 4294967295]'
+      );
+      expect(() => new CairoUint32(4294967296)).toThrow(
+        'Value is out of u32 range [0, 4294967295]'
+      );
     });
 
     test('should handle valid string inputs correctly', () => {
@@ -95,10 +99,14 @@ describe('CairoUint32 class Unit Tests', () => {
     });
 
     test('should validate string inputs with out-of-range values', () => {
-      expect(() => new CairoUint32('4294967296')).toThrow('Value is out of u32 range [0, 2^32)');
+      expect(() => new CairoUint32('4294967296')).toThrow(
+        'Value is out of u32 range [0, 4294967295]'
+      );
       // Note: '-1' is treated as text and converted via UTF-8, not as a number string
       // because it fails isStringWholeNumber (which only matches positive digits)
-      expect(() => new CairoUint32('0x100000000')).toThrow('Value is out of u32 range [0, 2^32)');
+      expect(() => new CairoUint32('0x100000000')).toThrow(
+        'Value is out of u32 range [0, 4294967295]'
+      );
     });
   });
 
@@ -241,13 +249,19 @@ describe('CairoUint32 class Unit Tests', () => {
     });
 
     test('should reject negative values', () => {
-      expect(() => CairoUint32.validate(-1)).toThrow('Value is out of u32 range [0, 2^32)');
-      expect(() => CairoUint32.validate(-100n)).toThrow('Value is out of u32 range [0, 2^32)');
+      expect(() => CairoUint32.validate(-1)).toThrow('Value is out of u32 range [0, 4294967295]');
+      expect(() => CairoUint32.validate(-100n)).toThrow(
+        'Value is out of u32 range [0, 4294967295]'
+      );
     });
 
     test('should reject values exceeding u32 range', () => {
-      expect(() => CairoUint32.validate(2n ** 32n)).toThrow('Value is out of u32 range [0, 2^32)');
-      expect(() => CairoUint32.validate(4294967296)).toThrow('Value is out of u32 range [0, 2^32)');
+      expect(() => CairoUint32.validate(2n ** 32n)).toThrow(
+        'Value is out of u32 range [0, 4294967295]'
+      );
+      expect(() => CairoUint32.validate(4294967296)).toThrow(
+        'Value is out of u32 range [0, 4294967295]'
+      );
     });
 
     test('should reject decimal numbers', () => {
@@ -281,7 +295,8 @@ describe('CairoUint32 class Unit Tests', () => {
 
   describe('isAbiType static method', () => {
     test('should identify correct ABI type', () => {
-      expect(CairoUint32.isAbiType('core::u32::u32')).toBe(true);
+      expect(CairoUint32.isAbiType('core::integer::u32')).toBe(true);
+      expect(CairoUint32.isAbiType('core::u32::u32')).toBe(false); // no abi spells it this way
       expect(CairoUint32.isAbiType('u32')).toBe(false);
       expect(CairoUint32.isAbiType('core::u64::u64')).toBe(false);
       expect(CairoUint32.isAbiType('core::felt252')).toBe(false);
@@ -447,12 +462,12 @@ describe('CairoUint32 class Unit Tests', () => {
       });
 
       test('should reject out-of-range values', () => {
-        expect(() => CairoUint32.validate(-1)).toThrow('Value is out of u32 range [0, 2^32)');
+        expect(() => CairoUint32.validate(-1)).toThrow('Value is out of u32 range [0, 4294967295]');
         expect(() => CairoUint32.validate(4294967296)).toThrow(
-          'Value is out of u32 range [0, 2^32)'
+          'Value is out of u32 range [0, 4294967295]'
         );
         expect(() => CairoUint32.validate(2n ** 32n)).toThrow(
-          'Value is out of u32 range [0, 2^32)'
+          'Value is out of u32 range [0, 4294967295]'
         );
       });
     });
@@ -474,10 +489,11 @@ describe('CairoUint32 class Unit Tests', () => {
 
     describe('isAbiType method', () => {
       test('should return true for correct ABI selector', () => {
-        expect(CairoUint32.isAbiType('core::u32::u32')).toBe(true);
+        expect(CairoUint32.isAbiType('core::integer::u32')).toBe(true);
       });
 
       test('should return false for incorrect ABI selector', () => {
+        expect(CairoUint32.isAbiType('core::u32::u32')).toBe(false);
         expect(CairoUint32.isAbiType('core::u64::u64')).toBe(false);
         expect(CairoUint32.isAbiType('core::felt252')).toBe(false);
         expect(CairoUint32.isAbiType('')).toBe(false);

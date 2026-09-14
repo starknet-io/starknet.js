@@ -93,7 +93,7 @@ The `data` array contains the `errorDescription` variable content (`'0x4d6567612
 You can decode it with:
 
 ```typescript
-const ErrorMessage = shortString.decodeShortString('0x4d6567612050616e69632e');
+const ErrorMessage = new CairoBytes31('0x4d6567612050616e69632e').decodeUtf8();
 ```
 
 ### Parsed response

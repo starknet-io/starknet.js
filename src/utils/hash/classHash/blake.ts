@@ -3,8 +3,8 @@
 /* eslint-disable no-restricted-syntax */
 import blake from '../../connect/blake';
 
+import { utf8ToBigInt } from '../../encode';
 import { toHex } from '../../num';
-import { encodeShortString } from '../../shortString';
 import type { Builtins, CompiledSierraCasm, ContractEntryPointFields } from '../../../types';
 import { PRIME } from '../../../global/constants';
 import { COMPILED_CLASS_VERSION as COMPILED_CLASS_V1, encodeBuiltins } from './util';
@@ -154,7 +154,7 @@ export function hashByteCodeSegmentsBlake(casm: CompiledSierraCasm): bigint {
  */
 export function computeCompiledClassHashBlake(casm: CompiledSierraCasm): string {
   // Hash compiled class version
-  const compiledClassVersion = BigInt(encodeShortString(COMPILED_CLASS_V1));
+  const compiledClassVersion = utf8ToBigInt(COMPILED_CLASS_V1);
 
   // Hash external entry points using Blake2s
   const externalEntryPointsHash = hashEntryPointBlake(casm.entry_points_by_type.EXTERNAL);

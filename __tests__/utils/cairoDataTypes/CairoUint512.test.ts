@@ -7,6 +7,7 @@ import {
   UINT_128_MIN,
   UINT_512_MAX,
   UINT_512_MIN,
+  transaction,
 } from '../../../src';
 
 describe('CairoUint512 class test', () => {
@@ -180,19 +181,19 @@ describe('CairoUint512 class test', () => {
     expect(() => {
       CairoUint512.validate(Symbol('test') as any);
     }).toThrow(
-      "Unsupported data type 'symbol' for u512. Expected string, number, bigint, or Uint512 object"
+      "Unsupported data type 'symbol' for u512. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint512 object"
     );
 
     expect(() => {
       CairoUint512.validate((() => {}) as any);
     }).toThrow(
-      "Unsupported data type 'function' for u512. Expected string, number, bigint, or Uint512 object"
+      "Unsupported data type 'function' for u512. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint512 object"
     );
 
     expect(() => {
       CairoUint512.validate(true as any);
     }).toThrow(
-      "Unsupported data type 'boolean' for u512. Expected string, number, bigint, or Uint512 object"
+      "Unsupported data type 'boolean' for u512. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint512 object"
     );
   });
 
@@ -288,6 +289,22 @@ describe('CairoUint512 class test', () => {
       limb1: '0x11111111111111111111111111111111',
       limb2: '0x22222222222222222222222222222222',
       limb3: '0x33333333333333333333333333333333',
+    });
+  });
+
+  describe('toApiRequest is flagged as compiled', () => {
+    test('should carry the __compiled__ flag', () => {
+      const result = new CairoUint512(255).toApiRequest();
+      expect(result).toEqual(['255', '0', '0', '0']);
+      expect(result).toHaveProperty('__compiled__', true);
+    });
+
+    test('should be taken as calldata by a call that skips request parsing', () => {
+      // the shape `Contract.invoke` builds under `withOptions({ parseRequest: false })` : `args` is
+      // the argument list, its only item is already serialized, and the callback hands `args` back
+      // untouched. Only the flag tells the two apart, and without it the calldata stays nested.
+      const args = [new CairoUint512(255).toApiRequest()];
+      expect(transaction.getCompiledCalldata(args, () => args)).toEqual(['255', '0', '0', '0']);
     });
   });
 });

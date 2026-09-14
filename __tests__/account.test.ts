@@ -4,8 +4,8 @@ import {
   CallData,
   Contract,
   DeclareDeployUDCResponse,
-  Provider,
   ProviderInterface,
+  RpcProvider,
   TransactionType,
   cairo,
   ec,
@@ -32,12 +32,11 @@ import {
 } from './config';
 
 const { toHex, hexToDecimalString, toBigInt } = num;
-const { randomAddress } = stark;
+const { randomFelt } = stark;
 const { Signature } = ec.starkCurve;
 
-// only Rpc0.8
 describe('deploy and test Account', () => {
-  let provider: Provider;
+  let provider: RpcProvider;
   let account: Account;
   let erc20: Contract;
   let erc20CallData: CallData;
@@ -50,7 +49,7 @@ describe('deploy and test Account', () => {
   beforeAll(async () => {
     initializeMatcher(expect);
 
-    provider = new Provider(await createTestProvider());
+    provider = await createTestProvider();
     account = getTestAccount(provider);
     expect(account).toBeInstanceOf(Account);
 
@@ -97,7 +96,7 @@ describe('deploy and test Account', () => {
 
   describeIfDevnet('Test on Devnet', () => {
     test('deployAccount with rawArgs - test on devnet', async () => {
-      const privKey = stark.randomAddress();
+      const privKey = stark.randomStarkPrivateKey();
       const pubKey = ec.starkCurve.getStarkKey(privKey);
       const calldata = { publicKey: pubKey };
 
@@ -296,7 +295,7 @@ describe('deploy and test Account', () => {
       if (declareAccount.transaction_hash) {
         await provider.waitForTransaction(declareAccount.transaction_hash);
       }
-      const privateKey = stark.randomAddress();
+      const privateKey = stark.randomStarkPrivateKey();
       const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
       const precalculatedAddress = hash.calculateContractAddressFromHash(
         starkKeyPub,
@@ -512,7 +511,7 @@ describe('deploy and test Account', () => {
   });
 
   describe('Contract interaction with Account', () => {
-    const wallet = stark.randomAddress();
+    const wallet = stark.randomFelt();
 
     beforeAll(async () => {
       const mintResponse = await account.execute({
@@ -525,7 +524,7 @@ describe('deploy and test Account', () => {
     });
 
     test('change from provider to account', async () => {
-      expect(erc20.providerOrAccount).toBeInstanceOf(Provider);
+      expect(erc20.providerOrAccount).toBeInstanceOf(RpcProvider);
       erc20.providerOrAccount = account;
       expect(erc20.providerOrAccount).toBeInstanceOf(Account);
     });
@@ -570,7 +569,7 @@ describe('deploy and test Account', () => {
     });
 
     test('UDC Deploy unique', async () => {
-      const salt = randomAddress(); // use random salt
+      const salt = randomFelt(); // use random salt
 
       const deployment = await account.deploy({
         classHash: erc20ClassHash,
@@ -589,7 +588,7 @@ describe('deploy and test Account', () => {
     });
 
     test('UDC Deploy non-unique', async () => {
-      const salt = randomAddress(); // use random salt
+      const salt = randomFelt(); // use random salt
 
       const deployment = await account.deploy({
         classHash: erc20ClassHash,
@@ -638,7 +637,7 @@ describe('deploy and test Account', () => {
       if (declareAccount.transaction_hash) {
         await provider.waitForTransaction(declareAccount.transaction_hash);
       }
-      const privateKey = stark.randomAddress();
+      const privateKey = stark.randomStarkPrivateKey();
       starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
       precalculatedAddress = hash.calculateContractAddressFromHash(
         starkKeyPub,

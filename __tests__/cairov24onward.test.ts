@@ -14,11 +14,12 @@ import {
   ProviderInterface,
   byteArray,
   cairo,
+  cairoTypeStrategy,
   num,
   type Uint512,
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
-import { encodeShortString } from '../src/utils/shortString';
+import { CairoBytes31 } from '../src/utils/cairoDataTypes/bytes31';
 import { CONTRACTS, createTestProvider, getTestAccount } from './config';
 
 describe('Cairo v2.4 onwards', () => {
@@ -51,20 +52,20 @@ describe('Cairo v2.4 onwards', () => {
       expect(resp).toBe('AZERTY');
       const str = 'TokenName';
       const callD1 = CallData.compile([str]);
-      expect(callD1).toEqual([hexToDecimalString(encodeShortString(str))]);
+      expect(callD1).toEqual([CairoBytes31.fromText(str).toBigInt().toString()]);
       const callD2 = CallData.compile({ str });
-      expect(callD2).toEqual([hexToDecimalString(encodeShortString(str))]);
+      expect(callD2).toEqual([CairoBytes31.fromText(str).toBigInt().toString()]);
 
       const myCallData = new CallData(CONTRACTS.String.sierra.abi);
       const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
-      expect(myCalldata1).toEqual([hexToDecimalString(encodeShortString(str))]);
+      expect(myCalldata1).toEqual([CairoBytes31.fromText(str).toBigInt().toString()]);
 
       const myCalldata2 = myCallData.compile('proceed_bytes31', { str });
-      expect(myCalldata2).toEqual([hexToDecimalString(encodeShortString(str))]);
+      expect(myCalldata2).toEqual([CairoBytes31.fromText(str).toBigInt().toString()]);
       const myCall1 = stringContract.populate('proceed_bytes31', [str]);
-      expect(myCall1.calldata).toEqual([hexToDecimalString(encodeShortString(str))]);
+      expect(myCall1.calldata).toEqual([CairoBytes31.fromText(str).toBigInt().toString()]);
       const myCall2 = stringContract.populate('proceed_bytes31', { str });
-      expect(myCall2.calldata).toEqual([hexToDecimalString(encodeShortString(str))]);
+      expect(myCall2.calldata).toEqual([CairoBytes31.fromText(str).toBigInt().toString()]);
     });
 
     test('bytes31 too long', async () => {
@@ -475,7 +476,11 @@ describe('Cairo v2.4 onwards', () => {
       const myCalldata3 = myCallData.compile('fixed_array', [CairoFixedArray.compile(myArray)]);
       const res3 = await fixedArrayContract.call('fixed_array', myCalldata3);
       expect(res3).toEqual(expectedRes);
-      const myFixedArray = new CairoFixedArray(myArray, '[core::integer::u32; 8]');
+      const myFixedArray = new CairoFixedArray(
+        myArray,
+        '[core::integer::u32; 8]',
+        cairoTypeStrategy
+      );
       const myCalldata4 = myCallData.compile('fixed_array', { x: myFixedArray.compile() });
       const res4 = await fixedArrayContract.call('fixed_array', myCalldata4);
       expect(res4).toEqual(expectedRes);

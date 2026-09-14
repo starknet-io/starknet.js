@@ -1,7 +1,8 @@
 import type { BigNumberish, RawArgsArray, StarkProfile } from '../../types';
 import { CallData } from '../../utils/calldata';
+import { CairoBytes31 } from '../../utils/cairoDataTypes/bytes31';
+import { utf8ToBigInt } from '../../utils/encode';
 import { getSelectorFromName } from '../../utils/hash';
-import { decodeShortString, encodeShortString } from '../../utils/shortString';
 import {
   dynamicCallData,
   dynamicFelt,
@@ -157,7 +158,7 @@ export class StarknetIdImpl {
           selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
           calldata: [
             dynamicCallData(undefined, [1, 0]),
-            dynamicCallData(encodeShortString('twitter')),
+            dynamicCallData(utf8ToBigInt('twitter')),
             dynamicCallData(verifierContract),
             dynamicCallData('0'),
           ],
@@ -168,7 +169,7 @@ export class StarknetIdImpl {
           selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
           calldata: [
             dynamicCallData(undefined, [1, 0]),
-            dynamicCallData(encodeShortString('github')),
+            dynamicCallData(utf8ToBigInt('github')),
             dynamicCallData(verifierContract),
             dynamicCallData('0'),
           ],
@@ -179,7 +180,7 @@ export class StarknetIdImpl {
           selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
           calldata: [
             dynamicCallData(undefined, [1, 0]),
-            dynamicCallData(encodeShortString('discord')),
+            dynamicCallData(utf8ToBigInt('discord')),
             dynamicCallData(verifierContract),
             dynamicCallData('0'),
           ],
@@ -190,7 +191,7 @@ export class StarknetIdImpl {
           selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
           calldata: [
             dynamicCallData(undefined, [1, 0]),
-            dynamicCallData(encodeShortString('proof_of_personhood')),
+            dynamicCallData(utf8ToBigInt('proof_of_personhood')),
             dynamicCallData(popContract),
             dynamicCallData('0'),
           ],
@@ -202,7 +203,7 @@ export class StarknetIdImpl {
           selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
           calldata: [
             dynamicCallData(undefined, [1, 0]),
-            dynamicCallData(encodeShortString('nft_pp_contract')),
+            dynamicCallData(utf8ToBigInt('nft_pp_contract')),
             dynamicCallData(pfpContract),
             dynamicCallData('0'),
           ],
@@ -213,7 +214,7 @@ export class StarknetIdImpl {
           selector: dynamicFelt(getSelectorFromName('get_extended_verifier_data')),
           calldata: [
             dynamicCallData(undefined, [1, 0]),
-            dynamicCallData(encodeShortString('nft_pp_id')),
+            dynamicCallData(utf8ToBigInt('nft_pp_id')),
             dynamicCallData('2'),
             dynamicCallData(pfpContract),
             dynamicCallData('0'),
@@ -267,7 +268,7 @@ export class StarknetIdImpl {
           data[0] === '0x9'
             ? finalArray[8]
                 .slice(1)
-                .map((val: string) => decodeShortString(val))
+                .map((val: string) => new CairoBytes31(val).decodeUtf8())
                 .join('')
             : undefined;
 

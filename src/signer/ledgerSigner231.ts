@@ -70,7 +70,7 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
   }
 
   /**
-   * Ask to the Ledger Nano to display and sign a Starknet V3 transaction (Rpc 0.7 & Rpc 0.8).
+   * Ask to the Ledger Nano to display and sign a Starknet V3 transaction.
    * @param {V3InvocationsSignerDetails} txDetails All the details needed for a txV3.
    * @param {Call[]} calls array of Starknet invocations
    * @returns an object including the transaction Hash and the signature
@@ -90,7 +90,7 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
    *     },
    *     l2_gas: { max_amount: "0x00", max_price_per_unit: "0x00"},
    *   }, tip: 0, version: "0x3", walletAddress: account0.address
-   *  }; // Rpc 0.7 transaction.
+   *  };
    * const res = await myLedgerSigner.signTxV3(txDetailsV3, calls);
    * // res = {hash:
    * //   signature:
@@ -186,7 +186,7 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
   }
 
   /**
-   *Ask the Ledger Nano to display and sign a Starknet V3 account deployment (Rpc 0.7 & Rpc 0.8).
+   *Ask the Ledger Nano to display and sign a Starknet V3 account deployment.
    * @param {V3DeployAccountSignerDetails} deployAccountDetail All the details needed for a V3 deploy account.
    * @returns an object including the transaction Hash and the signature
    * @example
@@ -205,9 +205,9 @@ export class LedgerSigner231<Transport extends Record<any, any> = any>
    *  ],
    *  contractAddress: '0x4ca062add1cf12a107be1107af17981cf6e544a24d987693230ea481d3d5e34',
    *  addressSalt: '0x07e52f68e3160e1ef698211cdf6d3792368fe347e7e2d4a8ace14d9b248f39c5',
-   *  chainId: '0x534e5f5345504f4c4941', maxFee: 0,
+   *  chainId: '0x534e5f5345504f4c4941',
    *  version: '0x3', nonce: 0n
-   *} // Rpc 0.7 transaction.
+   *}
    * const res = await myLedgerSigner.signDeployAccountV3(deployData);
    * // res = {hash:
    * //   signature:

@@ -1,17 +1,18 @@
-import { Account, Provider, num, shortString } from '../src';
+import { Account, RpcProvider, num } from '../src';
 import { CONTRACTS, createTestProvider, getTestAccount, STRKtokenAddress } from './config';
+import { CairoBytes31 } from '../src/utils/cairoDataTypes/bytes31';
 
 const { hexToDecimalString } = num;
 
 describe('deploy and test Wallet', () => {
-  let provider: Provider;
+  let provider: RpcProvider;
   let account: Account;
   let identityAddress: string;
   let namingAddress: string;
   let multicallAddress: string;
 
   beforeAll(async () => {
-    provider = new Provider(await createTestProvider());
+    provider = await createTestProvider();
     account = getTestAccount(provider);
 
     // Deploy Starknet id contract
@@ -104,7 +105,7 @@ describe('deploy and test Wallet', () => {
           entrypoint: 'set_verifier_data',
           calldata: [
             '1', // token_id
-            shortString.encodeShortString('discord'), // field
+            CairoBytes31.fromText('discord').toHexString(), // field
             123, // value
             0,
           ],

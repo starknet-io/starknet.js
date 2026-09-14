@@ -21,7 +21,7 @@ describeIfTestnet('Paymaster with Contract, in Testnet', () => {
   };
 
   beforeAll(async () => {
-    provider = getTestProvider(false);
+    provider = getTestProvider();
     const paymasterRpc = new PaymasterRpc({ nodeUrl: 'https://sepolia.paymaster.avnu.fi' });
     myAccount = getTestAccount(provider, undefined, paymasterRpc);
     // console.log(myAccount.paymaster);

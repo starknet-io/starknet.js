@@ -1,10 +1,10 @@
-import { Provider } from '../src';
+import { RpcProvider } from '../src';
 import { SupportedRpcVersion } from '../src/global/constants';
 import { getDefaultNodes, getSupportedRpcVersions } from '../src/utils/provider';
 
 describe('unit tests', () => {
   xdescribe('getDefaultNodes', () => {
-    it('constructs correct URLs for all supported RPC versions', () => {
+    test('constructs correct URLs for all supported RPC versions', () => {
       const supportedVersions = getSupportedRpcVersions();
       supportedVersions.forEach((version) => {
         const rpcNodes = getDefaultNodes(version);
@@ -19,7 +19,7 @@ describe('unit tests', () => {
     });
   });
   describe('getSupportedRpcVersions', () => {
-    it('should return a non-empty array of strings', () => {
+    test('should return a non-empty array of strings', () => {
       const versions = getSupportedRpcVersions();
       expect(Array.isArray(versions)).toBe(true);
       expect(versions.length).toBeGreaterThan(0);
@@ -28,7 +28,7 @@ describe('unit tests', () => {
       });
     });
 
-    it('should return an array with unique values', () => {
+    test('should return an array with unique values', () => {
       const versions = getSupportedRpcVersions();
       const uniqueVersions = [...new Set(versions)];
       expect(versions.length).toEqual(uniqueVersions.length);
@@ -65,7 +65,7 @@ function isTransientError(error: any): boolean {
  *  - `undefined` for any genuine failure (unsupported spec, malformed response...).
  */
 async function getSpecVersionWithRetry(
-  provider: InstanceType<typeof Provider>,
+  provider: RpcProvider,
   nodeUrl: string,
   retries = 3
 ): Promise<string | undefined> {
@@ -105,7 +105,7 @@ describe('Default RPC Nodes', () => {
           Object.keys(rpcNodes).map(async (network: any) => {
             return Promise.all(
               rpcNodes[network as keyof typeof rpcNodes].map(async (it: any) => {
-                const provider = new Provider({ nodeUrl: it });
+                const provider = new RpcProvider({ nodeUrl: it });
                 const version = await getSpecVersionWithRetry(provider, it);
 
                 return {

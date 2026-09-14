@@ -7,7 +7,7 @@ describe('Configuration', () => {
   });
 
   describe('Initial Configuration', () => {
-    it('should initialize with default values', () => {
+    test('should initialize with default values', () => {
       expect(config.get('transactionVersion')).toBe(
         constants.DEFAULT_GLOBAL_CONFIG.transactionVersion
       );
@@ -16,33 +16,33 @@ describe('Configuration', () => {
   });
 
   describe('get()', () => {
-    it('should retrieve the value of an existing key', () => {
+    test('should retrieve the value of an existing key', () => {
       expect(config.get('logLevel')).toBe(constants.DEFAULT_GLOBAL_CONFIG.logLevel);
     });
 
-    it('should return the default value for a non-existent key', () => {
+    test('should return the default value for a non-existent key', () => {
       expect(config.get('nonExistentKey', 'default')).toBe('default');
     });
 
-    it('should return undefined for a non-existent key without a default', () => {
+    test('should return undefined for a non-existent key without a default', () => {
       expect(config.get('nonExistentKey')).toBeUndefined();
     });
   });
 
   describe('set()', () => {
-    it('should update the value of an existing key', () => {
+    test('should update the value of an existing key', () => {
       config.set('logLevel', 'DEBUG');
       expect(config.get('logLevel')).toBe('DEBUG');
     });
 
-    it('should add a new key-value pair', () => {
+    test('should add a new key-value pair', () => {
       config.set('newKey', 'value');
       expect(config.get('newKey')).toBe('value');
     });
   });
 
   describe('update()', () => {
-    it('should merge provided configuration with existing values', () => {
+    test('should merge provided configuration with existing values', () => {
       config.update({ legacyMode: true, newKey: 'value' });
       expect(config.get('legacyMode')).toBe(true);
       expect(config.get('newKey')).toBe('value');
@@ -51,7 +51,7 @@ describe('Configuration', () => {
   });
 
   describe('getAll()', () => {
-    it('should return a copy of the configuration', () => {
+    test('should return a copy of the configuration', () => {
       const all = config.getAll();
       all.rpcVersion = '0.9.0'; // Modify the copy
       expect(config.get('rpcVersion')).toBe('0.10.0'); // Original remains unaffected
@@ -59,7 +59,7 @@ describe('Configuration', () => {
   });
 
   describe('reset()', () => {
-    it('should restore the configuration to initial defaults', () => {
+    test('should restore the configuration to initial defaults', () => {
       config.set('logLevel', 'ERROR');
       config.reset();
       expect(config.get('logLevel')).toBe('INFO');
@@ -67,41 +67,41 @@ describe('Configuration', () => {
   });
 
   describe('delete()', () => {
-    it('should remove a key from the configuration', () => {
+    test('should remove a key from the configuration', () => {
       config.set('newKey', 'value');
       config.delete('newKey');
       expect(config.hasKey('newKey')).toBe(false);
     });
 
-    it('should do nothing if the key does not exist', () => {
+    test('should do nothing if the key does not exist', () => {
       config.delete('nonExistentKey');
       expect(config.hasKey('nonExistentKey')).toBe(false);
     });
   });
 
   describe('hasKey()', () => {
-    it('should return true for existing keys', () => {
+    test('should return true for existing keys', () => {
       expect(config.hasKey('logLevel')).toBe(true);
     });
 
-    it('should return false for non-existent keys', () => {
+    test('should return false for non-existent keys', () => {
       expect(config.hasKey('nonExistentKey')).toBe(false);
     });
   });
 
   describe('Edge Cases', () => {
-    it('should handle undefined values with default in get()', () => {
+    test('should handle undefined values with default in get()', () => {
       config.set('someKey', undefined);
       expect(config.get('someKey', 'DEFAULT')).toBe('DEFAULT');
     });
 
-    it('should treat keys as case-sensitive', () => {
+    test('should treat keys as case-sensitive', () => {
       config.set('LogLevel', 'DEBUG');
       expect(config.hasKey('LogLevel')).toBe(true);
       expect(config.hasKey('logLevel')).toBe(true); // Original key still exists
     });
 
-    it('should handle nested configuration', () => {
+    test('should handle nested configuration', () => {
       config.set('channelDefaults.options.blockIdentifier', BlockTag.PRE_CONFIRMED);
       expect(config.get('channelDefaults.options.blockIdentifier')).toBe(BlockTag.PRE_CONFIRMED);
 

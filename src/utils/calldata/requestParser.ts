@@ -17,6 +17,7 @@ import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { CairoUint8 } from '../cairoDataTypes/uint8';
 import { CairoUint16 } from '../cairoDataTypes/uint16';
+import { CairoUint32 } from '../cairoDataTypes/uint32';
 import { CairoUint64 } from '../cairoDataTypes/uint64';
 import { CairoUint96 } from '../cairoDataTypes/uint96';
 import { CairoUint128 } from '../cairoDataTypes/uint128';
@@ -25,23 +26,24 @@ import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
 import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
-import { addHexPrefix, removeHexPrefix } from '../encode';
-import { toHex } from '../num';
+import { CairoBool } from '../cairoDataTypes/bool';
+import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
+import { unwrapCairoScalar } from '../cairoDataTypes/scalar';
+import { addHexPrefix, buf2hex, utf8ToUint8Array } from '../encode';
 import { isText, splitLongString } from '../shortString';
-import { isUndefined, isString } from '../typed';
+import { isUndefined } from '../typed';
 import {
   felt,
   getArrayType,
   isTypeArray,
   isTypeEnum,
   isTypeEthAddress,
+  isTypeFelt,
   isTypeNonZero,
   isTypeOption,
   isTypeResult,
-  isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
-  uint256,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -50,10 +52,73 @@ import {
   CairoResult,
   CairoResultVariant,
 } from './enum';
-import { AbiParserInterface } from './parser';
 import extractTupleMemberTypes from './tuple';
 
+/**
+ * All this module needs of a parser: how to turn a value of one abi type into its felts.
+ *
+ * Stated here rather than imported, and as a shape rather than a class : `AbiParser0` is the only
+ * parser that still calls into this module, and it imports it — naming it back would close the two
+ * into a cycle.
+ */
+type RequestSerializer = {
+  getRequestParser(abiType: string): (val: unknown) => any;
+};
+
 // TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
+
+/**
+ * Test if a long string can be provided in place of an array of values.
+ * Only an array of felt252 can be filled this way, as a felt252 holds up to 31 characters of text.
+ * @param {string} type type from abi
+ * @returns {boolean} Returns true if a long string is a valid input for this type
+ * @example
+ * ```typescript
+ * const result = acceptsLongString('core::array::Array::<core::felt252>');
+ * // result = true
+ * const result2 = acceptsLongString('core::array::Array::<core::integer::u8>');
+ * // result2 = false
+ * ```
+ */
+function acceptsLongString(type: string): boolean {
+  return isTypeArray(type) && isTypeFelt(getArrayType(type));
+}
+
+/**
+ * Convert a long string to the array of felt252 that Cairo is expecting.
+ * Each chunk is encoded to its explicit hex value : the value has already been identified as text,
+ * so a chunk that looks like a number ('67') or like a hex string ('0x12') has to stay text.
+ * @param {string} longStr text to convert
+ * @returns {string[]} an array of hex strings, one per chunk of 31 characters
+ * @example
+ * ```typescript
+ * const result = longStringToFeltArray('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567');
+ * // result = [
+ * //   '0x4142434445464748494a4b4c4d4e4f505152535455565758595a3132333435',
+ * //   '0x3637'
+ * // ]
+ * ```
+ */
+function longStringToFeltArray(longStr: string): string[] {
+  return splitLongString(longStr).map((chunk) => addHexPrefix(buf2hex(utf8ToUint8Array(chunk))));
+}
+
+/**
+ * Build the message of the error thrown when an array type receives an unusable value
+ * @param {string} subject faulty input, as described in the error message
+ * @param {string} type type from abi
+ * @param {unknown} value value provided
+ * @returns {string} the error message
+ * @example
+ * ```typescript
+ * const result = arrayInputErrorMessage('parameter tokens', 'core::array::Array::<core::integer::u8>', 'abc');
+ * // result = "ABI expected parameter tokens to be array, got abc"
+ * ```
+ */
+function arrayInputErrorMessage(subject: string, type: string, value: unknown): string {
+  const expected = acceptsLongString(type) ? 'array or long string' : 'array';
+  return `ABI expected ${subject} to be ${expected}, got ${value}`;
+}
 
 /**
  * parse base types
@@ -63,13 +128,16 @@ import extractTupleMemberTypes from './tuple';
  */
 function parseBaseTypes({
   type,
-  val,
+  val: rawVal,
   parser,
 }: {
   type: string;
   val: unknown;
-  parser: AbiParserInterface;
+  parser: RequestSerializer;
 }): AllowArray<string> {
+  // an instance of the very type declared here stands for the number it carries, so a value the
+  // caller has already typed is read exactly like a bare one. Every base type passes through here
+  const val = unwrapCairoScalar(rawVal, type);
   switch (true) {
     case CairoUint256.isAbiType(type):
       return parser.getRequestParser(type)(val);
@@ -78,6 +146,8 @@ function parseBaseTypes({
     case CairoUint8.isAbiType(type):
       return parser.getRequestParser(type)(val);
     case CairoUint16.isAbiType(type):
+      return parser.getRequestParser(type)(val);
+    case CairoUint32.isAbiType(type):
       return parser.getRequestParser(type)(val);
     case CairoUint64.isAbiType(type):
       return parser.getRequestParser(type)(val);
@@ -97,17 +167,19 @@ function parseBaseTypes({
       return parser.getRequestParser(type)(val);
     case CairoBytes31.isAbiType(type):
       return parser.getRequestParser(type)(val);
-    case isTypeSecp256k1Point(type): {
-      const pubKeyETH = removeHexPrefix(toHex(val as BigNumberish)).padStart(128, '0');
-      const pubKeyETHy = uint256(addHexPrefix(pubKeyETH.slice(-64)));
-      const pubKeyETHx = uint256(addHexPrefix(pubKeyETH.slice(0, -64)));
-      return [
-        felt(pubKeyETHx.low),
-        felt(pubKeyETHx.high),
-        felt(pubKeyETHy.low),
-        felt(pubKeyETHy.high),
-      ];
-    }
+    // without this a bool fell to the felt252 default, which bounds the field but not the two
+    // values a bool actually has. `validateFields` is stricter still upstream, and asks for a real
+    // boolean — this catches what reaches the parser by another road.
+    case CairoBool.isAbiType(type):
+      return parser.getRequestParser(type)(val);
+    // reached from parseCalldataField and from the struct branch of parseCalldataValue. Without
+    // this it fell to the felt252 default, which only bounds the field, not the 160 bits
+    case isTypeEthAddress(type):
+      return parser.getRequestParser(type)(val);
+    // the four felts a point occupies used to be spelled out here; the class now holds that split,
+    // and both strategies carry it since the felt252 default would emit a single felt
+    case CairoSecp256k1Point.isAbiType(type):
+      return parser.getRequestParser(type)(val);
     default:
       // TODO: check but u32 should land here with rest of the simple types, at the moment handle as felt
       return parser.getRequestParser(CairoFelt252.abiSelector)(val);
@@ -160,7 +232,7 @@ function parseCalldataValue({
   type: string;
   structs: AbiStructs;
   enums: AbiEnums;
-  parser: AbiParserInterface;
+  parser: RequestSerializer;
 }): string | string[] {
   if (element === undefined) {
     throw Error(`Missing parameter for type ${type}`);
@@ -171,10 +243,20 @@ function parseCalldataValue({
     const arrayType = CairoFixedArray.getFixedArrayType(type);
     let values: any[] = [];
     if (Array.isArray(element)) {
-      const array = new CairoFixedArray(element, type);
-      values = array.content;
+      // the size check the constructor used to do here, kept verbatim: building an instance now
+      // means building every item as its Cairo type, which is the new path's job, not this one's
+      const arraySize = CairoFixedArray.getFixedArraySize(type);
+      assert(
+        arraySize === element.length,
+        `The ABI type ${type} is expecting ${arraySize} items. ${element.length} items provided.`
+      );
+      values = element;
     } else if (typeof element === 'object') {
-      values = Object.values(element as object);
+      // an instance holds its items in `content`; enumerating it would yield its two fields
+      // instead. The size is still checked against the abi, whose type prevails over the
+      // instance's own
+      values =
+        element instanceof CairoFixedArray ? element.content : Object.values(element as object);
       assert(
         values.length === CairoFixedArray.getFixedArraySize(type),
         `ABI type ${type}: object provided do not includes  ${CairoFixedArray.getFixedArraySize(type)} items. ${values.length} items provided.`
@@ -187,6 +269,20 @@ function parseCalldataValue({
         parseCalldataValue({ element: it, type: arrayType, structs, enums, parser })
       );
     }, [] as string[]);
+  }
+
+  // value is a long string provided in place of an Array<felt252>, at any depth
+  if (isTypeArray(type) && !Array.isArray(element)) {
+    if (!acceptsLongString(type) || !isText(element)) {
+      throw Error(arrayInputErrorMessage(`type ${type}`, type, element));
+    }
+    return parseCalldataValue({
+      element: longStringToFeltArray(element),
+      type,
+      structs,
+      enums,
+      parser,
+    });
   }
 
   // value is Array
@@ -356,10 +452,16 @@ function parseCalldataValue({
     return parseBaseTypes({ type: getArrayType(type), val: element, parser });
   }
 
-  if (typeof element === 'object') {
+  // reached at any depth: a one-felt instance of the declared type is a value, not a composite to
+  // be walked into, so it is reduced before this guard rather than refused by it
+  const scalar = unwrapCairoScalar(element, type);
+  // a bytes31 stays an instance rather than becoming a number, and is the only Cairo type to reach
+  // this guard as one — ByteArray, u256, u512 and fixed arrays all return above. Its own class
+  // reads it just below
+  if (typeof scalar === 'object' && !(scalar instanceof CairoBytes31)) {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
   }
-  return parseBaseTypes({ type, val: element, parser });
+  return parseBaseTypes({ type, val: scalar, parser });
 }
 
 /**
@@ -425,10 +527,10 @@ export function parseCalldataField({
   /** enums from abi */
   enums: AbiEnums;
   /** parser used to serialize the value */
-  parser: AbiParserInterface;
+  parser: RequestSerializer;
 }): string | string[] {
   const { name, type } = input;
-  let { value } = argsIterator.next();
+  const { value } = argsIterator.next();
 
   switch (true) {
     // Fixed array
@@ -439,12 +541,8 @@ export function parseCalldataField({
       return parseCalldataValue({ element: value, type: input.type, structs, enums, parser });
     // Normal Array
     case isTypeArray(type):
-      if (!Array.isArray(value) && !isText(value)) {
-        throw Error(`ABI expected parameter ${name} to be array or long string, got ${value}`);
-      }
-      if (isString(value)) {
-        // long string match cairo felt*
-        value = splitLongString(value);
+      if (!Array.isArray(value) && !(acceptsLongString(type) && isText(value))) {
+        throw Error(arrayInputErrorMessage(`parameter ${name}`, type, value));
       }
       return parseCalldataValue({ element: value, type: input.type, structs, enums, parser });
     case isTypeNonZero(type):

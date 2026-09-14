@@ -5,8 +5,8 @@ import {
   Contract,
   ProviderInterface,
   CairoByteArray,
-  hdParsingStrategy,
-  ParsingStrategy,
+  cairoTypeStrategy,
+  type CairoTypeStrategy,
   BigNumberish,
   logger,
 } from '../src';
@@ -445,7 +445,9 @@ describe('CairoByteArray Contract Integration Tests', () => {
       casm: CONTRACTS.TestByteArrayStorage.casm,
       account,
       constructorCalldata: [],
-      parsingStrategy: hdParsingStrategy,
+      // stated explicitly, and it is the default: a Cairo 2 contract is parsed by the Cairo type
+      // classes, so `hdParsingStrategy` — the shape that serves a Cairo 0 abi — is refused here
+      parsingStrategy: cairoTypeStrategy,
     });
   }, 60000);
 
@@ -477,13 +479,13 @@ describe('CairoByteArray Contract Integration Tests', () => {
 
   test('should store and read Buffer file, custom response parsing strategy', async () => {
     // Create custom parsing strategy that extends hdParsingStrategy
-    const customParsingStrategy: ParsingStrategy = {
-      request: hdParsingStrategy.request,
+    const customParsingStrategy: CairoTypeStrategy = {
+      ...cairoTypeStrategy,
       response: {
-        ...hdParsingStrategy.response,
-        [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
-          return CairoByteArray.factoryFromApiResponse(responseIterator).toBuffer();
-        },
+        ...cairoTypeStrategy.response,
+        // the entry is handed the ByteArray already built, where it used to be handed the felts
+        // to read: one constructor now serves both directions, so reading is all that is left here
+        [CairoByteArray.abiSelector]: (instance) => (instance as CairoByteArray).toBuffer(),
       },
     };
 
@@ -512,13 +514,13 @@ describe('CairoByteArray Contract Integration Tests', () => {
 
   xtest('should store and read large Buffer file without event, custom response parsing strategy', async () => {
     // Create custom parsing strategy that extends hdParsingStrategy
-    const customParsingStrategy: ParsingStrategy = {
-      request: hdParsingStrategy.request,
+    const customParsingStrategy: CairoTypeStrategy = {
+      ...cairoTypeStrategy,
       response: {
-        ...hdParsingStrategy.response,
-        [CairoByteArray.abiSelector]: (responseIterator: Iterator<string>) => {
-          return CairoByteArray.factoryFromApiResponse(responseIterator).toBuffer();
-        },
+        ...cairoTypeStrategy.response,
+        // the entry is handed the ByteArray already built, where it used to be handed the felts
+        // to read: one constructor now serves both directions, so reading is all that is left here
+        [CairoByteArray.abiSelector]: (instance) => (instance as CairoByteArray).toBuffer(),
       },
     };
 

@@ -42,6 +42,17 @@
       "error",
       "nofunc"
     ],
-    "func-names": 0
+    "func-names": 0,
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "ignorePackages",
+        "mjs": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ]
   }
 }

@@ -1,652 +1,15 @@
-/* eslint-disable no-underscore-dangle, max-classes-per-file */
-import {
-  Provider,
-  Subscription,
-  SubscriptionNewHeadsEvent,
-  WebSocketChannel,
-  config,
-} from '../src';
+/* eslint-disable no-underscore-dangle -- these tests drive `Subscription`'s internal hooks
+   (`_handleEvent`, `_markClosed`) directly, which is the only way to exercise buffering and a
+   refused restore without a node. */
+import { Subscription, WebSocketChannel, config } from '../src';
 import { logger } from '../src/global/logger';
-import { getTestAccount, getTestProvider, STRKtokenAddress, TEST_WS_URL } from './config';
-
-const describeIfWs = TEST_WS_URL ? describe : describe.skip;
-const NODE_URL = TEST_WS_URL!;
+import { OfflineWebSocket, ScriptedWebSocket, useOfflineSocket, withTimeout } from './config';
 
 /**
- * Simulate an abnormal network drop to exercise auto-reconnection.
- *
- * A real drop surfaces as a `close` event (RFC 6455 code 1006) without a closing handshake,
- * and the channel reacts to that event exactly as it does here. `socket.close()` cannot be
- * used instead: some gateways (Pathfinder) never complete the closing handshake while a
- * subscription is active, so the `close` event would never fire and reconnection would
- * never start.
- *
- * The socket the channel abandons is then released here, because nothing else will — the
- * channel has already moved on to its replacement, so no teardown can reach it. Closing it is
- * not enough on its own: a graceful close that the gateway will not answer while a subscription
- * is still bound leaves the connection open for the rest of the run, and a single one of those
- * keeps the Node event loop alive after the suite has passed. Note that `--detectOpenHandles`
- * does not attribute that handle to anything, so it is no help in tracking it down.
+ * `WebSocketChannel` behaviour that needs no node: every socket here is mocked, so these run in
+ * every environment and are never gated on a URL. The live-node half is in
+ * `WebSocketChannel.ws.test.ts`.
  */
-const simulateConnectionDrop = (channel: WebSocketChannel) => {
-  const socket = channel.websocket;
-  // Subscription ids still bound to this socket, captured before the drop: restoring them on
-  // the replacement socket clears the map.
-  const subscriptionIds = Array.from(
-    ((channel as any).activeSubscriptions as Map<string, unknown>).keys()
-  );
-
-  socket.dispatchEvent(new Event('close'));
-
-  try {
-    // Unsubscribe before closing, so the gateway has no reason to hold the connection. The
-    // replies land on a socket whose listeners `onCloseProxy` has already detached, so they
-    // are simply ignored.
-    subscriptionIds.forEach((id, i) => {
-      socket.send(
-        JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1_000_000 + i,
-          method: 'starknet_unsubscribe',
-          params: { subscription_id: id },
-        })
-      );
-    });
-    socket.close();
-  } catch {
-    // ignore: the socket may already be closing/closed
-  }
-};
-
-/**
- * Open a WebSocket channel, retrying on connection errors.
- *
- * The shared gateways rate-limit new connections per IP, and a whole suite run opens around
- * twenty; once the limit trips it can take tens of seconds to replenish, and the rejected
- * connection surfaces through `waitForConnection()`. Hence five attempts with exponential
- * backoff, 1/2/4/8s — ~15s of waiting, while a connection that succeeds first try never sleeps.
- *
- * `autoReconnect` is forced off: this helper owns the retry loop, and letting the channel also
- * reconnect in the background on a failed attempt would spawn overlapping reconnection loops
- * (each retrying for tens of seconds) that pile up under rate-limiting.
- */
-const openChannel = async (
-  options: ConstructorParameters<typeof WebSocketChannel>[0]
-): Promise<WebSocketChannel> => {
-  const retries = 5;
-  const backoffMs = 1000;
-  let lastError: unknown;
-  for (let attempt = 0; attempt < retries; attempt += 1) {
-    const channel = new WebSocketChannel({ ...options, autoReconnect: false });
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      await channel.waitForConnection();
-      return channel;
-    } catch (error) {
-      lastError = error;
-      channel.disconnect();
-      // Last attempt: the loop is about to throw, so sleeping only delays the report.
-      if (attempt === retries - 1) break;
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => {
-        setTimeout(resolve, backoffMs * 2 ** attempt);
-      });
-    }
-  }
-  throw lastError;
-};
-
-/**
- * Resolve when `promise` settles or `ms` elapses, whichever comes first.
- *
- * The losing timer is always cleared: an un-cleared one keeps the Node event loop alive past
- * the end of the run, which is what makes Jest report that it "did not exit".
- */
-const withTimeout = async (promise: Promise<unknown>, ms: number): Promise<void> => {
-  let timer: NodeJS.Timeout | undefined;
-  await Promise.race([
-    promise,
-    new Promise((resolve) => {
-      timer = setTimeout(resolve, ms);
-    }),
-  ]).finally(() => clearTimeout(timer));
-};
-
-/**
- * A WebSocket that never touches the network.
- *
- * The unit describes at the bottom of this file need no connection and pass
- * `nodeUrl: 'ws://dummy-url'`, but the channel constructor opens a socket regardless and that
- * host never resolves — each one then sits in CONNECTING on a DNS lookup that never completes,
- * keeping the Node event loop alive after the run. A socket stuck before DNS resolution cannot
- * finish closing either, so the only fix is to never open one.
- */
-class OfflineWebSocket extends EventTarget {
-  static CONNECTING = 0;
-
-  static OPEN = 1;
-
-  static CLOSING = 2;
-
-  static CLOSED = 3;
-
-  public readyState = OfflineWebSocket.CONNECTING;
-
-  public onopen: ((ev: Event) => void) | null = null;
-
-  public onclose: ((ev: Event) => void) | null = null;
-
-  public onerror: ((ev: Event) => void) | null = null;
-
-  public onmessage: ((ev: Event) => void) | null = null;
-
-  // eslint-disable-next-line @typescript-eslint/no-useless-constructor, no-useless-constructor
-  constructor(_url: string) {
-    super();
-  }
-
-  public send() {}
-
-  public close() {
-    if (this.readyState === OfflineWebSocket.CLOSED) return;
-    this.readyState = OfflineWebSocket.CLOSED;
-    const ev = new Event('close');
-    this.onclose?.(ev);
-    this.dispatchEvent(ev);
-  }
-}
-
-/**
- * A WebSocket driven entirely by the test: it records what the channel sends and delivers
- * incoming frames on demand, several in one synchronous burst if asked.
- *
- * That burst is the point. A gateway flushing a batch dispatches its frames back to back
- * within a single read, so a frame can be processed *before* the continuation that the
- * previous frame woke has had a chance to run. No live node reproduces that window on demand.
- */
-class ScriptedWebSocket extends EventTarget {
-  static CONNECTING = 0;
-
-  static OPEN = 1;
-
-  static CLOSING = 2;
-
-  static CLOSED = 3;
-
-  static current: ScriptedWebSocket;
-
-  public readyState = ScriptedWebSocket.OPEN;
-
-  public onopen: ((ev: Event) => void) | null = null;
-
-  public onclose: ((ev: Event) => void) | null = null;
-
-  public onerror: ((ev: Event) => void) | null = null;
-
-  public onmessage: ((ev: Event) => void) | null = null;
-
-  /** Every frame the channel has sent, already parsed. */
-  public sent: any[] = [];
-
-  constructor(_url: string) {
-    super();
-    ScriptedWebSocket.current = this;
-  }
-
-  public send(data: string) {
-    this.sent.push(JSON.parse(data));
-  }
-
-  public close() {
-    if (this.readyState === ScriptedWebSocket.CLOSED) return;
-    this.readyState = ScriptedWebSocket.CLOSED;
-    const ev = new Event('close');
-    this.onclose?.(ev);
-    this.dispatchEvent(ev);
-  }
-
-  /** Delivers frames back to back, without yielding to the microtask queue in between. */
-  public deliver(...frames: object[]) {
-    frames.forEach((frame) => {
-      this.dispatchEvent(new MessageEvent('message', { data: JSON.stringify(frame) }));
-    });
-  }
-}
-
-/** Routes every channel built inside the calling describe through `OfflineWebSocket`. */
-const useOfflineSocket = () => {
-  beforeAll(() => {
-    config.set('websocket', OfflineWebSocket as any);
-  });
-
-  afterAll(() => {
-    config.set('websocket', undefined as any);
-  });
-};
-
-describeIfWs('E2E WebSocket Tests', () => {
-  /**
-   * The chain the node under test actually serves.
-   *
-   * Asserting against a hardcoded `SN_SEPOLIA` pinned the whole suite to one network and made
-   * every run on another one fail on the constant rather than on anything real. Reading it from
-   * the RPC provider also makes the assertion stronger: it now checks that the WebSocket channel
-   * and the HTTP channel agree on the chain, instead of checking a literal.
-   */
-  let expectedChainId: string;
-
-  beforeAll(async () => {
-    expectedChainId = await new Provider(getTestProvider()).getChainId();
-  });
-
-  describe('websocket specific endpoints', () => {
-    // Updated for RPC 0.9: removed subscribePendingTransaction (not available in 0.9)
-    // Added subscribeNewTransactionReceipts and subscribeNewTransactions (new in 0.9)
-    // account provider
-    const provider = new Provider(getTestProvider());
-    const account = getTestAccount(provider);
-
-    // websocket
-    let webSocketChannel: WebSocketChannel;
-
-    beforeEach(async () => {
-      webSocketChannel = await openChannel({ nodeUrl: NODE_URL });
-    });
-
-    afterEach(async () => {
-      if (webSocketChannel.isConnected()) {
-        webSocketChannel.disconnect();
-        await webSocketChannel.waitForDisconnection();
-      }
-    });
-
-    test('should throw an error when sending on a disconnected socket', async () => {
-      // This test uses its own channel to disable auto-reconnect and isolate the error behavior
-      const testChannel = await openChannel({ nodeUrl: NODE_URL, autoReconnect: false });
-
-      testChannel.disconnect();
-      await testChannel.waitForDisconnection();
-
-      // With autoReconnect: false, this should immediately throw, not queue.
-      await expect(testChannel.subscribeNewHeads()).rejects.toThrow(
-        'WebSocketChannel.send() failed due to socket being disconnected'
-      );
-    });
-
-    test('should allow manual reconnection after a user-initiated disconnect', async () => {
-      // The beforeEach channel is opened with autoReconnect disabled (see openChannel),
-      // so a user-initiated disconnect leaves it closed until reconnect() is called.
-      webSocketChannel.disconnect();
-      await webSocketChannel.waitForDisconnection();
-
-      expect(webSocketChannel.isConnected()).toBe(false);
-
-      // Now, manually reconnect
-      webSocketChannel.reconnect();
-      await webSocketChannel.waitForConnection();
-      expect(webSocketChannel.isConnected()).toBe(true);
-
-      // To prove the connection is working, make a simple RPC call.
-      // This avoids the flakiness of creating and tearing down a real subscription.
-      const chainId = await webSocketChannel.sendReceive('starknet_chainId');
-      expect(chainId).toBe(expectedChainId);
-    });
-
-    test('Test subscribeNewHeads', async () => {
-      // type not required, here I just test type availability
-      const sub: SubscriptionNewHeadsEvent = await webSocketChannel.subscribeNewHeads();
-      expect(sub).toBeInstanceOf(Subscription);
-
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        if (i === 2) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
-      });
-
-      await webSocketChannel.waitForUnsubscription(sub.id);
-    });
-
-    test('Test subscribeEvents', async () => {
-      const sub = await webSocketChannel.subscribeEvents();
-      expect(sub).toBeInstanceOf(Subscription);
-
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('keys');
-        if (i === 5) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
-      });
-
-      await webSocketChannel.waitForUnsubscription(sub.id);
-    });
-
-    test('Test subscribeEvents with finality status filter', async () => {
-      const sub = await webSocketChannel.subscribeEvents({
-        finalityStatus: 'ACCEPTED_ON_L2',
-      });
-      expect(sub).toBeInstanceOf(Subscription);
-
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('keys');
-        if (i === 2) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
-      });
-
-      await webSocketChannel.waitForUnsubscription(sub.id);
-    });
-
-    test('Test subscribeNewTransactionReceipts', async () => {
-      const sub = await webSocketChannel.subscribeNewTransactionReceipts();
-      expect(sub).toBeInstanceOf(Subscription);
-
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('execution_status');
-        if (i === 2) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
-      });
-
-      await webSocketChannel.waitForUnsubscription(sub.id);
-    });
-
-    test('Test subscribeNewTransactionReceipts with finality status filter', async () => {
-      const sub = await webSocketChannel.subscribeNewTransactionReceipts({
-        finalityStatus: ['ACCEPTED_ON_L2'],
-      });
-      expect(sub).toBeInstanceOf(Subscription);
-
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('execution_status');
-        if (i === 1) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
-      });
-
-      await webSocketChannel.waitForUnsubscription(sub.id);
-    });
-
-    test('Test subscribeNewTransactions', async () => {
-      const sub = await webSocketChannel.subscribeNewTransactions();
-      expect(sub).toBeInstanceOf(Subscription);
-
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('nonce');
-        if (i === 2) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
-      });
-
-      await webSocketChannel.waitForUnsubscription(sub.id);
-    });
-
-    test('Test subscribeNewTransactions with finality status filter', async () => {
-      const sub = await webSocketChannel.subscribeNewTransactions({
-        finalityStatus: ['ACCEPTED_ON_L2'],
-      });
-      expect(sub).toBeInstanceOf(Subscription);
-
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('nonce');
-        if (i === 1) {
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
-      });
-
-      await webSocketChannel.waitForUnsubscription(sub.id);
-    });
-
-    test('Test subscribeTransactionStatus', async () => {
-      const { transaction_hash } = await account.execute({
-        contractAddress: STRKtokenAddress,
-        entrypoint: 'transfer',
-        calldata: [account.address, '10', '0'],
-      });
-
-      const sub = await webSocketChannel.subscribeTransactionStatus({
-        transactionHash: transaction_hash,
-      });
-      expect(sub).toBeInstanceOf(Subscription);
-
-      let i = 0;
-      sub.on(async (result) => {
-        i += 1;
-        expect(result).toBeDefined();
-        if (i >= 1) {
-          // TODO: it should be 2 statuses received and ..., but juno do not report first one when sub., revisit after RPC 0.9
-          const status = await sub.unsubscribe();
-          expect(status).toBe(true);
-        }
-      });
-      await webSocketChannel.waitForUnsubscription(sub.id);
-    });
-  });
-
-  describe('websocket regular endpoints', () => {
-    let webSocketChannel: WebSocketChannel;
-
-    beforeAll(async () => {
-      webSocketChannel = await openChannel({ nodeUrl: NODE_URL });
-      expect(webSocketChannel.isConnected()).toBe(true);
-    });
-
-    afterAll(async () => {
-      // `beforeAll` can fail to connect at all (per-IP rate limiting), leaving the channel
-      // unassigned. Without this guard teardown throws a TypeError, which Jest reports as
-      // "Test suite failed to run", hiding the connection error that actually caused it.
-      if (!webSocketChannel) return;
-      webSocketChannel.disconnect();
-      await webSocketChannel.waitForDisconnection().catch(() => undefined);
-    });
-
-    test('regular rpc endpoint', async () => {
-      const response = await webSocketChannel.sendReceive('starknet_chainId');
-      expect(response).toBe(expectedChainId);
-    });
-  });
-
-  describe('WebSocketChannel Auto-Reconnection', () => {
-    let webSocketChannel: WebSocketChannel;
-
-    afterEach(async () => {
-      // Ensure the channel is always disconnected after each test to prevent open handles.
-      if (!webSocketChannel) return;
-
-      // Unsubscribe first: a gateway that will not complete the closing handshake of a
-      // still-subscribed socket leaves it in CLOSING for good, and that handle outlives the
-      // whole run. Several tests here call `done()` from inside a subscription handler, so
-      // nothing else drops them. Best-effort and bounded — teardown must not fail or stall
-      // on a dead socket.
-      const subs: Array<{ isClosed: boolean; unsubscribe: () => Promise<boolean> }> = Array.from(
-        ((webSocketChannel as any).activeSubscriptions as Map<string, any>).values()
-      );
-      await withTimeout(
-        Promise.all(subs.filter((s) => !s.isClosed).map((s) => s.unsubscribe().catch(() => false))),
-        2000
-      );
-
-      webSocketChannel.disconnect();
-      // Those same gateways can leave `waitForDisconnection()` hanging, so bound it: the next
-      // test builds a fresh channel and the node reclaims the idle socket on its own. It also
-      // rejects on the socket's `error` event, which some nodes (devnet among them) emit while
-      // closing — a noisy shutdown must not fail the test that just ran.
-      await withTimeout(
-        webSocketChannel.waitForDisconnection().catch(() => undefined),
-        3000
-      );
-    });
-
-    test('should automatically reconnect on connection drop', (done) => {
-      // Set a very short reconnection delay for faster tests
-      webSocketChannel = new WebSocketChannel({
-        nodeUrl: NODE_URL,
-        reconnectOptions: { retries: 5, delay: 1000, exponential: false },
-      });
-
-      let hasReconnected = false;
-      webSocketChannel.on('open', () => {
-        // This will be called once on initial connection, and a second time on reconnection.
-        if (hasReconnected) {
-          done(); // Test is successful if we get here
-        } else {
-          // This is the first connection, now we simulate the drop
-          hasReconnected = true;
-          simulateConnectionDrop(webSocketChannel);
-        }
-      });
-    });
-
-    test('sendReceive should time out if no response is received', async () => {
-      webSocketChannel = await openChannel({
-        nodeUrl: NODE_URL,
-        requestTimeout: 100, // Set a short timeout for testing
-      });
-
-      // Spy on the 'send' method and prevent it from sending anything.
-      // This guarantees that we will never get a response and the timeout will be triggered.
-      const sendSpy = jest.spyOn(webSocketChannel.websocket, 'send').mockImplementation(() => {});
-
-      // We expect this promise to reject with a timeout error.
-      await expect(
-        webSocketChannel.sendReceive('some_method_that_will_never_get_a_response')
-      ).rejects.toThrow('timed out after 100ms');
-
-      // Restore the original implementation for other tests
-      sendSpy.mockRestore();
-    });
-
-    test('should queue sendReceive requests when reconnecting and process them after', (done) => {
-      webSocketChannel = new WebSocketChannel({
-        nodeUrl: NODE_URL,
-        reconnectOptions: { retries: 5, delay: 1000, exponential: false },
-      });
-
-      let hasReconnected = false;
-      webSocketChannel.on('open', () => {
-        if (hasReconnected) {
-          // Reconnected. The promise from the queued sendReceive will resolve now.
-        } else {
-          // 1. First connection, now simulate a drop
-          hasReconnected = true;
-          simulateConnectionDrop(webSocketChannel);
-
-          // 2. Immediately try to send a request. It should be queued.
-          webSocketChannel
-            .sendReceive('starknet_chainId')
-            .then((result) => {
-              // 3. This assertion runs after reconnection, proving the queue was processed.
-              expect(result).toBe(expectedChainId);
-              done(); // 4. Test is done when the queued request has been successfully processed.
-            })
-            // Report the failure rather than leave `done()` uncalled: a queued request has no
-            // timeout of its own, so the test would otherwise hang until Jest's global one
-            // with no indication of what went wrong.
-            .catch(done);
-        }
-      });
-    });
-
-    test('should queue subscribe requests when reconnecting and process them after', (done) => {
-      webSocketChannel = new WebSocketChannel({
-        nodeUrl: NODE_URL,
-        reconnectOptions: { retries: 5, delay: 1000, exponential: false },
-      });
-
-      let hasReconnected = false;
-      webSocketChannel.on('open', () => {
-        if (hasReconnected) {
-          // Reconnected. The promise from the queued subscribeNewHeads will resolve now.
-        } else {
-          // 1. First connection, now simulate a drop
-          hasReconnected = true;
-          simulateConnectionDrop(webSocketChannel);
-
-          // 2. Immediately try to subscribe. The request should be queued.
-          webSocketChannel
-            .subscribeNewHeads()
-            .then((sub) => {
-              // 3. This should only execute after reconnection.
-              expect(sub).toBeInstanceOf(Subscription);
-              expect(webSocketChannel.isConnected()).toBe(true);
-
-              // 4. To prove it's a real subscription, wait for one event.
-              sub.on((data) => {
-                expect(data).toBeDefined();
-                done();
-              });
-            })
-            // See the note on the previous test.
-            .catch(done);
-        }
-      });
-    });
-
-    test('should restore active subscriptions after an automatic reconnection', (done) => {
-      webSocketChannel = new WebSocketChannel({
-        nodeUrl: NODE_URL,
-        reconnectOptions: { retries: 5, delay: 1000, exponential: false },
-      });
-
-      let connectionCount = 0;
-
-      const eventHandler = (data: any) => {
-        // The handler is called. If this is after the reconnection (connectionCount > 1),
-        // it proves the subscription was successfully restored.
-        if (connectionCount > 1) {
-          expect(data).toBeDefined();
-          done();
-        }
-      };
-
-      webSocketChannel.on('open', async () => {
-        connectionCount += 1;
-        if (connectionCount === 1) {
-          try {
-            // First connection: set up the subscription
-            const sub = await webSocketChannel.subscribeNewHeads();
-            sub.on(eventHandler);
-            // Now, simulate a drop
-            simulateConnectionDrop(webSocketChannel);
-          } catch (error) {
-            // This handler is `async`: an unobserved rejection would leave `done()` uncalled
-            // and the test hanging until the global timeout instead of reporting the cause.
-            done(error);
-          }
-        }
-        // On the second 'open' event (connectionCount === 2), the test will implicitly
-        // be waiting for the eventHandler to be called, which will resolve the test.
-      });
-    });
-  });
-});
 
 describe('Unit Test: WebSocketChannel Buffering', () => {
   useOfflineSocket();
@@ -781,6 +144,72 @@ describe('Unit Test: Subscription Class', () => {
     }).toThrow('A handler is already attached to this subscription.');
   });
 
+  test('re-attaching the same handler is a no-op rather than a throw', () => {
+    // React StrictMode invokes an effect twice with the same function. Throwing there fails a
+    // correct component; only a *different* handler is a genuine mistake.
+    const handler = jest.fn();
+
+    subscription.on(handler);
+    expect(() => subscription.on(handler)).not.toThrow();
+
+    subscription._handleEvent({ block_number: 1 } as any);
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  test('off() detaches, and events buffer again until the next on()', () => {
+    const first = jest.fn();
+    subscription.on(first);
+    subscription.off();
+
+    subscription._handleEvent({ block_number: 7 } as any);
+    expect(first).not.toHaveBeenCalled();
+
+    const second = jest.fn();
+    subscription.on(second);
+    expect(second).toHaveBeenCalledWith({ block_number: 7 });
+  });
+
+  test('on() on a closed subscription does nothing instead of throwing', () => {
+    // A closed subscription can never deliver again, so refusing here would force a component to
+    // build a new object for no benefit.
+    subscription.on(jest.fn());
+    subscription._markClosed();
+
+    expect(() => subscription.on(jest.fn())).not.toThrow();
+  });
+
+  test('onClose fires when the node refuses to re-establish the subscription', () => {
+    // The case the connection state cannot cover: the socket stays up, this one subscription dies.
+    const closed = jest.fn();
+    subscription.onClose(closed);
+
+    subscription._markClosed();
+
+    expect(closed).toHaveBeenCalledTimes(1);
+    expect(subscription.isClosed).toBe(true);
+  });
+
+  test('onClose on an already closed subscription fires immediately', () => {
+    // The closure can land between the subscribe call resolving and the consumer wiring its
+    // listener; a listener attached one tick late must not wait forever.
+    subscription._markClosed();
+
+    const closed = jest.fn();
+    subscription.onClose(closed);
+
+    expect(closed).toHaveBeenCalledTimes(1);
+  });
+
+  test('the detach function returned by onClose prevents the call', () => {
+    const closed = jest.fn();
+    const detach = subscription.onClose(closed);
+
+    detach();
+    subscription._markClosed();
+
+    expect(closed).not.toHaveBeenCalled();
+  });
+
   test('unsubscribe should be idempotent and only call the channel once', async () => {
     // Call unsubscribe multiple times.
     const result1 = await subscription.unsubscribe();
@@ -901,7 +330,8 @@ describe('Unit Test: WebSocketChannel subscription lifecycle', () => {
     const sub = await pending;
     expect(sub.isClosed).toBe(false);
 
-    const restoring = (webSocketChannel as any)._restoreSubscriptions();
+    // Restoration lives on the subscription channel the façade delegates to.
+    const restoring = (webSocketChannel as any).subscriptionChannel.restore();
     ws.deliver({ jsonrpc: '2.0', id: 1, error: { code: 1, message: 'subscription refused' } });
     await restoring;
 
@@ -1038,5 +468,44 @@ describe('Unit Test: WebSocketChannel request id resolution', () => {
     // The managed counter is independent of user-set ids, and starts at 0.
     expect(webSocketChannel.send('starknet_chainId')).toBe(0);
     expect(webSocketChannel.send('starknet_chainId')).toBe(1);
+  });
+});
+
+describe('Unit Test: WebSocketChannel waitForDisconnection', () => {
+  useOfflineSocket();
+
+  let webSocketChannel: WebSocketChannel;
+
+  beforeEach(() => {
+    webSocketChannel = new WebSocketChannel({ nodeUrl: 'ws://dummy-url', autoReconnect: false });
+  });
+
+  afterEach(() => {
+    webSocketChannel.disconnect();
+  });
+
+  test('resolves when the peer closes uncleanly, error first', async () => {
+    const socket = webSocketChannel.websocket as any;
+    socket.readyState = OfflineWebSocket.OPEN;
+    const waiting = webSocketChannel.waitForDisconnection();
+
+    // What devnet produces: it answers a client `close()` by dropping the TCP connection, so the
+    // socket is already leaving OPEN when the error lands and the close follows right after.
+    socket.readyState = OfflineWebSocket.CLOSING;
+    socket.dispatchEvent(new Event('error'));
+    socket.close();
+
+    await expect(waiting).resolves.toBe(OfflineWebSocket.CLOSED);
+  });
+
+  test('still rejects on an error that leaves the socket open', async () => {
+    const socket = webSocketChannel.websocket as any;
+    socket.readyState = OfflineWebSocket.OPEN;
+    const waiting = webSocketChannel.waitForDisconnection();
+
+    const failure = new Event('error');
+    socket.dispatchEvent(failure);
+
+    await expect(waiting).rejects.toBe(failure);
   });
 });

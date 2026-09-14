@@ -22,7 +22,6 @@ import { toHex } from './num';
  * const invocation: InvocationsDetailsWithNonce = {
  *   nonce: 1,
  *   version: 3,
- *   maxFee: 10 ** 15,
  *   feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1,
  *   tip: 10 ** 13,
  *   paymasterData: [],

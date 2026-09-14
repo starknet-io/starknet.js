@@ -13,7 +13,7 @@ Your message has to be an array of `BigNumberish`. First, calculate the hash of 
 > If the message does not respect some safety rules of composition, this method could be a way of attack of your smart contract. If you have any doubt, prefer the [EIP712 like method](#sign-and-verify-following-eip712), which is safe, but is also more complicated.
 
 ```typescript
-import { ec, hash, type BigNumberish, type WeierstrassSignatureType } from 'starknet';
+import { ec, hash, stark, type BigNumberish, type WeierstrassSignatureType } from 'starknet';
 
 const privateKey = '0x1234567890987654321';
 const starknetPublicKey = ec.starkCurve.getStarkKey(privateKey);
@@ -103,7 +103,11 @@ const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' }); //
 const accountAddress = '0x...'; // account of sender
 
 const msgHash2 = hash.computeHashOnElements(message);
-const result2: Boolean = rpcProvider.verifyMessageInStarknet(msgHash2, signature, accountAddress);
+const result2: Boolean = await myProvider.verifyMessageInStarknet(
+  msgHash2,
+  signature,
+  accountAddress
+);
 console.log('Result (boolean) =', result2);
 ```
 

@@ -12,10 +12,9 @@ import {
   SierraContractEntryPointFields,
 } from '../../../types';
 import { starkCurve } from '../../ec';
-import { addHexPrefix, utf8ToArray } from '../../encode';
+import { addHexPrefix, utf8ToBigInt, utf8ToUint8Array } from '../../encode';
 import { stringify } from '../../json';
 import { toHex } from '../../num';
-import { encodeShortString } from '../../shortString';
 import { COMPILED_CLASS_VERSION as COMPILED_CLASS_V1, encodeBuiltins, formatSpaces } from './util';
 
 export function computePoseidonHash(a: BigNumberish, b: BigNumberish): string {
@@ -74,7 +73,7 @@ export function hashByteCodeSegments(casm: CompiledSierraCasm): bigint {
  */
 export function computeCompiledClassHashPoseidon(casm: CompiledSierraCasm): string {
   // Hash compiled class version
-  const compiledClassVersion = BigInt(encodeShortString(COMPILED_CLASS_V1));
+  const compiledClassVersion = utf8ToBigInt(COMPILED_CLASS_V1);
 
   // Hash external entry points.
   const externalEntryPointsHash = hashEntryPoint(casm.entry_points_by_type.EXTERNAL);
@@ -110,7 +109,7 @@ function hashEntryPointSierra(data: SierraContractEntryPointFields[]) {
 
 function hashAbi(sierra: CompiledSierra) {
   const indentString = formatSpaces(stringify(sierra.abi, null));
-  return BigInt(addHexPrefix(starkCurve.keccak(utf8ToArray(indentString)).toString(16)));
+  return BigInt(addHexPrefix(starkCurve.keccak(utf8ToUint8Array(indentString)).toString(16)));
 }
 
 /**
@@ -128,7 +127,7 @@ export function computeSierraContractClassHash(sierra: CompiledSierra): string {
   const CONTRACT_CLASS_VERSION = 'CONTRACT_CLASS_V0.1.0';
 
   // Hash class version
-  const compiledClassVersion = BigInt(encodeShortString(CONTRACT_CLASS_VERSION));
+  const compiledClassVersion = utf8ToBigInt(CONTRACT_CLASS_VERSION);
 
   // Hash external entry points.
   const externalEntryPointsHash = hashEntryPointSierra(sierra.entry_points_by_type.EXTERNAL);

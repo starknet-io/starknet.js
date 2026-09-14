@@ -1,6 +1,7 @@
 import { NetworkName, StarknetChainId, SupportedRpcVersion } from '../../global/constants';
 import { BlockIdentifier, waitForTransactionOptions } from '../../types/lib';
 import type { PluginConfig } from '../../plugins/types';
+import type { RpcTransport } from '../../channel/transport';
 import { ResourceBoundsOverhead } from './spec.type';
 
 export interface ProviderOptions extends RpcProviderOptions {}
@@ -24,6 +25,11 @@ export type RpcProviderOptions = {
   specVersion?: SupportedRpcVersion;
   waitMode?: boolean;
   baseFetch?: WindowOrWorkerGlobalScope['fetch'];
+  /**
+   * Carries JSON-RPC envelopes to the node. Defaults to an `HttpTransport` built from `nodeUrl`,
+   * `headers` and `baseFetch`, so leaving it unset keeps the historical behaviour.
+   */
+  transport?: RpcTransport;
   resourceBoundsOverhead?: ResourceBoundsOverhead | false;
   batch?: false | number;
 } & PluginConfig;

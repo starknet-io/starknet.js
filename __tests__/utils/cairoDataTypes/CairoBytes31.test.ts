@@ -63,13 +63,13 @@ describe('CairoBytes31 class Unit Tests', () => {
 
     test('should reject invalid input types', () => {
       expect(() => new CairoBytes31(123 as any)).toThrow(
-        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, Uint8Array, or CairoBytes31'
       );
       expect(() => new CairoBytes31({} as any)).toThrow(
-        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, Uint8Array, or CairoBytes31'
       );
       expect(() => new CairoBytes31(null as any)).toThrow(
-        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, Uint8Array, or CairoBytes31'
       );
     });
 
@@ -280,16 +280,16 @@ describe('CairoBytes31 class Unit Tests', () => {
 
     test('should reject invalid input types', () => {
       expect(() => CairoBytes31.validate(123 as any)).toThrow(
-        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, Uint8Array, or CairoBytes31'
       );
       expect(() => CairoBytes31.validate({} as any)).toThrow(
-        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, Uint8Array, or CairoBytes31'
       );
       expect(() => CairoBytes31.validate(null as any)).toThrow(
-        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, Uint8Array, or CairoBytes31'
       );
       expect(() => CairoBytes31.validate(undefined as any)).toThrow(
-        'Invalid input type for CairoBytes31. Expected string, Buffer, or Uint8Array'
+        'Invalid input type for CairoBytes31. Expected string, Buffer, Uint8Array, or CairoBytes31'
       );
     });
 
@@ -405,6 +405,78 @@ describe('CairoBytes31 class Unit Tests', () => {
       const bytes31 = new CairoBytes31(boundary31);
       expect(bytes31.data.length).toBe(31);
       expect(bytes31.data.every((byte) => byte === 42)).toBe(true);
+    });
+  });
+
+  describe('fromText static method', () => {
+    test('should encode a decimal-looking string as text, not as a number', () => {
+      // the constructor reads '12345' as the number 12345 (0x3039)
+      expect(CairoBytes31.fromText('12345').toHexString()).toBe('0x3132333435');
+    });
+
+    test('should encode a hex-looking string as text, not as a number', () => {
+      // the constructor reads '0x68656c6c6f' as the number it spells
+      expect(CairoBytes31.fromText('0x68656c6c6f').toHexString()).toBe(
+        '0x307836383635366336633666'
+      );
+    });
+
+    test('should encode text as its UTF-8 bytes', () => {
+      expect(CairoBytes31.fromText('hello').toHexString()).toBe('0x68656c6c6f');
+      expect(CairoBytes31.fromText('café').toHexString()).toBe('0x636166c3a9');
+    });
+
+    test('should give each control character its own byte', () => {
+      expect(CairoBytes31.fromText('a\tb').toHexString()).toBe('0x610962');
+      expect(CairoBytes31.fromText('a\nb').toHexString()).toBe('0x610a62');
+    });
+
+    test('should round-trip through decodeUtf8', () => {
+      const texts = ['hello', 'café', 'a\tb', '0x68656c6c6f', '12345'];
+      texts.forEach((text) => {
+        expect(CairoBytes31.fromText(text).decodeUtf8()).toBe(text);
+      });
+    });
+
+    test('should reject text longer than 31 bytes', () => {
+      expect(() => CairoBytes31.fromText('x'.repeat(32))).toThrow(
+        'Data is too long: 32 bytes (max 31 bytes)'
+      );
+    });
+  });
+
+  describe('constructor from an existing CairoBytes31', () => {
+    test('should adopt the bytes of another instance', () => {
+      const source = new CairoBytes31('0x4142');
+      const copy = new CairoBytes31(source);
+
+      expect(copy.toHexString()).toBe('0x4142');
+      expect(copy.data).toEqual(source.data);
+    });
+
+    test('should copy the bytes rather than share them', () => {
+      const source = new CairoBytes31('0x4142');
+      const copy = new CairoBytes31(source);
+      source.data[30] = 0;
+
+      expect(copy.toHexString()).toBe('0x4142');
+    });
+
+    test('should carry a fromText value through without reading it again', () => {
+      // '12345' as text is 0x3132333435, where the string constructor reads the number 0x3039
+      expect(new CairoBytes31(CairoBytes31.fromText('12345')).toHexString()).toBe('0x3132333435');
+      expect(new CairoBytes31('12345').toHexString()).toBe('0x3039');
+    });
+
+    test('should accept an instance in validate and is', () => {
+      expect(() => CairoBytes31.validate(CairoBytes31.fromText('12345'))).not.toThrow();
+      expect(CairoBytes31.is(CairoBytes31.fromText('12345'))).toBe(true);
+    });
+
+    test('should still reject an object that is not a bytes31', () => {
+      expect(() => new CairoBytes31({ data: '0x41' } as any)).toThrow(
+        'Invalid input type for CairoBytes31. Expected string, Buffer, Uint8Array, or CairoBytes31'
+      );
     });
   });
 });

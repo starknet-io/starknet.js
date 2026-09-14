@@ -26,7 +26,7 @@ describe('PaymasterRpc', () => {
   });
 
   describe('constructor', () => {
-    it('should initialize with default values', () => {
+    test('should initialize with default values', () => {
       // When
       const client = new PaymasterRpc();
 
@@ -37,7 +37,7 @@ describe('PaymasterRpc', () => {
   });
 
   describe('isAvailable', () => {
-    it('should return true when paymaster is available', async () => {
+    test('should return true when paymaster is available', async () => {
       // Given
       const client = new PaymasterRpc();
       mockFetch.mockResolvedValueOnce({
@@ -57,7 +57,7 @@ describe('PaymasterRpc', () => {
       );
     });
 
-    it('should return false when paymaster is not available', async () => {
+    test('should return false when paymaster is not available', async () => {
       // Given
       const client = new PaymasterRpc();
       mockFetch.mockResolvedValueOnce({
@@ -71,7 +71,7 @@ describe('PaymasterRpc', () => {
       expect(result).toBe(false);
     });
 
-    it('should throw RpcError when RPC returns error', async () => {
+    test('should throw RpcError when RPC returns error', async () => {
       // Given
       const client = new PaymasterRpc();
       mockFetch.mockResolvedValueOnce({
@@ -82,7 +82,7 @@ describe('PaymasterRpc', () => {
       await expect(client.isAvailable()).rejects.toThrow(RpcError);
     });
 
-    it('should throw on network error', async () => {
+    test('should throw on network error', async () => {
       // Given
       const client = new PaymasterRpc();
       mockFetch.mockRejectedValueOnce(new Error('Network down'));
@@ -93,7 +93,7 @@ describe('PaymasterRpc', () => {
   });
 
   describe('buildTransaction', () => {
-    it('should return typedData and parsed tokenAmountAndPrice', async () => {
+    test('should return typedData and parsed tokenAmountAndPrice', async () => {
       // Given
       const client = new PaymasterRpc();
       const mockCall = {
@@ -155,7 +155,7 @@ describe('PaymasterRpc', () => {
   });
 
   describe('executeTransaction', () => {
-    it('should send execution request and return transaction hash', async () => {
+    test('should send execution request and return transaction hash', async () => {
       // Given
       const client = new PaymasterRpc();
       const mockSignature = ['0x1', '0x2'];
@@ -207,7 +207,7 @@ describe('PaymasterRpc', () => {
   });
 
   describe('getSupportedTokens', () => {
-    it('should return supported tokens and prices', async () => {
+    test('should return supported tokens and prices', async () => {
       // Given
       const client = new PaymasterRpc();
       const rpc_response = [
