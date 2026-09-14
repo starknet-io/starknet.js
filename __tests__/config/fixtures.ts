@@ -19,7 +19,11 @@ if (process.env.IS_DEVNET === 'true') {
 export const { TEST_WS_URL } = process.env;
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
-export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
+/**
+ * Guards the suites that need a live socket. On devnet the URL is derived, so this is true
+ * without anything being exported; elsewhere it follows `TEST_WS_URL`.
+ */
+export const describeIfWs = describeIf(!!TEST_WS_URL);
 export const describeIfNotDevnet = describeIf(process.env.IS_DEVNET === 'false');
 export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
 export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');

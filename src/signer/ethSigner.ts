@@ -1,5 +1,5 @@
-import type { RecoveredSignatureType } from '@noble/curves/abstract/weierstrass';
-import { secp256k1 } from '@noble/curves/secp256k1';
+import type { ECDSASignature } from '@noble/curves/abstract/weierstrass.js';
+import { secp256k1 } from '@noble/curves/secp256k1.js';
 
 import {
   ArraySignatureType,
@@ -10,11 +10,7 @@ import {
   Signature,
   TypedData,
   Uint256,
-  V3DeclareSignerDetails,
-  V3DeployAccountSignerDetails,
-  V3InvocationsSignerDetails,
 } from '../types';
-import { ETransactionVersion3 } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { addHexPrefix, buf2hex, removeHexPrefix, sanitizeHex } from '../utils/encode';
 import { ethRandomPrivateKey } from '../utils/eth';
@@ -23,7 +19,7 @@ import {
   calculateDeployAccountTransactionHash,
   calculateInvokeTransactionHash,
 } from '../utils/hash';
-import { toHex } from '../utils/num';
+import { hexToBytes, toHex } from '../utils/num';
 import { intDAM } from '../utils/stark';
 import { getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
@@ -49,15 +45,20 @@ export class EthSigner implements SignerInterface {
    */
   public async getPubKey(): Promise<string> {
     return addHexPrefix(
-      buf2hex(secp256k1.getPublicKey(this.pk, false)).padStart(130, '0').slice(2)
+      buf2hex(secp256k1.getPublicKey(hexToBytes(addHexPrefix(this.pk)), false))
+        .padStart(130, '0')
+        .slice(2)
     );
   }
 
   public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
     const msgHash = getMessageHash(typedData, accountAddress);
-    const signature: RecoveredSignatureType = secp256k1.sign(
-      removeHexPrefix(sanitizeHex(msgHash)),
-      this.pk
+    const signature = secp256k1.Signature.fromBytes(
+      secp256k1.sign(hexToBytes(sanitizeHex(msgHash)), hexToBytes(addHexPrefix(this.pk)), {
+        prehash: false,
+        format: 'recovered',
+      }),
+      'recovered'
     );
     return this.formatEthSignature(signature);
   }
@@ -67,24 +68,21 @@ export class EthSigner implements SignerInterface {
     details: InvocationsSignerDetails
   ): Promise<Signature> {
     const compiledCalldata = getExecuteCalldata(transactions, details.cairoVersion);
-    let msgHash;
+    const msgHash = calculateInvokeTransactionHash({
+      ...details,
+      senderAddress: details.walletAddress,
+      compiledCalldata,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
 
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3InvocationsSignerDetails;
-      msgHash = calculateInvokeTransactionHash({
-        ...det,
-        senderAddress: det.walletAddress,
-        compiledCalldata,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signTransaction version');
-    }
-    const signature: RecoveredSignatureType = secp256k1.sign(
-      removeHexPrefix(sanitizeHex(msgHash)),
-      this.pk
+    const signature = secp256k1.Signature.fromBytes(
+      secp256k1.sign(hexToBytes(sanitizeHex(msgHash)), hexToBytes(addHexPrefix(this.pk)), {
+        prehash: false,
+        format: 'recovered',
+      }),
+      'recovered'
     );
     return this.formatEthSignature(signature);
   }
@@ -93,25 +91,21 @@ export class EthSigner implements SignerInterface {
     details: DeployAccountSignerDetails
   ): Promise<Signature> {
     const compiledConstructorCalldata = CallData.compile(details.constructorCalldata);
-    /*     const version = BigInt(details.version).toString(); */
-    let msgHash;
+    const msgHash = calculateDeployAccountTransactionHash({
+      ...details,
+      salt: details.addressSalt,
+      compiledConstructorCalldata,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
 
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3DeployAccountSignerDetails;
-      msgHash = calculateDeployAccountTransactionHash({
-        ...det,
-        salt: det.addressSalt,
-        compiledConstructorCalldata,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signDeployAccountTransaction version');
-    }
-    const signature: RecoveredSignatureType = secp256k1.sign(
-      removeHexPrefix(sanitizeHex(msgHash)),
-      this.pk
+    const signature = secp256k1.Signature.fromBytes(
+      secp256k1.sign(hexToBytes(sanitizeHex(msgHash)), hexToBytes(addHexPrefix(this.pk)), {
+        prehash: false,
+        format: 'recovered',
+      }),
+      'recovered'
     );
     return this.formatEthSignature(signature);
   }
@@ -120,23 +114,19 @@ export class EthSigner implements SignerInterface {
     // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
     details: DeclareSignerDetails
   ): Promise<Signature> {
-    let msgHash;
+    const msgHash = calculateDeclareTransactionHash({
+      ...details,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
 
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3DeclareSignerDetails;
-      msgHash = calculateDeclareTransactionHash({
-        ...det,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-    } else {
-      throw Error('unsupported signDeclareTransaction version');
-    }
-
-    const signature: RecoveredSignatureType = secp256k1.sign(
-      removeHexPrefix(sanitizeHex(msgHash)),
-      this.pk
+    const signature = secp256k1.Signature.fromBytes(
+      secp256k1.sign(hexToBytes(sanitizeHex(msgHash)), hexToBytes(addHexPrefix(this.pk)), {
+        prehash: false,
+        format: 'recovered',
+      }),
+      'recovered'
     );
     return this.formatEthSignature(signature);
   }
@@ -146,7 +136,7 @@ export class EthSigner implements SignerInterface {
    * @param ethSignature secp256k1 signature from Noble curves library
    * @return an array of felts, representing a Cairo Eth Signature.
    */
-  protected formatEthSignature(ethSignature: RecoveredSignatureType): ArraySignatureType {
+  protected formatEthSignature(ethSignature: ECDSASignature): ArraySignatureType {
     const r: Uint256 = bnToUint256(ethSignature.r);
     const s: Uint256 = bnToUint256(ethSignature.s);
     return [
@@ -154,7 +144,7 @@ export class EthSigner implements SignerInterface {
       toHex(r.high),
       toHex(s.low),
       toHex(s.high),
-      toHex(ethSignature.recovery),
+      toHex(ethSignature.recovery!),
     ] as ArraySignatureType;
   }
 }

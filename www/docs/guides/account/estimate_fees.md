@@ -15,80 +15,75 @@ Starknet.js proposes several functions to estimate the fees:
 To estimate the cost to invoke a contract in the network:
 
 ```typescript
-const { suggestedMaxFee, unit } = await account0.estimateInvokeFee({
+const { resourceBounds, overall_fee, unit } = await account0.estimateInvokeFee({
   contractAddress: testAddress,
   entrypoint: 'increase_balance',
   calldata: ['10', '30'],
 });
 ```
 
-The result is in `suggestedMaxFee`, of type BigInt. The corresponding unit for this number is in `unit`. It's WEI for "legacy" transactions, and FRI for V3 transactions.
+`resourceBounds` holds the limits to pass to the transaction, already increased by the configured overhead. `overall_fee`, of type BigInt, is the maximum these limits can cost — the worst case, not the expected cost. `unit` is the currency of that amount, `FRI`.
 
 :::tip
 More details about the complex subject of Starknet fees in [Starknet docs](https://docs.starknet.io/architecture-and-concepts/network-architecture/fee-mechanism/)
 :::
 
-The complete answer for a V3 transaction:
+The complete answer:
 
 ```typescript
 {
-  overall_fee: 4188627200000000000n,
-  unit: 'FRI',
-  l1_gas_consumed: 0n,
-  l1_gas_price: 100000000000n,
-  l2_gas_consumed: 41886080n,
-  l2_gas_price: 100000000000n,
-  l1_data_gas_consumed: 192n,
-  l1_data_gas_price: 100000000000n,
-  suggestedMaxFee: 6282940800000000000n,
   resourceBounds: {
-    l2_gas: { max_amount: '0x3beb240', max_price_per_unit: '0x22ecb25c00' },
-    l1_gas: { max_amount: '0x0', max_price_per_unit: '0x22ecb25c00' },
-    l1_data_gas: { max_amount: '0x120', max_price_per_unit: '0x22ecb25c00' }
-  }
+    l2_gas: { max_amount: 62829120n, max_price_per_unit: 150000000000n },
+    l1_gas: { max_amount: 0n, max_price_per_unit: 150000000000n },
+    l1_data_gas: { max_amount: 288n, max_price_per_unit: 150000000000n }
+  },
+  overall_fee: 9424411200000000000n,
+  unit: 'FRI'
 }
 ```
+
+Every amount is a `bigint`. Here the node reported 41886080 units of L2 gas at 100000000000 FRI each; with the default 50% overhead applied to both the amount and the price, `resourceBounds` carries 62829120 units at 150000000000 FRI, and `overall_fee` is the sum of `max_amount * max_price_per_unit` over the three resources.
 
 ## estimateDeclareFee
 
 To estimate the cost to declare a contract in the network:
 
 ```typescript
-const { suggestedMaxFee } = await account0.estimateDeclareFee({
+const { resourceBounds, overall_fee } = await account0.estimateDeclareFee({
   contract: compiledTest,
   classHash: testClassHash,
 });
 ```
 
-The result is in `suggestedMaxFee`, of type BigInt. The units and full response format are the same as `invoke`.
+The response format is the same as `invoke`.
 
 ## estimateDeployFee
 
 To estimate the cost to deploy a contract in the network:
 
 ```typescript
-const { suggestedMaxFee } = await account0.estimateDeployFee({
+const { resourceBounds, overall_fee } = await account0.estimateDeployFee({
   classHash: testClassHash,
   // `constructorCalldata` is not necessary if the contract to deploy has no constructor
   constructorCalldata: callData,
 });
 ```
 
-The result is in `suggestedMaxFee`, of type BigInt. The units and full response format are the same as `invoke`.
+The response format is the same as `invoke`.
 
 ## estimateAccountDeployFee
 
 To estimate the cost to deploy an account in the network:
 
 ```typescript
-const { suggestedMaxFee } = await account0.estimateAccountDeployFee({
+const { resourceBounds, overall_fee } = await account0.estimateAccountDeployFee({
   classHash: OZaccountClassHash,
   constructorCalldata: OZaccountConstructorCallData,
   contractAddress: OZcontractAddress,
 });
 ```
 
-The result is in `suggestedMaxFee`, of type BigInt. Units and full response format are the same than `invoke`.
+The response format is the same as `invoke`.
 
 ## Fee limitation
 
@@ -153,14 +148,8 @@ txR.match({
 });
 ```
 
-For STRK fees, the result is:
+The result is:
 
 ```json
 { "unit": "FRI", "amount": "0x3a4f43814e180000" }
-```
-
-For ETH fees:
-
-```json
-{ "unit": "WEI", "amount": "0x70c6fff3c000" }
 ```

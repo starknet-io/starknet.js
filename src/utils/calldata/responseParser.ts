@@ -17,6 +17,7 @@ import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { CairoUint8 } from '../cairoDataTypes/uint8';
 import { CairoUint16 } from '../cairoDataTypes/uint16';
+import { CairoUint32 } from '../cairoDataTypes/uint32';
 import { CairoUint64 } from '../cairoDataTypes/uint64';
 import { CairoUint96 } from '../cairoDataTypes/uint96';
 import { CairoUint128 } from '../cairoDataTypes/uint128';
@@ -25,17 +26,16 @@ import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
 import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
-import { addHexPrefix, removeHexPrefix } from '../encode';
+import { CairoBool } from '../cairoDataTypes/bool';
+import { CairoSecp256k1Point } from '../cairoDataTypes/secp256k1Point';
 import {
   getArrayType,
   isCairo1Type,
   isLen,
   isTypeArray,
-  isTypeBool,
   isTypeEnum,
   isTypeEthAddress,
   isTypeNonZero,
-  isTypeSecp256k1Point,
   isTypeTuple,
 } from './cairo';
 import {
@@ -46,8 +46,17 @@ import {
   CairoResult,
   CairoResultVariant,
 } from './enum';
-import { AbiParserInterface } from './parser/interface';
 import extractTupleMemberTypes from './tuple';
+
+/**
+ * All this module needs of a parser: how to read a value of one abi type off a response.
+ *
+ * Stated here rather than imported, for the same reason as in `requestParser.ts` : `AbiParser0` is
+ * what calls into this module, and it imports it.
+ */
+type ResponseReader = {
+  getResponseParser(abiType: string): (responseIterator: Iterator<string>) => any;
+};
 
 /**
  * Parse base types
@@ -55,12 +64,11 @@ import extractTupleMemberTypes from './tuple';
  * @param it iterator
  * @returns bigint | boolean
  */
-function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInterface) {
+function parseBaseTypes(type: string, it: Iterator<string>, parser: ResponseReader) {
   let temp;
   switch (true) {
-    case isTypeBool(type):
-      temp = it.next().value;
-      return Boolean(BigInt(temp));
+    case CairoBool.isAbiType(type):
+      return parser.getResponseParser(type)(it);
     case CairoUint256.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case CairoUint512.isAbiType(type):
@@ -68,6 +76,8 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
     case CairoUint8.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case CairoUint16.isAbiType(type):
+      return parser.getResponseParser(type)(it);
+    case CairoUint32.isAbiType(type):
       return parser.getResponseParser(type)(it);
     case CairoUint64.isAbiType(type):
       return parser.getResponseParser(type)(it);
@@ -90,13 +100,8 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
       return BigInt(temp);
     case CairoBytes31.isAbiType(type):
       return parser.getResponseParser(type)(it);
-    case isTypeSecp256k1Point(type):
-      const xLow = removeHexPrefix(it.next().value).padStart(32, '0');
-      const xHigh = removeHexPrefix(it.next().value).padStart(32, '0');
-      const yLow = removeHexPrefix(it.next().value).padStart(32, '0');
-      const yHigh = removeHexPrefix(it.next().value).padStart(32, '0');
-      const pubK = BigInt(addHexPrefix(xHigh + xLow + yHigh + yLow));
-      return pubK;
+    case CairoSecp256k1Point.isAbiType(type):
+      return parser.getResponseParser(type)(it);
     default:
       // TODO: this is for all simple types felt and rest to BN, at the moment handle as felt
       return parser.getResponseParser(CairoFelt252.abiSelector)(it);
@@ -115,7 +120,7 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: AbiParserInt
 function parseResponseValue(
   responseIterator: Iterator<string>,
   element: { name: string; type: string },
-  parser: AbiParserInterface,
+  parser: ResponseReader,
   structs?: AbiStructs,
   enums?: AbiEnums
 ): BigNumberish | ParsedStruct | boolean | any[] | CairoEnum {
@@ -266,7 +271,7 @@ export default function responseParser({
   structs: AbiStructs;
   enums: AbiEnums;
   parsedResult?: Args | ParsedStruct;
-  parser: AbiParserInterface;
+  parser: ResponseReader;
 }): any {
   const { name, type } = output;
   let temp;

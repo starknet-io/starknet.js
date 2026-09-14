@@ -4,8 +4,8 @@ import {
   CallData,
   Contract,
   EthSigner,
-  Provider,
   ProviderInterface,
+  RpcProvider,
   addAddressPadding,
   cairo,
   encode,
@@ -68,7 +68,7 @@ describe('Ethereum signer', () => {
     let ethPubKContract: Contract;
 
     beforeAll(async () => {
-      provider = new Provider(await createTestProvider());
+      provider = await createTestProvider();
       account = getTestAccount(provider);
 
       const { deploy } = await account.declareAndDeploy({
@@ -100,12 +100,12 @@ describe('Ethereum signer', () => {
 
   describeIfDevnet('ETH account tx V3', () => {
     // devnet only because fee cost is high
-    let provider: Provider;
+    let provider: RpcProvider;
     let account: Account;
     let ethAccount: Account;
 
     beforeAll(async () => {
-      provider = new Provider(await createTestProvider());
+      provider = await createTestProvider();
       account = getTestAccount(provider);
 
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
@@ -152,7 +152,9 @@ describe('Ethereum signer', () => {
         entrypoint: 'transfer',
         calldata: {
           recipient: contractETHAccountAddress,
-          amount: cairo.uint256(2n * 10n ** 18n), // 2 STRK of fees
+          // Hard spending cap for this test. The node checks the balance against the ceiling of
+          // the bounds sent below — 400x the estimate, i.e. 2.03 STRK under Starknet 0.14.4.
+          amount: cairo.uint256(3n * 10n ** 18n), // 3 STRK of fees
         },
       });
       await account.provider.waitForTransaction(transaction_hash);

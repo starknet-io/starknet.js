@@ -1,6 +1,10 @@
 import { BigNumberish, ByteArray } from '../../types/lib';
+import { CairoByteArray } from '../cairoDataTypes/byteArray';
+import { CairoBytes31 } from '../cairoDataTypes/bytes31';
+import { CairoFelt252 } from '../cairoDataTypes/felt';
+import { CairoUint32 } from '../cairoDataTypes/uint32';
+import { utf8ToUint8Array } from '../encode';
 import { toHex } from '../num';
-import { decodeShortString, encodeShortString, splitLongString } from '../shortString';
 
 /**
  * convert a Cairo ByteArray to a JS string
@@ -17,17 +21,13 @@ import { decodeShortString, encodeShortString, splitLongString } from '../shortS
  * ```
  */
 export function stringFromByteArray(myByteArray: ByteArray): string {
-  const pending_word: string =
-    BigInt(myByteArray.pending_word) === 0n
-      ? ''
-      : decodeShortString(toHex(myByteArray.pending_word));
-  return (
-    myByteArray.data.reduce<string>((cumuledString, encodedString: BigNumberish) => {
-      const add: string =
-        BigInt(encodedString) === 0n ? '' : decodeShortString(toHex(encodedString));
-      return cumuledString + add;
-    }, '') + pending_word
-  );
+  return new CairoByteArray(
+    // CairoBytes31 only takes a string, a Buffer or a Uint8Array, while a data word is a
+    // BigNumberish — so it may arrive as a bigint or a number, and has to be normalized.
+    myByteArray.data.map((word: BigNumberish) => new CairoBytes31(toHex(word))),
+    new CairoFelt252(myByteArray.pending_word),
+    new CairoUint32(myByteArray.pending_word_len)
+  ).decodeUtf8();
 }
 
 /**
@@ -46,18 +46,15 @@ export function stringFromByteArray(myByteArray: ByteArray): string {
  * }
  */
 export function byteArrayFromString(targetString: string): ByteArray {
-  const shortStrings: string[] = splitLongString(targetString);
-  const remainder: string = shortStrings[shortStrings.length - 1];
-  const shortStringsEncoded: BigNumberish[] = shortStrings.map(encodeShortString);
-
-  const [pendingWord, pendingWordLength] =
-    remainder === undefined || remainder.length === 31
-      ? ['0x00', 0]
-      : [shortStringsEncoded.pop()!, remainder.length];
+  // the text is cut into words of 31 *bytes*, so a multi-byte character may straddle two words
+  const byteArray = new CairoByteArray(utf8ToUint8Array(targetString));
+  const pendingWordLen = Number(byteArray.pending_word_len.toBigInt());
 
   return {
-    data: shortStringsEncoded.length === 0 ? [] : shortStringsEncoded,
-    pending_word: pendingWord,
-    pending_word_len: pendingWordLength,
+    // full width kept as in v10: a data word has no length field, unlike the pending word
+    data: byteArray.data.map((word: CairoBytes31) => word.toHexString('padded')),
+    // an absent pending word reads '0x00' as in v10, where the canonical felt form is '0x0'
+    pending_word: pendingWordLen === 0 ? '0x00' : byteArray.pending_word.toHexString(),
+    pending_word_len: pendingWordLen,
   };
 }

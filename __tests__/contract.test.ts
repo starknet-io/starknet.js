@@ -15,12 +15,12 @@ import {
   num,
   byteArray,
   RpcError,
-  ReceiptTx,
   RpcProvider,
   contractLoader,
 } from '../src';
 
 import { CONTRACTS, createTestProvider, getTestAccount, initializeMatcher } from './config';
+import { CairoBytes31 } from '../src/utils/cairoDataTypes/bytes31';
 
 describe('contract module', () => {
   let erc20Address: string;
@@ -510,8 +510,8 @@ describe('Complex interaction', () => {
 
   test('Assert helpers and non helpers data produce same result', async () => {
     const feltedData = CallData.compile({
-      name: cairo.felt('Token'),
-      symbol: cairo.felt('ERC20'),
+      name: CairoBytes31.fromText('Token').toHexString(),
+      symbol: CairoBytes31.fromText('ERC20').toHexString(),
       decimals: cairo.felt(18),
       initial_supply: cairo.uint256('1000000000'),
       recipient: cairo.felt(account.address),
@@ -991,22 +991,20 @@ describe('Complex interaction', () => {
 
       const res0 = myCallData.decodeParameters('core::felt252', ['474107654995566025798705']);
       expect(res0).toBe(474107654995566025798705n);
+      // the felts now have to fit the members they are read into — `y1` is a u64, and the value
+      // this used to carry was past its range. A response is built as its declared type, and
+      // building it is what checks the bounds
       const res1 = myCallData.decodeParameters('echo::StructY', [
-        '4741076549955660',
+        '1844674407370955',
         '3534634645645',
       ]);
-      expect(res1).toEqual({ y1: 4741076549955660n, y2: 3534634645645n });
+      expect(res1).toEqual({ y1: 1844674407370955n, y2: 3534634645645n });
 
       const res2 = myCallData.decodeParameters('core::integer::u256', ['47410765', '35346645']);
       expect(res2).toBe(12027840023314154934885372750905072692667575885n);
-      const res3 = myCallData.decodeParameters('echo::Struct32', [
-        '47410765',
-        '12345',
-        '1',
-        '2',
-        '3',
-      ]);
-      expect(res3).toEqual({ b: 47410765n, c: { '0': 12345n, '1': 1n, '2': 2n, '3': 3n } });
+      // same here: `c` is a (u16, u32, u64, u128), so its first felt has to fit a u16
+      const res3 = myCallData.decodeParameters('echo::Struct32', ['47410765', '45', '1', '2', '3']);
+      expect(res3).toEqual({ b: 47410765n, c: { '0': 45n, '1': 1n, '2': 2n, '3': 3n } });
 
       const res4 = myCallData.decodeParameters(
         '(core::felt252, core::felt252, core::felt252, core::felt252)',
@@ -1115,7 +1113,7 @@ describe('Complex interaction', () => {
 
       const result4 = await echoContract.invoke('iecho', args, { waitForTransaction: true });
       expect(result4.block_number).toBeDefined();
-      expect(result4).toBeInstanceOf(ReceiptTx);
+      expect(result4.statusReceipt).toBe('SUCCEEDED');
       expect(result4.isSuccess()).toBe(true);
 
       const result5 = await echoContract.withOptions({ waitForTransaction: true }).iecho(calldata);
@@ -1132,9 +1130,9 @@ describe('Complex interaction', () => {
             formatResponse,
           })
           .echo(
-            shortString.encodeShortString(request.t1),
+            CairoBytes31.fromText(request.t1).toHexString(),
             request.n1,
-            request.tl2.map(shortString.encodeShortString),
+            request.tl2.map((text: string) => CairoBytes31.fromText(text).toHexString()),
             request.k1,
             request.k2,
             request.u1,
@@ -1166,7 +1164,7 @@ describe('Complex interaction', () => {
           .iecho(
             request.t1,
             request.n1,
-            request.tl2.map(shortString.encodeShortString),
+            request.tl2.map((text: string) => CairoBytes31.fromText(text).toHexString()),
             request.k1,
             request.k2,
             request.u1,
@@ -1247,7 +1245,7 @@ describe('Complex interaction', () => {
     });
 
     test('estimate fee transfer', async () => {
-      const gas = await erc20Contract.estimateFee.transfer(stark.randomAddress(), cairo.uint256(1));
+      const gas = await erc20Contract.estimateFee.transfer(stark.randomFelt(), cairo.uint256(1));
       expect(gas).toMatchSchemaRef('EstimateFeeResponseOverhead');
     });
   });

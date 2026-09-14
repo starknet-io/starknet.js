@@ -6,7 +6,7 @@ import { CallData } from './calldata';
 import { toOutsideCallV2 } from './outsideExecution';
 import { getSelectorFromName } from './hash';
 import { toBigInt } from './num';
-import { encodeShortString } from './shortString';
+import { CairoBytes31 } from './cairoDataTypes/bytes31';
 import { uint256ToBN } from './uint256';
 import type {
   OutsideCallV1,
@@ -184,7 +184,7 @@ const domainFieldToFelt = (value: string | number): bigint => {
   try {
     return toBigInt(value);
   } catch {
-    return toBigInt(encodeShortString(String(value)));
+    return CairoBytes31.fromText(String(value)).toBigInt();
   }
 };
 

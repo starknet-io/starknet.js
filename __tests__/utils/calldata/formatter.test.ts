@@ -3,10 +3,18 @@ import { toBigInt } from '../../../src/utils/num';
 
 describe('formatter', () => {
   test('should format one level depth object', () => {
-    const data = { value: toBigInt(1000), name: toBigInt(1) };
+    const data = { value: toBigInt(1000), name: toBigInt(9) };
     const type = { value: 'number', name: 'string' };
     const formatted = formatter(data, type);
-    expect(formatted).toEqual({ value: 1000, name: '1' });
+    expect(formatted).toEqual({ value: 1000, name: '\t' });
+  });
+
+  test('should format a string whose leading byte is below 0x10', () => {
+    // a node returns a felt in its shortest form, so '\tABC' arrives as 0x9414243, not 0x09414243
+    const data = { name: toBigInt('0x9414243') };
+    const type = { name: 'string' };
+    const formatted = formatter(data, type);
+    expect(formatted).toEqual({ name: '\tABC' });
   });
 
   test('should format nested object', () => {
@@ -17,10 +25,10 @@ describe('formatter', () => {
   });
 
   test('should format object that has arrays in it', () => {
-    const data = { items: [toBigInt(1), toBigInt(2), toBigInt(3)], value: toBigInt(1) };
+    const data = { items: [toBigInt(1), toBigInt(2), toBigInt(3)], value: toBigInt(9) };
     const type = { items: ['number'], value: 'string' };
     const formatted = formatter(data, type);
-    expect(formatted).toEqual({ items: [1, 2, 3], value: '1' });
+    expect(formatted).toEqual({ items: [1, 2, 3], value: '\t' });
   });
 
   test('should throw an error if at least one of the value is not Big Int', () => {

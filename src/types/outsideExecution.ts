@@ -2,7 +2,7 @@ import { ValuesType } from './helpers/valuesType';
 import { BigNumberish, RawArgs, type Signature } from './lib';
 
 export interface OutsideExecutionOptions {
-  /** authorized executer of the transaction(s):  Hex address or "ANY_CALLER" or shortString.encodeShortString(constants.OutsideExecutionCallerAny) */
+  /** authorized executer of the transaction(s):  Hex address or "ANY_CALLER" or constants.OutsideExecutionCallerAny */
   caller: string;
   /** Unix timestamp of the beginning of the timeframe */
   execute_after: BigNumberish;

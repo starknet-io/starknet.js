@@ -30,5 +30,8 @@ export default async (): Promise<Config> => {
     transform: {
       '^.+\\.(t|j)sx?$': '@swc/jest',
     },
+    // @noble/* and @scure/* are ESM-only since v2; they must be transpiled by @swc/jest
+    // instead of being ignored like the rest of node_modules.
+    transformIgnorePatterns: ['node_modules/(?!(@noble|@scure)/)'],
   };
 };

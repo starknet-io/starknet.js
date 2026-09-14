@@ -6,7 +6,7 @@ describe('fastExecute Plugin', () => {
   let rpcProvider: RpcProvider;
 
   beforeEach(async () => {
-    rpcProvider = getTestProvider(false);
+    rpcProvider = getTestProvider();
   });
 
   describe('fastWaitForTransaction()', () => {
@@ -99,7 +99,7 @@ describe('fastExecute Plugin', () => {
     });
 
     test('fast consecutive txs', async () => {
-      const testProvider = getTestProvider(false, {
+      const testProvider = getTestProvider({
         blockIdentifier: BlockTag.PRE_CONFIRMED,
       });
       const testAccount = getTestAccount(testProvider);
@@ -113,7 +113,7 @@ describe('fastExecute Plugin', () => {
       expect(tx1.txResult.transaction_hash).toMatch(/^0x/);
       const tx2 = await (testAccount as any).fastExecute(myCall);
       // wait for the transaction so the next tests have the right nonce
-      const provider = getTestProvider(false);
+      const provider = getTestProvider();
       await provider.waitForTransaction(tx2.txResult.transaction_hash);
       expect(tx2.isReady).toBe(true);
       expect(tx2.txResult.transaction_hash).toMatch(/^0x/);

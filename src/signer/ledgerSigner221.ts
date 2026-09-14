@@ -27,7 +27,7 @@ import { intDAM } from '../utils/stark';
 import { addHexPrefix, buf2hex, concatenateArrayBuffer, removeHexPrefix } from '../utils/encode';
 import { hexToBytes, stringToSha256ToArrayBuff4, toBigInt, toHex } from '../utils/num';
 import { starkCurve } from '../utils/ec';
-import { EDAMode, EDataAvailabilityMode, ETransactionVersion3 } from '../types/api';
+import { EDAMode, EDataAvailabilityMode } from '../types/api';
 import { addAddressPadding } from '../utils/address';
 import {
   encodeResourceBoundsL1,
@@ -77,9 +77,9 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
   }
 
   /**
-   * Sign in a Ledger a V1 or a V3 transaction. The details are displayed on the Ledger screen.
+   * Sign in a Ledger a V3 transaction. The details are displayed on the Ledger screen.
    * @param {Call[]} transactions An array of `Call` transactions (generated for example by `myContract.populate()`).
-   * @param {InvocationsSignerDetails} transactionsDetail An object that includes all the necessary inputs to hash the transaction. Can be `V2InvocationsSignerDetails` or `V3InvocationsSignerDetails` type.
+   * @param {InvocationsSignerDetails} transactionsDetail An object that includes all the necessary inputs to hash the transaction.
    * @returns {Signature} The signed transaction.
    * @example
    * ```typescript
@@ -116,29 +116,25 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
     transactionsDetail: InvocationsSignerDetails
   ): Promise<Signature> {
     const compiledCalldata = getExecuteCalldata(transactions, transactionsDetail.cairoVersion);
-    if (Object.values(ETransactionVersion3).includes(transactionsDetail.version as any)) {
-      const det = transactionsDetail as V3InvocationsSignerDetails;
-      const msgHash = calculateInvokeTransactionHash({
-        ...det,
-        senderAddress: det.walletAddress,
-        compiledCalldata,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-      const ledgerResponse = await this.signTxV3(det, transactions);
-      assert(
-        toBigInt(msgHash) === ledgerResponse.hash,
-        'The V3 transaction hash calculated by Starknet.js is different from the one calculated by the Ledger.'
-      ); // probably non compatibility with Cairo 0
-      return ledgerResponse.signature;
-    }
-    throw Error('unsupported signTransaction version');
+    const msgHash = calculateInvokeTransactionHash({
+      ...transactionsDetail,
+      senderAddress: transactionsDetail.walletAddress,
+      compiledCalldata,
+      version: transactionsDetail.version,
+      nonceDataAvailabilityMode: intDAM(transactionsDetail.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(transactionsDetail.feeDataAvailabilityMode),
+    });
+    const ledgerResponse = await this.signTxV3(transactionsDetail, transactions);
+    assert(
+      toBigInt(msgHash) === ledgerResponse.hash,
+      'The V3 transaction hash calculated by Starknet.js is different from the one calculated by the Ledger.'
+    ); // probably non compatibility with Cairo 0
+    return ledgerResponse.signature;
   }
 
   /**
    * Sign in a Ledger the deployment of a new account. The details are displayed on the Ledger screen.
-   * @param {DeployAccountSignerDetails} details An object that includes all necessary data to calculate the Hash. It can be `V2DeployAccountSignerDetails` or `V3DeployAccountSignerDetails` types.
+   * @param {DeployAccountSignerDetails} details An object that includes all necessary data to calculate the Hash.
    * @returns {Signature} The deploy account signature.
    * @example
    * ```typescript
@@ -152,26 +148,20 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
     details: DeployAccountSignerDetails
   ): Promise<Signature> {
     const compiledConstructorCalldata = CallData.compile(details.constructorCalldata);
-    let msgHash;
-
-    if (Object.values(ETransactionVersion3).includes(details.version as any)) {
-      const det = details as V3DeployAccountSignerDetails;
-      msgHash = calculateDeployAccountTransactionHash({
-        ...det,
-        salt: det.addressSalt,
-        compiledConstructorCalldata,
-        version: det.version,
-        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-      });
-      const ledgerResponse = await this.signDeployAccountV3(det);
-      assert(
-        toBigInt(msgHash) === ledgerResponse.hash,
-        'The transaction hash calculated by Starknet.js is different from the one calculated by the Ledger.'
-      ); // probably non compatibility with Cairo 0
-      return ledgerResponse.signature;
-    }
-    throw Error('unsupported signDeployAccountTransaction version');
+    const msgHash = calculateDeployAccountTransactionHash({
+      ...details,
+      salt: details.addressSalt,
+      compiledConstructorCalldata,
+      version: details.version,
+      nonceDataAvailabilityMode: intDAM(details.nonceDataAvailabilityMode),
+      feeDataAvailabilityMode: intDAM(details.feeDataAvailabilityMode),
+    });
+    const ledgerResponse = await this.signDeployAccountV3(details);
+    assert(
+      toBigInt(msgHash) === ledgerResponse.hash,
+      'The transaction hash calculated by Starknet.js is different from the one calculated by the Ledger.'
+    ); // probably non compatibility with Cairo 0
+    return ledgerResponse.signature;
   }
 
   /**
@@ -350,7 +340,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
    *  ],
    *  contractAddress: '0x4ca062add1cf12a107be1107af17981cf6e544a24d987693230ea481d3d5e34',
    *  addressSalt: '0x07e52f68e3160e1ef698211cdf6d3792368fe347e7e2d4a8ace14d9b248f39c5',
-   *  chainId: '0x534e5f5345504f4c4941', maxFee: 0,
+   *  chainId: '0x534e5f5345504f4c4941',
    *  version: '0x3', nonce: 0n
    *}
    * const res = await myLedgerSigner.signDeployAccountV3(deployData);

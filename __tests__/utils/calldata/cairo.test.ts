@@ -332,8 +332,20 @@ describe('tuple', () => {
 
 describe('felt', () => {
   test('should create Cairo type felts', () => {
-    const felts = [felt('test'), felt(256n), felt(1234)];
-    expect(felts).toEqual(['1952805748', '256', '1234']);
+    const felts = [felt('0x101'), felt('256'), felt(256n), felt(1234)];
+    expect(felts).toEqual(['257', '256', '256', '1234']);
+  });
+
+  test('should reject text, and point at the way to encode it', () => {
+    expect(() => felt('test')).toThrow('CairoBytes31.fromText');
+  });
+
+  test('should reject a boolean, which is not a BigNumberish', () => {
+    expect(() => felt(true as any)).toThrow();
+  });
+
+  test('should reject a non-integer number', () => {
+    expect(() => felt(3.14)).toThrow();
   });
 });
 

@@ -15,6 +15,20 @@ beforeAll(() => {
   expect.extend(customMatchers);
 });
 
+// Releases the file's WebSocket. An open socket is a live libuv handle, and nothing else can reach
+// it once the test file's module registry is gone, so without this a `node-ws` run never exits.
+//
+// The import is deferred, and skipped entirely off the WebSocket categories. Importing the test
+// factories here would pull the whole `src` barrel into setup — before a test file's `jest.mock`
+// calls are registered — so the real modules would already be cached and every mock in that file
+// would silently target a different instance. `defaultPaymaster.test.ts` mocks
+// `src/utils/paymaster`, and that is exactly how it broke.
+afterAll(async () => {
+  if (process.env.TEST_TRANSPORT !== 'ws') return;
+  const { closeTestTransports } = await import('./helpers/testInstances');
+  await closeTestTransports();
+});
+
 const util = require('util');
 
 jest.setTimeout(5 * 60 * 1000);

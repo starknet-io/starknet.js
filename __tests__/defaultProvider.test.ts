@@ -4,8 +4,8 @@ import {
   BlockNumber,
   CallData,
   LibraryError,
-  Provider,
   ProviderInterface,
+  RpcProvider,
   stark,
   num,
   type Calldata,
@@ -32,13 +32,13 @@ describe('defaultProvider', () => {
   let erc20Constructor: Calldata;
   let erc20ConstructorParams: RawArgs;
   const erc20CallData = new CallData(CONTRACTS.Erc20Oz100.sierra.abi);
-  const wallet = stark.randomAddress();
+  const wallet = stark.randomFelt();
   initializeMatcher(expect);
 
   beforeAll(async () => {
-    testProvider = new Provider(await createTestProvider());
+    testProvider = await createTestProvider();
     account = getTestAccount(testProvider);
-    expect(testProvider).toBeInstanceOf(Provider);
+    expect(testProvider).toBeInstanceOf(RpcProvider);
 
     erc20ConstructorParams = {
       name: 'Token',
