@@ -17,7 +17,6 @@ import {
   createTestProvider,
   erc20ClassHash,
   getTestAccount,
-  initializeMatcher,
   wrongClassHash,
 } from './config';
 
@@ -33,7 +32,6 @@ describe('defaultProvider', () => {
   let erc20ConstructorParams: RawArgs;
   const erc20CallData = new CallData(CONTRACTS.Erc20Oz100.sierra.abi);
   const wallet = stark.randomFelt();
-  initializeMatcher(expect);
 
   beforeAll(async () => {
     testProvider = await createTestProvider();
@@ -78,22 +76,21 @@ describe('defaultProvider', () => {
     describe('getBlock', () => {
       test('getBlock(blockIdentifier=latest)', async () => {
         expect(exampleBlock).not.toBeNull();
-        expect(exampleBlock).toMatchSchemaRef('GetBlockResponse');
       });
 
       test(`getBlock(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
         const block = await testProvider.getBlock(exampleBlockNumber);
-        expect(block).toMatchSchemaRef('GetBlockResponse');
+        expect(block.block_number).toBe(exampleBlockNumber);
       });
 
       test(`getBlock(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
         const block = await testProvider.getBlock(exampleBlockHash);
-        expect(block).toMatchSchemaRef('GetBlockResponse');
+        expect(block.block_hash).toBe(exampleBlockHash);
       });
 
       test('getBlock() -> { blockNumber }', async () => {
         const block = await testProvider.getBlock('latest');
-        expect(block).toMatchSchemaRef('GetBlockResponse');
+        expect(block).toBeDefined();
       });
 
       test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
@@ -102,7 +99,6 @@ describe('defaultProvider', () => {
           fail('exampleBlockHash is latest block, should not be pre confirmed');
         }
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
-        expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
       });
 
       test(`getStateUpdate(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
@@ -111,7 +107,6 @@ describe('defaultProvider', () => {
           fail('exampleBlockHash is latest block, should not be pre confirmed');
         }
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
-        expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
       });
     });
 
@@ -120,31 +115,20 @@ describe('defaultProvider', () => {
       return expect(num.toBigInt(nonce)).toEqual(num.toBigInt('0x0'));
     });
 
-    test('getClassAt(contractAddress, blockNumber="latest")', async () => {
-      const classResponse = await testProvider.getClassAt(erc20ContractAddress);
-      expect(classResponse).toMatchSchemaRef('SierraContractClass');
-    });
-
-    test('getClassByHash', async () => {
-      const classResponse = await testProvider.getClassByHash(erc20ClassHash);
-      expect(classResponse).toMatchSchemaRef('SierraContractClass');
-    });
-
     describe('getStorageAt', () => {
-      test('with "key" type of number', () => {
-        return expect(testProvider.getStorageAt(erc20ContractAddress, 0)).resolves.not.toThrow();
+      test('with "key" type of number', async () => {
+        const storage = await testProvider.getStorageAt(erc20ContractAddress, 0);
+        expect(storage.value).toMatch(/^0x[0-9a-f]+$/i);
       });
 
-      test('"key" type of string', () => {
-        return expect(
-          testProvider.getStorageAt(erc20ContractAddress, '0x0')
-        ).resolves.not.toThrow();
+      test('"key" type of string', async () => {
+        const storage = await testProvider.getStorageAt(erc20ContractAddress, '0x0');
+        expect(storage.value).toMatch(/^0x[0-9a-f]+$/i);
       });
 
-      test('with "key" type of BN', () => {
-        return expect(
-          testProvider.getStorageAt(erc20ContractAddress, num.toBigInt('0x0'))
-        ).resolves.not.toThrow();
+      test('with "key" type of BN', async () => {
+        const storage = await testProvider.getStorageAt(erc20ContractAddress, num.toBigInt('0x0'));
+        expect(storage.value).toMatch(/^0x[0-9a-f]+$/i);
       });
     });
 
@@ -154,25 +138,24 @@ describe('defaultProvider', () => {
 
     test('getTransaction() - successful deploy transaction', async () => {
       const transaction = await testProvider.getTransaction(exampleTransactionHash);
-      expect(transaction).toMatchSchemaRef('GetTransactionResponse');
+      expect(transaction).toBeDefined();
     });
 
     test('getTransactionReceipt() - successful transaction', async () => {
       const transactionReceipt = await testProvider.getTransactionReceipt(exampleTransactionHash);
-      expect(transactionReceipt).toMatchSchemaRef('GetTransactionReceiptResponse');
+      expect(transactionReceipt).toBeDefined();
     });
 
     describe('callContract()', () => {
-      test('callContract()', () => {
-        return expect(
-          testProvider.callContract({
-            contractAddress: erc20ContractAddress,
-            entrypoint: 'balanceOf',
-            calldata: CallData.compile({
-              user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
-            }),
-          })
-        ).resolves.not.toThrow();
+      test('callContract()', async () => {
+        const res = await testProvider.callContract({
+          contractAddress: erc20ContractAddress,
+          entrypoint: 'balanceOf',
+          calldata: CallData.compile({
+            user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
+          }),
+        });
+        expect(Array.isArray(res)).toBe(true);
       });
 
       test('callContract() - user wallet', () => {

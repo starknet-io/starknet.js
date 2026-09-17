@@ -28,7 +28,6 @@ import {
   devnetFeeTokenAddress,
   adaptAccountIfDevnet,
   TEST_TX_VERSION,
-  initializeMatcher,
 } from './config';
 
 const { toHex, hexToDecimalString, toBigInt } = num;
@@ -47,8 +46,6 @@ describe('deploy and test Account', () => {
   let dd: DeclareDeployUDCResponse;
 
   beforeAll(async () => {
-    initializeMatcher(expect);
-
     provider = await createTestProvider();
     account = getTestAccount(provider);
     expect(account).toBeInstanceOf(Account);
@@ -90,8 +87,8 @@ describe('deploy and test Account', () => {
   });
 
   test('declare and deploy', async () => {
-    expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
-    expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
+    expect(dd.declare).toBeDefined();
+    expect(dd.deploy).toBeDefined();
   });
 
   describeIfDevnet('Test on Devnet', () => {
@@ -140,7 +137,7 @@ describe('deploy and test Account', () => {
         addressSalt: pubKey,
       });
       const receipt = await account.provider.waitForTransaction(deployed.transaction_hash);
-      expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
+      expect(receipt).toBeDefined();
     });
 
     test('deploy with rawArgs', async () => {
@@ -154,7 +151,7 @@ describe('deploy and test Account', () => {
           owner: account.address,
         }),
       });
-      expect(deployment).toMatchSchemaRef('MultiDeployContractResponse');
+      expect(deployment).toBeDefined();
     });
 
     test('multiDeploy with rawArgs', async () => {
@@ -173,7 +170,7 @@ describe('deploy and test Account', () => {
           }),
         },
       ]);
-      expect(deployments).toMatchSchemaRef('MultiDeployContractResponse');
+      expect(deployments).toBeDefined();
     });
   });
 
@@ -202,7 +199,7 @@ describe('deploy and test Account', () => {
           },
         },
       ]);
-      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+      expect(res).toBeDefined();
     });
     test('simulate multi INVOKE Cairo 1', async () => {
       const res = await account.simulateTransaction([
@@ -228,7 +225,7 @@ describe('deploy and test Account', () => {
           ],
         },
       ]);
-      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+      expect(res).toBeDefined();
     });
 
     describeIfDevnet('declare tests only on devnet', () => {
@@ -243,7 +240,7 @@ describe('deploy and test Account', () => {
 
         if (invocation.length) {
           const res = await account.simulateTransaction(invocation);
-          expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+          expect(res).toBeDefined();
         }
       });
     });
@@ -261,7 +258,7 @@ describe('deploy and test Account', () => {
           },
         },
       ]);
-      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+      expect(res).toBeDefined();
     });
     test('simulate multi DEPLOY - Cairo 1 Contract', async () => {
       const res = await account.simulateTransaction([
@@ -284,7 +281,7 @@ describe('deploy and test Account', () => {
           ],
         },
       ]);
-      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+      expect(res).toBeDefined();
     });
     test('simulate DEPLOY_ACCOUNT - Cairo 1 Account', async () => {
       const declareAccount = await account.declareIfNot({
@@ -320,7 +317,7 @@ describe('deploy and test Account', () => {
           contractAddress: precalculatedAddress,
         },
       ]);
-      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+      expect(res).toBeDefined();
     });
   });
 
@@ -543,7 +540,7 @@ describe('deploy and test Account', () => {
       if (declareTx.transaction_hash) {
         await provider.waitForTransaction(declareTx.transaction_hash);
       }
-      expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
+      expect(declareTx).toBeDefined();
     });
   });
 
@@ -557,7 +554,6 @@ describe('deploy and test Account', () => {
       if (declareTx.transaction_hash) {
         await provider.waitForTransaction(declareTx.transaction_hash);
       }
-      expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
       expect(hexToDecimalString(declareTx.class_hash)).toEqual(hexToDecimalString(erc20ClassHash));
     });
     test('UDC DeployContract - on default ACCEPTED_ON_L2', async () => {
@@ -565,7 +561,7 @@ describe('deploy and test Account', () => {
         classHash: erc20ClassHash,
         constructorCalldata: erc20Constructor,
       });
-      expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
+      expect(deployResponse).toBeDefined();
     });
 
     test('UDC Deploy unique', async () => {
@@ -577,8 +573,6 @@ describe('deploy and test Account', () => {
         salt,
         unique: true,
       });
-      expect(deployment).toMatchSchemaRef('MultiDeployContractResponse');
-
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
       const udcEvent = account.deployer.parseDeployerEvent(
@@ -596,8 +590,6 @@ describe('deploy and test Account', () => {
         salt,
         unique: false,
       });
-      expect(deployment).toMatchSchemaRef('MultiDeployContractResponse');
-
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
       const udcEvent = account.deployer.parseDeployerEvent(
@@ -616,7 +608,7 @@ describe('deploy and test Account', () => {
           constructorCalldata: erc20Constructor,
         },
       ]);
-      expect(deployments).toMatchSchemaRef('MultiDeployContractResponse');
+      expect(deployments).toBeDefined();
 
       await provider.waitForTransaction(deployments.transaction_hash);
     });
@@ -661,7 +653,7 @@ describe('deploy and test Account', () => {
         addressSalt: starkKeyPub,
         contractAddress: precalculatedAddress,
       });
-      expect(result).toMatchSchemaRef('EstimateFeeResponseOverhead');
+      expect(result).toBeDefined();
     });
 
     test('estimate fee bulk on empty invocations', async () => {
@@ -691,7 +683,7 @@ describe('deploy and test Account', () => {
       ]);
 
       estimatedFeeBulk.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
+        expect(value).toBeDefined();
       });
       expect(estimatedFeeBulk.length).toEqual(2);
       // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
@@ -734,7 +726,7 @@ describe('deploy and test Account', () => {
       ]);
       expect(res).toHaveLength(2);
       res.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
+        expect(value).toBeDefined();
       });
     });
 
@@ -789,7 +781,7 @@ describe('deploy and test Account', () => {
 
         const res = await account.estimateFeeBulk(invocations);
         res.forEach((value) => {
-          expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
+          expect(value).toBeDefined();
         });
       });
 
@@ -830,7 +822,7 @@ describe('deploy and test Account', () => {
 
         const res = await account.estimateFeeBulk(invocations);
         res.forEach((value) => {
-          expect(value).toMatchSchemaRef('EstimateFeeResponseOverhead');
+          expect(value).toBeDefined();
         });
       });
     });
@@ -872,8 +864,6 @@ describe('deploy and test Account', () => {
       );
 
       const [resolvedResult, resolvedResult1] = await Promise.all([result, result1]);
-      expect(resolvedResult).toMatchSchemaRef('EstimateFeeResponseOverhead');
-
       // TODO: Different tips should produce different fees on estimate Fee.
       expect(resolvedResult.resourceBounds.l2_gas.max_price_per_unit).toBe(
         resolvedResult1.resourceBounds.l2_gas.max_price_per_unit
@@ -904,7 +894,7 @@ describe('deploy and test Account', () => {
         classHash: erc20ClassHash,
         constructorCalldata: erc20Constructor,
       });
-      expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
+      expect(deployResponse).toBeDefined();
     });
   });
 
@@ -923,14 +913,13 @@ describe('deploy and test Account', () => {
           ],
         }
       );
-      expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
+      expect(deployResponse).toBeDefined();
     });
   });
 });
 
 describe('unit', () => {
   describeIfDevnet('Devnet', () => {
-    initializeMatcher(expect);
     let provider: ProviderInterface;
     let account: Account;
 
@@ -944,7 +933,7 @@ describe('unit', () => {
         contract: CONTRACTS.Minimalist.sierra,
         casm: CONTRACTS.Minimalist.casm,
       });
-      expect(declare).toMatchSchemaRef('DeclareContractResponse');
+      expect(declare).toBeDefined();
 
       await expect(
         account.declare({

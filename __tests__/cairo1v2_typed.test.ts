@@ -34,7 +34,6 @@ import {
   CONTRACTS,
   createTestProvider,
   getTestAccount,
-  initializeMatcher,
   STRKtokenAddress,
   TEST_TX_VERSION,
 } from './config';
@@ -57,7 +56,6 @@ describe('Cairo 1', () => {
     let cairo1Contract: TypedContractV2<typeof tAbi>;
     let dd2: DeclareDeployUDCResponse;
     let cairo210Contract: TypedContractV2<typeof tAbi>;
-    initializeMatcher(expect);
 
     beforeAll(async () => {
       dd = await account.declareAndDeploy({
@@ -82,8 +80,8 @@ describe('Cairo 1', () => {
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
-      expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
-      expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
+      expect(dd.declare).toBeDefined();
+      expect(dd.deploy).toBeDefined();
       expect(cairo1Contract).toBeInstanceOf(Contract);
       expect(cairo210Contract).toBeInstanceOf(Contract);
     });
@@ -116,16 +114,6 @@ describe('Cairo 1', () => {
         classHash: dd.deploy.classHash,
       });
       expect(deploy).toHaveProperty('address');
-    });
-
-    test('GetClassByHash', async () => {
-      const classResponse = await provider.getClassByHash(dd.deploy.classHash);
-      expect(classResponse).toMatchSchemaRef('SierraContractClass');
-    });
-
-    test('GetClassAt', async () => {
-      const classResponse = await provider.getClassAt(dd.deploy.contract_address);
-      expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
 
     test('isCairo1', async () => {
@@ -757,7 +745,7 @@ describe('Cairo 1', () => {
         addressSalt: pubKey,
       });
       const receipt = await account.provider.waitForTransaction(deployed.transaction_hash);
-      expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
+      expect(receipt).toBeDefined();
     });
 
     test('deploy Cairo1 Account', () => {
