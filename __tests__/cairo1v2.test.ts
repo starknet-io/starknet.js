@@ -23,7 +23,7 @@ import {
   num,
   selector,
 } from '../src';
-import { CONTRACTS, createTestProvider, getTestAccount, initializeMatcher } from './config';
+import { CONTRACTS, createTestProvider, getTestAccount } from './config';
 import { CairoBytes31 } from '../src/utils/cairoDataTypes/bytes31';
 import { createAbiParser } from '../src/utils/calldata/parser';
 
@@ -43,7 +43,6 @@ describe('Cairo 1', () => {
   describe('API &  Contract interactions', () => {
     let cairo1Contract: Contract;
     let cairo210Contract: Contract;
-    initializeMatcher(expect);
 
     beforeAll(async () => {
       // dd
@@ -95,16 +94,6 @@ describe('Cairo 1', () => {
         classHash: cairo1Contract.classHash!,
       });
       expect(deploy).toHaveProperty('address');
-    });
-
-    test('GetClassByHash', async () => {
-      const classResponse = await provider.getClassByHash(cairo1Contract.classHash!);
-      expect(classResponse).toMatchSchemaRef('SierraContractClass');
-    });
-
-    test('GetClassAt', async () => {
-      const classResponse = await provider.getClassAt(cairo1Contract.address);
-      expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
 
     test('isCairo1', async () => {

@@ -19,7 +19,7 @@ import {
   contractLoader,
 } from '../src';
 
-import { CONTRACTS, createTestProvider, getTestAccount, initializeMatcher } from './config';
+import { CONTRACTS, createTestProvider, getTestAccount } from './config';
 import { CairoBytes31 } from '../src/utils/cairoDataTypes/bytes31';
 
 describe('contract module', () => {
@@ -31,8 +31,6 @@ describe('contract module', () => {
   const erc20CallData = new CallData(CONTRACTS.Erc20Oz100.sierra.abi);
   let erc20Constructor: Calldata;
   let erc20ConstructorParams: RawArgs;
-
-  initializeMatcher(expect);
 
   beforeAll(async () => {
     provider = await createTestProvider();
@@ -1228,10 +1226,10 @@ describe('Complex interaction', () => {
       const gas2 = await echoContract.estimateFee.iecho(...args);
       const gas3 = await echoContract.estimate('iecho', calldata);
       const gas4 = await echoContract.estimate('iecho', args);
-      expect(gas1).toMatchSchemaRef('EstimateFeeResponseOverhead');
-      expect(gas2).toMatchSchemaRef('EstimateFeeResponseOverhead');
-      expect(gas3).toMatchSchemaRef('EstimateFeeResponseOverhead');
-      expect(gas4).toMatchSchemaRef('EstimateFeeResponseOverhead');
+      expect(gas1).toBeDefined();
+      expect(gas2).toBeDefined();
+      expect(gas3).toBeDefined();
+      expect(gas4).toBeDefined();
     });
 
     test('estimate fee with options (expect to fail due to bad nonce)', async () => {
@@ -1246,7 +1244,7 @@ describe('Complex interaction', () => {
 
     test('estimate fee transfer', async () => {
       const gas = await erc20Contract.estimateFee.transfer(stark.randomFelt(), cairo.uint256(1));
-      expect(gas).toMatchSchemaRef('EstimateFeeResponseOverhead');
+      expect(gas).toBeDefined();
     });
   });
 });

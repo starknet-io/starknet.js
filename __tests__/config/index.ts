@@ -8,4 +8,3 @@ export * from './helpers/waitUntil';
 export * from './helpers/wsTestHelpers';
 export * from './helpers/mockTransport';
 export * from './helpers/mockWebSocket';
-export * from './schema';

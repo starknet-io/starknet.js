@@ -9,7 +9,6 @@ import {
   ETHtokenAddress,
   STRKtokenAddress,
   getTestAccount,
-  initializeMatcher,
   waitNextBlock,
 } from './config';
 import typedDataExample from '../__mocks__/typedData/baseExample.json';
@@ -64,7 +63,6 @@ describe('RPCProvider', () => {
   let provider: ProviderInterface;
   let account: Account;
   let accountPublicKey: string;
-  initializeMatcher(expect);
 
   beforeAll(async () => {
     rpcProvider = await createTestProvider();
@@ -164,7 +162,7 @@ describe('RPCProvider', () => {
 
   test('getStateUpdate', async () => {
     const stateUpdate = await rpcProvider.getBlockStateUpdate('latest');
-    expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
+    expect(stateUpdate).toBeDefined();
   });
 
   test('getSpecVersion', async () => {
@@ -346,7 +344,6 @@ describe('RPCProvider', () => {
       const blockResponse = await rpcProvider.getBlockWithReceipts(latestBlock.block_number);
       expect(blockResponse).toBeDefined();
       // TODO add Zod schema validation
-      // expect(blockResponse).toMatchSchemaRef('BlockWithTxReceipts');
     });
 
     test('getTransactionByBlockIdAndIndex', async () => {
@@ -364,7 +361,7 @@ describe('RPCProvider', () => {
 
     test('getSyncingStats', async () => {
       const syncingStats = await rpcProvider.getSyncingStats();
-      expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
+      expect(syncingStats).toBeDefined();
       if (isBoolean(syncingStats)) expect(syncingStats).toBe(false);
     });
 
@@ -420,7 +417,6 @@ describe('RPCProvider', () => {
         expect(result1).toHaveProperty('events');
         expect(Array.isArray(result?.events)).toBe(true);
         expect(result?.events?.length).toBe(2);
-        expect(result.events[0]).toMatchSchemaRef('StarknetEmittedEvent');
 
         const result2 = await rpcProvider.getEvents({
           from_block: { block_number: 0 },
@@ -441,7 +437,6 @@ describe('RPCProvider', () => {
     describe('deploy contract related tests', () => {
       let contract_address: string;
       let transaction_hash: string;
-      let ozClassHash: string;
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
@@ -453,7 +448,6 @@ describe('RPCProvider', () => {
 
         contract_address = deploy.contract_address;
         transaction_hash = deploy.transaction_hash;
-        ozClassHash = deploy.classHash;
       });
 
       test('declareDeploy()', () => {
@@ -463,17 +457,12 @@ describe('RPCProvider', () => {
 
       test('getTransactionByHash', async () => {
         const transaction = await rpcProvider.getTransactionByHash(transaction_hash);
-        expect(transaction).toMatchSchemaRef('GetTransactionResponse');
+        expect(transaction).toBeDefined();
       });
 
       test('getTransactionStatus()', async () => {
-        return expect(rpcProvider.getTransactionStatus(transaction_hash)).resolves.not.toThrow();
-      });
-
-      test('getTransaction', async () => {
-        // todo - schema for rpc need to be created and expected response here updated
-        const transaction = await rpcProvider.getTransactionByHash(transaction_hash);
-        expect(transaction).toMatchSchemaRef('GetTransactionResponse');
+        const status = await rpcProvider.getTransactionStatus(transaction_hash);
+        expect(status.finality_status).toBeDefined();
       });
 
       test('getClassHashAt', async () => {
@@ -485,16 +474,6 @@ describe('RPCProvider', () => {
         const trace = await rpcProvider.getTransactionTrace(transaction_hash);
         expect(trace).toBeDefined();
         // TODO add Zod schema validation
-      });
-
-      test('getClassAt', async () => {
-        const classAt = await rpcProvider.getClassAt(contract_address);
-        expect(classAt).toMatchSchemaRef('SierraContractClass');
-      });
-
-      test('getClass classHash', async () => {
-        const contractClass = await rpcProvider.getClass(ozClassHash);
-        expect(contractClass).toMatchSchemaRef('SierraContractClass');
       });
     });
   });

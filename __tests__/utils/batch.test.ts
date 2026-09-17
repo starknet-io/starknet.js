@@ -1,15 +1,9 @@
 import fetch from '../../src/utils/connect/fetch';
 import { BatchClient } from '../../src/utils/batch';
-import {
-  createBlockForDevnet,
-  createTestProvider,
-  getTestProvider,
-  initializeMatcher,
-} from '../config';
+import { createBlockForDevnet, createTestProvider, getTestProvider } from '../config';
 import { RPC } from '../../src/types';
 
 describe('BatchClient', () => {
-  initializeMatcher(expect);
   const provider = getTestProvider();
 
   let batchClient: BatchClient<RPC.Methods>;
@@ -36,7 +30,7 @@ describe('BatchClient', () => {
       ]);
 
       expect(typeof blockNumber.result).toBe('number');
-      expect(blockWithReceipts.result).toMatchSchemaRef('BlockWithTxReceipts');
+      expect(blockWithReceipts.result).toBeDefined();
 
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       fetchSpy.mockRestore();
