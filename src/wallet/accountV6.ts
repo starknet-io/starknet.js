@@ -64,16 +64,26 @@ export class WalletAccountV6 extends WalletAccountV5 {
 
   /**
    * Get the private balances held by the user inside the STRK20 privacy pool.
+   *
+   * Reading a shielded balance requires the user approval, and this approval is time
+   * limited : `validUntil` requests when it expires. When it is omitted, the wallet applies
+   * its own default window.
    * @param {Address[]} tokens - The tokens to get the private balance of. An empty array returns every shielded token.
+   * @param {number} [validUntil] - Requested expiry of the balance read authorization, as a Unix timestamp in seconds. Omit it to let the wallet apply its default window.
    * @returns {Promise<STRK20_BALANCE_ENTRY[]>} One entry per token.
    * @example
    * ```typescript
    * const balances = await myWalletAccount.strk20Balances([strkAddress]);
-   * // balances = [{ token: '0x4718...', amount: '0x2386f26fc10000' }]
+   * // balances = [{ token: '0x4718...', balance: '0x2386f26fc10000' }]
+   *
+   * // Asking for a 5 minutes authorization window :
+   * const expiry = Math.floor(Date.now() / 1000) + 300;
+   * const fresh = await myWalletAccount.strk20Balances([strkAddress], expiry);
+   * // fresh = [{ token: '0x4718...', balance: '0x2386f26fc10000' }]
    * ```
    */
-  public strk20Balances(tokens: Address[]): Promise<STRK20_BALANCE_ENTRY[]> {
-    return strk20Balances(this.v6Provider, tokens);
+  public strk20Balances(tokens: Address[], validUntil?: number): Promise<STRK20_BALANCE_ENTRY[]> {
+    return strk20Balances(this.v6Provider, tokens, validUntil);
   }
 
   /**
