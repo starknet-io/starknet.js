@@ -1,3 +1,9 @@
+## [11.0.1](https://github.com/starknet-io/starknet.js/compare/v11.0.0...v11.0.1) (2026-09-18)
+
+### Bug Fixes
+
+- **wallet:** missing RPC 0.10.4 valid_until option on strk20Balances ([c96a31a](https://github.com/starknet-io/starknet.js/commit/c96a31abb05b1c4c5b90ba2f8e320307731a3861))
+
 # [11.0.0](https://github.com/starknet-io/starknet.js/compare/v10.8.0...v11.0.0) (2026-09-14)
 
 ### Bug Fixes
