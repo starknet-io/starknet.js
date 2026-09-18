@@ -146,13 +146,30 @@ export function subscribeWalletEvent(
   return walletWSF.features['standard:events'].on('change', callback);
 }
 
+/**
+ * Get the private balances held by the user inside the STRK20 privacy pool.
+ *
+ * Reading a shielded balance requires the user approval, and this approval is time limited :
+ * `valid_until` requests when it expires. When it is omitted, the wallet applies its own
+ * default window.
+ * @param {WalletWithStarknetFeaturesV6} walletWSF - The get-starknet V6 wallet object to use.
+ * @param {Address[]} tokens - The tokens to get the private balance of. An empty array returns every shielded token.
+ * @param {number} [valid_until] - Requested expiry of the balance read authorization, as a Unix timestamp in seconds. Omit it to let the wallet apply its default window.
+ * @returns {Promise<STRK20_BALANCE_ENTRY[]>} One entry per token.
+ * @example
+ * ```typescript
+ * const balances = await strk20Balances(walletWSF, [strkAddress]);
+ * // balances = [{ token: '0x4718...', balance: '0x2386f26fc10000' }]
+ * ```
+ */
 export function strk20Balances(
   walletWSF: WalletWithStarknetFeaturesV6,
-  tokens: Address[]
+  tokens: Address[],
+  valid_until?: number
 ): Promise<STRK20_BALANCE_ENTRY[]> {
   return walletWSF.features['starknet:walletApi'].request({
     type: 'wallet_strk20Balances',
-    params: { tokens },
+    params: { tokens, valid_until },
   });
 }
 
