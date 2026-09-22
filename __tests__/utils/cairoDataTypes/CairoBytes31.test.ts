@@ -24,6 +24,13 @@ describe('CairoBytes31 class Unit Tests', () => {
       expect(bytes31.data).toEqual(uint8ArrayToSize([]));
     });
 
+    test("should read '0x' as no byte at all, the same as the empty string", () => {
+      // a number type refuses '0x', but here it is empty bytes, as an EVM tool writes them
+      const bytes31 = new CairoBytes31('0x');
+      expect(bytes31.data).toEqual(new CairoBytes31('').data);
+      expect([...bytes31.toApiRequest()]).toEqual(['0']);
+    });
+
     test('should handle Unicode strings', () => {
       const bytes31 = new CairoBytes31('☥');
       // '☥' in UTF-8: [226, 152, 165]

@@ -3,6 +3,7 @@ import { RANGE_CONTRACT_ADDRESS } from '../../global/constants';
 import { addHexPrefix } from '../encode';
 import { getNext } from '../num';
 import { isText } from '../shortString';
+import { isBigInt, isNumber } from '../typed';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { CairoFelt252 } from './felt';
@@ -49,7 +50,7 @@ export class CairoContractAddress {
   /**
    * Build from a number or a numeric string, refusing text and anything wider than 252 bits.
    * @param {BigNumberish | boolean} data the address to carry, within [0, 2^252 - 1]
-   * @throws {Error} when the value is text, is not a felt252 input, or is out of range
+   * @throws {Error} when the value is text, a decimal number, not a felt252 input, or out of range
    * @example
    * ```typescript
    * const result = new CairoContractAddress('0x1234').toApiRequest();
@@ -108,11 +109,12 @@ export class CairoContractAddress {
   /**
    * Throw unless the value can be carried by a ContractAddress.
    *
-   * Text is refused first, then the value is read as a felt252 — which is what refuses a null, an
-   * object or an unsupported type — and finally checked against the bound an address has, which
-   * is narrower than the field.
+   * Text is refused first, then a number with a decimal part. A number or a bigint is read as it
+   * is, so that a negative one reaches the range check. Anything else is read as a felt252 — which
+   * is what refuses a null, an object or an unsupported type. The value is finally checked against
+   * the bound an address has, which is narrower than the field.
    * @param {BigNumberish | boolean} data the value to check
-   * @throws {Error} when the value is text, is not a felt252 input, or is out of range
+   * @throws {Error} when the value is text, a decimal number, not a felt252 input, or out of range
    * @example
    * ```typescript
    * CairoContractAddress.validate('0x1234'); // passes
@@ -120,12 +122,21 @@ export class CairoContractAddress {
    * // throws Error("Invalid input: a ContractAddress cannot be built from text")
    * CairoContractAddress.validate(2n ** 251n);
    * // throws Error("Value is out of ContractAddress range [0, 3618502788666131106986593281521497120414687020801267626233049500247285300991]")
+   * CairoContractAddress.validate(-1);
+   * // throws Error("Value is out of ContractAddress range [0, 3618502788666131106986593281521497120414687020801267626233049500247285300991]")
    * ```
    */
   static validate(data: BigNumberish | boolean | unknown): void {
     assert(!isText(data), 'Invalid input: a ContractAddress cannot be built from text');
+    assert(
+      !isNumber(data) || Number.isInteger(data),
+      'Invalid input: decimal numbers are not supported, only integers'
+    );
 
-    const value = new CairoFelt252(data).toBigInt();
+    // a number is read here rather than by CairoFelt252, which would refuse a negative one before
+    // the range below is checked, and in the words of its encoding rather than of an address
+    const value =
+      isNumber(data) || isBigInt(data) ? BigInt(data) : new CairoFelt252(data).toBigInt();
     assert(
       value >= RANGE_CONTRACT_ADDRESS.min && value <= RANGE_CONTRACT_ADDRESS.max,
       `Value is out of ContractAddress range [${RANGE_CONTRACT_ADDRESS.min}, ${RANGE_CONTRACT_ADDRESS.max}]`

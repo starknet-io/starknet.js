@@ -86,6 +86,24 @@ describe('CairoInt32 class Unit Tests', () => {
       expect(i32FromHexString.data).toBe(2147483647n);
     });
 
+    test('should read a minus sign in front of a number as a sign, not as text', () => {
+      expect(new CairoInt32('-5').toBigInt()).toBe(-5n);
+      expect(new CairoInt32('-0x5').toBigInt()).toBe(-5n);
+      expect(new CairoInt32('-2147483648').toBigInt()).toBe(-2147483648n);
+      expect(() => new CairoInt32('-2147483649')).toThrow(
+        'Value is out of i32 range [-2147483648, 2147483647]'
+      );
+      // in front of anything else, the sign is text like the rest of the string
+      expect(new CairoInt32('-').toBigInt()).toBe(45n);
+      expect(new CairoInt32('-a').toBigInt()).toBe(11617n); // 0x2d61, the UTF-8 bytes of "-a"
+    });
+
+    test("should reject '0x', which holds no digit, and read '-0x' as text", () => {
+      expect(() => new CairoInt32('0x')).toThrow("Invalid input: '0x' holds no hexadecimal digit");
+      // '0x' is no number, so a sign in front of it is text
+      expect(new CairoInt32('-0x').toBigInt()).toBe(2961528n); // 0x2d3078, the UTF-8 bytes of "-0x"
+    });
+
     test('should reject decimal numbers', () => {
       expect(() => new CairoInt32(42.5)).toThrow(
         'Invalid input: decimal numbers are not supported, only integers'

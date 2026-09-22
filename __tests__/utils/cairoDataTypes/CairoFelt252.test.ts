@@ -339,6 +339,16 @@ describe('CairoFelt252 class Unit Tests', () => {
       );
     });
 
+    test("should reject '0x', which holds no digit, rather than read it as 0", () => {
+      expect(() => CairoFelt252.validate('0x')).toThrow(
+        "Invalid input: '0x' holds no hexadecimal digit"
+      );
+      expect(() => new CairoFelt252('0X')).toThrow(
+        "Invalid input: '0x' holds no hexadecimal digit"
+      );
+      expect(new CairoFelt252('0x0').toBigInt()).toBe(0n);
+    });
+
     test('should reject unsupported data types with specific error messages', () => {
       expect(() => CairoFelt252.validate(Symbol('test') as any)).toThrow(
         "Unsupported data type 'symbol' for felt252. Expected string, number, bigint, or boolean"

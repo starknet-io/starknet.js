@@ -51,6 +51,38 @@ describe('CairoUint256 class test', () => {
     }).toThrow("Unsupported data type 'function' for u256");
   });
 
+  test('constructor 1 should throw on a decimal number', () => {
+    expect(() => {
+      new CairoUint256(1.5);
+    }).toThrow('Invalid input: decimal numbers are not supported, only integers');
+  });
+
+  test("constructor 1 should throw on text, and on '0x' which holds no digit", () => {
+    expect(() => {
+      new CairoUint256('abc');
+    }).toThrow('Invalid input: a u256 cannot be built from text');
+    // a minus sign makes a number of a string for the signed integers only
+    expect(() => {
+      new CairoUint256('-1');
+    }).toThrow('Invalid input: a u256 cannot be built from text');
+    expect(() => {
+      new CairoUint256('0x');
+    }).toThrow("Invalid input: '0x' holds no hexadecimal digit");
+  });
+
+  test('constructor 1 should throw on an object that is not a Uint256', () => {
+    // BigInt would read a Date, or any object with a numeric valueOf, but a u256 is not built so
+    expect(() => {
+      new CairoUint256({} as any);
+    }).toThrow("Unsupported data type 'object' for u256");
+    expect(() => {
+      new CairoUint256({ low: 1 } as any);
+    }).toThrow("Unsupported data type 'object' for u256");
+    expect(() => {
+      new CairoUint256(new Date(0) as any);
+    }).toThrow("Unsupported data type 'object' for u256");
+  });
+
   test('constructor 2 should throw out of bounds', () => {
     expect(() => {
       new CairoUint256(UINT_256_LOW_MIN - 1n, 1000);
@@ -84,6 +116,34 @@ describe('CairoUint256 class test', () => {
     expect(() => {
       new CairoUint256({ low: 1000, high: UINT_256_HIGH_MAX + 1n });
     }).toThrow('high is out of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
+  });
+
+  test('constructors 2 and 3 should name the half that is not a number', () => {
+    expect(() => {
+      new CairoUint256(null as any, 0);
+    }).toThrow('low cannot be null');
+    expect(() => {
+      new CairoUint256(0, undefined as any);
+    }).toThrow('high cannot be undefined');
+    expect(() => {
+      new CairoUint256(1.5, 0);
+    }).toThrow('low must be an integer');
+    expect(() => {
+      new CairoUint256({ low: 0, high: 1.5 });
+    }).toThrow('high must be an integer');
+    // a half is read as isBigNumberish reads it, which is stricter than BigInt : BigInt would take
+    // every one of these strings but 'abc', and '' would even be 0
+    ['abc', '-1', '', ' 12 ', '0b101'].forEach((half) => {
+      expect(() => {
+        new CairoUint256(half, 0);
+      }).toThrow('low cannot be built from text');
+    });
+    expect(() => {
+      new CairoUint256('0x', 0);
+    }).toThrow("low cannot be '0x', which holds no hexadecimal digit");
+    expect(() => {
+      new CairoUint256(new Date(0) as any, 0);
+    }).toThrow('low must be a BigNumberish');
   });
 
   test('validate should throw on < UINT_256_MIN', () => {
@@ -135,6 +195,20 @@ describe('CairoUint256 class test', () => {
     );
   });
 
+  test('validate should reject a decimal number', () => {
+    expect(() => {
+      CairoUint256.validate(1.5);
+    }).toThrow('Invalid input: decimal numbers are not supported, only integers');
+  });
+
+  test('validate should reject an object, a Uint256 one included', () => {
+    // a Uint256 object is checked by validateProps, which the constructor calls for it
+    expect(() => {
+      CairoUint256.validate({ low: 1, high: 0 });
+    }).toThrow("Unsupported data type 'object' for u256");
+    expect(CairoUint256.is({ low: 1, high: 0 })).toBe(false);
+  });
+
   test('is should return true', () => {
     const is = CairoUint256.is(UINT_256_MIN);
     expect(is).toBe(true);
@@ -152,8 +226,9 @@ describe('CairoUint256 class test', () => {
     expect(CairoUint256.is((() => {}) as any)).toBe(false);
     expect(CairoUint256.is(true as any)).toBe(false);
     expect(CairoUint256.is(false as any)).toBe(false);
-    // Note: Date, Map, Set can be converted to numbers/BigInt so they may pass validation
-    // depending on BigInt conversion behavior
+    expect(CairoUint256.is(new Date(0) as any)).toBe(false);
+    expect(CairoUint256.is(new Map() as any)).toBe(false);
+    expect(CairoUint256.is(1.5)).toBe(false);
   });
 
   test('constructor 1 should support BigNumberish', () => {

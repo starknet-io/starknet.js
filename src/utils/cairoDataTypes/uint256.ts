@@ -2,8 +2,9 @@
 
 import { BigNumberish, Uint256 } from '../../types';
 import { addHexPrefix } from '../encode';
-import { isObject } from '../typed';
-import { getNext, isBigNumberish } from '../num';
+import { isNumber, isObject } from '../typed';
+import { getNext, isBigNumberish, isEmptyHex } from '../num';
+import { isText } from '../shortString';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 
@@ -128,7 +129,7 @@ export class CairoUint256 {
    * A `Uint256` object is accepted here too : it already carries `low` and `high`, and both are
    * checked as u128 rather than the whole being cut again.
    * @param {BigNumberish | Uint256} data the value to carry, within [0, 2^256 - 1]
-   * @throws {Error} when the value is null, undefined, of an unread type, or out of range
+   * @throws {Error} when the value is null, undefined, text, `'0x'`, of an unread type, a decimal number, or out of range
    * @example
    * ```typescript
    * const result = new CairoUint256(2n ** 130n + 5n).toApiRequest();
@@ -140,7 +141,7 @@ export class CairoUint256 {
    * Build from the two halves as they arrive, already cut (Api response).
    * @param {BigNumberish} low the bottom 128 bits
    * @param {BigNumberish} high the top 128 bits
-   * @throws {Error} when either half is out of the u128 range
+   * @throws {Error} when either half is null, undefined, text, `'0x'`, not a number, a decimal number, or outside the u128 range
    * @example
    * ```typescript
    * const result = new CairoUint256(5, 4).toBigInt();
@@ -173,24 +174,39 @@ export class CairoUint256 {
    * Throw unless a whole value can be represented as a u256, and give back its number.
    *
    * A string is only accepted while it spells a number, in base 10 or 16 : one that does not is
-   * refused for its type.
+   * refused as text, and `'0x'`, which holds no digit, is refused too. So is an object, a `Uint256`
+   * one included : its two halves are checked by {@link CairoUint256.validateProps}, which is what
+   * the constructor calls for it.
    * @param {BigNumberish} bigNumberish the value to check
    * @returns {bigint} the value as a number, once accepted
-   * @throws {Error} when the value is null, undefined, of an unread type, or out of range
+   * @throws {Error} when the value is null, undefined, text, `'0x'`, of an unread type, a decimal number, or out of range
    * @example
    * ```typescript
    * const result = CairoUint256.validate(255);
    * // result = 255n
    * CairoUint256.validate(-1);
    * // throws Error("bigNumberish is smaller than UINT_256_MIN")
+   * CairoUint256.validate('abc');
+   * // throws Error("Invalid input: a u256 cannot be built from text")
+   * CairoUint256.validate(1.5);
+   * // throws Error("Invalid input: decimal numbers are not supported, only integers")
    * ```
    */
   static validate(bigNumberish: BigNumberish | unknown) {
     assert(bigNumberish !== null, 'null value is not allowed for u256');
     assert(bigNumberish !== undefined, 'undefined value is not allowed for u256');
+    assert(!isText(bigNumberish), 'Invalid input: a u256 cannot be built from text');
+    assert(!isEmptyHex(bigNumberish), "Invalid input: '0x' holds no hexadecimal digit");
+    // an object is refused here, the Uint256 one included : the constructor hands that one to
+    // validateProps, and any other would reach BigInt and fail in its words
     assert(
-      isBigNumberish(bigNumberish) || isObject(bigNumberish),
+      isBigNumberish(bigNumberish),
       `Unsupported data type '${typeof bigNumberish}' for u256. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint256 object`
+    );
+    // isBigNumberish lets any number through, a decimal one included, which BigInt then refuses
+    assert(
+      !isNumber(bigNumberish) || Number.isInteger(bigNumberish),
+      'Invalid input: decimal numbers are not supported, only integers'
     );
 
     const bigInt = BigInt(bigNumberish as BigNumberish);
@@ -207,18 +223,31 @@ export class CairoUint256 {
    * @param {BigNumberish} low the bottom 128 bits
    * @param {BigNumberish} high the top 128 bits
    * @returns {{low: bigint, high: bigint}} the two halves as numbers
-   * @throws {Error} when either half is outside the u128 range
+   * @throws {Error} when either half is null, undefined, text, `'0x'`, not a number, a decimal number, or outside the u128 range
    * @example
    * ```typescript
    * const result = CairoUint256.validateProps(5, 4);
    * // result = { low: 5n, high: 4n }
    * CairoUint256.validateProps(-1, 4);
    * // throws Error("low is out of range UINT_256_LOW_MIN - UINT_256_LOW_MAX")
+   * CairoUint256.validateProps(1.5, 4);
+   * // throws Error("low must be an integer")
+   * CairoUint256.validateProps('abc', 4);
+   * // throws Error("low cannot be built from text")
    * ```
    */
   static validateProps(low: BigNumberish, high: BigNumberish) {
-    const bigIntLow = BigInt(low);
-    const bigIntHigh = BigInt(high);
+    const validateHalf = (half: BigNumberish, name: string): bigint => {
+      assert(half !== null, `${name} cannot be null`);
+      assert(half !== undefined, `${name} cannot be undefined`);
+      assert(!isText(half), `${name} cannot be built from text`);
+      assert(!isEmptyHex(half), `${name} cannot be '0x', which holds no hexadecimal digit`);
+      assert(isBigNumberish(half), `${name} must be a BigNumberish`);
+      assert(!isNumber(half) || Number.isInteger(half), `${name} must be an integer`);
+      return BigInt(half);
+    };
+    const bigIntLow = validateHalf(low, 'low');
+    const bigIntHigh = validateHalf(high, 'high');
     assert(
       bigIntLow >= UINT_256_LOW_MIN && bigIntLow <= UINT_256_LOW_MAX,
       'low is out of range UINT_256_LOW_MIN - UINT_256_LOW_MAX'

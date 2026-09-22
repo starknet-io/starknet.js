@@ -45,6 +45,38 @@ describe('CairoUint512 class test', () => {
     }).toThrow("Unsupported data type 'function' for u512");
   });
 
+  test('constructor 1 should throw on a decimal number', () => {
+    expect(() => {
+      new CairoUint512(1.5);
+    }).toThrow('Invalid input: decimal numbers are not supported, only integers');
+  });
+
+  test("constructor 1 should throw on text, and on '0x' which holds no digit", () => {
+    expect(() => {
+      new CairoUint512('abc');
+    }).toThrow('Invalid input: a u512 cannot be built from text');
+    // a minus sign makes a number of a string for the signed integers only
+    expect(() => {
+      new CairoUint512('-1');
+    }).toThrow('Invalid input: a u512 cannot be built from text');
+    expect(() => {
+      new CairoUint512('0x');
+    }).toThrow("Invalid input: '0x' holds no hexadecimal digit");
+  });
+
+  test('constructor 1 should throw on an object that is not a Uint512', () => {
+    // BigInt would read a Date, or any object with a numeric valueOf, but a u512 is not built so
+    expect(() => {
+      new CairoUint512({} as any);
+    }).toThrow("Unsupported data type 'object' for u512");
+    expect(() => {
+      new CairoUint512({ limb0: 1 } as any);
+    }).toThrow("Unsupported data type 'object' for u512");
+    expect(() => {
+      new CairoUint512(new Date(0) as any);
+    }).toThrow("Unsupported data type 'object' for u512");
+  });
+
   test('constructor 1 should support BigNumberish', () => {
     const case1 = new CairoUint512(10n);
     const case2 = new CairoUint512(10);
@@ -197,6 +229,46 @@ describe('CairoUint512 class test', () => {
     );
   });
 
+  test('validate should reject a decimal number', () => {
+    expect(() => {
+      CairoUint512.validate(1.5);
+    }).toThrow('Invalid input: decimal numbers are not supported, only integers');
+  });
+
+  test('validate should reject an object, a Uint512 one included', () => {
+    // a Uint512 object is checked by validateProps, which the constructor calls for it
+    const limbs = { limb0: 1, limb1: 0, limb2: 0, limb3: 0 };
+    expect(() => {
+      CairoUint512.validate(limbs);
+    }).toThrow("Unsupported data type 'object' for u512");
+    expect(CairoUint512.is(limbs)).toBe(false);
+  });
+
+  test('validateProps should name the limb that is not a number', () => {
+    expect(() => {
+      CairoUint512.validateProps(null as any, 0, 0, 0);
+    }).toThrow('limb0 cannot be null');
+    expect(() => {
+      CairoUint512.validateProps(0, 0, 0, undefined as any);
+    }).toThrow('limb3 cannot be undefined');
+    expect(() => {
+      CairoUint512.validateProps(0, 1.5, 0, 0);
+    }).toThrow('limb1 must be an integer');
+    // a limb is read as isBigNumberish reads it, which is stricter than BigInt : BigInt would take
+    // every one of these strings but 'abc', and '' would even be 0
+    ['abc', '-1', '', ' 12 ', '0b101'].forEach((limb) => {
+      expect(() => {
+        CairoUint512.validateProps(limb, 0, 0, 0);
+      }).toThrow('limb0 cannot be built from text');
+    });
+    expect(() => {
+      CairoUint512.validateProps('0x', 0, 0, 0);
+    }).toThrow("limb0 cannot be '0x', which holds no hexadecimal digit");
+    expect(() => {
+      CairoUint512.validateProps(new Date(0) as any, 0, 0, 0);
+    }).toThrow('limb0 must be a BigNumberish');
+  });
+
   test('validateProps should pass', () => {
     expect(CairoUint512.validateProps(1000, 1001, 1002, 1003)).toEqual({
       limb0: 1000n,
@@ -254,8 +326,9 @@ describe('CairoUint512 class test', () => {
     expect(CairoUint512.is((() => {}) as any)).toBe(false);
     expect(CairoUint512.is(true as any)).toBe(false);
     expect(CairoUint512.is(false as any)).toBe(false);
-    // Note: Date, Map, Set can be converted to numbers/BigInt so they may pass validation
-    // depending on BigInt conversion behavior
+    expect(CairoUint512.is(new Date(0) as any)).toBe(false);
+    expect(CairoUint512.is(new Map() as any)).toBe(false);
+    expect(CairoUint512.is(1.5)).toBe(false);
   });
 
   test('should convert UINT_512_MAX to Uint512 bigint', () => {

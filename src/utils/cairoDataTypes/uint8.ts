@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { BigNumberish } from '../../types';
 import { addHexPrefix, bigIntToUint8Array, utf8ToBigInt } from '../encode';
-import { getNext } from '../num';
+import { getNext, isEmptyHex } from '../num';
 import { isText } from '../shortString';
 import { isString, isObject, isNumber } from '../typed';
 import assert from '../assert';
@@ -55,7 +55,7 @@ export class CairoUint8 {
    * otherwise. Text therefore only fits here while it is a single ASCII character : two characters
    * already make a number past 255.
    * @param {BigNumberish | boolean} data the value to carry, within [0, 255]
-   * @throws {Error} when the value is null, undefined, an object, a decimal number, or out of range
+   * @throws {Error} when the value is null, undefined, an object, a decimal number, `'0x'`, or out of range
    * @example
    * ```typescript
    * const result = new CairoUint8('a').toApiRequest();
@@ -84,9 +84,7 @@ export class CairoUint8 {
    */
   static __processData(data: BigNumberish | boolean | unknown): bigint {
     if (isString(data) && isText(data)) {
-      // Only allow text strings that represent valid UTF-8 byte sequences for specific use cases
-      // For general numeric input validation, reject pure text strings
-      // This maintains compatibility while being more restrictive for validation
+      // a string that spells no number is text, taken for its UTF-8 bytes: 'a' is 97
       return utf8ToBigInt(data);
     }
     return BigInt(data as BigNumberish);
@@ -154,11 +152,11 @@ export class CairoUint8 {
   /**
    * Throw unless the value can be carried by a u8.
    *
-   * Four things are refused, each with its own message : a null or undefined value, an object or
-   * an array, a number with a decimal part, and a value outside [0, 255]. A text string reaches
+   * Five things are refused, each with its own message : a null or undefined value, an object or
+   * an array, a number with a decimal part, `'0x'`, and a value outside [0, 255]. A text string reaches
    * that last check as the number its bytes spell, so `'ab'` is refused for being out of range.
    * @param {BigNumberish | boolean} data the value to check
-   * @throws {Error} when the value is null, undefined, an object, a decimal number, or out of range
+   * @throws {Error} when the value is null, undefined, an object, a decimal number, `'0x'`, or out of range
    * @example
    * ```typescript
    * CairoUint8.validate(44); // passes
@@ -173,6 +171,7 @@ export class CairoUint8 {
       !isNumber(data) || Number.isInteger(data),
       'Invalid input: decimal numbers are not supported, only integers'
     );
+    assert(!isEmptyHex(data), "Invalid input: '0x' holds no hexadecimal digit");
 
     const value = CairoUint8.__processData(data);
     assert(

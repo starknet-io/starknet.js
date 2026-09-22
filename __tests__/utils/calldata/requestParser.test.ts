@@ -339,11 +339,7 @@ describe('requestParser', () => {
           enums: getAbiEnums(),
           parser: new AbiParser0([getAbiEntry('core::integer::u256')]),
         })
-      ).toThrow(
-        new Error(
-          "Unsupported data type 'string' for u256. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint256 object"
-        )
-      );
+      ).toThrow(new Error('Invalid input: a u256 cannot be built from text'));
     });
 
     test('should throw an error if provided tuple size do not match', () => {

@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { BigNumberish } from '../../types';
 import { addHexPrefix, bigIntToUint8Array, utf8ToBigInt } from '../encode';
-import { getNext } from '../num';
+import { getNext, isBigNumberish, isEmptyHex } from '../num';
 import { isText } from '../shortString';
 import { isString, isObject, isNumber } from '../typed';
 import assert from '../assert';
@@ -15,6 +15,10 @@ import { addCompiledFlag } from '../helpers';
  * `'1633837924'` and `'0x61626364'` give the same i32. A string that reads as text rather than as a
  * number is taken for its UTF-8 bytes, which is why `'abcd'` is 1633837924 and not a rejected input.
  *
+ * A minus sign in front of a number is read as a sign, not as text : `'-5'` is -5, as `-5` and
+ * `-5n` are. Only the signed integers read a string this way — for every other type, `'-5'` is
+ * text, encoded or refused as such.
+ *
  * An already built instance is **not** an accepted input : handed back to the constructor it is
  * seen as an object and refused. Inside the library it is `unwrapCairoScalar` that reduces an
  * instance to its number before an abi slot receives it.
@@ -25,6 +29,11 @@ import { addCompiledFlag } from '../helpers';
  * new CairoInt32('1633837924').toBigInt(); //   1633837924n
  * new CairoInt32('0x61626364').toBigInt(); // 1633837924n
  * new CairoInt32('abcd').toBigInt(); //    1633837924n     the UTF-8 bytes of the text
+ *
+ * // a negative value, reached three ways
+ * new CairoInt32(-5).toBigInt(); //     -5n
+ * new CairoInt32('-5').toBigInt(); //   -5n
+ * new CairoInt32('-0x5').toBigInt(); // -5n     a sign, not the text "-0x5"
  * ```
  */
 export class CairoInt32 {
@@ -51,15 +60,17 @@ export class CairoInt32 {
   /**
    * Build from a number, a string or a boolean, refusing anything out of the i32 range.
    *
-   * A string is read as a number when it spells one — decimal or hexadecimal — and as UTF-8 text
-   * otherwise. Text therefore only fits here up to 4 ASCII characters : one more already
-   * makes a number past 2147483647.
+   * A string is read as a number when it spells one — decimal or hexadecimal, with or without a
+   * leading minus sign — and as UTF-8 text otherwise. Text therefore only fits here up to 4 ASCII
+   * characters : one more already makes a number past 2147483647.
    * @param {BigNumberish | boolean} data the value to carry, within [-2147483648, 2147483647]
-   * @throws {Error} when the value is null, undefined, an object, a decimal number, or out of range
+   * @throws {Error} when the value is null, undefined, an object, a decimal number, `'0x'`, or out of range
    * @example
    * ```typescript
    * const result = new CairoInt32('abcd').toApiRequest();
    * // result = ["1633837924"]
+   * const result2 = new CairoInt32('-5').toApiRequest();
+   * // result2 = ["3618502788666131213697322783095070105623107215331596699973092056135872020476"]
    * ```
    */
   constructor(data: BigNumberish | boolean | unknown) {
@@ -72,6 +83,9 @@ export class CairoInt32 {
    *
    * Nothing here refuses a value : `validate` is what reads this number and decides. So an input
    * far outside the i32 range comes back untouched rather than raising.
+   *
+   * A minus sign in front of a number makes it negative rather than text : `'-5'` and `'-0x5'` are
+   * both -5. This holds for the signed integers only — for any other type, such a string is text.
    * @param {BigNumberish | boolean} data the value to convert
    * @returns {bigint} the number the input spells, of whatever size
    * @example
@@ -80,13 +94,18 @@ export class CairoInt32 {
    * // result = 1633837924n
    * const result2 = CairoInt32.__processData('abcde');
    * // result2 = 418262508645n     (past the i32 range, and returned all the same)
+   * const result3 = CairoInt32.__processData('-0x5');
+   * // result3 = -5n     (a negative number, not the text "-0x5")
    * ```
    */
   static __processData(data: BigNumberish | boolean | unknown): bigint {
+    // a sign in front of a number, and of a number only : '-' alone, '-abc' or '-0x' stay text.
+    // The sign is applied after the conversion because BigInt reads '-5' but not '-0x5'
+    if (isString(data) && data.startsWith('-') && isBigNumberish(data.slice(1))) {
+      return -BigInt(data.slice(1));
+    }
     if (isString(data) && isText(data)) {
-      // Only allow text strings that represent valid UTF-8 byte sequences for specific use cases
-      // For general numeric input validation, reject pure text strings
-      // This maintains compatibility while being more restrictive for validation
+      // a string that spells no number is text, taken for its UTF-8 bytes: 'a' is 97
       return utf8ToBigInt(data);
     }
     return BigInt(data as BigNumberish);
@@ -170,11 +189,11 @@ export class CairoInt32 {
   /**
    * Throw unless the value can be carried by an i32.
    *
-   * Four things are refused, each with its own message : a null or undefined value, an object or
-   * an array, a number with a decimal part, and a value outside [-2147483648, 2147483647]. A text string reaches
+   * Five things are refused, each with its own message : a null or undefined value, an object or
+   * an array, a number with a decimal part, `'0x'`, and a value outside [-2147483648, 2147483647]. A text string reaches
    * that last check as the number its bytes spell, so `'abcde'` is refused for being out of range.
    * @param {BigNumberish | boolean} data the value to check
-   * @throws {Error} when the value is null, undefined, an object, a decimal number, or out of range
+   * @throws {Error} when the value is null, undefined, an object, a decimal number, `'0x'`, or out of range
    * @example
    * ```typescript
    * CairoInt32.validate(70000); // passes
@@ -189,6 +208,7 @@ export class CairoInt32 {
       !isNumber(data) || Number.isInteger(data),
       'Invalid input: decimal numbers are not supported, only integers'
     );
+    assert(!isEmptyHex(data), "Invalid input: '0x' holds no hexadecimal digit");
 
     const value = CairoInt32.__processData(data);
     assert(

@@ -47,8 +47,12 @@ describe('CairoBool class Unit Tests', () => {
     });
 
     test('should reject a negative value', () => {
-      // the message comes from the encoding layer rather than from this class
-      expect(() => new CairoBool(-1)).toThrow('Cannot convert negative bigint');
+      expect(() => new CairoBool(-1)).toThrow(
+        'Only values 0 or 1 are possible in a core::bool, received -1'
+      );
+      expect(() => new CairoBool(-1n)).toThrow(
+        'Only values 0 or 1 are possible in a core::bool, received -1'
+      );
     });
   });
 
@@ -61,6 +65,14 @@ describe('CairoBool class Unit Tests', () => {
         'Invalid input: a core::bool cannot be built from text'
       );
       expect(() => new CairoBool('')).toThrow(
+        'Invalid input: a core::bool cannot be built from text'
+      );
+    });
+
+    test('should reject a signed numeric string, which also reads as text', () => {
+      // a minus sign makes a number of a string for the signed integers only : for every other
+      // type, a bool included, '-1' is text
+      expect(() => new CairoBool('-1')).toThrow(
         'Invalid input: a core::bool cannot be built from text'
       );
     });
@@ -78,7 +90,13 @@ describe('CairoBool class Unit Tests', () => {
     });
 
     test('should reject a decimal number', () => {
-      expect(() => new CairoBool(1.5)).toThrow("1.5 can't be computed by felt()");
+      expect(() => new CairoBool(1.5)).toThrow(
+        'Invalid input: decimal numbers are not supported, only integers'
+      );
+    });
+
+    test("should reject '0x', rather than read an empty value as false", () => {
+      expect(() => new CairoBool('0x')).toThrow("Invalid input: '0x' holds no hexadecimal digit");
     });
   });
 

@@ -119,14 +119,29 @@ describe('CairoSecp256k1Point class Unit Tests', () => {
 
     test('should reject text and arrays', () => {
       expect(() => new CairoSecp256k1Point('abc')).toThrow(
-        "Unsupported input for Secp256k1Point. Expected a number, a bigint, or a string spelling one, received 'string'"
+        'Invalid input: a Secp256k1Point cannot be built from text'
       );
       expect(() => new CairoSecp256k1Point([])).toThrow('Unsupported input for Secp256k1Point');
     });
 
+    test('should reject a signed numeric string, which reads as text', () => {
+      // a minus sign makes a number of a string for the signed integers only : for every other
+      // type, a point included, '-1' is text
+      expect(() => new CairoSecp256k1Point('-1')).toThrow(
+        'Invalid input: a Secp256k1Point cannot be built from text'
+      );
+    });
+
+    test("should reject '0x', which holds no digit", () => {
+      expect(() => new CairoSecp256k1Point('0x')).toThrow(
+        "Invalid input: '0x' holds no hexadecimal digit"
+      );
+    });
+
     test('should reject a decimal number', () => {
-      // the message comes from BigInt itself: isBigNumberish lets a non-integer number through
-      expect(() => new CairoSecp256k1Point(1.5)).toThrow('cannot be converted to a BigInt');
+      expect(() => new CairoSecp256k1Point(1.5)).toThrow(
+        'Invalid input: decimal numbers are not supported, only integers'
+      );
     });
 
     test('should reject any argument count other than 1 or 4', () => {
@@ -167,6 +182,26 @@ describe('CairoSecp256k1Point class Unit Tests', () => {
       );
       expect(() => CairoSecp256k1Point.validateProps(null as any, 2, 3, 4)).toThrow(
         'xLow cannot be null'
+      );
+    });
+
+    test('should name the limb that is not a whole number', () => {
+      expect(() => CairoSecp256k1Point.validateProps(1.5, 2, 3, 4)).toThrow(
+        'xLow must be an integer'
+      );
+      expect(() => new CairoSecp256k1Point(0, 0, 0, 1.5)).toThrow('yHigh must be an integer');
+      expect(() => CairoSecp256k1Point.validateProps('abc', 2, 3, 4)).toThrow(
+        'xLow cannot be built from text'
+      );
+      // '-1' is text here, as for every type but the signed integers
+      expect(() => CairoSecp256k1Point.validateProps('-1', 2, 3, 4)).toThrow(
+        'xLow cannot be built from text'
+      );
+      expect(() => CairoSecp256k1Point.validateProps('0x', 2, 3, 4)).toThrow(
+        "xLow cannot be '0x', which holds no hexadecimal digit"
+      );
+      expect(() => CairoSecp256k1Point.validateProps({} as any, 2, 3, 4)).toThrow(
+        'xLow must be a BigNumberish'
       );
     });
   });

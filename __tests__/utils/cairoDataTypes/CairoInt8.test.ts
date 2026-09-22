@@ -76,6 +76,22 @@ describe('CairoInt8 class Unit Tests', () => {
       expect(i8FromHexString.data).toBe(127n);
     });
 
+    test('should read a minus sign in front of a number as a sign, not as text', () => {
+      expect(new CairoInt8('-5').toBigInt()).toBe(-5n);
+      expect(new CairoInt8('-0x5').toBigInt()).toBe(-5n);
+      expect(new CairoInt8('-128').toBigInt()).toBe(-128n);
+      expect(() => new CairoInt8('-129')).toThrow('Value is out of i8 range [-128, 127]');
+      // in front of anything else, the sign is text like the rest of the string
+      expect(new CairoInt8('-').toBigInt()).toBe(45n);
+      expect(() => new CairoInt8('-a')).toThrow('Value is out of i8 range [-128, 127]');
+    });
+
+    test("should reject '0x', which holds no digit, and read '-0x' as text", () => {
+      expect(() => new CairoInt8('0x')).toThrow("Invalid input: '0x' holds no hexadecimal digit");
+      // '0x' is no number, so a sign in front of it is text : "-0x" is 2961528, past the i8 range
+      expect(() => new CairoInt8('-0x')).toThrow('Value is out of i8 range [-128, 127]');
+    });
+
     test('should reject decimal numbers', () => {
       expect(() => new CairoInt8(42.5)).toThrow(
         'Invalid input: decimal numbers are not supported, only integers'
