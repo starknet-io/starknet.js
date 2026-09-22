@@ -34,12 +34,14 @@ export function addAddressPadding(address: BigNumberish): string {
 /**
  * Check the validity of a Starknet address, and format it as a hex number: '0x' and 64 characters, adding leading zeros if necessary.
  *
+ * A string is read as hexadecimal, with or without its `0x` prefix — so `'31'` is 0x31 — and one
+ * holding anything but hexadecimal digits, `'0x'` included, is refused as a malformed address.
  * @param {BigNumberish} address
  * @returns {string} Hex string: 0x followed by 64 characters. No upper case characters in the response.
  * @throws address argument must be a valid address inside the address range bound
  * @example
  * ```typescript
- * const result = [31, 0x1f, '31', '0x1f', '0x90591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf'].map(addAddressPadding);
+ * const result = [31, 0x1f, '31', '0x1f', '0x90591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf'].map(validateAndParseAddress);
  * // result = [
  * //   '0x000000000000000000000000000000000000000000000000000000000000001f',
  * //   '0x000000000000000000000000000000000000000000000000000000000000001f',
@@ -47,9 +49,16 @@ export function addAddressPadding(address: BigNumberish): string {
  * //   '0x000000000000000000000000000000000000000000000000000000000000001f',
  * //   '0x0000090591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf'
  * // ]
+ * validateAndParseAddress('test');
+ * // throws Error("Invalid Address Format")
  * ```
  */
 export function validateAndParseAddress(address: BigNumberish): string {
+  // checked before the padding, which would otherwise fail in the words of BigInt, and on the
+  // prefixed string rather than on the one the caller passed
+  if (isString(address) && !/^(0x)?[0-9a-f]+$/i.test(address)) {
+    throw new Error('Invalid Address Format');
+  }
   const result = addAddressPadding(address);
 
   if (!result.match(/^(0x)?[0-9a-fA-F]{64}$/)) {

@@ -271,6 +271,12 @@ describe('CairoUint128 class Unit Tests', () => {
         'Invalid input: decimal numbers are not supported, only integers'
       );
     });
+
+    test("should reject '0x', which holds no digit", () => {
+      expect(() => CairoUint128.validate('0x')).toThrow(
+        "Invalid input: '0x' holds no hexadecimal digit"
+      );
+    });
   });
 
   describe('is static method', () => {

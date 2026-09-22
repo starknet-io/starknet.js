@@ -39,11 +39,19 @@ function isBytes31Shape(value: unknown): value is { data: Uint8Array } {
  * The bytes are held right-aligned in a fixed 31-byte buffer, so the length of the input is not
  * recoverable from the value — `'0x41'` and `'0x0041'` give the same bytes31. Reach for
  * `CairoByteArray` when the byte count has to survive.
+ *
+ * `'0x'` holds no byte at all, and is the same bytes31 as the empty string `''`. Where a number
+ * type refuses `'0x'`, a type made of bytes reads it as empty bytes, which is how an EVM tool
+ * writes them.
  * @example
  * ```typescript
  * // the same five characters, read two ways
  * new CairoBytes31('12345').toHexString(); //      "0x3039"        the number 12345
  * CairoBytes31.fromText('12345').toHexString(); // "0x3132333435"  the text '12345'
+ *
+ * // no byte at all, written two ways
+ * new CairoBytes31('').toApiRequest(); //   ["0"]
+ * new CairoBytes31('0x').toApiRequest(); // ["0"]
  * ```
  */
 export class CairoBytes31 {

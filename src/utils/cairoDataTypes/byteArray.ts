@@ -62,6 +62,10 @@ function isByteArrayShape(value: unknown): value is ByteArrayComponents {
  * A ByteArray is **not** Cairo's string type. It carries bytes, and text is only one of the things
  * those bytes can mean — which is why the constructor reads a string the way calldata does, and why
  * text has a door of its own, {@link CairoByteArray.fromText}.
+ *
+ * `'0x'` holds no byte at all, and is the same ByteArray as the empty string `''`. Where a number
+ * type refuses `'0x'`, a type made of bytes reads it as empty bytes, which is how an EVM tool
+ * writes them.
  * @example
  * ```typescript
  * // the same four characters, read four ways
@@ -69,6 +73,10 @@ function isByteArrayShape(value: unknown): value is ByteArrayComponents {
  * new CairoByteArray('12345').toHexString(); //      "0x3039"        the number 12345
  * new CairoByteArray('0x4142').toHexString(); //     "0x4142"        the bytes 0x41 0x42
  * CairoByteArray.fromText('12345').toHexString(); // "0x3132333435"  the text '12345'
+ *
+ * // no byte at all, written two ways
+ * new CairoByteArray('').toApiRequest(); //   ["0", "0", "0"]
+ * new CairoByteArray('0x').toApiRequest(); // ["0", "0", "0"]
  * ```
  */
 export class CairoByteArray {

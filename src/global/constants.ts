@@ -49,8 +49,13 @@ export const RANGE_ETH_ADDRESS = range(ZERO, 2n ** 160n - 1n);
 // A contract address is narrower than the field it lives in: an address is computed modulo
 // ADDR_BOUND, and `validateAndParseAddress` already refuses anything past it. The 252-bit bound
 // the RPC spec states is looser than both, and never the one that binds.
-// There is no such narrowing for a class hash, which is a hash output and so any felt252.
 export const RANGE_CONTRACT_ADDRESS = range(ZERO, ADDR_BOUND - 1n);
+
+// A class hash is narrower than the field too: the Cairo `ClassHash` type holds [0, 2^251), and
+// its conversion from a felt252 refuses anything past it. The 252-bit bound the RPC spec states is
+// looser, and never the one that binds either.
+// https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/class_hash.cairo
+export const RANGE_CLASS_HASH = range(ZERO, 2n ** 251n - 1n);
 
 export const LegacyUDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',

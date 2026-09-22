@@ -3,7 +3,7 @@ import { BigNumberish } from '../../types';
 import { addHexPrefix } from '../encode';
 import { getNext } from '../num';
 import { isText } from '../shortString';
-import { isBoolean } from '../typed';
+import { isBigInt, isBoolean, isNumber } from '../typed';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { CairoFelt252 } from './felt';
@@ -51,7 +51,7 @@ export class CairoBool {
   /**
    * Build from a boolean, or from the numbers 0 and 1.
    * @param {BigNumberish | boolean} data the value to carry : a boolean, 0 or 1
-   * @throws {Error} when the value is text, is not a felt252 input, or is a number other than 0 or 1
+   * @throws {Error} when the value is text, a decimal number, not a felt252 input, or a number other than 0 or 1
    * @example
    * ```typescript
    * const result = new CairoBool(false).toApiRequest();
@@ -129,22 +129,32 @@ export class CairoBool {
   /**
    * Throw unless the value can be carried by a bool.
    *
-   * Text is refused first, then the value is read as a felt252 — which is what refuses a null, an
-   * object or an unsupported type — and finally checked to be one of the only two numbers a bool
-   * can hold.
+   * Text is refused first, then a number with a decimal part. A number or a bigint is read as it
+   * is, so that a negative one reaches the last check. Anything else is read as a felt252 — which
+   * is what refuses a null, an object or an unsupported type. The value is finally checked to be
+   * one of the only two numbers a bool can hold.
    * @param {BigNumberish | boolean} data the value to check
-   * @throws {Error} when the value is text, is not a felt252 input, or is a number other than 0 or 1
+   * @throws {Error} when the value is text, a decimal number, not a felt252 input, or a number other than 0 or 1
    * @example
    * ```typescript
    * CairoBool.validate(true); // passes
    * CairoBool.validate(2);
    * // throws Error("Only values 0 or 1 are possible in a core::bool, received 2")
+   * CairoBool.validate(-1);
+   * // throws Error("Only values 0 or 1 are possible in a core::bool, received -1")
    * ```
    */
   static validate(data: BigNumberish | boolean | unknown): void {
     assert(!isText(data), 'Invalid input: a core::bool cannot be built from text');
+    assert(
+      !isNumber(data) || Number.isInteger(data),
+      'Invalid input: decimal numbers are not supported, only integers'
+    );
 
-    const value = new CairoFelt252(data).toBigInt();
+    // a number is read here rather than by CairoFelt252, which would refuse a negative one before
+    // the check below, and in the words of its encoding rather than of a bool
+    const value =
+      isNumber(data) || isBigInt(data) ? BigInt(data) : new CairoFelt252(data).toBigInt();
     assert(
       value === 0n || value === 1n,
       `Only values 0 or 1 are possible in a core::bool, received ${value}`

@@ -1,8 +1,9 @@
 /* eslint-disable no-bitwise */
 import { BigNumberish, Literal } from '../../types';
 import { addHexPrefix, removeHexPrefix } from '../encode';
-import { getNext, isBigNumberish } from '../num';
-import { isObject } from '../typed';
+import { getNext, isBigNumberish, isEmptyHex } from '../num';
+import { isText } from '../shortString';
+import { isNumber, isObject } from '../typed';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { UINT_128_MAX } from './uint256';
@@ -126,7 +127,9 @@ export class CairoSecp256k1Point {
   /**
    * @param {any[]} arr either one value — a 512-bit number or a {@link Secp256k1PointStruct} — or
    * the four limbs
-   * @throws {Error} when a value is out of range, or when the argument count is neither 1 nor 4
+   * @throws {Error} when a value is null, undefined, of an unread type, text, a decimal number, or out
+   * of range — see {@link CairoSecp256k1Point.validate} and {@link CairoSecp256k1Point.validateProps}
+   * — or when the argument count is neither 1 nor 4
    * @example
    * ```typescript
    * const result = new CairoSecp256k1Point(1n).toApiRequest();
@@ -186,21 +189,32 @@ export class CairoSecp256k1Point {
    * the constructor needs it, and computing it twice would mean splitting a 512-bit value twice.
    * @param {BigNumberish} input the 512-bit value to check
    * @returns {bigint} the value, once checked
-   * @throws {Error} when the value is null, undefined, of an unread type, or outside [0, 2^512 - 1]
+   * @throws {Error} when the value is null, undefined, text, `'0x'`, of an unread type, a decimal number, or outside [0, 2^512 - 1]
    * @example
    * ```typescript
    * const result = CairoSecp256k1Point.validate('0x1234');
    * // result = 4660n
    * CairoSecp256k1Point.validate(SECP256K1_POINT_MAX + 1n);
    * // throws Error("input is bigger than SECP256K1_POINT_MAX")
+   * CairoSecp256k1Point.validate('abc');
+   * // throws Error("Invalid input: a Secp256k1Point cannot be built from text")
+   * CairoSecp256k1Point.validate(1.5);
+   * // throws Error("Invalid input: decimal numbers are not supported, only integers")
    * ```
    */
   static validate(input: BigNumberish | unknown): bigint {
     assert(input !== null, 'null value is not allowed for Secp256k1Point');
     assert(input !== undefined, 'undefined value is not allowed for Secp256k1Point');
+    assert(!isText(input), 'Invalid input: a Secp256k1Point cannot be built from text');
+    assert(!isEmptyHex(input), "Invalid input: '0x' holds no hexadecimal digit");
     assert(
       isBigNumberish(input),
       `Unsupported input for Secp256k1Point. Expected a number, a bigint, or a string spelling one, received '${typeof input}'`
+    );
+    // isBigNumberish lets any number through, a decimal one included, which BigInt then refuses
+    assert(
+      !isNumber(input) || Number.isInteger(input),
+      'Invalid input: decimal numbers are not supported, only integers'
     );
 
     const bigInt = BigInt(input as BigNumberish);
@@ -216,13 +230,17 @@ export class CairoSecp256k1Point {
    * @param {BigNumberish} yLow the low 128 bits of y
    * @param {BigNumberish} yHigh the high 128 bits of y
    * @returns {{xLow: bigint, xHigh: bigint, yLow: bigint, yHigh: bigint}} the four limbs, checked
-   * @throws {Error} when a limb is null, undefined, not a number, negative, or wider than 128 bits
+   * @throws {Error} when a limb is null, undefined, text, `'0x'`, not a number, a decimal number, negative, or wider than 128 bits
    * @example
    * ```typescript
    * const result = CairoSecp256k1Point.validateProps(1, 2, 3, 4);
    * // result = { xLow: 1n, xHigh: 2n, yLow: 3n, yHigh: 4n }
    * CairoSecp256k1Point.validateProps(1, 2, 3, 2n ** 128n);
    * // throws Error("yHigh must fit in 128 bits")
+   * CairoSecp256k1Point.validateProps(1.5, 2, 3, 4);
+   * // throws Error("xLow must be an integer")
+   * CairoSecp256k1Point.validateProps('abc', 2, 3, 4);
+   * // throws Error("xLow cannot be built from text")
    * ```
    */
   static validateProps(
@@ -234,7 +252,10 @@ export class CairoSecp256k1Point {
     const validateLimb = (limb: BigNumberish, name: string): bigint => {
       assert(limb !== null, `${name} cannot be null`);
       assert(limb !== undefined, `${name} cannot be undefined`);
+      assert(!isText(limb), `${name} cannot be built from text`);
+      assert(!isEmptyHex(limb), `${name} cannot be '0x', which holds no hexadecimal digit`);
       assert(isBigNumberish(limb), `${name} must be a BigNumberish`);
+      assert(!isNumber(limb) || Number.isInteger(limb), `${name} must be an integer`);
       const bigInt = BigInt(limb);
       assert(bigInt >= 0n, `${name} must be non-negative`);
       assert(bigInt <= UINT_128_MAX, `${name} must fit in 128 bits`);

@@ -3,8 +3,9 @@
 import { BigNumberish, type Uint512 } from '../../types';
 import { addHexPrefix } from '../encode';
 import { UINT_128_MAX } from './uint256';
-import { isObject } from '../typed';
-import { getNext, isBigNumberish } from '../num';
+import { isNumber, isObject } from '../typed';
+import { getNext, isBigNumberish, isEmptyHex } from '../num';
+import { isText } from '../shortString';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 
@@ -109,7 +110,7 @@ export class CairoUint512 {
    * A `Uint512` object is accepted here too : it already carries the four limbs, and each is
    * checked as a u128 rather than the whole being cut again.
    * @param {BigNumberish | Uint512} bigNumberish the value to carry, within [0, 2^512 - 1]
-   * @throws {Error} when the value is null, undefined, of an unread type, or out of range
+   * @throws {Error} when the value is null, undefined, text, `'0x'`, of an unread type, a decimal number, or out of range
    * @example
    * ```typescript
    * const result = new CairoUint512(255).toApiRequest();
@@ -123,7 +124,7 @@ export class CairoUint512 {
    * @param {BigNumberish} limb1 bits 128 to 255
    * @param {BigNumberish} limb2 bits 256 to 383
    * @param {BigNumberish} limb3 bits 384 to 511
-   * @throws {Error} when any limb is out of the u128 range
+   * @throws {Error} when any limb is null, undefined, text, `'0x'`, not a number, a decimal number, or outside the u128 range
    * @example
    * ```typescript
    * const result = new CairoUint512(7, 0, 0, 64).toBigInt() === 2n ** 390n + 7n;
@@ -176,24 +177,39 @@ export class CairoUint512 {
    * Throw unless a whole value can be represented as a u512, and give back its number.
    *
    * A string is only accepted while it spells a number, in base 10 or 16 : one that does not is
-   * refused for its type.
+   * refused as text, and `'0x'`, which holds no digit, is refused too. So is an object, a `Uint512`
+   * one included : its four limbs are checked by {@link CairoUint512.validateProps}, which is what
+   * the constructor calls for it.
    * @param {BigNumberish} bigNumberish the value to check
    * @returns {bigint} the value as a number, once accepted
-   * @throws {Error} when the value is null, undefined, of an unread type, or out of range
+   * @throws {Error} when the value is null, undefined, text, `'0x'`, of an unread type, a decimal number, or out of range
    * @example
    * ```typescript
    * const result = CairoUint512.validate(255);
    * // result = 255n
    * CairoUint512.validate(-1);
    * // throws Error("bigNumberish is smaller than UINT_512_MIN.")
+   * CairoUint512.validate('abc');
+   * // throws Error("Invalid input: a u512 cannot be built from text")
+   * CairoUint512.validate(1.5);
+   * // throws Error("Invalid input: decimal numbers are not supported, only integers")
    * ```
    */
   static validate(bigNumberish: BigNumberish | unknown): bigint {
     assert(bigNumberish !== null, 'null value is not allowed for u512');
     assert(bigNumberish !== undefined, 'undefined value is not allowed for u512');
+    assert(!isText(bigNumberish), 'Invalid input: a u512 cannot be built from text');
+    assert(!isEmptyHex(bigNumberish), "Invalid input: '0x' holds no hexadecimal digit");
+    // an object is refused here, the Uint512 one included : the constructor hands that one to
+    // validateProps, and any other would reach BigInt and fail in its words
     assert(
-      isBigNumberish(bigNumberish) || isObject(bigNumberish),
+      isBigNumberish(bigNumberish),
       `Unsupported data type '${typeof bigNumberish}' for u512. Expected a numeric string (decimal or hexadecimal), number, bigint, or Uint512 object`
+    );
+    // isBigNumberish lets any number through, a decimal one included, which BigInt then refuses
+    assert(
+      !isNumber(bigNumberish) || Number.isInteger(bigNumberish),
+      'Invalid input: decimal numbers are not supported, only integers'
     );
 
     const bigInt = BigInt(bigNumberish as BigNumberish);
@@ -212,13 +228,17 @@ export class CairoUint512 {
    * @param {BigNumberish} limb2 bits 256 to 383
    * @param {BigNumberish} limb3 bits 384 to 511
    * @returns {{limb0: bigint, limb1: bigint, limb2: bigint, limb3: bigint}} the four limbs as numbers
-   * @throws {Error} when any limb is outside the u128 range
+   * @throws {Error} when any limb is null, undefined, text, `'0x'`, not a number, a decimal number, or outside the u128 range
    * @example
    * ```typescript
    * const result = CairoUint512.validateProps(7, 0, 0, 64);
    * // result = { limb0: 7n, limb1: 0n, limb2: 0n, limb3: 64n }
    * CairoUint512.validateProps(-1, 0, 0, 0);
    * // throws Error("limb0 is not in the range of a u128 number")
+   * CairoUint512.validateProps(1.5, 0, 0, 0);
+   * // throws Error("limb0 must be an integer")
+   * CairoUint512.validateProps('abc', 0, 0, 0);
+   * // throws Error("limb0 cannot be built from text")
    * ```
    */
   static validateProps(
@@ -227,10 +247,19 @@ export class CairoUint512 {
     limb2: BigNumberish,
     limb3: BigNumberish
   ): { limb0: bigint; limb1: bigint; limb2: bigint; limb3: bigint } {
-    const l0 = BigInt(limb0);
-    const l1 = BigInt(limb1);
-    const l2 = BigInt(limb2);
-    const l3 = BigInt(limb3);
+    const validateLimb = (limb: BigNumberish, name: string): bigint => {
+      assert(limb !== null, `${name} cannot be null`);
+      assert(limb !== undefined, `${name} cannot be undefined`);
+      assert(!isText(limb), `${name} cannot be built from text`);
+      assert(!isEmptyHex(limb), `${name} cannot be '0x', which holds no hexadecimal digit`);
+      assert(isBigNumberish(limb), `${name} must be a BigNumberish`);
+      assert(!isNumber(limb) || Number.isInteger(limb), `${name} must be an integer`);
+      return BigInt(limb);
+    };
+    const l0 = validateLimb(limb0, 'limb0');
+    const l1 = validateLimb(limb1, 'limb1');
+    const l2 = validateLimb(limb2, 'limb2');
+    const l3 = validateLimb(limb3, 'limb3');
     [l0, l1, l2, l3].forEach((value: bigint, index) => {
       assert(
         value >= UINT_128_MIN && value <= UINT_128_MAX,

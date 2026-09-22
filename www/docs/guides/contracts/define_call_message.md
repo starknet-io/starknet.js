@@ -21,7 +21,7 @@ Cairo has 2 versions, involving 2 types of data:
 
 - **Cairo 0**: here, everything is felt, an integer on 251 bits.  
   Available: array, struct, tuple, named tuple, or a mix of these elements.
-- **Cairo 1**: with plethora of literal types: u8, u16, u32, usize, u64, u96, u128, felt252, u256, bool, address, eth address, classHash.  
+- **Cairo 1**: with plethora of literal types: u8, u16, u32, usize, u64, u96, u128, i8, i16, i32, i64, i128, felt252, u256, bool, address, eth address, classHash.  
   Available: array, struct, tuple, bytes31, byteArray, enums or a mix of these elements.
 
 Starknet.js is compatible with both versions.
@@ -39,6 +39,8 @@ In Starknet.js, it's a bit ... complicated: you have the BigNumberish type and i
 - String (representing a number): "123", "0xabc2"
 - Number (max 53 bits): 123
 - BigInt (max 255 bits): 12345612345n
+
+A Number or a BigInt may be negative: `-5`, `-5n`. A string may not: `"-5"` is text, except for the signed integers `i8` to `i128` (see [below](#i8-i16-i32-i64-i128)).
 
 ```typescript
 import { BigNumberish } from 'starknet';
@@ -59,7 +61,19 @@ await myContract.my_function(12, '13', '0xe', 15n);
 ```
 
 > `EthAddress` is limited to 160 bits.
-> `felt, felt252, ClassHash` and `ContractAddress` are limited to 252 bits.
+> `felt` and `felt252` are limited to the field, below P = 2^251 + 17·2^192 + 1.
+> `ClassHash` is limited to 2^251 - 1, and `ContractAddress` to 2^251 - 257.
+
+### i8, i16, i32, i64, i128
+
+Starknet is waiting for a felt. A negative value travels as its field element, `P + value`.  
+You can send to Starknet.js methods: bigNumberish, negative or not.
+
+```typescript
+await myContract.my_function(-5, -5n, '-5', '-0x5');
+```
+
+> A minus sign in a string is read as a sign for these types only. For any other type, `'-5'` is text: encoded as such for `felt252` and `u8` to `u128`, refused for `ContractAddress`, `EthAddress`, `ClassHash`, `bool`, `u256` and `u512`.
 
 ### bool
 
@@ -588,6 +602,7 @@ const amount = myContract.call(...);
 | u8, u16, u32, usize                                            | `func get_v() -> u16`                     | number (53 bits max)                          | `const res=myContract.call(...`<br /> `const total: number = Number(res)`                                                                              |
 | u256 (255 bits max)                                            | `func get_v() -> u256`                    | bigint                                        | `const res: bigint = myContract.call(...`                                                                                                              |
 | u512 (512 bits max)                                            | `func get_v() -> u512`                    | bigint                                        | `const res: bigint = myContract.call(...`                                                                                                              |
+| i8, i16, i32, i64, i128                                        | `func get_v() -> i32`                     | bigint (negative included)                    | `const res: bigint = myContract.call(...`                                                                                                              |
 | array of u8, u16, u32, usize, u64, u96, u128, felt252, address | `func get_v() -> Array<u64>`              | bigint[]                                      | `const res: bigint[] = myContract.call(...`                                                                                                            |
 | fixed array of single type items                               | `func get_v() -> [core::integer::u32; 8]` | bigint[]                                      | `const res = (await myContract.call(...)) as bigint[]`                                                                                                 |
 | bytes31 (31 ASCII characters max)                              | `func get_v() -> bytes31`                 | string                                        | `const res: string = myContract.call(...`                                                                                                              |

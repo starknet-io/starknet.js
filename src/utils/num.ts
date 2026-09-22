@@ -33,16 +33,21 @@ export const isHexString = isHex;
 /**
  * Convert BigNumberish to bigint
  *
+ * `'0x'`, which holds no digit, is refused with its own message rather than with `BigInt`'s.
  * @param {BigNumberish} value value to convert
  * @returns {BigInt} converted value
+ * @throws {Error} when the value is `'0x'`, or anything else `BigInt` cannot read
  * @example
  * ```typescript
  * const str = '123';
  * const result = toBigInt(str);
  * // result = 123n
+ * toBigInt('0x');
+ * // throws Error("Invalid input: '0x' holds no hexadecimal digit")
  * ```
  */
 export function toBigInt(value: BigNumberish): bigint {
+  assert(!isEmptyHex(value), "Invalid input: '0x' holds no hexadecimal digit");
   return BigInt(value);
 }
 
@@ -142,22 +147,22 @@ export function hexToDecimalString(hex: string): string {
 }
 
 /**
- * Asserts input is equal to or greater then lowerBound and lower then upperBound.
+ * Asserts input is within [lowerBound, upperBound], both bounds included.
  *
- * The `inputName` parameter is used in the assertion message.
+ * The `inputName` parameter names the input in the assertion message.
  * @param input Value to check
- * @param lowerBound Lower bound value
- * @param upperBound Upper bound value
+ * @param lowerBound Lower bound value, included
+ * @param upperBound Upper bound value, included
  * @param inputName Name of the input for error message
  * @throws Error if input is out of range
  * @example
  * ```typescript
  * const input1:BigNumberish = 10;
- * assertInRange(input1, 5, 20, 'value')
+ * assertInRange(input1, 5, 20, 'amount')
  *
  * const input2: BigNumberish = 25;
- * assertInRange(input2, 5, 20, 'value');
- * // throws Error: Message not signable, invalid value length.
+ * assertInRange(input2, 5, 20, 'amount');
+ * // throws Error: Value is out of amount range [5, 20]
  * ```
  */
 export function assertInRange(
@@ -166,14 +171,14 @@ export function assertInRange(
   upperBound: BigNumberish,
   inputName = ''
 ) {
-  const messageSuffix = inputName === '' ? 'invalid length' : `invalid ${inputName} length`;
   const inputBigInt = BigInt(input);
   const lowerBoundBigInt = BigInt(lowerBound);
   const upperBoundBigInt = BigInt(upperBound);
+  const rangeName = inputName === '' ? 'range' : `${inputName} range`;
 
   assert(
     inputBigInt >= lowerBoundBigInt && inputBigInt <= upperBoundBigInt,
-    `Message not signable, ${messageSuffix}.`
+    `Value is out of ${rangeName} [${lowerBoundBigInt}, ${upperBoundBigInt}]`
   );
 }
 
@@ -378,21 +383,56 @@ export function stringToSha256ToArrayBuff4(str: string): Uint8Array {
 }
 
 /**
+ * Test if a value is a `0x` prefix with no digit after it.
+ *
+ * `'0x'` is hexadecimal in form — it is how an EVM tool writes empty data — but it spells no
+ * number : `BigInt('0x')` throws, `isBigNumberish` refuses it, and so does every Cairo type.
+ * @param {unknown} value the value to test
+ * @returns {boolean} true for `'0x'` and `'0X'`, false for anything else
+ * @example
+ * ```typescript
+ * const result = num.isEmptyHex('0x');
+ * // result = true
+ * const result2 = num.isEmptyHex('0x0');
+ * // result2 = false
+ * ```
+ */
+export function isEmptyHex(value: unknown): boolean {
+  return isString(value) && /^0x$/i.test(value);
+}
+
+/**
  * Checks if a given value is of BigNumberish type.
- * 234, 234n, "234", "0xea" are valid, exclude boolean and string
+ * 234, 234n, "234" and "0xea" are valid ; a boolean is not, nor a string that spells no number —
+ * `'0x'` included, which holds no digit.
+ *
+ * A number or a bigint passes whatever its sign, and a number whatever its decimal part : `-1`,
+ * `-1n` and `1.5` are all accepted here, and it is the Cairo type receiving the value that refuses
+ * what it cannot hold. A string is unsigned : it passes as decimal digits or as `0x` hexadecimal
+ * only, so `'-1'` and `'1.5'` do not — to the library, such a string is text. The signed integer
+ * classes, `CairoInt8` to `CairoInt128`, are the one place where a leading minus sign is read as a
+ * sign.
  * @param {unknown} input a value
  * @returns {boolean} true if type of input is `BigNumberish`
  * @example
  * ```typescript
  * const res = num.isBigNumberish("ZERO");
  * // res = false
- *  ```
+ * const res2 = num.isBigNumberish(-1);
+ * // res2 = true
+ * const res3 = num.isBigNumberish('-1');
+ * // res3 = false     (a string is unsigned : this one is text)
+ * const res4 = num.isBigNumberish(1.5);
+ * // res4 = true      (a number is not checked for a decimal part)
+ * const res5 = num.isBigNumberish('0x');
+ * // res5 = false     (hexadecimal in form, but no digit)
+ * ```
  */
 export function isBigNumberish(input: unknown): input is BigNumberish {
   return (
     isNumber(input) ||
     isBigInt(input) ||
-    (isString(input) && (isHex(input) || isStringWholeNumber(input)))
+    (isString(input) && ((isHex(input) && !isEmptyHex(input)) || isStringWholeNumber(input)))
   );
 }
 

@@ -1,7 +1,9 @@
 import { BigNumberish, Literal } from '../../types';
+import { RANGE_CLASS_HASH } from '../../global/constants';
 import { addHexPrefix } from '../encode';
 import { getNext } from '../num';
 import { isText } from '../shortString';
+import { isBigInt, isNumber } from '../typed';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { CairoFelt252 } from './felt';
@@ -10,9 +12,9 @@ import { CairoFelt252 } from './felt';
  * A Cairo `core::starknet::class_hash::ClassHash` : the hash identifying a declared class.
  *
  * On the wire it is a field element like any other, so what this class adds over
- * {@link CairoFelt252} is the bound the RPC spec sets on it — 252 bits. That is wider than a
- * felt252 is, so the two bounds each refuse values the other allows, and neither stands in for
- * the other.
+ * {@link CairoFelt252} is the bound of the Cairo `ClassHash` type : [0, 2^251), the same range as
+ * the Cairo type of an address, and narrower than the field. The 252-bit bound the RPC spec states
+ * is looser, and never the one that binds.
  *
  * A number, a bigint, a decimal string and a hexadecimal string are all read as the same number.
  * Text is **not** an accepted input : a class hash spelled as words is a mistake, not a value.
@@ -46,9 +48,9 @@ export class CairoClassHash {
   static abiSelector = Literal.ClassHash;
 
   /**
-   * Build from a number or a numeric string, refusing text and anything wider than 252 bits.
-   * @param {BigNumberish | boolean} data the hash to carry, within [0, 2^252 - 1]
-   * @throws {Error} when the value is text, is not a felt252 input, or is out of the ClassHash range
+   * Build from a number or a numeric string, refusing text and anything outside the ClassHash range.
+   * @param {BigNumberish | boolean} data the hash to carry, within [0, 2^251 - 1]
+   * @throws {Error} when the value is text, a decimal number, not a felt252 input, or out of the ClassHash range
    * @example
    * ```typescript
    * const result = new CairoClassHash('0x1234').toApiRequest();
@@ -107,22 +109,38 @@ export class CairoClassHash {
   /**
    * Throw unless the value can be carried by a ClassHash.
    *
-   * Text is refused first, then the value is read as a felt252 — which is what refuses a null, an
-   * object or an unsupported type, and what bounds the value. There is no narrower bound to add:
-   * a class hash is a hash output, so any field element is one.
+   * Text is refused first, then a number with a decimal part. A number or a bigint is read as it
+   * is, so that a negative one reaches the range check. Anything else is read as a felt252 — which
+   * is what refuses a null, an object or an unsupported type. The value is finally checked against
+   * the range of the Cairo `ClassHash` type, [0, 2^251), which is narrower than the field.
    * @param {BigNumberish | boolean} data the value to check
-   * @throws {Error} when the value is text, is not a felt252 input, or is outside the field
+   * @throws {Error} when the value is text, a decimal number, not a felt252 input, or out of the ClassHash range
    * @example
    * ```typescript
    * CairoClassHash.validate('0x1234'); // passes
    * CairoClassHash.validate('abc');
    * // throws Error("Invalid input: a ClassHash cannot be built from text")
+   * CairoClassHash.validate(2n ** 251n);
+   * // throws Error("Value is out of ClassHash range [0, 3618502788666131106986593281521497120414687020801267626233049500247285301247]")
+   * CairoClassHash.validate(-1);
+   * // throws Error("Value is out of ClassHash range [0, 3618502788666131106986593281521497120414687020801267626233049500247285301247]")
    * ```
    */
   static validate(data: BigNumberish | boolean | unknown): void {
     assert(!isText(data), 'Invalid input: a ClassHash cannot be built from text');
-    // the field is the only bound a class hash has, so a felt252's own check is the whole of it
-    CairoFelt252.validate(data);
+    assert(
+      !isNumber(data) || Number.isInteger(data),
+      'Invalid input: decimal numbers are not supported, only integers'
+    );
+
+    // a number is read here rather than by CairoFelt252, which would refuse a negative one before
+    // the range below is checked, and in the words of its encoding rather than of a class hash
+    const value =
+      isNumber(data) || isBigInt(data) ? BigInt(data) : new CairoFelt252(data).toBigInt();
+    assert(
+      value >= RANGE_CLASS_HASH.min && value <= RANGE_CLASS_HASH.max,
+      `Value is out of ClassHash range [${RANGE_CLASS_HASH.min}, ${RANGE_CLASS_HASH.max}]`
+    );
   }
 
   /**

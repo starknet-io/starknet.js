@@ -83,6 +83,23 @@ describe('CairoInt64 class Unit Tests', () => {
       expect(i64FromHexString.data).toBe(2n ** 63n - 1n);
     });
 
+    test('should read a minus sign in front of a number as a sign, not as text', () => {
+      const min = -(2n ** 63n);
+      expect(new CairoInt64('-5').toBigInt()).toBe(-5n);
+      expect(new CairoInt64('-0x5').toBigInt()).toBe(-5n);
+      expect(new CairoInt64(min.toString()).toBigInt()).toBe(min);
+      expect(() => new CairoInt64((min - 1n).toString())).toThrow('Value is out of i64 range');
+      // in front of anything else, the sign is text like the rest of the string
+      expect(new CairoInt64('-').toBigInt()).toBe(45n);
+      expect(new CairoInt64('-a').toBigInt()).toBe(11617n); // 0x2d61, the UTF-8 bytes of "-a"
+    });
+
+    test("should reject '0x', which holds no digit, and read '-0x' as text", () => {
+      expect(() => new CairoInt64('0x')).toThrow("Invalid input: '0x' holds no hexadecimal digit");
+      // '0x' is no number, so a sign in front of it is text
+      expect(new CairoInt64('-0x').toBigInt()).toBe(2961528n); // 0x2d3078, the UTF-8 bytes of "-0x"
+    });
+
     test('should reject decimal numbers', () => {
       expect(() => new CairoInt64(42.5)).toThrow(
         'Invalid input: decimal numbers are not supported, only integers'

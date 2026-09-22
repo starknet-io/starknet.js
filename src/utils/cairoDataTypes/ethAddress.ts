@@ -3,6 +3,7 @@ import { RANGE_ETH_ADDRESS } from '../../global/constants';
 import { addHexPrefix } from '../encode';
 import { getNext } from '../num';
 import { isText } from '../shortString';
+import { isBigInt, isNumber } from '../typed';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
 import { CairoFelt252 } from './felt';
@@ -51,7 +52,7 @@ export class CairoEthAddress {
   /**
    * Build from a number or a numeric string, refusing text and anything wider than 160 bits.
    * @param {BigNumberish | boolean} data the address to carry, within [0, 2^160 - 1]
-   * @throws {Error} when the value is text, is not a felt252 input, or is out of the EthAddress range
+   * @throws {Error} when the value is text, a decimal number, not a felt252 input, or out of the EthAddress range
    * @example
    * ```typescript
    * const result = new CairoEthAddress('0x1234').toApiRequest();
@@ -111,10 +112,12 @@ export class CairoEthAddress {
    * Throw unless the value can be carried by an EthAddress.
    *
    * Text is refused first, since an address spelled as words is a mistake rather than a value to
-   * encode. What remains is read as a felt252 — which is what refuses a null, an object or an
-   * unsupported type — then checked against the 160 bits an Ethereum address occupies.
+   * encode, then a number with a decimal part. A number or a bigint is read as it is, so that a
+   * negative one reaches the range check below. Anything else is read as a felt252 — which is what
+   * refuses a null, an object or an unsupported type. The value is finally checked against the 160
+   * bits an Ethereum address occupies.
    * @param {BigNumberish | boolean} data the value to check
-   * @throws {Error} when the value is text, is not a felt252 input, or is out of the EthAddress range
+   * @throws {Error} when the value is text, a decimal number, not a felt252 input, or out of the EthAddress range
    * @example
    * ```typescript
    * CairoEthAddress.validate('0x1234'); // passes
@@ -122,12 +125,21 @@ export class CairoEthAddress {
    * // throws Error("Invalid input: an EthAddress cannot be built from text")
    * CairoEthAddress.validate(2n ** 160n);
    * // throws Error("Value is out of EthAddress range [0, 1461501637330902918203684832716283019655932542975]")
+   * CairoEthAddress.validate(-1);
+   * // throws Error("Value is out of EthAddress range [0, 1461501637330902918203684832716283019655932542975]")
    * ```
    */
   static validate(data: BigNumberish | boolean | unknown): void {
     assert(!isText(data), 'Invalid input: an EthAddress cannot be built from text');
+    assert(
+      !isNumber(data) || Number.isInteger(data),
+      'Invalid input: decimal numbers are not supported, only integers'
+    );
 
-    const value = new CairoFelt252(data).toBigInt();
+    // a number is read here rather than by CairoFelt252, which would refuse a negative one before
+    // the range below is checked, and in the words of its encoding rather than of an address
+    const value =
+      isNumber(data) || isBigInt(data) ? BigInt(data) : new CairoFelt252(data).toBigInt();
     assert(
       value >= RANGE_ETH_ADDRESS.min && value <= RANGE_ETH_ADDRESS.max,
       `Value is out of EthAddress range [${RANGE_ETH_ADDRESS.min}, ${RANGE_ETH_ADDRESS.max}]`

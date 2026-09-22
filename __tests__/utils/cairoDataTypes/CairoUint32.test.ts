@@ -265,9 +265,18 @@ describe('CairoUint32 class Unit Tests', () => {
     });
 
     test('should reject decimal numbers', () => {
-      // Decimal numbers throw when converting to BigInt
-      expect(() => CairoUint32.validate(3.14)).toThrow();
-      expect(() => CairoUint32.validate(1.5)).toThrow();
+      expect(() => CairoUint32.validate(3.14)).toThrow(
+        'Invalid input: decimal numbers are not supported, only integers'
+      );
+      expect(() => CairoUint32.validate(1.5)).toThrow(
+        'Invalid input: decimal numbers are not supported, only integers'
+      );
+    });
+
+    test("should reject '0x', which holds no digit", () => {
+      expect(() => CairoUint32.validate('0x')).toThrow(
+        "Invalid input: '0x' holds no hexadecimal digit"
+      );
     });
   });
 

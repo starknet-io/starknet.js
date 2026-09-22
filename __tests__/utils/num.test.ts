@@ -9,6 +9,7 @@ import {
   getHexStringArray,
   hexToBytes,
   hexToDecimalString,
+  isEmptyHex,
   isHex,
   isStringWholeNumber,
   toBigInt,
@@ -22,6 +23,8 @@ describe('isHex', () => {
     expect(isHex('0xAB')).toBe(true);
     expect(isHex('0x0')).toBe(true);
     expect(isHex('0x12345')).toBe(true);
+    // hexadecimal in form, though it holds no digit : see isEmptyHex
+    expect(isHex('0x')).toBe(true);
   });
 
   test('should return false for non-hex strings', () => {
@@ -29,6 +32,20 @@ describe('isHex', () => {
     expect(isHex('ab')).toBe(false);
     expect(isHex('123')).toBe(false);
     expect(isHex('')).toBe(false);
+  });
+});
+
+describe('isEmptyHex', () => {
+  test("should recognise '0x' in either case", () => {
+    expect(isEmptyHex('0x')).toBe(true);
+    expect(isEmptyHex('0X')).toBe(true);
+  });
+
+  test('should refuse anything holding a digit, or not hexadecimal at all', () => {
+    expect(isEmptyHex('0x0')).toBe(false);
+    expect(isEmptyHex('')).toBe(false);
+    expect(isEmptyHex('0')).toBe(false);
+    expect(isEmptyHex(0)).toBe(false);
   });
 });
 
@@ -42,6 +59,7 @@ describe('toBigInt', () => {
 
   test('should throw for invalid arg', () => {
     expect(() => toBigInt('test')).toThrow();
+    expect(() => toBigInt('0x')).toThrow("Invalid input: '0x' holds no hexadecimal digit");
   });
 });
 
@@ -50,6 +68,10 @@ describe('toHex', () => {
     expect(toHex(100)).toBe('0x64');
     expect(toHex('200')).toBe('0xc8');
     expect(toHex('0x00023AB')).toBe('0x23ab');
+  });
+
+  test("should throw for '0x', which holds no digit", () => {
+    expect(() => toHex('0x')).toThrow("Invalid input: '0x' holds no hexadecimal digit");
   });
 });
 
@@ -74,8 +96,16 @@ describe('assertInRange', () => {
     expect(() => assertInRange(10, 5, 20, 'value')).not.toThrow();
   });
 
-  test('should throw when assertion is false', () => {
-    expect(() => assertInRange(30, 5, 20, 'value')).toThrow();
+  test('should throw when assertion is false, naming the range', () => {
+    expect(() => assertInRange(30, 5, 20, 'amount')).toThrow(
+      'Value is out of amount range [5, 20]'
+    );
+    expect(() => assertInRange(30, 5, 20)).toThrow('Value is out of range [5, 20]');
+  });
+
+  test('should include both bounds', () => {
+    expect(() => assertInRange(5, 5, 20)).not.toThrow();
+    expect(() => assertInRange(20, 5, 20)).not.toThrow();
   });
 });
 
@@ -175,6 +205,28 @@ describe('isBigNumberish', () => {
     expect(num.isBigNumberish('0xea')).toBe(true);
     expect(num.isBigNumberish('ea')).toBe(false);
     expect(num.isBigNumberish('zero')).toBe(false);
+  });
+
+  test('should accept a number or a bigint whatever its sign', () => {
+    expect(num.isBigNumberish(-1)).toBe(true);
+    expect(num.isBigNumberish(-1n)).toBe(true);
+  });
+
+  test('should accept a number whatever its decimal part', () => {
+    // the Cairo type receiving the value is what refuses it
+    expect(num.isBigNumberish(1.5)).toBe(true);
+  });
+
+  test("should refuse a signed or a decimal string, which is text, and '0x'", () => {
+    expect(num.isBigNumberish('-1')).toBe(false);
+    expect(num.isBigNumberish('-0x1')).toBe(false);
+    expect(num.isBigNumberish('1.5')).toBe(false);
+    // hexadecimal in form, but no digit
+    expect(num.isBigNumberish('0x')).toBe(false);
+  });
+
+  test('should refuse a boolean', () => {
+    expect(num.isBigNumberish(true)).toBe(false);
   });
 });
 

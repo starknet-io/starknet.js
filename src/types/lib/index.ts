@@ -13,6 +13,21 @@ export type WeierstrassSignatureType = weierstrass.ECDSASignature;
 export type ArraySignatureType = string[];
 export type Signature = ArraySignatureType | WeierstrassSignatureType;
 
+/**
+ * A number, in any of the three forms JavaScript carries one : a `number`, a `bigint`, or a
+ * `string` spelling it in decimal or in `0x` hexadecimal.
+ *
+ * The type itself accepts any string ; `num.isBigNumberish` is the check made at runtime. A number
+ * or a bigint may be negative, whereas a string is unsigned : `'-1'` is text to the library, except
+ * for the signed integer types `i8` to `i128`, which read it as -1.
+ * @example
+ * ```typescript
+ * const decimals: BigNumberish = 18;
+ * const amount: BigNumberish = 10n ** 18n;
+ * // the selector of balanceOf
+ * const selector: BigNumberish = '0x2e4263afad30923c891518314c3c95dbe830a16874e8abc5777a9a20b54c76e';
+ * ```
+ */
 export type BigNumberish = string | number | bigint;
 
 export type ByteArray = {

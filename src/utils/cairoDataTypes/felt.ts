@@ -2,7 +2,7 @@
 
 import { BigNumberish } from '../../types';
 import { PRIME } from '../../global/constants';
-import { getNext } from '../num';
+import { getNext, isEmptyHex } from '../num';
 import { isBoolean, isString, isBigInt, isNumber } from '../typed';
 import {
   stringToUint8Array,
@@ -187,16 +187,18 @@ export class CairoFelt252 {
   /**
    * Throw unless the value can be carried by a felt252.
    *
-   * Null, undefined and any type this class does not read are refused first, each with its own
-   * message, then the value is converted and its range checked. A negative number does not reach
-   * that range check : converting it fails earlier, and the message comes from the conversion.
+   * Null, undefined, any type this class does not read, and `'0x'` are refused first, each with its
+   * own message, then the value is converted and its range checked. A negative number does not
+   * reach that range check : converting it fails earlier, and the message comes from the conversion.
    * @param {BigNumberish | boolean} data the value to check
-   * @throws {Error} when the value is null, undefined, of an unread type, or outside [0, P)
+   * @throws {Error} when the value is null, undefined, of an unread type, `'0x'`, or outside [0, P)
    * @example
    * ```typescript
    * CairoFelt252.validate('Hello'); // passes
    * CairoFelt252.validate({});
    * // throws Error("Unsupported data type 'object' for felt252. Expected string, number, bigint, or boolean")
+   * CairoFelt252.validate('0x');
+   * // throws Error("Invalid input: '0x' holds no hexadecimal digit")
    * CairoFelt252.validate(-1);
    * // throws Error("Cannot convert negative bigint -1 to Uint8Array")
    * ```
@@ -208,6 +210,9 @@ export class CairoFelt252 {
       isString(data) || isNumber(data) || isBigInt(data) || isBoolean(data),
       `Unsupported data type '${typeof data}' for felt252. Expected string, number, bigint, or boolean`
     );
+    // hexadecimal in form but without a digit : refused rather than read as 0, so that an empty
+    // value, as an EVM tool writes it, does not become a zero one
+    assert(!isEmptyHex(data), "Invalid input: '0x' holds no hexadecimal digit");
 
     const value = CairoFelt252.__processData(data as BigNumberish | boolean);
     const bn = uint8ArrayToBigInt(value);

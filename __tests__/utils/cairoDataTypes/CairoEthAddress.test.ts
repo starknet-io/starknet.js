@@ -73,9 +73,10 @@ describe('CairoEthAddress class Unit Tests', () => {
     });
 
     test('should reject a negative value', () => {
-      // the message comes from the encoding layer rather than from this class
-      expect(() => new CairoEthAddress(-1)).toThrow('Cannot convert negative bigint');
-      expect(() => new CairoEthAddress(-1n)).toThrow('Cannot convert negative bigint');
+      expect(() => new CairoEthAddress(-1)).toThrow(
+        `Value is out of EthAddress range [${RANGE_ETH_ADDRESS.min}, ${RANGE_ETH_ADDRESS.max}]`
+      );
+      expect(() => new CairoEthAddress(-1n)).toThrow('Value is out of EthAddress range');
     });
   });
 
@@ -99,7 +100,8 @@ describe('CairoEthAddress class Unit Tests', () => {
     });
 
     test('should reject a signed numeric string, which also reads as text', () => {
-      // '-1' is neither hexadecimal nor a whole number, so it is text as far as isText is concerned
+      // a minus sign makes a number of a string for the signed integers only : for every other
+      // type, an address included, '-1' is text
       expect(() => new CairoEthAddress('-1')).toThrow(
         'Invalid input: an EthAddress cannot be built from text'
       );
@@ -126,7 +128,15 @@ describe('CairoEthAddress class Unit Tests', () => {
     });
 
     test('should reject a decimal number', () => {
-      expect(() => new CairoEthAddress(42.5)).toThrow("42.5 can't be computed by felt()");
+      expect(() => new CairoEthAddress(42.5)).toThrow(
+        'Invalid input: decimal numbers are not supported, only integers'
+      );
+    });
+
+    test("should reject '0x', rather than read an empty value as the zero address", () => {
+      expect(() => new CairoEthAddress('0x')).toThrow(
+        "Invalid input: '0x' holds no hexadecimal digit"
+      );
     });
   });
 

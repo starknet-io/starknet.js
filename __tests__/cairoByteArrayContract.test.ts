@@ -478,7 +478,7 @@ describe('CairoByteArray Contract Integration Tests', () => {
   });
 
   test('should store and read Buffer file, custom response parsing strategy', async () => {
-    // Create custom parsing strategy that extends hdParsingStrategy
+    // Create custom parsing strategy that extends cairoTypeStrategy
     const customParsingStrategy: CairoTypeStrategy = {
       ...cairoTypeStrategy,
       response: {
@@ -513,7 +513,7 @@ describe('CairoByteArray Contract Integration Tests', () => {
   });
 
   xtest('should store and read large Buffer file without event, custom response parsing strategy', async () => {
-    // Create custom parsing strategy that extends hdParsingStrategy
+    // Create custom parsing strategy that extends cairoTypeStrategy
     const customParsingStrategy: CairoTypeStrategy = {
       ...cairoTypeStrategy,
       response: {

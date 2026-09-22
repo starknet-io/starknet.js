@@ -59,6 +59,15 @@ describe('CairoByteArray Unit Tests', () => {
       expect(apiRequest[1]).toBe('0'); // pending_word as decimal
       expect(apiRequest[2]).toBe('0'); // pending_word_len
     });
+
+    test("should read '0x' as no byte at all, the same as the empty string", () => {
+      // a number type refuses '0x', but here it is empty bytes, as an EVM tool writes them
+      const byteArray = new CairoByteArray('0x');
+
+      expect(byteArray.data).toEqual([]);
+      expect(byteArray.pending_word_len?.toBigInt()).toBe(0n);
+      expect([...byteArray.toApiRequest()]).toEqual([...new CairoByteArray('').toApiRequest()]);
+    });
   });
 
   describe('Uint8Array constructor', () => {

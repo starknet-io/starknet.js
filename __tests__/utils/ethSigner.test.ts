@@ -266,6 +266,12 @@ describe('Ethereum signer', () => {
         '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
       );
     });
+
+    test('Eth address wider than 160 bits', () => {
+      expect(() => validateAndParseEthAddress(2n ** 160n)).toThrow(
+        'Value is out of Ethereum Address range [0, 1461501637330902918203684832716283019655932542975]'
+      );
+    });
   });
 });
 

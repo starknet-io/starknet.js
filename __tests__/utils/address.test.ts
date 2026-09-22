@@ -52,13 +52,16 @@ describe('validateAndParseAddress', () => {
   });
 
   test('should fail for invalid address', () => {
-    const addr = 'test';
-    expect(() => validateAndParseAddress(addr)).toThrow('Cannot convert 0xtest to a BigInt');
+    expect(() => validateAndParseAddress('test')).toThrow('Invalid Address Format');
+    expect(() => validateAndParseAddress('0xZZ')).toThrow('Invalid Address Format');
+    // an empty value is refused, rather than read as the zero address
+    expect(() => validateAndParseAddress('')).toThrow('Invalid Address Format');
+    expect(() => validateAndParseAddress('0x')).toThrow('Invalid Address Format');
   });
 
   test('should fail for out of bound address', () => {
     const addr = num.toHex(constants.ADDR_BOUND + 1n);
-    expect(() => validateAndParseAddress(addr)).toThrow(/^Message not signable/);
+    expect(() => validateAndParseAddress(addr)).toThrow('Value is out of Starknet Address range');
   });
 });
 
