@@ -1,3 +1,9 @@
+## [11.0.2](https://github.com/starknet-io/starknet.js/compare/v11.0.1...v11.0.2) (2026-09-22)
+
+### Bug Fixes
+
+- **cairoDataTypes:** read '-5' as -5 for i8 to i128, and refuse inputs in the type's own words ([062a0aa](https://github.com/starknet-io/starknet.js/commit/062a0aa17c52f4d96981780901b61803971beb2f))
+
 ## [11.0.1](https://github.com/starknet-io/starknet.js/compare/v11.0.0...v11.0.1) (2026-09-18)
 
 ### Bug Fixes
