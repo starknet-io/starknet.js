@@ -26,6 +26,9 @@ function HomepageHeader() {
 }
 
 function SkillSection() {
+  const { siteConfig } = useDocusaurusContext();
+  // read from the hand-written stamp in skills/starknet-js/SKILL.md (see docusaurus.config.ts)
+  const skillVersion = siteConfig.customFields.skillVersion as string;
   return (
     <div className={clsx('hero hero--primary', styles.heroBanner, styles.skillSection)}>
       <div className={clsx(styles.skillContainer)}>
@@ -33,7 +36,8 @@ function SkillSection() {
         <p>
           AI training data is outdated — install the starknet.js skill to give your coding agent
           accurate, up-to-date guidance. Works with Claude Code, Codex, Cursor, Gemini CLI, and any
-          other agent supporting the open skill standard.
+          other agent supporting the open skill standard. The skill is verified against{' '}
+          <strong>starknet.js v{skillVersion}</strong>.
         </p>
         <CodeBlock language="bash">npx skills add starknet-io/starknet.js</CodeBlock>
         <p>or copy the skill files directly:</p>

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import { themes } from 'prism-react-renderer';
@@ -182,6 +184,23 @@ const migrationGuideLink = `${docsBaseUrl}docs/guides/migrate`;
  */
 const onlyCurrentDocs = process.env.DOCS_ONLY_CURRENT === 'true';
 
+/*
+ * The landing page states which starknet.js release the agent skill was verified against. The
+ * stamp is written by hand in SKILL.md; this only copies it at build time. Rewording the stamp
+ * fails the build on purpose, rather than shipping a landing page that silently lost the version.
+ */
+const readSkillVersion = (): string => {
+  const skillPath = join(__dirname, '../skills/starknet-js/SKILL.md');
+  const match = readFileSync(skillPath, 'utf8').match(
+    /Skill verified against \*\*starknet\.js ([^*\s]+)\*\*/
+  );
+  if (!match) {
+    throw new Error(`Missing "Skill verified against **starknet.js X.Y.Z**" stamp in ${skillPath}`);
+  }
+  return match[1];
+};
+const skillVersion = readSkillVersion();
+
 const config: Config = {
   title: 'Starknet.js',
   tagline: 'JavaScript library for Starknet',
@@ -207,6 +226,7 @@ const config: Config = {
   ],
   organizationName: 'starknet-io', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
+  customFields: { skillVersion },
   presets: [
     [
       'classic',
