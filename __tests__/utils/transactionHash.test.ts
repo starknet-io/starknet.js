@@ -106,166 +106,163 @@ describe('TxV3 hashFeeFieldV3B3 — blockifier test vectors', () => {
   });
 });
 
-// TODO: create new tests with rpc0.8+ v3 tx
-/* describe('TxV3Old Hash Tests', () => {
+describe('TxV3 hashDAMode', () => {
   test('DaMode', () => {
-    const result = v3hash.hashDAMode(types.RPC.EDAMode.L1, types.RPC.EDAMode.L1);
+    const result = v3hash.hashDAMode(EDAMode.L1, EDAMode.L1);
     expect(result.toString(16)).toBe('0');
 
-    const result1 = v3hash.hashDAMode(types.RPC.EDAMode.L1, types.RPC.EDAMode.L2);
+    const result1 = v3hash.hashDAMode(EDAMode.L1, EDAMode.L2);
     expect(result1.toString(16)).toBe('1');
 
-    const result2 = v3hash.hashDAMode(types.RPC.EDAMode.L2, types.RPC.EDAMode.L1);
+    const result2 = v3hash.hashDAMode(EDAMode.L2, EDAMode.L1);
     expect(result2.toString(16)).toBe('100000000');
 
-    const result3 = v3hash.hashDAMode(types.RPC.EDAMode.L2, types.RPC.EDAMode.L2);
+    const result3 = v3hash.hashDAMode(EDAMode.L2, EDAMode.L2);
     expect(result3.toString(16)).toBe('100000001');
   });
+});
 
-  test('calculateInvokeTransactionHash Demo', () => {
+// Every expected hash below comes from outside this SDK: three Sepolia transactions, whose hash
+// the sequencer computed and which starknet_getTransactionByHash returns again, and one fixture
+// from the Starkware sequencer repository.
+describe('TxV3 transaction hash — sequencer test vectors', () => {
+  test('invoke matches Sepolia transaction from block 15616497', () => {
     const result = hash.calculateInvokeTransactionHash({
-      senderAddress: '0x12fd538',
+      senderAddress: '0x77dfdc45ba4695eac4c961f3d9bf820ed7e925a44d9963de7b7a0daf8768af0',
       version: '0x3',
-      compiledCalldata: ['0x11', '0x26'],
-      chainId: shortString.encodeShortString('1') as constants.StarknetChainId,
-      nonce: 9,
+      compiledCalldata: [
+        '0x2',
+        '0x248cf60e8ef4895e30dd49801c993ae6271cc52f5207da46c9d81d34f02c029',
+        '0x3c06b1ab163ddde6495ff43fed0ed7a913edc2b078bc89d460f235b09f950e8',
+        '0x0',
+        '0x248cf60e8ef4895e30dd49801c993ae6271cc52f5207da46c9d81d34f02c029',
+        '0x5df99ae77df976b4f0e5cf28c7dcfe09bd6e81aab787b19ac0c08e03d928cf',
+        '0x1',
+        '0x1d0',
+      ],
+      chainId: constants.StarknetChainId.SN_SEPOLIA,
+      nonce: '0x14c1aa',
       accountDeploymentData: [],
-      nonceDataAvailabilityMode: types.RPC.EDAMode.L1,
-      feeDataAvailabilityMode: types.RPC.EDAMode.L1,
+      nonceDataAvailabilityMode: EDAMode.L1,
+      feeDataAvailabilityMode: EDAMode.L1,
       resourceBounds: {
-        l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-        l1_gas: { max_amount: '0x7c9', max_price_per_unit: '0x1' },
+        l1_gas: { max_amount: 0x11170n, max_price_per_unit: 0x8d79883d20000n },
+        l2_gas: { max_amount: 0x5f5e100n, max_price_per_unit: 0xba43b7400n },
+        l1_data_gas: { max_amount: 0x2710n, max_price_per_unit: 0x62448724953354n },
       },
-      tip: 0,
+      tip: '0x5f5e100',
       paymasterData: [],
     });
 
-    expect(result).toBe('0x35591624e5ea7e612f7c65f7c5fcfa0d972365359cfb611aaf93a13a6026a13');
+    expect(result).toBe('0x381be3aec32afcfe7bbc6c62b7b5050d136424cac29a74022de5385bf4acf7c');
   });
 
-  test('calculateInvokeTransactionHash Network', () => {
-    const result = v3hash.calculateInvokeTransactionHash(
-      '0x3f6f3bc663aedc5285d6013cc3ffcbc4341d86ab488b8b68d297f8258793c41',
-      '0x3',
-      [
-        '0x2',
-        '0x4c312760dfd17a954cdd09e76aa9f149f806d88ec3e402ffaf5c4926f568a42',
-        '0x31aafc75f498fdfa7528880ad27246b4c15af4954f96228c9a132b328de1c92',
-        '0x0',
-        '0x6',
-        '0x450703c32370cf7ffff540b9352e7ee4ad583af143a361155f2b485c0c39684',
-        '0xb17d8a2731ba7ca1816631e6be14f0fc1b8390422d649fa27f0fbb0c91eea8',
-        '0x6',
-        '0x0',
-        '0x6',
-        '0x6333f10b24ed58cc33e9bac40b0d52e067e32a175a97ca9e2ce89fe2b002d82',
+  test('invoke with proofFacts matches the Starkware reexecution fixture', () => {
+    // starkware-libs/sequencer, crates/blockifier_reexecution/resources/raw_rpc_json_objects/
+    // transactions.json, key invoke_v3_with_proof_facts — hashed with the mainnet chain id
+    const result = hash.calculateInvokeTransactionHash({
+      senderAddress: '0x51258c78dba24ee15c3aed60fb6fbbfb91a7cb2f739c82e39871847823aa410',
+      version: '0x3',
+      compiledCalldata: [
+        '0x1',
+        '0x40337b1af3c663e86e333bab5a4b28da8d4652a15a69beee2b677776ffe812a',
+        '0x246333a752c1ac637ff1591c5c885e27d56060d241a29aad8475072da0777db',
+        '0x11',
         '0x3',
-        '0x602e89fe5703e5b093d13d0a81c9e6d213338dc15c59f4d3ff3542d1d7dfb7d',
-        '0x20d621301bea11ffd9108af1d65847e9049412159294d0883585d4ad43ad61b',
-        '0x276faadb842bfcbba834f3af948386a2eb694f7006e118ad6c80305791d3247',
-        '0x613816405e6334ab420e53d4b38a0451cb2ebca2755171315958c87d303cf6',
+        '0x0',
+        '0x3281798780c9e6efc0ee82884b785d68842631b3f2803619bf7507d6065f4fb',
+        '0x1',
+        '0x30b5bc96ceb941beb82123f24621c4973884cb60a7679cc4a1ed633cca491ce',
+        '0x0',
+        '0x419f54c4dbeda02c50bee99eebbc316821ed92e3cc53ac41d18a5852c8c31b1',
+        '0x3',
+        '0x1eed60b8d483b3bede62d1cc0f32874aea30747e6943437c858359b41801bf7',
+        '0x579a974f400c4f6a633117462be5470f01ccffb6ad70448bc3cd649097ea73f',
+        '0x6669cc2d160a654555944c71584d9058265b6e8a686f497f43bddab8a2592d3',
+        '0x4',
+        '0x51258c78dba24ee15c3aed60fb6fbbfb91a7cb2f739c82e39871847823aa410',
+        '0x30b5bc96ceb941beb82123f24621c4973884cb60a7679cc4a1ed633cca491ce',
+        '0x1eed60b8d483b3bede62d1cc0f32874aea30747e6943437c858359b41801bf7',
+        '0x579a974f400c4f6a633117462be5470f01ccffb6ad70448bc3cd649097ea73f',
+        '0x6669cc2d160a654555944c71584d9058265b6e8a686f497f43bddab8a2592d3',
       ],
-      constants.StarknetChainId.SN_SEPOLIA,
-      '0x8a9',
-      [],
-      0,
-      0,
-      {
-        l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-        l1_gas: { max_amount: '0x186a0', max_price_per_unit: '0x5af3107a4000' },
+      chainId: constants.StarknetChainId.SN_MAIN,
+      nonce: '0x2',
+      accountDeploymentData: [],
+      nonceDataAvailabilityMode: EDAMode.L1,
+      feeDataAvailabilityMode: EDAMode.L1,
+      resourceBounds: {
+        l1_gas: { max_amount: 0n, max_price_per_unit: 0x816b7355ba6fn },
+        l2_gas: { max_amount: 0x700c740n, max_price_per_unit: 0x861c46800n },
+        l1_data_gas: { max_amount: 0x360n, max_price_per_unit: 0x4c0e358c66n },
       },
-      '0x0',
-      []
-    );
+      tip: '0x0',
+      paymasterData: [],
+      proofFacts: [
+        '0x50524f4f4630',
+        '0x5649525455414c5f534e4f53',
+        '0x3e98c2d7703b03a7edb73ed7f075f97f1dcbaa8f717cdf6e1a57bf058265473',
+        '0x5649525455414c5f534e4f5330',
+        '0x89ae2e',
+        '0x397ebc55c4146288c6abca9bec8d3b3cc308ba73ac4ddac1fb6f8605d603d9c',
+        '0x70c7b342f93155315d1cb2da7a4e13a3c2430f51fb5696c1b224c3da5508dfb',
+        '0x1',
+        '0xbc200cc5fc8d6d0b0d7331c76d3416a75f4a527b24dae1a80c60329a54e347',
+      ],
+    });
 
-    expect(result).toBe('0x6d0e3ff991d62a10189a0ea11685d26b7efdb5baa9fa0d0a4edd1711185f671');
+    expect(result).toBe('0x3f600e8af3f94178298d7f56a396b81a8083db1b2cc0f16eaa09f5d79221730');
   });
 
-  test('calculateDeployAccountTransactionHash Demo', () => {
-    const result = v3hash.calculateDeployAccountTransactionHash(
-      '0x219bea54dc352c0d6853de34019644758620fa6298c4608829228c3f5f8db33',
-      '0x65bcf29c898ff912fa2bdd4c6cd94b9142da0399127601ef35dfc9babc7a691',
-      ['0x21b', '0x151'],
-      '0x12fd537',
-      '0x3',
-      shortString.encodeShortString('2') as constants.StarknetChainId,
-      '0x0',
-      types.RPC.EDAMode.L1,
-      types.RPC.EDAMode.L1,
-      {
-        l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-        l1_gas: { max_amount: '0x7c9', max_price_per_unit: '0x1' },
+  test('declare matches Sepolia transaction from block 15616673', () => {
+    const result = hash.calculateDeclareTransactionHash({
+      classHash: '0x7ed4eda23a0d7309967487acbfc7fffc84821366895dea6114aa68000c818a8',
+      compiledClassHash: '0x40547df7390fa6dd0955a25bc6a779d4116a1e1371b26db22c5b2a7a1ffbf19',
+      senderAddress: '0x475b12c58fe3e0543f947998babd3ad1e913750466ba7c525322a5d1c56e4a7',
+      version: '0x3',
+      chainId: constants.StarknetChainId.SN_SEPOLIA,
+      nonce: '0xd5',
+      accountDeploymentData: [],
+      nonceDataAvailabilityMode: EDAMode.L1,
+      feeDataAvailabilityMode: EDAMode.L1,
+      resourceBounds: {
+        l1_gas: { max_amount: 0n, max_price_per_unit: 0xb7530345df55n },
+        l2_gas: { max_amount: 0x1d2739a0n, max_price_per_unit: 0x77b7a5b8fn },
+        l1_data_gas: { max_amount: 0x120n, max_price_per_unit: 0x15cf21f3954n },
       },
-      '0x0',
-      []
-    );
+      tip: '0x0',
+      paymasterData: [],
+    });
 
-    expect(result).toBe('0x3877e0ffb3917187deb3321f6017f5339d22a3753d498df76203b6b8120dde5');
+    expect(result).toBe('0x16de62b01042d202177c320cbafafc6b1adcf37ca18a9ce5a212fac3980ae43');
   });
 
-  test('calculateDeployAccountTransactionHash Network', () => {
-    const result = v3hash.calculateDeployAccountTransactionHash(
-      '0x2fab82e4aef1d8664874e1f194951856d48463c3e6bf9a8c68e234a629a6f50',
-      '0x2338634f11772ea342365abd5be9d9dc8a6f44f159ad782fdebd3db5d969738',
-      ['0x5cd65f3d7daea6c63939d659b8473ea0c5cd81576035a4d34e52fb06840196c'],
-      '0x0',
-      '0x3',
-      constants.StarknetChainId.SN_SEPOLIA,
-      '0x0',
-      types.RPC.EDAMode.L1,
-      types.RPC.EDAMode.L1,
-      {
-        l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-        l1_gas: { max_amount: '0x186a0', max_price_per_unit: '0x5af3107a4000' },
+  test('deploy account matches Sepolia transaction from block 15617429', () => {
+    const result = hash.calculateDeployAccountTransactionHash({
+      // not part of the transaction itself: read from its receipt
+      contractAddress: '0x21b2f3b6f4f707a5630ef1476549951bd7ed401c921580c5b3bb4bd945cd062',
+      classHash: '0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72',
+      compiledConstructorCalldata: [
+        '0x1',
+        '0x2',
+        '0x75bde96776c18004db282868166cb249278738af82f536b645a796741f4fcb2',
+        '0x9db5d788e62a61c4144ca2c6594434def70200dc38ed4708e10d65f7d5efa',
+      ],
+      salt: '0x75bde96776c18004db282868166cb249278738af82f536b645a796741f4fcb2',
+      version: '0x3',
+      chainId: constants.StarknetChainId.SN_SEPOLIA,
+      nonce: '0x0',
+      nonceDataAvailabilityMode: EDAMode.L1,
+      feeDataAvailabilityMode: EDAMode.L1,
+      resourceBounds: {
+        l1_gas: { max_amount: 0n, max_price_per_unit: 0x18c24e65c6dfen },
+        l2_gas: { max_amount: 0x79a707n, max_price_per_unit: 0x1026d6ed66n },
+        l1_data_gas: { max_amount: 0x5a7n, max_price_per_unit: 0x281c7ca653cn },
       },
-      '0x0',
-      []
-    );
+      tip: '0x0',
+      paymasterData: [],
+    });
 
-    expect(result).toBe('0x3018236df5779c1f28caba0e64febcb78f5bc69aa3538be54f4e27def9de1b3');
+    expect(result).toBe('0x761a414cb50fecb10f8fac3ccc6f8e38e827a23831ea54e71e765ac4e7f2d78');
   });
-
-  test('calculateDeclareTransactionHash Demo', () => {
-    const result = v3hash.calculateDeclareTransactionHash(
-      '0x7d6b55b53dc0b621bb7e2b501340e4a88f7c448b513c9882d1be7ffac42ba3',
-      '0x7b',
-      '0x12fd538',
-      '0x3',
-      shortString.encodeShortString('3') as constants.StarknetChainId,
-      '0x0',
-      ['0x0'],
-      types.RPC.EDAMode.L1,
-      types.RPC.EDAMode.L1,
-      {
-        l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-        l1_gas: { max_amount: '0x7c9', max_price_per_unit: '0x1' },
-      },
-      '0x0',
-      ['0x0']
-    );
-
-    expect(result).toBe('0x6819909698b213a42e90751f85e6c6be877a679503e1a50921b1efc7ea997e');
-  });
-
-  test('calculateDeclareTransactionHash Network', () => {
-    const result = v3hash.calculateDeclareTransactionHash(
-      '0x5ae9d09292a50ed48c5930904c880dab56e85b825022a7d689cfc9e65e01ee7',
-      '0x1add56d64bebf8140f3b8a38bdf102b7874437f0c861ab4ca7526ec33b4d0f8',
-      '0x2fab82e4aef1d8664874e1f194951856d48463c3e6bf9a8c68e234a629a6f50',
-      '0x3',
-      constants.StarknetChainId.SN_SEPOLIA,
-      '0x1',
-      [],
-      types.RPC.EDAMode.L1,
-      types.RPC.EDAMode.L1,
-      {
-        l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-        l1_gas: { max_amount: '0x186a0', max_price_per_unit: '0x2540be400' },
-      },
-      '0x0',
-      []
-    );
-
-    expect(result).toBe('0x61bfaf480ac824971ad1bdc316fa821f58afd6b47e037242ef265d0aaea7c78');
-  });
-}); */
+});
