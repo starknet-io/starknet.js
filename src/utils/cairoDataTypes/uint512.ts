@@ -62,7 +62,7 @@ export class CairoUint512 {
    * // result = 7n
    * ```
    */
-  public limb0: bigint; // TODO should be u128
+  public limb0: bigint;
 
   /**
    * Bits 128 to 255 of the value.
@@ -72,7 +72,7 @@ export class CairoUint512 {
    * // result = 0n
    * ```
    */
-  public limb1: bigint; // TODO should be u128
+  public limb1: bigint;
 
   /**
    * Bits 256 to 383 of the value.
@@ -82,7 +82,7 @@ export class CairoUint512 {
    * // result = 0n
    * ```
    */
-  public limb2: bigint; // TODO should be u128
+  public limb2: bigint;
 
   /**
    * Bits 384 to 511 of the value.
@@ -92,7 +92,7 @@ export class CairoUint512 {
    * // result = 64n
    * ```
    */
-  public limb3: bigint; // TODO should be u128
+  public limb3: bigint;
 
   /**
    * The abi type this class serializes.

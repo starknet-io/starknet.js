@@ -101,7 +101,7 @@ export class CairoUint256 {
    * // result = 5n
    * ```
    */
-  public low: bigint; // TODO should be u128
+  public low: bigint;
 
   /**
    * The top 128 bits of the value.
@@ -111,7 +111,7 @@ export class CairoUint256 {
    * // result = 4n
    * ```
    */
-  public high: bigint; // TODO should be u128
+  public high: bigint;
 
   /**
    * The abi type this class serializes.
