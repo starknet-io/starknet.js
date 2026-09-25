@@ -428,7 +428,7 @@ describe('Cairo 1', () => {
       expect(myCairoEnum.activeVariant()).toEqual('Error');
 
       const myCairoEnum2: CairoCustomEnum = await cairo1Contract.my_enum_output(100);
-      // expect(myCairoEnum2.unwrap()).toEqual(BigInt(shortString.encodeShortString('attention:100')));
+      expect(myCairoEnum2.unwrap()).toEqual(CairoBytes31.fromText('attention:100').toBigInt());
       expect(myCairoEnum2.activeVariant()).toEqual('Warning');
 
       const myCairoEnum3: CairoCustomEnum = await cairo1Contract.my_enum_output(150);
