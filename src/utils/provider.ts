@@ -15,7 +15,7 @@ import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
 import { isHex, toHex } from './num';
-import { toApiVersion } from './resolve';
+import { compareVersions, toApiVersion } from './resolve';
 import { isDecimalString } from './shortString';
 import { compressProgram } from './stark';
 import { isBigInt, isNumber, isString } from './typed';
@@ -203,6 +203,15 @@ export class Block {
       } else if (isHex(__identifier)) {
         this.hash = __identifier;
       } else if (validBlockTags.includes(__identifier as BlockTag)) {
+        const rpcVersion = config.get('rpcVersion');
+        if (
+          __identifier === 'pre_confirmed' &&
+          rpcVersion &&
+          compareVersions(rpcVersion, SupportedRpcVersion.v0_9_0) < 0
+        ) {
+          throw new Error('`pre_confirmed` block tag is not supported by RPC versions < 0.9.');
+        }
+
         this.tag = __identifier;
       } else {
         throw TypeError(`Block identifier unmanaged: ${__identifier}`);
