@@ -141,6 +141,24 @@ describe('typedData', () => {
     `);
   });
 
+  test('should hash hex-looking selector names in revision 1', () => {
+    const selector = '0x1';
+    const selectorHash = getSelectorFromName(selector);
+
+    const activeSelectorValue = encodeValue(
+      {},
+      'selector',
+      selector,
+      {},
+      TypedDataRevision.ACTIVE
+    );
+    expect(activeSelectorValue).toEqual(['felt', selectorHash]);
+    expect(activeSelectorValue[1]).not.toBe(selector);
+
+    const legacySelectorValue = encodeValue({}, 'selector', selector);
+    expect(legacySelectorValue).toEqual(['felt', selector]);
+  });
+
   test('should prepare selector', () => {
     const res1 = prepareSelector('myFunction');
     expect(res1).toEqual('0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8');

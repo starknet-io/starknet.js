@@ -408,7 +408,11 @@ export function encodeValue(
       return ['felt', root];
     }
     case 'selector': {
-      return ['felt', prepareSelector(data as string)];
+      const selector =
+        revision === Revision.ACTIVE
+          ? getSelectorFromName(data as string)
+          : prepareSelector(data as string);
+      return ['felt', selector];
     }
     case 'string': {
       if (revision === Revision.ACTIVE) {
