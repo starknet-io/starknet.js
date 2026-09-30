@@ -135,7 +135,8 @@ describe('CairoTypeResult class Unit Tests', () => {
     });
 
     test('should require the variant for a CairoType already built', () => {
-      // the guard CairoTypeOption does not have: a built value says nothing about its branch
+      // a CairoUint8 alone does not tell if it is the Ok value or the Err value, so the
+      // variant must be given. CairoTypeOption and CairoTypeCustomEnum ask for it too.
       expect(() => new CairoTypeResult(new CairoUint8(8), T, S)).toThrow(
         '"variant" parameter is mandatory when creating a new Cairo Result from a CairoType.'
       );

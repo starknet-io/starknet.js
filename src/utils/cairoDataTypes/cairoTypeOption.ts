@@ -90,7 +90,13 @@ export class CairoTypeOption {
    * Build an option, from a value a caller passed or from the felts of a response.
    *
    * A {@link CairoOption} says its own branch, so `variant` is not given with one — nor with the
-   * response iterator, which reads the branch off the wire. Anywhere else it is required.
+   * response iterator, which reads the branch off the wire, nor with a `CairoTypeOption`, which
+   * is copied as it is. Anywhere else it is required.
+   *
+   * For the same reason, a `CairoOption` that holds a `CairoTypeOption` is refused: once it is
+   * unwrapped, the variant comes with the `CairoTypeOption`. Accepted, it would lose one level:
+   * `Some(Some(1))` would be sent as `Some(None)`. Write a nested value with `CairoOption`
+   * only, or build one `CairoTypeOption` for the whole type.
    *
    * `subType` is what makes an option of options work. Handed a `CairoOption`, this constructor
    * unwraps it and calls itself with what was inside, which for a nested option is another
@@ -101,11 +107,11 @@ export class CairoTypeOption {
    * @param {string} optionCairoType the abi type, `core::option::Option::<T>`
    * @param {AllowArray<CairoTypeStrategy>} parsingStrategy how to build the value
    * @param {CairoOptionVariant | number} [variant] which branch, when the content does not say.
-   * Must be omitted when `content` is the response iterator.
+   * Must be omitted when `content` is the response iterator or a `CairoTypeOption`.
    * @param {boolean} [subType=false] true when called from the unwrapping of a nested
    * `CairoOption`, which is the only caller that should set it
-   * @throws {Error} when the type is not an option, when the variant is missing, absurd, or
-   * contradicts the content
+   * @throws {Error} when the type is not an option, or when the variant is missing, absurd,
+   * contradicts the content, or is given with a `CairoTypeOption`
    * @example
    * ```typescript
    * const type = 'core::option::Option::<core::integer::u8>';
@@ -159,6 +165,12 @@ export class CairoTypeOption {
     }
 
     if (content instanceof CairoTypeOption) {
+      // with a variant, this option is the content of an outer option. Copying it would lose one
+      // level: Some(Some(1)) would be sent as Some(None).
+      assert(
+        isUndefined(variant),
+        'when "content" parameter is a CairoTypeOption, do not define "variant" parameter.'
+      );
       this.content = content.content;
       this.isVariantSome = content.isVariantSome;
       this.optionCairoType = content.optionCairoType;
