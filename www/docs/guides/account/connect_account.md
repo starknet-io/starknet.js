@@ -91,7 +91,7 @@ const myAccount = new Account({
   provider: myProvider,
   address: accountAddress,
   signer: privateKey,
-  cairoVersion: '1', // optional - Cairo version ('1' is default)
+  cairoVersion: '1', // optional - Cairo version of the account; read from the node when omitted
   transactionVersion: ETransactionVersion.V3, // ETransactionVersion.V3 is the default and only option
   paymaster: undefined, // optional - paymaster for sponsored transactions
   deployer: defaultDeployer, // optional - custom deployer (defaultDeployer or legacyDeployer)

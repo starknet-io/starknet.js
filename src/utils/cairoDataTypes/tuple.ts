@@ -8,6 +8,8 @@ import { CairoFelt252 } from './felt';
 import { isCairoType, type CairoType } from './cairoType.interface';
 import { findConstructor, findResponseParser } from './strategyLookup';
 
+// Cairo 0 specific: when Cairo 0 support is dropped, keep only `string` in TupleMember.
+// The `{ name, type }` form is a Cairo 0 named tuple.
 /** One member of a tuple type: a bare type, or a name and a type for a Cairo 0 named tuple. */
 type TupleMember = string | { name: string; type: string };
 
@@ -203,6 +205,8 @@ export class CairoTuple {
     const inputObject = input as Record<string, any>;
     const members = CairoTuple.getTupleElementTypes(tupleType);
 
+    // Cairo 0 specific: when Cairo 0 support is dropped, remove this branch.
+    // Only a Cairo 0 named tuple can be given as an object keyed by member names.
     const named = members.filter((member) => typeof member === 'object') as {
       name: string;
       type: string;
@@ -259,6 +263,8 @@ export class CairoTuple {
       return [];
     }
     const members = extractTupleMemberTypes(tupleType) as TupleMember[];
+    // Cairo 0 specific: when Cairo 0 support is dropped, remove the `isCairo1Type` test.
+    // Every tuple type is then a Cairo 1 one.
     if (isCairo1Type(tupleType) && `(${members.join(', ')})` !== tupleType) {
       throw new Error(
         `"${tupleType}" is not a valid Cairo type (its members do not recompose it, usually a missing space after a comma)`

@@ -6,6 +6,8 @@ import { CONTRACT } from '../../api';
 export type Abi = ReadonlyArray<FunctionAbi | AbiEvent | AbiStruct | InterfaceAbi | any>;
 
 // Basic elements
+// Cairo 0 specific: when Cairo 0 support is dropped, remove `'felt' | 'felt*'` from AbiEntry and
+// EventEntry. They are the Cairo 0 names of a felt and of an array of felts.
 export type AbiEntry = { name: string; type: 'felt' | 'felt*' | 'event' | string };
 
 export type EventEntry = { name: string; type: 'felt' | 'felt*' | string; kind: 'key' | 'data' };
@@ -17,6 +19,7 @@ export type FunctionAbi = {
   inputs: AbiEntry[];
   name: string;
   outputs: AbiEntry[];
+  // Cairo 0 specific: when Cairo 0 support is dropped, remove this field.
   stateMutability?: 'view';
   state_mutability?: string; // Cairo 1 Abi
   type: FunctionAbiType;
@@ -24,6 +27,8 @@ export type FunctionAbi = {
 
 export type AbiStructs = { [name: string]: AbiStruct };
 
+// Cairo 0 specific: when Cairo 0 support is dropped, remove `offset` and `size`.
+// Only a Cairo 0 abi gives them.
 export type AbiStruct = {
   members: (AbiEntry & { offset: number })[];
   name: string;
@@ -71,6 +76,7 @@ export type CairoEventVariant = CONTRACT.ENUM_EVENT & {
   type: string;
 };
 
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this type.
 export type LegacyEvent = {
   name: string;
   type: 'event';

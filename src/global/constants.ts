@@ -16,6 +16,8 @@ export const TEXT_TO_FELT_MAX_LEN = 31;
 export const ZERO = 0n;
 export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1
 export const MASK_31 = 2n ** 31n - 1n; // 2 ** 31 - 1
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this constant.
+// Only the Cairo 0 class hash uses it.
 export const API_VERSION = ZERO;
 export const PRIME = 2n ** 251n + 17n * 2n ** 192n + 1n;
 
@@ -243,6 +245,8 @@ export const SYSTEM_MESSAGES = {
     'Channel specification version is not compatible with the connected node Specification Version',
   unsupportedSpecVersion:
     'The connected node specification version is not supported by this library',
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep this message only if Starknet still
+  // holds Cairo 0 contracts; otherwise remove it.
   declareNonSierra: 'Declaring non Sierra (Cairo0)contract using RPC 0.8+',
   unsupportedMethodForRpcVersion: 'Unsupported method for RPC version',
   txEvictedFromMempool: 'Transaction TTL, evicted from the mempool, try to increase the tip',

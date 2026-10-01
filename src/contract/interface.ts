@@ -249,6 +249,7 @@ export abstract class ContractInterface {
    */
   public abstract parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents;
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, remove this method.
   /**
    * Check if the contract is implemented in Cairo 1
    *

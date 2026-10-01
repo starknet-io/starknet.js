@@ -1,3 +1,4 @@
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this file.
 import { CairoBytes31 } from '../../cairoDataTypes/bytes31';
 import { CairoByteArray } from '../../cairoDataTypes/byteArray';
 import { AbiEntryType, ETH_ADDRESS } from '../../../types';

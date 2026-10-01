@@ -504,6 +504,8 @@ export class RpcProvider implements ProviderInterface {
       }
       return { cairo: '1', compiler: undefined };
     }
+    // Cairo 0 specific: when Cairo 0 support is dropped, keep this result only if Starknet still
+    // holds Cairo 0 contracts; otherwise remove it.
     return { cairo: '0', compiler: '0' };
   }
 

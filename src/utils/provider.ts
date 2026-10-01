@@ -96,6 +96,8 @@ export async function createSierraContractClass(
 export async function parseContract(contract: CompiledContract | string): Promise<ContractClass> {
   const parsedContract = isString(contract) ? (parse(contract) as CompiledContract) : contract;
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, remove this branch.
+  // Declaring a Cairo 0 contract is already refused.
   if (!isSierra(contract)) {
     return {
       ...parsedContract,

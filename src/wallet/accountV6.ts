@@ -160,6 +160,9 @@ export class WalletAccountV6 extends WalletAccountV5 {
   static async connect(
     provider: ProviderOptions | ProviderInterface,
     walletProvider: WalletWithStarknetFeaturesV6,
+    // Cairo 0 specific: when Cairo 0 support is dropped, keep this parameter, here and in
+    // connectSilent, only if Starknet still holds Cairo 0 contracts; otherwise remove it.
+    // Beware: it is positional, and `paymaster` comes after it.
     cairoVersion?: CairoVersion,
     paymaster?: PaymasterOptions | PaymasterInterface,
     silentMode: boolean = false

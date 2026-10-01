@@ -117,6 +117,9 @@ describe('getAbiEvents', () => {
     );
   });
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, if Starknet still holds Cairo 0 contracts,
+  // make this test expect the clear error getAbiEvents will raise; otherwise remove it.
+  // Its abi starts with a type that has no '::', so it is read as a Cairo 0 abi.
   test('should return Cairo ABI events', () => {
     const abiCairoEventStruct: AbiEvent = {
       kind: 'struct',

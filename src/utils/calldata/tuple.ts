@@ -1,6 +1,8 @@
 /* eslint-disable no-plusplus */
 import { isCairo1Type, isTypeNamedTuple } from './cairo';
 
+// Cairo 0 specific: when Cairo 0 support is dropped, remove parseNamedTuple, parseSubTuple and
+// extractCairo0Tuple below. They split a Cairo 0 tuple type, whose members can carry a name.
 function parseNamedTuple(namedTuple: string): any {
   const name = namedTuple.substring(0, namedTuple.indexOf(':'));
   const type = namedTuple.substring(name.length + ':'.length);
@@ -129,5 +131,6 @@ function extractCairo1Tuple(type: string): string[] {
  * // cairo1Result: ["core::result::Result::<u8, u8>", "u8"]
  */
 export default function extractTupleMemberTypes(type: string): (string | object)[] {
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep only the Cairo 1 branch.
   return isCairo1Type(type) ? extractCairo1Tuple(type) : extractCairo0Tuple(type);
 }

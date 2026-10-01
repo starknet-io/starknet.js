@@ -43,6 +43,7 @@ import {
 } from '../../factories/abi';
 import { CairoBytes31 } from '../../../src/utils/cairoDataTypes/bytes31';
 
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this describe.
 describe('isLen', () => {
   test('should return true if name ends with "_len"', () => {
     expect(isLen('test_len')).toEqual(true);
@@ -55,6 +56,7 @@ describe('isLen', () => {
 
 describe('isTypeFelt', () => {
   test('should return true if given type is Felt', () => {
+    // Cairo 0 specific: when Cairo 0 support is dropped, remove this expectation.
     expect(isTypeFelt('felt')).toEqual(true);
     expect(isTypeFelt('core::felt252')).toEqual(true);
   });
@@ -68,6 +70,7 @@ describe('isTypeArray', () => {
   test('should return true if given type is an Array', () => {
     expect(isTypeArray('core::array::Array::<core::bool>')).toEqual(true);
     expect(isTypeArray('core::array::Span::<core::bool>')).toEqual(true);
+    // Cairo 0 specific: when Cairo 0 support is dropped, remove this expectation.
     expect(isTypeArray('felt*')).toEqual(true);
   });
 
@@ -87,6 +90,7 @@ describe('isTypeTuple', () => {
   });
 });
 
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this describe.
 describe('isTypeNamedTuple', () => {
   test('should return true if given type is named Tuple', () => {
     expect(isTypeNamedTuple('(core::bool, core::bool)')).toEqual(true);
@@ -245,6 +249,7 @@ describe('isCairo1Type', () => {
 
 describe('getArrayType', () => {
   test('should extract type from an array', () => {
+    // Cairo 0 specific: when Cairo 0 support is dropped, remove the two expectations below.
     expect(getArrayType('felt*')).toEqual('felt');
     expect(getArrayType('felt**')).toEqual('felt');
     expect(getArrayType('core::array::Array::<core::bool>')).toEqual('core::bool');
@@ -266,6 +271,8 @@ describe('isCairo1Abi', () => {
     expect(isCairo1Abi([getInterfaceAbi()])).toEqual(true);
   });
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep the two tests below only if Starknet
+  // still holds Cairo 0 contracts; otherwise remove them.
   test('should return false if ABI comes from Cairo 0 contract', () => {
     expect(isCairo1Abi([getFunctionAbi('felt')])).toEqual(false);
   });
@@ -280,6 +287,8 @@ describe('isCairo1Abi', () => {
 });
 
 describe('getAbiContractVersion', () => {
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep this test only if Starknet still
+  // holds Cairo 0 contracts; otherwise remove it.
   test('should return Cairo 0 contract version', () => {
     const contractVersion: ContractVersion = getAbiContractVersion([getFunctionAbi('felt')]);
     expect(contractVersion).toEqual({ cairo: '0', compiler: '0' });

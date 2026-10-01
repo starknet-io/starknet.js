@@ -17,6 +17,8 @@ import { byteArrayFromString } from '../../../src/utils/calldata/byteArray';
 import { ABI as StringABI } from '../../../__mocks__/cairo/cairo240/string';
 
 describe('requestParser', () => {
+  // Cairo 0 specific: when Cairo 0 support is dropped, remove this describe.
+  // It tests parseCalldataField, which goes with requestParser.ts.
   describe('parseCalldataField', () => {
     test('should return parsed calldata field for base type', () => {
       const args = [256n, 128n];

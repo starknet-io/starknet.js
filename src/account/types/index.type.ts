@@ -35,6 +35,8 @@ export type AccountOptions = {
   address: string;
   /** Private key or Signer Class instance for signing transactions */
   signer: Uint8Array | string | SignerInterface;
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep this option only if Starknet still
+  // holds Cairo 0 contracts, to refuse a Cairo 0 account; otherwise remove it.
   /** Cairo version to use for this account (optional, auto-detected if not provided) */
   cairoVersion?: CairoVersion;
   /** Transaction version to use for sending transactions (optional) */

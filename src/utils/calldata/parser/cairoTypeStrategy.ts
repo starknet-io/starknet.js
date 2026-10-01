@@ -33,6 +33,7 @@ import type { CairoType } from '../../cairoDataTypes/cairoType.interface';
 import type { CairoTypeStrategy, VariantType } from './cairoTypeStrategy.type';
 import assert from '../../assert';
 
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this function.
 /**
  * Is this the strategy shape that drives the Cairo type classes?
  *
@@ -40,8 +41,6 @@ import assert from '../../assert';
  * {@link ParsingStrategy}, whose entries go straight from a value to its felts, and this one,
  * whose constructors return an instance. They are told apart by what they carry — `request`
  * against `constructors` — so that one argument can serve both and neither has to be broken.
- *
- * This disappears with the Cairo 0 island.
  * @param {unknown} strategy the strategy handed to a parser, if any
  * @returns {boolean} true when it is a strategy of Cairo type classes
  * @example
@@ -145,10 +144,10 @@ const LEAF_TYPES = [
 /**
  * The strategy the composite classes drive.
  *
- * It carries the leaf types only for now : a composite adds itself to `dynamicSelectors` as it is
- * written, because its abi type is a family rather than one string. Nothing in the library reads
- * this map yet — the parsers still run on {@link hdParsingStrategy}, and moving them over is the
- * next step, not this one.
+ * It carries the leaf types, and the composites whose abi type is a family rather than one
+ * string — tuple, array, Option, Result, NonZero, fixed array — each found through
+ * `dynamicSelectors`. A contract's own structs and enums are added by the parser. This is the
+ * default strategy of the Cairo 1 parsers, `AbiParser1` and `AbiParser2`.
  * @example
  * ```typescript
  * const felts = cairoTypeStrategy.constructors['core::integer::u8'](44, cairoTypeStrategy)

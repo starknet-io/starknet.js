@@ -47,6 +47,8 @@ export abstract class AbiParserInterface {
    */
   public abstract getLegacyFormat(): Abi;
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, remove this method.
+  // Only AbiParser0 has something to check here.
   /**
    * Check the arguments of a method before any of them is serialized
    *
@@ -75,6 +77,8 @@ export abstract class AbiParserInterface {
   public abstract parseResponse(
     responseIterator: Iterator<string>,
     output: AbiEntry | EventEntry,
+    // Cairo 0 specific: when Cairo 0 support is dropped, remove this parameter.
+    // Only a Cairo 0 array needs it, to find its `a_len`.
     parsedResult?: Args | ParsedStruct
   ): any;
 }

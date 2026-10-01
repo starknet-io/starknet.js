@@ -484,6 +484,8 @@ export class Contract implements ContractInterface {
     );
   }
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, remove this method.
+  // A Contract can then only hold a Cairo 1 abi.
   public isCairo1(): boolean {
     return cairo.isCairo1Abi(this.abi);
   }

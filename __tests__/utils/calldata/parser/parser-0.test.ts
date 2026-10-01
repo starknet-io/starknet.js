@@ -1,3 +1,4 @@
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this file.
 import { AbiParser0, cairoTypeStrategy, fastParsingStrategy } from '../../../../src';
 import { getFunctionAbi } from '../../../factories/abi';
 

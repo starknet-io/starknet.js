@@ -93,6 +93,8 @@ export class AbiParser1 implements AbiParserInterface {
     ];
   }
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, remove this method, with its declaration
+  // in AbiParserInterface.
   /**
    * Check the arguments of a method before any of them is serialized — which here is nothing.
    *

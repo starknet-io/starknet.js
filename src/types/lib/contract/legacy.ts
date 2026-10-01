@@ -1,6 +1,9 @@
 import { Abi } from './abi';
+import { EntryPointsByType } from './sierra';
 
 /** LEGACY CONTRACT */
+// Cairo 0 specific: when Cairo 0 support is dropped, keep this type only if Starknet still
+// returns Cairo 0 classes; otherwise remove it.
 /**
  * format produced after compressing 'program' property
  */
@@ -10,6 +13,7 @@ export type LegacyContractClass = {
   abi: Abi;
 };
 
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this type.
 /**
  * format produced after compiling .cairo to .json
  */
@@ -18,22 +22,12 @@ export type LegacyCompiledContract = Omit<LegacyContractClass, 'program'> & {
 };
 
 /** SUBTYPES */
-export type Builtins = string[];
 export type CompressedProgram = string;
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this type. Only Program uses it.
 export type Hint = Record<string, unknown>;
 
-export type EntryPointsByType = {
-  CONSTRUCTOR: ContractEntryPointFields[];
-  EXTERNAL: ContractEntryPointFields[];
-  L1_HANDLER: ContractEntryPointFields[];
-};
-
-export type ContractEntryPointFields = {
-  selector: string;
-  offset: string | number;
-  builtins?: Builtins;
-};
-
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this type.
+// It is the program of a Cairo 0 compiled contract.
 export interface Program {
   builtins: string[];
   data: string[];
