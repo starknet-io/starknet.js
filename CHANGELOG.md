@@ -1,3 +1,9 @@
+## [11.0.3](https://github.com/starknet-io/starknet.js/compare/v11.0.2...v11.0.3) (2026-10-01)
+
+### Bug Fixes
+
+- **calldata:** let named arguments carry built Cairo types ([b05b91f](https://github.com/starknet-io/starknet.js/commit/b05b91f59d7795afcee3f52dbcbf98aab9aeb55d))
+
 ## [11.0.2](https://github.com/starknet-io/starknet.js/compare/v11.0.1...v11.0.2) (2026-09-22)
 
 ### Bug Fixes
