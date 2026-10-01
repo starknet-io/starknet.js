@@ -118,14 +118,29 @@ describe('CairoTypeOption class Unit Tests', () => {
       expect([...new CairoTypeOption(new CairoOption(None), U8, S).toApiRequest()]).toEqual(['1']);
     });
 
-    test('should take a CairoType already built, with the branch spelled out', () => {
-      const inner = new CairoTypeOption('0x0a', U8, S, Some);
-      const outer = new CairoTypeOption(inner, U8, S, Some);
-      expect(outer.isVariantSome).toBe(true);
-      // a CairoTypeOption handed in is copied, not wrapped: what it carried is what is kept
-      expect(outer.content).toEqual(new CairoUint8(10));
-      expect(outer.optionCairoType).toBe(U8);
-      expect([...outer.toApiRequest()]).toEqual(['0', '10']);
+    test('should copy a CairoTypeOption, keeping what it carried', () => {
+      const original = new CairoTypeOption('0x0a', U8, S, Some);
+      const copy = new CairoTypeOption(original, U8, S);
+      expect(copy.isVariantSome).toBe(true);
+      expect(copy.content).toEqual(new CairoUint8(10));
+      expect(copy.optionCairoType).toBe(U8);
+      expect([...copy.toApiRequest()]).toEqual(['0', '10']);
+    });
+
+    test('should refuse a variant alongside a CairoTypeOption', () => {
+      const original = new CairoTypeOption('0x0a', U8, S, Some);
+      expect(() => new CairoTypeOption(original, U8, S, Some)).toThrow(
+        'when "content" parameter is a CairoTypeOption, do not define "variant" parameter.'
+      );
+    });
+
+    test('should refuse a CairoOption wrapping a CairoTypeOption', () => {
+      // if it were copied, one level would be lost: Some(Some(1)) would be sent as ["0", "1"],
+      // which is the calldata of Some(None)
+      const inner = new CairoTypeOption(1, U8, S, Some);
+      expect(() => new CairoTypeOption(new CairoOption(Some, inner), optionType(2), S)).toThrow(
+        'when "content" parameter is a CairoTypeOption, do not define "variant" parameter.'
+      );
     });
 
     test('should require the variant for a CairoType already built', () => {
@@ -363,16 +378,6 @@ describe('CairoTypeOption class Unit Tests', () => {
       expect(CallData.compile([none()] as any)).toEqual(['1']);
       expect(CallData.compile({ input: some() } as any)).toEqual(['0', '7']);
       expect(CallData.compile({ input: none() } as any)).toEqual(['1']);
-    });
-  });
-
-  describe('calls the contract does not cover', () => {
-    // outside what the API ever emits, and asserted here so that a change of behaviour shows up
-    // rather than passing unnoticed
-    test('a CairoOption wrapping a built option is flattened by the copy', () => {
-      const inner = new CairoTypeOption(10, U8, S, Some);
-      const option = new CairoTypeOption(new CairoOption(Some, inner), U8, S);
-      expect([...option.toApiRequest()]).toEqual(['0', '10']);
     });
   });
 

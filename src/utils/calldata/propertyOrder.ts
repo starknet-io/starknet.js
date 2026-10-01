@@ -1,4 +1,4 @@
-import { AbiEntry, AbiEnums, AbiStructs, CairoEnum, RawArgsObject } from '../../types';
+import { AbiEntry, AbiEnum, AbiEnums, AbiStructs, CairoEnum, RawArgsObject } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import {
@@ -27,6 +27,7 @@ import extractTupleMemberTypes from './tuple';
 import { isUndefined, isString } from '../typed';
 import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoByteArray } from '../cairoDataTypes/byteArray';
+import { isCairoType } from '../cairoDataTypes/cairoType.interface';
 
 function errorU256(key: string) {
   return Error(
@@ -40,6 +41,35 @@ function errorU512(key: string) {
   );
 }
 
+/**
+ * Get from the abi the type of the value that an enum variant holds.
+ *
+ * The type is read in the abi entry of the variant, not guessed from the name of the enum.
+ * @param {AbiEnum} abiEnum the abi definition of the enum
+ * @param {string} variantName the name of the variant
+ * @returns {string} the Cairo type of the variant, or an empty string when the abi does not list
+ * this variant. With an empty string, the value is not reordered.
+ * @example
+ * ```typescript
+ * const abiEnum: AbiEnum = {
+ *   type: 'enum',
+ *   name: 'test::Shape',
+ *   variants: [
+ *     { name: 'Dot', type: 'test::Point' },
+ *     { name: 'Nothing', type: '()' },
+ *   ],
+ * };
+ * const result = getVariantType(abiEnum, 'Dot');
+ * // result = "test::Point"
+ * const result2 = getVariantType(abiEnum, 'Unknown');
+ * // result2 = ""
+ * ```
+ */
+function getVariantType(abiEnum: AbiEnum, variantName: string): string {
+  // an abi written by hand may have no `variants` list
+  return abiEnum.variants?.find((abiVariant) => abiVariant.name === variantName)?.type ?? '';
+}
+
 export default function orderPropsByAbi(
   unorderedObject: RawArgsObject,
   abiOfObject: AbiEntry[],
@@ -49,6 +79,12 @@ export default function orderPropsByAbi(
   const orderInput = (unorderedItem: any, abiType: string): any => {
     if (CairoFixedArray.isTypeFixedArray(abiType)) {
       return orderFixedArray(unorderedItem, abiType);
+    }
+    // a Cairo type instance (CairoStruct, CairoArray...) is already built, in the right order.
+    // Do not open it: its inner fields are not the values to send. A fixed array instance is
+    // handled above, to check its size.
+    if (isCairoType(unorderedItem)) {
+      return unorderedItem;
     }
     if (isTypeArray(abiType)) {
       return orderArray(unorderedItem, abiType);
@@ -174,17 +210,11 @@ export default function orderPropsByAbi(
     return orderedObject2;
   }
 
-  const orderEnum = (unorderedObject2: CairoEnum, abiObject: AbiEntry): CairoEnum => {
+  const orderEnum = (unorderedObject2: CairoEnum, abiObject: AbiEnum): CairoEnum => {
     if (isTypeResult(abiObject.name)) {
       const unorderedResult = unorderedObject2 as CairoResult<any, any>;
-      const resultOkType: string = abiObject.name.substring(
-        abiObject.name.indexOf('<') + 1,
-        abiObject.name.lastIndexOf(',')
-      );
-      const resultErrType: string = abiObject.name.substring(
-        abiObject.name.indexOf(',') + 1,
-        abiObject.name.lastIndexOf('>')
-      );
+      const resultOkType: string = getVariantType(abiObject, 'Ok');
+      const resultErrType: string = getVariantType(abiObject, 'Err');
       if (unorderedResult.isOk()) {
         return new CairoResult<any, any>(
           CairoResultVariant.Ok,
@@ -198,10 +228,7 @@ export default function orderPropsByAbi(
     }
     if (isTypeOption(abiObject.name)) {
       const unorderedOption = unorderedObject2 as CairoOption<any>;
-      const resultSomeType: string = abiObject.name.substring(
-        abiObject.name.indexOf('<') + 1,
-        abiObject.name.lastIndexOf('>')
-      );
+      const resultSomeType: string = getVariantType(abiObject, 'Some');
       if (unorderedOption.isSome()) {
         return new CairoOption<any>(
           CairoOptionVariant.Some,
@@ -218,10 +245,7 @@ export default function orderPropsByAbi(
       if (isUndefined(variant[1])) {
         return variant;
       }
-      const variantType: string = abiObject.type.substring(
-        abiObject.type.lastIndexOf('<') + 1,
-        abiObject.type.lastIndexOf('>')
-      );
+      const variantType: string = getVariantType(abiObject, variant[0]);
       if (variantType === '()') {
         return variant;
       }

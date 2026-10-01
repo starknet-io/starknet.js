@@ -1,7 +1,11 @@
 import {
   Abi,
+  type AbiEnum,
+  type AbiStruct,
+  CairoArray,
   CairoByteArray,
   CairoBytes31,
+  CairoCustomEnum,
   CairoFelt252,
   CairoFixedArray,
   CairoInt8,
@@ -9,6 +13,15 @@ import {
   CairoInt32,
   CairoInt64,
   CairoInt128,
+  CairoOption,
+  CairoOptionVariant,
+  CairoResult,
+  CairoResultVariant,
+  CairoStruct,
+  CairoTuple,
+  CairoTypeCustomEnum,
+  CairoTypeOption,
+  CairoTypeResult,
   CairoUint8,
   CairoUint16,
   CairoUint32,
@@ -18,7 +31,12 @@ import {
   CairoUint256,
   CallData,
   cairoTypeStrategy,
+  enumStrategy,
+  structStrategy,
 } from '../../../src';
+
+const { Some } = CairoOptionVariant;
+const { Err } = CairoResultVariant;
 
 const BYTE_ARRAY_STRUCT = {
   type: 'struct',
@@ -37,13 +55,86 @@ const PAIR_STRUCT = {
     { name: 'a', type: 'core::integer::u64' },
     { name: 'b', type: 'core::felt252' },
   ],
-};
+} as AbiStruct;
+
+const OUTER_STRUCT = {
+  type: 'struct',
+  name: 'test::Outer',
+  members: [
+    { name: 'p', type: 'test::Pair' },
+    { name: 'n', type: 'core::integer::u8' },
+  ],
+} as AbiStruct;
+
+const SHAPE_ENUM = {
+  type: 'enum',
+  name: 'test::Shape',
+  variants: [
+    { name: 'Dot', type: 'test::Pair' },
+    { name: 'Nothing', type: '()' },
+  ],
+} as AbiEnum;
+
+const OPTION_OF_PAIR = 'core::option::Option::<test::Pair>';
+const RESULT_OF_PAIR = 'core::result::Result::<core::felt252, test::Pair>';
+const OPTION_OF_U8 = 'core::option::Option::<core::integer::u8>';
+const OPTION_OF_OPTION = `core::option::Option::<${OPTION_OF_U8}>`;
+
+/**
+ * The enums that a Cairo compiler writes in the abi for the types above.
+ *
+ * Property ordering only works inside an enum listed in the abi. Without them, the object form
+ * would not run the code that these tests check.
+ */
+const ABI_ENUMS = [
+  SHAPE_ENUM,
+  {
+    type: 'enum',
+    name: OPTION_OF_PAIR,
+    variants: [
+      { name: 'Some', type: 'test::Pair' },
+      { name: 'None', type: '()' },
+    ],
+  },
+  {
+    type: 'enum',
+    name: RESULT_OF_PAIR,
+    variants: [
+      { name: 'Ok', type: 'core::felt252' },
+      { name: 'Err', type: 'test::Pair' },
+    ],
+  },
+  {
+    type: 'enum',
+    name: OPTION_OF_U8,
+    variants: [
+      { name: 'Some', type: 'core::integer::u8' },
+      { name: 'None', type: '()' },
+    ],
+  },
+  {
+    type: 'enum',
+    name: OPTION_OF_OPTION,
+    variants: [
+      { name: 'Some', type: OPTION_OF_U8 },
+      { name: 'None', type: '()' },
+    ],
+  },
+];
+
+/** What the Cairo type classes need to build a `Pair` or a `Shape` by hand. */
+const STRATEGIES = [cairoTypeStrategy, structStrategy([PAIR_STRUCT]), enumStrategy([SHAPE_ENUM])];
+
+/** A `Pair` already built, which serializes as `['44', '7']`. */
+const builtPair = () => new CairoStruct({ a: 44, b: 7 }, PAIR_STRUCT, STRATEGIES);
 
 /** An abi whose only function takes one parameter `v` of the given type. */
 const abiFor = (type: string): Abi =>
   [
     BYTE_ARRAY_STRUCT,
     PAIR_STRUCT,
+    OUTER_STRUCT,
+    ...ABI_ENUMS,
     {
       type: 'function',
       name: 'fn',
@@ -204,6 +295,74 @@ describe('an argument already typed by the caller', () => {
         [byteArray],
         ['1', ...byteArray.toApiRequest()]
       );
+    });
+  });
+
+  describe('a composite passed as its own instance', () => {
+    test('a struct', () => {
+      expectBothForms('test::Pair', builtPair(), ['44', '7']);
+    });
+
+    test('a dynamic array', () => {
+      const type = 'core::array::Array::<core::integer::u64>';
+      expectBothForms(type, new CairoArray([44, 45], type, STRATEGIES), ['2', '44', '45']);
+    });
+
+    test('a tuple', () => {
+      const type = '(core::integer::u8, test::Pair)';
+      const tuple = new CairoTuple({ 0: 7, 1: { a: 44, b: 7 } }, type, STRATEGIES);
+      expectBothForms(type, tuple, ['7', '44', '7']);
+    });
+
+    test('an option', () => {
+      const option = new CairoTypeOption({ a: 44, b: 7 }, OPTION_OF_PAIR, STRATEGIES, Some);
+      expectBothForms(OPTION_OF_PAIR, option, ['0', '44', '7']);
+    });
+
+    test('a result', () => {
+      const result = new CairoTypeResult({ a: 44, b: 7 }, RESULT_OF_PAIR, STRATEGIES, Err);
+      expectBothForms(RESULT_OF_PAIR, result, ['1', '44', '7']);
+    });
+
+    test('a custom enum', () => {
+      // `Dot` is the variant of index 0
+      const shape = new CairoTypeCustomEnum({ a: 44, b: 7 }, SHAPE_ENUM, STRATEGIES, 0);
+      expectBothForms('test::Shape', shape, ['0', '44', '7']);
+    });
+  });
+
+  describe('a struct already built, held by plain data or by an enum', () => {
+    test('as a member of a plain struct', () => {
+      expectBothForms('test::Outer', { n: 1, p: builtPair() }, ['44', '7', '1']);
+    });
+
+    test('as an item of a plain array', () => {
+      expectBothForms('core::array::Array::<test::Pair>', [builtPair()], ['1', '44', '7']);
+    });
+
+    test('in the Some of a CairoOption', () => {
+      expectBothForms(OPTION_OF_PAIR, new CairoOption(Some, builtPair()), ['0', '44', '7']);
+    });
+
+    test('in the Err of a CairoResult', () => {
+      expectBothForms(RESULT_OF_PAIR, new CairoResult(Err, builtPair()), ['1', '44', '7']);
+    });
+
+    test('in the active variant of a CairoCustomEnum', () => {
+      expectBothForms('test::Shape', new CairoCustomEnum({ Dot: builtPair() }), ['0', '44', '7']);
+    });
+  });
+
+  describe('an option already built, wrapped in a CairoOption', () => {
+    test('is refused by both forms, in the same words', () => {
+      // the abi expects two levels of option, but this value would be sent with one:
+      // Some(Some(1)) as ["0", "1"], which is the calldata of Some(None)
+      const inner = new CairoTypeOption(1, OPTION_OF_U8, STRATEGIES, Some);
+      const { positional, named } = bothForms(OPTION_OF_OPTION, new CairoOption(Some, inner));
+      const refusal =
+        'when "content" parameter is a CairoTypeOption, do not define "variant" parameter.';
+      expect(positional).toThrow(refusal);
+      expect(named).toThrow(refusal);
     });
   });
 });
