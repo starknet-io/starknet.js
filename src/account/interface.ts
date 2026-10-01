@@ -65,6 +65,8 @@ export abstract class AccountInterface {
    */
   public abstract signer: SignerInterface;
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep this property only if Starknet still
+  // holds Cairo 0 contracts, to refuse a Cairo 0 account; otherwise remove it.
   /**
    * Cairo version of the account contract implementation
    */

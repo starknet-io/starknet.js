@@ -774,6 +774,8 @@ export class RpcChannel {
     }
     if (invocation.type === ETransactionType.DECLARE) {
       // Sierra contracts required for DECLARE transactions in RPC 0.9
+      // Cairo 0 specific: when Cairo 0 support is dropped, keep this check only if Starknet still
+      // holds Cairo 0 contracts; otherwise remove it.
       assert(isSierra(invocation.contract), 'Declaring non Sierra contract using RPC 0.9');
 
       const btx: RPC.BROADCASTED_DECLARE_TXN_V3 = {

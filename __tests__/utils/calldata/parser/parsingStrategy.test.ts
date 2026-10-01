@@ -134,6 +134,8 @@ describe('the default parsing strategy', () => {
     });
   });
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, remove this describe.
+  // It tests hdParsingStrategy and fastParsingStrategy, which serve a Cairo 0 abi only.
   describe('the strategy shape a Cairo 1 abi refuses', () => {
     test('should name what to use instead of the Cairo 0 strategies', () => {
       [hdParsingStrategy, fastParsingStrategy].forEach((strategy) => {

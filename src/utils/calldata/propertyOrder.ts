@@ -203,6 +203,8 @@ export default function orderPropsByAbi(
           enumerable: true,
           value: value ?? unorderedObject2[myObjKeys[index]],
         });
+      // Cairo 0 specific: when Cairo 0 support is dropped, keep only `abiTypeCairoX`.
+      // A member written `{ name, type }` comes from a Cairo 0 named tuple.
       const abiType: string = abiTypeCairoX?.type ? abiTypeCairoX.type : abiTypeCairoX; // Named tuple, or tuple
       setProperty(orderInput(unorderedObject2[myObjKeys[index]], abiType));
       return orderedObject;

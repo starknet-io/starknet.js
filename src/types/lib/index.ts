@@ -200,6 +200,8 @@ export type Invocation = CallDetails & {
 
 export type Call = CallDetails & { entrypoint: string };
 
+// Cairo 0 specific: when Cairo 0 support is dropped, keep the '0' of CairoVersion and
+// CompilerVersion only if Starknet still holds Cairo 0 contracts; otherwise remove it.
 export type CairoVersion = '0' | '1' | undefined;
 export type CompilerVersion = '0' | '1' | '2' | undefined;
 
@@ -316,6 +318,8 @@ export type Invocations = Array<
   | ({ type: typeof ETransactionType.INVOKE } & OptionalPayload<AllowArray<Call>>)
 >;
 
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this type.
+// Only requestParser.ts uses it.
 export type Tupled = { element: any; type: string };
 
 export type Args = {

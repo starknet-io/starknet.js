@@ -70,6 +70,7 @@ export function extractContractHashes(
   return response;
 }
 
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this function.
 /**
  * Helper to redeclare response Cairo0 contract
  */

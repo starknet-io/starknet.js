@@ -1,5 +1,4 @@
 import { Abi } from './abi';
-import { EntryPointsByType } from './legacy';
 
 /** Cairo Assembly .casm */
 export type CairoAssembly = {
@@ -44,6 +43,19 @@ export type CompiledSierraCasm = CairoAssembly;
 /** SUBTYPES */
 export type ByteCode = string[];
 export type PythonicHints = [number, string[]][];
+export type Builtins = string[];
+
+export type EntryPointsByType = {
+  CONSTRUCTOR: ContractEntryPointFields[];
+  EXTERNAL: ContractEntryPointFields[];
+  L1_HANDLER: ContractEntryPointFields[];
+};
+
+export type ContractEntryPointFields = {
+  selector: string;
+  offset: string | number;
+  builtins?: Builtins;
+};
 
 export type SierraProgramDebugInfo = {
   type_names: [number, string][];

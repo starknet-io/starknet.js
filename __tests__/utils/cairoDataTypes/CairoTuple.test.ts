@@ -149,6 +149,7 @@ describe('CairoTuple class Unit Tests', () => {
       ]);
     });
 
+    // Cairo 0 specific: when Cairo 0 support is dropped, remove this test.
     test('should split a Cairo 0 named tuple into names and types', () => {
       expect(CairoTuple.getTupleElementTypes('(x:felt, y:felt)')).toEqual([
         { name: 'x', type: 'felt' },
@@ -158,9 +159,11 @@ describe('CairoTuple class Unit Tests', () => {
 
     test('should name the members, or number them when the type does not', () => {
       expect(CairoTuple.extractTupleMembersNames(PAIR)).toEqual(['0', '1']);
+      // Cairo 0 specific: when Cairo 0 support is dropped, remove this expectation.
       expect(CairoTuple.extractTupleMembersNames('(x:felt, y:felt)')).toEqual(['x', 'y']);
     });
 
+    // Cairo 0 specific: when Cairo 0 support is dropped, remove this test.
     test('a Cairo 0 named tuple is read but cannot be built by this strategy', () => {
       // the members are named and typed correctly, but 'felt' is a Cairo 0 type name and the
       // strategy only registers the Cairo 1 ones, so there is nothing to build the member with
@@ -197,6 +200,7 @@ describe('CairoTuple class Unit Tests', () => {
       ]);
     });
 
+    // Cairo 0 specific: when Cairo 0 support is dropped, remove this test.
     test('should leave alone a Cairo 0 tuple, which is split with every space stripped', () => {
       expect(CairoTuple.getTupleElementTypes('(x:felt,y:felt)')).toEqual([
         { name: 'x', type: 'felt' },

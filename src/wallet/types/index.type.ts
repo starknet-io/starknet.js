@@ -11,6 +11,8 @@ export type RpcCall = Omit<RpcMessage, 'result'>;
 // This is provider object expected by WalletAccount to communicate with wallet
 export interface StarknetWalletProvider extends StarknetWindowObject {}
 
+// Cairo 0 specific: when Cairo 0 support is dropped, keep the `cairoVersion` field of the three
+// option types below only if Starknet still holds Cairo 0 contracts; otherwise remove it.
 export type WalletAccountV4Options = {
   provider: ProviderOptions | ProviderInterface;
   walletProvider: StarknetWalletProvider;

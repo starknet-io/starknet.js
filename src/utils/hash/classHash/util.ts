@@ -38,22 +38,6 @@ export function formatSpaces(json: string): string {
 }
 
 /**
- * JSON replacer function that skips null values and empty arrays for specific keys
- * Used in legacy contract class serialization
- */
-export function nullSkipReplacer(key: string, value: any) {
-  if (key === 'attributes' || key === 'accessible_scopes') {
-    return Array.isArray(value) && value.length === 0 ? undefined : value;
-  }
-
-  if (key === 'debug_info') {
-    return null;
-  }
-
-  return value === null ? undefined : value;
-}
-
-/**
  * Convert builtins array to encoded BigInt array
  * Common pattern used in both Poseidon and Blake2s hashing
  */

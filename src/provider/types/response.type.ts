@@ -82,6 +82,8 @@ export type PreConfirmedStateUpdate = PRE_CONFIRMED_STATE_UPDATE;
 export type StateUpdate = STATE_UPDATE;
 export type StateUpdateResponse = StateUpdate | PreConfirmedStateUpdate;
 
+// Cairo 0 specific: when Cairo 0 support is dropped, keep LegacyContractClass in this union only
+// if Starknet still returns Cairo 0 classes; otherwise remove it.
 /**
  * Standardized type
  *

@@ -19,8 +19,7 @@ export * from './parsingStrategy';
 // `CairoStruct` built for a contract's struct needs a strategy carrying that struct's name — which
 // only `structStrategy` produces.
 //
-// `isCairoTypeStrategy` stays in: it tells this shape from the one Cairo 0 uses, and it goes with
-// that island.
+// `isCairoTypeStrategy` stays in: it only tells this shape from the one Cairo 0 uses.
 export {
   cairoTypeStrategy,
   enumStrategy,
@@ -53,6 +52,8 @@ export function createAbiParser(
   parsingStrategy?: ParsingStrategy | CairoTypeStrategy
 ): AbiParserInterface {
   const version = getAbiVersion(abi);
+  // Cairo 0 specific: when Cairo 0 support is dropped, if Starknet still holds Cairo 0 contracts,
+  // replace this branch by a clear error; otherwise remove it.
   if (version === 0) {
     return new AbiParser0(abi, parsingStrategy);
   }
@@ -86,6 +87,8 @@ export function createAbiParser(
  */
 export function getAbiVersion(abi: Abi): 1 | 2 | 0 {
   if (abi.find((it) => it.type === 'interface')) return 2;
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep this detection only if Starknet still
+  // holds Cairo 0 contracts; otherwise an abi without an interface is always version 1.
   if (isCairo1Abi(abi)) return 1;
   return 0;
 }

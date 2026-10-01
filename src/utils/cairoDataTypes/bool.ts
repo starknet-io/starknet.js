@@ -15,10 +15,6 @@ import { CairoFelt252 } from './felt';
  * too — `1`, `0n`, `'1'`, `'0x0'` — because that is how a bool comes back from a node, as a felt
  * rather than as a JS value. Any other number is refused : a bool is not a felt narrowed to a
  * range, it is exactly two values.
- *
- * On the request side the library is stricter still : `CallData.compile` runs `validateFields`
- * first, which requires a real boolean. So a `1` reaching a `core::bool` argument is refused there
- * before this class ever sees it.
  * @example
  * ```typescript
  * // the same value, reached three ways

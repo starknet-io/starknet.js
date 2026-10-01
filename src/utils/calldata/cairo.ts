@@ -20,6 +20,7 @@ import { isBigNumberish } from '../num';
 import { isNumber } from '../typed';
 
 // Intended for internal usage, maybe should be exported somewhere else and not exported to utils
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this function.
 /**
  * Checks if the given name ends with "_len".
  *
@@ -27,6 +28,8 @@ import { isNumber } from '../typed';
  * @returns - True if the name ends with "_len", false otherwise.
  */
 export const isLen = (name: string) => /_len$/.test(name);
+// Cairo 0 specific: when Cairo 0 support is dropped, remove the `'felt'` test.
+// `felt` is the Cairo 0 name of `core::felt252`.
 /**
  * Checks if a given type is felt.
  *
@@ -34,6 +37,8 @@ export const isLen = (name: string) => /_len$/.test(name);
  * @returns - True if the type is felt, false otherwise.
  */
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
+// Cairo 0 specific: when Cairo 0 support is dropped, remove the `*` test.
+// `felt*` is how Cairo 0 writes an array.
 /**
  * Checks if the given type is an array type.
  *
@@ -52,6 +57,7 @@ export const isTypeArray = (type: string) =>
  * @returns - `true` if the type is a tuple type, otherwise `false`.
  */
 export const isTypeTuple = (type: string) => type.startsWith('(') && type.endsWith(')');
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this function.
 /**
  * Checks whether a given type is a named tuple.
  *
@@ -161,11 +167,15 @@ export const isCairo1Type = (type: string) => type.includes('::');
  * @returns - The array type.
  */
 export const getArrayType = (type: string) => {
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep only the Cairo 1 branch.
+  // `felt*` is how Cairo 0 writes an array.
   return isCairo1Type(type)
     ? type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'))
     : type.replaceAll('*', '');
 };
 
+// Cairo 0 specific: when Cairo 0 support is dropped, keep this function only if Starknet still
+// holds Cairo 0 contracts; otherwise remove it.
 /**
  * Test if an ABI comes from a Cairo 1 contract
  * @param abi representing the interface of a Cairo contract
@@ -225,6 +235,8 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
   if (isCairo1Type(io[0].type)) {
     return { cairo: '1', compiler: '1' };
   }
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep this result only if Starknet still
+  // holds Cairo 0 contracts; otherwise remove it.
   return { cairo: '0', compiler: '0' };
 }
 

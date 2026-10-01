@@ -74,6 +74,8 @@ export class CallData {
       const invocableFunctionNames = this.abi
         .filter((abi) => {
           if (abi.type !== 'function') return false;
+          // Cairo 0 specific: when Cairo 0 support is dropped, remove the `stateMutability` test.
+          // A Cairo 0 abi spells it `stateMutability`, a Cairo 1 abi `state_mutability`.
           const isView = abi.stateMutability === 'view' || abi.state_mutability === 'view';
           return type === ValidateType.INVOKE ? !isView : isView;
         })
@@ -300,6 +302,8 @@ export class CallData {
     const parsed = outputs.flat().reduce((acc, output, idx) => {
       const propName = output.name ?? idx;
       acc[propName] = this.parser.parseResponse(responseIterator, output, acc);
+      // Cairo 0 specific: when Cairo 0 support is dropped, remove this test. A Cairo 0 array comes
+      // with its length as a separate output, `a_len`, dropped here once the array is read.
       if (acc[propName] && acc[`${propName}_len`]) {
         delete acc[`${propName}_len`];
       }

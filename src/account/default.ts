@@ -109,6 +109,8 @@ export class Account implements AccountInterface {
 
   public address: string;
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep this property only if Starknet still
+  // holds Cairo 0 contracts, to refuse a Cairo 0 account; otherwise remove it.
   public cairoVersion: CairoVersion;
 
   readonly transactionVersion: typeof ETransactionVersion.V3;
@@ -171,6 +173,8 @@ export class Account implements AccountInterface {
     }
   }
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, if Starknet still holds Cairo 0 contracts,
+  // make this method refuse a Cairo 0 account with a clear error; otherwise remove it.
   /**
    * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor.
    * @param classHash if provided detects Cairo version from classHash, otherwise from the account address
@@ -199,6 +203,8 @@ export class Account implements AccountInterface {
     payload: DeclareContractPayload,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
+    // Cairo 0 specific: when Cairo 0 support is dropped, keep this check only if Starknet still
+    // holds Cairo 0 contracts; otherwise remove it.
     assert(
       isSierra(payload.contract),
       'Declare fee estimation is not supported for Cairo0 contracts'
@@ -471,6 +477,8 @@ export class Account implements AccountInterface {
     payload: DeclareContractPayload,
     details: UniversalDetails = {}
   ): Promise<DeclareContractResponse> {
+    // Cairo 0 specific: when Cairo 0 support is dropped, keep this check only if Starknet still
+    // holds Cairo 0 contracts; otherwise remove it.
     assert(isSierra(payload.contract), SYSTEM_MESSAGES.declareNonSierra);
 
     const declareContractPayload = extractContractHashes(
@@ -1011,6 +1019,8 @@ export class Account implements AccountInterface {
           };
         }
         if (transaction.type === ETransactionType.DECLARE) {
+          // Cairo 0 specific: when Cairo 0 support is dropped, keep this check only if Starknet
+          // still holds Cairo 0 contracts; otherwise remove it.
           assert(
             isSierra(txPayload.contract),
             'Declare fee estimation is not supported for Cairo0 contracts'

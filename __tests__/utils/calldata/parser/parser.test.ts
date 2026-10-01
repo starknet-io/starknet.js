@@ -19,6 +19,8 @@ describe('createAbiParser', () => {
     expect(abiParser instanceof AbiParser1).toEqual(true);
   });
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, if Starknet still holds Cairo 0 contracts,
+  // make this test expect the clear error createAbiParser will raise; otherwise remove it.
   // a Cairo 0 abi is the one whose types carry no '::', and it gets its own parser so that the
   // Cairo 1 ones can move to the Cairo type classes without it
   test('should create an AbiParser0 instance', () => {

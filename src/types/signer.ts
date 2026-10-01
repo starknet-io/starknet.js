@@ -13,6 +13,8 @@ export type InvocationsSignerDetails = V3InvocationsSignerDetails & {
 
 export type V3InvocationsSignerDetails = V3TransactionDetails & {
   walletAddress: string;
+  // Cairo 0 specific: when Cairo 0 support is dropped, keep this field only if Starknet still
+  // holds Cairo 0 contracts, to refuse a Cairo 0 account; otherwise remove it.
   cairoVersion: CairoVersion;
   chainId: StarknetChainId;
   version: `${ETransactionVersion3}`;

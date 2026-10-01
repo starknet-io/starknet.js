@@ -1,6 +1,7 @@
 import extractTupleMemberTypes from '../../../src/utils/calldata/tuple';
 
 describe('extractTupleMemberTypes', () => {
+  // Cairo 0 specific: when Cairo 0 support is dropped, remove this test.
   test('should return tuple member types for Cairo0', () => {
     const tuple = '(u8, u8)';
     const result = extractTupleMemberTypes(tuple);

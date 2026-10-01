@@ -34,6 +34,7 @@ export function isAbiEvent(object: AbiEntry): boolean {
   return object.type === 'event';
 }
 
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this function.
 /**
  * Retrieves the events from the given Cairo 0 ABI.
  * @param {Abi} abi - The Cairo 0 ABI to extract events from.
@@ -149,6 +150,8 @@ function getCairo1AbiEvents(abi: Abi): AbiEvents {
  * ```
  */
 export function getAbiEvents(abi: Abi): AbiEvents {
+  // Cairo 0 specific: when Cairo 0 support is dropped, if Starknet still holds Cairo 0 contracts,
+  // replace the Cairo 0 branch by a clear error; otherwise keep only the Cairo 1 branch.
   return isCairo1Abi(abi) ? getCairo1AbiEvents(abi) : getCairo0AbiEvents(abi);
 }
 

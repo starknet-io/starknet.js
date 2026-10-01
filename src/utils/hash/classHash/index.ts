@@ -9,12 +9,13 @@ import {
 } from '../../../types';
 import { parse } from '../../json';
 import { isString } from '../../typed';
-import { computeLegacyContractClassHash } from './pedersen';
+import { computeLegacyContractClassHash } from './cairo0';
 import { computeCompiledClassHashPoseidon, computeSierraContractClassHash } from './poseidon';
 import { computeCompiledClassHashBlake } from './blake';
 import { compareVersions } from '../../resolve';
 import { SN_VERSION_IMPLEMENTING_BLAKE_FOR_COMPILED_CLASS } from '../../../global/constants';
 
+export * from './cairo0';
 export * from './pedersen';
 export * from './poseidon';
 export * from './blake';
@@ -37,6 +38,8 @@ export function computeContractClassHash(contract: CompiledContract | string): s
     return computeSierraContractClassHash(compiledContract as CompiledSierra);
   }
 
+  // Cairo 0 specific: when Cairo 0 support is dropped, if Starknet still holds Cairo 0 contracts,
+  // replace this line by a clear error; otherwise remove it, and the Sierra test above.
   return computeLegacyContractClassHash(compiledContract as LegacyCompiledContract);
 }
 

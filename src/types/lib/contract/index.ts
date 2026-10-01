@@ -3,6 +3,8 @@ import { LegacyCompiledContract, LegacyContractClass } from './legacy';
 import { CompiledSierra, SierraContractClass } from './sierra';
 
 // Final types
+// Cairo 0 specific: when Cairo 0 support is dropped, remove LegacyContractClass from this union.
+// It describes what is declared, and declaring a Cairo 0 contract is already refused.
 /**
  * format produced after compressing compiled contract
  *

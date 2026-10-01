@@ -1,3 +1,4 @@
+// Cairo 0 specific: when Cairo 0 support is dropped, remove this file.
 /* eslint-disable no-case-declarations */
 import {
   AbiEntry,
