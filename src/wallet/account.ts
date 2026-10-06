@@ -37,7 +37,65 @@ import {
   Signature,
 } from '../types/api';
 
-// Represent 'Selected Active' Account inside Connected Wallet
+/**
+ * @deprecated Use {@link WalletAccountV6} (get-starknet v6) instead. This class is kept only for
+ * DAPPs that are still on get-starknet v4.
+ *
+ * @remarks
+ * Account that lets a wallet sign and send the transactions, using get-starknet v4.
+ * It represents the 'Selected Active' Account inside the Connected Wallet.
+ *
+ * The private key stays in the wallet. Reads go to the RPC node given at the instantiation,
+ * writes go to the wallet. It works only in a DAPP, not in a Node.js script.
+ *
+ * The wallet is selected with the `get-starknet` v4 library. Its `connect()` function opens a
+ * window with the list of wallets. It returns the `StarknetWindowObject` (SWO) of the wallet that
+ * the user selected. With `get-starknet-core` v4 you can also build your own UI and logic. See
+ * [this DAPP](https://github.com/PhilippeR26/Starknet-WalletAccount/blob/53514a5529c4aebe9e7c6331186e83b7a7310ce0/src/app/components/client/WalletHandle/SelectWallet.tsx)
+ * for an example where only the wallets compatible with the Starknet Wallet API can be selected.
+ *
+ * The address and the chain ID follow the wallet automatically. This can lead to reads and
+ * writes on different networks, so create a new instance each time the account or the network
+ * changes.
+ *
+ * The wallet emits 2 events: `accountsChanged` and `networkChanged`.
+ * A change of network emits both. A change of account emits only `accountsChanged`.
+ * You can subscribe with the SWO (`on`) or with the `onAccountChange` and `onNetworkChanged`
+ * methods of this class. To unsubscribe, call `off` on the SWO with the same function.
+ *
+ * Needs `@starknet-io/get-starknet` v4.0.3 min.
+ *
+ * @example
+ * ```typescript
+ * import { connect } from '@starknet-io/get-starknet';
+ * import { WalletAccount, wallet } from 'starknet';
+ * const selectedWalletSWO = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
+ * const myWalletAccount = await WalletAccount.connect(
+ *   { nodeUrl: 'https://api.zan.top/public/starknet-sepolia/rpc/v0_10' },
+ *   selectedWalletSWO
+ * );
+ * // The wallet writes on this network:
+ * const writeChainId = await wallet.requestChainId(myWalletAccount.walletProvider);
+ * // writeChainId = '0x534e5f5345504f4c4941' (SN_SEPOLIA, if the wallet is on Sepolia)
+ * // The provider reads on this network:
+ * const readChainId = await myWalletAccount.provider.getChainId();
+ * // readChainId = '0x534e5f5345504f4c4941'
+ * ```
+ * @example
+ * ```typescript
+ * // Subscribe with the wallet object (SWO). Unsubscribe with `.off` and the same function.
+ * const handleAccount: AccountChangeEventHandler = (accounts: string[] | undefined) => {
+ *   if (accounts?.length) console.log('new address =', accounts[0]);
+ * };
+ * const handleNetwork: NetworkChangeEventHandler = (chainId?: string) => {
+ *   if (chainId) console.log('new chain =', chainId);
+ * };
+ * selectedWalletSWO.on('accountsChanged', handleAccount);
+ * selectedWalletSWO.on('networkChanged', handleNetwork);
+ * selectedWalletSWO.off('accountsChanged', handleAccount);
+ * selectedWalletSWO.off('networkChanged', handleNetwork);
+ * ```
+ */
 export class WalletAccount extends Account {
   public walletProvider: StarknetWalletProvider;
 
@@ -60,9 +118,7 @@ export class WalletAccount extends Account {
     });
   }
 
-  /**
-   * WALLET EVENTS
-   */
+  // WALLET EVENTS
   public onAccountChange(callback: AccountChangeEventHandler): void {
     onAccountChange(this.walletProvider, callback);
   }
@@ -71,9 +127,7 @@ export class WalletAccount extends Account {
     onNetworkChanged(this.walletProvider, callback);
   }
 
-  /**
-   * WALLET SPECIFIC METHODS
-   */
+  // WALLET SPECIFIC METHODS
   public requestAccounts(silentMode = false) {
     return requestAccounts(this.walletProvider, silentMode);
   }
@@ -94,9 +148,7 @@ export class WalletAccount extends Account {
     return addStarknetChain(this.walletProvider, chain);
   }
 
-  /**
-   * ACCOUNT METHODS
-   */
+  // ACCOUNT METHODS
   override execute(calls: AllowArray<Call>) {
     const txCalls = [].concat(calls as any).map((it) => {
       const { contractAddress, entrypoint, calldata } = it;

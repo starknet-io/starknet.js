@@ -330,12 +330,11 @@ export abstract class AccountInterface {
   /**
    * Declare a contract class on Starknet
    *
-   // eslint-disable-next-line prettier/prettier
-   * @param contractPayload - Contract declaration payload 
-   * - .contract - Compiled Sierra contract  
-   * - .classHash - Pre-computed class hash (optional)  
-   * - .casm - Compiled CASM (required for Cairo 1) 
-   * - .compiledClassHash - Pre-computed CASM hash  
+   * @param contractPayload - Contract declaration payload
+   * - .contract - Compiled Sierra contract
+   * - .classHash - Pre-computed class hash (optional)
+   * - .casm - Compiled CASM (required for Cairo 1)
+   * - .compiledClassHash - Pre-computed CASM hash
    *
    * @param transactionsDetail - Transaction execution options
    * @inheritdoc execute

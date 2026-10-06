@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="458" height="566" viewBox="0 0 458 566">
+  <title>Architecture of a WalletAccount: DAPP, Starknet.js, get-starknet, wallet and Starknet network</title>
+  <rect width="458" height="566" fill="#ffffff"/>
+  <!-- Arrows: the lines first, then the boxes (they cover the ends of the lines), then the arrow heads. -->
+  <g stroke="#000000" stroke-width="1" fill="none">
+    <line x1="229.2" y1="61.3" x2="229.2" y2="110.2"/>
+    <line x1="229.2" y1="182.8" x2="229.2" y2="231.4"/>
+    <line x1="229.2" y1="317.4" x2="229.2" y2="373.9"/>
+    <line x1="229.2" y1="442.9" x2="229.2" y2="490.5"/>
+    <line x1="395.1" y1="60.9" x2="395.6" y2="373.9"/>
+  </g>
+  <rect x="9.4" y="7.1" width="439.4" height="53.8" fill="#FFFFA6" stroke="#000000" stroke-width="1"/>
+  <rect x="112.6" y="110.2" width="233.2" height="71.8" fill="#E8F2A1" stroke="#000000" stroke-width="1"/>
+  <rect x="126" y="231.4" width="206.3" height="85.2" fill="#DEE6EF" stroke="#000000" stroke-width="1"/>
+  <rect x="18.4" y="374.8" width="421.6" height="67.3" fill="#FFDBB6" stroke="#000000" stroke-width="1"/>
+  <rect x="130.5" y="491.4" width="197.3" height="67.3" fill="#E0C2CD" stroke="#000000" stroke-width="1"/>
+  <g fill="#000000">
+    <polygon points="228.7,61.3 235.2,78.4 228.7,76.4 222.1,78.4"/>
+    <polygon points="228.6,182.8 235.3,199.6 228.6,197.4 221.9,199.6"/>
+    <polygon points="228.6,317.4 235.3,333.9 228.6,332 222,333.9"/>
+    <polygon points="228.6,442.9 235.3,459.6 228.6,457.5 222,459.6"/>
+    <polygon points="228.7,373.9 233.1,362.2 228.7,363.9 224.2,362.2"/>
+    <polygon points="228.6,490.5 233,479 228.6,480.4 224.3,479"/>
+    <polygon points="395.1,373.9 399.5,362.3 395.1,363.9 390.7,362.3"/>
+  </g>
+  <!-- Labels: to change one, edit the text of the matching <text> element. -->
+  <g fill="#000000" font-family="Arial, Helvetica, 'Liberation Sans', sans-serif" text-anchor="middle">
+    <text x="228.9" y="41" font-size="22.3">Starknet network</text>
+    <text x="229.3" y="140.9" font-size="20.4">Wallet</text>
+    <text x="228.2" y="163.9" font-size="20.4">(Ready, Braavos, ...)</text>
+    <text x="228.4" y="281" font-size="22.3">get-starknet v5/v6</text>
+    <text x="228.5" y="416" font-size="22.3">Starknet.js WalletAccountV5/V6</text>
+    <text x="228.3" y="532.2" font-size="22.3">DAPP</text>
+  </g>
+</svg>
