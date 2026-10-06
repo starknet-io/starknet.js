@@ -149,7 +149,7 @@ export function subscribeWalletEvent(
 /**
  * Get the private balances held by the user inside the STRK20 privacy pool.
  *
- * Reading a shielded balance requires the user approval, and this approval is time limited :
+ * Reading a shielded balance requires the user approval, and this approval is time limited:
  * `valid_until` requests when it expires. When it is omitted, the wallet applies its own
  * default window.
  * @param {WalletWithStarknetFeaturesV6} walletWSF - The get-starknet V6 wallet object to use.
@@ -196,16 +196,16 @@ export function strk20InvokeTransaction(
 
 /**
  * Compute the commitment of a DAPP STRK20 shadow account. The commitment is computed
- * locally by the wallet from the user private state ; no transaction is sent.
+ * locally by the wallet from the user private state; no transaction is sent.
  *
  * When `nonce` is given, the full commitment of this single shadow account is returned.
- * When `nonce` is omitted, the partial (nonce independent) commitment is returned instead :
+ * When `nonce` is omitted, the partial (nonce independent) commitment is returned instead:
  * it is shared by every shadow account the user derives for this DAPP, so it can be
  * published once to let a DAPP recognize all the shadow accounts of a user without learning
  * any individual nonce.
  * @param {WalletWithStarknetFeaturesV6} walletWSF - The get-starknet V6 wallet object to use.
  * @param {STRK20_DAPP_NAME} dapp_name - The DAPP that scopes the shadow account(s).
- * @param {FELT} [nonce] - The shadow account nonce ; each nonce selects a distinct shadow account for this user + DAPP. Omit it to get the partial commitment.
+ * @param {FELT} [nonce] - The shadow account nonce; each nonce selects a distinct shadow account for this user + DAPP. Omit it to get the partial commitment.
  * @returns {Promise<FELT>} The shadow account commitment.
  * @example
  * ```typescript

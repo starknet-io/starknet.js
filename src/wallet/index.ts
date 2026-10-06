@@ -5,7 +5,7 @@ export * from './accountV6';
 // STRK20 privacy protocol types (wallet-api spec, RPC 0.10.4+).
 // Re-exported so DAPPs can import them directly from `starknet` when using WalletAccountV6.
 
-// Starknet.js flavored types : same as the wallet-api spec ones, except that every embedded
+// Starknet.js flavored types: same as the wallet-api spec ones, except that every embedded
 // call is a Starknet.js `Call`. The raw spec types remain available in the `RPC` namespace.
 export type {
   STRK20_ACTION,

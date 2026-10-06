@@ -20,7 +20,7 @@ There are 2 types of Paymaster transactions:
 
 In `starknet.js`, you can interact with a Paymaster in two ways:
 
-- Through the `Account` or `WalletAccount` classes
+- Through the `Account` or `WalletAccountV6` classes
 - Or directly via the `PaymasterRpc` class
 
 :::warning IMPORTANT
@@ -200,24 +200,24 @@ If the account selected in the Wallet extension (Braavos, ArgentX, ...) is not d
 If necessary, deploy first the account, using:
 
 ```typescript
-// starknetWalletObject is the wallet selected by get-starknet v4.
+// selectedWallet is the wallet selected by get-starknet v6.
 // Get data to deploy the account:
-const deploymentData: AccountDeploymentData = await wallet.deploymentData(starknetWalletObject);
+const deploymentData = await walletV6.deploymentData(selectedWallet);
 const feesDetails: PaymasterDetails = {
   feeMode: { mode: 'default', gasToken },
   deploymentData: { ...deploymentData, version: 1 as 1 },
 };
-// MyWalletAccount is the WalletAccount instance related to the selected wallet.
-const estimatedFees: PaymasterFeeEstimate = await MyWalletAccount.estimatePaymasterTransactionFee(
+// myWalletAccount is the WalletAccountV6 instance related to the selected wallet.
+const estimatedFees: PaymasterFeeEstimate = await myWalletAccount.estimatePaymasterTransactionFee(
   [],
   feesDetails
 );
-const resp = await MyWalletAccount.executePaymasterTransaction(
+const resp = await myWalletAccount.executePaymasterTransaction(
   [],
   feesDetails,
   estimatedFees.suggested_max_fee_in_gas_token
 );
-const txR = await newAccount.provider.waitForTransaction(resp.transaction_hash);
+const txR = await myWalletAccount.provider.waitForTransaction(resp.transaction_hash);
 ```
 
 ## PaymasterRpc Functions
@@ -241,14 +241,16 @@ A demo DAPP is available [here](https://starknet-paymaster-snip-29.vercel.app/) 
 
 ## Full Example – React + Starknet.js + Paymaster
 
+In this example, `selectedWallet` is the wallet chosen by the user. The [WalletAccount guide](./walletAccount.md#with-get-starknet-v6) explains how to list the wallets and how to choose one.
+
 ```tsx
 import { FC, useEffect, useState } from 'react';
-import { connect } from 'get-starknet'; // v4 only
-import { Account, PaymasterRpc, TokenData, WalletAccount } from 'starknet'; // v8+
+import type { WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard/features'; // v6
+import { Account, PaymasterRpc, TokenData, WalletAccountV6 } from 'starknet'; // v11
 
 const paymasterRpc = new PaymasterRpc();
 
-const App: FC = () => {
+const App: FC<{ selectedWallet: WalletWithStarknetFeatures }> = ({ selectedWallet }) => {
   const [account, setAccount] = useState<Account>();
   const [loading, setLoading] = useState(false);
   const [tx, setTx] = useState<string>();
@@ -256,12 +258,13 @@ const App: FC = () => {
   const [gasTokens, setGasTokens] = useState<TokenData[]>([]);
 
   const handleConnect = async () => {
-    const starknet = await connect();
-    if (!starknet) return;
-    await starknet.enable();
-    if (starknet.isConnected && starknet.provider && starknet.account.address) {
-      setAccount(await WalletAccount.connect(starknet.provider, starknet, undefined, paymasterRpc));
-    }
+    const walletAccount = await WalletAccountV6.connect(
+      { nodeUrl: 'https://api.zan.top/public/starknet-sepolia/rpc/v0_10' },
+      selectedWallet,
+      undefined,
+      paymasterRpc
+    );
+    if (walletAccount.address) setAccount(walletAccount);
   };
 
   useEffect(() => {

@@ -4,7 +4,7 @@ sidebar_position: 12
 
 # Migrate from v10 to v11
 
-This guide covers every breaking change between v10 (10.7.0) and v11, and how to resolve it. Two
+This guide covers every breaking change between v10 (10.8.0) and v11, and how to resolve it. Two
 shorter parts follow: the deprecations, which break nothing today, and what v11 adds.
 
 If you hit a change that is not described here, please tell us and we will complete this guide.
@@ -42,15 +42,15 @@ instead of quietly encoding a different one.
 | Starknet ID names are validated, not truncated    | **Low**    | Only if you resolve or encode `.stark` names            |
 | The feeder gateway `BaseUrl` constant removed     | **Low**    | Only if you imported `constants.BaseUrl`                |
 
-Two deprecations ship with the release — `stark.randomAddress()` and `Provider` — but neither of
-them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
+Three deprecations ship in v11 — `stark.randomAddress()`, `Provider` and `WalletAccount` — but none
+of them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
 
 ### What did not change
 
 Worth stating, because the release is a major: `Account`, `Contract`, `CallData` and the `Signer`
 interface are untouched. `WebSocketChannel` keeps exactly the API it had in v10 — same constructor
 options, same `subscribe*` methods, same events. No RPC spec version is added or dropped: 0.9 and
-0.10.x remain supported, with 0.10.3 as the default. What left the package exports is listed above.
+0.10.x remain supported, with 0.10.4 as the default. What left the package exports is listed above.
 Most of it had been marked `@deprecated` for at least three major versions; the rest is the v1
 transaction API, which no live network has accepted for a long time.
 
@@ -508,7 +508,7 @@ disagree — `compile('fn', { v: 1 })` was refused for a `core::bool` parameter 
 
 ## Part 2 — Deprecations
 
-Neither of these breaks anything today. Existing code keeps working; migrate at your own pace.
+None of these breaks anything today. Existing code keeps working; migrate at your own pace.
 
 ### `stark.randomAddress()`
 
@@ -547,6 +547,25 @@ import { RpcProvider } from 'starknet'; // ✅ was Provider
 
 const myProvider = new RpcProvider({ nodeUrl: myNodeUrl });
 ```
+
+### `WalletAccount`
+
+`WalletAccount` is the class for get-starknet v4. It is now marked `@deprecated`. It still works, but
+it is kept only for DAPPs that are still on get-starknet v4. Use `WalletAccountV6` instead. It needs
+get-starknet v6: install `@starknet-io/get-starknet-discovery@6` and
+`@starknet-io/get-starknet-wallet-standard@6`.
+
+This is not only a rename. get-starknet v6 works in a different way, so a few calls change:
+
+| With `WalletAccount` (get-starknet v4)                           | With `WalletAccountV6` (get-starknet v6)                                     |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `connect()` of get-starknet v4 opens a window to choose a wallet | `createStore().getWallets()` lists the wallets. You build your own selection |
+| A `StarknetWindowObject` is given to `WalletAccount.connect()`   | A `WalletWithStarknetFeatures` is given to `WalletAccountV6.connect()`       |
+| `onAccountChange()` and `onNetworkChanged()`                     | `onChange()` for the two, and `unsubscribeChange()` to stop                  |
+| `wallet.requestChainId(...)`                                     | `walletV6.requestChainId(...)`                                               |
+
+The methods that sign and send keep their names: `execute`, `signMessage`, `declare` and `deploy`.
+For a complete example, see the [WalletAccount guide](./account/walletAccount.md#with-get-starknet-v6).
 
 ## Part 3 — What is new in v11
 
