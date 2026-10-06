@@ -1,3 +1,9 @@
+# [11.1.0](https://github.com/starknet-io/starknet.js/compare/v11.0.3...v11.1.0) (2026-10-06)
+
+### Features
+
+- **wallet:** deprecate WalletAccount in favor of WalletAccountV6 ([70082b7](https://github.com/starknet-io/starknet.js/commit/70082b7cdf3fe793e49ac58c0c5fdce91cfc195c))
+
 ## [11.0.3](https://github.com/starknet-io/starknet.js/compare/v11.0.2...v11.0.3) (2026-10-01)
 
 ### Bug Fixes
