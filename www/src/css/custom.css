@@ -14,11 +14,16 @@
   --ifm-color-primary-lighter: black;
   --ifm-color-primary-lightest: black;
   --ifm-code-font-size: 95%;
-  --ifm-link-color: rgb(40, 40, 150);
+  --ifm-link-color: #0b57d0;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
+/*
+ * For readability concerns, you should choose a lighter palette in dark mode.
+ * The `html` prefix is needed: the build merges this file's `:root` rule with the one
+ * of src/theme/SearchBar/styles.css and moves it after this block. Both selectors have the
+ * same weight, so without `html` the light colors win in dark mode.
+ */
+html[data-theme='dark'] {
   --ifm-color-primary: white;
   --ifm-color-primary-dark: white;
   --ifm-color-primary-darker: white;
@@ -26,7 +31,7 @@
   --ifm-color-primary-light: white;
   --ifm-color-primary-lighter: white;
   --ifm-color-primary-lightest: white;
-  --ifm-link-color: rgb(70, 160, 190);
+  --ifm-link-color: #6cb6ff;
 }
 
 .docusaurus-highlight-code-line {
@@ -42,6 +47,11 @@
 
 [data-theme='dark'] .DocSearch {
   --docsearch-hit-active-color: black;
+}
+
+/* Underline the links of the page content, so they stand out from the text without relying on color alone. */
+.theme-doc-markdown a:not(.hash-link):not(.button) {
+  text-decoration: underline;
 }
 
 /* skip for home page and v4 docs */
