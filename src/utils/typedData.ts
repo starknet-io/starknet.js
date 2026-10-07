@@ -381,11 +381,12 @@ export function encodeValue(
         const variantType = enumType.find((t) => t.name === variantKey) as StarknetType;
         const variantIndex = enumType.indexOf(variantType);
 
+        // a variant without arguments, `()`, contributes no subtypes to the hash
         const encodedSubtypes = variantType.type
           .slice(1, -1)
           .split(',')
+          .filter((subtype) => subtype !== '')
           .map((subtype, index) => {
-            if (!subtype) return subtype;
             const subtypeData = (variantData as unknown[])[index];
             return encodeValue(types, subtype, subtypeData, undefined, revision)[1];
           });

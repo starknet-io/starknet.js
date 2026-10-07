@@ -20,7 +20,7 @@ import {
   type Signature,
 } from '../../src';
 import { PRIME } from '../../src/global/constants';
-import { getSelectorFromName } from '../../src/utils/hash';
+import { computePoseidonHashOnElements, getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
 import {
   encodeType,
@@ -352,7 +352,7 @@ describe('typedData', () => {
 
     messageHash = getMessageHash(exampleEnum, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x6e61abaf480b1370bbf231f54e298c5f4872f40a6d2dd409ff30accee5bbd1e"`
+      `"0x69b8e06cf1afab12f3983bd75243a1b4a43d313dd407837292f715a28d57017"`
     );
 
     messageHash = getMessageHash(exampleEnumNested, exampleAddress);
@@ -364,6 +364,38 @@ describe('typedData', () => {
     expect(spyPoseidon).toHaveBeenCalled();
     spyPedersen.mockRestore();
     spyPoseidon.mockRestore();
+  });
+
+  test('should encode an enum variant without arguments with its index only', () => {
+    // a `()` variant contributes no parameters: hash_array(variant_index), no trailing 0
+    const exampleUnitVariant = {
+      types: {
+        StarknetDomain: exampleEnum.types.StarknetDomain,
+        Example: [{ name: 'feeMode', type: 'enum', contains: 'FeeMode' }],
+        FeeMode: [
+          { name: 'No Fee', type: '()' },
+          { name: 'Pay Fee', type: '(u128)' },
+        ],
+      },
+      primaryType: 'Example',
+      domain: exampleEnum.domain,
+      message: { feeMode: { 'No Fee': [] } },
+    };
+
+    const [, encoded] = encodeValue(
+      exampleUnitVariant.types,
+      'enum',
+      exampleUnitVariant.message.feeMode,
+      { parent: 'Example', key: 'feeMode' },
+      TypedDataRevision.ACTIVE
+    );
+    expect(encoded).toBe(computePoseidonHashOnElements([0]));
+    expect(encoded).not.toBe(computePoseidonHashOnElements([0, 0]));
+
+    // reference value computed with starknet.py 0.30.0 (TypedData.from_dict(...).message_hash)
+    expect(getMessageHash(exampleUnitVariant, exampleAddress)).toBe(
+      '0x60456a10c6ce8c808e1d2709efdf717929650ad6ce3f1680a662f271cc162ed'
+    );
   });
 
   describe('should fail validation', () => {
