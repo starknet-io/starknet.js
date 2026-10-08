@@ -21,17 +21,26 @@ const browserNodeShimPlugin: Plugin = {
 
 export default defineConfig((overrideOptions) => {
   const baseConfig: Options = {
-    entry: ['src/index.ts'],
+    // `src/ledger/index.ts` is the `starknet/ledger` entry point, built to `dist/ledger/index.*`
+    // (see `exports` in package.json).
+    entry: ['src/index.ts', 'src/ledger/index.ts'],
+    // `src/ledger` imports the package by its name. Keeping that import makes `dist/ledger/*`
+    // load `dist/index.*`, instead of holding a second copy of the whole library.
+    external: ['starknet'],
+    // No shared chunk between the two entry points: `dist/index.mjs` stays one self-contained file.
+    splitting: false,
     sourcemap: true,
     clean: true,
     format: ['cjs'],
     globalName: 'starknet',
   };
 
-  // For IIFE browser builds, add the shim plugin to handle Node.js modules
+  // For IIFE browser builds, add the shim plugin to handle Node.js modules.
+  // Main entry only: a second IIFE file would also declare `var starknet`.
   if (overrideOptions.format?.includes('iife')) {
     return {
       ...baseConfig,
+      entry: ['src/index.ts'],
       esbuildPlugins: [browserNodeShimPlugin],
     };
   }

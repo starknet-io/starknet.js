@@ -35,6 +35,9 @@ type _Transport = any;
  * Signer for accounts using a Ledger Nano S+/X signature (Starknet Ledger APP version 1.1.1)
  *
  * The Ledger has to be connected, unlocked and the Starknet APP has to be selected prior of use of this class.
+ * @deprecated Import it from `starknet/ledger` instead: it is the same class, with the transport typed as a
+ * Ledger `Transport`. Importing it from `starknet` is kept only for backward compatibility, and will be
+ * removed in v12.
  */
 export class LedgerSigner111<Transport extends Record<any, any> = any> implements SignerInterface {
   readonly transporter: Transport;
@@ -296,6 +299,8 @@ export class LedgerSigner111<Transport extends Record<any, any> = any> implement
  * for a Ledger Starknet DAPP v1.1.1.
  *
  * EIP2645 path = 2645'/starknet/application/0/accountId/0
+ * @deprecated Import it from `starknet/ledger` instead: it is the same function. Importing it from
+ * `starknet` is kept only for backward compatibility, and will be removed in v12.
  * @param {number} accountId Id of account. < 2**31.
  * @param {string} [applicationName='LedgerW'] utf8 string of application name.
  * @returns an Uint8array of 24 bytes.

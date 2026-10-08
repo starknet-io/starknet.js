@@ -18,6 +18,18 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./ledger": {
+      "types": "./dist/ledger/index.d.ts",
+      "import": "./dist/ledger/index.mjs",
+      "require": "./dist/ledger/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "ledger": [
+        "./dist/ledger/index.d.ts"
+      ]
     }
   },
   "files": [
@@ -58,6 +70,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
+    "@ledgerhq/hw-transport": "^6.36.0",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",
@@ -107,6 +120,14 @@
     "@starknet-io/starknet-types-09": "npm:@starknet-io/types-js@0.9.2",
     "abi-wan-kanabi": "2.2.4",
     "lossless-json": "^4.2.0"
+  },
+  "peerDependencies": {
+    "@ledgerhq/hw-transport": "^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@ledgerhq/hw-transport": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22.12"

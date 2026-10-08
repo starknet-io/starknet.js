@@ -567,6 +567,25 @@ This is not only a rename. get-starknet v6 works in a different way, so a few ca
 The methods that sign and send keep their names: `execute`, `signMessage`, `declare` and `deploy`.
 For a complete example, see the [WalletAccount guide](./account/walletAccount.md#with-get-starknet-v6).
 
+### Ledger signers
+
+The Ledger signers now have their own entry point: `starknet/ledger`. It has the same classes and
+functions, with the transport typed as a Ledger `Transport`. So `transporter` has the type of the
+transport you pass, and a value that is not a Ledger transport is refused at compile time.
+
+Importing them from `starknet` still works, but it is marked `@deprecated` and will be removed in
+v12. The migration is a change of import path, with no behavior change:
+
+```typescript
+import { LedgerSigner231 } from 'starknet/ledger'; // ✅ was imported from 'starknet'
+```
+
+This applies to `LedgerSigner111`, `LedgerSigner221`, `LedgerSigner231`, `getLedgerPathBuffer111`,
+`getLedgerPathBuffer221`, and to the aliases `LedgerSigner` and `getLedgerPathBuffer`. The
+`Transport` type comes from `@ledgerhq/hw-transport`, which the Ledger transport packages
+(`@ledgerhq/hw-transport-node-hid`, `@ledgerhq/hw-transport-webhid`, …) already install. See the
+[Ledger section of the signature guide](./account/signature.md#signing-with-a-ledger-hardware-wallet).
+
 ## Part 3 — What is new in v11
 
 Nothing here requires any change on your side. Each item links to the guide that covers it in full.
