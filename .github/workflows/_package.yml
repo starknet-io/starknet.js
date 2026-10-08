@@ -1,0 +1,111 @@
+name: _ Check package
+on:
+  workflow_call:
+
+jobs:
+  check:
+    name: Check the built package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+
+      - name: install the packed package in an empty project
+        # As a user gets it: the packed archive, plus every peer dependency that package.json
+        # declares. No name is written here, so a new peer dependency is installed too.
+        run: |
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
+          mkdir "$RUNNER_TEMP/consumer"
+          cd "$RUNNER_TEMP/consumer"
+          npm init -y > /dev/null
+          peers=$(node -p "Object.entries(require('$GITHUB_WORKSPACE/package.json').peerDependencies || {}).map(([name, range]) => name + '@' + range).join(' ')")
+          npm install --ignore-scripts --no-audit --no-fund "$RUNNER_TEMP"/starknet-*.tgz $peers
+
+      - name: check every entry point (generic part)
+        # Everything is read from package.json: a new entry point is checked as soon as it is
+        # declared in `exports`, with no change here.
+        working-directory: ${{ runner.temp }}/consumer
+        run: |
+          cat > entries.cjs <<'EOF'
+          const assert = require('node:assert');
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const root = path.join(__dirname, 'node_modules', 'starknet');
+          const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+
+          // Every file that package.json points to exists.
+          const fields = [pkg.main, pkg.module, pkg.types, pkg.browser, pkg.jsdelivr, pkg.unpkg, pkg.exports, pkg.typesVersions];
+          const files = new Set(JSON.stringify(fields).match(/(?:\.\/)?dist\/[^"]+/g));
+          for (const file of files) assert.ok(fs.existsSync(path.join(root, file)), `missing file: ${file}`);
+
+          // Every entry point of `exports` loads with require.
+          const entries = Object.keys(pkg.exports).map((key) => (key === '.' ? 'starknet' : `starknet/${key.slice(2)}`));
+          for (const entry of entries) require(entry);
+          fs.writeFileSync('entries.json', JSON.stringify(entries));
+
+          // One import per entry point, type-checked in the last step.
+          const imports = entries.map((entry, i) => `import * as entry${i} from '${entry}';`);
+          const names = entries.map((_, i) => `entry${i}`).join(', ');
+          fs.writeFileSync('entries.ts', `${imports.join('\n')}\n\nexport const all = [${names}];\n`);
+          console.log(`${files.size} files found, ${entries.length} entry points loaded: ${entries.join(', ')}`);
+          EOF
+          node entries.cjs
+
+          cat > entries.mjs <<'EOF'
+          import { readFileSync } from 'node:fs';
+
+          // Every entry point of `exports` loads with import.
+          for (const entry of JSON.parse(readFileSync('entries.json', 'utf8'))) await import(entry);
+          EOF
+          node entries.mjs
+
+      - name: check starknet/ledger (part specific to this entry point)
+        working-directory: ${{ runner.temp }}/consumer
+        run: |
+          cat > ledger.cjs <<'EOF'
+          const assert = require('node:assert');
+          const starknet = require('starknet');
+          const { LedgerSigner231 } = require('starknet/ledger');
+
+          // A signer of starknet/ledger is also one of starknet: there is no second copy of the library.
+          assert.ok(new LedgerSigner231({}, 0) instanceof starknet.LedgerSigner231);
+          EOF
+          node ledger.cjs
+
+          # Type-checked in the last step.
+          cat > ledger.ts <<'EOF'
+          import type Transport from '@ledgerhq/hw-transport';
+          import { LedgerSigner231 } from 'starknet/ledger';
+
+          declare const transport: Transport;
+          export const signer = new LedgerSigner231(transport, 0);
+          // @ts-expect-error An empty object is not a Ledger transport.
+          export const refused = new LedgerSigner231({}, 0);
+          // @ts-expect-error `transporter` has the type of the transport, not `any`.
+          export const missing = signer.transporter.notAMethod;
+          EOF
+
+      - name: type-check every check file
+        # entries.ts, plus the .ts files of the parts specific to an entry point. An unused
+        # `@ts-expect-error` is an error too, so a lost type check fails here.
+        working-directory: ${{ runner.temp }}/consumer
+        run: |
+          tsc="$GITHUB_WORKSPACE/node_modules/.bin/tsc"
+          for resolution in bundler node16 node; do
+            case "$resolution" in
+              bundler) module=esnext ;;
+              node16) module=node16 ;;
+              node) module=commonjs ;;
+            esac
+            echo "moduleResolution: $resolution"
+            "$tsc" --noEmit --strict --skipLibCheck --esModuleInterop --target es2022 --module "$module" --moduleResolution "$resolution" *.ts
+          done
