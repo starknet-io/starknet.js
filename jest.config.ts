@@ -112,6 +112,9 @@ export default async (): Promise<Config> => {
     // @noble/* and @scure/* are ESM-only since v2; they must be transpiled by @swc/jest
     // instead of being ignored like the rest of node_modules.
     transformIgnorePatterns: ['node_modules/(?!(@noble|@scure)/)'],
+    // `src/ledger` imports the package by its name. That name must load the sources, so a test
+    // gets the same classes as its `../src` imports and `instanceof` stays true.
+    moduleNameMapper: { '^starknet$': '<rootDir>/src/index.ts' },
   } satisfies Partial<Config>;
 
   return {

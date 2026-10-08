@@ -201,6 +201,49 @@ const readSkillVersion = (): string => {
 };
 const skillVersion = readSkillVersion();
 
+/*
+ * TypeDoc options shared by the two API instances below. `starknet/ledger` has its own instance:
+ * as a second entry point of the main one, it would move every API page under `API/index/`.
+ */
+const typedocSharedOptions = {
+  tsconfig: '../tsconfig.json',
+  // Keep `docs/API/.gitkeep` (see www/.gitignore) by not wiping the output dir on build.
+  cleanOutputDir: false,
+  includeVersion: true,
+  fileExtension: '.md',
+  sourceLinkTemplate: generateSourceLinkTemplate(process.env.GIT_REVISION_OVERRIDE || 'develop'),
+  visibilityFilters: {
+    protected: false,
+    private: false,
+  },
+  sort: ['kind'],
+  kindSortOrder: [
+    'Reference',
+    'Project',
+    'Module',
+    'Class',
+    'Namespace',
+    'Enum',
+    'EnumMember',
+    'Interface',
+    'TypeAlias',
+    'Constructor',
+    'Property',
+    'Variable',
+    'Function',
+    'Accessor',
+    'Method',
+    'Parameter',
+    'TypeParameter',
+    'TypeLiteral',
+    'CallSignature',
+    'ConstructorSignature',
+    'IndexSignature',
+    'GetSignature',
+    'SetSignature',
+  ],
+};
+
 const config: Config = {
   title: 'Starknet.js',
   tagline: 'JavaScript library for Starknet',
@@ -409,48 +452,24 @@ const config: Config = {
     [
       'docusaurus-plugin-typedoc',
       {
+        ...typedocSharedOptions,
         entryPoints: ['../src/index.ts'],
-        tsconfig: '../tsconfig.json',
         out: 'docs/API',
         name: 'Starknet.js API',
-        // Keep `docs/API/.gitkeep` (see www/.gitignore) by not wiping the output dir on build.
-        cleanOutputDir: false,
-        includeVersion: true,
-        fileExtension: '.md',
-        sourceLinkTemplate: generateSourceLinkTemplate(
-          process.env.GIT_REVISION_OVERRIDE || 'develop'
-        ),
-        visibilityFilters: {
-          protected: false,
-          private: false,
-        },
-        sort: ['kind'],
-        kindSortOrder: [
-          'Reference',
-          'Project',
-          'Module',
-          'Class',
-          'Namespace',
-          'Enum',
-          'EnumMember',
-          'Interface',
-          'TypeAlias',
-          'Constructor',
-          'Property',
-          'Variable',
-          'Function',
-          'Accessor',
-          'Method',
-          'Parameter',
-          'TypeParameter',
-          'TypeLiteral',
-          'CallSignature',
-          'ConstructorSignature',
-          'IndexSignature',
-          'GetSignature',
-          'SetSignature',
-        ],
         readme: './ApiTitle.md',
+      },
+    ],
+    [
+      'docusaurus-plugin-typedoc',
+      {
+        ...typedocSharedOptions,
+        // A second instance of a plugin needs its own id.
+        id: 'ledger',
+        entryPoints: ['../src/ledger/index.ts'],
+        out: 'docs/API/ledger',
+        name: 'starknet/ledger',
+        // `ApiTitle.md` links to the pages of the main instance, so this one has no readme.
+        readme: 'none',
       },
     ],
   ],

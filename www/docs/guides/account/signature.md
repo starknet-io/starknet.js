@@ -253,13 +253,17 @@ import type Transport from '@ledgerhq/hw-transport'; // type for the transporter
 In a Web DAPP, take care that some browsers are not compatible (FireFox, ...), and that the Bluetooth is not working in all cases and in all operating systems.
 
 :::note
-The last version of the Ledger Starknet APP (v2.3.1) supports explained V1 (ETH, Rpc 0.7) & V3 (STRK, Rpc 0.7 & 0.8) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to enable `Blind signing` in the APP settings.
+The Ledger Starknet APP, from v2.3.1 to v2.4.3, supports explained V1 (ETH, Rpc 0.7) & V3 (STRK, Rpc 0.7 & 0.8) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to enable `Blind signing` in the APP settings.
 :::
+
+The Ledger signers are imported from `starknet/ledger` (their [API](../../API/ledger/index.md)).
+Importing them from `starknet` still works in v11, but it is deprecated.
 
 For example, for a Node script:
 
 ```typescript
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
+import { LedgerSigner231 } from 'starknet/ledger';
 const myLedgerTransport: Transport = await TransportNodeHid.create();
 const myLedgerSigner = new LedgerSigner231(myLedgerTransport, 0);
 const pubK = await myLedgerSigner.getPubKey();
@@ -298,12 +302,14 @@ console.log('version=', appVersion);
 You also have in Starknet.js a signer for the old v1.1.1 Ledger Starknet APP.
 
 ```typescript
+import { LedgerSigner111 } from 'starknet/ledger';
 const myLedgerSigner = new LedgerSigner111(myLedgerTransport, 0);
 ```
 
 If you want to use the accounts created with the v1.1.1, using the v2.3.1 signer:
 
 ```typescript
+import { LedgerSigner231, getLedgerPathBuffer111 } from 'starknet/ledger';
 const myLedgerSigner = new LedgerSigner231(myLedgerTransport, 0, undefined, getLedgerPathBuffer111);
 ```
 

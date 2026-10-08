@@ -40,6 +40,9 @@ import { LedgerSigner111 } from './ledgerSigner111';
  * Signer for accounts using a Ledger Nano S+/X signature (Starknet Ledger APP version 2.2.1).
  *
  * The Ledger has to be connected, unlocked and the Starknet APP has to be selected prior of use of this class.
+ * @deprecated Import it from `starknet/ledger` instead: it is the same class, with the transport typed as a
+ * Ledger `Transport`. Importing it from `starknet` is kept only for backward compatibility, and will be
+ * removed in v12.
  */
 export class LedgerSigner221<Transport extends Record<any, any> = any>
   extends LedgerSigner111
@@ -58,13 +61,13 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
    *
    * If you are using APP v2.2.1 with an account created with the v1.1.1, you need to use :
    * ```typescript
-   * const myLedgerSigner = new LedgerSigner211(myNodeTransport, 0, undefined, getLedgerPathBuffer111);
+   * const myLedgerSigner = new LedgerSigner221(myNodeTransport, 0, undefined, getLedgerPathBuffer111);
    * ```
    * @example
    * ```typescript
    * import TransportNodeHid from "@ledgerhq/hw-transport-node-hid";
    * const myNodeTransport = await TransportNodeHid.create();
-   * const myLedgerSigner = new LedgerSigner211(myNodeTransport, 0);
+   * const myLedgerSigner = new LedgerSigner221(myNodeTransport, 0);
    * ```
    */
   constructor(
@@ -434,12 +437,14 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
  * Format the Ledger wallet path to an Uint8Array.
  * for a Ledger Starknet DAPP v2.2.0
  * EIP2645 path = 2645'/starknet'/application'/0'/accountId'/0
+ * @deprecated Import it from `starknet/ledger` instead: it is the same function. Importing it from
+ * `starknet` is kept only for backward compatibility, and will be removed in v12.
  * @param {number} accountId Id of account. < 2**31.
  * @param {string} [applicationName='LedgerW'] utf8 string of application name.
  * @returns an Uint8array of 24 bytes.
  * @example
  * ```typescript
- * const result = getLedgerPathBuffer211(0);
+ * const result = getLedgerPathBuffer221(0);
  * // result = Uint8Array(24) [
  *   128,   0,  10,  85, 199, 65, 233, 201,
  *   171, 206, 231, 219, 128,  0,   0,   0,
