@@ -24,6 +24,8 @@ on:
       - 'ts*'
       # a change to the release configuration must be able to run the release
       - '.releaserc*'
+      # a change to a workflow must be able to run the workflow it changes
+      - '.github/workflows/**'
       - '!www/**'
   push:
     branches:
@@ -39,6 +41,8 @@ on:
       - 'ts*'
       # a change to the release configuration must be able to run the release
       - '.releaserc*'
+      # a change to a workflow must be able to run the workflow it changes
+      - '.github/workflows/**'
       - '!www/**'
 
 # Default every read-only job to the minimum token scope. Release jobs override
@@ -85,9 +89,15 @@ jobs:
       version: ${{ matrix.version }}
     secrets: inherit
 
+  # Builds, packs and installs the package as a user would: a broken entry point blocks the release.
+  package-check:
+    name: Check the built package
+    if: github.event_name != 'workflow_dispatch'
+    uses: ./.github/workflows/_package.yml
+
   release-auto:
     name: Release
-    needs: [tests-dev, tests-main]
+    needs: [tests-dev, tests-main, package-check]
     # `always() && !failure()` lets the release proceed even when a test job is
     # skipped (e.g. tests-main is skipped on non-`main` branches), while still
     # blocking it if a test job actually fails. semantic-release is idempotent
