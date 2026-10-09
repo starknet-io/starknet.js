@@ -586,6 +586,9 @@ This applies to `LedgerSigner111`, `LedgerSigner221`, `LedgerSigner231`, `getLed
 (`@ledgerhq/hw-transport-node-hid`, `@ledgerhq/hw-transport-webhid`, …) already install. See the
 [Ledger section of the signature guide](./account/signature.md#signing-with-a-ledger-hardware-wallet).
 
+In `starknet/ledger`, the aliases `LedgerSigner` and `getLedgerPathBuffer` are deprecated: they are
+other names of `LedgerSigner111` and `getLedgerPathBuffer111`, so use these names instead.
+
 ## Part 3 — What is new in v11
 
 Nothing here requires any change on your side. Each item links to the guide that covers it in full.

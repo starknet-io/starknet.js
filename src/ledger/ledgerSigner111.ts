@@ -40,3 +40,27 @@ export class LedgerSigner111<T extends Transport = Transport> extends starknet.L
 export function getLedgerPathBuffer111(accountId: number, applicationName?: string): Uint8Array {
   return starknet.getLedgerPathBuffer111(accountId, applicationName);
 }
+
+// Deprecated aliases. They are declarations, not `export { LedgerSigner111 as LedgerSigner }`:
+// the build drops the JSDoc of an export specifier, so users would never see the deprecation.
+
+/**
+ * @deprecated Use {@link LedgerSigner111} instead. `LedgerSigner` is an alias of it, kept only for
+ * backward compatibility, and will be removed in a future major version. The two are the same
+ * class, so the migration is a rename: no behavior changes.
+ */
+export const LedgerSigner = LedgerSigner111;
+
+/**
+ * @deprecated Use {@link LedgerSigner111} instead. `LedgerSigner` is an alias of it, kept only for
+ * backward compatibility, and will be removed in a future major version. The two are the same
+ * class, so the migration is a rename: no behavior changes.
+ */
+export type LedgerSigner<T extends Transport = Transport> = LedgerSigner111<T>;
+
+/**
+ * @deprecated Use {@link getLedgerPathBuffer111} instead. `getLedgerPathBuffer` is an alias of it,
+ * kept only for backward compatibility, and will be removed in a future major version. The two are
+ * the same function, so the migration is a rename: no behavior changes.
+ */
+export const getLedgerPathBuffer = getLedgerPathBuffer111;
