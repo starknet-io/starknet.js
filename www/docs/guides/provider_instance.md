@@ -80,7 +80,7 @@ import { RpcProvider } from 'starknet';
 |                  Alchemy |        No         | v0_8, v0_9, v0_10 |
 |                      Zan | v0_8, v0_9, v0_10 | v0_8, v0_9, v0_10 |
 |                   Infura |        No         |       v0_8        |
-|                     Lava |    v0_8, v0_9     |       v0_8        |
+|                     Lava |   Not available   |    v0_8, v0_9     |
 | Local Pathfinder v0.22.6 | v0_8, v0_9, v0_10 |        N/A        |
 |       Local Juno v0.16.3 | v0_8, v0_9, v0_10 |        N/A        |
 
@@ -106,9 +106,10 @@ import { RpcProvider } from 'starknet';
 
 :::note
 
-- This status has been verified 22/jun/2026.
+- This status has been verified 22/jun/2026, except for Lava on Mainnet (verified 09/oct/2026).
 - Zan public node is limited to 15 calls per second, and has also monthly limitation.
-- The Lava Sepolia Testnet public node is no longer available.
+- The Lava public nodes are no longer available. To use Lava, create a free account on [gateway.lavanet.xyz](https://gateway.lavanet.xyz) to get an API key.
+- With a Lava API key, add `/rpc/v0_8` or `/rpc/v0_9` at the end of the URL to get this RPC version. `/rpc/v0_10` is ignored. Without any ending, the RPC version can change at each request.
 
 :::
 
@@ -154,13 +155,10 @@ const providerZanMainnet = new RpcProvider({
 const providerAlchemyMainnet = new RpcProvider({
   nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_10/' + alchemyKey,
 });
-// Lava node RPC 0.8.1 for Mainnet:
+// Lava node RPC 0.9.0 for Mainnet (0.8 also available).
+// Keep the '/rpc/v0_9' at the end. Without it, Lava picks a random RPC version for each request:
 const providerMainnetLava = new RpcProvider({
-  nodeUrl: 'https://g.w.lavanet.xyz:443/gateway/strk/rpc-http/' + lavaMainnetKey,
-});
-// Public Lava node RPC 0.9.0 for Mainnet (0.8 also available):
-const providerLavaMainnet = new RpcProvider({
-  nodeUrl: 'https://rpc.starknet.lava.build/rpc/v0_9',
+  nodeUrl: 'https://g.w.lavanet.xyz:443/gateway/strk/rpc-http/' + lavaMainnetKey + '/rpc/v0_9',
 });
 ```
 
