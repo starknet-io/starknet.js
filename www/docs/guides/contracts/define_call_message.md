@@ -51,7 +51,7 @@ const decimals: BigNumberish = 18;
 
 If your Cairo smart contract is waiting for a:
 
-### felt, u8, u16, u32, usize, u64, u96, u128, felt252, ContractAddress, EthAddress, ClassHash
+### felt, u8, u16, u32, usize, u64, u96, u128, felt252, ContractAddress, EthAddress, ClassHash, StorageAddress
 
 Starknet is waiting for a felt.  
 You can send to Starknet.js methods: bigNumberish.
@@ -62,7 +62,7 @@ await myContract.my_function(12, '13', '0xe', 15n);
 
 > `EthAddress` is limited to 160 bits.
 > `felt` and `felt252` are limited to the field, below P = 2^251 + 17·2^192 + 1.
-> `ClassHash` is limited to 2^251 - 1, and `ContractAddress` to 2^251 - 257.
+> `ClassHash` and `StorageAddress` are limited to 2^251 - 1, and `ContractAddress` to 2^251 - 257.
 
 ### i8, i16, i32, i64, i128
 
@@ -73,7 +73,7 @@ You can send to Starknet.js methods: bigNumberish, negative or not.
 await myContract.my_function(-5, -5n, '-5', '-0x5');
 ```
 
-> A minus sign in a string is read as a sign for these types only. For any other type, `'-5'` is text: encoded as such for `felt252` and `u8` to `u128`, refused for `ContractAddress`, `EthAddress`, `ClassHash`, `bool`, `u256` and `u512`.
+> A minus sign in a string is read as a sign for these types only. For any other type, `'-5'` is text: encoded as such for `felt252` and `u8` to `u128`, refused for `ContractAddress`, `EthAddress`, `ClassHash`, `StorageAddress`, `bool`, `u256` and `u512`.
 
 ### bool
 

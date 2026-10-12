@@ -20,6 +20,7 @@ export * from './ethAddress';
 export * from './secp256k1Point';
 export * from './classHash';
 export * from './contractAddress';
+export * from './storageAddress';
 
 // The composites, and the shape every Cairo type class satisfies.
 //

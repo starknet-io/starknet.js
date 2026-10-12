@@ -3,6 +3,7 @@ import { CairoByteArray } from '../../cairoDataTypes/byteArray';
 import { CairoBytes31 } from '../../cairoDataTypes/bytes31';
 import { CairoClassHash } from '../../cairoDataTypes/classHash';
 import { CairoContractAddress } from '../../cairoDataTypes/contractAddress';
+import { CairoStorageAddress } from '../../cairoDataTypes/storageAddress';
 import { CairoEthAddress } from '../../cairoDataTypes/ethAddress';
 import { CairoFelt252 } from '../../cairoDataTypes/felt';
 import { CairoInt8 } from '../../cairoDataTypes/int8';
@@ -81,7 +82,7 @@ function isResponseIterator(input: unknown): input is Iterator<string> {
  *
  * Every leaf answers the two directions the same way — its constructor for a value, its
  * `factoryFromApiResponse` for the felts of a response — so the entry is the same shape each
- * time and is written once here rather than nineteen times below.
+ * time and is written once here rather than once per leaf below.
  * @param {object} cairoType the class to wrap
  * @returns {Function} the constructor entry for that class
  * @example
@@ -123,6 +124,7 @@ const LEAF_TYPES = [
   CairoEthAddress,
   CairoClassHash,
   CairoContractAddress,
+  CairoStorageAddress,
   CairoBytes31,
   CairoByteArray,
   CairoSecp256k1Point,
@@ -211,6 +213,7 @@ export const cairoTypeStrategy: CairoTypeStrategy = {
     [CairoEthAddress.abiSelector]: (instance) => (instance as CairoEthAddress).toBigInt(),
     [CairoClassHash.abiSelector]: (instance) => (instance as CairoClassHash).toBigInt(),
     [CairoContractAddress.abiSelector]: (instance) => (instance as CairoContractAddress).toBigInt(),
+    [CairoStorageAddress.abiSelector]: (instance) => (instance as CairoStorageAddress).toBigInt(),
     [CairoBytes31.abiSelector]: (instance) => (instance as CairoBytes31).decodeUtf8(),
     [CairoByteArray.abiSelector]: (instance) => (instance as CairoByteArray).decodeUtf8(),
     [CairoSecp256k1Point.abiSelector]: (instance) => (instance as CairoSecp256k1Point).toBigInt(),
