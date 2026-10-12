@@ -59,6 +59,11 @@ export const RANGE_CONTRACT_ADDRESS = range(ZERO, ADDR_BOUND - 1n);
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/class_hash.cairo
 export const RANGE_CLASS_HASH = range(ZERO, 2n ** 251n - 1n);
 
+// A storage address has the same range as a class hash: the Cairo `StorageAddress` type holds
+// [0, 2^251), and its conversion from a felt252 refuses anything past it.
+// https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/storage_access.cairo
+export const RANGE_STORAGE_ADDRESS = range(ZERO, 2n ** 251n - 1n);
+
 export const LegacyUDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
