@@ -1,3 +1,9 @@
+# [11.2.0](https://github.com/starknet-io/starknet.js/compare/v11.1.0...v11.2.0) (2026-10-12)
+
+### Features
+
+- **cairoDataTypes:** add CairoStorageAddress ([96ad4c6](https://github.com/starknet-io/starknet.js/commit/96ad4c6390c47dd8753f4d1ffdad63469007ab28)), closes [#1116](https://github.com/starknet-io/starknet.js/issues/1116)
+
 # [11.1.0](https://github.com/starknet-io/starknet.js/compare/v11.0.3...v11.1.0) (2026-10-06)
 
 ### Features
