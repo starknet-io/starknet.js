@@ -139,7 +139,6 @@ export type ParsedEvents = Array<ParsedEvent> & {
 // TODO: This should be in formatResponse type
 /**
  * Advance formatting used to get js types data as result
- * @see https://starknet-io.github.io/starknet.js/docs/guides/define_call_message/#formatresponse
  * @example
  * ```typescript
  * // assign custom or existing method to resulting data

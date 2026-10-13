@@ -7,7 +7,7 @@ import type { RpcTransport } from './types';
 export type HttpTransportOptions = {
   /**
    * The HTTP endpoint of the Starknet node.
-   * @example 'https://starknet-sepolia.public.blastapi.io/rpc/v0_10'
+   * @example 'https://api.zan.top/public/starknet-sepolia/rpc/v0_10'
    */
   nodeUrl: string;
   /** Extra headers sent with every request, an API key for instance. */
@@ -47,7 +47,7 @@ export function postJsonRpc(
  * @example
  * ```typescript
  * const transport = new HttpTransport({
- *   nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_10',
+ *   nodeUrl: 'https://api.zan.top/public/starknet-sepolia/rpc/v0_10',
  *   baseFetch: fetch,
  * });
  * const myProvider = new RpcProvider({ transport });

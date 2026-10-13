@@ -54,7 +54,7 @@ type V3Details = Required<
 /**
  * Compress compiled Cairo 0 program
  *
- * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/gateway/transaction.py#L54-L58)
+ * [Reference](https://github.com/starkware-libs/cairo-lang/blob/v0.14.0.1/src/starkware/starknet/services/api/gateway/transaction_utils.py#L34-L39)
  * @param {Program | string} jsonProgram Representing the compiled Cairo 0 program
  * @return {CompressedProgram} Compressed Cairo 0 program
  * @example

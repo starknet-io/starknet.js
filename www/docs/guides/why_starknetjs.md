@@ -69,11 +69,11 @@ The `Contract` class provides:
 
 Connect your dApp to any Starknet environment:
 
-| Network                                                   | Description                              | Use Case              |
-| --------------------------------------------------------- | ---------------------------------------- | --------------------- |
-| [Mainnet](https://starkscan.co)                           | Production network (Layer 2 of Ethereum) | Live applications     |
-| [Testnet](https://sepolia.starkscan.co/)                  | Test network (Layer 2 of Sepolia)        | Testing & development |
-| [Devnet](https://github.com/0xSpaceShard/starknet-devnet) | Local development network                | Rapid development     |
+| Network                                                  | Description                              | Use Case              |
+| -------------------------------------------------------- | ---------------------------------------- | --------------------- |
+| [Mainnet](https://starkscan.co)                          | Production network (Layer 2 of Ethereum) | Live applications     |
+| [Testnet](https://sepolia.starkscan.co/)                 | Test network (Layer 2 of Sepolia)        | Testing & development |
+| [Devnet](https://github.com/starknet-io/starknet-devnet) | Local development network                | Rapid development     |
 
 You can also connect to:
 
@@ -84,8 +84,8 @@ You can also connect to:
 
 Before diving into Starknet.js, familiarize yourself with:
 
-1. [Starknet Documentation](https://docs.starknet.io/documentation/) - Understanding the network
-2. [Cairo Programming](https://book.cairo-lang.org/) - Smart contract development
+1. [Starknet Documentation](https://docs.starknet.io) - Understanding the network
+2. [Cairo Programming](https://www.starknet.io/cairo-book/) - Smart contract development
 3. JavaScript/TypeScript fundamentals
 
 ## Next Steps

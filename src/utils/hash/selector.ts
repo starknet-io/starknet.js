@@ -37,7 +37,7 @@ function keccakHex(str: string): string {
 
 /**
  * Calculate the BigInt Starknet Keccak hash for a given string
- * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L38)
+ * [Reference](https://docs.starknet.io/learn/protocol/cryptography#starknet-keccak)
  *
  * @param str value to hash
  * @returns BigInt Keccak hash
@@ -55,7 +55,7 @@ export function starknetKeccak(str: string): bigint {
 
 /**
  * Calculate the hex-string selector for a given abi function name
- * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L46)
+ * [Reference](https://www.starknet.io/cairo-book/ch102-01-contract-class-abi.html#function-selector)
  *
  * @param funcName abi function name
  * @returns hex-string selector
