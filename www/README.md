@@ -67,30 +67,36 @@ Just before the release of a new version in the `main` branch documentation vers
 - Ensure that all the necessary commits/PRs/merges are performed
 - Ensure that the `www` directory is up to date
 
-- Execute the documentation build with the appropriate version tag used in the documentation code links with one of the following:
+- Empty `/www/docs/API`, but keep the `.gitkeep` file that git tracks there. TypeDoc does not empty this folder before it writes, so pages left there by an earlier build would end up in the new version:
 
 ```bash
-# from the root directory, use the module version from package.json
-npm run docs:build:version
-
-# from the root directory, manually set the version
-npm run docs:build --git-revision-override=vX.Y.Z
-
-# from the /www documentation directory, manually set the version
-GIT_REVISION_OVERRIDE=vX.Y.Z npm run build
+# from the root directory
+find www/docs/API -mindepth 1 ! -name .gitkeep -delete
 ```
 
-- Launch the documentation versioning with one of the following:
+- Launch the documentation versioning with one of the following. It generates the API pages again, with code links to the `vX.Y.Z` tag, then copies the documentation:
 
 ```bash
 # from the root directory, use the module version from package.json
 npm run docs:version
 
 # from the root directory, manually set the version
-npm run docs:version --version-override=X.Y.Z
+npm run docs:version --version-override=X.Y.Z --git-revision-override=vX.Y.Z
 
 # from the /www documentation directory, manually set the version
-npm run docusaurus docs:version X.Y.Z
+GIT_REVISION_OVERRIDE=vX.Y.Z npm run docusaurus docs:version X.Y.Z
+```
+
+- In `/www/docusaurus.config.ts`, add a `banner` entry for `X.Y.Z` to the `versions` map. The comment above this map explains which value to use.
+
+- Build the documentation to check that no link is broken, in the new version too, with one of the following:
+
+```bash
+# from the root directory
+npm run docs:build
+
+# from the /www documentation directory
+npm run build
 ```
 
 - The official documentation (API + guides) of `X.Y.Z` is created

@@ -51,7 +51,7 @@
     "docs": "cd www && npm run start",
     "docs:build": "cd www && GIT_REVISION_OVERRIDE=${npm_config_git_revision_override} npm run build",
     "docs:build:version": "v=$(npm run info:version -s) && npm run docs:build --git-revision-override=${npm_config_git_revision_override=v$v}",
-    "docs:version": "v=$(npm run info:version -s) && cd www && npm run version ${npm_config_version_override=$v}",
+    "docs:version": "v=$(npm run info:version -s) && cd www && GIT_REVISION_OVERRIDE=${npm_config_git_revision_override=v$v} npm run version ${npm_config_version_override=$v}",
     "info:version": "npm pkg get version | xargs",
     "format": "prettier --log-level log --write \"**/*.{ts,js,md,yml,json}\"",
     "lint": "eslint . --cache --fix --ext .ts",
