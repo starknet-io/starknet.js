@@ -177,14 +177,6 @@ const migrationGuideLink = `${docsBaseUrl}docs/guides/migrate`;
 // const migrationGuideLink = `${docsBaseUrl}docs/next/guides/migrate`;
 
 /*
- * Archiving helper, not a production setting: a normal build renders every version listed
- * in `versions.json` on top of the current one. `DOCS_ONLY_CURRENT=true` narrows it to the
- * current line, which is all that is needed to regenerate `docs/API` before freezing a new
- * snapshot. CI never sets it, so deployed builds still ship every version.
- */
-const onlyCurrentDocs = process.env.DOCS_ONLY_CURRENT === 'true';
-
-/*
  * The landing page states which starknet.js release the agent skill was verified against. The
  * stamp is written by hand in SKILL.md; this only copies it at build time. Rewording the stamp
  * fails the build on purpose, rather than shipping a landing page that silently lost the version.
@@ -257,6 +249,8 @@ const config: Config = {
     },
   },
   onBrokenLinks: 'throw',
+  // Docusaurus 3 only warns about broken anchors by default.
+  onBrokenAnchors: 'throw',
   favicon: 'img/favicon.ico',
   headTags: [
     {
@@ -284,19 +278,12 @@ const config: Config = {
           // is what `npm install starknet` gives, and the banner would say otherwise. Every
           // new snapshot needs an explicit `banner` entry here.
           lastVersion: 'current',
-          ...(onlyCurrentDocs ? { onlyIncludeVersions: ['current'] } : {}),
           versions: {
             current: { label: '11.x', banner: 'none' },
-            // Declared only when they are part of the build, to stay in step with
-            // `onlyIncludeVersions` above.
-            ...(onlyCurrentDocs
-              ? {}
-              : {
-                  '10.8.0': { banner: 'none' },
-                  '9.2.1': { banner: 'unmaintained' },
-                  '8.6.0': { banner: 'unmaintained' },
-                  '7.6.4': { banner: 'unmaintained' },
-                }),
+            '10.8.0': { banner: 'none' },
+            '9.2.1': { banner: 'unmaintained' },
+            '8.6.0': { banner: 'unmaintained' },
+            '7.6.4': { banner: 'unmaintained' },
           },
           async sidebarItemsGenerator(args) {
             const sidebarItems = await args.defaultSidebarItemsGenerator(args);

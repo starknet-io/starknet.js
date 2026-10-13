@@ -154,7 +154,6 @@ export abstract class AccountInterface {
    * - .addressSalt - Salt for address generation
    *
    * @param estimateFeeDetails - Optional details for fee estimation
-   * @inheritdoc estimateInvokeFee
    *
    * @returns Fee estimation including overall_fee and resourceBounds
    * @example
@@ -181,7 +180,6 @@ export abstract class AccountInterface {
    * - .constructorCalldata - Constructor parameters
    *
    * @param estimateFeeDetails - Optional details for fee estimation
-   * @inheritdoc estimateInvokeFee
    *
    * @returns Fee estimation for the deployment transaction
    * @example
@@ -206,7 +204,6 @@ export abstract class AccountInterface {
    * - .payload - Transaction-specific payload
    *
    * @param details - Optional details for fee estimation
-   * @inheritdoc estimateInvokeFee
    *
    * @returns Array of fee estimations for each transaction
    * @example
@@ -282,7 +279,6 @@ export abstract class AccountInterface {
    *
    * @param calls - Array of calls to be sponsored
    * @param paymasterDetails - Paymaster configuration
-   * @inheritdoc estimatePaymasterTransactionFee
    *
    * @returns Prepared transaction with typed data for signing
    * @example
@@ -337,7 +333,6 @@ export abstract class AccountInterface {
    * - .compiledClassHash - Pre-computed CASM hash
    *
    * @param transactionsDetail - Transaction execution options
-   * @inheritdoc execute
    *
    * @returns Declaration transaction hash and class hash
    * @example
@@ -363,7 +358,6 @@ export abstract class AccountInterface {
    * - .unique - Modify salt for unique address (default: true).
    *
    * @param details - Transaction execution options
-   * @inheritdoc execute
    *
    * @returns Deployed contract addresses and transaction hash
    * @example
@@ -383,10 +377,8 @@ export abstract class AccountInterface {
    * Deploy and wait for a contract deployment to complete
    *
    * @param payload - Deployment configuration(s)
-   * @inheritdoc deploy
    *
    * @param details - Transaction execution options
-   * @inheritdoc execute
    *
    * @returns Deployment result with contract address and UDC event details
    * @remarks
@@ -418,7 +410,6 @@ export abstract class AccountInterface {
    * - .unique - Ensure unique deployment address
    *
    * @param details - Transaction execution options
-   * @inheritdoc execute
    *
    * @returns Declaration and deployment results
    * @remarks
@@ -449,7 +440,6 @@ export abstract class AccountInterface {
    * - .contractAddress - Pre-computed address
    *
    * @param transactionsDetail - Transaction execution options
-   * @inheritdoc execute
    *
    * @returns Deployment transaction hash and contract address
    * @remarks
