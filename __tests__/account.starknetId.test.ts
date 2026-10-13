@@ -19,7 +19,7 @@ describe('deploy and test Wallet', () => {
     const idResponse = await account.declareAndDeploy({
       contract: CONTRACTS.StarknetId.Identity.sierra,
       casm: CONTRACTS.StarknetId.Identity.casm,
-      constructorCalldata: [account.address, 0],
+      constructorCalldata: [account.address, []],
     });
     identityAddress = idResponse.deploy.contract_address;
 

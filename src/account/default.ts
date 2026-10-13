@@ -70,7 +70,7 @@ import {
   getOutsideCall,
   getTypedData,
 } from '../utils/outsideExecution';
-import { parseContract } from '../utils/provider';
+import { extractAbi, parseContract } from '../utils/provider';
 import { supportsInterface } from '../utils/src5';
 import {
   randomFelt,
@@ -88,6 +88,7 @@ import { type PaymasterInterface, PaymasterRpc } from '../paymaster';
 import { assertPaymasterTransactionSafety } from '../utils/paymaster';
 import assert from '../utils/assert';
 import { defaultDeployer, Deployer } from '../deployer';
+import { compileConstructorCalldata } from '../deployer/compileConstructorCalldata';
 import type { TipType } from '../provider/modules/tip';
 import { PluginManager } from '../plugins/manager';
 import { defaultPlugins } from '../plugins/defaults';
@@ -552,13 +553,30 @@ export class Account implements AccountInterface {
     payload: DeclareAndDeployContractPayload,
     details: UniversalDetails & waitForTransactionOptions = {}
   ): Promise<DeclareDeployUDCResponse> {
+    if (payload.abi) {
+      logger.warn(
+        'The "abi" field is ignored: the ABI is taken from "contract". This field will be removed in v12.'
+      );
+    }
+    // The constructor calldata is checked with the abi of `contract` before the declaration,
+    // so that a wrong constructor call fails before any transaction is sent.
+    const contractAbi = extractAbi(await parseContract(payload.contract));
+    // An abi with no constructor is left out, as before: with it, `CallData` would turn a
+    // non-empty calldata into an unclear TypeError, or drop it silently.
+    const abi = contractAbi?.some((entry) => entry.type === 'constructor')
+      ? contractAbi
+      : undefined;
+    const constructorCalldata = compileConstructorCalldata(payload.constructorCalldata, abi);
+
     let declare = await this.declareIfNot(payload, details);
     if (declare.transaction_hash !== '') {
       const tx = await this.provider.waitForTransaction(declare.transaction_hash, details);
       declare = { ...declare, ...tx };
     }
+    // The calldata is already compiled, so the deployer needs no abi.
+    // `abi: undefined` makes sure the ignored one does not reach it.
     const deploy = await this.deployContract(
-      { ...payload, classHash: declare.class_hash },
+      { ...payload, classHash: declare.class_hash, constructorCalldata, abi: undefined },
       details
     );
     return { declare: { ...declare }, deploy };

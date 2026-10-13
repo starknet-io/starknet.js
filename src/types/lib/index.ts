@@ -107,7 +107,7 @@ export type UniversalDeployerContractPayload = {
   salt?: string;
   unique?: boolean;
   constructorCalldata?: RawArgs;
-  abi?: Abi; // TODO: check chain of usage in Account
+  abi?: Abi;
 };
 
 export type DeployAccountContractPayload = {
@@ -175,8 +175,14 @@ export type CompleteDeclareContractPayload = {
   compiledClassHash: string;
 };
 
-export type DeclareAndDeployContractPayload = Omit<UniversalDeployerContractPayload, 'classHash'> &
-  DeclareContractPayload;
+export type DeclareAndDeployContractPayload = Omit<
+  UniversalDeployerContractPayload,
+  'classHash' | 'abi'
+> &
+  DeclareContractPayload & {
+    /** @deprecated Ignored: the ABI is taken from `contract`. Will be removed in v12. */
+    abi?: Abi;
+  };
 
 export type DeclareContractTransaction = {
   contract: ContractClass;

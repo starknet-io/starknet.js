@@ -44,6 +44,7 @@ import { logger } from '../global/logger';
 import { RpcProvider } from '../provider/rpc';
 import { getCompiledCalldata } from '../utils/transaction';
 import { extractAbi, parseContract } from '../utils/provider';
+import { compileConstructorCalldata } from '../deployer/compileConstructorCalldata';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -596,18 +597,19 @@ export class Contract implements ContractInterface {
         parseRequest?: boolean;
       };
       const contract = await parseContract(declareParams.contract);
-      abi = declareParams.abi ? declareParams.abi : extractAbi(contract);
+      // The abi always comes from `contract`. A given `abi` is passed on as is:
+      // declareAndDeploy ignores it and warns.
+      abi = extractAbi(contract);
+      // parseRequest false: the calldata is compiled as given, without the abi, as before.
+      // It is then already compiled, and declareAndDeploy does not check it again.
+      const constructorCalldata = parseRequest
+        ? declareParams.constructorCalldata
+        : compileConstructorCalldata(declareParams.constructorCalldata);
 
       const {
         declare: { class_hash },
         deploy: { contract_address: deployed_address },
-      } = await account.declareAndDeploy(
-        {
-          ...declareParams,
-          abi: parseRequest ? abi : undefined,
-        },
-        details
-      );
+      } = await account.declareAndDeploy({ ...declareParams, constructorCalldata }, details);
       classHash = class_hash.toString();
       contract_address = deployed_address;
     }

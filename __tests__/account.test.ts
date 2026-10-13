@@ -16,6 +16,7 @@ import {
   type InvokeTransactionReceiptResponse,
   Deployer,
   RPC,
+  logger,
 } from '../src';
 import {
   C1v2ClassHash,
@@ -89,6 +90,54 @@ describe('deploy and test Account', () => {
   test('declare and deploy', async () => {
     expect(dd.declare).toBeDefined();
     expect(dd.deploy).toBeDefined();
+  });
+
+  test('declareAndDeploy checks the constructor calldata before declaring', async () => {
+    const declareIfNotSpy = jest.spyOn(account, 'declareIfNot');
+    try {
+      await expect(
+        account.declareAndDeploy({
+          contract: CONTRACTS.Erc20Oz100.sierra,
+          casm: CONTRACTS.Erc20Oz100.casm,
+        })
+      ).rejects.toThrow('Invalid number of arguments, expected 5 arguments, but got 0');
+      expect(declareIfNotSpy).not.toHaveBeenCalled();
+    } finally {
+      declareIfNotSpy.mockRestore();
+    }
+  });
+
+  test('declareAndDeploy ignores abi and uses the ABI of contract', async () => {
+    const warnSpy = jest.spyOn(logger, 'warn').mockImplementation(() => {});
+    try {
+      const response = await account.declareAndDeploy({
+        contract: CONTRACTS.Erc20Oz100.sierra,
+        casm: CONTRACTS.Erc20Oz100.casm,
+        // abi of another contract, with constructor(name: felt252, address: ContractAddress)
+        abi: CONTRACTS.OnlyConstructor.sierra.abi,
+        // keys not in the order of the ERC20 abi: only that abi puts them in the right order
+        constructorCalldata: {
+          owner: account.address,
+          recipient: account.address,
+          amount: 300n,
+          symbol: 'IGN',
+          name: 'Ignored abi',
+        },
+      });
+      const token = new Contract({
+        abi: CONTRACTS.Erc20Oz100.sierra.abi,
+        address: response.deploy.contract_address,
+        providerOrAccount: provider,
+      });
+
+      expect(await token.name()).toBe('Ignored abi');
+      expect(await token.balanceOf(account.address)).toBe(300n);
+      expect(warnSpy).toHaveBeenCalledWith(
+        'The "abi" field is ignored: the ABI is taken from "contract". This field will be removed in v12.'
+      );
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
   describeIfDevnet('Test on Devnet', () => {
