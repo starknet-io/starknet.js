@@ -175,7 +175,7 @@ type WebSocketChannelEvents = {
 export class WebSocketChannel {
   /**
    * The URL of the WebSocket RPC Node.
-   * @example 'wss://starknet-sepolia.public.blastapi.io/rpc/v0_8'
+   * @example 'wss://your-starknet-node/rpc/v0_10'
    */
   public nodeUrl: string;
 

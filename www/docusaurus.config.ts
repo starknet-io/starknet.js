@@ -389,7 +389,7 @@ const config: Config = {
               to: '/docs/guides/intro',
             },
             {
-              label: 'Migrate to v9',
+              label: 'Migrate to v11',
               to: migrationGuideLink,
             },
           ],

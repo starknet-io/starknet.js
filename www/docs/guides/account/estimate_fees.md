@@ -25,7 +25,7 @@ const { resourceBounds, overall_fee, unit } = await account0.estimateInvokeFee({
 `resourceBounds` holds the limits to pass to the transaction, already increased by the configured overhead. `overall_fee`, of type BigInt, is the maximum these limits can cost — the worst case, not the expected cost. `unit` is the currency of that amount, `FRI`.
 
 :::tip
-More details about the complex subject of Starknet fees in [Starknet docs](https://docs.starknet.io/architecture-and-concepts/network-architecture/fee-mechanism/)
+More details about the complex subject of Starknet fees in [Starknet docs](https://docs.starknet.io/learn/protocol/fees)
 :::
 
 The complete answer:

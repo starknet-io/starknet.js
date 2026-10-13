@@ -48,7 +48,7 @@ export type WsTransportEvents = {
 
 /** What {@link WsTransport} needs to open its socket. */
 export type WsTransportOptions = {
-  /** @example 'wss://starknet-sepolia.public.blastapi.io/rpc/v0_10' */
+  /** @example 'wss://your-starknet-node/rpc/v0_10' */
   nodeUrl: string;
   /** Custom WebSocket implementation. Falls back to `config.get('websocket')`, then the global. */
   websocket?: WebSocketModule;

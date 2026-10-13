@@ -201,7 +201,7 @@ const providerZanSepoliaTestnet2 = new RpcProvider({
 
 ### Pathfinder
 
-For a local [Pathfinder](https://github.com/eqlabs/pathfinder) node:
+For a local [Pathfinder](https://github.com/software-mansion/pathfinder) node:
 
 ```typescript
 const myProvider = new RpcProvider({ nodeUrl: '127.0.0.1:9545/rpc/v0_10' });

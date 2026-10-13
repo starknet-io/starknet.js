@@ -11,7 +11,7 @@ This guide explains how to handle communication between Ethereum (Layer 1) and S
 - L2 Starknet Testnet ↔️ L1 Sepolia ETH testnet
 - L2 local Starknet Devnet ↔️ L1 local ETH testnet (Foundry/Anvil, ...)
 
-For a detailed explanation of the messaging architecture, see the [Starknet documentation](https://docs.starknet.io/architecture/messaging/).
+For a detailed explanation of the messaging architecture, see the [Starknet documentation](https://docs.starknet.io/learn/protocol/messaging).
 
 ## Prerequisites
 
@@ -278,4 +278,4 @@ If message consumption fails:
 
 ## Additional Resources
 
-- [Starknet Messaging Documentation](https://docs.starknet.io/architecture/messaging/#l2_l1_messages)
+- [Starknet Messaging Documentation](https://docs.starknet.io/learn/protocol/messaging#l2-→-l1-messages)

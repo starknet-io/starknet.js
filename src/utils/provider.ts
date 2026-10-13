@@ -128,7 +128,7 @@ export function extractAbi(contract: ContractClass): Abi {
  * ```typescript
  * const result= provider.getDefaultNodeUrl(constants.NetworkName.SN_MAIN);
  * // console : "Using default public node url, please provide nodeUrl in provider options!"
- * // result = "https://starknet-mainnet.public.blastapi.io/rpc/v0_9"
+ * // result = "https://api.zan.top/public/starknet-mainnet/rpc/v0_10"
  * ```
  */
 export const getDefaultNodeUrl = (
