@@ -151,7 +151,7 @@ export default function orderPropsByAbi(
           value: value ?? unorderedObject2[abiParam.name],
         });
 
-      if (unorderedObject2[abiParam.name] === 'undefined') {
+      if (unorderedObject2[abiParam.name] === undefined) {
         if (isCairo1Type(abiParam.type) || !isLen(abiParam.name)) {
           throw Error(`Your object needs a property with key : ${abiParam.name} .`);
         }
@@ -265,6 +265,10 @@ export default function orderPropsByAbi(
       });
     if (isLen(abiParam.name) && !isCairo1Type(abiParam.type)) {
       return orderedObject;
+    }
+    // a key missing from the object, often a misspelled one: name the parameter it should hold
+    if (unorderedObject[abiParam.name] === undefined) {
+      throw Error(`Your object needs a property with key : ${abiParam.name} .`);
     }
     setProperty(orderInput(unorderedObject[abiParam.name], abiParam.type));
     return orderedObject;

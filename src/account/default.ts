@@ -15,6 +15,7 @@ import {
   OutsideExecutionVersion,
 } from '../types';
 import type {
+  Abi,
   AccountInvocations,
   AccountInvocationsFactoryDetails,
   AccountOptions,
@@ -63,7 +64,7 @@ import type {
 import { ETransactionType } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
-import { calculateContractAddressFromHash } from '../utils/hash';
+import { calculateContractAddressFromHash, computeContractClassHash } from '../utils/hash';
 import { isHex, toBigInt, toHex } from '../utils/num';
 import {
   buildExecuteFromOutsideCall,
@@ -227,10 +228,15 @@ export class Account implements AccountInterface {
       addressSalt = 0,
       constructorCalldata = [],
       contractAddress,
-    }: DeployAccountContractPayload,
+      abi,
+    }: DeployAccountContractPayload & { abi?: Abi },
     details: UniversalDetails = {}
   ): Promise<EstimateFeeResponseOverhead> {
-    const compiledCalldata = CallData.compile(constructorCalldata);
+    // Without an abi, the calldata is compiled as before. `compileConstructorCalldata` would
+    // change one case: it unwraps a compiled calldata given inside an array (`[calldata]`).
+    const compiledCalldata = abi
+      ? compileConstructorCalldata(constructorCalldata, abi)
+      : CallData.compile(constructorCalldata);
     const contractAddressFinal =
       contractAddress ??
       calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);
@@ -453,6 +459,9 @@ export class Account implements AccountInterface {
    * First check if contract is already declared, if not declare it
    * If contract already declared returned transaction_hash is ''.
    * Method will pass even if contract is already declared
+   *
+   * A given `classHash` is used as is to look for the class on the node, without being checked
+   * against `contract`, to save time.
    * @param transactionsDetail (optional)
    */
   public async declareIfNot(
@@ -560,24 +569,41 @@ export class Account implements AccountInterface {
     }
     // The constructor calldata is checked with the abi of `contract` before the declaration,
     // so that a wrong constructor call fails before any transaction is sent.
-    const contractAbi = extractAbi(await parseContract(payload.contract));
-    // An abi with no constructor is left out, as before: with it, `CallData` would turn a
-    // non-empty calldata into an unclear TypeError, or drop it silently.
-    const abi = contractAbi?.some((entry) => entry.type === 'constructor')
-      ? contractAbi
-      : undefined;
+    const abi = extractAbi(await parseContract(payload.contract));
     const constructorCalldata = compileConstructorCalldata(payload.constructorCalldata, abi);
+    // A given classHash must be the one of `contract`. Otherwise `declareIfNot` could find another
+    // class on the node, and this method would deploy it with a calldata checked for this one.
+    // Once checked, the hash is passed on, so that the steps below do not compute it again.
+    // `null` counts as no classHash, as in `extractContractHashes`.
+    const classHash = computeContractClassHash(payload.contract);
+    if (
+      payload.classHash !== undefined &&
+      payload.classHash !== null &&
+      toBigInt(payload.classHash) !== toBigInt(classHash)
+    ) {
+      throw Error(
+        `The given classHash ${payload.classHash} is not the class hash of "contract": ${classHash}`
+      );
+    }
 
-    let declare = await this.declareIfNot(payload, details);
-    if (declare.transaction_hash !== '') {
+    let declare = await this.declareIfNot({ ...payload, classHash }, details);
+    const declarationSent = declare.transaction_hash !== '';
+    if (declarationSent) {
       const tx = await this.provider.waitForTransaction(declare.transaction_hash, details);
       declare = { ...declare, ...tx };
     }
+    // A given nonce was used by the declaration: the deployment, the second transaction, takes
+    // the next one. Without a given nonce, each transaction gets the current one from the node.
+    // `null` counts as no nonce, as in `getNonceSafe`.
+    const deployDetails =
+      declarationSent && details.nonce !== undefined && details.nonce !== null
+        ? { ...details, nonce: toBigInt(details.nonce) + 1n }
+        : details;
     // The calldata is already compiled, so the deployer needs no abi.
     // `abi: undefined` makes sure the ignored one does not reach it.
     const deploy = await this.deployContract(
       { ...payload, classHash: declare.class_hash, constructorCalldata, abi: undefined },
-      details
+      deployDetails
     );
     return { declare: { ...declare }, deploy };
   }
@@ -590,10 +616,15 @@ export class Account implements AccountInterface {
       constructorCalldata = [],
       addressSalt = 0,
       contractAddress: providedContractAddress,
-    }: DeployAccountContractPayload,
+      abi,
+    }: DeployAccountContractPayload & { abi?: Abi },
     details: UniversalDetails = {}
   ): Promise<DeployContractResponse> {
-    const compiledCalldata = CallData.compile(constructorCalldata); // TODO: TT check if we should add abi here to safe compile
+    // Without an abi, the calldata is compiled as before. `compileConstructorCalldata` would
+    // change one case: it unwraps a compiled calldata given inside an array (`[calldata]`).
+    const compiledCalldata = abi
+      ? compileConstructorCalldata(constructorCalldata, abi)
+      : CallData.compile(constructorCalldata);
     const contractAddress =
       providedContractAddress ??
       calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);
@@ -610,6 +641,7 @@ export class Account implements AccountInterface {
           constructorCalldata,
           addressSalt,
           contractAddress,
+          abi,
         },
         detailsWithTip
       );
@@ -918,10 +950,15 @@ export class Account implements AccountInterface {
       addressSalt = 0,
       constructorCalldata = [],
       contractAddress: providedContractAddress,
-    }: DeployAccountContractPayload,
+      abi,
+    }: DeployAccountContractPayload & { abi?: Abi },
     details: InvocationsSignerDetails
   ): Promise<DeployAccountContractTransaction> {
-    const compiledCalldata = CallData.compile(constructorCalldata);
+    // Without an abi, the calldata is compiled as before. `compileConstructorCalldata` would
+    // change one case: it unwraps a compiled calldata given inside an array (`[calldata]`).
+    const compiledCalldata = abi
+      ? compileConstructorCalldata(constructorCalldata, abi)
+      : CallData.compile(constructorCalldata);
     const contractAddress =
       providedContractAddress ??
       calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);

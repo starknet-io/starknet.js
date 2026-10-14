@@ -578,14 +578,18 @@ export class Contract implements ContractInterface {
         abi = deployParams.abi;
       }
 
-      // Deploy the contract using the provided classHash
+      // Deploy the contract using the provided classHash. parseRequest false: the parameters are
+      // not read with the abi, the calldata is only flattened as given, then the deployer reads
+      // these felts back with the abi, and refuses them if they do not match.
       const deployResult = await account.deployContract(
         {
           classHash,
-          constructorCalldata: deployParams.constructorCalldata,
+          constructorCalldata: parseRequest
+            ? deployParams.constructorCalldata
+            : compileConstructorCalldata(deployParams.constructorCalldata),
           salt: deployParams.salt,
           unique: deployParams.unique,
-          abi: parseRequest ? abi : undefined,
+          abi,
         },
         details
       );
@@ -600,8 +604,9 @@ export class Contract implements ContractInterface {
       // The abi always comes from `contract`. A given `abi` is passed on as is:
       // declareAndDeploy ignores it and warns.
       abi = extractAbi(contract);
-      // parseRequest false: the calldata is compiled as given, without the abi, as before.
-      // It is then already compiled, and declareAndDeploy does not check it again.
+      // parseRequest false: the parameters are not read with the abi, the calldata is only
+      // flattened as given. declareAndDeploy then reads these felts back with the abi of
+      // `contract`, and refuses them if they do not match.
       const constructorCalldata = parseRequest
         ? declareParams.constructorCalldata
         : compileConstructorCalldata(declareParams.constructorCalldata);

@@ -41,6 +41,7 @@ instead of quietly encoding a different one.
 | The leftover v1 transaction API removed           | **Low**    | Only if you imported `v2hash` or `ETransactionVersion2` |
 | Starknet ID names are validated, not truncated    | **Low**    | Only if you resolve or encode `.stark` names            |
 | The feeder gateway `BaseUrl` constant removed     | **Low**    | Only if you imported `constants.BaseUrl`                |
+| `declareAndDeploy` checks the calldata first      | **Low**    | Only if you split values into felts by hand             |
 
 Three deprecations ship in v11 — `stark.randomAddress()`, `Provider` and `WalletAccount` — but none
 of them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
@@ -505,6 +506,33 @@ myArray.toApiRequest(); // ["10", "20", "30"] — it serializes itself now
 it. The messages change, and one asymmetry disappears: the named and positional call forms used to
 disagree — `compile('fn', { v: 1 })` was refused for a `core::bool` parameter where
 `compile('fn', [1])` was accepted. Both now accept it, and both refuse `2`.
+
+### 13. `declareAndDeploy` checks the constructor calldata before declaring
+
+In v10, `account.declareAndDeploy()` sent the constructor calldata unchecked when no `abi` field
+was given. A wrong calldata then failed at the deployment, after the declaration was paid. The
+calldata is now checked with the abi of `contract`, before anything is sent.
+
+So the calldata must follow the constructor parameters, as it already had to with
+`Contract.factory()`:
+
+- an array has one item per parameter, so felts split by hand no longer fit;
+- an object has the parameter names of the abi as keys, in any order.
+
+```typescript
+// constructor(recipient: ContractAddress, amount: u256)
+const constructorCalldata = [recipient, 1000n, 0n]; // amount split by hand into two felts
+await myAccount.declareAndDeploy({
+  contract: compiledSierra,
+  casm: compiledCasm,
+  constructorCalldata,
+});
+// v10: deployed
+// v11: throws before declaring — Invalid number of arguments, expected 2 arguments, but got 3
+```
+
+Write `[recipient, 1000n]` or `{ recipient, amount: 1000n }` instead. Felts compiled with the abi
+are accepted too: `new CallData(compiledSierra.abi).compile('constructor', [recipient, 1000n])`.
 
 ## Part 2 — Deprecations
 

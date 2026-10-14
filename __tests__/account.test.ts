@@ -140,6 +140,175 @@ describe('deploy and test Account', () => {
     }
   });
 
+  test('declareAndDeploy refuses a calldata for a contract with no constructor, before declaring', async () => {
+    const declareIfNotSpy = jest.spyOn(account, 'declareIfNot');
+    try {
+      // u96 has no constructor: before this check, the declaration was paid, then the node refused
+      await expect(
+        account.declareAndDeploy({
+          contract: CONTRACTS.U96.sierra,
+          casm: CONTRACTS.U96.casm,
+          constructorCalldata: [1],
+        })
+      ).rejects.toThrow('Cannot pass calldata to a contract with no constructor');
+      expect(declareIfNotSpy).not.toHaveBeenCalled();
+    } finally {
+      declareIfNotSpy.mockRestore();
+    }
+  });
+
+  test('declareAndDeploy refuses compiled felts that do not match the constructor, before declaring', async () => {
+    const declareIfNotSpy = jest.spyOn(account, 'declareIfNot');
+    try {
+      // compiled without the abi: 5 felts where the ERC20 constructor takes 10
+      const feltsWithoutAbi = CallData.compile([
+        'Token',
+        'ERC20',
+        1000n,
+        account.address,
+        account.address,
+      ]);
+      await expect(
+        account.declareAndDeploy({
+          contract: CONTRACTS.Erc20Oz100.sierra,
+          casm: CONTRACTS.Erc20Oz100.casm,
+          constructorCalldata: feltsWithoutAbi,
+        })
+      ).rejects.toThrow('The compiled constructor calldata does not match the abi');
+      expect(declareIfNotSpy).not.toHaveBeenCalled();
+    } finally {
+      declareIfNotSpy.mockRestore();
+    }
+  });
+
+  test('declareAndDeploy gives the deployment the nonce after the one used by the declaration', async () => {
+    // a declaration is sent (simulated): it uses the given nonce 5, so the deployment must use 6
+    const declareIfNotSpy = jest
+      .spyOn(account, 'declareIfNot')
+      .mockResolvedValue({ transaction_hash: '0x123', class_hash: '0x456' });
+    const waitSpy = jest.spyOn(account.provider, 'waitForTransaction').mockResolvedValue({} as any);
+    const deployContractSpy = jest.spyOn(account, 'deployContract').mockResolvedValue({} as any);
+    try {
+      await account.declareAndDeploy(
+        { contract: CONTRACTS.U96.sierra, casm: CONTRACTS.U96.casm },
+        { nonce: 5 }
+      );
+      expect(declareIfNotSpy.mock.calls[0][1]?.nonce).toBe(5);
+      expect(deployContractSpy.mock.calls[0][1]?.nonce).toBe(6n);
+    } finally {
+      declareIfNotSpy.mockRestore();
+      waitSpy.mockRestore();
+      deployContractSpy.mockRestore();
+    }
+  });
+
+  test('declareAndDeploy keeps the given nonce for the deployment when no declaration is sent', async () => {
+    // the class is already declared (simulated): the given nonce 5 goes to the deployment
+    const declareIfNotSpy = jest
+      .spyOn(account, 'declareIfNot')
+      .mockResolvedValue({ transaction_hash: '', class_hash: '0x456' });
+    const deployContractSpy = jest.spyOn(account, 'deployContract').mockResolvedValue({} as any);
+    try {
+      await account.declareAndDeploy(
+        { contract: CONTRACTS.U96.sierra, casm: CONTRACTS.U96.casm },
+        { nonce: 5 }
+      );
+      expect(deployContractSpy.mock.calls[0][1]?.nonce).toBe(5);
+    } finally {
+      declareIfNotSpy.mockRestore();
+      deployContractSpy.mockRestore();
+    }
+  });
+
+  test('declareAndDeploy refuses a classHash that is not the one of contract, before declaring', async () => {
+    const declareIfNotSpy = jest.spyOn(account, 'declareIfNot');
+    try {
+      // the class hash of u96, given with the ERC20 contract: the ERC20 abi would check the
+      // calldata, while the u96 class would be the one looked for, and deployed if found
+      const u96ClassHash = hash.computeContractClassHash(CONTRACTS.U96.sierra);
+      await expect(
+        account.declareAndDeploy({
+          contract: CONTRACTS.Erc20Oz100.sierra,
+          casm: CONTRACTS.Erc20Oz100.casm,
+          classHash: u96ClassHash,
+          constructorCalldata: erc20Constructor,
+        })
+      ).rejects.toThrow(`The given classHash ${u96ClassHash} is not the class hash of "contract"`);
+      expect(declareIfNotSpy).not.toHaveBeenCalled();
+    } finally {
+      declareIfNotSpy.mockRestore();
+    }
+  });
+
+  test('declareAndDeploy treats a null nonce as no nonce', async () => {
+    // a declaration is sent (simulated) with the nonce of the node: the deployment gets no given
+    // nonce either, and nothing fails once the declaration is out
+    const declareIfNotSpy = jest
+      .spyOn(account, 'declareIfNot')
+      .mockResolvedValue({ transaction_hash: '0x123', class_hash: '0x456' });
+    const waitSpy = jest.spyOn(account.provider, 'waitForTransaction').mockResolvedValue({} as any);
+    const deployContractSpy = jest.spyOn(account, 'deployContract').mockResolvedValue({} as any);
+    try {
+      await account.declareAndDeploy(
+        { contract: CONTRACTS.U96.sierra, casm: CONTRACTS.U96.casm },
+        { nonce: null as any }
+      );
+      expect(deployContractSpy.mock.calls[0][1]?.nonce).toBeNull();
+    } finally {
+      declareIfNotSpy.mockRestore();
+      waitSpy.mockRestore();
+      deployContractSpy.mockRestore();
+    }
+  });
+
+  test('declareAndDeploy treats a null classHash as no classHash', async () => {
+    // the class hash is computed from contract and passed on, as when none is given
+    const declareIfNotSpy = jest
+      .spyOn(account, 'declareIfNot')
+      .mockResolvedValue({ transaction_hash: '', class_hash: '0x456' });
+    const deployContractSpy = jest.spyOn(account, 'deployContract').mockResolvedValue({} as any);
+    try {
+      await account.declareAndDeploy({
+        contract: CONTRACTS.U96.sierra,
+        casm: CONTRACTS.U96.casm,
+        classHash: null as any,
+      });
+      expect(declareIfNotSpy.mock.calls[0][0].classHash).toBe(
+        hash.computeContractClassHash(CONTRACTS.U96.sierra)
+      );
+    } finally {
+      declareIfNotSpy.mockRestore();
+      deployContractSpy.mockRestore();
+    }
+  });
+
+  test('deployAccount with an abi refuses a constructor calldata that does not match it, before sending', async () => {
+    const deployAccountContractSpy = jest.spyOn(account.provider, 'deployAccountContract');
+    try {
+      // `publicKey` is not the name of the parameter in the abi of the account: `public_key` is
+      await expect(
+        account.deployAccount({
+          classHash: '0x1234',
+          constructorCalldata: { publicKey: '0x123' },
+          abi: CONTRACTS.AccountOz080.sierra.abi,
+        })
+      ).rejects.toThrow('Your object needs a property with key : public_key .');
+      expect(deployAccountContractSpy).not.toHaveBeenCalled();
+    } finally {
+      deployAccountContractSpy.mockRestore();
+    }
+  });
+
+  test('estimateAccountDeployFee with an abi refuses a constructor calldata that does not match it', async () => {
+    await expect(
+      account.estimateAccountDeployFee({
+        classHash: '0x1234',
+        constructorCalldata: { publicKey: '0x123' },
+        abi: CONTRACTS.AccountOz080.sierra.abi,
+      })
+    ).rejects.toThrow('Your object needs a property with key : public_key .');
+  });
+
   describeIfDevnet('Test on Devnet', () => {
     test('deployAccount with rawArgs - test on devnet', async () => {
       const privKey = stark.randomStarkPrivateKey();
@@ -187,6 +356,57 @@ describe('deploy and test Account', () => {
       });
       const receipt = await account.provider.waitForTransaction(deployed.transaction_hash);
       expect(receipt).toBeDefined();
+    });
+
+    test('deployAccount with an abi - test on devnet', async () => {
+      const privKey = stark.randomStarkPrivateKey();
+      const pubKey = ec.starkCurve.getStarkKey(privKey);
+      // with `abi`, the object uses the name of the parameter in the abi of the account
+      const calldata = { public_key: pubKey };
+
+      // declare account
+      const declareAccount = await account.declareIfNot({
+        contract: CONTRACTS.AccountOz080.sierra,
+        casm: CONTRACTS.AccountOz080.casm,
+      });
+      const accountClassHash = declareAccount.class_hash;
+
+      // fund new account
+      const toBeAccountAddress = hash.calculateContractAddressFromHash(
+        pubKey,
+        accountClassHash,
+        calldata,
+        0
+      );
+
+      const { transaction_hash } = await account.execute({
+        contractAddress: devnetFeeTokenAddress,
+        entrypoint: 'transfer',
+        calldata: {
+          recipient: toBeAccountAddress,
+          amount: cairo.uint256(5n * 10n ** 16n),
+        },
+      });
+      await account.provider.waitForTransaction(transaction_hash);
+
+      // deploy account
+      const accountOZ = adaptAccountIfDevnet(
+        new Account({
+          provider,
+          address: toBeAccountAddress,
+          signer: privKey,
+          transactionVersion: TEST_TX_VERSION,
+        })
+      );
+      const deployed = await accountOZ.deploySelf({
+        classHash: accountClassHash,
+        constructorCalldata: calldata,
+        addressSalt: pubKey,
+        abi: CONTRACTS.AccountOz080.sierra.abi,
+      });
+      const receipt = await account.provider.waitForTransaction(deployed.transaction_hash);
+      expect(receipt).toBeDefined();
+      expect(toHex(deployed.contract_address)).toBe(toHex(toBeAccountAddress));
     });
 
     test('deploy with rawArgs', async () => {

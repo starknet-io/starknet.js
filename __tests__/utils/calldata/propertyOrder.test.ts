@@ -276,4 +276,30 @@ describe('orderPropsByAbi', () => {
       expect(compileNamed('test::Shape', value)).toEqual(['0', '1', '2']);
     });
   });
+
+  // a property the abi declares and the object lacks, often a misspelled key: it is refused with
+  // the name it should have, rather than with the error of the type that receives `undefined`
+  describe('a property the object lacks', () => {
+    test('is refused with its name among the arguments', () => {
+      const callData = new CallData([
+        ...abi,
+        {
+          type: 'function',
+          name: 'fn',
+          inputs: [{ name: 'v', type: 'core::integer::u8' }],
+          outputs: [],
+          state_mutability: 'external',
+        },
+      ]);
+      expect(() => callData.compile('fn', { w: 1 })).toThrow(
+        'Your object needs a property with key : v .'
+      );
+    });
+
+    test('is refused with its name in a member of a plain struct', () => {
+      expect(() => compileNamed('test::Point', { x: 1 })).toThrow(
+        'Your object needs a property with key : y .'
+      );
+    });
+  });
 });

@@ -63,6 +63,9 @@ export function wait(delay: number): Promise<unknown> {
 export async function createSierraContractClass(
   contract: CompiledSierra
 ): Promise<SierraContractClass> {
+  if (contract.abi === undefined || contract.abi === null) {
+    throw Error('Invalid Sierra contract: the "abi" field is missing');
+  }
   const result = { ...contract } as any;
   delete result.sierra_program_debug_info;
   result.abi = formatSpaces(stringify(contract.abi));

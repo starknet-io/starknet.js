@@ -29,7 +29,8 @@ export {
 export * from './cairoTypeStrategy.type';
 
 /**
- * Creates ABI parser
+ * Create the parser of an abi. It is chosen from the format of the abi ({@link getAbiVersion}),
+ * not from the version of Cairo.
  *
  * A Cairo 0 abi gets its own parser, kept apart from the Cairo 1 ones so that those can move to
  * the Cairo type classes without dragging along types — `felt`, `felt*` — that no class registers.
@@ -67,10 +68,16 @@ export function createAbiParser(
 }
 
 /**
- * Retrieves ABI version
+ * Get the format of an abi, which tells which parser reads it: {@link AbiParser0},
+ * {@link AbiParser1} or {@link AbiParser2}. It is the shape of the abi, not the version of Cairo.
+ * - 0: a Cairo 0 abi.
+ * - 1: a Cairo 1 abi with its functions at the top level. It comes from a Cairo V1 contract, or
+ *   from a Cairo V2 contract with no `interface` entry: one with no external function, or one
+ *   that declares its functions one by one with `#[external(v0)]`.
+ * - 2: a Cairo 1 abi with `interface` entries, from a Cairo V2 contract written with interfaces.
  *
  * @param {Abi} abi
- * @returns {1 | 2 | 0} abi 1, 2 or 0 version
+ * @returns {1 | 2 | 0} the format of the abi
  *
  * @example
  * // Example 1: Return ABI version 2
@@ -94,7 +101,8 @@ export function getAbiVersion(abi: Abi): 1 | 2 | 0 {
 }
 
 /**
- * Checks if no constructor valid
+ * Checks a constructor call to a contract that has no constructor in its abi:
+ * it is valid only with an empty calldata, an empty array or an empty object.
  *
  * @param {string} method
  * @param {RawArgs} argsCalldata
@@ -106,12 +114,15 @@ export function getAbiVersion(abi: Abi): 1 | 2 | 0 {
  * // result1 === true
  * const result2 = isNoConstructorValid('test', ['test'])
  * // result2 === false
+ * const result3 = isNoConstructorValid('constructor', { a: 1 })
+ * // result3 === false
  */
 export function isNoConstructorValid(
   method: string,
   argsCalldata: RawArgs,
   abiMethod?: FunctionAbi
 ): boolean {
-  // No constructor in abi and validly empty args
-  return method === 'constructor' && !abiMethod && !argsCalldata.length;
+  // No constructor in abi and validly empty args. Counting the keys works for an array and for
+  // an object: an object has no length, so `!argsCalldata.length` took a filled object for empty.
+  return method === 'constructor' && !abiMethod && Object.keys(argsCalldata).length === 0;
 }

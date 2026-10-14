@@ -355,6 +355,25 @@ describe('contract module', () => {
       expect(await token.balanceOf(account.address)).toBe(1000n);
     });
 
+    test('optimization, factory deployment with parseRequest false still refuses felts that do not match the constructor', async () => {
+      const declareIfNotSpy = jest.spyOn(account, 'declareIfNot');
+      try {
+        // u96 has no constructor: the felt is refused before anything is declared
+        await expect(
+          Contract.factory({
+            contract: CONTRACTS.U96.sierra,
+            casm: CONTRACTS.U96.casm,
+            account,
+            constructorCalldata: [1],
+            parseRequest: false,
+          })
+        ).rejects.toThrow('Cannot pass calldata to a contract with no constructor');
+        expect(declareIfNotSpy).not.toHaveBeenCalled();
+      } finally {
+        declareIfNotSpy.mockRestore();
+      }
+    });
+
     describe('Deploy-only mode', () => {
       test('deploy-only mode with classHash and provided ABI', async () => {
         const erc20 = await Contract.factory({
@@ -402,6 +421,25 @@ describe('contract module', () => {
 
         expect(erc20).toBeInstanceOf(Contract);
         expect(erc20.classHash).toBe(erc20ClassHash);
+      });
+
+      test('deploy-only mode with parseRequest=false still refuses felts that do not match the constructor', async () => {
+        const executeSpy = jest.spyOn(account, 'execute');
+        try {
+          // the copy loses the `__compiled__` mark, and the last felt is left out
+          const oneFeltMissing = [...erc20Constructor].slice(0, -1);
+          await expect(
+            Contract.factory({
+              classHash: erc20ClassHash,
+              account,
+              constructorCalldata: oneFeltMissing,
+              parseRequest: false,
+            })
+          ).rejects.toThrow('it has fewer felts than the constructor takes');
+          expect(executeSpy).not.toHaveBeenCalled();
+        } finally {
+          executeSpy.mockRestore();
+        }
       });
 
       test('deploy-only mode with salt parameter', async () => {

@@ -12,8 +12,10 @@ import { AbiParser1 } from './parser-1';
  * The abi parser for an abi that groups its functions under an `interface` entry.
  *
  * It is chosen when `getAbiVersion` answers 2, which is decided by the mere presence of that
- * entry — the format Cairo has emitted since compiler 2, mid-2023, and so what every contract
- * declared on Starknet today looks like.
+ * entry — the abi of a Cairo V2 contract that declares its functions through a
+ * `#[starknet::interface]`, the usual way since compiler 2, mid-2023. A Cairo V2 contract with no
+ * external function, or that declares its functions one by one with `#[external(v0)]`, has no
+ * such entry, and goes to {@link AbiParser1}.
  *
  * Everything it does differently from {@link AbiParser1} follows from that one nesting : a method
  * is looked up among the interface's `items` rather than at the top level, and `getLegacyFormat`
