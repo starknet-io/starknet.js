@@ -31,7 +31,7 @@ import { hdParsingStrategy, ParsingStrategy } from './parsingStrategy';
  * `validate.ts` — and the day support for it is dropped, that is what gets deleted.
  *
  * A Cairo 0 abi is recognized by `getAbiVersion` returning 0, which happens when the first
- * function that has any input or output declares it with a type carrying no `::`.
+ * function or constructor that has any input or output declares it with a type carrying no `::`.
  * @example
  * ```typescript
  * const abi = [

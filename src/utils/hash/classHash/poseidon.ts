@@ -124,6 +124,9 @@ function hashAbi(sierra: CompiledSierra) {
 ```
  */
 export function computeSierraContractClassHash(sierra: CompiledSierra): string {
+  if (sierra.abi === undefined || sierra.abi === null) {
+    throw Error('Invalid Sierra contract: the "abi" field is missing');
+  }
   const CONTRACT_CLASS_VERSION = 'CONTRACT_CLASS_V0.1.0';
 
   // Hash class version

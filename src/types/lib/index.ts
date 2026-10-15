@@ -107,7 +107,14 @@ export type UniversalDeployerContractPayload = {
   salt?: string;
   unique?: boolean;
   constructorCalldata?: RawArgs;
-  abi?: Abi; // TODO: check chain of usage in Account
+  /**
+   * Abi of the contract to deploy. When given, the constructor calldata is checked against it:
+   * parameters are compiled with it, felts already compiled are read back and written again
+   * with it. Without it, the calldata is not checked: it is flattened as given, an object in the
+   * order of its keys, and plain JS values of compound types (a text for a `ByteArray`, a number
+   * for a `u256`) are not written the way the constructor reads them.
+   */
+  abi?: Abi;
 };
 
 export type DeployAccountContractPayload = {
@@ -132,7 +139,11 @@ type BaseDeclareContractPayload = {
   contract: CompiledContract | string; // TODO: check if description is ok
   /**
    * Class hash of the contract. Optional optimization - if not provided,
-   * it will be computed from the contract
+   * it will be computed from the contract.
+   *
+   * `declare` and `declareIfNot` use a given value as is, without checking it against
+   * `contract`, to save time: a wrong value makes the declaration fail, or makes `declareIfNot`
+   * take another class for this one. `declareAndDeploy` checks it, and refuses a wrong value.
    */
   classHash?: string;
 };
@@ -175,8 +186,14 @@ export type CompleteDeclareContractPayload = {
   compiledClassHash: string;
 };
 
-export type DeclareAndDeployContractPayload = Omit<UniversalDeployerContractPayload, 'classHash'> &
-  DeclareContractPayload;
+export type DeclareAndDeployContractPayload = Omit<
+  UniversalDeployerContractPayload,
+  'classHash' | 'abi'
+> &
+  DeclareContractPayload & {
+    /** @deprecated Ignored: the ABI is taken from `contract`. Will be removed in v12. */
+    abi?: Abi;
+  };
 
 export type DeclareContractTransaction = {
   contract: ContractClass;

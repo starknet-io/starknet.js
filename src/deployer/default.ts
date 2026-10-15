@@ -1,17 +1,15 @@
 import { UDC } from '../global/constants';
 import {
-  ValidateType,
   type BigNumberish,
   type DeployContractUDCResponse,
   type InvokeTransactionReceiptResponse,
   type UniversalDeployerContractPayload,
 } from '../types';
-import { CallData } from '../utils/calldata';
 import { starkCurve } from '../utils/ec';
 import { calculateContractAddressFromHash } from '../utils/hash';
 import { toCairoBool, toHex } from '../utils/num';
 import { randomFelt } from '../utils/stark';
-import { getCompiledCalldata } from '../utils/transaction/getCompiledCalldata';
+import { compileConstructorCalldata } from './compileConstructorCalldata';
 import type { DeployerInterface } from './interface';
 import type { DeployerCall } from './types/index.type';
 
@@ -38,22 +36,7 @@ export class Deployer implements DeployerInterface {
         abi,
       } = it as UniversalDeployerContractPayload;
 
-      const compiledConstructorCallData = getCompiledCalldata(constructorCalldata, () => {
-        // compile with abi
-        if (abi) {
-          const calldataClass = new CallData(abi);
-          // Array-shaped calldata is already positional: validate its length up front.
-          // Object-shaped calldata must keep its field names until `compile()`, which
-          // orders them by ABI name — flattening here first would make that ordering
-          // depend on JS insertion order instead.
-          if (Array.isArray(constructorCalldata)) {
-            calldataClass.validate(ValidateType.DEPLOY, 'constructor', constructorCalldata);
-          }
-          return calldataClass.compile('constructor', constructorCalldata);
-        }
-        // compile without abi
-        return CallData.compile(constructorCalldata);
-      });
+      const compiledConstructorCallData = compileConstructorCalldata(constructorCalldata, abi);
 
       const deploySalt = salt ?? randomFelt();
 

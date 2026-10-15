@@ -2,6 +2,7 @@ import { ProviderInterface } from '../provider/interface';
 import type { SignerInterface } from '../signer';
 import type { DeployerInterface } from '../deployer/index';
 import type {
+  Abi,
   AllowArray,
   BigNumberish,
   BlockIdentifier,
@@ -152,6 +153,7 @@ export abstract class AccountInterface {
    * - .constructorCalldata - Constructor parameters
    * - .contractAddress - Pre-computed account address
    * - .addressSalt - Salt for address generation
+   * - .abi - Abi of the account contract (optional): the constructor calldata is checked against it
    *
    * @param estimateFeeDetails - Optional details for fee estimation
    *
@@ -166,7 +168,7 @@ export abstract class AccountInterface {
    * ```
    */
   public abstract estimateAccountDeployFee(
-    contractPayload: DeployAccountContractPayload,
+    contractPayload: DeployAccountContractPayload & { abi?: Abi },
     estimateFeeDetails?: UniversalDetails
   ): Promise<EstimateFeeResponseOverhead>;
 
@@ -328,7 +330,7 @@ export abstract class AccountInterface {
    *
    * @param contractPayload - Contract declaration payload
    * - .contract - Compiled Sierra contract
-   * - .classHash - Pre-computed class hash (optional)
+   * - .classHash - Pre-computed class hash (optional), used as is: it is not checked against .contract
    * - .casm - Compiled CASM (required for Cairo 1)
    * - .compiledClassHash - Pre-computed CASM hash
    *
@@ -356,6 +358,8 @@ export abstract class AccountInterface {
    * - .constructorCalldata - Constructor parameters.
    * - .salt - Deployment salt (random if not specified).
    * - .unique - Modify salt for unique address (default: true).
+   * - .abi - Abi of the contract (optional): the constructor calldata is checked against it.
+   *   Without it, the calldata is flattened as given, with no check.
    *
    * @param details - Transaction execution options
    *
@@ -404,8 +408,8 @@ export abstract class AccountInterface {
    * - .contract - Compiled Sierra contract
    * - .casm - Compiled CASM (required for Cairo 1)
    * - .compiledClassHash - Pre-computed CASM hash
-   * - .classHash - Pre-computed class hash
-   * - .constructorCalldata - Constructor parameters
+   * - .classHash - Pre-computed class hash, checked against .contract: a wrong one is refused
+   * - .constructorCalldata - Constructor parameters, or felts already compiled
    * - .salt - Deployment salt
    * - .unique - Ensure unique deployment address
    *
@@ -413,7 +417,11 @@ export abstract class AccountInterface {
    *
    * @returns Declaration and deployment results
    * @remarks
+   * - Before declaring, checks the constructor calldata against the abi of `contract` (felts
+   *   already compiled are read back with it), and a given `classHash` against `contract`:
+   *   a mismatch fails before any transaction is sent
    * - Automatically skips declaration if contract is already declared
+   * - With a given `nonce`, the deployment uses the next one when a declaration is sent
    * - Waits for both transactions to complete
    * - Does not support batch operations
    * @example
@@ -438,6 +446,7 @@ export abstract class AccountInterface {
    * - .constructorCalldata - Constructor parameters
    * - .addressSalt - Salt for address generation
    * - .contractAddress - Pre-computed address
+   * - .abi - Abi of the account contract (optional): the constructor calldata is checked against it
    *
    * @param transactionsDetail - Transaction execution options
    *
@@ -454,7 +463,7 @@ export abstract class AccountInterface {
    * ```
    */
   public abstract deployAccount(
-    contractPayload: DeployAccountContractPayload,
+    contractPayload: DeployAccountContractPayload & { abi?: Abi },
     transactionsDetail?: InvocationsDetails
   ): Promise<DeployContractResponse>;
 
@@ -510,6 +519,9 @@ export abstract class AccountInterface {
 
   /**
    * Declare a contract class if not already declared
+   *
+   * A given `classHash` is used as is to look for the class on the node, without being checked
+   * against `contract`, to save time.
    *
    * @param contractPayload - Contract declaration payload
    * @param transactionsDetail - Transaction execution options

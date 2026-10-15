@@ -28,5 +28,12 @@ describe('Hash Tester', () => {
         '0x345df0a9b35ce05d03772ba7938acad66921c5c39c1a5af74aee72aa25c363e'
       );
     });
+
+    test('ClassHash of a Sierra contract without abi field', () => {
+      const sierraWithoutAbi = { ...CONTRACTS.Hash.sierra, abi: undefined } as any;
+      expect(() => hash.computeSierraContractClassHash(sierraWithoutAbi)).toThrow(
+        'Invalid Sierra contract: the "abi" field is missing'
+      );
+    });
   });
 });

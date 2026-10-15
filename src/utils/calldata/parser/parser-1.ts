@@ -17,15 +17,20 @@ import type { ParsingStrategy } from './parsingStrategy';
  * The abi parser for a flat abi written in Cairo 1 vocabulary.
  *
  * It is chosen when `getAbiVersion` answers 1 : the abi has no `interface` entry, and the first
- * function carrying any input or output declares it with a type containing `::`. Two very
- * different things land here.
+ * function or constructor carrying any input or output declares it with a type containing `::`.
+ * Three different things land here.
  *
- * The first is a genuine **Cairo 1.0 / 1.1 contract**, compiled before the abi format grew its
- * `interface` entry — roughly 2023. Those contracts are still on chain and still callable.
+ * The first is a genuine **Cairo V1 contract** (compiler 1.0 / 1.1), compiled before the abi
+ * format grew its `interface` entry — roughly 2023. Those contracts are still on chain and still
+ * callable.
  *
- * The second, and by far the most frequent, is an abi someone **wrote or trimmed by hand** : a
+ * The second is a **Cairo V2 contract with no `interface` entry** : one with no external function
+ * (see `__mocks__/cairo/onlyConstructor`), or one that declares its functions one by one with
+ * `#[external(v0)]`. Compiled by Cairo V2, its abi is flat all the same.
+ *
+ * The third, and by far the most frequent, is an abi someone **wrote or trimmed by hand** : a
  * couple of functions kept for a `decodeParameters` call, a fixture in a test suite. Such an abi
- * is flat whatever the Cairo version of the contract it came from — so a Cairo 2 contract whose
+ * is flat whatever the Cairo version of the contract it came from — so a Cairo V2 contract whose
  * abi has been stripped of its `interface` entry is parsed here, not by {@link AbiParser2}. The
  * class is picked on the **shape of the abi**, never on the contract behind it, which is why this
  * one stays busy rather than being a legacy path.

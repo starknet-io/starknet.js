@@ -44,6 +44,7 @@ import { logger } from '../global/logger';
 import { RpcProvider } from '../provider/rpc';
 import { getCompiledCalldata } from '../utils/transaction';
 import { extractAbi, parseContract } from '../utils/provider';
+import { compileConstructorCalldata } from '../deployer/compileConstructorCalldata';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -577,14 +578,18 @@ export class Contract implements ContractInterface {
         abi = deployParams.abi;
       }
 
-      // Deploy the contract using the provided classHash
+      // Deploy the contract using the provided classHash. parseRequest false: the parameters are
+      // not read with the abi, the calldata is only flattened as given, then the deployer reads
+      // these felts back with the abi, and refuses them if they do not match.
       const deployResult = await account.deployContract(
         {
           classHash,
-          constructorCalldata: deployParams.constructorCalldata,
+          constructorCalldata: parseRequest
+            ? deployParams.constructorCalldata
+            : compileConstructorCalldata(deployParams.constructorCalldata),
           salt: deployParams.salt,
           unique: deployParams.unique,
-          abi: parseRequest ? abi : undefined,
+          abi,
         },
         details
       );
@@ -596,18 +601,20 @@ export class Contract implements ContractInterface {
         parseRequest?: boolean;
       };
       const contract = await parseContract(declareParams.contract);
-      abi = declareParams.abi ? declareParams.abi : extractAbi(contract);
+      // The abi always comes from `contract`. A given `abi` is passed on as is:
+      // declareAndDeploy ignores it and warns.
+      abi = extractAbi(contract);
+      // parseRequest false: the parameters are not read with the abi, the calldata is only
+      // flattened as given. declareAndDeploy then reads these felts back with the abi of
+      // `contract`, and refuses them if they do not match.
+      const constructorCalldata = parseRequest
+        ? declareParams.constructorCalldata
+        : compileConstructorCalldata(declareParams.constructorCalldata);
 
       const {
         declare: { class_hash },
         deploy: { contract_address: deployed_address },
-      } = await account.declareAndDeploy(
-        {
-          ...declareParams,
-          abi: parseRequest ? abi : undefined,
-        },
-        details
-      );
+      } = await account.declareAndDeploy({ ...declareParams, constructorCalldata }, details);
       classHash = class_hash.toString();
       contract_address = deployed_address;
     }

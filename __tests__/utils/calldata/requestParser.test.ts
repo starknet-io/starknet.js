@@ -500,4 +500,15 @@ describe('requestParser', () => {
       });
     });
   });
+
+  describe('a method the abi does not have', () => {
+    const stringCallData = new CallData(StringABI as Abi);
+
+    test('should be refused with a clear message, not a TypeError', () => {
+      // a misspelled name: the real one is `proceed_string`
+      expect(() => stringCallData.compile('proceed_strin', ['12345'])).toThrow(
+        'Method "proceed_strin" not found in abi'
+      );
+    });
+  });
 });

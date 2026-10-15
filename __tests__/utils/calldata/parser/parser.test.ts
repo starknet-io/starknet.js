@@ -52,4 +52,12 @@ describe('isNoConstructorValid', () => {
   test('should return false if constructor valid', () => {
     expect(isNoConstructorValid('test', ['test'])).toEqual(false);
   });
+
+  test('should return true for an empty object', () => {
+    expect(isNoConstructorValid('constructor', {})).toEqual(true);
+  });
+
+  test('should return false for an object with a field, which is not an empty calldata', () => {
+    expect(isNoConstructorValid('constructor', { a: 1 })).toEqual(false);
+  });
 });

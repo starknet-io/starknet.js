@@ -17,6 +17,7 @@ import {
   RpcError,
   RpcProvider,
   contractLoader,
+  logger,
 } from '../src';
 
 import { CONTRACTS, createTestProvider, getTestAccount } from './config';
@@ -313,6 +314,66 @@ describe('contract module', () => {
       expect(erc20).toBeInstanceOf(Contract);
     });
 
+    test('factory deployment ignores abi and uses the ABI of contract', async () => {
+      const warnSpy = jest.spyOn(logger, 'warn').mockImplementation(() => {});
+      try {
+        const erc20 = await Contract.factory({
+          contract: CONTRACTS.Erc20Oz100.sierra,
+          casm: CONTRACTS.Erc20Oz100.casm,
+          account,
+          constructorCalldata: erc20ConstructorParams,
+          // abi of another contract, which has no balanceOf function
+          abi: CONTRACTS.OnlyConstructor.sierra.abi,
+        });
+
+        expect(await erc20.balanceOf(account.address)).toBe(1000n);
+        expect(warnSpy).toHaveBeenCalledWith(
+          'The "abi" field is ignored: the ABI is taken from "contract". This field will be removed in v12.'
+        );
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    test('optimization, factory deployment with parseRequest false sends unmarked felts as given', async () => {
+      // the copy loses the `__compiled__` mark: with parsing on, these 10 felts would be read
+      // as parameters and refused, as the constructor has 5
+      const felts = [...erc20Constructor];
+      const erc20 = await Contract.factory({
+        contract: CONTRACTS.Erc20Oz100.sierra,
+        casm: CONTRACTS.Erc20Oz100.casm,
+        account,
+        constructorCalldata: felts,
+        parseRequest: false,
+      });
+      const token = new Contract({
+        abi: CONTRACTS.Erc20Oz100.sierra.abi,
+        address: erc20.address,
+        providerOrAccount: provider,
+      });
+
+      expect(await token.balanceOf(account.address)).toBe(1000n);
+    });
+
+    test('optimization, factory deployment with parseRequest false still refuses felts that do not match the constructor', async () => {
+      const declareIfNotSpy = jest.spyOn(account, 'declareIfNot');
+      try {
+        // u96 has no constructor: the felt is refused before anything is declared
+        await expect(
+          Contract.factory({
+            contract: CONTRACTS.U96.sierra,
+            casm: CONTRACTS.U96.casm,
+            account,
+            constructorCalldata: [1],
+            parseRequest: false,
+          })
+        ).rejects.toThrow('Cannot pass calldata to a contract with no constructor');
+        expect(declareIfNotSpy).not.toHaveBeenCalled();
+      } finally {
+        declareIfNotSpy.mockRestore();
+      }
+    });
+
     describe('Deploy-only mode', () => {
       test('deploy-only mode with classHash and provided ABI', async () => {
         const erc20 = await Contract.factory({
@@ -360,6 +421,25 @@ describe('contract module', () => {
 
         expect(erc20).toBeInstanceOf(Contract);
         expect(erc20.classHash).toBe(erc20ClassHash);
+      });
+
+      test('deploy-only mode with parseRequest=false still refuses felts that do not match the constructor', async () => {
+        const executeSpy = jest.spyOn(account, 'execute');
+        try {
+          // the copy loses the `__compiled__` mark, and the last felt is left out
+          const oneFeltMissing = [...erc20Constructor].slice(0, -1);
+          await expect(
+            Contract.factory({
+              classHash: erc20ClassHash,
+              account,
+              constructorCalldata: oneFeltMissing,
+              parseRequest: false,
+            })
+          ).rejects.toThrow('it has fewer felts than the constructor takes');
+          expect(executeSpy).not.toHaveBeenCalled();
+        } finally {
+          executeSpy.mockRestore();
+        }
       });
 
       test('deploy-only mode with salt parameter', async () => {

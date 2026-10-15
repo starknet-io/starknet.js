@@ -46,6 +46,27 @@ export * as byteArray from './byteArray';
 export { parseCalldataField } from './requestParser';
 export * from './parser';
 
+/**
+ * Error for a method that the abi does not have. For the constructor, the words are the ones of
+ * the node, which refuses the same calldata.
+ * @param {string} method the method looked for in the abi
+ * @returns {Error} the error to throw
+ * @example
+ * ```typescript
+ * const result = methodNotInAbiError('constructor');
+ * // result.message = 'Cannot pass calldata to a contract with no constructor'
+ * const result2 = methodNotInAbiError('transferr');
+ * // result2.message = 'Method "transferr" not found in abi'
+ * ```
+ */
+function methodNotInAbiError(method: string): Error {
+  return Error(
+    method === 'constructor'
+      ? 'Cannot pass calldata to a contract with no constructor'
+      : `Method "${method}" not found in abi`
+  );
+}
+
 export class CallData {
   abi: Abi;
 
@@ -86,15 +107,20 @@ export class CallData {
       );
     }
 
-    // get requested method from abi
+    // get requested method from abi. The constructor is found by its name only, as in `compile`:
+    // a Cairo V1 abi declares it as a `function` named `constructor`, a Cairo V2 abi as a
+    // `constructor` entry.
     const abiMethod = this.abi.find((abi) =>
       type === ValidateType.DEPLOY
-        ? abi.name === method && abi.type === 'constructor'
+        ? abi.name === method
         : abi.name === method && abi.type === 'function'
     ) as FunctionAbi;
 
     if (isNoConstructorValid(method, args, abiMethod)) {
       return;
+    }
+    if (!abiMethod) {
+      throw methodNotInAbiError(method);
     }
 
     // validate arguments length
@@ -130,6 +156,9 @@ export class CallData {
 
     if (isNoConstructorValid(method, argsCalldata, abiMethod)) {
       return [];
+    }
+    if (!abiMethod) {
+      throw methodNotInAbiError(method);
     }
 
     let args: RawArgsArray;
