@@ -1,3 +1,13 @@
+# [11.3.0](https://github.com/starknet-io/starknet.js/compare/v11.2.0...v11.3.0) (2026-10-15)
+
+### Bug Fixes
+
+- **account:** check the declareAndDeploy constructor calldata with the ABI of contract ([c2ca12d](https://github.com/starknet-io/starknet.js/commit/c2ca12d36987d0dbbb70314e03ab13af4c612ee1)), closes [#830](https://github.com/starknet-io/starknet.js/issues/830)
+
+### Features
+
+- **account:** check the constructor calldata in every form, with the ABI, before sending ([e0bc728](https://github.com/starknet-io/starknet.js/commit/e0bc728318566e1b8c4e524bc5102eea8242bdea)), closes [#830](https://github.com/starknet-io/starknet.js/issues/830)
+
 # [11.2.0](https://github.com/starknet-io/starknet.js/compare/v11.1.0...v11.2.0) (2026-10-12)
 
 ### Features
