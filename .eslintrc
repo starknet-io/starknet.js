@@ -58,7 +58,7 @@
   "overrides": [
     {
       "files": ["src/**/*.ts"],
-      "excludedFiles": ["src/ledger/**"],
+      "excludedFiles": ["src/ledger/**", "src/falcon/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -66,7 +66,7 @@
             "paths": [
               {
                 "name": "starknet",
-                "message": "Inside src, import from a relative path. Only src/ledger may import the package by its name: anywhere else, the built dist/index.* would load itself."
+                "message": "Inside src, import from a relative path. Only src/ledger and src/falcon may import the package by its name: anywhere else, the built dist/index.* would load itself."
               }
             ]
           }

@@ -94,6 +94,73 @@ jobs:
           export const missing = signer.transporter.notAMethod;
           EOF
 
+      - name: check starknet/falcon (part specific to this entry point)
+        # The only run of the built Falcon code: a new key pair signs a SNIP-12 message, and the
+        # signature is checked, with require and with import.
+        working-directory: ${{ runner.temp }}/consumer
+        run: |
+          cat > falcon-message.json <<'EOF'
+          {
+            "types": {
+              "StarkNetDomain": [
+                { "name": "name", "type": "felt" },
+                { "name": "chainId", "type": "felt" },
+                { "name": "version", "type": "felt" }
+              ],
+              "Message": [{ "name": "message", "type": "felt" }]
+            },
+            "primaryType": "Message",
+            "domain": { "name": "Package check", "chainId": "SN_SEPOLIA", "version": "1" },
+            "message": { "message": "1234" }
+          }
+          EOF
+
+          cat > falcon.cjs <<'EOF'
+          const assert = require('node:assert');
+          const { Falcon512Signer, falcon512 } = require('starknet/falcon');
+          const typedData = require('./falcon-message.json');
+
+          async function main() {
+            const { secretKey, publicKey } = falcon512.generateKeyPair();
+            const signature = await new Falcon512Signer(secretKey).signMessage(typedData, '0x123');
+            assert.strictEqual(signature.length, 61);
+            assert.ok(falcon512.verifyMessage(typedData, signature, publicKey, '0x123'));
+            assert.ok(!falcon512.verifyMessage(typedData, signature, publicKey, '0x456'));
+          }
+          main().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          EOF
+          node falcon.cjs
+
+          cat > falcon.mjs <<'EOF'
+          import assert from 'node:assert';
+          import { readFileSync } from 'node:fs';
+          import { Falcon512Signer, falcon512 } from 'starknet/falcon';
+
+          const typedData = JSON.parse(readFileSync('falcon-message.json', 'utf8'));
+          const { secretKey, publicKey } = falcon512.generateKeyPair();
+          const signature = await new Falcon512Signer(secretKey).signMessage(typedData, '0x123');
+          assert.strictEqual(signature.length, 61);
+          assert.ok(falcon512.verifyMessage(typedData, signature, publicKey, '0x123'));
+          assert.ok(!falcon512.verifyMessage(typedData, signature, publicKey, '0x456'));
+          EOF
+          node falcon.mjs
+
+          # Type-checked in the last step.
+          cat > falcon.ts <<'EOF'
+          import { Account, RpcProvider } from 'starknet';
+          import { Falcon512Signer, falcon512, type Falcon512KeyPair } from 'starknet/falcon';
+
+          const keys: Falcon512KeyPair = falcon512.generateKeyPair();
+          const signer = new Falcon512Signer(keys.secretKey);
+          // The signer of starknet/falcon fits the Account of starknet.
+          export const account = new Account({ provider: new RpcProvider(), address: '0x123', signer });
+          // @ts-expect-error signRaw is protected: no public method signs an arbitrary hash.
+          export const refused = signer.signRaw('0x1');
+          EOF
+
       - name: type-check every check file
         # entries.ts, plus the .ts files of the parts specific to an entry point. An unused
         # `@ts-expect-error` is an error too, so a lost type check fails here.

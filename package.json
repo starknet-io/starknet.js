@@ -23,12 +23,20 @@
       "types": "./dist/ledger/index.d.ts",
       "import": "./dist/ledger/index.mjs",
       "require": "./dist/ledger/index.js"
+    },
+    "./falcon": {
+      "types": "./dist/falcon/index.d.ts",
+      "import": "./dist/falcon/index.mjs",
+      "require": "./dist/falcon/index.js"
     }
   },
   "typesVersions": {
     "*": {
       "ledger": [
         "./dist/ledger/index.d.ts"
+      ],
+      "falcon": [
+        "./dist/falcon/index.d.ts"
       ]
     }
   },
@@ -108,6 +116,7 @@
     "typescript-coverage-report": "npm:@penovicp/typescript-coverage-report@^1.0.0-beta.2"
   },
   "dependencies": {
+    "@noble/ciphers": "~2.4.0",
     "@noble/curves": "~2.4.0",
     "@noble/hashes": "~2.4.0",
     "@scure/base": "~2.4.0",

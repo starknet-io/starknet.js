@@ -314,3 +314,7 @@ const myLedgerSigner = new LedgerSigner231(myLedgerTransport, 0, undefined, getL
 ```
 
 :::
+
+## Post-quantum signature
+
+To sign with Falcon-512, a signature designed to resist quantum computers, see [Post-quantum signature (Falcon-512)](./postQuantum.md).

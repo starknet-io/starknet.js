@@ -80,6 +80,7 @@ namespaces (`hash`, `num`, `cairo`, `shortString`, …).
 | `channel/transport/` | What carries the envelopes, below the channels and independent of the spec version: `HttpTransport`, `WsTransport`, `ReconnectingWsTransport`.                                                |
 | `signer/`            | `Signer`, `EthSigner`, `LedgerSigner*` (+ `SignerInterface`) — message/transaction signing. The `LedgerSigner*` exported from here are deprecated: see `ledger/`.                             |
 | `ledger/`            | Entry point of `starknet/ledger` (built to `dist/ledger/`): `LedgerSigner*` typed with the Ledger `Transport`. In v11 they extend the classes of `signer/`.                                   |
+| `falcon/`            | Entry point of `starknet/falcon` (built to `dist/falcon/`): `Falcon512Signer`, a post-quantum signer for the S2morrow account. `engine/noble/` is a patched copy of noble: see `PATCH.md`.    |
 | `wallet/`            | `WalletAccountV6` (recommended) / `WalletAccountV5` / `WalletAccount` (deprecated) — browser wallet (get-starknet / wallet-standard) integration.                                             |
 | `paymaster/`         | `PaymasterRpc` (+ `PaymasterInterface`) — gasless / sponsored transaction flows.                                                                                                              |
 | `deployer/`          | `Deployer` (+ `DeployerInterface`) — UDC-based contract deployment helpers.                                                                                                                   |
