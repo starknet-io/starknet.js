@@ -1,3 +1,9 @@
+# [11.4.0](https://github.com/starknet-io/starknet.js/compare/v11.3.0...v11.4.0) (2026-10-16)
+
+### Features
+
+- **falcon:** add starknet/falcon, a post-quantum Falcon-512 signer for the S2morrow account ([bfe33ac](https://github.com/starknet-io/starknet.js/commit/bfe33acc9a3801abe6dc09206e5520ca40a36eb8))
+
 # [11.3.0](https://github.com/starknet-io/starknet.js/compare/v11.2.0...v11.3.0) (2026-10-15)
 
 ### Bug Fixes
