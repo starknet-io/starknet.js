@@ -115,10 +115,10 @@ export class Falcon512Signer implements starknet.SignerInterface {
    * @returns {Promise<string>} the public key: 0x, then 1794 hex digits
    * @example
    * ```typescript
-   * const { secretKey } = falcon512.generateKeyPair(new Uint8Array(48).fill(1));
+   * const { secretKey } = falcon512.generateKeyPair();
    * const mySigner = new Falcon512Signer(secretKey);
    * const result = await mySigner.getPubKey();
-   * // result = '0x0964915645b6…' (1796 characters)
+   * // result = '0x09…' (1796 characters; 09 is the header of the format)
    * ```
    */
   public async getPubKey(): Promise<string> {
@@ -130,10 +130,10 @@ export class Falcon512Signer implements starknet.SignerInterface {
    * @returns {string[]} the 29 felts, as hex strings (a new array at each call)
    * @example
    * ```typescript
-   * const { secretKey } = falcon512.generateKeyPair(new Uint8Array(48).fill(1));
+   * const { secretKey } = falcon512.generateKeyPair();
    * const mySigner = new Falcon512Signer(secretKey);
    * const result = mySigner.getPackedPublicKey();
-   * // result = ['0x4467f8af29f9c6e52b39638779aae3403e02b282ad51e4063bda4e58062c545', …] (29 felts)
+   * // result = ['0x…', …] (29 felts)
    * ```
    */
   public getPackedPublicKey(): string[] {

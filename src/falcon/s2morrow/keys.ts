@@ -475,8 +475,9 @@ export function encodePublicKey(h: ArrayLike<number>): Uint8Array {
  * @throws {Error} when the seed is not 48 bytes
  * @example
  * ```typescript
- * const result = falcon512.generateKeyPair(new Uint8Array(48).fill(1));
- * // result = { secretKey: Uint8Array(1281) [89, 0, 31, 1, …], publicKey: Uint8Array(897) [9, 100, 145, 86, …] }
+ * const result = falcon512.generateKeyPair();
+ * // result = { secretKey: Uint8Array(1281) [89, …], publicKey: Uint8Array(897) [9, …] }
+ * // A new random key at each call; 89 (0x59) and 9 (0x09) are the headers of the two formats.
  * ```
  */
 export function generateKeyPair(seed?: Uint8Array): Falcon512KeyPair {
@@ -493,9 +494,9 @@ export function generateKeyPair(seed?: Uint8Array): Falcon512KeyPair {
  * @throws {Error} when the secret key is invalid
  * @example
  * ```typescript
- * const { secretKey } = falcon512.generateKeyPair(new Uint8Array(48).fill(1));
+ * const { secretKey, publicKey } = falcon512.generateKeyPair();
  * const result = falcon512.getPublicKey(secretKey);
- * // result = Uint8Array(897) [9, 100, 145, 86, 69, 182, …]
+ * // result = Uint8Array(897) [9, …] (the same bytes as publicKey)
  * ```
  */
 export function getPublicKey(secretKey: Uint8Array | string): Uint8Array {
@@ -529,9 +530,9 @@ export function publicKeyToNtt(publicKey: Uint8Array | string): Uint16Array {
  * @throws {Error} when the public key is invalid
  * @example
  * ```typescript
- * const { publicKey } = falcon512.generateKeyPair(new Uint8Array(48).fill(1));
+ * const { publicKey } = falcon512.generateKeyPair();
  * const result = falcon512.getPackedPublicKey(publicKey);
- * // result = ['0x4467f8af29f9c6e52b39638779aae3403e02b282ad51e4063bda4e58062c545', …] (29 felts)
+ * // result = ['0x…', …] (29 felts)
  * ```
  */
 export function getPackedPublicKey(publicKey: Uint8Array | string): string[] {
@@ -592,9 +593,9 @@ export function importFalconRsSecretKey(secretKey: Uint8Array | string): Uint8Ar
  * @throws {Error} when the secret key is invalid
  * @example
  * ```typescript
- * const { secretKey } = falcon512.generateKeyPair(new Uint8Array(48).fill(1));
+ * const { secretKey } = falcon512.generateKeyPair();
  * const result = falcon512.exportFalconRsSecretKey(secretKey);
- * // result = Uint8Array(3584) [0, 64, 0, 208, 255, 6, …]
+ * // result = Uint8Array(3584) […]
  * ```
  */
 export function exportFalconRsSecretKey(secretKey: Uint8Array | string): Uint8Array {
