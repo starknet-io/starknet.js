@@ -22,6 +22,7 @@ const fixture = loadFalconRsFixture();
 const { secretKey, publicKey } = falcon512.generateKeyPair();
 const pkNtt = publicKeyToNtt(publicKey);
 const MSG = 0x1234abcdn;
+const OTHER_MSG = 0x1234abcen; // a hash other than MSG
 
 describe('signHash / verifyHash', () => {
   test('round trip; 61 hex felts; salt length 2', () => {
@@ -50,7 +51,7 @@ describe('signHash / verifyHash', () => {
     const sig = signHash(MSG, secretKey, pkNtt);
     const otherPkNtt = publicKeyToNtt(falcon512.generateKeyPair().publicKey);
     const withFelt5 = (felt: string): string[] => [...sig.slice(0, 5), felt, ...sig.slice(6)];
-    expect(verifyHash(MSG + 1n, sig, pkNtt)).toBe(false);
+    expect(verifyHash(OTHER_MSG, sig, pkNtt)).toBe(false);
     expect(verifyHash(MSG, sig, otherPkNtt)).toBe(false);
     expect(verifyHash(MSG, sig.slice(0, 60), pkNtt)).toBe(false);
     expect(verifyHash(MSG, [...sig.slice(0, 29), '0x3', ...sig.slice(30)], pkNtt)).toBe(false);
