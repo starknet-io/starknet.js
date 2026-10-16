@@ -21,13 +21,14 @@ const browserNodeShimPlugin: Plugin = {
 
 export default defineConfig((overrideOptions) => {
   const baseConfig: Options = {
-    // `src/ledger/index.ts` is the `starknet/ledger` entry point, built to `dist/ledger/index.*`
+    // `src/ledger/index.ts` and `src/falcon/index.ts` are the `starknet/ledger` and
+    // `starknet/falcon` entry points, built to `dist/<name>/index.*`
     // (see `exports` in package.json).
-    entry: ['src/index.ts', 'src/ledger/index.ts'],
-    // `src/ledger` imports the package by its name. Keeping that import makes `dist/ledger/*`
-    // load `dist/index.*`, instead of holding a second copy of the whole library.
+    entry: ['src/index.ts', 'src/ledger/index.ts', 'src/falcon/index.ts'],
+    // `src/ledger` and `src/falcon` import the package by its name. Keeping that import makes
+    // their `dist/<name>/*` load `dist/index.*`, instead of holding a second copy of the library.
     external: ['starknet'],
-    // No shared chunk between the two entry points: `dist/index.mjs` stays one self-contained file.
+    // No shared chunk between the entry points: `dist/index.mjs` stays one self-contained file.
     splitting: false,
     sourcemap: true,
     clean: true,

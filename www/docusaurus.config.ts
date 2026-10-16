@@ -194,8 +194,9 @@ const readSkillVersion = (): string => {
 const skillVersion = readSkillVersion();
 
 /*
- * TypeDoc options shared by the two API instances below. `starknet/ledger` has its own instance:
- * as a second entry point of the main one, it would move every API page under `API/index/`.
+ * TypeDoc options shared by the API instances below. `starknet/ledger` and `starknet/falcon` have
+ * their own instance: another entry point in the main one would move every API page under
+ * `API/index/`.
  */
 const typedocSharedOptions = {
   tsconfig: '../tsconfig.json',
@@ -208,6 +209,9 @@ const typedocSharedOptions = {
     protected: false,
     private: false,
   },
+  // Protected members (like `signRaw` of the signers) are for subclasses, not for the users of an
+  // object: keep them out of the API docs.
+  excludeProtected: true,
   sort: ['kind'],
   kindSortOrder: [
     'Reference',
@@ -456,6 +460,18 @@ const config: Config = {
         out: 'docs/API/ledger',
         name: 'starknet/ledger',
         // `ApiTitle.md` links to the pages of the main instance, so this one has no readme.
+        readme: 'none',
+      },
+    ],
+    [
+      'docusaurus-plugin-typedoc',
+      {
+        ...typedocSharedOptions,
+        id: 'falcon',
+        entryPoints: ['../src/falcon/index.ts'],
+        out: 'docs/API/falcon',
+        name: 'starknet/falcon',
+        // The index page shows the module comment of `src/falcon/index.ts`: no readme.
         readme: 'none',
       },
     ],

@@ -1,0 +1,3 @@
+# Vendored copy of @noble/post-quantum, checked by SHA-256 (see src/falcon/engine/noble/PATCH.md).
+# Remove this line together with the folder, when starknet/falcon switches to the npm package.
+src/falcon/engine/noble/
