@@ -143,6 +143,14 @@ const falconSigner = Falcon512Signer.fromFalconRs(falconRsSecretKey);
 falcon-rs derives the random seed of each signature from its public salt, so the signatures it produced may leak information about the secret key. Use such a key only to keep using an existing account. For real funds, generate a new key with `falcon512.generateKeyPair()`: the S2morrow account cannot change its key, so this means a new account.
 :::
 
+Complete scripts for a devnet (deployment, transfer, SNIP-12 message, declaration, import of a falcon-rs key) are in the [Starknet.js workshop](https://github.com/PhilippeR26/starknet.js-workshop-typescript/tree/main/src/scripts/signature/falcon512/snjs).
+
+## Performance
+
+![Time to sign one INVOKE transaction: 4.5 ms with ECDSA, 15.1 ms with Falcon-512 (starknet/falcon), 8.5 ms with Falcon-512 (falcon-rs WASM)](./pictures/falcon-sign-tx-time.svg)
+
+The falcon-rs WASM is shown for comparison only: its signatures may leak information about the secret key (see [Keys created with falcon-rs](#keys-created-with-falcon-rs)).
+
 ## Limits
 
 - **Falcon, not yet FN-DSA.** This is Falcon as submitted to Round 3 of the NIST process. The NIST standard based on Falcon, FN-DSA (FIPS 206), is still in development ([NIST](https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization), August 2026). The README of noble, the library this code comes from, says that FN-DSA would most likely be incompatible with Falcon.
