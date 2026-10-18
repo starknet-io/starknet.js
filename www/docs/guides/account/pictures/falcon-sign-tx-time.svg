@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" width="720" height="250" role="img" aria-labelledby="title desc">
+  <title id="title">Time to sign one INVOKE transaction</title>
+  <desc id="desc">Median of 5 runs of 100 signatures, starknet.js 11.4.0, Node 26, Intel Core i5-10300H. ECDSA (Signer): 4.5 ms. Falcon-512 with starknet/falcon: 15.1 ms. Falcon-512 with the falcon-rs WASM: 8.5 ms. Each time includes the transaction hash (3.8 ms), the same for all three.</desc>
+  <style>
+    .surface { fill: #fcfcfb; stroke: rgba(11, 11, 11, 0.1); }
+    .ink1 { fill: #0b0b0b; }
+    .ink2 { fill: #52514e; }
+    .accent { fill: #2a78d6; }
+    .context { fill: #898781; }
+    .baseline { stroke: #c3c2b7; }
+    text { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    .title { font-size: 17px; font-weight: 600; }
+    .subtitle { font-size: 13px; }
+    .label { font-size: 14px; font-weight: 600; }
+    .sublabel { font-size: 12px; }
+    .value { font-size: 14px; font-weight: 600; }
+    .note { font-size: 12.5px; }
+    @media (prefers-color-scheme: dark) {
+      .surface { fill: #1a1a19; stroke: rgba(255, 255, 255, 0.1); }
+      .ink1 { fill: #f0efec; }
+      .ink2 { fill: #c3c2b7; }
+      .accent { fill: #3987e5; }
+      .context { fill: #898781; }
+      .baseline { stroke: #383835; }
+    }
+  </style>
+
+  <rect class="surface" x="0.5" y="0.5" width="719" height="249" rx="12" stroke-width="1" />
+
+  <text class="title ink1" x="24" y="36">Time to sign one INVOKE transaction</text>
+  <text class="subtitle ink2" x="24" y="58">Median of 5 × 100 signatures · starknet.js 11.4.0 · Node 26 · Intel Core i5-10300H</text>
+
+  <!-- Scale: 25 px per ms, from the baseline at x = 244. Bars are 24 px thick, rounded at the data end only. -->
+  <line class="baseline" x1="244" y1="82" x2="244" y2="206" stroke-width="1" />
+
+  <!-- ECDSA: 4.51 ms -->
+  <text class="label ink1" x="232" y="97" text-anchor="end">ECDSA</text>
+  <text class="sublabel ink2" x="232" y="113" text-anchor="end">Signer</text>
+  <path class="context" d="M244 88 h108.75 a4 4 0 0 1 4 4 v16 a4 4 0 0 1 -4 4 h-108.75 z" />
+  <text class="value ink1" x="364.75" y="105">4.5 ms</text>
+
+  <!-- Falcon-512, starknet/falcon: 15.11 ms (the subject of the guide: accent color) -->
+  <text class="label ink1" x="232" y="141" text-anchor="end">Falcon-512</text>
+  <text class="sublabel ink2" x="232" y="157" text-anchor="end">starknet/falcon</text>
+  <path class="accent" d="M244 132 h373.75 a4 4 0 0 1 4 4 v16 a4 4 0 0 1 -4 4 h-373.75 z" />
+  <text class="value ink1" x="629.75" y="149">15.1 ms</text>
+
+  <!-- Falcon-512, falcon-rs WASM: 8.52 ms -->
+  <text class="label ink1" x="232" y="185" text-anchor="end">Falcon-512</text>
+  <text class="sublabel ink2" x="232" y="201" text-anchor="end">falcon-rs WASM</text>
+  <path class="context" d="M244 176 h209 a4 4 0 0 1 4 4 v16 a4 4 0 0 1 -4 4 h-209 z" />
+  <text class="value ink1" x="465" y="193">8.5 ms</text>
+
+  <text class="note ink2" x="24" y="234">Lower is better. Each time includes the transaction hash (3.8 ms), the same for all three.</text>
+</svg>
