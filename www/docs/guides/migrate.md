@@ -42,18 +42,20 @@ instead of quietly encoding a different one.
 | Starknet ID names are validated, not truncated    | **Low**    | Only if you resolve or encode `.stark` names            |
 | The feeder gateway `BaseUrl` constant removed     | **Low**    | Only if you imported `constants.BaseUrl`                |
 | `declareAndDeploy` checks the calldata first      | **Low**    | Only if you split values into felts by hand             |
+| `preparePaymasterTransaction` signature changed   | **Low**    | Only if you call `preparePaymasterTransaction` directly |
 
 Three deprecations ship in v11 — `stark.randomAddress()`, `Provider` and `WalletAccount` — but none
 of them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
 
 ### What did not change
 
-Worth stating, because the release is a major: `Account`, `Contract`, `CallData` and the `Signer`
-interface are untouched. `WebSocketChannel` keeps exactly the API it had in v10 — same constructor
-options, same `subscribe*` methods, same events. No RPC spec version is added or dropped: 0.9 and
-0.10.x remain supported, with 0.10.4 as the default. What left the package exports is listed above.
-Most of it had been marked `@deprecated` for at least three major versions; the rest is the v1
-transaction API, which no live network has accepted for a long time.
+Worth stating, because the release is a major: `Contract`, `CallData` and the `Signer` interface
+are untouched, and `Account` changes in one place only — the lower-level
+`preparePaymasterTransaction` (section 14). `WebSocketChannel` keeps exactly the API it had in v10
+— same constructor options, same `subscribe*` methods, same events. No RPC spec version is added or
+dropped: 0.9 and 0.10.x remain supported, with 0.10.4 as the default. What left the package exports
+is listed above. Most of it had been marked `@deprecated` for at least three major versions; the
+rest is the v1 transaction API, which no live network has accepted for a long time.
 
 ### Migration in three minutes
 
@@ -533,6 +535,34 @@ await myAccount.declareAndDeploy({
 
 Write `[recipient, 1000n]` or `{ recipient, amount: 1000n }` instead. Felts compiled with the abi
 are accepted too: `new CallData(compiledSierra.abi).compile('constructor', [recipient, 1000n])`.
+
+### 14. The paymaster safety check moved into `preparePaymasterTransaction`
+
+`account.executePaymasterTransaction()` does not change: it still builds, checks, signs and sends
+in one call. The change is only in the lower-level `preparePaymasterTransaction`, the method that
+signs a transaction the paymaster has prepared.
+
+In v10 this method signed the transaction with no check — the check was only in
+`executePaymasterTransaction`. Code that called the lower-level methods one by one (build, prepare,
+send) signed whatever the paymaster returned.
+
+In v11 the check moved into `preparePaymasterTransaction`, so both paths run it. The check is also
+stronger: it rebuilds the outside execution it expects from your own calls, and compares the hash
+that the account would sign. This stops a paymaster that renames the signed field, or that puts
+your calls in a message of another kind. The method now needs the calls and the fee details you
+asked for:
+
+```typescript
+const prepared = await account.buildPaymasterTransaction(calls, paymasterDetails);
+
+// v10
+const executable = await account.preparePaymasterTransaction(prepared);
+
+// v11 — pass the same calls and details you gave to buildPaymasterTransaction
+const executable = await account.preparePaymasterTransaction(prepared, calls, paymasterDetails);
+```
+
+If you only use `executePaymasterTransaction`, nothing changes.
 
 ## Part 2 — Deprecations
 

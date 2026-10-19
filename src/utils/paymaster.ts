@@ -1,13 +1,20 @@
 import { NetworkName, PAYMASTER_RPC_NODES, StarknetChainId } from '../global/constants';
 import { logger } from '../global/logger';
-import { BigNumberish, PaymasterDetails, PreparedTransaction, Call } from '../types';
+import {
+  BigNumberish,
+  PaymasterDetails,
+  PreparedTransaction,
+  Call,
+  OutsideExecutionVersion,
+} from '../types';
 import assert from './assert';
 import { CallData } from './calldata';
-import { toOutsideCallV2 } from './outsideExecution';
+import { getTypedData, toOutsideCallV2 } from './outsideExecution';
+import { getMessageHash } from './typedData';
 import { getSelectorFromName } from './hash';
 import { toBigInt } from './num';
 import { CairoBytes31 } from './cairoDataTypes/bytes31';
-import { uint256ToBN } from './uint256';
+import { bnToUint256, uint256ToBN } from './uint256';
 import type {
   OutsideCallV1,
   OutsideCallV2,
@@ -216,9 +223,12 @@ const assertChainIdFromTypedData = (
 };
 
 /**
- * Asserts that a paymaster-prepared transaction is safe to sign: the typed-data domain is
- * bound to the account's own chain, and — for non-sponsored transactions — the calls and the
- * appended gas-token transfer match what the user actually requested.
+ * Asserts that a paymaster-prepared transaction is safe to sign. It checks that the typed-data
+ * domain is bound to the account's own chain, and — for non-sponsored transactions — that the
+ * calls and the appended gas-token transfer match what the user asked for. It then rebuilds the
+ * outside execution it expects, from its own SNIP-9 shape and the user's own calls, and checks
+ * that the hash the account would sign is that outside execution and nothing else. When the user
+ * gave time bounds, the signed window must stay inside them.
  * @param {PreparedTransaction} preparedTransaction - The transaction returned by the paymaster.
  * @param {Call[]} calls - The calls originally requested by the user.
  * @param {PaymasterDetails} paymasterDetails - The fee mode and related paymaster details.
@@ -288,5 +298,70 @@ export const assertPaymasterTransactionSafety = (
         );
       }
     }
+
+    // The checks above read fields from the paymaster message. But the account signs a hash, and
+    // the hash covers only the fields listed in `types`. And `types` comes from the paymaster
+    // too. So the paymaster can show one list of calls to the checks here, and have a different
+    // list signed under another field name. It can also put the user calls in a message of
+    // another kind, like a session key, and have that signed in their place. To stop this, we
+    // build the outside execution we expect on our own: our SNIP-9 shape, our chain, the user
+    // calls. Then we compare its hash with the paymaster hash. From the message we reuse only
+    // what we cannot know: the caller, the nonce, the two time limits, and the fee recipient
+    // (the paymaster address).
+    const msg = message as Record<string, unknown>;
+    const version = hasV1Calls ? OutsideExecutionVersion.V1 : OutsideExecutionVersion.V2;
+    const [callerKey, nonceKey, afterKey, beforeKey] = hasV1Calls
+      ? ['caller', 'nonce', 'execute_after', 'execute_before']
+      : ['Caller', 'Nonce', 'Execute After', 'Execute Before'];
+
+    // A message without these four fields is not an outside execution.
+    assert(
+      [callerKey, nonceKey, afterKey, beforeKey].every((key) => msg[key] !== undefined),
+      'Paymaster typed data does not match the expected outside execution'
+    );
+    const caller = msg[callerKey] as string;
+    const nonce = msg[nonceKey] as BigNumberish;
+    const executeAfter = msg[afterKey] as BigNumberish;
+    const executeBefore = msg[beforeKey] as BigNumberish;
+
+    // If the user gave a time window, the signed window must fit inside it. It must not start
+    // before, and not end after. Without timeBounds there is nothing to compare.
+    if (paymasterDetails.timeBounds) {
+      const requestedAfter = toBigInt(paymasterDetails.timeBounds.executeAfter ?? 1);
+      const requestedBefore = toBigInt(paymasterDetails.timeBounds.executeBefore);
+      assert(
+        toBigInt(executeAfter) >= requestedAfter && toBigInt(executeBefore) <= requestedBefore,
+        'Paymaster typed data execution window is not within the requested time bounds'
+      );
+    }
+
+    // The user calls. Then, if not sponsored, the fee transfer. We build it again from the gas
+    // token and the fee the user approved. We keep only the recipient (the paymaster address)
+    // from the message.
+    const expectedCalls: Call[] = [...calls];
+    if (paymasterDetails.feeMode.mode !== 'sponsored') {
+      const feeCall = toOutsideCallV2(unsafeCalls[unsafeCalls.length - 1]);
+      const feeRecipient = CallData.toCalldata(feeCall.Calldata)[0];
+      const feeAmount = bnToUint256(preparedTransaction.fee.suggested_max_fee_in_gas_token);
+      expectedCalls.push({
+        contractAddress: paymasterDetails.feeMode.gasToken,
+        entrypoint: 'transfer',
+        calldata: [feeRecipient, feeAmount.low, feeAmount.high],
+      });
+    }
+    const expectedTypedData = getTypedData(
+      chainId,
+      { caller, execute_after: executeAfter, execute_before: executeBefore },
+      nonce,
+      expectedCalls,
+      version
+    );
+
+    // The account address goes into the hash. It is the same on both sides, so any fixed value
+    // gives the same answer. This function does not receive the real one.
+    assert(
+      getMessageHash(expectedTypedData, 0) === getMessageHash(preparedTransaction.typed_data, 0),
+      'Paymaster typed data does not match the expected outside execution'
+    );
   }
 };

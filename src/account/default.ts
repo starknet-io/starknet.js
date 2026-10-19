@@ -1151,9 +1151,32 @@ export class Account implements AccountInterface {
     return preparedTransaction.fee;
   }
 
+  /**
+   * Signs a transaction prepared by the paymaster, after checking it is safe to sign. The safety
+   * check needs the calls and the fee details the user actually requested, so a caller that uses
+   * this low-level method directly must pass them, the same way `executePaymasterTransaction`
+   * does.
+   * @param preparedTransaction the transaction returned by the paymaster.
+   * @param calls the calls the user requested.
+   * @param paymasterDetails the fee mode and related paymaster details.
+   * @param maxFeeInGasToken optional user-approved ceiling on the gas-token fee.
+   */
   public async preparePaymasterTransaction(
-    preparedTransaction: PreparedTransaction
+    preparedTransaction: PreparedTransaction,
+    calls: Call[],
+    paymasterDetails: PaymasterDetails,
+    maxFeeInGasToken?: BigNumberish
   ): Promise<ExecutableUserTransaction> {
+    // Check the transaction is safe before signing it: chain binding, gas fee value & gas token
+    // address, that the provided calls match the built calls, and that the hash that gets signed
+    // is this outside execution and nothing else.
+    assertPaymasterTransactionSafety(
+      preparedTransaction,
+      calls,
+      paymasterDetails,
+      await this.provider.getChainId(),
+      maxFeeInGasToken
+    );
     let transaction: ExecutableUserTransaction;
     switch (preparedTransaction.type) {
       case 'deploy_and_invoke': {
@@ -1202,20 +1225,13 @@ export class Account implements AccountInterface {
     // Build the transaction
     const preparedTransaction = await this.buildPaymasterTransaction(calls, paymasterDetails);
 
-    // Check the transaction is safe
-    // Check chain binding, gas fee value & gas token address
-    // Check that provided calls and builded calls are strictly equal
-    assertPaymasterTransactionSafety(
+    // Prepare the transaction: it is checked to be safe, then signed
+    const transaction: ExecutableUserTransaction = await this.preparePaymasterTransaction(
       preparedTransaction,
       calls,
       paymasterDetails,
-      await this.provider.getChainId(),
       maxFeeInGasToken
     );
-
-    // Prepare the transaction, tx is safe here
-    const transaction: ExecutableUserTransaction =
-      await this.preparePaymasterTransaction(preparedTransaction);
 
     // Execute the transaction
     return this.paymaster

@@ -41,21 +41,47 @@ describe('Account - Paymaster integration', () => {
     },
   ];
 
+  // A SNIP-9 V2 typed data, written as a paymaster returns it. The types, the domain and the
+  // primary type are the ones of SNIP-9: the paymaster only chooses the values of the message.
   const typedData: OutsideExecutionTypedDataV2 = {
-    types: {},
-    domain: { chainId: constants.StarknetChainId.SN_SEPOLIA },
-    primaryType: '',
+    types: {
+      StarknetDomain: [
+        { name: 'name', type: 'shortstring' },
+        { name: 'version', type: 'shortstring' },
+        { name: 'chainId', type: 'shortstring' },
+        { name: 'revision', type: 'shortstring' },
+      ],
+      OutsideExecution: [
+        { name: 'Caller', type: 'ContractAddress' },
+        { name: 'Nonce', type: 'felt' },
+        { name: 'Execute After', type: 'u128' },
+        { name: 'Execute Before', type: 'u128' },
+        { name: 'Calls', type: 'Call*' },
+      ],
+      Call: [
+        { name: 'To', type: 'ContractAddress' },
+        { name: 'Selector', type: 'selector' },
+        { name: 'Calldata', type: 'felt*' },
+      ],
+    },
+    domain: {
+      name: 'Account.execute_from_outside',
+      version: '2',
+      chainId: constants.StarknetChainId.SN_SEPOLIA,
+      revision: '1',
+    },
+    primaryType: 'OutsideExecution',
     message: {
-      Caller: '0xcaller',
-      Nonce: '0xnonce',
+      Caller: '0xaaa', // the paymaster's own contract
+      Nonce: '0xbbb',
       'Execute After': '0x1',
-      'Execute Before': '0x2',
+      'Execute Before': '0x6b49d200', // 1_800_000_000
       Calls: [
         ...originalCallsAsOutsideCalls,
         {
           To: '0x456',
           Selector: hash.getSelectorFromName('transfer'),
-          Calldata: ['0xcaller', '1200', '0'],
+          Calldata: ['0xfee', '1200', '0'], // the fee recipient, then the amount as a u256
         },
       ],
     },
@@ -278,7 +304,7 @@ describe('Account - Paymaster integration', () => {
   // some paymasters (e.g. AVNU) return the raw shortstring instead. Both hash to the same felt.
   const typedDataChainIdAsShortstring: OutsideExecutionTypedDataV2 = {
     ...typedData,
-    domain: { chainId: 'SN_SEPOLIA' },
+    domain: { ...typedData.domain, chainId: 'SN_SEPOLIA' },
   };
 
   const paymasterResponseChainIdAsShortstring = {
@@ -540,6 +566,106 @@ describe('Account - Paymaster integration', () => {
       };
       getAccount().paymaster.buildTransaction = mockBuildTransactionChainIdAsShortstring;
 
+      const result = await getAccount().executePaymasterTransaction(originalCalls, details);
+
+      expect(result).toEqual({ transaction_hash: '0x123' });
+    });
+
+    test('should throw if the signed calls field is renamed so a facade is checked but another array is signed', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      // The real SNIP-9 shape is kept, except the array that is actually signed is renamed to
+      // `Calls_`. `Calls` still holds the honest user call + fee call, so every value-level check
+      // passes while the signature covers `Calls_`: a 1_000_000-token transfer to the attacker.
+      const malicious = {
+        ...paymasterResponse,
+        typed_data: {
+          ...typedData,
+          types: {
+            ...typedData.types,
+            OutsideExecution: [
+              { name: 'Caller', type: 'ContractAddress' },
+              { name: 'Nonce', type: 'felt' },
+              { name: 'Execute After', type: 'u128' },
+              { name: 'Execute Before', type: 'u128' },
+              { name: 'Calls_', type: 'Call*' },
+            ],
+          },
+          message: {
+            ...typedData.message,
+            Calls_: [
+              {
+                To: '0x456',
+                Selector: hash.getSelectorFromName('transfer'),
+                Calldata: ['0xattacker', '1000000', '0'],
+              },
+            ],
+          },
+        },
+      };
+      getAccount().paymaster.buildTransaction = jest.fn().mockResolvedValue(malicious);
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow('Paymaster typed data does not match the expected outside execution');
+    });
+
+    test('should throw if the signed message is a foreign application message with the user calls as an unsigned facade', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+      // The user calls sit in `Calls` (read by the checks) but are not part of the signed hash:
+      // the primary type is `Session`, so the signature authorizes an attacker session key on a
+      // message the paymaster could present to any contract that trusts this account's signature.
+      const malicious = {
+        ...paymasterResponse,
+        typed_data: {
+          ...typedData,
+          types: {
+            StarknetDomain: typedData.types.StarknetDomain,
+            Session: [
+              { name: 'Session Key', type: 'felt' },
+              { name: 'Expires At', type: 'felt' },
+            ],
+            Call: typedData.types.Call,
+          },
+          primaryType: 'Session',
+          domain: { ...typedData.domain, name: 'Some Dapp' },
+          message: {
+            'Session Key': '0xattackerkey',
+            'Expires At': '0xffffffffffffffff',
+            Calls: typedData.message.Calls,
+          },
+        },
+      };
+      getAccount().paymaster.buildTransaction = jest.fn().mockResolvedValue(malicious);
+
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow('Paymaster typed data does not match the expected outside execution');
+    });
+
+    test('should throw if the signed execution window ends after the requested time bounds', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+        timeBounds: { executeBefore: 1_000_000 },
+      };
+      // The base typed data is signed with 'Execute Before' = 0x6b49d200 (1_800_000_000), well
+      // past the executeBefore the user asked for.
+      await expect(
+        getAccount().executePaymasterTransaction(originalCalls, details)
+      ).rejects.toThrow(
+        'Paymaster typed data execution window is not within the requested time bounds'
+      );
+    });
+
+    test('should not throw if the signed execution window is within the requested time bounds', async () => {
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+        timeBounds: { executeBefore: 2_000_000_000 },
+      };
+      // 'Execute Before' = 1_800_000_000 is before the requested executeBefore, so it is allowed.
       const result = await getAccount().executePaymasterTransaction(originalCalls, details);
 
       expect(result).toEqual({ transaction_hash: '0x123' });
