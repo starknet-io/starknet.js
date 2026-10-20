@@ -1,3 +1,9 @@
+## [11.4.1](https://github.com/starknet-io/starknet.js/compare/v11.4.0...v11.4.1) (2026-10-20)
+
+### Bug Fixes
+
+- **paymaster:** verify the signed hash is the expected outside execution ([a049bc1](https://github.com/starknet-io/starknet.js/commit/a049bc13f63aa209d6378351954fc0219ee122df))
+
 # [11.4.0](https://github.com/starknet-io/starknet.js/compare/v11.3.0...v11.4.0) (2026-10-16)
 
 ### Features
