@@ -6,6 +6,7 @@ import type {
 import {
   Account,
   OutsideExecutionVersion,
+  cairo,
   constants,
   logger,
   hash,
@@ -427,6 +428,43 @@ describe('Account - Paymaster integration', () => {
         details,
         '0x123456'
       );
+      expect(result).toEqual({ transaction_hash: '0x123' });
+    });
+
+    test('should sign and execute transaction via paymaster when a call holds a u256 object', async () => {
+      // A u256 can be written as an object, like cairo.uint256(1000). The paymaster gets it
+      // flattened, so the safety check must flatten it the same way before it rebuilds the hash.
+      const callsWithU256: Call[] = [
+        {
+          contractAddress: '0x123',
+          entrypoint: 'transfer',
+          calldata: ['0x789', cairo.uint256(1000)],
+        },
+      ];
+      const typedDataWithU256: OutsideExecutionTypedDataV2 = {
+        ...typedData,
+        message: {
+          ...typedData.message,
+          Calls: [
+            {
+              To: '0x123',
+              Selector: hash.getSelectorFromName('transfer'),
+              Calldata: ['0x789', '1000', '0'],
+            },
+            typedData.message.Calls[1],
+          ],
+        },
+      };
+      mockBuildTransaction.mockResolvedValueOnce({
+        ...paymasterResponse,
+        typed_data: typedDataWithU256,
+      });
+      const details: PaymasterDetails = {
+        feeMode: { mode: 'default', gasToken: '0x456' },
+      };
+
+      const result = await getAccount().executePaymasterTransaction(callsWithU256, details);
+
       expect(result).toEqual({ transaction_hash: '0x123' });
     });
 
