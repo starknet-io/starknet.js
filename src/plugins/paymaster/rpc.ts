@@ -1,4 +1,4 @@
-import type { JRPC, PAYMASTER_API, TIME_BOUNDS } from '../types/api';
+import type { JRPC, PAYMASTER_API, TIME_BOUNDS } from '../../types/api';
 import type {
   Call,
   ExecutableUserTransaction,
@@ -12,16 +12,16 @@ import type {
   UserTransaction,
   PaymasterOptions,
   TokenData,
-} from '../types';
-import { getDefaultPaymasterNodeUrl } from '../utils/paymaster';
-import fetch from '../utils/connect/fetch';
-import { LibraryError, RpcError } from '../utils/errors';
+} from '../../types';
+import { getDefaultPaymasterNodeUrl } from './utils';
+import fetch from '../../utils/connect/fetch';
+import { LibraryError, RpcError } from '../../utils/errors';
 import { PaymasterInterface } from './interface';
-import { NetworkName } from '../global/constants';
-import { stringify } from '../utils/json';
-import { CallData } from '../utils/calldata';
-import { getSelectorFromName } from '../utils/hash';
-import { signatureToHexArray } from '../utils/stark';
+import { NetworkName } from '../../global/constants';
+import { stringify } from '../../utils/json';
+import { CallData } from '../../utils/calldata';
+import { getSelectorFromName } from '../../utils/hash';
+import { signatureToHexArray } from '../../utils/stark';
 
 const convertCalls = (calls: Call[]): PAYMASTER_API.CALL[] =>
   calls.map((call) => ({

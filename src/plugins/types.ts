@@ -96,9 +96,12 @@ export interface StarknetPlugin<
 export interface PluginConfig {
   /**
    * Plugins to install.
-   * - `undefined` (default): install defaultPlugins (starknetId, brotherId)
+   * - `undefined` (default): install defaultPlugins (starknetId, brotherId, fastExecute, paymaster)
    * - explicit array: install exactly these plugins
    * - `false`: no plugins
+   *
+   * On an Account, the `paymaster` option always installs the paymaster plugin, even with `false`
+   * or with a list without it.
    */
   plugins?: StarknetPlugin<any, any>[] | false;
 }

@@ -1,4 +1,4 @@
-import type { NetworkName } from '../../global/constants';
+import type { NetworkName } from '../../../global/constants';
 
 export interface PaymasterOptions extends PaymasterRpcOptions {}
 

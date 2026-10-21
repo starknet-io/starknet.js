@@ -11,7 +11,8 @@ import type {
   RawArgsArray,
   Signature,
 } from '../../types/lib';
-import type { PaymasterDetails, UniversalDetails } from '../../account/types/index.type';
+import type { UniversalDetails } from '../../account/types/index.type';
+import type { PaymasterDetails } from '../../plugins/paymaster/types/index.type';
 import type { ProviderInterface } from '../../provider';
 import type { AccountInterface } from '../../account/interface';
 import type { CairoTypeStrategy, ParsingStrategy } from '../../utils/calldata/parser';

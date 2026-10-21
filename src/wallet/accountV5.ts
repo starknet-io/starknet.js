@@ -39,7 +39,7 @@ import {
   watchAsset,
 } from './connectV5';
 import type { WalletAccountV5Options } from './types/index.type';
-import type { PaymasterInterface } from '../paymaster';
+import type { PaymasterInterface } from '../plugins/paymaster';
 import { defaultDeployer } from '../deployer';
 
 /**

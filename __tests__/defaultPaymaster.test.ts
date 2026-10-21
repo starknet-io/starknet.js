@@ -14,7 +14,7 @@ jest.mock('../src/utils/connect/fetch');
 jest.mock('../src/utils/stark', () => ({
   signatureToHexArray: jest.fn(() => ['0x1', '0x2']),
 }));
-jest.mock('../src/utils/paymaster', () => ({
+jest.mock('../src/plugins/paymaster/utils', () => ({
   getDefaultPaymasterNodeUrl: jest.fn(() => 'https://mock-node-url'),
 }));
 

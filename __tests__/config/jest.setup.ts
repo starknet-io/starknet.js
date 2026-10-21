@@ -22,7 +22,7 @@ beforeAll(() => {
 // factories here would pull the whole `src` barrel into setup — before a test file's `jest.mock`
 // calls are registered — so the real modules would already be cached and every mock in that file
 // would silently target a different instance. `defaultPaymaster.test.ts` mocks
-// `src/utils/paymaster`, and that is exactly how it broke.
+// `src/plugins/paymaster/utils`, and that is exactly how it broke.
 afterAll(async () => {
   if (process.env.TEST_TRANSPORT !== 'ws') return;
   const { closeTestTransports } = await import('./helpers/testInstances');

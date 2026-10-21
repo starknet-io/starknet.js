@@ -27,8 +27,8 @@ import {
   watchAsset,
 } from './connect';
 import type { StarknetWalletProvider, WalletAccountV4Options } from './types/index.type';
-import type { PaymasterOptions } from '../paymaster/types/index.type';
-import type { PaymasterInterface } from '../paymaster';
+import type { PaymasterOptions } from '../plugins/paymaster/types/index.type';
+import type { PaymasterInterface } from '../plugins/paymaster';
 import {
   AccountChangeEventHandler,
   NetworkChangeEventHandler,

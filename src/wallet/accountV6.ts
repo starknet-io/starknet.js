@@ -8,7 +8,7 @@ import type {
 } from '@starknet-io/starknet-types-0104';
 import type { AllowArray, CairoVersion, Call, ProviderOptions, PaymasterOptions } from '../types';
 import type { ProviderInterface } from '../provider';
-import type { PaymasterInterface } from '../paymaster';
+import type { PaymasterInterface } from '../plugins/paymaster';
 import { WalletAccountV5 } from './accountV5';
 import { fromWalletApiCall, toWalletApiActions, toWalletApiCall } from './adapterV6';
 import {
