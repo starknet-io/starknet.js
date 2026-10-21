@@ -1,3 +1,9 @@
+## [11.4.2](https://github.com/starknet-io/starknet.js/compare/v11.4.1...v11.4.2) (2026-10-21)
+
+### Bug Fixes
+
+- **paymaster:** compile the calldata of the calls like execute(), in getOutsideCall and in Contract ([5a0e748](https://github.com/starknet-io/starknet.js/commit/5a0e7485af9d067e9b812c1ac8fc28b155c8ba4d))
+
 ## [11.4.1](https://github.com/starknet-io/starknet.js/compare/v11.4.0...v11.4.1) (2026-10-20)
 
 ### Bug Fixes
