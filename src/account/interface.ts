@@ -24,14 +24,17 @@ import type {
 import type {
   DeclareDeployUDCResponse,
   MultiDeployContractResponse,
-  PaymasterDetails,
   UniversalDetails,
 } from './types/index.type';
 import type {
   EstimateFeeResponseBulkOverhead,
   EstimateFeeResponseOverhead,
 } from '../provider/types/index.type';
-import type { PaymasterFeeEstimate, PreparedTransaction } from '../paymaster/types/index.type';
+import type {
+  PaymasterDetails,
+  PaymasterFeeEstimate,
+  PreparedTransaction,
+} from '../plugins/paymaster/types/index.type';
 import type { DeployContractUDCResponse } from '../deployer/types/index.type';
 
 /**

@@ -30,6 +30,14 @@ export {
   type FastExecuteProviderMethods,
   type FastExecuteAccountMethods,
 } from './fast-execute';
+// Same reason as `starknetIdPlugin` above: the package root already has a `paymaster` namespace
+// (`export * as paymaster from './plugins/paymaster/utils'` in `src/index.ts`).
+export {
+  paymasterPlugin,
+  PaymasterRpc,
+  PaymasterInterface,
+  type PaymasterAccountMethods,
+} from './paymaster';
 
 // Default plugins and augmentations
 export { defaultPlugins } from './defaults';

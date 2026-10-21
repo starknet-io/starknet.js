@@ -1,6 +1,6 @@
 import type { WalletWithStarknetFeatures } from '@starknet-io/get-starknet-wallet-standard/features';
 import type { WalletWithStarknetFeatures as WalletWithStarknetFeaturesV6 } from '@starknet-io/get-starknet-wallet-standard-v6/features';
-import type { PaymasterInterface } from '../../paymaster';
+import type { PaymasterInterface } from '../../plugins/paymaster';
 import type { ProviderInterface } from '../../provider';
 import type { CairoVersion, PaymasterOptions, ProviderOptions } from '../../types';
 import type { RpcMessage, StarknetWindowObject } from '../../types/api';

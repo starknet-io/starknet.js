@@ -14,7 +14,7 @@ import {
   type Signature,
 } from '../src';
 
-jest.mock('../src/paymaster/rpc');
+jest.mock('../src/plugins/paymaster/rpc');
 logger.setLogLevel('ERROR');
 
 describe('Account - Paymaster integration', () => {

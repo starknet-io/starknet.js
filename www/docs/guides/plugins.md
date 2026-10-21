@@ -8,11 +8,12 @@ The plugin system lets you extend `RpcProvider` and `Account` with custom method
 
 ## Default Plugins
 
-Three plugins are pre-installed on every `RpcProvider` and `Account`:
+Four plugins are pre-installed on every `RpcProvider` and `Account`:
 
 - **StarknetId** — Starknet Name Service integration
 - **BrotherId** — Brother.id naming service integration
 - **FastExecute** — gaming-optimized rapid transaction execution
+- **Paymaster** — [SNIP-29 paymaster](./account/paymaster.md) transactions (methods on `Account` only)
 
 ```typescript
 import { RpcProvider, Account, BlockTag } from 'starknet';
@@ -58,11 +59,14 @@ const custom = new RpcProvider({
 :::note
 The StarknetId plugin factory is exported as **`starknetIdPlugin`**, not `starknetId`: the
 bare `starknetId` name is already used by the utility namespace (`starknetId.useEncoded`,
-`starknetId.isStarkDomain`, ...). The two other factories keep their plain names,
-`brotherId()` and `fastExecute()`.
+`starknetId.isStarkDomain`, ...). For the same reason, the Paymaster plugin factory is exported
+as **`paymasterPlugin`**: `paymaster` is also a utility namespace. The two other factories keep
+their plain names, `brotherId()` and `fastExecute()`.
 :::
 
-The same `plugins` option is available on `Account`.
+The same `plugins` option is available on `Account`. There, `plugins: false` or a list without
+`paymasterPlugin()` also removes the paymaster methods. The `paymaster` option of the account is
+the exception: it always installs the paymaster plugin, and it replaces the one of the list.
 
 ## Runtime Installation
 

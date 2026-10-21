@@ -66,6 +66,9 @@ const myAccount = new Account({
 });
 ```
 
+The paymaster methods of the account come from the Paymaster plugin, installed by default. If you
+set the `plugins` option of the account yourself, see the [Plugin System](../plugins.md) guide.
+
 ## Getting Supported Gas Tokens
 
 Before sending a transaction with a Paymaster, you must first know which tokens are accepted:

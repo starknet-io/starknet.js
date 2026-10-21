@@ -6,7 +6,7 @@ import {
   ExecutableUserTransaction,
   ExecutionParameters,
   RPC,
-} from '../types';
+} from '../../types';
 
 export abstract class PaymasterInterface {
   public abstract nodeUrl: string;

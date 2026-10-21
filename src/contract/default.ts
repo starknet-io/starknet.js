@@ -46,6 +46,11 @@ import { getCompiledCalldata } from '../utils/transaction';
 import { extractAbi, parseContract } from '../utils/provider';
 import { compileConstructorCalldata } from '../deployer/compileConstructorCalldata';
 
+// The paymaster methods of an account come from the paymaster plugin. Without the plugin, a
+// paymaster option of a contract method cannot work: say so, instead of "is not a function".
+const NO_PAYMASTER_MESSAGE =
+  'This account has no paymaster methods: add paymasterPlugin() to its plugins, or set its paymaster option.';
+
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
 /**
@@ -383,6 +388,10 @@ export class Contract implements ContractInterface {
 
     if (isAccount(this.providerOrAccount!)) {
       if (restInvokeOptions.paymasterDetails) {
+        assert(
+          typeof this.providerOrAccount.executePaymasterTransaction === 'function',
+          NO_PAYMASTER_MESSAGE
+        );
         const myCall: Call = {
           contractAddress: this.address,
           entrypoint: method,
@@ -443,6 +452,10 @@ export class Contract implements ContractInterface {
 
     if (isAccount(this.providerOrAccount!)) {
       if (estimateDetails.paymasterDetails) {
+        assert(
+          typeof this.providerOrAccount.estimatePaymasterTransactionFee === 'function',
+          NO_PAYMASTER_MESSAGE
+        );
         const myCall: Call = {
           contractAddress: this.address,
           entrypoint: method,
