@@ -392,13 +392,9 @@ export class Contract implements ContractInterface {
           typeof this.providerOrAccount.executePaymasterTransaction === 'function',
           NO_PAYMASTER_MESSAGE
         );
-        const myCall: Call = {
-          contractAddress: this.address,
-          entrypoint: method,
-          calldata: args,
-        };
+        // Send the calldata compiled with the abi, as execute() does below, not the raw arguments.
         return this.providerOrAccount.executePaymasterTransaction(
-          [myCall],
+          [invocation],
           restInvokeOptions.paymasterDetails,
           restInvokeOptions.maxFeeInGasToken
         );
@@ -456,13 +452,9 @@ export class Contract implements ContractInterface {
           typeof this.providerOrAccount.estimatePaymasterTransactionFee === 'function',
           NO_PAYMASTER_MESSAGE
         );
-        const myCall: Call = {
-          contractAddress: this.address,
-          entrypoint: method,
-          calldata: args,
-        };
+        // Send the calldata compiled with the abi (see populate), not the raw arguments.
         return this.providerOrAccount.estimatePaymasterTransactionFee(
-          [myCall],
+          [invocation],
           estimateDetails.paymasterDetails
         );
       }

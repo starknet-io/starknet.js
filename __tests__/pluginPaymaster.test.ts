@@ -174,4 +174,75 @@ describe('Paymaster plugin', () => {
       })
     ).rejects.toThrow('This account has no paymaster methods');
   });
+
+  describe('contract methods with a paymaster option', () => {
+    // An ERC-20 transfer: once compiled with the abi, the u256 amount is two felts.
+    const erc20Abi: Abi = [
+      {
+        type: 'struct',
+        name: 'core::integer::u256',
+        members: [
+          { name: 'low', type: 'core::integer::u128' },
+          { name: 'high', type: 'core::integer::u128' },
+        ],
+      },
+      {
+        type: 'function',
+        name: 'transfer',
+        inputs: [
+          { name: 'recipient', type: 'core::starknet::contract_address::ContractAddress' },
+          { name: 'amount', type: 'core::integer::u256' },
+        ],
+        outputs: [{ type: 'core::bool' }],
+        state_mutability: 'external',
+      },
+    ];
+    const paymasterDetails: PaymasterDetails = { feeMode: { mode: 'sponsored' } };
+
+    test('contract.invoke sends the calldata compiled with the abi', async () => {
+      const account = new Account({ provider, address, signer });
+      const executeSpy = jest
+        .spyOn(account, 'executePaymasterTransaction')
+        .mockResolvedValue({ transaction_hash: '0x1' });
+      const contract = new Contract({
+        abi: erc20Abi,
+        address: '0x123',
+        providerOrAccount: account,
+      });
+
+      await contract.invoke('transfer', ['0x456', 100], { paymasterDetails });
+
+      expect(executeSpy).toHaveBeenCalledWith(
+        [{ contractAddress: '0x123', entrypoint: 'transfer', calldata: ['1110', '100', '0'] }],
+        paymasterDetails,
+        undefined
+      );
+    });
+
+    test('contract.estimate sends the calldata compiled with the abi', async () => {
+      const fee: PaymasterFeeEstimate = {
+        gas_token_price_in_strk: '0x1',
+        estimated_fee_in_strk: '0x2',
+        estimated_fee_in_gas_token: '0x3',
+        suggested_max_fee_in_strk: '0x4',
+        suggested_max_fee_in_gas_token: '0x5',
+      };
+      const account = new Account({ provider, address, signer });
+      const estimateSpy = jest
+        .spyOn(account, 'estimatePaymasterTransactionFee')
+        .mockResolvedValue(fee);
+      const contract = new Contract({
+        abi: erc20Abi,
+        address: '0x123',
+        providerOrAccount: account,
+      });
+
+      await contract.estimate('transfer', ['0x456', 100], { paymasterDetails });
+
+      expect(estimateSpy).toHaveBeenCalledWith(
+        [{ contractAddress: '0x123', entrypoint: 'transfer', calldata: ['1110', '100', '0'] }],
+        paymasterDetails
+      );
+    });
+  });
 });

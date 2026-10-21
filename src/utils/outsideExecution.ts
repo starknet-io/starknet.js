@@ -27,6 +27,8 @@ export function toOutsideCallV2(call: OutsideCallV1 | OutsideCallV2): OutsideCal
 
 /**
  * Converts a Call object to an OutsideCall object that can be used for an Outside Execution.
+ * The calldata follows the rule of `account.execute()`: a calldata marked as compiled is kept as
+ * it is, and any other calldata is a list or an object of parameters, which is flattened.
  * @param {Call} call transaction to proceed.
  * @returns {OutsideCall} transaction formatted in conformity to SNIP-9
  * @example
@@ -46,7 +48,10 @@ export function toOutsideCallV2(call: OutsideCallV1 | OutsideCallV2): OutsideCal
  */
 export function getOutsideCall(call: Call): OutsideCall {
   const callData = call.calldata ?? [];
-  const callDataCompiled = Array.isArray(callData) ? callData : CallData.compile(callData);
+  // Same rule as fromCallsToExecuteCalldata_cairo1: an array without the compiled mark is a list
+  // of parameters, and a parameter can be an object, like a u256.
+  const callDataCompiled =
+    Array.isArray(callData) && '__compiled__' in callData ? callData : CallData.compile(callData);
   return {
     to: call.contractAddress,
     selector: getSelectorFromName(call.entrypoint),
