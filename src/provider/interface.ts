@@ -185,12 +185,22 @@ export abstract class ProviderInterface {
   ): Promise<Nonce>;
 
   /**
-   * Get the value of the storage (contract's variable) at the given address and key
+   * Get the value stored in one storage slot of a contract.
    *
-   * @param contractAddress
-   * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
+   * @param contractAddress - contract address
+   * @param key - address of the storage slot. For a variable that holds one felt, it is
+   * `hash.starknetKeccak(name)`. For the other cases, see the
+   * [Cairo book](https://www.starknet.io/cairo-book/ch101-01-00-contract-storage.html#addresses-of-storage-variables).
    * @param blockIdentifier - block identifier
-   * @returns the value of the storage variable
+   * @param responseFlags - `['INCLUDE_LAST_UPDATE_BLOCK']` also gives the last block that
+   * modified the slot. It needs a node that uses RPC spec 0.10. With RPC spec 0.9, the flag is
+   * ignored and `last_update_block` is 0.
+   * @returns `value` and `last_update_block`, which is 0 without `INCLUDE_LAST_UPDATE_BLOCK`
+   * @example
+   * ```typescript
+   * const result = await provider.getStorageAt(contractAddress, hash.starknetKeccak('balance'));
+   * // result = { value: '0x64', last_update_block: 0 }
+   * ```
    */
   public abstract getStorageAt(
     contractAddress: BigNumberish,
