@@ -266,8 +266,6 @@ describe('Cairo 1', () => {
       const storage2 = await account.provider.getStorageAt(cairo1Contract.address, key + 1n);
       expect(BigInt(storage1.value)).toBe(user.address);
       expect(Boolean(BigInt(storage2.value))).toBe(user.is_claimed);
-
-      // TODO: Complex mapping - https://docs.starknet.io/documentation/architecture_and_concepts/Contracts/contract-storage/
     });
 
     test('Cairo 1 Contract Interaction - echo flat un-named un-nested tuple', async () => {
