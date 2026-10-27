@@ -1,3 +1,9 @@
+## [11.4.3](https://github.com/starknet-io/starknet.js/compare/v11.4.2...v11.4.3) (2026-10-27)
+
+### Bug Fixes
+
+- **contract:** refuse options after the arguments of a typed contract method ([cedd4c2](https://github.com/starknet-io/starknet.js/commit/cedd4c25d80da2b6c6c144f8730db14ecc58989e))
+
 ## [11.4.2](https://github.com/starknet-io/starknet.js/compare/v11.4.1...v11.4.2) (2026-10-21)
 
 ### Bug Fixes
