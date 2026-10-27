@@ -550,7 +550,9 @@ const specialParameters: Calldata = [
   '467456745457',
   '22252',
 ];
-const getResponse = await myAccount.get_bal(specialParameters, { parseRequest: false });
+const getResponse = await myContract
+  .withOptions({ parseRequest: false })
+  .get_bal(...specialParameters);
 ```
 
 To use with `parseRequest: false` (see hereunder).
@@ -629,9 +631,8 @@ If for any reason (mainly for speed of processing), you want to define yourself 
 Parameters are an array of strings (representing numbers).
 
 ```typescript
-const txH = await myContract.send_tk(['2036735872918048433518', '5130580', '18'], {
-  parseRequest: false,
-});
+const myCalldata = ['2036735872918048433518', '5130580', '18'];
+const txH = await myContract.withOptions({ parseRequest: false }).send_tk(...myCalldata);
 ```
 
 ### parseResponse
@@ -639,7 +640,7 @@ const txH = await myContract.send_tk(['2036735872918048433518', '5130580', '18']
 If for any reason, you want to receive a low-level answer from Starknet, you can use the parseResponse option.
 
 ```typescript
-const result = await myContract.call('get_bals', 100n, { parseResponse: false });
+const result = await myContract.call('get_bals', [100n], { parseResponse: false });
 ```
 
 The answer is an array of strings (representing numbers).

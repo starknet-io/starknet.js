@@ -1,4 +1,12 @@
-import { type CompiledSierra, type Calldata, CallData, Deployer, cairo } from '../../src';
+import {
+  type CompiledSierra,
+  type Calldata,
+  CallData,
+  Contract,
+  Deployer,
+  cairo,
+  type ProviderInterface,
+} from '../../src';
 import { isSierra, extractContractHashes } from '../../src/utils/contract';
 import { parseContract } from '../../src/utils/provider';
 import { CONTRACTS } from '../config/fixtures';
@@ -377,5 +385,52 @@ describe('Deployer.buildDeployerCall with already compiled felts for a NonZero p
         deployerAddress
       )
     ).toThrow('value 0 is not authorized in NonZero type');
+  });
+});
+
+describe('Contract method options', () => {
+  // one view function with one parameter; `as const` lets typedv2() know its types
+  const abi = [
+    {
+      type: 'function',
+      name: 'balance_of',
+      inputs: [{ name: 'account', type: 'core::starknet::contract_address::ContractAddress' }],
+      outputs: [{ type: 'core::integer::u256' }],
+      state_mutability: 'view',
+    },
+  ] as const;
+
+  test('refuses options after the arguments of a typed method', async () => {
+    const callContract = jest.fn().mockResolvedValue(['0x0', '0x0']);
+    const provider = { callContract } as unknown as ProviderInterface;
+    const contract = new Contract({ abi, address: '0x1', providerOrAccount: provider });
+    const typedContract = contract.typedv2(abi);
+
+    // @ts-expect-error Options go through `withOptions()`, not after the arguments.
+    const result = typedContract.balance_of('0x2', { blockIdentifier: 'latest' });
+
+    // at run time, the options object is one argument too many
+    await expect(result).rejects.toThrow(
+      'Invalid number of arguments, expected 1 arguments, but got 2'
+    );
+    expect(callContract).not.toHaveBeenCalled();
+  });
+
+  test('sends spread calldata as given, with the block set by withOptions()', async () => {
+    const callContract = jest.fn().mockResolvedValue(['0x0', '0x0']);
+    const provider = { callContract } as unknown as ProviderInterface;
+    const contract = new Contract({ abi, address: '0x1', providerOrAccount: provider });
+    const calldata = ['0x2'];
+
+    // TypeScript does not check `contract.balance_of` (its type is `any`). It checks
+    // `functions.balance_of` with AsyncContractFunction: spread calldata must still compile.
+    await contract
+      .withOptions({ parseRequest: false, blockIdentifier: 'latest' })
+      .functions.balance_of(...calldata);
+
+    expect(callContract).toHaveBeenCalledWith(
+      { contractAddress: '0x1', calldata: ['0x2'], entrypoint: 'balance_of' },
+      'latest'
+    );
   });
 });

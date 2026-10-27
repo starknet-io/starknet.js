@@ -43,14 +43,17 @@ instead of quietly encoding a different one.
 | The feeder gateway `BaseUrl` constant removed     | **Low**    | Only if you imported `constants.BaseUrl`                |
 | `declareAndDeploy` checks the calldata first      | **Low**    | Only if you split values into felts by hand             |
 | `preparePaymasterTransaction` signature changed   | **Low**    | Only if you call `preparePaymasterTransaction` directly |
+| Typed methods refuse options after the arguments  | **Low**    | Only if you pass them; use `withOptions()`              |
+| The `ArgsOrCalldataWithOptions` type removed      | **Low**    | Only if you imported it; use `ArgsOrCalldata`           |
 
 Three deprecations ship in v11 — `stark.randomAddress()`, `Provider` and `WalletAccount` — but none
 of them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
 
 ### What did not change
 
-Worth stating, because the release is a major: `Contract`, `CallData` and the `Signer` interface
-are untouched, and `Account` changes in one place only — the lower-level
+Worth stating, because the release is a major: `CallData` and the `Signer` interface are
+untouched, `Contract` only refuses, at compile time, a call form that did not work in v10
+(section 15), and `Account` changes in one place only — the lower-level
 `preparePaymasterTransaction` (section 14). `WebSocketChannel` keeps exactly the API it had in v10
 — same constructor options, same `subscribe*` methods, same events. No RPC spec version is added or
 dropped: 0.9 and 0.10.x remain supported, with 0.10.4 as the default. What left the package exports
@@ -563,6 +566,33 @@ const executable = await account.preparePaymasterTransaction(prepared, calls, pa
 ```
 
 If you only use `executePaymasterTransaction`, nothing changes.
+
+### 15. A typed contract refuses options after the arguments
+
+Since starknet.js v7, the options of a contract method go through `withOptions()`. An options
+object placed after the arguments is not read as options: it is one more argument. With
+`parseRequest: true`, the default, the call fails with `Invalid number of arguments`. With
+`parseRequest: false`, the object is sent as calldata, and the block is ignored.
+
+In v10, TypeScript still accepted this form on a contract typed with `typedv2()`. In v11, it is a
+compile error:
+
+```typescript
+const typedContract = myContract.typedv2(abi);
+
+// v10: compiles, then fails at run time
+// v11: compile error
+await typedContract.balance_of(address, { blockIdentifier: 'latest' });
+
+// v10 and v11
+await typedContract.withOptions({ blockIdentifier: 'latest' }).balance_of(address);
+```
+
+On a contract that is not typed, TypeScript cannot see the mistake: options after the arguments
+still compile, and still do not work at run time. Use `withOptions()` there too.
+
+The `ArgsOrCalldataWithOptions` type is removed, because it described the same old form. Use
+`ArgsOrCalldata`: it accepts the same arguments.
 
 ## Part 2 — Deprecations
 

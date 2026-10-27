@@ -40,8 +40,12 @@ declare module 'abi-wan-kanabi' {
     Result: CairoResult<ResultT, ErrorT>;
     Enum: CairoCustomEnum;
     Calldata: RawArgs | Calldata;
-    CallOptions: CallOptions;
-    InvokeOptions: ExecuteOptions;
+    // abi-wan-kanabi gives each typed method one more call form: the arguments, then an options
+    // object, as in `typed.balance_of(address, { blockIdentifier: 'latest' })`. Contract methods
+    // do not read this object: options go through `withOptions()`. With `never`, TypeScript
+    // refuses this form. Without these two lines, the form would accept any value.
+    CallOptions: never;
+    InvokeOptions: never;
     InvokeFunctionResponse: InvokeFunctionResponse;
   }
 }
