@@ -197,7 +197,7 @@ If you want to have a very fast execution, with minimum resource usage:
 
 ```typescript
 const specialParameters: Calldata = ['2036735872918048433518', '5130580', '18'];
-const getResponse = await myAccount.call('get_bal', specialParameters, { parseRequest: false });
+const getResponse = await myContract.call('get_bal', specialParameters, { parseRequest: false });
 ```
 
 You provide the low-level numbers expected by Starknet, without any parsing or checking. See more details [here](./define_call_message.md#parse-configuration).
