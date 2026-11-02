@@ -110,6 +110,7 @@ import { RpcProvider } from 'starknet';
 
 - This status has been verified 22/jun/2026, except for Lava on Mainnet (verified 09/oct/2026).
 - Starknet Foundation public nodes: `https://mainnet.nodes.starknet.org/rpc/v0_10` and `https://sepolia.nodes.starknet.org/rpc/v0_10` (verified 02/nov/2026).
+- Starknet Foundation public nodes are limited to 600 requests per minute per IP (about 10 per second, with bursts up to 60). Requests over the limit get an HTTP 429 response.
 - Zan public node is limited to 15 calls per second, and has also monthly limitation.
 - The Lava public nodes are no longer available. To use Lava, create a free account on [gateway.lavanet.xyz](https://gateway.lavanet.xyz) to get an API key.
 - With a Lava API key, add `/rpc/v0_8` or `/rpc/v0_9` at the end of the URL to get this RPC version. `/rpc/v0_10` is ignored. Without any ending, the RPC version can change at each request.
