@@ -79,6 +79,7 @@ import { RpcProvider } from 'starknet';
 | -----------------------: | :---------------: | :---------------: |
 |                  Alchemy |        No         | v0_8, v0_9, v0_10 |
 |                      Zan | v0_8, v0_9, v0_10 | v0_8, v0_9, v0_10 |
+|      Starknet Foundation | v0_8, v0_9, v0_10 |        N/A        |
 |                   Infura |        No         |       v0_8        |
 |                     Lava |   Not available   |    v0_8, v0_9     |
 | Local Pathfinder v0.22.6 | v0_8, v0_9, v0_10 |        N/A        |
@@ -90,6 +91,7 @@ import { RpcProvider } from 'starknet';
 | -----------------------: | :---------------: | :---------------: |
 |                  Alchemy |        No         | v0_8, v0_9, v0_10 |
 |                      Zan | v0_8, v0_9, v0_10 | v0_8, v0_9, v0_10 |
+|      Starknet Foundation | v0_8, v0_9, v0_10 |        N/A        |
 |                   Infura |        No         |       v0_8        |
 |                     Lava |   Not available   |   Not available   |
 | Local Pathfinder v0.22.6 | v0_8, v0_9, v0_10 |        N/A        |
@@ -107,6 +109,8 @@ import { RpcProvider } from 'starknet';
 :::note
 
 - This status has been verified 22/jun/2026, except for Lava on Mainnet (verified 09/oct/2026).
+- Starknet Foundation public nodes: `https://mainnet.nodes.starknet.org/rpc/v0_10` and `https://sepolia.nodes.starknet.org/rpc/v0_10` (verified 02/nov/2026).
+- Starknet Foundation public nodes are limited to 600 requests per minute per IP (about 10 per second, with bursts up to 60). Requests over the limit get an HTTP 429 response.
 - Zan public node is limited to 15 calls per second, and has also monthly limitation.
 - The Lava public nodes are no longer available. To use Lava, create a free account on [gateway.lavanet.xyz](https://gateway.lavanet.xyz) to get an API key.
 - With a Lava API key, add `/rpc/v0_8` or `/rpc/v0_9` at the end of the URL to get this RPC version. `/rpc/v0_10` is ignored. Without any ending, the RPC version can change at each request.
