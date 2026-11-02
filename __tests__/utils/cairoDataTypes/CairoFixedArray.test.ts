@@ -115,6 +115,13 @@ describe('CairoFixedArray class Unit Tests', () => {
       new CairoFixedArray(iterator, F3, S);
       expect(iterator.next().value).toBe('0x9');
     });
+
+    test('should refuse a huge size whose items read no felt', () => {
+      expect(new CairoFixedArray([].values(), '[(); 3]', S).content).toHaveLength(3);
+      expect(() => new CairoFixedArray([].values(), '[(); 4294967295]', S)).toThrow(
+        /reads no felt/
+      );
+    });
   });
 
   describe('nesting', () => {
