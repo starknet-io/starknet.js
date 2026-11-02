@@ -1,3 +1,9 @@
+# [11.5.0](https://github.com/starknet-io/starknet.js/compare/v11.4.3...v11.5.0) (2026-11-02)
+
+### Features
+
+- **provider:** add Starknet Foundation public nodes to default RPC nodes ([bafe60f](https://github.com/starknet-io/starknet.js/commit/bafe60f6c3f4c84883cca4147e65ad229ff0a704))
+
 ## [11.4.3](https://github.com/starknet-io/starknet.js/compare/v11.4.2...v11.4.3) (2026-10-27)
 
 ### Bug Fixes
