@@ -12,6 +12,15 @@ Security fixes are applied to the current major release line and to the active p
 
 Versions 7.x, 8.x and 9.x reached end-of-life in September 2026 and no longer receive security fixes. If you are on an unsupported version, upgrade to the latest 10.x release. The [migration guide](https://starknet-js.com/docs/guides/migrate) covers the breaking changes between major versions.
 
+## Scope and assumptions
+
+starknet.js is a client library, and its security scope rests on two assumptions:
+
+- **The RPC node is honest and spec-conformant.** The library decodes whatever the configured node returns, trusting it to follow the Starknet JSON-RPC specification. Checking that a node's responses are well-formed is the node's job (Pathfinder, Juno, devnet), not the library's. A compromised or malicious node can already return any data — wrong balances, fake call results, forged events — and the library does not defend against that.
+- **Contract ABIs describe real, compiled contracts.** Given an ABI, the library trusts that it is the ABI of a contract the Cairo compiler could produce. It does not harden against hand-written ABIs that declare types no contract can express.
+
+A report that only reproduces through a dishonest node, or through an ABI that no compiled contract could produce, falls outside this scope.
+
 ## Reporting a vulnerability
 
 Please do not open a public issue or pull request for a suspected vulnerability.
