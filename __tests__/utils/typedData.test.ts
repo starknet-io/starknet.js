@@ -425,6 +425,90 @@ describe('typedData', () => {
     });
   });
 
+  describe('untrusted type graphs (GHSA-pwhq-6jxx-6j46)', () => {
+    const domainTypes = examplePresetTypes.types.StarknetDomain;
+    const { domain } = examplePresetTypes;
+    const anySignature = ['0x1', '0x2'];
+    const anyPublicKey = stark.getFullPublicKey('0x1');
+
+    /** T0 -> T1 -> ... -> felt, with a message nested as deep. */
+    const chain = (depth: number) => {
+      const types: Record<string, { name: string; type: string }[]> = {
+        StarknetDomain: domainTypes,
+      };
+      let message: any = '0x1';
+      for (let i = depth - 1; i >= 0; i -= 1) {
+        types[`T${i}`] = [{ name: 'f', type: i === depth - 1 ? 'felt' : `T${i + 1}` }];
+        message = { f: message };
+      }
+      return { types, primaryType: 'T0', domain, message };
+    };
+
+    /** Two types per layer, each pointing at both types of the next layer. */
+    const diamond = (layers: number) => {
+      const types: Record<string, { name: string; type: string }[]> = {
+        StarknetDomain: domainTypes,
+      };
+      for (let i = 0; i < layers; i += 1) {
+        const last = i === layers - 1;
+        ['A', 'B'].forEach((name) => {
+          types[`${name}${i}`] = [
+            { name: 'a', type: last ? 'felt' : `A${i + 1}` },
+            { name: 'b', type: last ? 'felt' : `B${i + 1}` },
+          ];
+        });
+      }
+      return types;
+    };
+
+    test('hashes a reasonably nested message as before', () => {
+      expect(getMessageHash(chain(100), exampleAddress)).toMatch(/^0x[0-9a-f]+$/);
+    });
+
+    test('refuses a deeply nested message with an error, before checking the signature', () => {
+      // used to overflow the call stack inside verifyMessage, with any signature
+      expect(() =>
+        typedData.verifyMessage(chain(1000), anySignature, anyPublicKey, exampleAddress)
+      ).toThrow(/nested deeper than 128 levels/);
+    });
+
+    test('lists the dependencies of a diamond-shaped graph in linear time', () => {
+      // each layer doubled the work: 30 layers took minutes
+      const types = diamond(30);
+      const started = Date.now();
+      const encoded = encodeType(types, 'A0', TypedDataRevision.ACTIVE);
+      expect(Date.now() - started).toBeLessThan(1000);
+      expect(encoded.startsWith('"A0"("a":"A1","b":"B1")')).toBe(true);
+      // A0, then both types of the 29 layers below it
+      expect(encoded.match(/"[AB]\d+"\(/g)).toHaveLength(59);
+    });
+
+    test('refuses a type that depends on too many others', () => {
+      expect(() => encodeType(chain(2000).types, 'T0', TypedDataRevision.ACTIVE)).toThrow(
+        /depends on more than 1024 types/
+      );
+    });
+
+    test('encodes a type that refers to itself instead of overflowing the call stack', () => {
+      const types = {
+        Node: [
+          { name: 'value', type: 'felt' },
+          { name: 'children', type: 'Node*' },
+        ],
+      };
+      expect(encodeType(types, 'Node')).toBe('Node(value:felt,children:Node*)');
+      expect(getTypeHash(types, 'Node')).toBe(
+        getSelectorFromName('Node(value:felt,children:Node*)')
+      );
+    });
+
+    test('a failed encoding leaves the next one unaffected', () => {
+      // the depth reached by the failed call must not carry over to this one
+      expect(() => getMessageHash(chain(1000), exampleAddress)).toThrow();
+      expect(() => getMessageHash(chain(100), exampleAddress)).not.toThrow();
+    });
+  });
+
   describe('verifyMessage', () => {
     const addr = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
     const privK = '0x71d7bb07b9a64f6f78ac4c816aff4da9';

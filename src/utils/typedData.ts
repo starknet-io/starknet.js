@@ -65,6 +65,38 @@ const revisionConfiguration: Record<Revision, Configuration> = {
   },
 };
 
+/**
+ * How deep a message may nest structs, arrays, enums and merkle trees. Far beyond any real
+ * message, and far below where the call stack runs out.
+ */
+const MAX_ENCODING_DEPTH = 128;
+let encodingDepth = 0;
+/** How many other types a single type may depend on. Real messages use a handful. */
+const MAX_TYPE_DEPENDENCIES = 1024;
+/**
+ * Type hashes already computed during the encoding in flight. Every nested struct and every array
+ * entry needs the hash of its type, which walks the whole type graph, so without it an untrusted
+ * message pays for that walk once per value. Dropped when the outermost `encodeData` returns,
+ * since the caller may change its types between two calls.
+ */
+let typeHashCache = new WeakMap<TypedData['types'], Map<string, string>>();
+let structsInFlight = 0;
+
+function cachedTypeHash(types: TypedData['types'], type: string, revision: Revision): string {
+  let hashes = typeHashCache.get(types);
+  if (!hashes) {
+    hashes = new Map();
+    typeHashCache.set(types, hashes);
+  }
+  const key = `${revision}:${type}`;
+  let hash = hashes.get(key);
+  if (hash === undefined) {
+    hash = getTypeHash(types, type, revision);
+    hashes.set(key, hash);
+  }
+  return hash;
+}
+
 function assertRange(data: unknown, type: string, { min, max }: { min: bigint; max: bigint }) {
   const value = BigInt(data as string);
   assert(value >= min && value <= max, `${value} (${type}) is out of bounds [${min}, ${max}]`);
@@ -176,46 +208,55 @@ export function getDependencies(
   contains: string = '',
   revision: Revision = Revision.LEGACY
 ): string[] {
-  let dependencyTypes: string[] = [type];
+  // The type graph comes from the caller, possibly an untrusted one: it is walked depth-first in
+  // pre-order with one shared visited set and an explicit stack, so the cost stays linear in the
+  // size of the graph and neither a deep nor a cyclic one can exhaust the call stack.
+  const result: string[] = [];
+  const visited = new Set<string>();
+  const stack = referencedTypes(type, contains, revision)
+    .filter((t) => !dependencies.includes(t))
+    .reverse();
 
+  while (stack.length > 0) {
+    const depType = stack.pop() as string;
+    if (!visited.has(depType) && types[depType]) {
+      visited.add(depType);
+      result.push(depType);
+      const children = (types[depType] as StarknetEnumType[]).flatMap((t) =>
+        referencedTypes(t.type, t.contains, revision)
+      );
+      for (let i = children.length - 1; i >= 0; i -= 1) {
+        if (!visited.has(children[i])) stack.push(children[i]);
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * The type names a field type points to: itself, the element of a struct array, the enum it
+ * contains, or the members of an enum variant.
+ */
+function referencedTypes(type: string, contains: string | undefined, revision: Revision): string[] {
   // Include pointers (struct arrays)
   if (type[type.length - 1] === '*') {
-    dependencyTypes = [type.slice(0, -1)];
-  } else if (revision === Revision.ACTIVE) {
+    return [type.slice(0, -1)];
+  }
+  if (revision === Revision.ACTIVE) {
     // enum base
     if (type === 'enum') {
-      dependencyTypes = [contains];
+      return [contains ?? ''];
     }
     // enum element types
-    else if (type.match(/^\(.*\)$/)) {
-      dependencyTypes = type
+    if (type.match(/^\(.*\)$/)) {
+      return type
         .slice(1, -1)
         .split(',')
         .map((depType) => (depType[depType.length - 1] === '*' ? depType.slice(0, -1) : depType));
     }
   }
-
-  return dependencyTypes
-    .filter((t) => !dependencies.includes(t) && types[t])
-    .reduce<string[]>(
-      // This comment prevents prettier from rolling everything here into a single line.
-      (p, depType) => [
-        ...p,
-        ...[
-          depType,
-          ...(types[depType] as StarknetEnumType[]).reduce<string[]>(
-            (previous, t) => [
-              ...previous,
-              ...getDependencies(types, t.type, previous, t.contains, revision).filter(
-                (dependency) => !previous.includes(dependency)
-              ),
-            ],
-            []
-          ),
-        ].filter((dependency) => !p.includes(dependency)),
-      ],
-      []
-    );
+  return [type];
 }
 
 function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
@@ -267,6 +308,13 @@ export function encodeType(
     undefined,
     revision
   );
+  // Each nested struct hashes its own type string, which lists every type it depends on: without a
+  // bound, a long chain of types costs its full length once per level of the message.
+  if (dependencies.length > MAX_TYPE_DEPENDENCIES) {
+    throw new Error(
+      `Cannot encode type ${type}: it depends on more than ${MAX_TYPE_DEPENDENCIES} types`
+    );
+  }
   const newTypes = !primary ? [] : [primary, ...dependencies.sort()];
 
   const esc = revisionConfiguration[revision].escapeTypeString;
@@ -347,6 +395,26 @@ export function encodeValue(
   data: unknown,
   ctx: Context = {},
   revision: Revision = Revision.LEGACY
+): [string, string] {
+  // Every nested struct, array, enum or merkle tree comes back through here, so counting the
+  // calls in flight bounds the recursion before an untrusted message can overflow the call stack.
+  if (encodingDepth >= MAX_ENCODING_DEPTH) {
+    throw new Error(`Cannot encode data: nested deeper than ${MAX_ENCODING_DEPTH} levels`);
+  }
+  encodingDepth += 1;
+  try {
+    return encodeNestedValue(types, type, data, ctx, revision);
+  } finally {
+    encodingDepth -= 1;
+  }
+}
+
+function encodeNestedValue(
+  types: TypedData['types'],
+  type: string,
+  data: unknown,
+  ctx: Context,
+  revision: Revision
 ): [string, string] {
   if (types[type]) {
     return [type, getStructHash(types, type, data as TypedData['message'], revision)];
@@ -486,8 +554,11 @@ export function encodeData<T extends TypedData>(
   revision: Revision = Revision.LEGACY
 ): [string[], string[]] {
   const targetType = types[type] ?? revisionConfiguration[revision].presetTypes[type];
-  const [returnTypes, values] = targetType.reduce<[string[], string[]]>(
-    ([ts, vs], field) => {
+  structsInFlight += 1;
+  try {
+    const returnTypes = ['felt'];
+    const values = [cachedTypeHash(types, type, revision)];
+    targetType.forEach((field) => {
       if (
         data[field.name as keyof T['message']] === undefined ||
         (data[field.name as keyof T['message']] === null && field.type !== 'enum')
@@ -499,15 +570,17 @@ export function encodeData<T extends TypedData>(
       const ctx = { parent: type, key: field.name };
       const [t, encodedValue] = encodeValue(types, field.type, value, ctx, revision);
 
-      return [
-        [...ts, t],
-        [...vs, encodedValue],
-      ];
-    },
-    [['felt'], [getTypeHash(types, type, revision)]]
-  );
+      returnTypes.push(t);
+      values.push(encodedValue);
+    });
 
-  return [returnTypes, values];
+    return [returnTypes, values];
+  } finally {
+    structsInFlight -= 1;
+    if (structsInFlight === 0) {
+      typeHashCache = new WeakMap();
+    }
+  }
 }
 
 /**

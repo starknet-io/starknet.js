@@ -196,6 +196,10 @@ const isValid2 = typedData.verifyMessage(msgHash, signature, fullPublicKey);
 const isValid3 = ec.starkCurve.verify(signature, msgHash, fullPublicKey);
 ```
 
+:::note
+The message is hashed before the signature is checked, so a server verifying messages it receives should cap the size of the requests it accepts. Hashing also refuses a message nested more than 128 levels deep, and a type depending on more than 1024 other types: `verifyMessage` throws an error for them.
+:::
+
 ### Verify TypedData in Starknet
 
 On the receiver side, you receive the message, the signature, and the account address.  
