@@ -233,8 +233,14 @@ export const DEFAULT_GLOBAL_CONFIG: {
 };
 
 export const RPC_DEFAULT_NODES = {
-  SN_MAIN: [`https://api.zan.top/public/starknet-mainnet/rpc/`],
-  SN_SEPOLIA: [`https://api.zan.top/public/starknet-sepolia/rpc/`],
+  SN_MAIN: [
+    `https://api.zan.top/public/starknet-mainnet/rpc/`,
+    `https://mainnet.nodes.starknet.org/rpc/`,
+  ],
+  SN_SEPOLIA: [
+    `https://api.zan.top/public/starknet-sepolia/rpc/`,
+    `https://sepolia.nodes.starknet.org/rpc/`,
+  ],
 } as const;
 
 export const PAYMASTER_RPC_NODES = {
