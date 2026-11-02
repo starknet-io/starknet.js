@@ -502,6 +502,27 @@ describe('typedData', () => {
       );
     });
 
+    test('refuses a type declaring the same field name twice', () => {
+      // both fields read the same value, so each level of the message was hashed twice over
+      const types = {
+        StarknetDomain: domainTypes,
+        Node: [
+          { name: 'children', type: 'Node*' },
+          { name: 'children', type: 'Node*' },
+        ],
+      };
+      let message: any = { children: [] };
+      for (let i = 0; i < 30; i += 1) message = { children: [message] };
+      expect(() =>
+        typedData.verifyMessage(
+          { types, primaryType: 'Node', domain, message },
+          anySignature,
+          anyPublicKey,
+          exampleAddress
+        )
+      ).toThrow(/declares the same field name twice/);
+    });
+
     test('a failed encoding leaves the next one unaffected', () => {
       // the depth reached by the failed call must not carry over to this one
       expect(() => getMessageHash(chain(1000), exampleAddress)).toThrow();

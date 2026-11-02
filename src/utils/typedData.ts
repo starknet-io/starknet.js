@@ -554,6 +554,11 @@ export function encodeData<T extends TypedData>(
   revision: Revision = Revision.LEGACY
 ): [string[], string[]] {
   const targetType = types[type] ?? revisionConfiguration[revision].presetTypes[type];
+  // Two fields of one name read the same value, which then gets encoded twice: nested, that
+  // doubles the work at every level of the message.
+  if (new Set(targetType.map((field) => field.name)).size !== targetType.length) {
+    throw new Error(`Cannot encode data: type ${type} declares the same field name twice`);
+  }
   structsInFlight += 1;
   try {
     const returnTypes = ['felt'];

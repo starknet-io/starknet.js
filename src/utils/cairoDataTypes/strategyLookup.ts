@@ -44,17 +44,21 @@ export function findConstructor(
 }
 
 /**
- * How many elements a collection of a zero-width type — `()`, an empty struct — may hold. It is
- * also how many elements one felt can make, through nested arrays, so it stays small.
+ * How many elements that read no felt — `()`, an empty struct, a fixed array of them — one
+ * collection may build, its nested collections included.
  */
 const MAX_ZERO_WIDTH_ELEMENTS = 256;
+let zeroWidthElements = 0;
+let buildsInFlight = 0;
 
 /**
  * Build `count` elements of one type from the response felts, for an array or a fixed array.
  *
- * An element that reads no felt at all leaves the count as the only thing the response decides,
- * so a single felt could ask for billions of them: past {@link MAX_ZERO_WIDTH_ELEMENTS}, such a
- * collection is refused. Elements that read felts need no bound, since the response runs out first.
+ * An element that reads no felt at all leaves the count as the only thing deciding how many get
+ * built — a single felt, or nothing but the abi for a fixed array, could ask for billions of
+ * them, and nesting multiplies the counts. So all the collections nested in the outermost one
+ * share {@link MAX_ZERO_WIDTH_ELEMENTS} such elements, and building past it is refused. Elements
+ * that read felts need no bound, since the response runs out first.
  * @param {Iterator<string>} responseIterator the response felts, positioned on the first element
  * @param {number} count how many elements to build
  * @param {Function} build the constructor of the element type
@@ -84,15 +88,27 @@ export function buildElements(
     },
   };
   const elements: CairoType[] = [];
-  for (let i = 0; i < count; i += 1) {
-    elements.push(build(counted, strategies, elementType));
-    if (read === 0 && count > MAX_ZERO_WIDTH_ELEMENTS) {
-      throw new Error(
-        `${count} elements of ${elementType} requested, which reads no felt: at most ${MAX_ZERO_WIDTH_ELEMENTS} allowed`
-      );
+  buildsInFlight += 1;
+  try {
+    for (let i = 0; i < count; i += 1) {
+      const readBefore = read;
+      elements.push(build(counted, strategies, elementType));
+      if (read === readBefore) {
+        zeroWidthElements += 1;
+        if (zeroWidthElements > MAX_ZERO_WIDTH_ELEMENTS) {
+          throw new Error(
+            `${count} elements of ${elementType} requested, which read no felt: at most ${MAX_ZERO_WIDTH_ELEMENTS} allowed, nested collections included`
+          );
+        }
+      }
+    }
+    return elements;
+  } finally {
+    buildsInFlight -= 1;
+    if (buildsInFlight === 0) {
+      zeroWidthElements = 0;
     }
   }
-  return elements;
 }
 
 /**

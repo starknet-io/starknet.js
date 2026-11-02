@@ -139,7 +139,7 @@ describe('CairoArray class Unit Tests', () => {
 
       test('should refuse a length that one felt would turn into billions of elements', () => {
         // GHSA-pwhq-6jxx-6j46: nothing but the length felt is read, so it alone sized the array
-        expect(() => new CairoArray(['0xffffffff'].values(), UNITS, S)).toThrow(/reads no felt/);
+        expect(() => new CairoArray(['0xffffffff'].values(), UNITS, S)).toThrow(/read no felt/);
         const abi = [
           {
             type: 'function',
@@ -151,7 +151,19 @@ describe('CairoArray class Unit Tests', () => {
         ];
         expect(() =>
           new CallData(abi).decodeParameters(UNITS, [`0x${(3_000_000).toString(16)}`])
-        ).toThrow(/reads no felt/);
+        ).toThrow(/read no felt/);
+      });
+
+      test('should count the elements of nested arrays together', () => {
+        const NESTED_UNITS = 'core::array::Array::<core::array::Array::<()>>';
+        // two inner arrays of 100: fine
+        expect(
+          new CairoArray(['0x2', '0x64', '0x64'].values(), NESTED_UNITS, S).content
+        ).toHaveLength(2);
+        // three inner arrays of 200, each under the bound on its own
+        expect(
+          () => new CairoArray(['0x3', '0xc8', '0xc8', '0xc8'].values(), NESTED_UNITS, S)
+        ).toThrow(/read no felt/);
       });
 
       test('should still read a long array of elements that do read felts', () => {
