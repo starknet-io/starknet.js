@@ -1,3 +1,12 @@
+## [11.5.1](https://github.com/starknet-io/starknet.js/compare/v11.5.0...v11.5.1) (2026-11-04)
+
+### Bug Fixes
+
+- **cairo-types:** refuse huge arrays of elements that read no felt ([3a8873d](https://github.com/starknet-io/starknet.js/commit/3a8873d0bc63c3baeb595b780cbd179dfcdf26e2))
+- **typed-data:** bound the cost of hashing untrusted typed data ([be2cffc](https://github.com/starknet-io/starknet.js/commit/be2cffc5e797b894eab7c3b8d769716138da8fa4))
+- **typed-data:** bound the work of hashing typed data ([0116d8a](https://github.com/starknet-io/starknet.js/commit/0116d8af3e8975ab51eca63a64295c1d5c2ee3cf))
+- **typed-data:** refuse duplicate field names, share the zero-width bound across nesting ([8601fc3](https://github.com/starknet-io/starknet.js/commit/8601fc384f102442ee8e49a6457dc10bc03aa1f0))
+
 # [11.5.0](https://github.com/starknet-io/starknet.js/compare/v11.4.3...v11.5.0) (2026-11-02)
 
 ### Features
