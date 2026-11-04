@@ -73,9 +73,10 @@ describeIfTestnet('Proof in transaction', () => {
         await expect(
           account.execute(myCall2, { proof, proofFacts: wrongProofFacts })
         ).rejects.toMatchObject({
-          message: expect.stringContaining(
-            'Expected first field to be 88314448135728 (PROOF0) or 88314448135729 (PROOF1)'
-          ),
+          // The node lists all the proof versions that it can read: PROOF0, PROOF1 and
+          // PROOF2 in Starknet 0.14.4. This list changes with each new version, so the
+          // test checks only the start of the message.
+          message: expect.stringContaining('Expected first field to be'),
         });
       });
 
