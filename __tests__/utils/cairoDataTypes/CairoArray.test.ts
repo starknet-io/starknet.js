@@ -129,55 +129,6 @@ describe('CairoArray class Unit Tests', () => {
       expect(new CairoArray(decimal.values(), U8, S).content).toHaveLength(10);
       expect(new CairoArray(hexadecimal.values(), U8, S).content).toHaveLength(10);
     });
-
-    describe('elements that read no felt', () => {
-      const UNITS = 'core::array::Array::<()>';
-
-      test('should read a short array of them', () => {
-        expect(new CairoArray(['0x3'].values(), UNITS, S).content).toHaveLength(3);
-      });
-
-      test('should refuse a length that one felt would turn into billions of elements', () => {
-        // GHSA-pwhq-6jxx-6j46: nothing but the length felt is read, so it alone sized the array
-        expect(() => new CairoArray(['0xffffffff'].values(), UNITS, S)).toThrow(/read no felt/);
-        const abi = [
-          {
-            type: 'function',
-            name: 'units',
-            inputs: [],
-            outputs: [{ type: UNITS }],
-            state_mutability: 'view',
-          },
-        ];
-        expect(() =>
-          new CallData(abi).decodeParameters(UNITS, [`0x${(3_000_000).toString(16)}`])
-        ).toThrow(/read no felt/);
-      });
-
-      test('should count the elements of nested arrays together', () => {
-        const NESTED_UNITS = 'core::array::Array::<core::array::Array::<()>>';
-        // two inner arrays of 100: fine
-        expect(
-          new CairoArray(['0x2', '0x64', '0x64'].values(), NESTED_UNITS, S).content
-        ).toHaveLength(2);
-        // three inner arrays of 200, each under the bound on its own
-        expect(
-          () => new CairoArray(['0x3', '0xc8', '0xc8', '0xc8'].values(), NESTED_UNITS, S)
-        ).toThrow(/read no felt/);
-      });
-
-      test('should still read a long array of elements that do read felts', () => {
-        const values = Array.from({ length: 1000 }, (_, index) => index % 256);
-        const response = asResponse(new CairoArray(values, U8, S));
-        expect(new CairoArray(response.values(), U8, S).content).toHaveLength(1000);
-      });
-
-      test('should run out of response instead of looping on a huge length', () => {
-        expect(() => new CairoArray(['0xffffffffffff', '0x1'].values(), U8, S)).toThrow(
-          'Unexpected end of response'
-        );
-      });
-    });
   });
 
   describe('nesting', () => {

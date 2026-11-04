@@ -1,5 +1,13 @@
 /* eslint-disable no-param-reassign */
-import { PRIME, RANGE_FELT, RANGE_I128, RANGE_U128 } from '../global/constants';
+import {
+  PRIME,
+  RANGE_FELT,
+  RANGE_I128,
+  RANGE_U128,
+  TEXT_TO_FELT_MAX_LEN,
+  TYPED_DATA_MAX_HASHED_FELTS,
+  TYPED_DATA_MAX_TYPES,
+} from '../global/constants';
 import {
   BigNumberish,
   TypedDataRevision as Revision,
@@ -65,36 +73,63 @@ const revisionConfiguration: Record<Revision, Configuration> = {
   },
 };
 
-/**
- * How deep a message may nest structs, arrays, enums and merkle trees. Far beyond any real
- * message, and far below where the call stack runs out.
- */
-const MAX_ENCODING_DEPTH = 128;
-let encodingDepth = 0;
-/** How many other types a single type may depend on. Real messages use a handful. */
-const MAX_TYPE_DEPENDENCIES = 1024;
-/**
- * Type hashes already computed during the encoding in flight. Every nested struct and every array
- * entry needs the hash of its type, which walks the whole type graph, so without it an untrusted
- * message pays for that walk once per value. Dropped when the outermost `encodeData` returns,
- * since the caller may change its types between two calls.
- */
-let typeHashCache = new WeakMap<TypedData['types'], Map<string, string>>();
-let structsInFlight = 0;
+/** What is left of the budget of the hash in progress. `undefined` when no hash is in progress. */
+let feltsLeft: number | undefined;
 
-function cachedTypeHash(types: TypedData['types'], type: string, revision: Revision): string {
-  let hashes = typeHashCache.get(types);
-  if (!hashes) {
-    hashes = new Map();
-    typeHashCache.set(types, hashes);
+/**
+ * Spend `felts` from the budget of the hash in progress. Throw an error when the budget runs out.
+ *
+ * When no hash is in progress, do nothing. This happens when a low-level function, such as
+ * `encodeType`, is called on its own.
+ *
+ * @param {number} felts - The felts about to be hashed.
+ *
+ * @throws Will throw an error when the hash needs more than `TYPED_DATA_MAX_HASHED_FELTS` felts.
+ *
+ * @example
+ * ```typescript
+ * withBudget(() => spend(13_501));
+ * // throws Error: 'Cannot encode data: more than 13500 felts to hash'
+ * ```
+ */
+function spend(felts: number): void {
+  if (feltsLeft === undefined) return;
+  feltsLeft -= felts;
+  if (feltsLeft < 0) {
+    throw new Error(`Cannot encode data: more than ${TYPED_DATA_MAX_HASHED_FELTS} felts to hash`);
   }
-  const key = `${revision}:${type}`;
-  let hash = hashes.get(key);
-  if (hash === undefined) {
-    hash = getTypeHash(types, type, revision);
-    hashes.set(key, hash);
+}
+
+/**
+ * Run `encode` as one hash, with one budget of `TYPED_DATA_MAX_HASHED_FELTS` felts.
+ *
+ * The hash functions call each other. For example, `getMessageHash` ends up calling `encodeData`,
+ * which calls `encodeValue` for each field, and `encodeValue` calls `encodeData` again for a nested
+ * struct. Only the first of these calls opens a budget. The calls made inside it spend from the same
+ * budget. When the first call ends, even with an error, the budget is closed, so the next hash gets
+ * a full budget.
+ *
+ * @param {() => T} encode - The hash work to run.
+ *
+ * @returns {T} The value that `encode` returns.
+ *
+ * @example
+ * ```typescript
+ * const result = withBudget(() => {
+ *   spend(2);
+ *   return 'done';
+ * });
+ * // result = 'done'
+ * ```
+ */
+function withBudget<T>(encode: () => T): T {
+  if (feltsLeft !== undefined) return encode();
+  feltsLeft = TYPED_DATA_MAX_HASHED_FELTS;
+  try {
+    return encode();
+  } finally {
+    feltsLeft = undefined;
   }
-  return hash;
 }
 
 function assertRange(data: unknown, type: string, { min, max }: { min: bigint; max: bigint }) {
@@ -193,13 +228,17 @@ export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType
  * Get the dependencies of a struct type. If a struct has the same dependency multiple times, it's only included once
  * in the resulting array.
  *
+ * The walk visits each type once, even when several types point to it, so its cost follows the size of the type
+ * graph.
+ *
  * @param {TypedData['types']} types - The types object containing all defined types.
  * @param {string} type - The name of the type to get dependencies for.
- * @param {string[]} [dependencies=[]] - The array to store dependencies.
+ * @param {string[]} [dependencies=[]] - The type names to leave out when `type` points to them.
  * @param {string} [contains=''] - The type contained within the struct.
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  *
  * @returns {string[]} The array of dependencies.
+ * @throws Will throw an error if a type refers to itself, directly or through other types.
  */
 export function getDependencies(
   types: TypedData['types'],
@@ -208,55 +247,40 @@ export function getDependencies(
   contains: string = '',
   revision: Revision = Revision.LEGACY
 ): string[] {
-  // The type graph comes from the caller, possibly an untrusted one: it is walked depth-first in
-  // pre-order with one shared visited set and an explicit stack, so the cost stays linear in the
-  // size of the graph and neither a deep nor a cyclic one can exhaust the call stack.
-  const result: string[] = [];
-  const visited = new Set<string>();
-  const stack = referencedTypes(type, contains, revision)
-    .filter((t) => !dependencies.includes(t))
-    .reverse();
-
-  while (stack.length > 0) {
-    const depType = stack.pop() as string;
-    if (!visited.has(depType) && types[depType]) {
-      visited.add(depType);
-      result.push(depType);
-      const children = (types[depType] as StarknetEnumType[]).flatMap((t) =>
-        referencedTypes(t.type, t.contains, revision)
-      );
-      for (let i = children.length - 1; i >= 0; i -= 1) {
-        if (!visited.has(children[i])) stack.push(children[i]);
-      }
-    }
-  }
-
-  return result;
-}
-
-/**
- * The type names a field type points to: itself, the element of a struct array, the enum it
- * contains, or the members of an enum variant.
- */
-function referencedTypes(type: string, contains: string | undefined, revision: Revision): string[] {
-  // Include pointers (struct arrays)
-  if (type[type.length - 1] === '*') {
-    return [type.slice(0, -1)];
-  }
-  if (revision === Revision.ACTIVE) {
-    // enum base
-    if (type === 'enum') {
-      return [contains ?? ''];
-    }
-    // enum element types
-    if (type.match(/^\(.*\)$/)) {
-      return type
+  // The type names that a field type points to: the type itself, the element of a struct array,
+  // the enum that the field contains, or the parameters of an enum variant.
+  const pointedTypes = (fieldType: string, fieldContains: string = ''): string[] => {
+    if (fieldType.endsWith('*')) return [fieldType.slice(0, -1)];
+    if (revision === Revision.ACTIVE && fieldType === 'enum') return [fieldContains];
+    if (revision === Revision.ACTIVE && /^\(.*\)$/.test(fieldType)) {
+      return fieldType
         .slice(1, -1)
         .split(',')
-        .map((depType) => (depType[depType.length - 1] === '*' ? depType.slice(0, -1) : depType));
+        .map((param) => (param.endsWith('*') ? param.slice(0, -1) : param));
     }
-  }
-  return [type];
+    return [fieldType];
+  };
+
+  // One list for the whole walk, so that a type reached by several branches is visited once.
+  const found = new Set<string>();
+  const inProgress = new Set<string>();
+  const visit = (depType: string) => {
+    if (inProgress.has(depType)) {
+      throw new Error(`Cannot encode type ${depType}: it refers to itself`);
+    }
+    if (!types[depType] || found.has(depType)) return;
+    found.add(depType);
+    inProgress.add(depType);
+    (types[depType] as StarknetEnumType[]).forEach((field) =>
+      pointedTypes(field.type, field.contains).forEach(visit)
+    );
+    inProgress.delete(depType);
+  };
+
+  pointedTypes(type, contains)
+    .filter((depType) => !dependencies.includes(depType))
+    .forEach(visit);
+  return Array.from(found);
 }
 
 function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
@@ -283,6 +307,7 @@ function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  *
  * @returns {string} The encoded string.
+ * @throws Will throw an error if the types declare more than `constants.TYPED_DATA_MAX_TYPES` types, or if a type refers to itself, directly or through other types.
  *
  * @example
  * ```typescript
@@ -297,6 +322,12 @@ export function encodeType(
   type: string,
   revision: Revision = Revision.LEGACY
 ): string {
+  // A message with many types makes each struct cost more to hash: refuse it before any work.
+  if (Object.keys(types).length > TYPED_DATA_MAX_TYPES) {
+    throw new Error(
+      `Cannot encode type ${type}: more than ${TYPED_DATA_MAX_TYPES} types are declared`
+    );
+  }
   const allTypes =
     revision === Revision.ACTIVE
       ? { ...types, ...revisionConfiguration[revision].presetTypes }
@@ -308,18 +339,11 @@ export function encodeType(
     undefined,
     revision
   );
-  // Each nested struct hashes its own type string, which lists every type it depends on: without a
-  // bound, a long chain of types costs its full length once per level of the message.
-  if (dependencies.length > MAX_TYPE_DEPENDENCIES) {
-    throw new Error(
-      `Cannot encode type ${type}: it depends on more than ${MAX_TYPE_DEPENDENCIES} types`
-    );
-  }
   const newTypes = !primary ? [] : [primary, ...dependencies.sort()];
 
   const esc = revisionConfiguration[revision].escapeTypeString;
 
-  return newTypes
+  const encoded = newTypes
     .map((dependency) => {
       const dependencyElements = allTypes[dependency].map((t) => {
         const targetType =
@@ -339,6 +363,10 @@ export function encodeType(
       return `${esc(dependency)}(${dependencyElements})`;
     })
     .join('');
+
+  // The type string is hashed as one felt per 31 characters, once for each struct of the message.
+  spend(Math.ceil(encoded.length / TEXT_TO_FELT_MAX_LEN));
+  return encoded;
 }
 
 /**
@@ -349,6 +377,7 @@ export function encodeType(
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  *
  * @returns {string} The hash.
+ * @throws Will throw an error if the types declare more than `constants.TYPED_DATA_MAX_TYPES` types, or if a type refers to itself, directly or through other types.
  *
  * @example
  * ```typescript
@@ -377,6 +406,7 @@ export function getTypeHash(
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  *
  * @returns {[string, string]} The ABI compatible type and corresponding value.
+ * @throws Will throw an error if the types declare more than `constants.TYPED_DATA_MAX_TYPES` types, if the data needs more than `constants.TYPED_DATA_MAX_HASHED_FELTS` felts to hash, or if a type refers to itself.
  *
  * @example
  * ```typescript
@@ -396,144 +426,134 @@ export function encodeValue(
   ctx: Context = {},
   revision: Revision = Revision.LEGACY
 ): [string, string] {
-  // Every nested struct, array, enum or merkle tree comes back through here, so counting the
-  // calls in flight bounds the recursion before an untrusted message can overflow the call stack.
-  if (encodingDepth >= MAX_ENCODING_DEPTH) {
-    throw new Error(`Cannot encode data: nested deeper than ${MAX_ENCODING_DEPTH} levels`);
-  }
-  encodingDepth += 1;
-  try {
-    return encodeNestedValue(types, type, data, ctx, revision);
-  } finally {
-    encodingDepth -= 1;
-  }
-}
-
-function encodeNestedValue(
-  types: TypedData['types'],
-  type: string,
-  data: unknown,
-  ctx: Context,
-  revision: Revision
-): [string, string] {
-  if (types[type]) {
-    return [type, getStructHash(types, type, data as TypedData['message'], revision)];
-  }
-
-  if (revisionConfiguration[revision].presetTypes[type]) {
-    return [
-      type,
-      getStructHash(
-        revisionConfiguration[revision].presetTypes,
-        type,
-        data as TypedData['message'],
-        revision
-      ),
-    ];
-  }
-
-  if (type.endsWith('*')) {
-    const hashes: string[] = (data as Array<TypedData['message']>).map(
-      (entry) => encodeValue(types, type.slice(0, -1), entry, undefined, revision)[1]
+  return withBudget((): [string, string] => {
+    // Every value is one felt to hash. A text is hashed 31 characters at a time, so it costs one
+    // felt for each 31 characters: a string, a selector name, or a number written in digits.
+    // The first two felts are free, so that a felt written in hex (66 characters) or in digits
+    // (up to 78) costs one felt, like any other felt.
+    spend(
+      typeof data === 'string' ? Math.max(1, Math.ceil(data.length / TEXT_TO_FELT_MAX_LEN) - 2) : 1
     );
-    return [type, revisionConfiguration[revision].hashMethod(hashes)];
-  }
 
-  switch (type) {
-    case 'enum': {
-      if (revision === Revision.ACTIVE) {
-        const [variantKey, variantData] = Object.entries(data as TypedData['message'])[0];
+    if (types[type]) {
+      return [type, getStructHash(types, type, data as TypedData['message'], revision)];
+    }
 
-        const parentType = types[ctx.parent as string].find((t) => t.name === ctx.key);
-        const enumType = types[(parentType as StarknetEnumType).contains];
-        const variantType = enumType.find((t) => t.name === variantKey) as StarknetType;
-        const variantIndex = enumType.indexOf(variantType);
-
-        const encodedSubtypes = variantType.type
-          .slice(1, -1)
-          .split(',')
-          .map((subtype, index) => {
-            if (!subtype) return subtype;
-            const subtypeData = (variantData as unknown[])[index];
-            return encodeValue(types, subtype, subtypeData, undefined, revision)[1];
-          });
-        return [
+    if (revisionConfiguration[revision].presetTypes[type]) {
+      return [
+        type,
+        getStructHash(
+          revisionConfiguration[revision].presetTypes,
           type,
-          revisionConfiguration[revision].hashMethod([variantIndex, ...encodedSubtypes]),
-        ];
-      } // else fall through to default
-      return [type, getHex(data as string)];
+          data as TypedData['message'],
+          revision
+        ),
+      ];
     }
-    case 'merkletree': {
-      const merkleTreeType = getMerkleTreeType(types, ctx);
-      const structHashes: string[] = (data as Array<TypedData['message']>).map((struct) => {
-        return encodeValue(types, merkleTreeType, struct, undefined, revision)[1];
-      });
-      const { root } = new MerkleTree(
-        structHashes as string[],
-        revisionConfiguration[revision].hashMerkleMethod
+
+    if (type.endsWith('*')) {
+      const hashes: string[] = (data as Array<TypedData['message']>).map(
+        (entry) => encodeValue(types, type.slice(0, -1), entry, undefined, revision)[1]
       );
-      return ['felt', root];
+      return [type, revisionConfiguration[revision].hashMethod(hashes)];
     }
-    case 'selector': {
-      return ['felt', prepareSelector(data as string)];
-    }
-    case 'string': {
-      if (revision === Revision.ACTIVE) {
-        const byteArray = byteArrayFromString(data as string);
-        const elements = [
-          byteArray.data.length,
-          ...byteArray.data,
-          byteArray.pending_word,
-          byteArray.pending_word_len,
-        ];
-        return [type, revisionConfiguration[revision].hashMethod(elements)];
-      } // else fall through to default
-      return [type, getHex(data as string)];
-    }
-    case 'i128': {
-      if (revision === Revision.ACTIVE) {
-        const value = BigInt(data as string);
-        assertRange(value, type, RANGE_I128);
-        return [type, getHex(value < 0n ? PRIME + value : value)];
-      } // else fall through to default
-      return [type, getHex(data as string)];
-    }
-    case 'timestamp':
-    case 'u128': {
-      if (revision === Revision.ACTIVE) {
-        assertRange(data, type, RANGE_U128);
-      } // else fall through to default
-      return [type, getHex(data as string)];
-    }
-    case 'felt':
-    case 'shortstring': {
-      // TODO: should 'shortstring' diverge into directly using CairoBytes31.fromText()?
-      if (revision === Revision.ACTIVE) {
-        assertRange(getHex(data as string), type, RANGE_FELT);
-      } // else fall through to default
-      return [type, getHex(data as string)];
-    }
-    case 'ClassHash':
-    case 'ContractAddress': {
-      if (revision === Revision.ACTIVE) {
-        assertRange(data, type, RANGE_FELT);
-      } // else fall through to default
-      return [type, getHex(data as string)];
-    }
-    case 'bool': {
-      if (revision === Revision.ACTIVE) {
-        assert(isBoolean(data), `Type mismatch for ${type} ${data}`);
-      } // else fall through to default
-      return [type, getHex(data as string)];
-    }
-    default: {
-      if (revision === Revision.ACTIVE) {
-        throw new Error(`Unsupported type: ${type}`);
+
+    switch (type) {
+      case 'enum': {
+        if (revision === Revision.ACTIVE) {
+          const [variantKey, variantData] = Object.entries(data as TypedData['message'])[0];
+
+          const parentType = types[ctx.parent as string].find((t) => t.name === ctx.key);
+          const enumType = types[(parentType as StarknetEnumType).contains];
+          const variantType = enumType.find((t) => t.name === variantKey) as StarknetType;
+          const variantIndex = enumType.indexOf(variantType);
+
+          const encodedSubtypes = variantType.type
+            .slice(1, -1)
+            .split(',')
+            .map((subtype, index) => {
+              if (!subtype) return subtype;
+              const subtypeData = (variantData as unknown[])[index];
+              return encodeValue(types, subtype, subtypeData, undefined, revision)[1];
+            });
+          return [
+            type,
+            revisionConfiguration[revision].hashMethod([variantIndex, ...encodedSubtypes]),
+          ];
+        } // else fall through to default
+        return [type, getHex(data as string)];
       }
-      return [type, getHex(data as string)];
+      case 'merkletree': {
+        const merkleTreeType = getMerkleTreeType(types, ctx);
+        const structHashes: string[] = (data as Array<TypedData['message']>).map((struct) => {
+          return encodeValue(types, merkleTreeType, struct, undefined, revision)[1];
+        });
+        const { root } = new MerkleTree(
+          structHashes as string[],
+          revisionConfiguration[revision].hashMerkleMethod
+        );
+        return ['felt', root];
+      }
+      case 'selector': {
+        return ['felt', prepareSelector(data as string)];
+      }
+      case 'string': {
+        if (revision === Revision.ACTIVE) {
+          const byteArray = byteArrayFromString(data as string);
+          const elements = [
+            byteArray.data.length,
+            ...byteArray.data,
+            byteArray.pending_word,
+            byteArray.pending_word_len,
+          ];
+          return [type, revisionConfiguration[revision].hashMethod(elements)];
+        } // else fall through to default
+        return [type, getHex(data as string)];
+      }
+      case 'i128': {
+        if (revision === Revision.ACTIVE) {
+          const value = BigInt(data as string);
+          assertRange(value, type, RANGE_I128);
+          return [type, getHex(value < 0n ? PRIME + value : value)];
+        } // else fall through to default
+        return [type, getHex(data as string)];
+      }
+      case 'timestamp':
+      case 'u128': {
+        if (revision === Revision.ACTIVE) {
+          assertRange(data, type, RANGE_U128);
+        } // else fall through to default
+        return [type, getHex(data as string)];
+      }
+      case 'felt':
+      case 'shortstring': {
+        // TODO: should 'shortstring' diverge into directly using CairoBytes31.fromText()?
+        if (revision === Revision.ACTIVE) {
+          assertRange(getHex(data as string), type, RANGE_FELT);
+        } // else fall through to default
+        return [type, getHex(data as string)];
+      }
+      case 'ClassHash':
+      case 'ContractAddress': {
+        if (revision === Revision.ACTIVE) {
+          assertRange(data, type, RANGE_FELT);
+        } // else fall through to default
+        return [type, getHex(data as string)];
+      }
+      case 'bool': {
+        if (revision === Revision.ACTIVE) {
+          assert(isBoolean(data), `Type mismatch for ${type} ${data}`);
+        } // else fall through to default
+        return [type, getHex(data as string)];
+      }
+      default: {
+        if (revision === Revision.ACTIVE) {
+          throw new Error(`Unsupported type: ${type}`);
+        }
+        return [type, getHex(data as string)];
+      }
     }
-  }
+  });
 }
 
 /**
@@ -546,6 +566,7 @@ function encodeNestedValue(
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  *
  * @returns {[string[], string[]]} The ABI compatible types and corresponding values.
+ * @throws Will throw an error if the types declare more than `constants.TYPED_DATA_MAX_TYPES` types, if the data needs more than `constants.TYPED_DATA_MAX_HASHED_FELTS` felts to hash, or if a type refers to itself.
  */
 export function encodeData<T extends TypedData>(
   types: T['types'],
@@ -553,39 +574,32 @@ export function encodeData<T extends TypedData>(
   data: T['message'],
   revision: Revision = Revision.LEGACY
 ): [string[], string[]] {
-  const targetType = types[type] ?? revisionConfiguration[revision].presetTypes[type];
-  // Two fields of one name read the same value, which then gets encoded twice: nested, that
-  // doubles the work at every level of the message.
-  if (new Set(targetType.map((field) => field.name)).size !== targetType.length) {
-    throw new Error(`Cannot encode data: type ${type} declares the same field name twice`);
-  }
-  structsInFlight += 1;
-  try {
-    const returnTypes = ['felt'];
-    const values = [cachedTypeHash(types, type, revision)];
-    targetType.forEach((field) => {
-      if (
-        data[field.name as keyof T['message']] === undefined ||
-        (data[field.name as keyof T['message']] === null && field.type !== 'enum')
-      ) {
-        throw new Error(`Cannot encode data: missing data for '${field.name}'`);
-      }
+  // Open the budget here too, so that all the fields of a struct spend from one budget.
+  return withBudget((): [string[], string[]] => {
+    const targetType = types[type] ?? revisionConfiguration[revision].presetTypes[type];
+    const [returnTypes, values] = targetType.reduce<[string[], string[]]>(
+      ([ts, vs], field) => {
+        if (
+          data[field.name as keyof T['message']] === undefined ||
+          (data[field.name as keyof T['message']] === null && field.type !== 'enum')
+        ) {
+          throw new Error(`Cannot encode data: missing data for '${field.name}'`);
+        }
 
-      const value = data[field.name as keyof T['message']];
-      const ctx = { parent: type, key: field.name };
-      const [t, encodedValue] = encodeValue(types, field.type, value, ctx, revision);
+        const value = data[field.name as keyof T['message']];
+        const ctx = { parent: type, key: field.name };
+        const [t, encodedValue] = encodeValue(types, field.type, value, ctx, revision);
 
-      returnTypes.push(t);
-      values.push(encodedValue);
-    });
+        return [
+          [...ts, t],
+          [...vs, encodedValue],
+        ];
+      },
+      [['felt'], [getTypeHash(types, type, revision)]]
+    );
 
     return [returnTypes, values];
-  } finally {
-    structsInFlight -= 1;
-    if (structsInFlight === 0) {
-      typeHashCache = new WeakMap();
-    }
-  }
+  });
 }
 
 /**
@@ -598,6 +612,7 @@ export function encodeData<T extends TypedData>(
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  *
  * @returns {string} The hash of the encoded data.
+ * @throws Will throw an error if the types declare more than `constants.TYPED_DATA_MAX_TYPES` types, if the data needs more than `constants.TYPED_DATA_MAX_HASHED_FELTS` felts to hash, or if a type refers to itself.
  *
  * @example
  * ```typescript
@@ -629,6 +644,7 @@ export function getStructHash<T extends TypedData>(
  *
  * @returns {string} The hash of the message to sign.
  * @throws Will throw an error if the typedData does not match the JSON schema.
+ * @throws Will throw an error if the typed data declares more than `constants.TYPED_DATA_MAX_TYPES` types, if the message needs more than `constants.TYPED_DATA_MAX_HASHED_FELTS` felts to hash, or if a type refers to itself.
  *
  * @example
  * ```typescript
@@ -687,14 +703,17 @@ export function getMessageHash(typedData: TypedData, accountAddress: BigNumberis
   const revision = identifyRevision(typedData) as Revision;
   const { domain, hashMethod } = revisionConfiguration[revision];
 
-  const message = [
-    utf8ToBigInt('StarkNet Message'),
-    getStructHash(typedData.types, domain, typedData.domain, revision),
-    accountAddress,
-    getStructHash(typedData.types, typedData.primaryType, typedData.message, revision),
-  ];
+  // One budget for the whole message: the domain and the message spend from the same budget.
+  return withBudget(() => {
+    const message = [
+      utf8ToBigInt('StarkNet Message'),
+      getStructHash(typedData.types, domain, typedData.domain, revision),
+      accountAddress,
+      getStructHash(typedData.types, typedData.primaryType, typedData.message, revision),
+    ];
 
-  return hashMethod(message);
+    return hashMethod(message);
+  });
 }
 
 /**
@@ -705,6 +724,7 @@ export function getMessageHash(typedData: TypedData, accountAddress: BigNumberis
  * @param {BigNumberish} fullPublicKey a number coded on 520 bits (from ec.getFullPublicKey()).
  * @param {BigNumberish} [accountAddress] address of the account that has signed the message. Not needed with a message hash is provided in `message`
  * @returns {boolean} true if the message is verified.
+ * @throws Will throw an error if `message` is a TypedData that declares more than `constants.TYPED_DATA_MAX_TYPES` types, needs more than `constants.TYPED_DATA_MAX_HASHED_FELTS` felts to hash, or has a type which refers to itself.
  * @example
  * ```typescript
  * const myTypedMessage: TypedMessage = .... ;

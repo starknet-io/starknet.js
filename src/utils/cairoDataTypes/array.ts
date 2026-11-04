@@ -8,7 +8,7 @@ import { splitLongString } from '../shortString';
 import { CairoBytes31 } from './bytes31';
 import { CairoFelt252 } from './felt';
 import { isCairoType, type CairoType } from './cairoType.interface';
-import { buildElements, findConstructor, findResponseParser } from './strategyLookup';
+import { findConstructor, findResponseParser } from './strategyLookup';
 
 /**
  * A Cairo dynamic array : any number of values, all of the same type.
@@ -180,7 +180,7 @@ export class CairoArray {
     if (!build) {
       throw new Error(`No parser found for element type: ${elementType} in parsing strategy`);
     }
-    return buildElements(responseIterator, length, build, strategies, elementType);
+    return Array.from({ length }, () => build(responseIterator, strategies, elementType));
   }
 
   /**

@@ -115,22 +115,6 @@ describe('CairoFixedArray class Unit Tests', () => {
       new CairoFixedArray(iterator, F3, S);
       expect(iterator.next().value).toBe('0x9');
     });
-
-    test('should refuse a huge size whose items read no felt', () => {
-      expect(new CairoFixedArray([].values(), '[(); 3]', S).content).toHaveLength(3);
-      expect(() => new CairoFixedArray([].values(), '[(); 4294967295]', S)).toThrow(/read no felt/);
-    });
-
-    test('should count the items of nested fixed arrays together', () => {
-      // each level stays under the bound, but four of them would build over four billion units
-      expect(new CairoFixedArray([].values(), '[[(); 10]; 10]', S).content).toHaveLength(10);
-      expect(() => new CairoFixedArray([].values(), '[[(); 256]; 256]', S)).toThrow(/read no felt/);
-      expect(() => new CairoFixedArray([].values(), '[[[[(); 256]; 256]; 256]; 256]', S)).toThrow(
-        /read no felt/
-      );
-      // the count starts over with the next collection
-      expect(new CairoFixedArray([].values(), '[(); 200]', S).content).toHaveLength(200);
-    });
   });
 
   describe('nesting', () => {

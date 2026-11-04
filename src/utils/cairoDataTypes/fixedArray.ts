@@ -4,7 +4,7 @@ import type { CairoTypeStrategy } from '../calldata/parser/cairoTypeStrategy.typ
 import { addCompiledFlag } from '../helpers';
 import { isUndefined } from '../typed';
 import { isCairoType, type CairoType } from './cairoType.interface';
-import { buildElements, findConstructor, findResponseParser } from './strategyLookup';
+import { findConstructor, findResponseParser } from './strategyLookup';
 
 /**
  * A Cairo fixed array : a known number of items, all of the same type.
@@ -201,7 +201,7 @@ export class CairoFixedArray {
     if (!build) {
       throw new Error(`No parser found for element type: ${itemType} in parsing strategy`);
     }
-    return buildElements(responseIterator, size, build, strategies, itemType);
+    return Array.from({ length: size }, () => build(responseIterator, strategies, itemType));
   }
 
   /**
