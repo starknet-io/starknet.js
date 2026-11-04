@@ -80,6 +80,40 @@ export const SNIP9_V1_INTERFACE_ID =
 export const SNIP9_V2_INTERFACE_ID =
   '0x1d1144bb2138366ff28d8e9ab57456b1d332ac42196230c3a602003c89872';
 
+/**
+ * The most types that the `types` object of one typed data message (SNIP-12) may declare.
+ *
+ * Real messages declare a few types: an outside execution (SNIP-9) declares 3, the domain
+ * included. 64 leaves a wide margin above that. A higher limit would only let a message make each
+ * struct cost more to hash, or overflow the call stack with a long chain of types. So the hash
+ * functions of `typedData` refuse a message that declares more types than this.
+ */
+export const TYPED_DATA_MAX_TYPES = 64;
+
+/**
+ * The most work that hashing one typed data message (SNIP-12) may take, counted in felts.
+ *
+ * A message can come from someone you do not trust, and a small message can make the hash take
+ * minutes. So the hash functions of `typedData` give each hash this budget, and throw an error when
+ * the budget runs out.
+ *
+ * The hash spends:
+ * - 1 felt for each value: a struct field, an array element, an enum parameter, a merkle tree leaf;
+ * - for a value written as text (a `string`, a selector name, a number written in digits), 1 felt
+ *   for each 31 characters, but the first 2 felts are free. So a felt written in hex or in digits
+ *   still costs 1 felt;
+ * - 1 felt for each 31 characters of the type string of each struct.
+ *
+ * The value covers the largest outside execution (SNIP-9 V1 or V2) that Starknet accepts. A
+ * transaction carries at most 5,000 felts of calldata, so at most about 1,660 calls, and an
+ * outside execution V1 hashes them with about 13,300 felts. A higher value would only let a
+ * message keep the CPU busy longer.
+ *
+ * A message of revision 0 hashes with Pedersen, about 15 times slower for each felt than Poseidon
+ * (revision 1). So with the same budget, a revision 0 message can take about 15 times longer.
+ */
+export const TYPED_DATA_MAX_HASHED_FELTS = 13_500;
+
 // Ledger signer
 // 0x80
 export const HARDENING_BYTE = 128;

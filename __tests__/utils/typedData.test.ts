@@ -19,7 +19,11 @@ import {
   type ArraySignatureType,
   type Signature,
 } from '../../src';
-import { PRIME } from '../../src/global/constants';
+import {
+  PRIME,
+  TYPED_DATA_MAX_HASHED_FELTS,
+  TYPED_DATA_MAX_TYPES,
+} from '../../src/global/constants';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
 import {
@@ -470,6 +474,263 @@ describe('typedData', () => {
       expect(() =>
         typedData.verifyMessage(v1NestedExample, signedMessage, fullPubK, 'wrong')
       ).toThrow('accountAddress shall be a BigNumberish');
+    });
+  });
+
+  describe('limits on the work of a hash', () => {
+    const domainType = exampleBaseTypes.types.StarknetDomain;
+    const overBudget = `Cannot encode data: more than ${TYPED_DATA_MAX_HASHED_FELTS} felts to hash`;
+
+    // A revision 1 message with these types, and this value for the primary type.
+    const messageOf = (types: object, primaryType: string, value: object) =>
+      ({
+        types: { StarknetDomain: domainType, ...types },
+        primaryType,
+        domain: exampleBaseTypes.domain,
+        message: value,
+      }) as any;
+
+    const dependenciesOf = (types: object, type: string) =>
+      typedData.getDependencies(types as any, type, [], '', TypedDataRevision.ACTIVE);
+
+    // A selector name costs one felt for each 31 characters.
+    const selectorOfFelts = (felts: number) => 'a'.repeat(31 * felts);
+
+    const tooManyFelts = () => Array.from({ length: TYPED_DATA_MAX_HASHED_FELTS + 1 }, () => '0x1');
+
+    // Layer i has two types, A and B. Both point to the A and the B of the next layer.
+    // Top points to the first layer. With 24 layers, there are 49 types.
+    const layeredTypes = (layers: number) => {
+      const types: Record<string, { name: string; type: string }[]> = {
+        Top: [
+          { name: 'a', type: 'A0' },
+          { name: 'b', type: 'B0' },
+        ],
+      };
+      for (let i = 0; i < layers; i += 1) {
+        const fields =
+          i === layers - 1
+            ? [{ name: 'x', type: 'felt' }]
+            : [
+                { name: 'a', type: `A${i + 1}` },
+                { name: 'b', type: `B${i + 1}` },
+              ];
+        types[`A${i}`] = fields;
+        types[`B${i}`] = fields;
+      }
+      return types;
+    };
+
+    test('lists each type of a graph with many shared types once, and quickly', () => {
+      const start = Date.now();
+      const dependencies = dependenciesOf(layeredTypes(24), 'Top');
+      const duration = Date.now() - start;
+
+      expect(dependencies).toHaveLength(49);
+      expect(new Set(dependencies).size).toBe(49);
+      expect(dependencies[0]).toBe('Top');
+      expect(duration).toBeLessThan(1000);
+    });
+
+    test('refuses a type that refers to itself', () => {
+      const types = { Node: [{ name: 'children', type: 'Node*' }] };
+
+      expect(() => dependenciesOf(types, 'Node')).toThrow(
+        'Cannot encode type Node: it refers to itself'
+      );
+    });
+
+    test('refuses a type that refers to itself through another type', () => {
+      const types = { A: [{ name: 'b', type: 'B' }], B: [{ name: 'a', type: 'A' }] };
+
+      expect(() => dependenciesOf(types, 'A')).toThrow('Cannot encode type A: it refers to itself');
+    });
+
+    test('refuses a message with a type that refers to itself, with a clear error', () => {
+      const message = messageOf({ Node: [{ name: 'children', type: 'Node*' }] }, 'Node', {
+        children: [],
+      });
+
+      expect(() => getMessageHash(message, exampleAddress)).toThrow(
+        'Cannot encode type Node: it refers to itself'
+      );
+    });
+
+    // The type Example, then unused types, until there are `count` types.
+    const manyTypes = (count: number) => {
+      const types: Record<string, { name: string; type: string }[]> = {
+        Example: [{ name: 'x', type: 'felt' }],
+      };
+      for (let i = 1; i < count; i += 1) types[`Unused${i}`] = [{ name: 'x', type: 'felt' }];
+      return types;
+    };
+
+    test('refuses a message that declares more types than the limit', () => {
+      // With StarknetDomain, the message declares one type more than the limit.
+      const message = messageOf(manyTypes(TYPED_DATA_MAX_TYPES), 'Example', { x: '0x1' });
+
+      expect(() => getMessageHash(message, exampleAddress)).toThrow(
+        `more than ${TYPED_DATA_MAX_TYPES} types are declared`
+      );
+    });
+
+    test('accepts a message that declares as many types as the limit', () => {
+      // With StarknetDomain, the message declares exactly as many types as the limit.
+      const message = messageOf(manyTypes(TYPED_DATA_MAX_TYPES - 1), 'Example', { x: '0x1' });
+
+      expect(getMessageHash(message, exampleAddress)).toMatch(/^0x[0-9a-f]+$/);
+    });
+
+    test('refuses a long chain of types with a clear error, not a stack overflow', () => {
+      const types: Record<string, { name: string; type: string }[]> = {};
+      for (let i = 0; i < 2000; i += 1) {
+        types[`T${i}`] = [{ name: 'f', type: i === 1999 ? 'felt' : `T${i + 1}` }];
+      }
+      const message = messageOf(types, 'T0', { f: '0x1' });
+
+      expect(() => getMessageHash(message, exampleAddress)).toThrow(
+        `more than ${TYPED_DATA_MAX_TYPES} types are declared`
+      );
+    });
+
+    test('refuses an array with more felts than the budget', () => {
+      const message = messageOf({ Example: [{ name: 'values', type: 'felt*' }] }, 'Example', {
+        values: tooManyFelts(),
+      });
+
+      expect(() => getMessageHash(message, exampleAddress)).toThrow(overBudget);
+    });
+
+    test('refuses an array of numbers with more felts than the budget', () => {
+      const message = messageOf({ Example: [{ name: 'values', type: 'u128*' }] }, 'Example', {
+        values: Array.from({ length: TYPED_DATA_MAX_HASHED_FELTS + 1 }, () => 1),
+      });
+
+      expect(() => getMessageHash(message, exampleAddress)).toThrow(overBudget);
+    });
+
+    test('refuses a direct call to encodeValue with more felts than the budget', () => {
+      expect(() =>
+        encodeValue({}, 'felt*', tooManyFelts(), undefined, TypedDataRevision.ACTIVE)
+      ).toThrow(overBudget);
+    });
+
+    test('shares the budget between the fields of a direct call to encodeData', () => {
+      // Each selector needs just over half of the budget: one fits, two together do not.
+      const half = Math.floor(TYPED_DATA_MAX_HASHED_FELTS / 2) + 3;
+      const types = {
+        Example: [
+          { name: 'first', type: 'selector' },
+          { name: 'second', type: 'selector' },
+        ],
+      };
+      const value = { first: selectorOfFelts(half), second: selectorOfFelts(half) };
+
+      expect(() =>
+        typedData.encodeData(types as any, 'Example', value, TypedDataRevision.ACTIVE)
+      ).toThrow(overBudget);
+    });
+
+    test('refuses a string that needs more felts than the budget', () => {
+      const text = 'a'.repeat(31 * (TYPED_DATA_MAX_HASHED_FELTS + 3));
+      const message = messageOf({ Example: [{ name: 'text', type: 'string' }] }, 'Example', {
+        text,
+      });
+
+      expect(() => getMessageHash(message, exampleAddress)).toThrow(overBudget);
+    });
+
+    test('refuses a number written with more digits than the budget allows', () => {
+      const amount = '9'.repeat(31 * (TYPED_DATA_MAX_HASHED_FELTS + 3));
+      const message = messageOf({ Example: [{ name: 'amount', type: 'felt' }] }, 'Example', {
+        amount,
+      });
+
+      expect(() => getMessageHash(message, exampleAddress)).toThrow(overBudget);
+    });
+
+    test('counts a felt written in hex as one felt', () => {
+      // A felt in hex has 66 characters. At 3 felts each, this message would be refused.
+      const hexFelt = `0x${'0'.repeat(63)}1`;
+      const values = Array.from(
+        { length: Math.floor(TYPED_DATA_MAX_HASHED_FELTS / 3) + 1 },
+        () => hexFelt
+      );
+      const message = messageOf({ Example: [{ name: 'values', type: 'felt*' }] }, 'Example', {
+        values,
+      });
+
+      expect(getMessageHash(message, exampleAddress)).toMatch(/^0x[0-9a-f]+$/);
+    });
+
+    test('refuses a field name that makes the type string longer than the budget allows', () => {
+      const name = 'a'.repeat(31 * (TYPED_DATA_MAX_HASHED_FELTS + 1));
+      const message = messageOf({ Example: [{ name, type: 'felt' }] }, 'Example', {
+        [name]: '0x1',
+      });
+
+      expect(() => getMessageHash(message, exampleAddress)).toThrow(overBudget);
+    });
+
+    test('shares the budget between the fields of a message', () => {
+      // Each selector needs just over half of the budget: one fits, two together do not.
+      const half = Math.floor(TYPED_DATA_MAX_HASHED_FELTS / 2) + 3;
+      const one = messageOf({ Example: [{ name: 'first', type: 'selector' }] }, 'Example', {
+        first: selectorOfFelts(half),
+      });
+      const two = messageOf(
+        {
+          Example: [
+            { name: 'first', type: 'selector' },
+            { name: 'second', type: 'selector' },
+          ],
+        },
+        'Example',
+        { first: selectorOfFelts(half), second: selectorOfFelts(half) }
+      );
+
+      expect(getMessageHash(one, exampleAddress)).toMatch(/^0x[0-9a-f]+$/);
+      expect(() => getMessageHash(two, exampleAddress)).toThrow(overBudget);
+    });
+
+    test('shares the budget between the domain and the message', () => {
+      // The domain and the message each need just over half of the budget.
+      const half = Math.floor(TYPED_DATA_MAX_HASHED_FELTS / 2) + 3;
+      const message = {
+        types: {
+          StarknetDomain: [{ name: 'name', type: 'selector' }],
+          Example: [{ name: 'target', type: 'selector' }],
+        },
+        primaryType: 'Example',
+        domain: { name: selectorOfFelts(half), revision: '1' },
+        message: { target: selectorOfFelts(half) },
+      } as any;
+
+      expect(() => getMessageHash(message, exampleAddress)).toThrow(overBudget);
+    });
+
+    test('hashes a message correctly after a refusal', () => {
+      const refused = messageOf({ Example: [{ name: 'values', type: 'felt*' }] }, 'Example', {
+        values: tooManyFelts(),
+      });
+      expect(() => getMessageHash(refused, exampleAddress)).toThrow(overBudget);
+
+      expect(getMessageHash(typedDataExample, exampleAddress)).toBe(
+        '0x6fcff244f63e38b9d88b9e3378d44757710d1b244282b435cb472053c8d78d0'
+      );
+    });
+
+    test('gives each message its own budget', () => {
+      // The message needs 60% of the budget: a second hash would be refused if the first one had
+      // not given the budget back.
+      const message = messageOf({ Example: [{ name: 'target', type: 'selector' }] }, 'Example', {
+        target: selectorOfFelts(Math.floor(TYPED_DATA_MAX_HASHED_FELTS * 0.6)),
+      });
+
+      const first = getMessageHash(message, exampleAddress);
+      const second = getMessageHash(message, exampleAddress);
+
+      expect(second).toBe(first);
     });
   });
 });
