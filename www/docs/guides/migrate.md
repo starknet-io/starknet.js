@@ -46,8 +46,9 @@ instead of quietly encoding a different one.
 | Typed methods refuse options after the arguments  | **Low**    | Only if you pass them; use `withOptions()`              |
 | The `ArgsOrCalldataWithOptions` type removed      | **Low**    | Only if you imported it; use `ArgsOrCalldata`           |
 
-Three deprecations ship in v11 — `stark.randomAddress()`, `Provider` and `WalletAccount` — but none
-of them breaks existing code. They are covered in [Part 2](#part-2--deprecations).
+[Part 2](#part-2--deprecations) covers the deprecations: `stark.randomAddress()`, `Provider`,
+`WalletAccount` with the `wallet` namespace, the Ledger signers imported from `starknet`, and the
+three fee estimates of `RpcProvider` for a single transaction. None of them breaks existing code.
 
 ### What did not change
 
@@ -655,6 +656,13 @@ This is not only a rename. get-starknet v6 works in a different way, so a few ca
 The methods that sign and send keep their names: `execute`, `signMessage`, `declare` and `deploy`.
 For a complete example, see the [WalletAccount guide](./account/walletAccount.md#with-get-starknet-v6).
 
+The functions of the `wallet` namespace are deprecated too, because they work only with
+get-starknet v4. Use the functions of `walletV6` instead. They have the same names, but they take a
+`WalletWithStarknetFeatures` instead of a `StarknetWindowObject`. `wallet.onAccountChange()` and
+`wallet.onNetworkChanged()` are replaced by `walletV6.subscribeWalletEvent()`. Its callback is
+called for a change of account and for a change of network, and it returns a function that stops
+the subscription. `WalletAccount` and the `wallet` namespace will be removed in v12.
+
 ### Ledger signers
 
 The Ledger signers now have their own entry point: `starknet/ledger`. It has the same classes and
@@ -676,6 +684,30 @@ This applies to `LedgerSigner111`, `LedgerSigner221`, `LedgerSigner231`, `getLed
 
 In `starknet/ledger`, the aliases `LedgerSigner` and `getLedgerPathBuffer` are deprecated: they are
 other names of `LedgerSigner111` and `getLedgerPathBuffer111`, so use these names instead.
+
+### Fee estimates for a single transaction
+
+`getInvokeEstimateFee()`, `getDeclareEstimateFee()` and `getDeployAccountEstimateFee()` only call
+`getEstimateFeeBulk()` with one transaction. They were marked `@deprecated` in v8, but only on
+`ProviderInterface`, so editors did not show it for `RpcProvider`. Now they do. The three methods
+still work, and they will not be removed before v13.
+
+Use `getEstimateFeeBulk()` instead: give it one transaction with its `type`, and take the first
+result.
+
+```typescript
+import { TransactionType } from 'starknet';
+
+// ✅ was: await myProvider.getInvokeEstimateFee(invocation, details, blockIdentifier, skipValidate)
+const [feeEstimate] = await myProvider.getEstimateFeeBulk(
+  [{ type: TransactionType.INVOKE, ...invocation, ...details }],
+  { blockIdentifier, skipValidate }
+);
+```
+
+For the two other methods, use `TransactionType.DECLARE` or `TransactionType.DEPLOY_ACCOUNT`. The
+`estimateInvokeFee()`, `estimateDeclareFee()` and `estimateAccountDeployFee()` methods of `Account`
+are not concerned.
 
 ## Part 3 — What is new in v11
 

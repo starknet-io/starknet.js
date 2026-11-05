@@ -509,6 +509,31 @@ export class RpcProvider implements ProviderInterface {
     return { cairo: '0', compiler: '0' };
   }
 
+  /**
+   * Estimates the fee for a given INVOKE transaction
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - (optional) the entrypoint of the contract
+   * - calldata - (optional, defaults to []) the calldata
+   * - signature - (optional, defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
+   * @returns the estimated fee
+   * @deprecated This method only calls `getEstimateFeeBulk` with one transaction. Use
+   * {@link RpcProvider.getEstimateFeeBulk | getEstimateFeeBulk} instead (see the example).
+   * This method will be removed in a future major version, not before v13.
+   * @example
+   * ```typescript
+   * const feeEstimate = await provider.getInvokeEstimateFee(invocation, details);
+   * // Equivalent to:
+   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: TransactionType.INVOKE, ...invocation, ...details }]);
+   * ```
+   * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
+   */
   public async getInvokeEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
@@ -523,6 +548,30 @@ export class RpcProvider implements ProviderInterface {
     )[0]; // Return the first (and only) estimate
   }
 
+  /**
+   * Estimates the fee for a given DECLARE transaction
+   *
+   * @param invocation transaction payload to be declared containing:
+   * - compiled contract code
+   * - sender address
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce
+   * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
+   * @returns the estimated fee
+   * @deprecated This method only calls `getEstimateFeeBulk` with one transaction. Use
+   * {@link RpcProvider.getEstimateFeeBulk | getEstimateFeeBulk} instead (see the example).
+   * This method will be removed in a future major version, not before v13.
+   * @example
+   * ```typescript
+   * const feeEstimate = await provider.getDeclareEstimateFee(transaction, details);
+   * // Equivalent to:
+   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: TransactionType.DECLARE, ...transaction, ...details }]);
+   * ```
+   * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
+   */
   public async getDeclareEstimateFee(
     invocation: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
@@ -537,6 +586,31 @@ export class RpcProvider implements ProviderInterface {
     )[0]; // Return the first (and only) estimate
   }
 
+  /**
+   * Estimates the fee for a given DEPLOY_ACCOUNT transaction
+   *
+   * @param invocation transaction payload to be deployed containing:
+   * - classHash
+   * - constructorCalldata
+   * - addressSalt
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce
+   * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
+   * @returns the estimated fee
+   * @deprecated This method only calls `getEstimateFeeBulk` with one transaction. Use
+   * {@link RpcProvider.getEstimateFeeBulk | getEstimateFeeBulk} instead (see the example).
+   * This method will be removed in a future major version, not before v13.
+   * @example
+   * ```typescript
+   * const feeEstimate = await provider.getDeployAccountEstimateFee(transaction, details);
+   * // Equivalent to:
+   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: TransactionType.DEPLOY_ACCOUNT, ...transaction, ...details }]);
+   * ```
+   * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
+   */
   public async getDeployAccountEstimateFee(
     invocation: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,

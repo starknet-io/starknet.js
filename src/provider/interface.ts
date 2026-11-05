@@ -294,12 +294,14 @@ export abstract class ProviderInterface {
    * @param blockIdentifier - (optional) block identifier
    * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
-   * @deprecated Consider using getEstimateFeeBulk for multiple transactions
+   * @deprecated This method only calls `getEstimateFeeBulk` with one transaction. Use
+   * {@link ProviderInterface.getEstimateFeeBulk | getEstimateFeeBulk} instead (see the example).
+   * This method will be removed in a future major version, not before v13.
    * @example
    * ```typescript
    * const feeEstimate = await provider.getInvokeEstimateFee(invocation, details);
    * // Equivalent to:
-   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.INVOKE, ...invocation, ...details }], options);
+   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: TransactionType.INVOKE, ...invocation, ...details }]);
    * ```
    * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
@@ -323,12 +325,14 @@ export abstract class ProviderInterface {
    * @param blockIdentifier - (optional) block identifier
    * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
-   * @deprecated Consider using getEstimateFeeBulk for multiple transactions
+   * @deprecated This method only calls `getEstimateFeeBulk` with one transaction. Use
+   * {@link ProviderInterface.getEstimateFeeBulk | getEstimateFeeBulk} instead (see the example).
+   * This method will be removed in a future major version, not before v13.
    * @example
    * ```typescript
    * const feeEstimate = await provider.getDeclareEstimateFee(transaction, details);
    * // Equivalent to:
-   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.DECLARE, ...transaction, ...details }], options);
+   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: TransactionType.DECLARE, ...transaction, ...details }]);
    * ```
    * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
@@ -353,12 +357,14 @@ export abstract class ProviderInterface {
    * @param blockIdentifier - (optional) block identifier
    * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
-   * @deprecated Consider using getEstimateFeeBulk for multiple transactions
+   * @deprecated This method only calls `getEstimateFeeBulk` with one transaction. Use
+   * {@link ProviderInterface.getEstimateFeeBulk | getEstimateFeeBulk} instead (see the example).
+   * This method will be removed in a future major version, not before v13.
    * @example
    * ```typescript
    * const feeEstimate = await provider.getDeployAccountEstimateFee(transaction, details);
    * // Equivalent to:
-   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: ETransactionType.DEPLOY_ACCOUNT, ...transaction, ...details }], options);
+   * const [feeEstimate] = await provider.getEstimateFeeBulk([{ type: TransactionType.DEPLOY_ACCOUNT, ...transaction, ...details }]);
    * ```
    * @remarks This method is an alias that calls getEstimateFeeBulk with a single transaction
    */
