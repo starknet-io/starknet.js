@@ -320,6 +320,7 @@ export function toCairoBool(value: boolean): string {
  * @param {string} str hex-string
  * @returns {Uint8Array} array containing the converted elements
  * @throws str must be a hex-string
+ * @see {@link encode.buf2hex} Does the inverse conversion: `Uint8Array` to hex-string.
  * @example
  * ```typescript
  * let result;

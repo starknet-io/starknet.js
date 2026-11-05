@@ -98,6 +98,7 @@ export function btoaUniversal(b: ArrayBuffer): string {
  *
  * @param {Uint8Array} buffer The encoded Uint8Array.
  * @returns {string} The hex-string
+ * @see {@link num.hexToBytes} Does the inverse conversion: hex-string to `Uint8Array`.
  *
  * @example
  * ```typescript
