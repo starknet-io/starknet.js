@@ -1,3 +1,9 @@
+# [11.6.0](https://github.com/starknet-io/starknet.js/compare/v11.5.1...v11.6.0) (2026-11-06)
+
+### Features
+
+- deprecate the get-starknet v4 wallet namespace and show the fee estimate deprecations ([cd5f9a6](https://github.com/starknet-io/starknet.js/commit/cd5f9a66d85d52d3648af98f45ce3bfd92079210))
+
 ## [11.5.1](https://github.com/starknet-io/starknet.js/compare/v11.5.0...v11.5.1) (2026-11-04)
 
 ### Bug Fixes
