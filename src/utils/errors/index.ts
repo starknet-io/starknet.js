@@ -47,15 +47,17 @@ export class RpcError<BaseErrorT extends RPC_ERROR = RPC_ERROR> extends LibraryE
     params: any;
   };
 
-  constructor(
-    public readonly baseError: BaseErrorT,
-    method: string,
-    params: any
-  ) {
+  // Declared after `request`, and not as a constructor parameter: fields are created in the
+  // order they are declared, so `JSON.stringify(error)` and `console.log(error)` list `request`
+  // first.
+  public readonly baseError: BaseErrorT;
+
+  constructor(baseError: BaseErrorT, method: string, params: any) {
     // legacy message format
     super(`RPC: ${method} with params ${stringify(params, null, 2)}\n
       ${baseError.code}: ${baseError.message}: ${stringify((baseError as RPC.JRPC.Error).data)}`);
 
+    this.baseError = baseError;
     this.request = { method, params };
   }
 

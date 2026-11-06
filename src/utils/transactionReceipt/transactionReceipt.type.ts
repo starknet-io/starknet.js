@@ -23,8 +23,7 @@ export type TransactionReceiptCallbacksDefault = Partial<TransactionReceiptCallb
 };
 
 export type TransactionReceiptCallbacks =
-  | TransactionReceiptCallbacksDefined
-  | TransactionReceiptCallbacksDefault;
+  TransactionReceiptCallbacksDefined | TransactionReceiptCallbacksDefault;
 
 // Transaction receipt types with helpers - clean, consolidated definitions
 export type SuccessfulTransactionReceiptResponseHelper = SuccessfulTransactionReceiptResponse & {

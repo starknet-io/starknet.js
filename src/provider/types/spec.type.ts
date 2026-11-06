@@ -158,8 +158,7 @@ export type SimulateTransaction = SimpleOneOf<
   RPCSPEC0104.SimulateTransaction
 >;
 export type SimulateTransactionResponse =
-  | RPCSPEC09.SimulateTransactionResponse
-  | RPCSPEC0104.SimulateTransactionResponse;
+  RPCSPEC09.SimulateTransactionResponse | RPCSPEC0104.SimulateTransactionResponse;
 
 export type INITIAL_READS = RPCSPEC0104.INITIAL_READS;
 

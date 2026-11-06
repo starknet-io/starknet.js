@@ -144,9 +144,9 @@ const eventsList = await myProvider.getEvents({
 :::tip
 
 - If you don't want to filter by key, you can either remove the `keys` parameter, or affect it this way: `[[]]`.
-- `keys` is an array of accepted keys values (see [SNIP-13](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-13.md#specification)). If you are looking at only A in first key : use [[A]].
-  If you want A or B in the first key: use [[A,B]]. If you want A in the first key, and B in the second key, use [[A],[B]]. If you want A or B in the first key AND C in the second key, use `[[A,B],[C]]`.
-  :::
+- `keys` is an array of accepted keys values (see [SNIP-13](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-13.md#specification)). If you are looking at only A in first key : use [[A]]. If you want A or B in the first key: use [[A,B]]. If you want A in the first key, and B in the second key, use [[A],[B]]. If you want A or B in the first key AND C in the second key, use `[[A,B],[C]]`.
+
+:::
 
 :::warning CAUTION
 An event can be nested in a Cairo component (See the Cairo code of the contract to verify). In this case, the array of keys will start with additional hashes, and you will have to adapt your code in consequence; in this example, we have to skip one hash:

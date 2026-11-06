@@ -45,10 +45,7 @@ import { RPCResponseParser } from './modules/responseParser';
 
 export abstract class ProviderInterface {
   public abstract channel:
-    | RPC09.RpcChannel
-    | RPC0102.RpcChannel
-    | RPC0103.RpcChannel
-    | RPC0104.RpcChannel;
+    RPC09.RpcChannel | RPC0102.RpcChannel | RPC0103.RpcChannel | RPC0104.RpcChannel;
 
   public abstract responseParser: RPCResponseParser;
 
