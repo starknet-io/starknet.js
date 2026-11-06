@@ -243,8 +243,7 @@ export type V3TransactionDetails = {
 };
 
 export type InvocationsDetailsWithNonce =
-  | (InvocationsDetails & { nonce: BigNumberish })
-  | V3TransactionDetails;
+  (InvocationsDetails & { nonce: BigNumberish }) | V3TransactionDetails;
 
 /**
  * new statuses are defined by props: finality_status and execution_status

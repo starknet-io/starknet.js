@@ -32,8 +32,7 @@ function checkCompiledConstructorCalldata(calldata: Calldata, abi: Abi): void {
   const calldataClass = new CallData(abi);
   // found by its name only, as in `CallData`: a Cairo V1 abi declares it as a `function`
   const constructorAbi = calldataClass.abi.find((entry) => entry.name === 'constructor') as
-    | FunctionAbi
-    | undefined;
+    FunctionAbi | undefined;
   if (!constructorAbi) {
     if (calldata.length > 0) {
       throw Error('Cannot pass calldata to a contract with no constructor');

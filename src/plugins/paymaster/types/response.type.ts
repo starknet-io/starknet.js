@@ -34,9 +34,7 @@ export type PreparedDeployAndInvokeTransaction = {
   fee: PaymasterFeeEstimate;
 };
 export type PreparedTransaction =
-  | PreparedDeployTransaction
-  | PreparedInvokeTransaction
-  | PreparedDeployAndInvokeTransaction;
+  PreparedDeployTransaction | PreparedInvokeTransaction | PreparedDeployAndInvokeTransaction;
 
 export interface TokenData {
   token_address: string;
@@ -82,9 +80,7 @@ export type ExecutableDeployAndInvokeTransaction = {
   invoke: ExecutableUserInvoke;
 };
 export type ExecutableUserTransaction =
-  | ExecutableDeployTransaction
-  | ExecutableInvokeTransaction
-  | ExecutableDeployAndInvokeTransaction;
+  ExecutableDeployTransaction | ExecutableInvokeTransaction | ExecutableDeployAndInvokeTransaction;
 
 export type FeeMode = { mode: 'sponsored' } | { mode: 'default'; gasToken: string };
 export type ExecutionParameters = {

@@ -94,5 +94,4 @@ export type StateUpdateResponse = StateUpdate | PreConfirmedStateUpdate;
  * CompiledSierra without '.sierra_program_debug_info'
  */
 export type ContractClassResponse =
-  | LegacyContractClass
-  | Omit<CompiledSierra, 'sierra_program_debug_info'>;
+  LegacyContractClass | Omit<CompiledSierra, 'sierra_program_debug_info'>;

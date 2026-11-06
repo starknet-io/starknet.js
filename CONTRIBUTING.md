@@ -16,6 +16,7 @@ _[Use the GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone
 - If it’s your first pull request, watch [this amazing course](http://makeapullrequest.com/) by [Kent C. Dodds](https://twitter.com/kentcdodds)
 - Fork the repository and clone your fork
 - Checkout the `develop` branch (or `next-version` if it was more recently updated)
+- Use Node.js 22.22.2 or later in the 22.x line, 24.15 or later in the 24.x line, or Node.js 26 or later. Some development tools need these versions, which are higher than the Node.js 22.12 needed to use starknet.js.
 - To install dependencies, run:
 
   ```bash
