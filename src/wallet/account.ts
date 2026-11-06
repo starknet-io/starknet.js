@@ -39,7 +39,7 @@ import {
 
 /**
  * @deprecated Use {@link WalletAccountV6} (get-starknet v6) instead. This class is kept only for
- * DAPPs that are still on get-starknet v4.
+ * DAPPs that are still on get-starknet v4. It will be removed in v12.
  *
  * @remarks
  * Account that lets a wallet sign and send the transactions, using get-starknet v4.
