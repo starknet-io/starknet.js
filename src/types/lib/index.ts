@@ -352,7 +352,8 @@ export type waitForTransactionOptions = {
    */
   lifeCycleRetries?: number;
   /**
-   * Define the number of retries before throwing an error
+   * Limit transaction status polling, including pending statuses returned without an RPC error.
+   * The remaining budget is also used when retrying transaction receipt requests.
    */
   retries?: number;
   /**

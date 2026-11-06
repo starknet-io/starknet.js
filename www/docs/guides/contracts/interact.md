@@ -103,6 +103,24 @@ Be sure to use `waitForTransaction` between the calls, because you may experienc
 
 For more information about defining call messages and parameters, see [this guide](./define_call_message.md).
 
+### Limiting transaction polling
+
+Use `retries` to limit how often `waitForTransaction` polls for a matching status:
+
+```typescript
+await myProvider.waitForTransaction(tx.transaction_hash, {
+  retries: 30,
+  retryInterval: 1000,
+});
+```
+
+The initial status request can be followed by up to 30 retries. Responses with a pending status
+count toward this limit, even when the RPC request succeeds. The same limit applies when using
+custom `successStates`, such as waiting for `ACCEPTED_ON_L1`. A matching status on the final
+attempt still succeeds, and the provider then requests the receipt. Receipt retries use the
+remaining budget. `retryInterval` sets the delay between attempts; it does not limit the time
+an individual RPC request can take.
+
 ## Multiple Operations (Multicall)
 
 Execute multiple contract calls in a single transaction:

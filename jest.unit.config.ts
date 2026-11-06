@@ -1,7 +1,7 @@
 import type { Config } from 'jest';
 
 /**
- * Unit-test config — runs the pure unit tests under `__tests__/utils` WITHOUT a
+ * Unit-test config — runs the pure utility and transaction-wait tests WITHOUT a
  * running Starknet devnet or RPC node.
  *
  * It deliberately omits the `globalSetup` used by the default config
@@ -18,8 +18,11 @@ export default async (): Promise<Config> => {
       escapeString: true,
       printBasicPrototype: true,
     },
-    roots: ['<rootDir>/__tests__/utils'],
-    testMatch: ['**/(*.)+(spec|test).[jt]s?(x)'],
+    roots: ['<rootDir>/__tests__'],
+    testMatch: [
+      '<rootDir>/__tests__/utils/**/(*.)+(spec|test).[jt]s?(x)',
+      '<rootDir>/__tests__/waitForTransaction.test.ts',
+    ],
     testPathIgnorePatterns: [
       '/node_modules/',
       '__tests__/utils/ethSigner.test.ts',
