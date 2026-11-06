@@ -352,7 +352,7 @@ export type waitForTransactionOptions = {
    */
   lifeCycleRetries?: number;
   /**
-   * Define the number of retries before throwing an error
+   * Limit status polling, including pending statuses, and receipt retries.
    */
   retries?: number;
   /**

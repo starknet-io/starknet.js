@@ -525,7 +525,8 @@ export class RpcChannel {
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
     const transactionHash = toHex(txHash);
-    let retries = options?.retries ?? this.retries;
+    const maxRetries = options?.retries ?? this.retries;
+    let retries = maxRetries;
     let lifeCycleRetries = options?.lifeCycleRetries ?? 3;
     let onchain = false;
     let isErrorState = false;
@@ -587,10 +588,10 @@ export class RpcChannel {
           }
           lifeCycleRetries -= 1;
         }
+      }
 
-        if (retries <= 0) {
-          throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
-        }
+      if (!onchain && retries <= 0) {
+        throw new Error(`waitForTransaction timed-out with retries ${maxRetries}`);
       }
 
       retries -= 1;
@@ -607,7 +608,7 @@ export class RpcChannel {
         txReceipt = await this.getTransactionReceipt(transactionHash);
       } catch (error) {
         if (retries <= 0) {
-          throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
+          throw new Error(`waitForTransaction timed-out with retries ${maxRetries}`);
         }
         retries -= 1;
         // eslint-disable-next-line no-await-in-loop
