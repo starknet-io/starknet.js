@@ -1,3 +1,9 @@
+## [11.6.1](https://github.com/starknet-io/starknet.js/compare/v11.6.0...v11.6.1) (2026-11-06)
+
+### Bug Fixes
+
+- **types:** let TypeScript accept `using` on WebSocketProvider ([7dc2206](https://github.com/starknet-io/starknet.js/commit/7dc22067cd75e7bd5246b85ad905d87d8a0b292a))
+
 # [11.6.0](https://github.com/starknet-io/starknet.js/compare/v11.5.1...v11.6.0) (2026-11-06)
 
 ### Features
