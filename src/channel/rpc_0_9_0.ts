@@ -502,10 +502,10 @@ export class RpcChannel {
           }
           lifeCycleRetries -= 1;
         }
+      }
 
-        if (retries <= 0) {
-          throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
-        }
+      if (!onchain && retries <= 0) {
+        throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
       }
 
       retries -= 1;

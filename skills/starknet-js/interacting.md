@@ -15,6 +15,7 @@ const mainnet = new RpcProvider({ nodeUrl: constants.NetworkName.SN_MAIN });
 - The constructor does NOT read the RPC version from the URL: pass `specVersion` or use `RpcProvider.create()`.
 - Supported RPC specs: **0.9.0, 0.10.0, 0.10.2, 0.10.3, 0.10.4**. Devnet: `http://127.0.0.1:5050/rpc`.
 - Useful: `getSpecVersion()`, `getBlock('latest')`, `getClassAt(addr)` (→ `{ abi }`), `getNonceForAddress`, `getEvents`, `waitForTransaction`.
+- `waitForTransaction(hash, { retries, retryInterval })` bounds status polling, including pending responses and custom `successStates`. Receipt retries share the remaining budget; this is not a timeout for an individual RPC request.
 - Batching: `new RpcProvider({ batch: 0 })` merges concurrent requests into one HTTP call.
 - Errors: `catch (e) { if (e instanceof RpcError && e.isType('CONTRACT_NOT_FOUND')) … }`.
 
