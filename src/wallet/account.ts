@@ -236,6 +236,4 @@ export class WalletAccount extends Account {
   ) {
     return WalletAccount.connect(provider, walletProvider, cairoVersion, paymaster, true);
   }
-
-  // TODO: MISSING ESTIMATES
 }

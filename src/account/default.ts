@@ -186,7 +186,7 @@ export class Account implements AccountInterface {
       this.cairoVersion = cairo;
     }
     return this.cairoVersion;
-  } // TODO: TT Cairo version is still needed for invoke on existing contracts
+  }
 
   public async estimateInvokeFee(
     calls: AllowArray<Call>,

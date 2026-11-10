@@ -41,10 +41,6 @@ import {
   isTypeUint,
 } from './cairo';
 
-// TODO: separate validate is redundant as CairoTypes are validated during construction.
-// TODO: This validate should provide added valie method base validate poiniting to incorect value for method, opt. using color coding
-// TODO: Something like: store_message(a -> *INVALID JS TYPE*, b, c -> *MISSING REQUIRED ARG*)
-
 const validateFelt = (parameter: any, input: AbiEntry) => {
   // an instance of the very type declared here stands for the number it carries, and is then
   // checked exactly like a bare one
@@ -247,7 +243,6 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
 
 const validateTuple = (parameter: any, input: AbiEntry) => {
   assert(isObject(parameter), `Validate: arg ${input.name} should be a tuple (defined as object)`);
-  // todo: skip tuple structural validation for now
 };
 
 const validateArray = (

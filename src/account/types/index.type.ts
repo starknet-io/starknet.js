@@ -53,7 +53,6 @@ export type AccountOptions = {
 
 export type EstimateFeeBulk = Array<EstimateFeeResponseOverhead>;
 
-// TODO: This is too wide generic with optional params
 export type AccountInvocationsFactoryDetails = {
   versions: Array<`${ETransactionVersion3}`>;
   nonce?: BigNumberish;

@@ -30,8 +30,6 @@ export type ParsingStrategy = {
   response: Record<AbiEntryType, (responseIterator: Iterator<string>) => any>;
 };
 
-// TODO: extend for complex types like structs, tuples, enums, arrays, etc.
-
 /**
  * The default parsing strategy.
  *
@@ -46,7 +44,6 @@ export type ParsingStrategy = {
  * Configure parsing strategy for each abi type
  */
 export const hdParsingStrategy = {
-  // TODO: provjeri svi request parseri stvaraju array, dali je to ok sa requstParserom
   request: {
     [CairoBytes31.abiSelector]: (val: unknown) => {
       return new CairoBytes31(val).toApiRequest();
