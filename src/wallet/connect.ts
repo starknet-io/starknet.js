@@ -74,7 +74,6 @@ export function addStarknetChain(
   swo: StarknetWindowObject,
   chain: AddStarknetChainParameters
 ): Promise<boolean> {
-  // TODO: This should set custom RPC endpoint ?
   return swo.request({ type: 'wallet_addStarknetChain', params: chain });
 }
 

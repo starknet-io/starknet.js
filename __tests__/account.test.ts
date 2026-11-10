@@ -930,8 +930,6 @@ describe('deploy and test Account', () => {
     });
 
     test('estimate fee bulk invoke functions', async () => {
-      // TODO @dhruvkelawala check expectation for feeTransactionVersion
-      // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
       const estimatedFeeBulk = await account.estimateFeeBulk([
         {
           type: TransactionType.INVOKE,
@@ -955,8 +953,6 @@ describe('deploy and test Account', () => {
         expect(value).toBeDefined();
       });
       expect(estimatedFeeBulk.length).toEqual(2);
-      // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-      // innerInvokeEstFeeSpy.mockClear();
     });
 
     test('deploy account & multi invoke functions', async () => {

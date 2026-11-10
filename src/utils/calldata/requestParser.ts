@@ -66,8 +66,6 @@ type RequestSerializer = {
   getRequestParser(abiType: string): (val: unknown) => any;
 };
 
-// TODO: cleanup implementations to work with unknown, instead of blind casting with 'as'
-
 /**
  * Test if a long string can be provided in place of an array of values.
  * Only an array of felt252 can be filled this way, as a felt252 holds up to 31 characters of text.
@@ -182,7 +180,6 @@ function parseBaseTypes({
     case CairoSecp256k1Point.isAbiType(type):
       return parser.getRequestParser(type)(val);
     default:
-      // TODO: check but u32 should land here with rest of the simple types, at the moment handle as felt
       return parser.getRequestParser(CairoFelt252.abiSelector)(val);
   }
 }
