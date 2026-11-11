@@ -1,3 +1,9 @@
+## [11.6.2](https://github.com/starknet-io/starknet.js/compare/v11.6.1...v11.6.2) (2026-11-11)
+
+### Bug Fixes
+
+- bound waitForTransaction polling for pending statuses ([76e3501](https://github.com/starknet-io/starknet.js/commit/76e3501b482eb69071a63225a1f71196a8158c33))
+
 ## [11.6.1](https://github.com/starknet-io/starknet.js/compare/v11.6.0...v11.6.1) (2026-11-06)
 
 ### Bug Fixes
