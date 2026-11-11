@@ -115,9 +115,10 @@ one axis to the other is a design regression, not a shortcut.
 - Update docs in `www/` and add tests for any behavior change (see CONTRIBUTING.md).
 - [`skills/starknet-js/`](./skills/starknet-js/) is the published agent skill that
   teaches AI coding agents how to _use_ this library (installable via
-  `npx skills add starknet-io/starknet.js`). If you change the public API surface
-  (signatures, constructor options, calldata handling…), check that the skill files
-  are not made stale, and update them in the same PR if they are. The line
+  `npx skills add starknet-io/starknet.js`). **Do not** change it in a contribution,
+  even when you change the public API: it describes the version written in its
+  `SKILL.md`, and the maintainers update it only when a new version is promoted to
+  `latest`. For that update, note that the line
   `Skill verified against **starknet.js X.Y.Z**.` in `SKILL.md` is parsed by
   `www/docusaurus.config.ts` to show the version on the docs landing page: change only
   the version number, or update the regex there in the same change — an unrecognized
