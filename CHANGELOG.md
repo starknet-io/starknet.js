@@ -1,3 +1,9 @@
+## [11.6.3](https://github.com/starknet-io/starknet.js/compare/v11.6.2...v11.6.3) (2026-11-13)
+
+### Bug Fixes
+
+- **types:** make the published types compile with skipLibCheck false ([14b26c5](https://github.com/starknet-io/starknet.js/commit/14b26c5e062950eb81390b665cf433ccc9e1531a))
+
 ## [11.6.2](https://github.com/starknet-io/starknet.js/compare/v11.6.1...v11.6.2) (2026-11-11)
 
 ### Bug Fixes
