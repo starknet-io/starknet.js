@@ -16,6 +16,14 @@ npm install starknet
 npm install starknet@next
 ```
 
+## Requirements
+
+- **Node.js 22.12 or later** to use starknet.js. On Node.js 22.0 to 22.11, `import` works but `require('starknet')` fails.
+- **Node.js 22.22.2 or later in the 22.x line, 24.15 or later in the 24.x line, or Node.js 26 or later** to work on starknet.js itself: some development tools need these higher versions.
+- **TypeScript**: set `moduleResolution` to `bundler` (code built by Vite, webpack...) or `nodenext` (code run by Node.js).
+  - The older value `node` (also called `node10`) loses the types that come from get-starknet, such as the wallets: they become `any`. TypeScript 6 reports this value as deprecated, and TypeScript 7 does not accept it.
+  - With `node16`, keep `skipLibCheck` at `true` (the value written by `tsc --init`). With `false`, use `nodenext`.
+
 ## Running tests locally
 
 Local tests rely on <ins>[Starknet Devnet](https://github.com/starknet-io/starknet-devnet)</ins>, a local testnet emulation.

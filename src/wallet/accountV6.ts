@@ -25,6 +25,20 @@ import type { WalletAccountV6Options } from './types/index.type';
 import type { STRK20_ACTION, STRK20_CALL_AND_PROOF } from './types/strk20.type';
 
 /**
+ * `WalletAccountV5`, without the two static methods that `WalletAccountV6` replaces.
+ *
+ * `connect` and `connectSilent` of `WalletAccountV6` take a get-starknet v6 wallet. The ones of
+ * `WalletAccountV5` take a get-starknet v5 wallet. These two wallet types are not compatible, and
+ * TypeScript refuses a subclass when a static method does not fit the one of its parent (TS2417).
+ * A `@ts-ignore` is not enough: the build drops it from the published types.
+ * So `WalletAccountV6` extends this type: all of `WalletAccountV5`, except these two methods.
+ * At run time, it is `WalletAccountV5` itself.
+ * In v12, a base class without `connect`, shared by both accounts, should replace this type.
+ */
+type WalletAccountV5WithoutConnect = Omit<typeof WalletAccountV5, 'connect' | 'connectSilent'> &
+  (new (...args: ConstructorParameters<typeof WalletAccountV5>) => WalletAccountV5);
+
+/**
  * Account that lets a browser wallet sign and send the transactions, using get-starknet v6.
  * This is the recommended class for a new DAPP.
  *
@@ -48,9 +62,7 @@ import type { STRK20_ACTION, STRK20_CALL_AND_PROOF } from './types/strk20.type';
  * // chainId = '0x534e5f5345504f4c4941' (the wallet is on Sepolia)
  * ```
  */
-// @ts-ignore — TS2417: static `connect` parameter type (WalletWithStarknetFeaturesV6 from types-js@0.10.x)
-// is intentionally incompatible with WalletAccountV5's (types-js@0.7.x); runtime behavior is correct.
-export class WalletAccountV6 extends WalletAccountV5 {
+export class WalletAccountV6 extends (WalletAccountV5 as WalletAccountV5WithoutConnect) {
   /**
    * Prefer {@link WalletAccountV6.connect}: it also asks the wallet for the address.
    * @param {WalletAccountV6Options} options - The provider, the wallet, the account address, and

@@ -176,3 +176,57 @@ jobs:
             echo "moduleResolution: $resolution"
             "$tsc" --noEmit --strict --skipLibCheck --esModuleInterop --target es2022 --module "$module" --moduleResolution "$resolution" *.ts
           done
+
+      - name: type-check the published types without skipLibCheck
+        # The step above uses `--skipLibCheck`, which hides an error in a .d.ts of the package. A
+        # user who does not set it gets that error in their own build. Here the .d.ts is checked
+        # too, in the strict mode of a user. It catches:
+        #   - TS2550: `Symbol.dispose` is unknown, when the `esnext.disposable` lib is not loaded;
+        #   - TS2417: `WalletAccountV6` does not fit its parent class `WalletAccountV5`;
+        #   - TS2850 or TS7053: `using` is refused on a `WebSocketProvider`.
+        # Left out on purpose:
+        #   - `starknet/ledger`: `@ledgerhq/hw-transport` has its own type errors with this option;
+        #   - `node16` and `node`: they report errors that no change of ours can fix (TS1479 for
+        #     the dependencies that exist only as ES modules, TS2307 because `node` ignores
+        #     `exports`).
+        working-directory: ${{ runner.temp }}/consumer
+        run: |
+          # `@types/node` loads the `esnext.disposable` lib, and then TS2550 cannot appear.
+          if [ -e node_modules/@types/node ]; then
+            echo "@types/node is installed: this step would not see TS2550"
+            exit 1
+          fi
+
+          # The files are in a folder of their own: the step above compiles every *.ts here.
+          mkdir strict
+          cat > strict/published-types.ts <<'EOF'
+          import * as main from 'starknet';
+          import * as falcon from 'starknet/falcon';
+
+          export const all = [main, falcon];
+          EOF
+
+          cat > strict/using.ts <<'EOF'
+          import { WebSocketProvider } from 'starknet';
+
+          declare const provider: WebSocketProvider;
+          provider[Symbol.dispose]();
+
+          export async function main(): Promise<void> {
+            using p = await WebSocketProvider.create({ nodeUrl: 'ws://localhost:5050/ws' });
+            console.log(p.channel);
+          }
+          EOF
+
+          tsc="$GITHUB_WORKSPACE/node_modules/.bin/tsc"
+          for resolution in bundler nodenext; do
+            case "$resolution" in
+              bundler) module=esnext ;;
+              nodenext) module=nodenext ;;
+            esac
+            echo "moduleResolution: $resolution"
+            # No `--lib`: the default one of `--target es2022`, as a user who sets nothing.
+            "$tsc" --noEmit --strict --skipLibCheck false --target es2022 --module "$module" --moduleResolution "$resolution" strict/published-types.ts
+            # `using` needs the `esnext.disposable` lib, which the user must load.
+            "$tsc" --noEmit --strict --skipLibCheck false --target es2022 --lib es2022,esnext.disposable,dom --module "$module" --moduleResolution "$resolution" strict/using.ts
+          done

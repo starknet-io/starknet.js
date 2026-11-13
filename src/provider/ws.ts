@@ -155,6 +155,15 @@ if (typeof Symbol.dispose !== 'undefined') {
   (WebSocketProvider.prototype as any)[Symbol.dispose] = WebSocketProvider.prototype.dispose;
 }
 
+// `Symbol.dispose` is declared by the `esnext.disposable` lib of TypeScript. A user who compiles
+// without this lib would get an error in the published types (TS2550). This declaration merges
+// with the one of the lib when it is there, and replaces it when it is not.
+declare global {
+  interface SymbolConstructor {
+    readonly dispose: unique symbol;
+  }
+}
+
 declare module './ws' {
   interface WebSocketProvider {
     [Symbol.dispose](): void;
