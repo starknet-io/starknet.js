@@ -3,6 +3,7 @@ import { isBigInt, isString } from './typed';
 
 /**
  * Convert strk to fri or fri to strk
+ * @throws {Error} if a strk amount has more than 18 decimals (1 strk = 10^18 fri)
  * @example
  * ```typescript
  * units(1000n, 'fri') // '0.000000000000001' strk
@@ -22,8 +23,13 @@ export function units(amount: string | bigint, simbol: 'fri' | 'strk' = 'fri') {
     }
 
     const [integer, decimal = '0'] = numStr.split('.');
+    if (decimal.length > 18) {
+      // 1 strk = 10^18 fri, so more decimals can't be expressed in fri
+      throw new Error(`units: '${numStr}' strk has more than 18 decimals`);
+    }
     const pdec = decimal.padEnd(18, '0');
-    return `${integer}${pdec}`.replace(/\b0+/g, '');
+    // strip leading zeros, but keep the last digit so zero stays '0'
+    return `${integer}${pdec}`.replace(/\b0+(?=\d)/g, '');
   }
 
   const bis = BigInt(amount).toString();

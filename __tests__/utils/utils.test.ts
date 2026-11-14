@@ -29,7 +29,16 @@ test('units', () => {
   expect(units('123123123.123', 'strk')).toEqual('123123123123000000000000000');
   expect(units('0x40ff', 'strk')).toEqual('16639000000000000000000');
 
-  const toTest = ['0.333', '123123123.123', '1000.1', '123123123.123123', '0.0000003'];
+  expect(units('0.123456789012345678', 'strk')).toEqual('123456789012345678');
+  expect(units('0', 'strk')).toEqual('0');
+  expect(units('0.0', 'strk')).toEqual('0');
+  expect(units('000', 'strk')).toEqual('0');
+  expect(units(0n, 'strk')).toEqual('0');
+  expect(units('0x0', 'strk')).toEqual('0');
+  expect(() => units('0.1234567890123456789', 'strk')).toThrow(/18 decimals/);
+  expect(() => units('1.0000000000000000001', 'strk')).toThrow(/18 decimals/);
+
+  const toTest = ['0.333', '123123123.123', '1000.1', '123123123.123123', '0.0000003', '0'];
   toTest.forEach((element) => {
     expect(units(units(element, 'strk'), 'fri')).toEqual(element);
   });
