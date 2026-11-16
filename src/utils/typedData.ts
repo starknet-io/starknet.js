@@ -527,7 +527,9 @@ export function encodeValue(
       }
       case 'felt':
       case 'shortstring': {
-        // TODO: should 'shortstring' diverge into directly using CairoBytes31.fromText()?
+        // Keep this encoding: a string that spells a number, like '123', is read as that number.
+        // Encoding it as text would change revision 1 hashes, which deployed contracts rely on.
+        // Such a change belongs to revision 2.
         if (revision === Revision.ACTIVE) {
           assertRange(getHex(data as string), type, RANGE_FELT);
         } // else fall through to default

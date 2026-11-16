@@ -338,6 +338,40 @@ const declareResponse = await myAccount.declareIfNot({
 
 :::
 
+## Universal Deployer Contract (UDC)
+
+An account does not deploy a contract by itself. It sends an INVOKE transaction that calls the Universal Deployer Contract (UDC), a contract already deployed on the network, and the UDC deploys the new contract. `deployContract()`, `declareAndDeploy()` and `Contract.factory()` all work this way, so most of the time you do not see the UDC.
+
+You need to call the UDC yourself only when the deployment must be in the same transaction as other calls. `myAccount.deployer.buildDeployerCall()` builds the call to the UDC, and gives the address of the future contract. Its second parameter is the address of the account that sends the transaction and pays for it: the address of the new contract depends on it. For example, to deploy a contract and send it 10 STRK in the same transaction:
+
+```typescript
+import { CallData, cairo } from 'starknet';
+
+const STRK_ADDRESS = '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d';
+
+// 1. Build the UDC call. The future address of the contract comes with it.
+const { calls: deployCalls, addresses } = myAccount.deployer.buildDeployerCall(
+  { classHash: myClassHash, constructorCalldata: myConstructorCalldata },
+  myAccount.address // the account that sends and pays for the transaction
+);
+const futureAddress = addresses[0];
+
+// 2. Build the other call: send 10 STRK to the future contract.
+const transferCall = {
+  contractAddress: STRK_ADDRESS,
+  entrypoint: 'transfer',
+  calldata: CallData.compile({
+    recipient: futureAddress,
+    amount: cairo.uint256(10n * 10n ** 18n),
+  }),
+};
+
+// 3. Send both calls in one transaction.
+const { transaction_hash } = await myAccount.execute([...deployCalls, transferCall]);
+await myProvider.waitForTransaction(transaction_hash);
+console.log('Contract deployed and funded at:', futureAddress);
+```
+
 ## Best Practices
 
 1. **Always wait for transactions**: Use `myProvider.waitForTransaction()` after deployments

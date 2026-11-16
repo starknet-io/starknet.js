@@ -1,5 +1,3 @@
-// TODO: Inherit from RPC 0.9 with addition to Legacy
-
 import { CONTRACT } from '../../api';
 
 /** ABI */

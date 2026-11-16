@@ -63,6 +63,73 @@ describe('UNIT TEST: RPC 0.10.1 Channel - New API features', () => {
   });
 
   describe('waitForTransaction', () => {
+    test('stops polling pending statuses after the configured retries', async () => {
+      jest.useFakeTimers();
+      const transactionStatusSpy = jest.spyOn(channel, 'getTransactionStatus').mockResolvedValue({
+        finality_status: 'PRE_CONFIRMED',
+        execution_status: 'SUCCEEDED',
+      });
+      const transactionReceiptSpy = jest.spyOn(channel, 'getTransactionReceipt');
+      const settled = jest.fn();
+
+      channel
+        .waitForTransaction('0x123', { retries: 1, retryInterval: 1_000 })
+        .then(settled, settled);
+
+      try {
+        await jest.advanceTimersByTimeAsync(3_000);
+
+        expect(transactionStatusSpy).toHaveBeenCalledTimes(2);
+        expect(transactionReceiptSpy).not.toHaveBeenCalled();
+        expect(settled).toHaveBeenCalledTimes(1);
+        expect(settled).toHaveBeenCalledWith(
+          new Error('waitForTransaction timed-out with retries 1')
+        );
+      } finally {
+        jest.clearAllTimers();
+        transactionStatusSpy.mockRestore();
+        transactionReceiptSpy.mockRestore();
+        jest.useRealTimers();
+      }
+    });
+
+    test('returns the receipt when the last allowed status poll succeeds', async () => {
+      jest.useFakeTimers();
+      const receipt = { transaction_hash: '0x123' };
+      const transactionStatusSpy = jest
+        .spyOn(channel, 'getTransactionStatus')
+        .mockResolvedValueOnce({
+          finality_status: 'PRE_CONFIRMED',
+          execution_status: 'SUCCEEDED',
+        })
+        .mockResolvedValueOnce({
+          finality_status: 'ACCEPTED_ON_L2',
+          execution_status: 'SUCCEEDED',
+        });
+      const transactionReceiptSpy = jest
+        .spyOn(channel, 'getTransactionReceipt')
+        .mockResolvedValueOnce(receipt as any);
+      const settled = jest.fn();
+
+      channel
+        .waitForTransaction('0x123', { retries: 1, retryInterval: 1_000 })
+        .then(settled, settled);
+
+      try {
+        await jest.advanceTimersByTimeAsync(2_000);
+
+        expect(transactionStatusSpy).toHaveBeenCalledTimes(2);
+        expect(transactionReceiptSpy).toHaveBeenCalledTimes(1);
+        expect(settled).toHaveBeenCalledTimes(1);
+        expect(settled).toHaveBeenCalledWith(receipt);
+      } finally {
+        jest.clearAllTimers();
+        transactionStatusSpy.mockRestore();
+        transactionReceiptSpy.mockRestore();
+        jest.useRealTimers();
+      }
+    });
+
     test('returns immediately after the receipt is available', async () => {
       jest.useFakeTimers();
       const receipt = { transaction_hash: '0x123' };

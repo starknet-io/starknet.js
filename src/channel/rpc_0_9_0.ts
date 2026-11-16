@@ -50,7 +50,6 @@ import {
 import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
 import { config } from '../global/config';
-// TODO: check if we can filet type before entering to this method, as so to specify here only RPC 0.8 types
 
 export class RpcChannel {
   readonly id = 'RPC090';
@@ -272,7 +271,6 @@ export class RpcChannel {
     return this.specVersion;
   }
 
-  // TODO: New Method add test
   /**
    * Given an l1 tx hash, returns the associated l1_handler tx hashes and statuses for all L1 -> L2 messages sent by the l1 transaction, ordered by the l1 tx sending order
    */
@@ -283,7 +281,6 @@ export class RpcChannel {
     });
   }
 
-  // TODO: New Method add test
   public getStorageProof(
     classHashes: BigNumberish[] = [],
     contractAddresses: BigNumberish[] = [],
@@ -302,7 +299,6 @@ export class RpcChannel {
     });
   }
 
-  // TODO: New Method add test
   public getCompiledCasm(classHash: BigNumberish): Promise<RPC.CASM_COMPILED_CONTRACT_CLASS> {
     const class_hash = toHex(classHash);
 
@@ -440,7 +436,8 @@ export class RpcChannel {
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
     const transactionHash = toHex(txHash);
-    let retries = options?.retries ?? this.retries;
+    const maxRetries = options?.retries ?? this.retries;
+    let retries = maxRetries;
     let lifeCycleRetries = options?.lifeCycleRetries ?? 3;
     let onchain = false;
     let isErrorState = false;
@@ -502,10 +499,10 @@ export class RpcChannel {
           }
           lifeCycleRetries -= 1;
         }
+      }
 
-        if (retries <= 0) {
-          throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
-        }
+      if (!onchain && retries <= 0) {
+        throw new Error(`waitForTransaction timed-out with retries ${maxRetries}`);
       }
 
       retries -= 1;
@@ -522,7 +519,7 @@ export class RpcChannel {
         txReceipt = await this.getTransactionReceipt(transactionHash);
       } catch (error) {
         if (retries <= 0) {
-          throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
+          throw new Error(`waitForTransaction timed-out with retries ${maxRetries}`);
         }
         retries -= 1;
         // eslint-disable-next-line no-await-in-loop

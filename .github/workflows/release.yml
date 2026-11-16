@@ -50,12 +50,17 @@ on:
 permissions:
   contents: read
 
-# Cancel redundant in-progress runs for the same ref (replaces the
+# Cancel redundant in-progress runs of the same pull request (replaces the
 # `cancel_others` behaviour of the now-unmaintained skip-duplicate-actions).
-# Scoped to pull_request only: a push to a release branch is never cancelled,
-# so an in-flight publish can never be interrupted by a newer push.
+# `cancel-in-progress` is read from the run that arrives, not from the run in progress.
+# So pull request runs get their own group (`pr`). After a merge, GitHub can start a
+# late `pull_request` run on the ref of the base branch: in a shared group, it would
+# cancel the push run in progress.
+# `push` and `workflow_dispatch` share the `release` group: both run semantic-release,
+# and must never run it twice at the same time on one branch. A run in progress in
+# this group is never cancelled.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && 'pr' || 'release' }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -98,13 +103,19 @@ jobs:
   release-auto:
     name: Release
     needs: [tests-dev, tests-main, package-check]
-    # `always() && !failure()` lets the release proceed even when a test job is
-    # skipped (e.g. tests-main is skipped on non-`main` branches), while still
-    # blocking it if a test job actually fails. semantic-release is idempotent
-    # (no version bump = no publish), so running it on a duplicate push is safe.
+    # `always()` is needed: without it, a skipped test job would skip the release too
+    # (tests-main is skipped on every branch but `main`).
+    # `!failure()` blocks the release when a test job fails.
+    # `failure()` does not count a cancelled job. So `!cancelled()` and the check of
+    # `needs.*.result` block the release when the run or a test job is cancelled.
+    # Without them, a `feat:` or `fix:` commit would be published with unfinished tests.
+    # semantic-release is idempotent (no version bump = no publish), so running it on
+    # a duplicate push is safe.
     if: |
       always()
       && !failure()
+      && !cancelled()
+      && !contains(needs.*.result, 'cancelled')
       && github.event_name == 'push'
     uses: ./.github/workflows/_release.yml
     secrets: inherit

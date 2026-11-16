@@ -113,7 +113,6 @@ export async function parseContract(contract: CompiledContract | string): Promis
   return (await createSierraContractClass(parsedContract as CompiledSierra)) as SierraContractClass;
 }
 
-// TODO: Check if something like this exist
 /**
  * Extract the ABI from a given ContractClass.
  * @param contract ContractClass

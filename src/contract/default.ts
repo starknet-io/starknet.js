@@ -211,7 +211,6 @@ export class Contract implements ContractInterface {
    *  - parser?: Abi parser (optional, default createAbiParser(options.abi))
    */
   constructor(options: ContractOptions) {
-    // TODO: REFACTOR: move from legacy format and add support for legacy format
     // Must have params
     this.parsingStrategy = options.parsingStrategy;
     const parser = createAbiParser(options.abi, options.parsingStrategy);

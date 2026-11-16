@@ -343,7 +343,6 @@ describe('RPCProvider', () => {
     test('getBlockWithReceipts - 0.v RpcChannel', async () => {
       const blockResponse = await rpcProvider.getBlockWithReceipts(latestBlock.block_number);
       expect(blockResponse).toBeDefined();
-      // TODO add Zod schema validation
     });
 
     test('getTransactionByBlockIdAndIndex', async () => {
@@ -473,7 +472,6 @@ describe('RPCProvider', () => {
       test('traceTransaction', async () => {
         const trace = await rpcProvider.getTransactionTrace(transaction_hash);
         expect(trace).toBeDefined();
-        // TODO add Zod schema validation
       });
     });
   });

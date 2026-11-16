@@ -104,7 +104,6 @@ function parseBaseTypes(type: string, it: Iterator<string>, parser: ResponseRead
     case CairoSecp256k1Point.isAbiType(type):
       return parser.getResponseParser(type)(it);
     default:
-      // TODO: this is for all simple types felt and rest to BN, at the moment handle as felt
       return parser.getResponseParser(CairoFelt252.abiSelector)(it);
   }
 }
@@ -231,19 +230,6 @@ function parseResponseValue(
       acc[name] = parseResponseValue(responseIterator, el, parser, structs, enums);
       return acc;
     }, {} as any);
-  }
-
-  // TODO: duplicated, investigate why and what was an issue then de-duplicate
-  // type c1 array
-  if (isTypeArray(element.type)) {
-    // eslint-disable-next-line no-case-declarations
-    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
-    const el = { name: '', type: getArrayType(element.type) };
-    const len = BigInt(responseIterator.next().value); // get length
-    while (parsedDataArr.length < len) {
-      parsedDataArr.push(parseResponseValue(responseIterator, el, parser, structs, enums));
-    }
-    return parsedDataArr;
   }
 
   // base type

@@ -117,7 +117,6 @@ export type ParsedEvents = Array<ParsedEvent> & {
   getByPath?(path: string): ParsedStruct | null;
 };
 
-// TODO: This should be in formatResponse type
 /**
  * Advance formatting used to get js types data as result
  * @example
