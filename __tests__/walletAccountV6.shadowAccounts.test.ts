@@ -105,6 +105,22 @@ describe('WalletAccountV6 STRK20 shadow accounts', () => {
     expect(result).toEqual({ transaction_hash: '0x6f7d' });
   });
 
+  test('strk20InvokeTransaction sends a register action as it is', async () => {
+    const { fake, wallet } = await connect({
+      wallet_strk20InvokeTransaction: { transaction_hash: '0x7a1' },
+    });
+
+    // Spec 0.10.5. It registers the account in the pool, and must be alone in its request.
+    const actions: STRK20_ACTION[] = [{ type: 'register' }];
+
+    await wallet.strk20InvokeTransaction(actions);
+
+    expect(messageOf(fake, 'wallet_strk20InvokeTransaction')).toEqual({
+      type: 'wallet_strk20InvokeTransaction',
+      params: { actions: [{ type: 'register' }] },
+    });
+  });
+
   test('strk20PrepareInvoke returns a Starknet.js call, ready to be submitted', async () => {
     const proof = { data: 'AAA=', output: ['0x1'], proof_facts: ['0x2'] };
     const { wallet } = await connect({

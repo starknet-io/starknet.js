@@ -23,7 +23,7 @@ import {
   type STRK20_DAPP_NAME,
   type API_VERSION,
   type FELT,
-} from '@starknet-io/starknet-types-0104';
+} from '@starknet-io/starknet-types-0105';
 
 /**
  * Connect the DApp to the wallet through the wallet-standard `standard:connect` feature.

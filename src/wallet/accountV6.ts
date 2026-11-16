@@ -5,7 +5,7 @@ import type {
   STRK20_PROOF,
   Address,
   FELT,
-} from '@starknet-io/starknet-types-0104';
+} from '@starknet-io/starknet-types-0105';
 import type { AllowArray, CairoVersion, Call, ProviderOptions, PaymasterOptions } from '../types';
 import type { ProviderInterface } from '../provider';
 import type { PaymasterInterface } from '../plugins/paymaster';
@@ -178,8 +178,10 @@ export class WalletAccountV6 extends (WalletAccountV5 as WalletAccountV5WithoutC
 
   /**
    * Submit STRK20 actions as a single atomic transaction. The wallet displays an approval
-   * UI, generates the SNIP-36 proof, adds the fee action, and submits — so this call may
-   * take significantly longer than a standard invoke.
+   * UI, generates the SNIP-36 proof, adds the fee action (except for a `register` action),
+   * and submits — so this call may take significantly longer than a standard invoke.
+   * The account must be registered in the pool first, else the wallet answers `NOT_REGISTERED`:
+   * send `[{ type: 'register' }]` once, alone in its request.
    * @param {STRK20_ACTION[]} actions - The STRK20 actions to perform atomically (min 1).
    * @returns {Promise<{transaction_hash: string}>} The hash of the submitted transaction.
    * @example

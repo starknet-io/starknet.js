@@ -1,4 +1,4 @@
-import { RPC09, RPC0104 } from '../channel';
+import { RPC09, RPC0105 } from '../channel';
 import {
   ReconnectingWsTransport,
   type ReconnectingWsTransportOptions,
@@ -20,7 +20,7 @@ export type WebSocketProviderOptions = RpcProviderOptions &
   Omit<Partial<ReconnectingWsTransportOptions>, 'nodeUrl'> &
   // Derived rather than restated, so an option added to the subscription channel reaches this
   // provider without a second edit. `transport` is excluded because it is settled below.
-  Omit<RPC0104.SubscriptionChannelOptions, 'transport'> & {
+  Omit<RPC0105.SubscriptionChannelOptions, 'transport'> & {
     /**
      * An already-built transport to borrow. Mutually exclusive with `nodeUrl`, and the form to
      * use in React: the socket lives at module scope while components own only subscriptions.
@@ -29,7 +29,7 @@ export type WebSocketProviderOptions = RpcProviderOptions &
   };
 
 /** The subscription channel of a given spec version. */
-type AnySubscriptionChannel = RPC09.SubscriptionChannel | RPC0104.SubscriptionChannel;
+type AnySubscriptionChannel = RPC09.SubscriptionChannel | RPC0105.SubscriptionChannel;
 
 /**
  * An `RpcProvider` whose requests and subscriptions share one WebSocket.
@@ -100,7 +100,7 @@ export class WebSocketProvider extends RpcProvider {
 
     const forVersion = (specVersion: string): AnySubscriptionChannel => {
       if (isVersion('0.9', specVersion)) return new RPC09.SubscriptionChannel(channelOptions);
-      if (isVersion('0.10', specVersion)) return new RPC0104.SubscriptionChannel(channelOptions);
+      if (isVersion('0.10', specVersion)) return new RPC0105.SubscriptionChannel(channelOptions);
       throw new LibraryError(`unsupported subscription channel for spec version: ${specVersion}`);
     };
 
@@ -140,7 +140,7 @@ export class WebSocketProvider extends RpcProvider {
       return new this({ ...options, transport, specVersion: SupportedRpcVersion.v0_9_0 }) as T;
     }
     if (isVersion('0.10', spec)) {
-      return new this({ ...options, transport, specVersion: SupportedRpcVersion.v0_10_4 }) as T;
+      return new this({ ...options, transport, specVersion: SupportedRpcVersion.v0_10_5 }) as T;
     }
 
     throw new LibraryError(

@@ -22,6 +22,7 @@ export type {
   STRK20_DEPOSIT_ACTION,
   STRK20_INVOKE_ACTION,
   STRK20_PROOF,
+  STRK20_REGISTER_ACTION,
   STRK20_TRANSFER_ACTION,
   STRK20_WITHDRAW_ACTION,
-} from '@starknet-io/starknet-types-0104';
+} from '@starknet-io/starknet-types-0105';

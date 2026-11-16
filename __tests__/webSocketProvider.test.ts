@@ -51,10 +51,10 @@ describe('UNIT TEST: WebSocketProvider', () => {
     expect(v09.subscriptions.channelSpecVersion).toBe(SupportedRpcVersion.v0_9_0);
 
     // The requested version picks the generation, not the revision: any 0.10.x asks for the
-    // newest 0.10 channel, which is 0.10.4. What matters here is that both sides land on it.
+    // newest 0.10 channel, which is 0.10.5. What matters here is that both sides land on it.
     const v0103 = new WebSocketProvider({ transport, specVersion: SupportedRpcVersion.v0_10_3 });
-    expect(v0103.channel.channelSpecVersion).toBe(SupportedRpcVersion.v0_10_4);
-    expect(v0103.subscriptions.channelSpecVersion).toBe(SupportedRpcVersion.v0_10_4);
+    expect(v0103.channel.channelSpecVersion).toBe(SupportedRpcVersion.v0_10_5);
+    expect(v0103.subscriptions.channelSpecVersion).toBe(SupportedRpcVersion.v0_10_5);
 
     transport.close();
   });
