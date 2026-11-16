@@ -1,3 +1,9 @@
+# [11.7.0](https://github.com/starknet-io/starknet.js/compare/v11.6.3...v11.7.0) (2026-11-16)
+
+### Features
+
+- add RPC 0.10.5 support (starknet-types-0105, RpcChannel v0_10_5, STRK20 register) ([2ab33e2](https://github.com/starknet-io/starknet.js/commit/2ab33e214627a68ea241d3d56ad8cb2f0d111264))
+
 ## [11.6.3](https://github.com/starknet-io/starknet.js/compare/v11.6.2...v11.6.3) (2026-11-13)
 
 ### Bug Fixes
