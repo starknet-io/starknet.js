@@ -2,10 +2,11 @@ import type {
   STRK20_CALL_AND_PROOF as STRK20_CALL_AND_PROOF_SPEC,
   STRK20_DEPOSIT_ACTION,
   STRK20_INVOKE_ACTION,
+  STRK20_REGISTER_ACTION,
   STRK20_SHADOW_ACCOUNT_INVOKE_ACTION as STRK20_SHADOW_ACCOUNT_INVOKE_ACTION_SPEC,
   STRK20_TRANSFER_ACTION,
   STRK20_WITHDRAW_ACTION,
-} from '@starknet-io/starknet-types-0104';
+} from '@starknet-io/starknet-types-0105';
 import type { Call } from '../../types';
 
 /**
@@ -46,7 +47,7 @@ export type STRK20_SHADOW_ACCOUNT_INVOKE_ACTION = Omit<
 
 /**
  * A single action to perform via the STRK20 privacy protocol. The `type` field
- * discriminates the variant.
+ * discriminates the variant. A `register` action must be the only action of its request.
  * @example
  * ```typescript
  * const actions: STRK20_ACTION[] = [
@@ -63,6 +64,7 @@ export type STRK20_SHADOW_ACCOUNT_INVOKE_ACTION = Omit<
  * ```
  */
 export type STRK20_ACTION =
+  | STRK20_REGISTER_ACTION
   | STRK20_DEPOSIT_ACTION
   | STRK20_WITHDRAW_ACTION
   | STRK20_TRANSFER_ACTION

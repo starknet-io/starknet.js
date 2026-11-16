@@ -1,7 +1,7 @@
 import type {
   Call as WalletApiCall,
   STRK20_ACTION as STRK20_ACTION_SPEC,
-} from '@starknet-io/starknet-types-0104';
+} from '@starknet-io/starknet-types-0105';
 import type { Call } from '../types';
 import { CallData } from '../utils/calldata';
 import type { STRK20_ACTION } from './types/strk20.type';

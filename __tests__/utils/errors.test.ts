@@ -2,7 +2,7 @@ import { RPC, RpcError } from '../../src';
 
 describe('Error utility tests', () => {
   test('RpcError', () => {
-    const baseError: RPC.RPCSPEC0104.UNEXPECTED_ERROR = {
+    const baseError: RPC.RPCSPEC0105.UNEXPECTED_ERROR = {
       code: 63,
       message: 'An unexpected error occurred',
       data: 'data',

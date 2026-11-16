@@ -55,6 +55,7 @@ The Starknet.js version must align with the RPC version supported by the chosen 
 |            v0.10.2            | Starknet.js v10.8.0                   |
 |            v0.10.3            | Starknet.js v10.8.0                   |
 |            v0.10.4            | Starknet.js v10.8.0                   |
+|            v0.10.5            | Starknet.js v11.7.0                   |
 
 :::note
 

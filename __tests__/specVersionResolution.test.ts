@@ -90,6 +90,7 @@ describe('spec version resolution', () => {
         { reported: '0.10.2', resolved: '0.10.2' },
         { reported: '0.10.3-rc.0', resolved: '0.10.3' },
         { reported: '0.10.4', resolved: '0.10.4' },
+        { reported: '0.10.5', resolved: '0.10.5' },
       ];
 
       const providers = await Promise.all(

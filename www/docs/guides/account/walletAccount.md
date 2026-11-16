@@ -151,10 +151,11 @@ Reading the diagram: a **solid arrow** is an action your DAPP declares in its `S
 
 #### STRK20 actions
 
-A DAPP describes what it wants with an array of `STRK20_ACTION`. There are exactly five action types:
+A DAPP describes what it wants with an array of `STRK20_ACTION`. There are exactly six action types:
 
 | Action `type`             | Fields                                            | Effect                                                           |
 | ------------------------- | ------------------------------------------------- | ---------------------------------------------------------------- |
+| `"register"`              | (none)                                            | Registers the account in the pool. Must be alone in its request. |
 | `"deposit"`               | `token`, `amount`                                 | Public funds → pool (always to self).                            |
 | `"withdraw"`              | `token`, `amount`, `recipient`                    | Pool → public `recipient` address.                               |
 | `"transfer"`              | `token`, `amount` (FELT or `"OPEN"`), `recipient` | Private transfer inside the pool to another registered user.     |
@@ -180,6 +181,14 @@ const actions: STRK20_ACTION[] = [
   },
 ];
 ```
+
+Before any other action, the account must be registered in the pool, once. Until then, the wallet answers `NOT_REGISTERED`. To register, send a `register` action alone in its request:
+
+```typescript
+const result = await myWalletAccount.strk20InvokeTransaction([{ type: 'register' }]);
+```
+
+The wallet answers `INVALID_REQUEST_PAYLOAD` if the `register` action is mixed with other actions, or if the account is already registered. The `register` action comes with the wallet API 0.10.5.
 
 #### The invoke helper
 
