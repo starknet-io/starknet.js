@@ -64,7 +64,7 @@ Do the following steps:
 
 - Install [Docker](https://docs.docker.com/engine/install/) (it can also be installed via a package manager, e.g., `brew` for Mac)
 - Run `Docker` on your machine (open the application)
-- Run `docker pull shardlabs/starknet-devnet-rs:latest` in your terminal, or go to [starknet-devnet-rs](https://hub.docker.com/r/shardlabs/starknet-devnet-rs/tags), copy and run the `docker pull` command from the appropriate tag
+- Run `docker pull starknetfoundation/starknet-devnet-rs:latest` in your terminal, or go to [starknet-devnet-rs](https://hub.docker.com/r/starknetfoundation/starknet-devnet-rs/tags), copy and run the `docker pull` command from the appropriate tag
 - Run the tests
 
 ### Commit messages

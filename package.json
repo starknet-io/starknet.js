@@ -107,7 +107,7 @@
     "prettier": "^3.9.10",
     "prettier-plugin-import-sort": "^0.0.7",
     "semantic-release": "^25.0.9",
-    "starknet-devnet": "^0.10.1",
+    "starknet-devnet": "^0.11.0",
     "ts-node": "^10.9.2",
     "tsup": "^9.0.0",
     "type-coverage": "^2.31.2",

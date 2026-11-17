@@ -62,10 +62,10 @@ How to proceed is out of the scope of this guide, but you can for example:
 - Mint STRK on starknet-devnet, like so:
 
 ```bash
-// STRK
-curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"unit":"FRI"}' -H "Content-Type:application/json"
-// ETH
-curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"unit":"WEI"}' -H "Content-Type:application/json"
+# STRK
+curl -X POST http://127.0.0.1:5050/rpc -d '{"jsonrpc":"2.0","id":1,"method":"devnet_mint","params":{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"unit":"FRI"}}' -H "Content-Type:application/json"
+# ETH
+curl -X POST http://127.0.0.1:5050/rpc -d '{"jsonrpc":"2.0","id":1,"method":"devnet_mint","params":{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"unit":"WEI"}}' -H "Content-Type:application/json"
 ```
 
 ### Deployment of the new account
@@ -230,11 +230,16 @@ console.log('calculated fees =', estimatedFee);
 ```typescript
 // fund account address before account creation (easy in Devnet)
 const { data: answer } = await axios.post(
-  'http://127.0.0.1:5050/mint',
+  'http://127.0.0.1:5050/rpc',
   {
-    address: BraavosProxyAddress,
-    amount: 100_000_000_000_000_000_000,
-    unit: 'FRI',
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'devnet_mint',
+    params: {
+      address: BraavosProxyAddress,
+      amount: 100_000_000_000_000_000_000,
+      unit: 'FRI',
+    },
   },
   { headers: { 'Content-Type': 'application/json' } }
 );
@@ -392,11 +397,16 @@ console.log('Precalculated account address=', AAcontractAddress);
 
 // fund account address before account creation
 const { data: answer } = await axios.post(
-  'http://127.0.0.1:5050/mint',
+  'http://127.0.0.1:5050/rpc',
   {
-    address: AAcontractAddress,
-    amount: 50_000_000_000_000_000_000,
-    unit: 'FRI',
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'devnet_mint',
+    params: {
+      address: AAcontractAddress,
+      amount: 50_000_000_000_000_000_000,
+      unit: 'FRI',
+    },
   },
   { headers: { 'Content-Type': 'application/json' } }
 );
