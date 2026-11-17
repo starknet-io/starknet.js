@@ -1,38 +1,53 @@
-import { isHex } from './num';
+import { isHex, toBigInt } from './num';
 import { isBigInt, isString } from './typed';
 
 /**
- * Convert strk to fri or fri to strk
- * @throws {Error} if a strk amount has more than 18 decimals (1 strk = 10^18 fri)
+ * Convert strk to fri or fri to strk. Negative amounts are accepted in both directions.
+ * @param {string | bigint} amount amount to convert, in the unit given by `symbol`
+ * @param {'fri' | 'strk'} symbol unit of `amount`: 'fri' (default) gives strk, 'strk' gives fri
+ * @throws {Error} if a strk amount is not a bigint, a hex string or a decimal string
+ * (an optional minus sign, then digits with at most one dot)
+ * @throws {Error} if a strk amount has more than 18 decimals, not counting zeros at the end
+ * (1 strk = 10^18 fri)
+ * @throws {Error} if a fri amount is an empty string
  * @example
  * ```typescript
  * units(1000n, 'fri') // '0.000000000000001' strk
  * units('1', 'strk') // '1000000000000000000' fri
+ * units(-1n, 'fri') // '-0.000000000000000001' strk
  * ```
  */
-export function units(amount: string | bigint, simbol: 'fri' | 'strk' = 'fri') {
-  if (simbol === 'strk') {
-    let numStr = '';
-    if (isBigInt(amount)) numStr = amount.toString();
-    else if (isString(amount)) {
-      if (isHex(amount)) {
-        numStr = BigInt(amount).toString();
-      } else {
-        numStr = amount;
-      }
+export function units(amount: string | bigint, symbol: 'fri' | 'strk' = 'fri') {
+  if (symbol === 'strk') {
+    // TypeScript forbids other types, but plain JavaScript can pass a number
+    if (!isBigInt(amount) && !isString(amount)) {
+      throw new Error(`units: a strk amount must be a string or a bigint, not ${typeof amount}`);
     }
-
-    const [integer, decimal = '0'] = numStr.split('.');
-    if (decimal.length > 18) {
+    const numStr = isBigInt(amount) || isHex(amount) ? toBigInt(amount).toString() : amount;
+    // An optional minus sign, then digits with at most one dot: '1', '-1.5', '.5', '1.'
+    const match = /^(-?)(\d*)(?:\.(\d*))?$/.exec(numStr);
+    if (!match || `${match[2]}${match[3] ?? ''}` === '') {
+      throw new Error(`units: '${numStr}' is not a strk amount`);
+    }
+    const [, sign, integer, decimal = ''] = match;
+    // Zeros at the end change nothing: '1.50000000000000000000' is 1.5 strk
+    const significant = decimal.replace(/0+$/, '');
+    if (significant.length > 18) {
       // 1 strk = 10^18 fri, so more decimals can't be expressed in fri
       throw new Error(`units: '${numStr}' strk has more than 18 decimals`);
     }
-    const pdec = decimal.padEnd(18, '0');
-    // strip leading zeros, but keep the last digit so zero stays '0'
-    return `${integer}${pdec}`.replace(/\b0+(?=\d)/g, '');
+    const fri = BigInt(`${integer}${significant.padEnd(18, '0')}`);
+    // '-0' gives '0', without a sign
+    return fri === 0n ? '0' : `${sign}${fri.toString()}`;
   }
 
-  const bis = BigInt(amount).toString();
+  if (isString(amount) && amount.trim() === '') {
+    throw new Error('units: the fri amount is an empty string');
+  }
+  const fri = toBigInt(amount);
+  // Work on the absolute value: a minus sign would be counted as a digit
+  const sign = fri < 0n ? '-' : '';
+  const bis = (fri < 0n ? -fri : fri).toString();
   let strk;
   if (bis.length <= 18) {
     strk = `0.${bis.padStart(18, '0')}`;
@@ -40,5 +55,5 @@ export function units(amount: string | bigint, simbol: 'fri' | 'strk' = 'fri') {
     strk = `${bis.slice(0, bis.length - 18)}.${bis.slice(bis.length - 18)}`;
   }
 
-  return strk.replace(/(\.[0-9]*[1-9])0+$|\.0*$/, '$1');
+  return sign + strk.replace(/(\.[0-9]*[1-9])0+$|\.0*$/, '$1');
 }
