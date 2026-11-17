@@ -1,3 +1,9 @@
+## [11.7.2](https://github.com/starknet-io/starknet.js/compare/v11.7.1...v11.7.2) (2026-11-17)
+
+### Bug Fixes
+
+- units() refuses malformed amounts and handles negative amounts ([4b7d396](https://github.com/starknet-io/starknet.js/commit/4b7d39644ca19402087b6926f200503e3f639157))
+
 ## [11.7.1](https://github.com/starknet-io/starknet.js/compare/v11.7.0...v11.7.1) (2026-11-17)
 
 ### Bug Fixes
