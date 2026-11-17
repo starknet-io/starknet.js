@@ -1,3 +1,9 @@
+## [11.7.1](https://github.com/starknet-io/starknet.js/compare/v11.7.0...v11.7.1) (2026-11-17)
+
+### Bug Fixes
+
+- units() rejects strk amounts with more than 18 decimals and keeps zero ([4c1e43f](https://github.com/starknet-io/starknet.js/commit/4c1e43f17f6ccf23b7ebc5ad3018751ffc830d0e)), closes [#1756](https://github.com/starknet-io/starknet.js/issues/1756)
+
 # [11.7.0](https://github.com/starknet-io/starknet.js/compare/v11.6.3...v11.7.0) (2026-11-16)
 
 ### Features
