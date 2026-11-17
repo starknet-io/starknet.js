@@ -44,6 +44,75 @@ test('units', () => {
   });
 });
 
+test('units: short strk amounts', () => {
+  expect(units('.5', 'strk')).toEqual('500000000000000000');
+  expect(units('1.', 'strk')).toEqual('1000000000000000000');
+});
+
+test('units: negative strk amounts', () => {
+  expect(units('-1.5', 'strk')).toEqual('-1500000000000000000');
+  expect(units('-.5', 'strk')).toEqual('-500000000000000000');
+  expect(units(-1n, 'strk')).toEqual('-1000000000000000000');
+  // minus zero is zero, without a sign
+  expect(units('-0', 'strk')).toEqual('0');
+  expect(units('-0.0', 'strk')).toEqual('0');
+});
+
+test('units: zeros after the 18th decimal are accepted', () => {
+  expect(units('1.50000000000000000000', 'strk')).toEqual('1500000000000000000');
+  expect(units('0.0000000000000000010', 'strk')).toEqual('1');
+});
+
+test('units: a strk amount with several dots is refused', () => {
+  // '1.000.000' is one million in some countries: it must not become 1 strk
+  expect(() => units('1.000.000', 'strk')).toThrow("units: '1.000.000' is not a strk amount");
+  expect(() => units('1.2.3', 'strk')).toThrow("units: '1.2.3' is not a strk amount");
+});
+
+test('units: a strk amount with other characters is refused', () => {
+  // '1 ' must not become 1 fri
+  expect(() => units('1 ', 'strk')).toThrow("units: '1 ' is not a strk amount");
+  expect(() => units(' 1', 'strk')).toThrow("units: ' 1' is not a strk amount");
+  expect(() => units('1,5', 'strk')).toThrow("units: '1,5' is not a strk amount");
+  expect(() => units('+1.5', 'strk')).toThrow("units: '+1.5' is not a strk amount");
+  expect(() => units('1e3', 'strk')).toThrow("units: '1e3' is not a strk amount");
+  expect(() => units('--1', 'strk')).toThrow("units: '--1' is not a strk amount");
+  expect(() => units('-0x10', 'strk')).toThrow("units: '-0x10' is not a strk amount");
+});
+
+test('units: a strk amount with no digit is refused', () => {
+  expect(() => units('', 'strk')).toThrow("units: '' is not a strk amount");
+  expect(() => units('.', 'strk')).toThrow("units: '.' is not a strk amount");
+  expect(() => units('-', 'strk')).toThrow("units: '-' is not a strk amount");
+  expect(() => units('0x', 'strk')).toThrow("Invalid input: '0x' holds no hexadecimal digit");
+});
+
+test('units: a strk amount given as a number is refused', () => {
+  // TypeScript forbids it, but plain JavaScript can pass a number: it used to give 0 fri
+  expect(() => units(1.5 as unknown as string, 'strk')).toThrow(
+    'units: a strk amount must be a string or a bigint, not number'
+  );
+});
+
+test('units: negative fri amounts', () => {
+  expect(units(-1n, 'fri')).toEqual('-0.000000000000000001');
+  expect(units('-1', 'fri')).toEqual('-0.000000000000000001');
+  expect(units(-(10n ** 17n), 'fri')).toEqual('-0.1');
+  expect(units(-15n * 10n ** 17n, 'fri')).toEqual('-1.5');
+});
+
+test('units: negative amounts survive a round trip', () => {
+  expect(units(units('-0.000000000000000001', 'strk'), 'fri')).toEqual('-0.000000000000000001');
+  expect(units(units(-340n, 'fri'), 'strk')).toEqual('-340');
+});
+
+test('units: an empty fri amount is refused', () => {
+  // BigInt('') is 0n: without this check, '' would become '0' strk
+  expect(() => units('', 'fri')).toThrow('units: the fri amount is an empty string');
+  expect(() => units(' ', 'fri')).toThrow('units: the fri amount is an empty string');
+  expect(() => units('0x', 'fri')).toThrow("Invalid input: '0x' holds no hexadecimal digit");
+});
+
 test('isNode', () => {
   expect(IS_BROWSER).toBe(false);
 });
