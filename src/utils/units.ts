@@ -30,13 +30,13 @@ export function units(amount: string | bigint, symbol: 'fri' | 'strk' = 'fri') {
       throw new Error(`units: '${numStr}' is not a strk amount`);
     }
     const [, sign, integer, decimal = ''] = match;
-    // Zeros at the end change nothing: '1.50000000000000000000' is 1.5 strk
-    const significant = decimal.replace(/0+$/, '');
-    if (significant.length > 18) {
-      // 1 strk = 10^18 fri, so more decimals can't be expressed in fri
+    // 1 strk = 10^18 fri: a digit other than 0 after the 18th decimal is a fraction of a fri.
+    // Zeros there change nothing: '1.50000000000000000000' is 1.5 strk.
+    // Do not trim the zeros with /0+$/: it is very slow on a long run of zeros.
+    if (/[1-9]/.test(decimal.slice(18))) {
       throw new Error(`units: '${numStr}' strk has more than 18 decimals`);
     }
-    const fri = BigInt(`${integer}${significant.padEnd(18, '0')}`);
+    const fri = BigInt(`${integer}${decimal.slice(0, 18).padEnd(18, '0')}`);
     // '-0' gives '0', without a sign
     return fri === 0n ? '0' : `${sign}${fri.toString()}`;
   }
