@@ -45,17 +45,19 @@ console.log('RPC version =', resp);
 
 The Starknet.js version must align with the RPC version supported by the chosen node as shown below:
 
-| RPC spec version of your node | Starknet.js version to use            |
-| :---------------------------: | ------------------------------------- |
-|            v0.7.x             | Starknet.js v6.24.1 or v7.6.4         |
-|            v0.8.x             | Starknet.js v7.6.4 or v8.9.2          |
-|            v0.9.x             | Starknet.js v8.9.2, v9.4.2 or v10.8.0 |
-|            v0.10.0            | Starknet.js v9.4.2 or v10.8.0         |
-|            v0.10.1            | Not supported                         |
-|            v0.10.2            | Starknet.js v10.8.0                   |
-|            v0.10.3            | Starknet.js v10.8.0                   |
-|            v0.10.4            | Starknet.js v10.8.0                   |
-|            v0.10.5            | Starknet.js v11.7.0                   |
+| RPC spec version of your node | Starknet.js version to use                     |
+| :---------------------------: | ---------------------------------------------- |
+|            v0.7.x             | Starknet.js v6.24.1 or v7.6.4                  |
+|            v0.8.x             | Starknet.js v7.6.4 or v8.9.2                   |
+|            v0.9.x             | Starknet.js v8.9.2, v9.4.2, v10.8.0 or v11.7.0 |
+|            v0.10.0            | Starknet.js v9.4.2, v10.8.0 or v11.7.0         |
+|            v0.10.1            | Not supported                                  |
+|            v0.10.2            | Starknet.js v10.8.0 or v11.7.0                 |
+|            v0.10.3            | Starknet.js v10.8.0 or v11.7.0                 |
+|            v0.10.4            | Starknet.js v10.8.0 or v11.7.0                 |
+|            v0.10.5            | Starknet.js v11.7.0 (1)                        |
+
+(1) Starknet.js v10.8.0 also works with a v0.10.5 node, because this revision changes nothing in the RPC. But `RpcProvider.create()` logs a warning, and `provider.setUpSpecVersion()` throws an error.
 
 :::note
 
