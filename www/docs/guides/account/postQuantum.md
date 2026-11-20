@@ -108,7 +108,7 @@ await myProvider.waitForTransaction(transferHash);
 `declare` takes the same `{ skipValidate: false }` option.
 
 :::info Fees
-Checking a Falcon signature on-chain costs much more than checking an ECDSA one. Measured on devnet: a STRK transfer uses about 25 million units of L2 gas, about 13 times more than from an ECDSA account, and the deployment of the account about 39 million.
+Checking a Falcon signature on-chain costs much more than checking an ECDSA one: a STRK transfer uses 13 to 40 times more L2 gas, depending on the account (see [On-chain cost](#on-chain-cost)).
 
 By default, Starknet.js estimates the fees without running the validation of the account, so the estimate would miss this cost. Always pass `{ skipValidate: false }`, as in the examples above.
 :::
@@ -224,6 +224,19 @@ const isValid = falcon512.verifyMessage(
 ![Time to sign one INVOKE transaction: 4.5 ms with ECDSA, 15.1 ms with Falcon-512 (starknet/falcon), 8.5 ms with Falcon-512 (falcon-rs WASM)](./pictures/falcon-sign-tx-time.svg)
 
 The falcon-rs WASM is shown for comparison only: its signatures may leak information about the secret key (see [Keys created with falcon-rs](#keys-created-with-falcon-rs)).
+
+### On-chain cost
+
+Checking a Falcon signature costs much more L2 gas than checking an ECDSA one. L2 gas used by a STRK transfer:
+
+| Account                                | Signature | L2 gas of a STRK transfer | Compared with ECDSA |
+| -------------------------------------- | --------- | ------------------------- | ------------------- |
+| Standard (ECDSA, OpenZeppelin account) | 2 felts   | 1.85 million              | ×1                  |
+| S2morrow                               | 61 felts  | 24.9 million              | ×13.5               |
+| OpenZeppelin, hint                     | 60 felts  | 67.2 million              | ×36                 |
+| OpenZeppelin, direct                   | 31 felts  | 74.8 million              | ×40                 |
+
+Measured with starknet-devnet 0.11.0. The fee is this gas multiplied by the price of the gas, which changes every day.
 
 ## Limits
 
