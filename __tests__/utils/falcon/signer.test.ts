@@ -1,5 +1,6 @@
 import { inspect } from 'node:util';
 import {
+  CairoBytes31,
   CallData,
   constants,
   EDataAvailabilityMode,
@@ -16,8 +17,12 @@ import {
   type InvocationsSignerDetails,
 } from '../../../src';
 import { Falcon512Signer, falcon512 } from '../../../src/falcon';
+// Not exported by starknet/falcon (no blind signing): reached through their module.
+import { verifyHashOz } from '../../../src/falcon/oz/signature';
+import { publicKeyToNtt } from '../../../src/falcon/s2morrow/keys';
 import { loadFalconRsFixture } from './helpers/falconRsFixture';
 import { giftTypedData } from './helpers/giftTypedData';
+import { readOzFelts, readOzShortString } from './helpers/ozFixtures';
 
 const { secretKey, publicKey } = falcon512.generateKeyPair();
 const signer = new Falcon512Signer(secretKey);
@@ -181,5 +186,153 @@ describe('Falcon512Signer signatures verify against starknet.js hashes', () => {
       version: '0x1',
     } as unknown as InvocationsSignerDetails;
     await expect(signer.signTransaction(calls, details)).rejects.toThrow('only V3');
+  });
+});
+
+describe('Falcon512Signer for the OpenZeppelin accounts', () => {
+  const pkNtt = publicKeyToNtt(publicKey);
+  const invokeDetails: InvocationsSignerDetails = {
+    ...common,
+    walletAddress: ADDRESS,
+    cairoVersion: '1',
+    version: ETransactionVersion3.V3,
+  };
+  const deployDetails: DeployAccountSignerDetails = {
+    ...common,
+    nonce: 0,
+    classHash: '0x14660ce3739fbde6e33d994cebd6a9fb20e800516b2e1b6c253d4d09baa9ae0',
+    constructorCalldata: CallData.compile({ public_key: falcon512.getPackedPublicKey(publicKey) }),
+    addressSalt: '0x123',
+    contractAddress: ADDRESS,
+    version: ETransactionVersion3.V3,
+  };
+  const declareDetails: DeclareSignerDetails = {
+    ...common,
+    classHash: '0x123',
+    compiledClassHash: '0x456',
+    senderAddress: ADDRESS,
+    version: ETransactionVersion3.V3,
+  };
+  const deployHash = hash.calculateDeployAccountTransactionHash({
+    ...deployDetails,
+    salt: deployDetails.addressSalt,
+    compiledConstructorCalldata: CallData.compile(deployDetails.constructorCalldata),
+    version: deployDetails.version,
+    nonceDataAvailabilityMode: stark.intDAM(deployDetails.nonceDataAvailabilityMode),
+    feeDataAvailabilityMode: stark.intDAM(deployDetails.feeDataAvailabilityMode),
+  });
+  const declareHash = hash.calculateDeclareTransactionHash({
+    ...declareDetails,
+    version: declareDetails.version,
+    nonceDataAvailabilityMode: stark.intDAM(declareDetails.nonceDataAvailabilityMode),
+    feeDataAvailabilityMode: stark.intDAM(declareDetails.feeDataAvailabilityMode),
+  });
+  const messageHash = typedData.getMessageHash(giftTypedData, ADDRESS);
+  // OpenZeppelin reference data: the acceptance hashes of a key change and of an empty current key.
+  const rotationAddress = CairoBytes31.fromText(
+    readOzShortString('rotation_fixture', 'account_address')
+  ).toBigInt();
+  const rotationCurrentKey = readOzFelts('fixture', 'public_key');
+  const rotationHash = readOzFelts('rotation_fixture', 'accept_ownership_hash')[0];
+  const emptyKeyAddress = CairoBytes31.fromText(
+    readOzShortString('migration_fixture', 'account_address')
+  ).toBigInt();
+  const emptyKeyHash = readOzFelts('migration_fixture', 'accept_ownership_hash')[0];
+
+  test('without options, the signatures keep the S2morrow format (61 felts)', async () => {
+    const sig = await new Falcon512Signer(secretKey).signMessage(giftTypedData, ADDRESS);
+    expect(sig).toHaveLength(61);
+    expect(falcon512.verify(sig, messageHash, publicKey)).toBe(true);
+  });
+
+  test("'oz-hint': the four signing methods give valid 60-felt signatures", async () => {
+    const ozSigner = new Falcon512Signer(secretKey, { accountType: 'oz-hint' });
+    const invokeSig = (await ozSigner.signTransaction(calls, invokeDetails)) as string[];
+    const deploySig = (await ozSigner.signDeployAccountTransaction(deployDetails)) as string[];
+    const declareSig = (await ozSigner.signDeclareTransaction(declareDetails)) as string[];
+    const messageSig = (await ozSigner.signMessage(giftTypedData, ADDRESS)) as string[];
+    expect(invokeSig).toHaveLength(60);
+    expect(deploySig).toHaveLength(60);
+    expect(declareSig).toHaveLength(60);
+    expect(messageSig).toHaveLength(60);
+    expect(verifyHashOz(BigInt(invokeHash(invokeDetails)), invokeSig, pkNtt, 'hint')).toBe(true);
+    expect(verifyHashOz(BigInt(deployHash), deploySig, pkNtt, 'hint')).toBe(true);
+    expect(verifyHashOz(BigInt(declareHash), declareSig, pkNtt, 'hint')).toBe(true);
+    expect(verifyHashOz(BigInt(messageHash), messageSig, pkNtt, 'hint')).toBe(true);
+  });
+
+  test("'oz-direct': the four signing methods give valid 31-felt signatures", async () => {
+    const ozSigner = new Falcon512Signer(secretKey, { accountType: 'oz-direct' });
+    const invokeSig = (await ozSigner.signTransaction(calls, invokeDetails)) as string[];
+    const deploySig = (await ozSigner.signDeployAccountTransaction(deployDetails)) as string[];
+    const declareSig = (await ozSigner.signDeclareTransaction(declareDetails)) as string[];
+    const messageSig = (await ozSigner.signMessage(giftTypedData, ADDRESS)) as string[];
+    expect(invokeSig).toHaveLength(31);
+    expect(deploySig).toHaveLength(31);
+    expect(declareSig).toHaveLength(31);
+    expect(messageSig).toHaveLength(31);
+    expect(verifyHashOz(BigInt(invokeHash(invokeDetails)), invokeSig, pkNtt, 'direct')).toBe(true);
+    expect(verifyHashOz(BigInt(deployHash), deploySig, pkNtt, 'direct')).toBe(true);
+    expect(verifyHashOz(BigInt(declareHash), declareSig, pkNtt, 'direct')).toBe(true);
+    expect(verifyHashOz(BigInt(messageHash), messageSig, pkNtt, 'direct')).toBe(true);
+  });
+
+  test('fromFalconRs takes the option', async () => {
+    const fixture = loadFalconRsFixture();
+    const fromFalconRs = Falcon512Signer.fromFalconRs(fixture.secretKey, {
+      accountType: 'oz-direct',
+    });
+    const sig = (await fromFalconRs.signMessage(giftTypedData, ADDRESS)) as string[];
+    expect(sig).toHaveLength(31);
+    expect(verifyHashOz(BigInt(messageHash), sig, fixture.pkNtt, 'direct')).toBe(true);
+  });
+
+  test('an unknown option value is refused', () => {
+    expect(() => new Falcon512Signer(secretKey, { accountType: 'oz' } as any)).toThrow(
+      'unknown accountType'
+    );
+  });
+
+  test('signOwnershipAcceptance signs the acceptance hash of a key change', async () => {
+    const ozSigner = new Falcon512Signer(secretKey, { accountType: 'oz-hint' });
+    const sig = await ozSigner.signOwnershipAcceptance(rotationAddress, rotationCurrentKey);
+    expect(sig).toHaveLength(60);
+    expect(verifyHashOz(rotationHash, sig, pkNtt, 'hint')).toBe(true);
+  });
+
+  test('signOwnershipAcceptance accepts an empty current key', async () => {
+    const ozSigner = new Falcon512Signer(secretKey, { accountType: 'oz-direct' });
+    const sig = await ozSigner.signOwnershipAcceptance(emptyKeyAddress, []);
+    expect(sig).toHaveLength(31);
+    expect(verifyHashOz(emptyKeyHash, sig, pkNtt, 'direct')).toBe(true);
+  });
+
+  test('signOwnershipAcceptance refuses an S2morrow signer', async () => {
+    await expect(
+      new Falcon512Signer(secretKey).signOwnershipAcceptance(ADDRESS, [])
+    ).rejects.toThrow('cannot change its key');
+  });
+
+  test('signOwnershipAcceptance refuses a malformed current key', async () => {
+    const ozSigner = new Falcon512Signer(secretKey, { accountType: 'oz-hint' });
+    await expect(ozSigner.signOwnershipAcceptance(ADDRESS, '0x123' as any)).rejects.toThrow(
+      '29 felts, or none'
+    );
+    await expect(
+      ozSigner.signOwnershipAcceptance(ADDRESS, rotationCurrentKey.slice(0, 28))
+    ).rejects.toThrow('29 felts, or none');
+  });
+
+  test('signOwnershipAcceptance refuses a signRaw override that returns no array', async () => {
+    class ObjectSigner extends Falcon512Signer {
+      // eslint-disable-next-line class-methods-use-this
+      protected async signRaw(): Promise<any> {
+        return { r: 1n, s: 2n };
+      }
+    }
+    const objectSigner = new ObjectSigner(secretKey, { accountType: 'oz-hint' });
+    await expect(objectSigner.signOwnershipAcceptance(ADDRESS, [])).rejects.toThrow(
+      'signRaw must return an array of felts'
+    );
   });
 });
