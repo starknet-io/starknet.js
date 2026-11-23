@@ -67,9 +67,10 @@ export interface FalconEngine {
  * The engine of `starknet/falcon`, backed by a copy of `@noble/post-quantum` 0.7.1. This file is
  * the only one of `src/falcon/` that imports the copy.
  *
- * What is copied: `noble/falcon.ts`, `noble/_crystals.ts`, `noble/utils.ts` and `noble/LICENSE`
- * (MIT, Paul Miller), from the npm package `@noble/post-quantum@0.7.1`. The copy adds one thing:
- * `falcon512.internal`, with `sign(hashPoint, secretKey)` and `verify(s2, hashPoint, publicKey)`.
+ * What is copied: `noble/falcon.ts`, `noble/ml-kem.ts`, `noble/_crystals.ts`, `noble/utils.ts` and
+ * `noble/LICENSE` (MIT, Paul Miller), from the npm package `@noble/post-quantum@0.7.1`. The copy
+ * adds one thing: `falcon512.internal`, with `sign(hashPoint, secretKey)` and
+ * `verify(s2, hashPoint, publicKey)`.
  * noble 0.7.1 computes the hash point itself, with SHAKE256, inside `genFalcon`; the S2morrow
  * account needs a Poseidon hash point, computed by `s2morrow/hashToPoint.ts`. `noble/PATCH.md`
  * lists the changes, the exact diff and the SHA-256 of each copied file, checked by
@@ -82,7 +83,7 @@ export interface FalconEngine {
  * 1. `package.json`: add `@noble/post-quantum` to the dependencies, and remove `@noble/ciphers`
  *    (only the copy imports it; noble brings its own).
  * 2. Here: import `falcon512` from `@noble/post-quantum/falcon.js`, and adapt the four functions
- *    below if the published names differ.
+ *    below if the published names differ. Import `ml_kem768` from `@noble/post-quantum/ml-kem.js`.
  * 3. Delete the folder `noble/`, its line in `.prettierignore` (and the file, if no other line is
  *    left), the test `__tests__/utils/falcon/vendor.test.ts`, and the point "Traceable vendored
  *    code" of `src/falcon/SECURITY.md`.
@@ -102,3 +103,7 @@ export const nobleEngine: FalconEngine = Object.freeze({
   verifyHashPoint: (s2: Int16Array, hashPoint: Uint16Array, publicKey: Uint8Array) =>
     falcon512.internal.verify(s2, hashPoint, publicKey),
 });
+
+// ML-KEM-768 (FIPS 203), for the `mlkem` key exchange. Same copy of noble 0.7.1, with no change to
+// its code: its API is the one of the npm package.
+export { ml_kem768 } from './noble/ml-kem';

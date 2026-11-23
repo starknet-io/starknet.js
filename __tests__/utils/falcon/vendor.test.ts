@@ -16,6 +16,7 @@ test('vendored noble files match the SHA-256 recorded in PATCH.md', () => {
     'LICENSE',
     '_crystals.ts',
     'falcon.ts',
+    'ml-kem.ts',
     'utils.ts',
   ]);
   entries.forEach(({ hash, file }) => {

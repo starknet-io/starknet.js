@@ -2,7 +2,7 @@
 
 ## Origin
 
-- Package: `@noble/post-quantum@0.7.1` (npm): `src/falcon.ts`, `src/_crystals.ts`, `src/utils.ts`, `LICENSE` (MIT, Paul Miller).
+- Package: `@noble/post-quantum@0.7.1` (npm): `src/falcon.ts`, `src/ml-kem.ts`, `src/_crystals.ts`, `src/utils.ts`, `LICENSE` (MIT, Paul Miller).
 - npm integrity: `sha512-+P9981IiAnVh+rmcubozzVwrEy3XsN/tMhTnvsjV9VDaYpOnNCqWqKo2FLWxbu92YHfjGIlE5XnW175UK+ln+Q==`
 - Upstream repository: https://github.com/paulmillr/noble-post-quantum
 
@@ -14,10 +14,14 @@ outside noble. Version 0.7.1 has no hook for that. The patch mirrors what noble 
 ML-DSA (`ml_dsa*.internal` with `externalMu`). It is proposed upstream in
 https://github.com/paulmillr/noble-post-quantum/pull/55.
 
+`ml-kem.ts` (ML-KEM, FIPS 203) needs no patch. It is copied for the key exchange of `starknet/falcon` (the `mlkem`
+namespace). So all the noble code of this entry point comes from one source, and ML-KEM reuses `_crystals.ts` and
+`utils.ts`. It moves to the npm package together with Falcon.
+
 ## Changes (nothing else is modified)
 
 1. Relative import specifiers `'./x.ts'` → `'./x'` (starknet.js uses extensionless relative imports, resolved by tsup and Jest).
-2. A first line `/* eslint-disable -- … */` in the three `.ts` files: the lint rules of starknet.js do not apply to
+2. A first line `/* eslint-disable -- … */` in the four `.ts` files: the lint rules of starknet.js do not apply to
    this copy, and `eslint --fix` must not rewrite it. Prettier skips the whole folder through `.prettierignore`, at the
    root of the repo.
 3. New exported types `FalconInternalSignOpts` and `FalconInternal`, placed before the JSDoc of type `Falcon`; field
@@ -28,6 +32,8 @@ https://github.com/paulmillr/noble-post-quantum/pull/55.
      (`opts.random` for tests only); throws after 1000 attempts (`opts.maxIterations`) instead of
      looping forever; validates the hash point (512 coefficients < q) and works on a copy.
    - `internal.verify(s2, hashPoint, publicKey)`: `verifyRaw` without decoding and hashing.
+
+`ml-kem.ts` has changes 1 and 2 only.
 
 ## When this copy goes away
 
@@ -203,6 +209,31 @@ The steps are listed in the JSDoc of `../engine.ts`.
    };
    (res as any).__test = tests;
    return Object.freeze(res);
+--- upstream/ml-kem.ts
++++ vendored/ml-kem.ts
+@@ -1,3 +1,4 @@
++/* eslint-disable -- vendored copy of @noble/post-quantum 0.7.1, kept as is: see PATCH.md */
+ /**
+  * ML-KEM: Module Lattice-based Key Encapsulation Mechanism from
+  * [FIPS-203](https://csrc.nist.gov/pubs/fips/203/ipd). A.k.a. CRYSTALS-Kyber.
+@@ -22,7 +23,7 @@
+ /*! noble-post-quantum - MIT License (c) 2024 Paul Miller (paulmillr.com) */
+ import { sha3_256, sha3_512, shake256 } from '@noble/hashes/sha3.js';
+ import { type CHash, swap32IfBE, u32 } from '@noble/hashes/utils.js';
+-import { genCrystals, type XOF, XOF128 } from './_crystals.ts';
++import { genCrystals, type XOF, XOF128 } from './_crystals';
+ import {
+   abytes,
+   cleanBytes,
+@@ -36,7 +37,7 @@
+   type TArg,
+   type TRet,
+   vecCoder,
+-} from './utils.ts';
++} from './utils';
+ 
+ /** Key encapsulation mechanism interface */
+ 
 --- upstream/utils.ts
 +++ vendored/utils.ts
 @@ -1,3 +1,4 @@
@@ -216,6 +247,7 @@ The steps are listed in the JSDoc of `../engine.ts`.
 
 ```
 2af7f10e37bc0360503aab1a8b349759160cc22e2409e943542ac931905459a2  falcon.ts
+774c5e295b0fc82ceb3999f1f8a37a845fb0a48326a4648c5224b9ea49f0823b  ml-kem.ts
 6fd3e3340618c4da1d1bcde76893beed5ea642274f874e8b25dfea4af13660ec  _crystals.ts
 4d257a3f99c8ac0d6e74116086021e125de7d012a827e68af1f0a91b57034a02  utils.ts
 ```
@@ -228,5 +260,6 @@ Checked by `__tests__/utils/falcon/vendor.test.ts`. Regenerate this section afte
 0dea4b70b40ca57e3cfe30186e3dbd245147fe4d83ac566e92e70203aac59034  LICENSE
 ab0046303859b97176511aef7986295c10885380fbe1bf39f789183350b08ce7  _crystals.ts
 56b7fba7b1ddabb87d7f48ad19cc712f9b5c1587938c468e5e40bd0aefc31759  falcon.ts
+ba2ae6566f9b74a2b0f041ae24d1fd031686607edda5500f91e64d186b022580  ml-kem.ts
 d72471fb94efbe5fb4ce2b54a51874d7d5878e28167382be16b309d3be29cd96  utils.ts
 ```
