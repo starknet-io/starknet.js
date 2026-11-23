@@ -1,5 +1,12 @@
 import * as starknet from 'starknet';
 import {
+  parseFalconOptions,
+  type Falcon512AccountType,
+  type Falcon512Options,
+} from './accountType';
+import { ownershipAcceptanceHash } from './oz/ownership';
+import { signHashOz } from './oz/signature';
+import {
   getPublicKey,
   getPackedPublicKey,
   importFalconRsSecretKey,
@@ -27,11 +34,16 @@ function assertV3(details: starknet.InvocationsDetailsWithNonce): void {
 }
 
 /**
- * Signer for the S2morrow Falcon-512 account (post-quantum signature), in pure TypeScript.
+ * Signer for the Falcon-512 accounts (post-quantum signature), in pure TypeScript.
  *
  * Falcon-512 is a signature scheme built on lattices, designed to resist attacks by quantum
- * computers. The S2morrow account (https://github.com/feltroidprime/s2morrow) verifies it on-chain,
- * on a Poseidon hash of the transaction. A signature is 61 felts.
+ * computers. Three account contracts verify it on-chain, each with its own signature layout: the
+ * `accountType` option of the constructor selects it (see `Falcon512AccountType`).
+ * - `'s2morrow'` (default): the S2morrow account (https://github.com/feltroidprime/s2morrow), which
+ *   hashes the transaction with Poseidon. A signature is 61 felts.
+ * - `'oz-hint'` and `'oz-direct'`: the two Falcon-512 accounts of OpenZeppelin Contracts for Cairo
+ *   (pre-release v4.1.0-rc.0), which hash it with SHAKE-256. A signature is 60 felts with the hint
+ *   s1·h, which makes the on-chain check cheaper, or 31 felts without it.
  *
  * Fees: the on-chain verification costs much more L2 gas than an ECDSA one. By default, the fee
  * estimates of `Account` skip the validation of the signature (`skipValidate: true`), so they leave
@@ -55,21 +67,27 @@ export class Falcon512Signer implements starknet.SignerInterface {
 
   readonly #packedPublicKey: string[];
 
+  readonly #accountType: Falcon512AccountType;
+
   /**
    * Builds a signer from a NIST Falcon-512 secret key. The key is fully checked, then copied: the
    * signer keeps its own copy, in a private field.
    * @param {Uint8Array | string} secretKey NIST Falcon-512 secret key (1281 bytes), Uint8Array or
    * hex string. Prefer a Uint8Array: a string cannot be wiped from memory.
-   * @throws {Error} when the secret key is invalid
+   * @param {Falcon512Options} [options] `accountType`: the type of the account that checks the
+   * signatures, `'s2morrow'` (default), `'oz-hint'` or `'oz-direct'`
+   * @throws {Error} when the secret key or an option is invalid
    * @example
    * ```typescript
    * const { secretKey } = falcon512.generateKeyPair();
-   * const mySigner = new Falcon512Signer(secretKey);
+   * const mySigner = new Falcon512Signer(secretKey); // for an S2morrow account
+   * const myOzSigner = new Falcon512Signer(secretKey, { accountType: 'oz-hint' });
    * new Falcon512Signer(new Uint8Array(1281));
    * // throws Error("Falcon512: invalid secret key header")
    * ```
    */
-  constructor(secretKey: Uint8Array | string) {
+  constructor(secretKey: Uint8Array | string, options?: Falcon512Options) {
+    const accountType = parseFalconOptions(options); // read before the key is copied
     const bytes = toBytes(secretKey, SECRET_KEY_LENGTH, 'secret key');
     let publicKey: Uint8Array;
     try {
@@ -78,6 +96,7 @@ export class Falcon512Signer implements starknet.SignerInterface {
       bytes.fill(0); // the copy of an invalid key is not kept
       throw error;
     }
+    this.#accountType = accountType;
     this.#publicKey = publicKey;
     this.#secretKey = bytes;
     this.#pkNtt = publicKeyToNtt(this.#publicKey);
@@ -90,10 +109,12 @@ export class Falcon512Signer implements starknet.SignerInterface {
    * Warning: falcon-rs derives the seed of its sampler from the public salt of each signature, so
    * the signatures it produced may leak information about the secret key. Use this for continuity
    * only; for real funds, generate a new key with `falcon512.generateKeyPair`. The S2morrow account
-   * cannot change its key: a new key means a new account.
+   * cannot change its key: a new key means a new account. An OpenZeppelin account can change its
+   * key (see `signOwnershipAcceptance`).
    * @param {Uint8Array | string} secretKey the falcon-rs secret key (3584 bytes), or its hex string
+   * @param {Falcon512Options} [options] `accountType`, as for the constructor
    * @returns {Falcon512Signer} a signer that holds the same key, in the NIST format
-   * @throws {Error} when the falcon-rs secret key is invalid
+   * @throws {Error} when the falcon-rs secret key or an option is invalid
    * @example
    * ```typescript
    * const mySigner = Falcon512Signer.fromFalconRs(falconRsSecretKey); // 3584 bytes, from falcon-rs
@@ -101,10 +122,10 @@ export class Falcon512Signer implements starknet.SignerInterface {
    * // result = ['0xb2cf4f8b3c6f60cc662f438970ad34017e260c52d7911297a42811ce3cea2b', …] (29 felts)
    * ```
    */
-  static fromFalconRs(secretKey: Uint8Array | string): Falcon512Signer {
+  static fromFalconRs(secretKey: Uint8Array | string, options?: Falcon512Options): Falcon512Signer {
     const nist = importFalconRsSecretKey(secretKey);
     try {
-      return new Falcon512Signer(nist);
+      return new Falcon512Signer(nist, options);
     } finally {
       nist.fill(0);
     }
@@ -126,7 +147,9 @@ export class Falcon512Signer implements starknet.SignerInterface {
   }
 
   /**
-   * The 29 felts of the account constructor argument `pk_packed`.
+   * The 29 felts of the public key, in the form the accounts store it: the constructor argument
+   * `pk_packed` of S2morrow, or the `public_key` array of an OpenZeppelin account (whose
+   * constructor calldata is `29`, then these 29 felts). The same for the three account types.
    * @returns {string[]} the 29 felts, as hex strings (a new array at each call)
    * @example
    * ```typescript
@@ -144,11 +167,12 @@ export class Falcon512Signer implements starknet.SignerInterface {
    * Signs a SNIP-12 message (TypedData) for off-chain use.
    * @param {TypedData} typedData the message to sign
    * @param {string} accountAddress address of the account that signs the message
-   * @returns {Promise<Signature>} the 61 felts of the signature, as hex strings
+   * @returns {Promise<Signature>} the signature, as hex strings: 61 felts (S2morrow), 60
+   * (OpenZeppelin, hint) or 31 (OpenZeppelin, direct)
    * @example
    * ```typescript
    * const result = await mySigner.signMessage(myTypedData, accountAddress);
-   * // result = ['0x…', …] (61 felts, random salt); result[29] = '0x2' (salt length)
+   * // result = ['0x…', …] (S2morrow: 61 felts, random salt); result[29] = '0x2' (salt length)
    * ```
    */
   public async signMessage(
@@ -162,7 +186,8 @@ export class Falcon512Signer implements starknet.SignerInterface {
    * Signs an INVOKE transaction (V3 only).
    * @param {Call[]} transactions the calls of the transaction
    * @param {InvocationsSignerDetails} details the details needed to hash the transaction
-   * @returns {Promise<Signature>} the 61 felts of the signature, as hex strings
+   * @returns {Promise<Signature>} the signature, as hex strings: 61, 60 or 31 felts, according to
+   * the account type
    * @throws {Error} when the transaction is not V3
    * @example
    * ```typescript
@@ -191,7 +216,7 @@ export class Falcon512Signer implements starknet.SignerInterface {
    *   feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1,
    * };
    * const result = await mySigner.signTransaction(calls, details);
-   * // result = ['0x…', …] (61 felts)
+   * // result = ['0x…', …] (S2morrow: 61 felts)
    * ```
    */
   public async signTransaction(
@@ -217,7 +242,8 @@ export class Falcon512Signer implements starknet.SignerInterface {
   /**
    * Signs the DEPLOY_ACCOUNT transaction of a Falcon-512 account (V3 only).
    * @param {DeployAccountSignerDetails} details the details needed to hash the transaction
-   * @returns {Promise<Signature>} the 61 felts of the signature, as hex strings
+   * @returns {Promise<Signature>} the signature, as hex strings: 61, 60 or 31 felts, according to
+   * the account type
    * @throws {Error} when the transaction is not V3
    * @example
    * ```typescript
@@ -244,7 +270,7 @@ export class Falcon512Signer implements starknet.SignerInterface {
    *   feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1,
    * };
    * const result = await mySigner.signDeployAccountTransaction(details);
-   * // result = ['0x…', …] (61 felts)
+   * // result = ['0x…', …] (S2morrow: 61 felts)
    * ```
    */
   public async signDeployAccountTransaction(
@@ -266,7 +292,8 @@ export class Falcon512Signer implements starknet.SignerInterface {
   /**
    * Signs a DECLARE transaction (V3 only).
    * @param {DeclareSignerDetails} details the details needed to hash the transaction
-   * @returns {Promise<Signature>} the 61 felts of the signature, as hex strings
+   * @returns {Promise<Signature>} the signature, as hex strings: 61, 60 or 31 felts, according to
+   * the account type
    * @throws {Error} when the transaction is not V3
    * @example
    * ```typescript
@@ -289,7 +316,7 @@ export class Falcon512Signer implements starknet.SignerInterface {
    *   feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1,
    * };
    * const result = await mySigner.signDeclareTransaction(details);
-   * // result = ['0x…', …] (61 felts)
+   * // result = ['0x…', …] (S2morrow: 61 felts)
    * ```
    */
   public async signDeclareTransaction(
@@ -306,10 +333,65 @@ export class Falcon512Signer implements starknet.SignerInterface {
   }
 
   /**
-   * Signs a hash: the last step of all the methods above. It stays protected, so that no public
-   * method signs an arbitrary hash. A subclass can override it, as for every starknet.js signer.
+   * Signs the acceptance of a key change of an OpenZeppelin Falcon-512 account.
+   *
+   * The account changes its key when it calls its own `set_public_key(new_public_key, signature)`:
+   * the current key signs that transaction, as any other, and the new key must sign an acceptance.
+   * Call this method on the signer of the new key, with the key that the account holds now. The
+   * signed hash is Poseidon('StarkNet Message', 'accept_ownership', account address,
+   * Poseidon(current key)). It holds no chain id, nonce or expiry: an acceptance is not single-use,
+   * and the current key must still sign each key change.
+   * @param {BigNumberish} accountAddress the address of the account
+   * @param {BigNumberish[]} currentPublicKey the 29 felts of the key that the account holds now
+   * (`getPackedPublicKey()` of its current signer, or its `get_public_key`)
+   * @returns {Promise<string[]>} the acceptance, as hex strings, in the layout of this signer: 60
+   * felts (`'oz-hint'`) or 31 (`'oz-direct'`)
+   * @throws {Error} for an S2morrow signer (that account cannot change its key), or when the
+   * current key has neither 29 felts nor none, or a value is not a felt252. Also when a subclass
+   * makes `signRaw` return something else than an array of felts
+   * @example
+   * ```typescript
+   * const newSigner = new Falcon512Signer(newSecretKey, { accountType: 'oz-hint' });
+   * const acceptance = await newSigner.signOwnershipAcceptance(
+   *   falconAccount.address,
+   *   currentSigner.getPackedPublicKey()
+   * );
+   * const { transaction_hash } = await falconAccount.execute(
+   *   {
+   *     contractAddress: falconAccount.address,
+   *     entrypoint: 'set_public_key',
+   *     calldata: CallData.compile({
+   *       new_public_key: newSigner.getPackedPublicKey(),
+   *       signature: acceptance,
+   *     }),
+   *   },
+   *   { skipValidate: false }
+   * );
+   * await myProvider.waitForTransaction(transaction_hash);
+   * // From now on, the account checks the signatures of newSigner.
+   * ```
+   */
+  public async signOwnershipAcceptance(
+    accountAddress: starknet.BigNumberish,
+    currentPublicKey: readonly starknet.BigNumberish[]
+  ): Promise<string[]> {
+    if (this.#accountType === 's2morrow') {
+      throw new Error('Falcon512: an S2morrow account cannot change its key');
+    }
+    const signature = await this.signRaw(ownershipAcceptanceHash(accountAddress, currentPublicKey));
+    if (!Array.isArray(signature)) {
+      throw new Error('Falcon512: signRaw must return an array of felts');
+    }
+    return signature;
+  }
+
+  /**
+   * Signs a hash: the last step of all the methods above, in the layout of the account type. It
+   * stays protected, so that no public method signs an arbitrary hash. A subclass can override it,
+   * as for every starknet.js signer.
    * @param {string} msgHash the hash to sign, a felt252
-   * @returns {Promise<Signature>} the 61 felts of the signature, as hex strings
+   * @returns {Promise<Signature>} the signature, as hex strings: 61, 60 or 31 felts, according to
+   * the account type
    * @example
    * ```typescript
    * class LoggedFalconSigner extends Falcon512Signer {
@@ -323,6 +405,14 @@ export class Falcon512Signer implements starknet.SignerInterface {
    * ```
    */
   protected async signRaw(msgHash: string): Promise<starknet.Signature> {
-    return signHash(starknet.num.toBigInt(msgHash), this.#secretKey, this.#pkNtt);
+    const value = starknet.num.toBigInt(msgHash);
+    switch (this.#accountType) {
+      case 'oz-hint':
+        return signHashOz(value, this.#secretKey, this.#pkNtt, 'hint');
+      case 'oz-direct':
+        return signHashOz(value, this.#secretKey, this.#pkNtt, 'direct');
+      default: // 's2morrow'
+        return signHash(value, this.#secretKey, this.#pkNtt);
+    }
   }
 }

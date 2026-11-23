@@ -84,10 +84,12 @@ describe('src/falcon boundaries', () => {
     expect(violations).toEqual([]);
   });
 
-  test('s2morrow/ keeps no module-level cache (secret-derived values would outlive their use)', () => {
+  test('s2morrow/ and oz/ keep no module-level cache (secret-derived values would outlive their use)', () => {
     const moduleCache = /^(?:const|let|var)\s+(\w+)\s*(?::[^=]+)?=\s*new\s+(?:Map|Set|WeakMap)\b/gm;
     const violations = falconFiles
-      .filter((file) => file.includes(`${path.sep}s2morrow${path.sep}`))
+      .filter((file) =>
+        ['s2morrow', 'oz'].some((dir) => file.includes(`${path.sep}${dir}${path.sep}`))
+      )
       .flatMap((file) =>
         [...readFileSync(file, 'utf8').matchAll(moduleCache)].map(
           (m) => `${relative(file)}: module-level cache '${m[1]}'`
