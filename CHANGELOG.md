@@ -1,3 +1,9 @@
+# [11.8.0](https://github.com/starknet-io/starknet.js/compare/v11.7.2...v11.8.0) (2026-11-23)
+
+### Features
+
+- **falcon:** sign and verify for the OpenZeppelin Falcon-512 accounts ([f8034a2](https://github.com/starknet-io/starknet.js/commit/f8034a261e80f1e52e56dd88e3b712d7b7230a7d))
+
 ## [11.7.2](https://github.com/starknet-io/starknet.js/compare/v11.7.1...v11.7.2) (2026-11-17)
 
 ### Bug Fixes
