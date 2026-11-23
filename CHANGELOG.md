@@ -1,3 +1,9 @@
+# [11.9.0](https://github.com/starknet-io/starknet.js/compare/v11.8.0...v11.9.0) (2026-11-23)
+
+### Features
+
+- **falcon:** share a post-quantum secret between two Falcon accounts with ML-KEM-768 ([5e8aa3f](https://github.com/starknet-io/starknet.js/commit/5e8aa3f46a6e8d41c26aeb366fd453e73f6e4ea1))
+
 # [11.8.0](https://github.com/starknet-io/starknet.js/compare/v11.7.2...v11.8.0) (2026-11-23)
 
 ### Features
