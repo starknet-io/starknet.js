@@ -47,3 +47,19 @@ for f in fixture rotation_fixture migration_fixture; do
     -H "Accept: application/vnd.github.raw" | diff - "__mocks__/falcon/oz/$f.cairo" && echo "$f: identical"
 done
 ```
+
+## `nistMlKem768.json` — copied from the NIST test data of ML-KEM
+
+Three ML-KEM-768 cases of the test data that the NIST publishes for FIPS 203 (ACVP). The values are
+copied unchanged: hexadecimal strings, as in the NIST files. Source:
+https://github.com/usnistgov/ACVP-Server, tag `v1.1.0.43` (commit `975de31`), files
+`gen-val/json-files/ML-KEM-keyGen-FIPS203/internalProjection.json` and
+`gen-val/json-files/ML-KEM-encapDecap-FIPS203/internalProjection.json`. Read by
+`__tests__/utils/falcon/engine.test.ts`. These keys are public test material: never use them for
+real.
+
+| Part            | NIST file and case                   | Content                                                                                |
+| --------------- | ------------------------------------ | -------------------------------------------------------------------------------------- |
+| `keyGen`        | `ML-KEM-keyGen-FIPS203`, case 26     | `d` and `z` (32 bytes each), then the expected public key `ek` and secret key `dk`     |
+| `encapsulation` | `ML-KEM-encapDecap-FIPS203`, case 26 | a public key `ek` and a random value `m`, then the expected capsule `c` and secret `k` |
+| `decapsulation` | `ML-KEM-encapDecap-FIPS203`, case 86 | a secret key `dk` and a capsule `c`, then the expected secret `k`                      |

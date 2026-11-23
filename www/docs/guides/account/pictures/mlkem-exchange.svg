@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 660" width="800" height="660" role="img" aria-labelledby="title desc">
+  <title id="title">Sharing a secret between two Falcon accounts</title>
+  <desc id="desc">Sequence of the ML-KEM key exchange, then of an encrypted message. 1: Alice creates an ML-KEM key, signs it with her Falcon account, and sends to Bob the ML-KEM public key, its end of validity and her signature. 2: Bob reads the Falcon key of Alice on Starknet, checks her signature, gets the secret and a capsule with encapsulate, signs the capsule, and sends to Alice the capsule, a timestamp and his signature. 3: Alice reads the Falcon key of Bob on Starknet, checks his signature, and gets the same secret with decapsulate. Both have the same secret of 32 bytes, which is never sent. 4: Alice encrypts a text with AES-256-GCM, and sends the nonce and the encrypted text to Bob. 5: Bob decrypts the text with the secret. Blue arrows are sent off-chain, by any channel. Gray arrows are read on Starknet, with no transaction and no fee.</desc>
+  <style>
+    .surface { fill: #fcfcfb; stroke: rgba(11, 11, 11, 0.1); }
+    .halo { paint-order: stroke; stroke: #fcfcfb; stroke-width: 6px; stroke-linejoin: round; }
+    .ink1 { fill: #0b0b0b; }
+    .ink2 { fill: #52514e; }
+    .accent { fill: #2a78d6; }
+    .context { fill: #898781; }
+    .headbox { fill: #fcfcfb; stroke-width: 1.5; }
+    .headbox-person { stroke: #2a78d6; }
+    .headbox-chain { stroke: #898781; }
+    .notebox { fill: #f3f2ee; stroke: #c3c2b7; stroke-width: 1; }
+    .lifeline { stroke: #c3c2b7; stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .flow { stroke: #2a78d6; stroke-width: 2; }
+    .read { stroke: #898781; stroke-width: 2; }
+    .secret { stroke: #2a78d6; stroke-width: 2; stroke-dasharray: 7 5; }
+    .stepnum { fill: #ffffff; }
+    text { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    .title { font-size: 17px; font-weight: 600; }
+    .subtitle { font-size: 13px; }
+    .head { font-size: 14px; font-weight: 600; }
+    .headsub { font-size: 12px; }
+    .label { font-size: 13px; font-weight: 600; }
+    .note { font-size: 12.5px; }
+    .num { font-size: 12px; font-weight: 700; }
+    .legend { font-size: 12.5px; }
+    @media (prefers-color-scheme: dark) {
+      .surface { fill: #1a1a19; stroke: rgba(255, 255, 255, 0.1); }
+      .halo { stroke: #1a1a19; }
+      .ink1 { fill: #f0efec; }
+      .ink2 { fill: #c3c2b7; }
+      .accent { fill: #3987e5; }
+      .headbox { fill: #1a1a19; }
+      .headbox-person { stroke: #3987e5; }
+      .notebox { fill: #252523; stroke: #383835; }
+      .lifeline { stroke: #4a4a46; }
+      .flow { stroke: #3987e5; }
+      .secret { stroke: #3987e5; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow-flow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="accent" d="M0 0 L10 5 L0 10 z" />
+    </marker>
+    <marker id="arrow-read" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="context" d="M0 0 L10 5 L0 10 z" />
+    </marker>
+  </defs>
+
+  <rect class="surface" x="0.5" y="0.5" width="799" height="659" rx="12" stroke-width="1" />
+
+  <text class="title ink1" x="24" y="36">Sharing a secret between two Falcon accounts</text>
+  <text class="subtitle ink2" x="24" y="58">ML-KEM-768, then AES-256-GCM · the secret itself is never sent</text>
+
+  <!-- Columns: Alice at x = 180, Starknet at x = 420, Bob at x = 640. -->
+  <rect class="headbox headbox-person" x="100" y="78" width="160" height="46" rx="8" />
+  <text class="head ink1" x="180" y="97" text-anchor="middle">Alice</text>
+  <text class="headsub ink2" x="180" y="115" text-anchor="middle">dapp + Falcon account</text>
+
+  <rect class="headbox headbox-chain" x="320" y="78" width="200" height="46" rx="8" />
+  <text class="head ink1" x="420" y="97" text-anchor="middle">Starknet</text>
+  <text class="headsub ink2" x="420" y="115" text-anchor="middle">Falcon keys (get_public_key)</text>
+
+  <rect class="headbox headbox-person" x="560" y="78" width="160" height="46" rx="8" />
+  <text class="head ink1" x="640" y="97" text-anchor="middle">Bob</text>
+  <text class="headsub ink2" x="640" y="115" text-anchor="middle">dapp + Falcon account</text>
+
+  <line class="lifeline" x1="180" y1="124" x2="180" y2="600" />
+  <line class="lifeline" x1="420" y1="124" x2="420" y2="600" />
+  <line class="lifeline" x1="640" y1="124" x2="640" y2="600" />
+
+  <!-- Step 1: Alice creates and signs an ML-KEM key, then sends it to Bob. -->
+  <circle class="accent" cx="26" cy="159" r="11" />
+  <text class="num stepnum" x="26" y="163" text-anchor="middle">1</text>
+  <rect class="notebox" x="65" y="138" width="230" height="42" rx="6" />
+  <text class="note ink1" x="180" y="155" text-anchor="middle">createKey: a new ML-KEM key</text>
+  <text class="note ink1" x="180" y="172" text-anchor="middle">signs it with her account</text>
+  <line class="flow" x1="180" y1="210" x2="638" y2="210" marker-end="url(#arrow-flow)" />
+  <text class="label ink1 halo" x="410" y="202" text-anchor="middle">ML-KEM public key + validUntil + signature</text>
+
+  <!-- Step 2: Bob reads the Falcon key of Alice, checks, encapsulates, signs the capsule, sends it. -->
+  <circle class="accent" cx="26" cy="240" r="11" />
+  <text class="num stepnum" x="26" y="244" text-anchor="middle">2</text>
+  <line class="read" x1="420" y1="240" x2="638" y2="240" marker-end="url(#arrow-read)" />
+  <text class="label ink2 halo" x="530" y="232" text-anchor="middle">Falcon key of Alice</text>
+  <rect class="notebox" x="525" y="256" width="230" height="59" rx="6" />
+  <text class="note ink1" x="640" y="273" text-anchor="middle">checks the signature of Alice</text>
+  <text class="note ink1" x="640" y="290" text-anchor="middle">encapsulate: secret + capsule</text>
+  <text class="note ink1" x="640" y="307" text-anchor="middle">signs the capsule</text>
+  <line class="flow" x1="640" y1="344" x2="182" y2="344" marker-end="url(#arrow-flow)" />
+  <text class="label ink1 halo" x="410" y="336" text-anchor="middle">capsule + timestamp + signature</text>
+
+  <!-- Step 3: Alice reads the Falcon key of Bob, checks, decapsulates. -->
+  <circle class="accent" cx="26" cy="374" r="11" />
+  <text class="num stepnum" x="26" y="378" text-anchor="middle">3</text>
+  <line class="read" x1="420" y1="374" x2="182" y2="374" marker-end="url(#arrow-read)" />
+  <text class="label ink2 halo" x="300" y="366" text-anchor="middle">Falcon key of Bob</text>
+  <rect class="notebox" x="65" y="390" width="230" height="42" rx="6" />
+  <text class="note ink1" x="180" y="407" text-anchor="middle">checks the signature of Bob</text>
+  <text class="note ink1" x="180" y="424" text-anchor="middle">decapsulate: the same secret</text>
+
+  <!-- Both have the same secret. -->
+  <line class="secret" x1="180" y1="462" x2="640" y2="462" />
+  <circle class="accent" cx="180" cy="462" r="5" />
+  <circle class="accent" cx="640" cy="462" r="5" />
+  <text class="label ink1 halo" x="410" y="456" text-anchor="middle">same secret (32 bytes), never sent</text>
+
+  <!-- Step 4: Alice encrypts a text with the secret, and sends it. -->
+  <circle class="accent" cx="26" cy="493" r="11" />
+  <text class="num stepnum" x="26" y="497" text-anchor="middle">4</text>
+  <rect class="notebox" x="65" y="480" width="230" height="26" rx="6" />
+  <text class="note ink1" x="180" y="497" text-anchor="middle">encrypts a text with AES-256-GCM</text>
+  <line class="flow" x1="180" y1="536" x2="638" y2="536" marker-end="url(#arrow-flow)" />
+  <text class="label ink1 halo" x="410" y="528" text-anchor="middle">nonce + encrypted text</text>
+
+  <!-- Step 5: Bob decrypts it. -->
+  <circle class="accent" cx="26" cy="565" r="11" />
+  <text class="num stepnum" x="26" y="569" text-anchor="middle">5</text>
+  <rect class="notebox" x="525" y="552" width="230" height="26" rx="6" />
+  <text class="note ink1" x="640" y="569" text-anchor="middle">decrypts the text with the secret</text>
+
+  <!-- Legend -->
+  <line class="flow" x1="40" y1="626" x2="78" y2="626" marker-end="url(#arrow-flow)" />
+  <text class="legend ink2" x="90" y="630">sent off-chain, by any channel</text>
+  <line class="read" x1="360" y1="626" x2="398" y2="626" marker-end="url(#arrow-read)" />
+  <text class="legend ink2" x="410" y="630">read on Starknet: no transaction, no fee</text>
+</svg>

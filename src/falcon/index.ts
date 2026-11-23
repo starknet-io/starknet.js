@@ -10,11 +10,17 @@
  * const myOzSigner = new Falcon512Signer(secretKey, { accountType: 'oz-hint' });
  * ```
  *
+ * `mlkem` is a post-quantum key exchange between two Falcon-512 accounts of OpenZeppelin, with
+ * ML-KEM-768 (FIPS 203). Alice publishes an ML-KEM key, signed by her account. Bob sends her a
+ * capsule, signed by his account. Then both have the same secret. See `mlkem.createKey`.
+ *
  * The Falcon code is a copy of `@noble/post-quantum` 0.7.1 (MIT, Paul Miller), with one addition:
  * signing and verifying a hash point computed outside noble, because the S2morrow account hashes
  * the transaction with Poseidon, not with SHAKE256. This addition is proposed to noble in
  * https://github.com/paulmillr/noble-post-quantum/pull/55. Once noble publishes it,
  * `starknet/falcon` will use the npm package and drop the copy, with no change to its own API.
+ * The ML-KEM code of `mlkem` is a copy of the same version, with no addition: it moves to the npm
+ * package together with the Falcon code.
  *
  * Status: Falcon as submitted to Round 3 of the NIST post-quantum standardization, not FN-DSA
  * (FIPS 206); noble has no independent audit (its author audited version 0.6.1); signing is not
@@ -23,5 +29,12 @@
  */
 export { Falcon512Signer } from './Falcon512Signer';
 export * as falcon512 from './falcon512';
+export * as mlkem from './mlkem';
 export type { Falcon512KeyPair } from './s2morrow/keys';
 export type { Falcon512AccountType, Falcon512Options } from './accountType';
+export type {
+  MlKemEncapsulation,
+  MlKemKey,
+  MlKemSignedCapsule,
+  MlKemSignedKey,
+} from './mlkem/mlkem.type';

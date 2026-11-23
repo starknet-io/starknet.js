@@ -1,4 +1,6 @@
-import { nobleEngine } from '../../../src/falcon/engine/engine';
+import { concatBytes, hexToBytes } from '@noble/hashes/utils.js';
+import nistMlKem768 from '../../../__mocks__/falcon/nistMlKem768.json';
+import { ml_kem768, nobleEngine } from '../../../src/falcon/engine/engine';
 import { falcon512 } from '../../../src/falcon/engine/noble/falcon';
 
 const N = 512;
@@ -72,5 +74,38 @@ describe('nobleEngine', () => {
     const hp = randomHashPoint();
     const s2 = nobleEngine.signHashPoint(hp, secretKey);
     expect(nobleEngine.verifyHashPoint(s2, hp, publicKey)).toBe(true);
+  });
+});
+
+// The copy of noble for ML-KEM-768 (`noble/ml-kem.ts`) must give the results that the NIST gives
+// for FIPS 203. Data and source: __mocks__/falcon/README.md.
+describe('noble copy: ML-KEM-768 gives the results of the NIST', () => {
+  test('creating the keys: from d and z, the expected public key and secret key', () => {
+    const { keyGen } = nistMlKem768;
+    // The seed is d, then z (64 bytes). It is also the seed that `mlkem.createKey` gives to Alice.
+    const seed = concatBytes(hexToBytes(keyGen.d), hexToBytes(keyGen.z));
+    const { publicKey: ek, secretKey: dk } = ml_kem768.keygen(seed);
+    expect(ek).toEqual(hexToBytes(keyGen.ek));
+    expect(dk).toEqual(hexToBytes(keyGen.dk));
+  });
+
+  test('encapsulation: from a public key and a random value, the expected capsule and secret', () => {
+    const { encapsulation } = nistMlKem768;
+    // noble calls the capsule `cipherText`.
+    const { cipherText, sharedSecret } = ml_kem768.encapsulate(
+      hexToBytes(encapsulation.ek),
+      hexToBytes(encapsulation.m)
+    );
+    expect(cipherText).toEqual(hexToBytes(encapsulation.c));
+    expect(sharedSecret).toEqual(hexToBytes(encapsulation.k));
+  });
+
+  test('decapsulation: from a secret key and a capsule, the expected secret', () => {
+    const { decapsulation } = nistMlKem768;
+    const sharedSecret = ml_kem768.decapsulate(
+      hexToBytes(decapsulation.c),
+      hexToBytes(decapsulation.dk)
+    );
+    expect(sharedSecret).toEqual(hexToBytes(decapsulation.k));
   });
 });
