@@ -388,6 +388,78 @@ describe('Deployer.buildDeployerCall with already compiled felts for a NonZero p
   });
 });
 
+describe('Deployer.buildDeployerCall for a Secp256k1Point parameter', () => {
+  // an account whose constructor takes public_key: Secp256k1Point. The constructor refuses a point
+  // that is not on the curve, so the deployment would fail on the node.
+  const accountEthAbi = CONTRACTS.AccountEthOz090.sierra.abi;
+  const classHash = '0x1234';
+  const deployerAddress = '0xabc';
+  const salt = '0x1';
+  // an Ethereum public key, x || y, then its four limbs as the constructor takes them
+  const ethPubKey =
+    '0x8c7aea7d673a5858bdca128d124fb0765cceb2c16f198f4c14b328aa571331e6f6c87f51d5224d73d118765cb19d7565212f80be5048bff926ba791c17541c92';
+  const ethPubKeyFelts = [
+    '0x5cceb2c16f198f4c14b328aa571331e6',
+    '0x8c7aea7d673a5858bdca128d124fb076',
+    '0x212f80be5048bff926ba791c17541c92',
+    '0xf6c87f51d5224d73d118765cb19d7565',
+  ].map((felt) => BigInt(felt).toString());
+  // (1, 1) : 1^2 is not 1^3 + 7
+  const notOnCurve = `0x${'1'.padStart(64, '0')}${'1'.padStart(64, '0')}`;
+  const notOnCurveMessage =
+    'Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it';
+
+  test('accepts a point on the curve, as a parameter', () => {
+    const deployer = new Deployer();
+    const calldata = deployer.buildDeployerCall(
+      { classHash, salt, abi: accountEthAbi, constructorCalldata: { public_key: ethPubKey } },
+      deployerAddress
+    ).calls[0].calldata as Calldata;
+
+    expect(calldata.slice(4)).toEqual(ethPubKeyFelts);
+  });
+
+  test('accepts a point on the curve, as already compiled felts', () => {
+    const deployer = new Deployer();
+    const calldata = deployer.buildDeployerCall(
+      {
+        classHash,
+        salt,
+        abi: accountEthAbi,
+        constructorCalldata: CallData.compile(ethPubKeyFelts),
+      },
+      deployerAddress
+    ).calls[0].calldata as Calldata;
+
+    expect(calldata.slice(4)).toEqual(ethPubKeyFelts);
+  });
+
+  test('refuses a point that is not on the curve, as a parameter', () => {
+    const deployer = new Deployer();
+    expect(() =>
+      deployer.buildDeployerCall(
+        { classHash, salt, abi: accountEthAbi, constructorCalldata: { public_key: notOnCurve } },
+        deployerAddress
+      )
+    ).toThrow(notOnCurveMessage);
+  });
+
+  test('refuses a point that is not on the curve, as already compiled felts', () => {
+    const deployer = new Deployer();
+    expect(() =>
+      deployer.buildDeployerCall(
+        {
+          classHash,
+          salt,
+          abi: accountEthAbi,
+          constructorCalldata: CallData.compile(['1', '0', '1', '0']),
+        },
+        deployerAddress
+      )
+    ).toThrow(`The compiled constructor calldata does not match the abi: ${notOnCurveMessage}`);
+  });
+});
+
 describe('Contract method options', () => {
   // one view function with one parameter; `as const` lets typedv2() know its types
   const abi = [
