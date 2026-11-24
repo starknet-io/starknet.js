@@ -33,6 +33,18 @@ describe('secp256k1Point cairo type test', () => {
     );
   });
 
+  test('secp256k1Point not on the curve', () => {
+    // (1, 1) : 1^2 is not 1^3 + 7, so the account constructor would refuse it
+    const point = `0x${'1'.padStart(64, '0')}${'1'.padStart(64, '0')}`;
+    expect(() => {
+      myCallDataAccount.compile('constructor', {
+        public_key: point,
+      });
+    }).toThrow(
+      'Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it'
+    );
+  });
+
   test('secp256k1Point parse', () => {
     const res = myCallDataTest.parse('get_public_key', [
       '0x5cceb2c16f198f4c14b328aa571331e6',

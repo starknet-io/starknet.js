@@ -183,7 +183,9 @@ const expectedLimbs = (value: bigint): string[] => {
 };
 
 describe('the leaf types the strategy now carries', () => {
-  const PUB_KEY = BigInt(`0x${'1a'.repeat(64)}`);
+  // an Ethereum public key, x || y : a point on the curve, as a point must be to be sent
+  const PUB_KEY =
+    0x8c7aea7d673a5858bdca128d124fb0765cceb2c16f198f4c14b328aa571331e6f6c87f51d5224d73d118765cb19d7565212f80be5048bff926ba791c17541c92n;
 
   describe('core::bool', () => {
     test('serializes the two values a bool has', () => {
@@ -249,7 +251,8 @@ describe('the leaf types the strategy now carries', () => {
     test.each(abiVersions)('%s emits four felts, x then y', (_name, abiFor) => {
       const callData = new CallData(abiFor(SECP256K1_POINT));
       expect(callData.compile('fn', [PUB_KEY])).toEqual(expectedLimbs(PUB_KEY));
-      expect(callData.compile('fn', [1n])).toEqual(['0', '0', '1', '0']);
+      // (0, 0), the point at infinity
+      expect(callData.compile('fn', [0n])).toEqual(['0', '0', '0', '0']);
     });
 
     test('both strategies emit the same four felts, since this is not a check', () => {
@@ -276,6 +279,19 @@ describe('the leaf types the strategy now carries', () => {
       expect(() => new CallData(abiV2(SECP256K1_POINT)).compile('fn', [2n ** 512n])).toThrow(
         'input is bigger than SECP256K1_POINT_MAX'
       );
+    });
+
+    test('refuses a point that is not on the curve, in both strategies', () => {
+      // (1, 1) : 1^2 is not 1^3 + 7
+      const notOnCurve = 2n ** 256n + 1n;
+      const message =
+        'Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it';
+      expect(() => new CallData(abiV2(SECP256K1_POINT)).compile('fn', [notOnCurve])).toThrow(
+        message
+      );
+      expect(() =>
+        new CallData(abiV2(SECP256K1_POINT), fastCairoTypeStrategy).compile('fn', [notOnCurve])
+      ).toThrow(message);
     });
   });
 });

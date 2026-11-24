@@ -6,10 +6,12 @@ import { isText } from '../shortString';
 import { isNumber, isObject } from '../typed';
 import assert from '../assert';
 import { addCompiledFlag } from '../helpers';
-import { UINT_128_MAX } from './uint256';
+import { UINT_128_MAX, UINT_256_MAX } from './uint256';
 
 /**
- * The largest value a Secp256k1Point can carry : both coordinates at their maximum, 512 bits.
+ * The largest number the 512 bits of a Secp256k1Point can hold : both coordinates at their
+ * maximum. It is only a bound : a point must also be on the curve, and this value is not, so
+ * `new CairoSecp256k1Point(SECP256K1_POINT_MAX)` throws.
  * @example
  * ```typescript
  * const result = SECP256K1_POINT_MAX === (1n << 512n) - 1n;
@@ -27,6 +29,77 @@ export const SECP256K1_POINT_MAX = (1n << 512n) - 1n;
  * ```
  */
 export const SECP256K1_POINT_MIN = 0n;
+
+// p, the prime of the secp256k1 curve : each coordinate of a point is a number modulo p
+const SECP256K1_PRIME = 2n ** 256n - 2n ** 32n - 977n;
+
+/**
+ * Throw unless (x, y) is a point that a contract accepts as a Secp256k1Point.
+ *
+ * A contract reads such a parameter with the `secp256k1_new` syscall. It accepts (0, 0), which
+ * stands for the point at infinity. Otherwise it refuses a coordinate that is not smaller than p,
+ * and a point that is not on the curve y^2 = x^3 + 7 modulo p.
+ * @param {bigint} x the x coordinate
+ * @param {bigint} y the y coordinate
+ * @throws {Error} when a coordinate is not smaller than p, or when the point is not on the curve
+ * @example
+ * ```typescript
+ * // G, the generator of the curve
+ * assertOnSecp256k1Curve(
+ *   0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798n,
+ *   0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n
+ * );
+ * // no error
+ * assertOnSecp256k1Curve(0n, 0n);
+ * // no error : the point at infinity
+ * assertOnSecp256k1Curve(1n, 1n);
+ * // throws Error("Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it")
+ * ```
+ */
+function assertOnSecp256k1Curve(x: bigint, y: bigint): void {
+  if (x === 0n && y === 0n) {
+    return;
+  }
+  assert(
+    x < SECP256K1_PRIME,
+    'Secp256k1Point: x must be smaller than p, the prime of the secp256k1 curve'
+  );
+  assert(
+    y < SECP256K1_PRIME,
+    'Secp256k1Point: y must be smaller than p, the prime of the secp256k1 curve'
+  );
+  assert(
+    (y * y) % SECP256K1_PRIME === (x * x * x + 7n) % SECP256K1_PRIME,
+    'Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it'
+  );
+}
+
+/**
+ * Throw unless one limb of a point is a whole number that fits in 128 bits, and return it.
+ * @param {BigNumberish} limb the limb to check
+ * @param {string} name the name of the limb, used in the error message
+ * @returns {bigint} the limb, once checked
+ * @throws {Error} when the limb is null, undefined, text, `'0x'`, not a number, a decimal number, negative, or wider than 128 bits
+ * @example
+ * ```typescript
+ * const result = validateLimb('0x12', 'xLow');
+ * // result = 18n
+ * validateLimb(2n ** 128n, 'yHigh');
+ * // throws Error("yHigh must fit in 128 bits")
+ * ```
+ */
+function validateLimb(limb: BigNumberish, name: string): bigint {
+  assert(limb !== null, `${name} cannot be null`);
+  assert(limb !== undefined, `${name} cannot be undefined`);
+  assert(!isText(limb), `${name} cannot be built from text`);
+  assert(!isEmptyHex(limb), `${name} cannot be '0x', which holds no hexadecimal digit`);
+  assert(isBigNumberish(limb), `${name} must be a BigNumberish`);
+  assert(!isNumber(limb) || Number.isInteger(limb), `${name} must be an integer`);
+  const bigInt = BigInt(limb);
+  assert(bigInt >= 0n, `${name} must be non-negative`);
+  assert(bigInt <= UINT_128_MAX, `${name} must fit in 128 bits`);
+  return bigInt;
+}
 
 /**
  * The four 128-bit limbs a Secp256k1Point occupies on the wire, in the order a call carries them.
@@ -47,17 +120,33 @@ export interface Secp256k1PointStruct {
  * class accepts is the 512-bit concatenation `x || y`, x in the upper half : that is the shape an
  * uncompressed public key already has once its `04` prefix is dropped.
  *
- * Both ways in are supported : one number, or the four limbs directly, which is how a response is
- * read back.
+ * Both ways in are supported : one number, or the four limbs directly, in the order a call carries
+ * them.
+ *
+ * What the caller passes in is checked as soon as the point is built : it must be on the curve, or
+ * be (0, 0), which stands for the point at infinity, since a contract refuses anything else. A
+ * point read from a contract response is taken as it comes, without this check.
  * @example
  * ```typescript
- * // one number, x in the upper 256 bits
- * const point = new CairoSecp256k1Point(1n);
- * point.toApiRequest(); // ["0", "0", "1", "0"]     x = 0, y = 1
+ * // G, the generator of the curve, as one number : x in the upper 256 bits, y in the lower ones
+ * const G =
+ *   0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n;
+ * const point = new CairoSecp256k1Point(G);
+ * point.toStruct();
+ * // { xLow: "0x29bfcdb2dce28d959f2815b16f81798", xHigh: "0x79be667ef9dcbbac55a06295ce870b07",
+ * //   yLow: "0xfd17b448a68554199c47d08ffb10d4b8", yHigh: "0x483ada7726a3c4655da4fbfc0e1108a8" }
  *
- * // the four limbs, as a call carries them
- * const same = new CairoSecp256k1Point(0, 0, 1, 0);
- * same.toBigInt(); // 1n
+ * // the same point from its four limbs, as a call carries them
+ * const same = new CairoSecp256k1Point(
+ *   '0x29bfcdb2dce28d959f2815b16f81798',
+ *   '0x79be667ef9dcbbac55a06295ce870b07',
+ *   '0xfd17b448a68554199c47d08ffb10d4b8',
+ *   '0x483ada7726a3c4655da4fbfc0e1108a8'
+ * );
+ * same.toBigInt() === G; // true
+ *
+ * new CairoSecp256k1Point(1n); // x = 0, y = 1
+ * // throws Error("Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it")
  * ```
  */
 export class CairoSecp256k1Point {
@@ -65,8 +154,9 @@ export class CairoSecp256k1Point {
    * The low 128 bits of the x coordinate.
    * @example
    * ```typescript
-   * const result = new CairoSecp256k1Point({ xLow: 1, xHigh: 2, yLow: 3, yHigh: 4 }).xLow;
-   * // result = 1n
+   * // G, the generator of the curve, as in the example of the class
+   * const result = new CairoSecp256k1Point(G).xLow;
+   * // result = 0x29bfcdb2dce28d959f2815b16f81798n
    * ```
    */
   public xLow: bigint;
@@ -75,8 +165,9 @@ export class CairoSecp256k1Point {
    * The high 128 bits of the x coordinate.
    * @example
    * ```typescript
-   * const result = new CairoSecp256k1Point({ xLow: 1, xHigh: 2, yLow: 3, yHigh: 4 }).xHigh;
-   * // result = 2n
+   * // G, the generator of the curve, as in the example of the class
+   * const result = new CairoSecp256k1Point(G).xHigh;
+   * // result = 0x79be667ef9dcbbac55a06295ce870b07n
    * ```
    */
   public xHigh: bigint;
@@ -85,8 +176,9 @@ export class CairoSecp256k1Point {
    * The low 128 bits of the y coordinate.
    * @example
    * ```typescript
-   * const result = new CairoSecp256k1Point({ xLow: 1, xHigh: 2, yLow: 3, yHigh: 4 }).yLow;
-   * // result = 3n
+   * // G, the generator of the curve, as in the example of the class
+   * const result = new CairoSecp256k1Point(G).yLow;
+   * // result = 0xfd17b448a68554199c47d08ffb10d4b8n
    * ```
    */
   public yLow: bigint;
@@ -95,8 +187,9 @@ export class CairoSecp256k1Point {
    * The high 128 bits of the y coordinate.
    * @example
    * ```typescript
-   * const result = new CairoSecp256k1Point({ xLow: 1, xHigh: 2, yLow: 3, yHigh: 4 }).yHigh;
-   * // result = 4n
+   * // G, the generator of the curve, as in the example of the class
+   * const result = new CairoSecp256k1Point(G).yHigh;
+   * // result = 0x483ada7726a3c4655da4fbfc0e1108a8n
    * ```
    */
   public yHigh: bigint;
@@ -128,14 +221,14 @@ export class CairoSecp256k1Point {
    * @param {any[]} arr either one value — a 512-bit number or a {@link Secp256k1PointStruct} — or
    * the four limbs
    * @throws {Error} when a value is null, undefined, of an unread type, text, a decimal number, or out
-   * of range — see {@link CairoSecp256k1Point.validate} and {@link CairoSecp256k1Point.validateProps}
-   * — or when the argument count is neither 1 nor 4
+   * of range, or when the point is not on the curve — see {@link CairoSecp256k1Point.validate} and
+   * {@link CairoSecp256k1Point.validateProps} — or when the argument count is neither 1 nor 4
    * @example
    * ```typescript
-   * const result = new CairoSecp256k1Point(1n).toApiRequest();
-   * // result = ["0", "0", "1", "0"]
-   * const result2 = new CairoSecp256k1Point({ xLow: 1, xHigh: 2, yLow: 3, yHigh: 4 }).toApiRequest();
-   * // result2 = ["1", "2", "3", "4"]
+   * const result = new CairoSecp256k1Point(0n).toApiRequest();
+   * // result = ["0", "0", "0", "0"]     (0, 0), the point at infinity
+   * new CairoSecp256k1Point({ xLow: 1, xHigh: 2, yLow: 3, yHigh: 4 });
+   * // throws Error("Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it")
    * ```
    */
   public constructor(...arr: any[]) {
@@ -183,17 +276,22 @@ export class CairoSecp256k1Point {
   }
 
   /**
-   * Throw unless the value can be carried by a Secp256k1Point, and return it as a number.
+   * Throw unless the value is a point that a contract accepts, and return it as a number.
+   *
+   * The value must fit in 512 bits, and the point it stands for must be on the curve, or be (0, 0),
+   * the point at infinity.
    *
    * Unlike the other classes here this one gives the number back rather than returning nothing :
    * the constructor needs it, and computing it twice would mean splitting a 512-bit value twice.
    * @param {BigNumberish} input the 512-bit value to check
    * @returns {bigint} the value, once checked
-   * @throws {Error} when the value is null, undefined, text, `'0x'`, of an unread type, a decimal number, or outside [0, 2^512 - 1]
+   * @throws {Error} when the value is null, undefined, text, `'0x'`, of an unread type, a decimal number, or outside [0, 2^512 - 1], or when the point is not on the curve
    * @example
    * ```typescript
-   * const result = CairoSecp256k1Point.validate('0x1234');
-   * // result = 4660n
+   * const result = CairoSecp256k1Point.validate(0n);
+   * // result = 0n     (0, 0), the point at infinity
+   * CairoSecp256k1Point.validate('0x1234');
+   * // throws Error("Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it")
    * CairoSecp256k1Point.validate(SECP256K1_POINT_MAX + 1n);
    * // throws Error("input is bigger than SECP256K1_POINT_MAX")
    * CairoSecp256k1Point.validate('abc');
@@ -220,21 +318,33 @@ export class CairoSecp256k1Point {
     const bigInt = BigInt(input as BigNumberish);
     assert(bigInt >= SECP256K1_POINT_MIN, 'input is smaller than SECP256K1_POINT_MIN');
     assert(bigInt <= SECP256K1_POINT_MAX, 'input is bigger than SECP256K1_POINT_MAX');
+    // x is the upper 256 bits, y the lower 256 bits
+    assertOnSecp256k1Curve(bigInt >> 256n, bigInt & UINT_256_MAX);
     return bigInt;
   }
 
   /**
-   * Throw unless the four limbs can each be carried by 128 bits, and return them as numbers.
+   * Throw unless the four limbs each fit in 128 bits and together make a point that a contract
+   * accepts, and return them as numbers.
    * @param {BigNumberish} xLow the low 128 bits of x
    * @param {BigNumberish} xHigh the high 128 bits of x
    * @param {BigNumberish} yLow the low 128 bits of y
    * @param {BigNumberish} yHigh the high 128 bits of y
    * @returns {{xLow: bigint, xHigh: bigint, yLow: bigint, yHigh: bigint}} the four limbs, checked
-   * @throws {Error} when a limb is null, undefined, text, `'0x'`, not a number, a decimal number, negative, or wider than 128 bits
+   * @throws {Error} when a limb is null, undefined, text, `'0x'`, not a number, a decimal number, negative, or wider than 128 bits, or when the point is not on the curve
    * @example
    * ```typescript
-   * const result = CairoSecp256k1Point.validateProps(1, 2, 3, 4);
-   * // result = { xLow: 1n, xHigh: 2n, yLow: 3n, yHigh: 4n }
+   * // G, the generator of the curve
+   * const result = CairoSecp256k1Point.validateProps(
+   *   '0x29bfcdb2dce28d959f2815b16f81798',
+   *   '0x79be667ef9dcbbac55a06295ce870b07',
+   *   '0xfd17b448a68554199c47d08ffb10d4b8',
+   *   '0x483ada7726a3c4655da4fbfc0e1108a8'
+   * );
+   * // result = { xLow: 0x29bfcdb2dce28d959f2815b16f81798n, xHigh: 0x79be667ef9dcbbac55a06295ce870b07n,
+   * //   yLow: 0xfd17b448a68554199c47d08ffb10d4b8n, yHigh: 0x483ada7726a3c4655da4fbfc0e1108a8n }
+   * CairoSecp256k1Point.validateProps(1, 2, 3, 4);
+   * // throws Error("Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it")
    * CairoSecp256k1Point.validateProps(1, 2, 3, 2n ** 128n);
    * // throws Error("yHigh must fit in 128 bits")
    * CairoSecp256k1Point.validateProps(1.5, 2, 3, 4);
@@ -249,40 +359,30 @@ export class CairoSecp256k1Point {
     yLow: BigNumberish,
     yHigh: BigNumberish
   ): { xLow: bigint; xHigh: bigint; yLow: bigint; yHigh: bigint } {
-    const validateLimb = (limb: BigNumberish, name: string): bigint => {
-      assert(limb !== null, `${name} cannot be null`);
-      assert(limb !== undefined, `${name} cannot be undefined`);
-      assert(!isText(limb), `${name} cannot be built from text`);
-      assert(!isEmptyHex(limb), `${name} cannot be '0x', which holds no hexadecimal digit`);
-      assert(isBigNumberish(limb), `${name} must be a BigNumberish`);
-      assert(!isNumber(limb) || Number.isInteger(limb), `${name} must be an integer`);
-      const bigInt = BigInt(limb);
-      assert(bigInt >= 0n, `${name} must be non-negative`);
-      assert(bigInt <= UINT_128_MAX, `${name} must fit in 128 bits`);
-      return bigInt;
-    };
-
-    return {
+    const limbs = {
       xLow: validateLimb(xLow, 'xLow'),
       xHigh: validateLimb(xHigh, 'xHigh'),
       yLow: validateLimb(yLow, 'yLow'),
       yHigh: validateLimb(yHigh, 'yHigh'),
     };
+    // each coordinate is its high 128 bits followed by its low 128 bits
+    assertOnSecp256k1Curve((limbs.xHigh << 128n) + limbs.xLow, (limbs.yHigh << 128n) + limbs.yLow);
+    return limbs;
   }
 
   /**
-   * Can this value be carried by a Secp256k1Point?
+   * Is this value a point that a contract accepts as a Secp256k1Point?
    *
    * The non-throwing form of {@link CairoSecp256k1Point.validate}, so it answers false for every
    * input that one refuses, whatever the reason.
    * @param {any} data the value to test
-   * @returns {boolean} true when the value fits in 512 bits
+   * @returns {boolean} true when the value fits in 512 bits and stands for a point on the curve, or for (0, 0)
    * @example
    * ```typescript
-   * const result = CairoSecp256k1Point.is(SECP256K1_POINT_MAX);
-   * // result = true
-   * const result2 = CairoSecp256k1Point.is(SECP256K1_POINT_MAX + 1n);
-   * // result2 = false
+   * const result = CairoSecp256k1Point.is(0n);
+   * // result = true     (0, 0), the point at infinity
+   * const result2 = CairoSecp256k1Point.is(SECP256K1_POINT_MAX);
+   * // result2 = false   x is not smaller than p
    * ```
    */
   static is(data: any): boolean {
@@ -312,21 +412,33 @@ export class CairoSecp256k1Point {
 
   /**
    * Read one point off a contract response, advancing the iterator past its four felts.
+   *
+   * A response is read as it comes : each felt must fit in 128 bits, but the point is not checked
+   * against the curve. What a node answers is taken as correct, and a contract can only return a
+   * point on the curve, or (0, 0).
    * @param {Iterator<string>} responseIterator the response felts, positioned on this point
    * @returns {CairoSecp256k1Point} the point that was read
+   * @throws {Error} when the response ends before four felts, or when a felt does not fit in 128 bits
    * @example
    * ```typescript
    * const response = ['0x0', '0x0', '0x1', '0x0'];
    * const result = CairoSecp256k1Point.factoryFromApiResponse(response.values()).toBigInt();
-   * // result = 1n
+   * // result = 1n     not on the curve, and read all the same
    * ```
    */
   static factoryFromApiResponse(responseIterator: Iterator<string>): CairoSecp256k1Point {
-    const xLow = getNext(responseIterator);
-    const xHigh = getNext(responseIterator);
-    const yLow = getNext(responseIterator);
-    const yHigh = getNext(responseIterator);
-    return new CairoSecp256k1Point(xLow, xHigh, yLow, yHigh);
+    const xLow = validateLimb(getNext(responseIterator), 'xLow');
+    const xHigh = validateLimb(getNext(responseIterator), 'xHigh');
+    const yLow = validateLimb(getNext(responseIterator), 'yLow');
+    const yHigh = validateLimb(getNext(responseIterator), 'yHigh');
+    // Built without the constructor, which would check the curve : only what the caller passes in
+    // is checked, and what a node answers is read as it comes.
+    const point = Object.create(CairoSecp256k1Point.prototype) as CairoSecp256k1Point;
+    point.xLow = xLow;
+    point.xHigh = xHigh;
+    point.yLow = yLow;
+    point.yHigh = yHigh;
+    return point;
   }
 
   /**
@@ -337,10 +449,11 @@ export class CairoSecp256k1Point {
    * @returns {bigint} the two coordinates concatenated, x in the upper 256 bits
    * @example
    * ```typescript
-   * const result = new CairoSecp256k1Point(1n).toBigInt();
-   * // result = 1n
-   * const result2 = new CairoSecp256k1Point(0, 0, 3, 0).toBigInt();
-   * // result2 = 3n
+   * // G, the generator of the curve, as in the example of the class
+   * const result = new CairoSecp256k1Point(G).toBigInt() === G;
+   * // result = true
+   * const result2 = new CairoSecp256k1Point(0, 0, 0, 0).toBigInt();
+   * // result2 = 0n     (0, 0), the point at infinity
    * ```
    */
   toBigInt(): bigint {
@@ -354,8 +467,10 @@ export class CairoSecp256k1Point {
    * @returns {Secp256k1PointStruct} the limbs, each 0x-prefixed and unpadded
    * @example
    * ```typescript
-   * const result = new CairoSecp256k1Point({ xLow: 1, xHigh: 2, yLow: 3, yHigh: 4 }).toStruct();
-   * // result = { xLow: "0x1", xHigh: "0x2", yLow: "0x3", yHigh: "0x4" }
+   * // G, the generator of the curve, as in the example of the class
+   * const result = new CairoSecp256k1Point(G).toStruct();
+   * // result = { xLow: "0x29bfcdb2dce28d959f2815b16f81798", xHigh: "0x79be667ef9dcbbac55a06295ce870b07",
+   * //   yLow: "0xfd17b448a68554199c47d08ffb10d4b8", yHigh: "0x483ada7726a3c4655da4fbfc0e1108a8" }
    * ```
    */
   toStruct(): Secp256k1PointStruct {
@@ -372,8 +487,8 @@ export class CairoSecp256k1Point {
    * @returns {string} the 512-bit value as a 0x-prefixed hex string
    * @example
    * ```typescript
-   * const result = new CairoSecp256k1Point(4660n).toHexString();
-   * // result = "0x1234"
+   * const result = new CairoSecp256k1Point(0n).toHexString();
+   * // result = "0x0"     (0, 0), the point at infinity
    * ```
    */
   toHexString(): string {
@@ -385,8 +500,10 @@ export class CairoSecp256k1Point {
    * @returns {string[]} the limbs as decimal strings, `[xLow, xHigh, yLow, yHigh]`, flagged as compiled
    * @example
    * ```typescript
-   * const result = new CairoSecp256k1Point({ xLow: 1, xHigh: 2, yLow: 3, yHigh: 4 }).toApiRequest();
-   * // result = ["1", "2", "3", "4"]
+   * // G, the generator of the curve, as in the example of the class
+   * const result = new CairoSecp256k1Point(G).toApiRequest();
+   * // result = ["3468390537006497937951914270391801752", "161825202758953104525843685720298294023",
+   * //   "336417762351022071123394393598455764152", "96009999919712310848645357523629574312"]
    * ```
    */
   toApiRequest(): string[] {
@@ -405,11 +522,19 @@ export class CairoSecp256k1Point {
    * read as a point whose upper limbs are zero. A longer one is refused rather than truncated.
    * @param {string} hexString the value, 0x-prefixed or not, at most 128 hex digits
    * @returns {CairoSecp256k1Point} the point the string spells
-   * @throws {Error} when the string holds more than 128 hex digits
+   * @throws {Error} when the string holds more than 128 hex digits, or when the point is not on the
+   * curve
    * @example
    * ```typescript
-   * const result = CairoSecp256k1Point.fromHex('0x1').toApiRequest();
-   * // result = ["0", "0", "1", "0"]
+   * // G, the generator of the curve
+   * const result = CairoSecp256k1Point.fromHex(
+   *   '0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8'
+   * ).xHigh;
+   * // result = 0x79be667ef9dcbbac55a06295ce870b07n
+   * const result2 = CairoSecp256k1Point.fromHex('0x0').toApiRequest();
+   * // result2 = ["0", "0", "0", "0"]     left-padded to 128 hex digits : (0, 0), the point at infinity
+   * CairoSecp256k1Point.fromHex('0x1'); // x = 0, y = 1
+   * // throws Error("Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it")
    * ```
    */
   static fromHex(hexString: string): CairoSecp256k1Point {
