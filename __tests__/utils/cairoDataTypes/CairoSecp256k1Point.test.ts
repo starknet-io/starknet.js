@@ -5,9 +5,13 @@ import {
   Literal,
 } from '../../../src';
 
+// G, PUB_KEY, Y_OF_X_1 and X_OF_Y_1 are built with BigInt() rather than written as bigint literals :
+// written as literals, CodeQL took them for undefined and reported each use of them.
+
 // G, the generator of the secp256k1 curve, as one 512-bit number x || y, then as its four limbs
-const G =
-  0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n;
+const G = BigInt(
+  '0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8'
+);
 const G_X_LOW = 0x029bfcdb2dce28d959f2815b16f81798n;
 const G_X_HIGH = 0x79be667ef9dcbbac55a06295ce870b07n;
 const G_Y_LOW = 0xfd17b448a68554199c47d08ffb10d4b8n;
@@ -15,8 +19,9 @@ const G_Y_HIGH = 0x483ada7726a3c4655da4fbfc0e1108a8n;
 
 // an Ethereum public key, x || y, as an uncompressed key reads once its 04 prefix is gone. It is the
 // key of __tests__/utils/secp256k1Point.test.ts, where its four limbs are written out too.
-const PUB_KEY =
-  0x8c7aea7d673a5858bdca128d124fb0765cceb2c16f198f4c14b328aa571331e6f6c87f51d5224d73d118765cb19d7565212f80be5048bff926ba791c17541c92n;
+const PUB_KEY = BigInt(
+  '0x8c7aea7d673a5858bdca128d124fb0765cceb2c16f198f4c14b328aa571331e6f6c87f51d5224d73d118765cb19d7565212f80be5048bff926ba791c17541c92'
+);
 
 // p, the prime of the secp256k1 curve
 const P = 2n ** 256n - 2n ** 32n - 977n;
@@ -24,8 +29,8 @@ const P = 2n ** 256n - 2n ** 32n - 977n;
 // Two points on the curve with one small coordinate, computed with @noble/curves and checked with
 // y^2 = x^3 + 7 modulo p : (1, Y_OF_X_1) and (X_OF_Y_1, 1). Adding p to the small coordinate still
 // fits in 256 bits, which gives a coordinate that is right modulo p but not smaller than p.
-const Y_OF_X_1 = 0x4218f20ae6c646b363db68605822fb14264ca8d2587fdd6fbc750d587e76a7een;
-const X_OF_Y_1 = 0x1fe1e5ef3fceb5c135ab7741333ce5a6e80d68167653f6b2b24bcbcfaaaff507n;
+const Y_OF_X_1 = BigInt('0x4218f20ae6c646b363db68605822fb14264ca8d2587fdd6fbc750d587e76a7ee');
+const X_OF_Y_1 = BigInt('0x1fe1e5ef3fceb5c135ab7741333ce5a6e80d68167653f6b2b24bcbcfaaaff507');
 
 const NOT_ON_CURVE =
   'Secp256k1Point: this point is not on the secp256k1 curve (y^2 must equal x^3 + 7 modulo p), so a contract would refuse it';
