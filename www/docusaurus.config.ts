@@ -202,7 +202,9 @@ const typedocSharedOptions = {
   tsconfig: '../tsconfig.json',
   // Keep `docs/API/.gitkeep` (see www/.gitignore) by not wiping the output dir on build.
   cleanOutputDir: false,
-  includeVersion: true,
+  // No version in the titles: TypeDoc would take it from package.json at build time, which can be
+  // out of date. The "Version: 11.x" badge of the docs shows the version.
+  includeVersion: false,
   fileExtension: '.md',
   sourceLinkTemplate: generateSourceLinkTemplate(process.env.GIT_REVISION_OVERRIDE || 'develop'),
   visibilityFilters: {
