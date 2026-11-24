@@ -1,3 +1,9 @@
+## [11.9.1](https://github.com/starknet-io/starknet.js/compare/v11.9.0...v11.9.1) (2026-11-24)
+
+### Bug Fixes
+
+- **calldata:** refuse a Secp256k1Point that is not on the secp256k1 curve ([e13cbee](https://github.com/starknet-io/starknet.js/commit/e13cbee3ba27d06e4a38433ab0f2a6e123bdc792))
+
 # [11.9.0](https://github.com/starknet-io/starknet.js/compare/v11.8.0...v11.9.0) (2026-11-23)
 
 ### Features
