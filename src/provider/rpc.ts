@@ -36,8 +36,8 @@ import {
 } from '../types';
 import { ETransactionType, RPCSPEC0105, RPCSPEC09 } from '../types/api';
 import assert from '../utils/assert';
-import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { extractContractHashes, isSierra } from '../utils/contract';
+import { utf8ToBigInt } from '../utils/encode';
 import { LibraryError } from '../utils/errors';
 import { solidityUint256PackedKeccak256 } from '../utils/hash';
 import { toHex } from '../utils/num';
@@ -504,8 +504,24 @@ export class RpcProvider implements ProviderInterface {
 
     if (isSierra(contractClass)) {
       if (compiler) {
-        const abiTest = getAbiContractVersion(contractClass.abi);
-        return { cairo: '1', compiler: abiTest.compiler };
+        // The Cairo compiler writes versions at the start of the Sierra program.
+        // Any start not handled below gives an unknown compiler (undefined): no guess, no error.
+        try {
+          const program = contractClass.sierra_program;
+          const firstFelt = BigInt(program[0]);
+          // Oldest format (Sierra 0.1.0, Cairo 1.0.0-alpha): the program starts with the text
+          // '0.1.0', that is 0x302e312e30, and gives no compiler version.
+          // Example: __mocks__/cairo/complexInput/complex_sierra.sierra.json
+          if (firstFelt === utf8ToBigInt('0.1.0')) return { cairo: '1', compiler: '1' };
+          // Since Cairo 1.0.0-rc0: the first 6 felts are the Sierra version, then the compiler
+          // version. 0x1, 0x6, 0x0, 0x2, 0x8, 0x2 is Sierra 1.6.0, compiled by Cairo 2.8.2.
+          // So the 4th felt is the major version of the compiler.
+          const compilerMajor = BigInt(program[3]);
+          if (firstFelt === 1n && compilerMajor === 1n) return { cairo: '1', compiler: '1' };
+          if (firstFelt === 1n && compilerMajor === 2n) return { cairo: '1', compiler: '2' };
+        } catch {
+          // The program is not a list of felts: the compiler is unknown.
+        }
       }
       return { cairo: '1', compiler: undefined };
     }

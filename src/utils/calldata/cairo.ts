@@ -209,10 +209,21 @@ export function isTypeNonZero(type: string): boolean {
 }
 
 /**
- * Return ContractVersion (Abi version) based on Abi
- * or undefined for unknown version
- * @param abi
- * @returns string
+ * Guess the Cairo version and the compiler version of a contract from the shape of its abi.
+ *
+ * The compiler version is only a guess: '2' when the abi has an `interface` entry, '1' for
+ * another Cairo 1 abi. The guess is wrong for a contract compiled by Cairo 2 that has no
+ * `interface` entry (no external function, or functions declared one by one with
+ * `#[external(v0)]`): the answer is '1'.
+ * For a declared class, `provider.getContractVersion` gives the real compiler version: it reads
+ * it in the Sierra program.
+ * @param abi the abi of the contract
+ * @returns the versions; `undefined` when the abi does not tell
+ * @example
+ * ```typescript
+ * const version = cairo.getAbiContractVersion(myAbi);
+ * // version = { cairo: '1', compiler: '2' }
+ * ```
  */
 export function getAbiContractVersion(abi: Abi): ContractVersion {
   // determine by interface for "Cairo 1.2"
