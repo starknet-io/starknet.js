@@ -449,7 +449,8 @@ export abstract class ProviderInterface {
    * @param contractAddress string
    * @param classHash undefined
    * @param options - getContractVersionOptions
-   *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
+   *   - (optional) compiler - (default true) read the major version of the compiler in the Sierra
+   *     program (undefined when unknown, for example a compiler newer than 2.x)
    *   - (optional) blockIdentifier - block identifier
    */
   public abstract getContractVersion(
@@ -463,7 +464,8 @@ export abstract class ProviderInterface {
    * @param contractAddress undefined
    * @param classHash
    * @param options - getContractVersionOptions
-   *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
+   *   - (optional) compiler - (default true) read the major version of the compiler in the Sierra
+   *     program (undefined when unknown, for example a compiler newer than 2.x)
    *   - (optional) blockIdentifier - block identifier
    */
   public abstract getContractVersion(

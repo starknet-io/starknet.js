@@ -3,6 +3,7 @@ import {
   Block,
   BlockNumber,
   CallData,
+  constants,
   LibraryError,
   ProviderInterface,
   RpcProvider,
@@ -15,6 +16,7 @@ import {
 import {
   CONTRACTS,
   createTestProvider,
+  describeIfNotDevnet,
   erc20ClassHash,
   getTestAccount,
   wrongClassHash,
@@ -71,6 +73,31 @@ describe('defaultProvider', () => {
       const expected = { cairo: '1', compiler: '2' };
       expect(await testProvider.getContractVersion(erc20ContractAddress)).toEqual(expected);
       expect(await testProvider.getContractVersion(undefined, erc20ClassHash)).toEqual(expected);
+    });
+
+    test('getContractVersion reads the compiler in the Sierra program, not in the abi', async () => {
+      // onlyConstructor is compiled by Cairo 2.8.2, but its abi has no `interface` entry
+      const declareResponse = await account.declareIfNot({
+        contract: CONTRACTS.OnlyConstructor.sierra,
+        casm: CONTRACTS.OnlyConstructor.casm,
+      });
+      if (declareResponse.transaction_hash) {
+        await testProvider.waitForTransaction(declareResponse.transaction_hash);
+      }
+
+      const version = await testProvider.getContractVersion(undefined, declareResponse.class_hash);
+
+      expect(version).toEqual({ cairo: '1', compiler: '2' });
+    });
+
+    // No network accepts a Cairo 0 declaration any more, and devnet cannot run Cairo 0.
+    // So this test uses a Cairo 0 contract already deployed on Testnet and Mainnet: the legacy UDC.
+    describeIfNotDevnet('Cairo 0 contract', () => {
+      test('getContractVersion of the legacy UDC', async () => {
+        const version = await testProvider.getContractVersion(constants.LegacyUDC.ADDRESS);
+
+        expect(version).toEqual({ cairo: '0', compiler: '0' });
+      });
     });
 
     describe('getBlock', () => {

@@ -403,7 +403,12 @@ export type getEstimateFeeBulkOptions = {
 export type ContractVersion = {
   /** version of the cairo language */
   cairo: CairoVersion;
-  /** version of the cairo compiler used to compile the contract */
+  /**
+   * Major version of the Cairo compiler used to compile the contract ('0' for Cairo 0).
+   * `undefined` when unknown: for example with the option `compiler: false` of
+   * `getContractVersion`, or for a compiler that this version of starknet.js does not know yet,
+   * such as a future 3.x.
+   */
   compiler: CompilerVersion;
 };
 
