@@ -1,3 +1,9 @@
+## [11.9.2](https://github.com/starknet-io/starknet.js/compare/v11.9.1...v11.9.2) (2026-11-25)
+
+### Bug Fixes
+
+- **provider:** read the compiler version in the Sierra program in getContractVersion ([f0b3d7a](https://github.com/starknet-io/starknet.js/commit/f0b3d7a93b4af1920cb10d6b70b670610c7f2c6c))
+
 ## [11.9.1](https://github.com/starknet-io/starknet.js/compare/v11.9.0...v11.9.1) (2026-11-24)
 
 ### Bug Fixes
