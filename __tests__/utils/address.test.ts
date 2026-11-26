@@ -36,6 +36,11 @@ describe('addAddressPadding', () => {
 
     expect(addAddressPadding(addr)).toBe(padded);
   });
+
+  test('should throw for a negative value', () => {
+    expect(() => addAddressPadding(-1)).toThrow('is negative');
+    expect(() => addAddressPadding(-1n)).toThrow('is negative');
+  });
 });
 
 describe('validateAndParseAddress', () => {

@@ -62,17 +62,24 @@ export function tryToBigInt(value: BigNumberish | undefined) {
 /**
  * Convert BigNumberish to hex-string
  *
+ * A negative value is refused: a hex-string has no sign, and `'0x-5'` is not one.
  * @param {BigNumberish} value value to convert
  * @returns {string} converted number in hex-string format
+ * @throws {Error} when the value is negative, or cannot be read by {@link toBigInt}
  * @example
  * ```typescript
  * toHex(100); // '0x64'
  * toHex('200'); // '0xc8'
  * toHex('0x00023AB'); // '0x23ab'
+ * toHex(-5); // throws Error('Invalid input: -5 is negative, a hex-string cannot hold a sign')
  * ```
  */
 export function toHex(value: BigNumberish): string {
-  return addHexPrefix(toBigInt(value).toString(16));
+  const bn = toBigInt(value);
+  if (bn < 0n) {
+    throw new Error(`Invalid input: ${bn} is negative, a hex-string cannot hold a sign`);
+  }
+  return addHexPrefix(bn.toString(16));
 }
 
 /**
@@ -109,7 +116,7 @@ export function cleanHex(hex: string): string {
  */
 export function toStorageKey(number: BigNumberish): string {
   // TODO: This is not completely correct as it will not enforce first 0 and second [0-7], 0x82bda... will pass as valid and should be false
-  return addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
+  return addHexPrefix(removeHexPrefix(toHex(number)).padStart(64, '0'));
 }
 
 /**
@@ -126,7 +133,7 @@ export function toStorageKey(number: BigNumberish): string {
  * ```
  */
 export function toHex64(number: BigNumberish): string {
-  const res = addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
+  const res = addHexPrefix(removeHexPrefix(toHex(number)).padStart(64, '0'));
   if (res.length !== 66) throw TypeError('number is too big for hex 0x(64) representation');
   return res;
 }

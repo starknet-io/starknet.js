@@ -30,7 +30,7 @@ import {
   getSelectorFromName,
 } from './hash';
 import { MerkleTree } from './merkle';
-import { isBigNumberish, isHex, toHex } from './num';
+import { isBigNumberish, isHex, toBigInt, toHex } from './num';
 import { isBoolean, isString } from './typed';
 
 interface Context {
@@ -154,14 +154,17 @@ function identifyRevision({ types, domain }: TypedData) {
 }
 
 function getHex(value: BigNumberish): string {
+  let bn: bigint;
   try {
-    return toHex(value);
+    bn = toBigInt(value);
   } catch (e) {
     if (isString(value)) {
       return toHex(CairoBytes31.fromText(value).toBigInt());
     }
     throw new Error(`Invalid BigNumberish: ${value}`);
   }
+  // a number is never read as text, even when it is negative and so cannot be hashed
+  return toHex(bn);
 }
 
 /**
