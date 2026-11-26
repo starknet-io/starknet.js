@@ -1,3 +1,9 @@
+## [11.9.3](https://github.com/starknet-io/starknet.js/compare/v11.9.2...v11.9.3) (2026-11-26)
+
+### Bug Fixes
+
+- toHex() refuses a negative value instead of returning 0x-5 ([#1767](https://github.com/starknet-io/starknet.js/issues/1767)) ([e2036f1](https://github.com/starknet-io/starknet.js/commit/e2036f13326f140b4cb78aede5d10361a0cff8de))
+
 ## [11.9.2](https://github.com/starknet-io/starknet.js/compare/v11.9.1...v11.9.2) (2026-11-25)
 
 ### Bug Fixes
