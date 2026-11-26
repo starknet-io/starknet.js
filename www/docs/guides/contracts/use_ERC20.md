@@ -87,26 +87,32 @@ const erc20 = new Contract({
 
 ## Interact with an ERC20
 
-Standard ERC20 operations:
+A contract stores an amount as an integer, in the smallest unit of the token. The number of decimals of the token, given by `decimals()`, sets the size of this unit: with 18 decimals, 1 token is stored as `10n ** 18n`. `parseUnits` converts a decimal amount, written as text, into this integer, and `formatUnits` converts the integer back into a decimal amount, to display it:
 
 ```typescript
+import { cairo, formatUnits, parseUnits } from 'starknet';
+
+const decimals = await erc20.decimals(); // 18n
+
 // Check balance
-const balance = await erc20.balanceOf(myAccount.address);
-console.log('Balance:', balance);
+const balance = await erc20.balanceOf(myAccount.address); // 20000000000000000000n
+console.log('Balance:', formatUnits(balance, decimals)); // Balance: 20
 
 // Transfer tokens (direct method call)
 const recipient = '0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1';
-const amount = cairo.uint256(1n * 10n ** 18n); // 1 token
+const amount = cairo.uint256(parseUnits('1.5', decimals)); // 1.5 tokens
 const tx = await erc20.transfer(recipient, amount);
 await myProvider.waitForTransaction(tx.transaction_hash);
 
 // Approve spending
 const spender = '0x...';
-const allowanceAmount = cairo.uint256(5n * 10n ** 18n);
+const allowanceAmount = cairo.uint256(parseUnits('5', decimals));
 const approveTx = await erc20.approve(spender, allowanceAmount);
 await myProvider.waitForTransaction(approveTx.transaction_hash);
 
 // Check allowance
 const allowance = await erc20.allowance(myAccount.address, spender);
-console.log('Allowance:', allowance);
+console.log('Allowance:', formatUnits(allowance, decimals)); // Allowance: 5
 ```
+
+`parseUnits` only reads a decimal text, such as `'1.5'`. An amount read on-chain, such as `balance`, is already in the smallest unit: give it to `formatUnits`, never to `parseUnits`.
