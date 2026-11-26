@@ -76,7 +76,9 @@ export function tryToBigInt(value: BigNumberish | undefined) {
  */
 export function toHex(value: BigNumberish): string {
   const bn = toBigInt(value);
-  assert(bn >= 0n, `Invalid input: ${bn} is negative, a hex-string cannot hold a sign`);
+  if (bn < 0n) {
+    throw new Error(`Invalid input: ${bn} is negative, a hex-string cannot hold a sign`);
+  }
   return addHexPrefix(bn.toString(16));
 }
 
