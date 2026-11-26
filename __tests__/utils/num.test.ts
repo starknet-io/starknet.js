@@ -73,6 +73,14 @@ describe('toHex', () => {
   test("should throw for '0x', which holds no digit", () => {
     expect(() => toHex('0x')).toThrow("Invalid input: '0x' holds no hexadecimal digit");
   });
+
+  test('should throw for a negative value, rather than return 0x-5', () => {
+    const message = 'Invalid input: -5 is negative, a hex-string cannot hold a sign';
+    expect(() => toHex(-5)).toThrow(message);
+    expect(() => toHex(-5n)).toThrow(message);
+    expect(() => toHex('-5')).toThrow(message);
+    expect(toHex(-0)).toBe('0x0');
+  });
 });
 
 describe('cleanHex', () => {
@@ -251,6 +259,8 @@ describe('toStorageKey, toHex64', () => {
     const key3 = num.toStorageKey(123n);
     expect(key3).toEqual('0x000000000000000000000000000000000000000000000000000000000000007b');
     expect(key3.length).toEqual(66);
+
+    expect(() => num.toStorageKey(-1)).toThrow('is negative');
   });
 
   test('should convert to 0x + 64 hex restricted', () => {
@@ -283,5 +293,8 @@ describe('toStorageKey, toHex64', () => {
     const key4 = num.toHex64('0x82bdafb0c4a2b03cd0f16ddcc3339da37f2cbb1aecb2a419764e35b7c3a8ec29');
     expect(key4).toEqual('0x82bdafb0c4a2b03cd0f16ddcc3339da37f2cbb1aecb2a419764e35b7c3a8ec29');
     expect(key4.length).toEqual(66);
+
+    // '-5' padded to 64 characters has the expected length, but is not hex
+    expect(() => num.toHex64(-5)).toThrow('is negative');
   });
 });
