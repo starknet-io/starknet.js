@@ -131,8 +131,20 @@ export class BatchClient<T extends { [key: string]: { params?: any; result?: any
       });
     }
 
-    const results = await this.batchPromises[requestId];
-    delete this.batchPromises[requestId];
+    let results: JRPC.ResponseBody[];
+    try {
+      results = await this.batchPromises[requestId];
+    } finally {
+      delete this.batchPromises[requestId];
+    }
+
+    // JSON-RPC 2.0: a batch rejected as a whole (size limit, rate limit...) gets a single
+    // response object. Every caller of that batch gets its error.
+    if (!Array.isArray(results)) {
+      const reply = results as { error?: JRPC.Error } | undefined;
+      if (reply?.error) return reply as TResponse;
+      throw new Error(`Unexpected reply to a batch request. Method: ${String(method)}`);
+    }
 
     // Find this request in the results and return it
     const result = results.find((res: any) => res.id === requestId);
