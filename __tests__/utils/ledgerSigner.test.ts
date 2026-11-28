@@ -83,6 +83,14 @@ describe('starknet/ledger', () => {
     );
   });
 
+  test('getLedgerPathBuffer111 returns 24 bytes when the application hash starts with a zero byte', () => {
+    expect(getLedgerPathBuffer111(0, 'App135')).toEqual(
+      new Uint8Array([
+        128, 0, 10, 85, 71, 65, 233, 201, 0, 40, 206, 181, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      ])
+    );
+  });
+
   test('getLedgerPathBuffer221 returns the EIP2645 path of the APPs from v2.2.1 to v2.4.3', () => {
     expect(getLedgerPathBuffer221(0)).toEqual(
       new Uint8Array([

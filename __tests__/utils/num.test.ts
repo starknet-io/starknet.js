@@ -203,6 +203,11 @@ describe('stringToSha256ToArrayBuff4', () => {
     const buff = num.stringToSha256ToArrayBuff4('LedgerW');
     expect(buff).toEqual(new Uint8Array([43, 206, 231, 219]));
   });
+
+  test('should keep 4 bytes when the leading byte is zero', () => {
+    const buff = num.stringToSha256ToArrayBuff4('App135');
+    expect(buff).toEqual(new Uint8Array([0, 40, 206, 181]));
+  });
 });
 
 describe('isBigNumberish', () => {

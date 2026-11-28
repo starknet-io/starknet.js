@@ -387,7 +387,7 @@ export function stringToSha256ToArrayBuff4(str: string): Uint8Array {
   // eslint-disable-next-line no-bitwise
   const int31 = (n: bigint) => Number(n & MASK_31);
   const result: number = int31(BigInt(addHexPrefix(buf2hex(sha256(utf8ToBytes(str))))));
-  return hexToBytes(toHex(result));
+  return hexToBytes(addHexPrefix(removeHexPrefix(toHex(result)).padStart(8, '0')));
 }
 
 /**
